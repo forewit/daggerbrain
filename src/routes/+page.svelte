@@ -1,11 +1,13 @@
 <script lang="ts">
 	import ArmorSlot from '$lib/daggerbrain/components/character sheet/ArmorSlot.svelte';
+	import SubclassCard from '$lib/daggerbrain/components/character sheet/Cards/SubclassCard.svelte';
 	import DamageThresholds from '$lib/daggerbrain/components/character sheet/DamageThresholds.svelte';
 	import EvasionSlot from '$lib/daggerbrain/components/character sheet/EvasionSlot.svelte';
 	import HopeTracker from '$lib/daggerbrain/components/character sheet/HopeSlot.svelte';
 	import Inventory from '$lib/daggerbrain/components/character sheet/Inventory.svelte';
 	import Level from '$lib/daggerbrain/components/character sheet/Level.svelte';
 	import Traits from '$lib/daggerbrain/components/character sheet/Traits.svelte';
+	import DiceTrigger from '$lib/dice/DiceTrigger.svelte';
 </script>
 
 <p class="p-3 font-medium">Daggerbrain</p>
@@ -17,3 +19,6 @@
 <Level class="border" />
 <DamageThresholds class="border" />
 <Inventory class="border" />
+<SubclassCard class="border" />
+<DiceTrigger class="border">dice</DiceTrigger>
+
