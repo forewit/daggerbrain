@@ -1,32 +1,64 @@
-import { isDark } from '$lib/utils';
-import type { State } from './types';
+import type { Character, Deck, } from './types';
 import { getContext, setContext } from 'svelte';
-import { loadState, saveState } from './data';
+import { loadCharacters, saveCharacters } from './data';
 
-const DEFAULT_STATE: State = {}
+
+
 
 function createApp() {
   // --- ephemeral state ---
+  let pwa = $state(false)
 
   // --- persistant state --- 
-  let state: State = $state({})
+  let characters: Character[] = $state([])
 
   // --- derived state ---
 
   // --- helper functions ---
+  function newCharacter(from?: string): string {
+    const uid = crypto.randomUUID()
+    if (from) {
+      const character = characters.find((c) => c.uid === from)
+      if (character) {
+        characters.push({ ...character, uid })
+      }
+    } else {
+      characters.push({ uid, name: "New Character", image: "", deck: { Ancestry: [], Community: [], Subclass: [], Domain: [] } })
+    }
+    return uid
+  }
 
+
+
+  function deleteCharacter(uid: string): void {
+    characters = characters.filter((c) => c.uid !== uid)
+  }
 
   // --- loading and saving handlers ---
   let initialLoad = $state(false)
   $effect(() => {
     if (initialLoad) return;
-    state = loadState(DEFAULT_STATE)
+    characters = loadCharacters([])
     initialLoad = true;
   })
   $effect(() => {
-    state
+    characters
     if (!initialLoad) return
-    saveState(state)
+    saveCharacters(characters)
+  })
+
+
+  // --- pwa ---
+  $effect(() => {
+    const displayModes = ["fullscreen", "standalone", "minimal-ui"];
+    try {
+      pwa = displayModes.some(
+        (displayMode) => window.matchMedia(`(display-mode: ${displayMode})`).matches
+      );
+    } catch (e) {
+      // In case matchMedia isn't supported or other errors, keep pwa=false
+      pwa = false;
+    }
   })
 
   // --- cleanup ---
@@ -34,11 +66,13 @@ function createApp() {
 
   return {
     // read only
+    get pwa() { return pwa },
+    get characters() { return characters },
 
     // helper functions
     destroy,
-
-    // read/write
+    newCharacter,
+    deleteCharacter,
   }
 }
 

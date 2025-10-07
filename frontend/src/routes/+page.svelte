@@ -6,19 +6,7 @@
 
   const app = getAppContext();
 
-  let pwa = $state(false);
   onMount(() => {
-    // check if pwa
-    const displayModes = ["fullscreen", "standalone", "minimal-ui"];
-    try {
-      pwa = displayModes.some(
-        (displayMode) => window.matchMedia(`(display-mode: ${displayMode})`).matches
-      );
-    } catch (e) {
-      // In case matchMedia isn't supported or other errors, keep pwa=false
-      pwa = false;
-    }
-
     //  pwa instructions credit: https://github.com/philfung/add-to-homescreen
     //@ts-ignore
     window.AddToHomeScreenInstance = window.AddToHomeScreen({
@@ -39,27 +27,21 @@
 
 <svelte:head>
   <title>Daggerbrain</title>
-  <meta name="theme-color" content="#110f1c" />
   <!-- pwa instructions credit: https://github.com/philfung/add-to-homescreen -->
   <link rel="stylesheet" href="/add-to-homescreen/add-to-homescreen.css" />
   <script type="text/javascript" src="/add-to-homescreen/add-to-homescreen.min.js"></script>
 </svelte:head>
 
-
 <!-- Page -->
 <main
   style="scrollbar-width: none;"
-  class={cn(
-    pwa ? "h-lvh w-lvw" : "h-dvh w-dvw",
-    "relative snap-y snap-mandatory overflow-y-auto overflow-x-hidden"
-  )}
+  class={cn(app.pwa ? "h-lvh w-lvw" : "h-dvh w-dvw", "relative overflow-y-auto overflow-x-hidden")}
 >
   <div
     class={cn(
-      "pt-[env(safe-area-inset-top)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]",
-      "h-full w-full relative bg-[#110f1c]"
+      "pt-[env(safe-area-inset-top)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]"
     )}
   >
-
-</div>
+    <a href="/characters">Characters</a>
+  </div>
 </main>

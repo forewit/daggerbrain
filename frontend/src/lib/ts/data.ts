@@ -1,7 +1,7 @@
 // src/lib/data.ts
-import type { State } from "./types"
+import type { Character } from "./types"
 
-const STATE_KEY = "daggerbrain:state"
+const CHARACTERS_KEY = "daggerbrain:characters"
 
 // --- helpers ---
 function safeParse<T>(raw: string | null, fallback: T): T {
@@ -13,13 +13,13 @@ function safeParse<T>(raw: string | null, fallback: T): T {
     }
 }
 
-// --- current state ---
-export function loadState(fallback: State): State {
-    const raw = localStorage.getItem(STATE_KEY)
-    if (raw === null) saveState(fallback)
-    return safeParse<State>(raw, fallback)
+// --- characters ---
+export function loadCharacters(fallback: Character[]): Character[] {
+    const raw = localStorage.getItem(CHARACTERS_KEY)
+    if (raw === null) saveCharacters(fallback)
+    return safeParse<Character[]>(raw, fallback)
 }
 
-export function saveState(state: State): void {
-    localStorage.setItem(STATE_KEY, JSON.stringify(state))
+export function saveCharacters(state: Character[]): void {
+    localStorage.setItem(CHARACTERS_KEY, JSON.stringify(state))
 }
