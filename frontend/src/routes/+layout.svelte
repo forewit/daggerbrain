@@ -16,7 +16,7 @@
 </script>
 
 <svelte:head>
-  <meta name="theme-color" content="#110f1c" />
+  <meta name="theme-color" content="#1a1625" />
   <link rel="icon" href="/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.json" />

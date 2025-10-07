@@ -14,7 +14,7 @@
 	bind:this={ref}
 	data-slot="textarea"
 	class={cn(
-		"border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 field-sizing-content shadow-xs flex min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base outline-none transition-[color,box-shadow] focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+		"border-border bg-card ring-offset-background placeholder:text-muted-foreground shadow-sm flex min-h-16 w-full rounded-md border px-3 py-2 text-sm outline-none transition-colors disabled:cursor-not-allowed disabled:opacity-50 inset-shadow focus-visible:border-primary focus-visible:ring-ring/50 focus-visible:ring-2 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
 		className
 	)}
 	onfocus={(e) => {

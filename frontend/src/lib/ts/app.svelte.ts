@@ -23,7 +23,7 @@ function createApp() {
         characters.push({ ...character, uid })
       }
     } else {
-      characters.push({ uid, name: "New Character", image: "", deck: { Ancestry: [], Community: [], Subclass: [], Domain: [] } })
+      characters.push({ uid, name: "New Character", image: "", description: "", deck: { urls: [] } })
     }
     return uid
   }
