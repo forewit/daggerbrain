@@ -1,5 +1,5 @@
 export type State = {
-   
+
 };
 
 export type Character = {
@@ -12,5 +12,14 @@ export type Character = {
 
 // list of cards (as image src urls)
 export type Deck = {
-    urls: string[];
+    heritage: Card[]
+    domain: Card[]
+    class: Card[]
+}
+
+export type CardType = 'heritage' | 'domain' | 'class'
+
+export type Card = {
+    name: string
+    image_url: string
 }

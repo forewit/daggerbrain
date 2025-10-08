@@ -160,11 +160,11 @@
                 href="/characters/{data.characterUid}/deck"
                 class="text-xs text-primary hover:underline"
               >
-                View all {character.deck.urls.length}
+                View all {character.deck.heritage.length + character.deck.domain.length + character.deck.class.length}
               </a>
             </div>
             
-            {#if character.deck.urls.length === 0}
+            {#if character.deck.heritage.length + character.deck.domain.length + character.deck.class.length === 0}
               <div class="text-center py-16">
                 <div class="text-4xl mb-3 opacity-40">🃏</div>
                 <p class="text-sm text-muted-foreground mb-4">No cards yet</p>
@@ -177,27 +177,32 @@
                 </Button>
               </div>
             {:else}
-              <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-3 xl:grid-cols-5 gap-2">
-                {#each character.deck.urls.slice(0, 11) as url, index}
-                  <a 
-                    href="/characters/{data.characterUid}/deck?card={index}"
-                    class="aspect-[360/504] rounded-md overflow-hidden bg-muted border border-border hover:border-primary/50 transition-colors card-shadow"
-                  >
-                    <img 
-                      src={url || cardBack} 
-                      alt="Card {index + 1}" 
-                      class="w-full h-full object-cover"
-                    />
-                  </a>
+              <div class="space-y-4">
+                {#each [
+                  { label: 'Ancestry', cards: character.deck.heritage },
+                  { label: 'Domain', cards: character.deck.domain },
+                  { label: 'Class', cards: character.deck.class },
+                ] as { label, cards }}
+                  {#if cards.length > 0}
+                    <div>
+                      <h3 class="text-xs font-medium text-muted-foreground uppercase mb-2">{label}</h3>
+                      <div class="flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-width:thin]">
+                        {#each cards as card}
+                          <a 
+                            href="/characters/{data.characterUid}/deck"
+                            class="aspect-[360/504] w-20 sm:w-24 flex-shrink-0 rounded-md overflow-hidden bg-muted border border-border hover:border-primary/50 transition-colors card-shadow snap-start"
+                          >
+                            <img 
+                              src={card.image_url || cardBack} 
+                              alt={card.name} 
+                              class="w-full h-full object-cover"
+                            />
+                          </a>
+                        {/each}
+                      </div>
+                    </div>
+                  {/if}
                 {/each}
-                {#if character.deck.urls.length > 11}
-                  <a 
-                    href="/characters/{data.characterUid}/deck"
-                    class="aspect-[360/504] rounded-md bg-muted border border-dashed border-border flex items-center justify-center hover:border-primary/50 transition-colors text-center p-1"
-                  >
-                    <span class="text-xs text-muted-foreground">+{character.deck.urls.length - 11}</span>
-                  </a>
-                {/if}
               </div>
             {/if}
           </div>
