@@ -13,8 +13,10 @@ export type Character = {
     stress: Slot
     hope: Slot
     traits: Traits
-    ancestry: Ancestry,
-    community: Community,
+    heritage: {
+        ancestry: Ancestry
+        community: Community
+    }
     transformation: Transformation,
     class: Class,
     subclass: Subclass,
@@ -27,6 +29,7 @@ export type Slot = {
 
 export type Domain = {
     name: string
+    color: string
     cards: DomainCard[]
 }
 
@@ -47,11 +50,13 @@ export type Traits = {
 }
 
 export type Ancestry = {
+    name: string
     top_feature: Feature
     bottom_feature: Feature
 }
 
 export type Community = {
+    name: string
     description: string
     features: Feature[]
 }
