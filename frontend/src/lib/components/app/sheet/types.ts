@@ -1,8 +1,8 @@
-export type character = {
+export type Character = {
     name: string,
     level: number,
     proficiency: number,
-
+    image: string,
     evasion: number,
     damage_thresholds: {
         major: number,
