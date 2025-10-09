@@ -30,6 +30,7 @@
     "vite": "^7.1.9"
   },
   "dependencies": {
+    "@sveltejs/adapter-static": "^3.0.10",
     "zod": "^4.1.12"
   }
 }

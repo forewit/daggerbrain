@@ -8,14 +8,14 @@
   }: { class?: string; armor: Character["armor"] } = $props();
 </script>
 
-<div class={cn("flex gap-2 w-[90px] text-center border-2 rounded-md p-2", className)}>
+<div class={cn("flex gap-2 h-min text-center border-2 rounded-md p-2", className)}>
   <div class="">
     <p class="text-lg font-bold">
       {armor.max}
     </p>
     <p class="text-sm font-medium">Armor</p>
   </div>
-  <div class="flex flex-wrap justify-center gap-1">
+  <div class="flex flex-col flex-wrap gap-1 h-12">
     {#each Array(armor.max) as _, index}
       <button 
       aria-label="armor-slot"

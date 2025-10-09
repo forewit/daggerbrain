@@ -10,6 +10,8 @@
   import Hp from "./hp.svelte";
   import Stress from "./stress.svelte";
   import Hope from "./hope.svelte";
+  import ClassFeatures from "./class-features.svelte";
+  import Deck from "./deck.svelte";
 
   let { class: className = "", character = $bindable() }: { class?: string; character: Character } =
     $props();
@@ -67,4 +69,7 @@
 
   <!-- hope -->
    <Hope {character} />
+
+   <!-- class features -->
+  <ClassFeatures characterClass={character.class} class="mx-2"/>
 </div>

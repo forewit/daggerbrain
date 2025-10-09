@@ -1,100 +1,133 @@
+<!-- src/routes/+page.svelte -->
 <script lang="ts">
-  import { getAppContext } from "$lib/ts/app.svelte";
-  import { cn, focusVisibleRingStyle } from "$lib/utils";
-  import { onMount } from "svelte";
-  import { IsMobile } from "$lib/hooks/is-mobile.svelte.js";
-  import Button from "$lib/components/ui/button/button.svelte";
+  import { HOPE_MAX } from "$lib/components/app/sheet/constants";
+  import Deck from "$lib/components/app/sheet/deck.svelte";
+  import Sheet from "$lib/components/app/sheet/sheet.svelte";
+  import type { Character } from "$lib/components/app/sheet/types";
 
-  const app = getAppContext();
-
-  onMount(() => {
-    //  pwa instructions credit: https://github.com/philfung/add-to-homescreen
-    //@ts-ignore
-    window.AddToHomeScreenInstance = window.AddToHomeScreen({
-      appName: "What are you doing?", // Name of the app. [Required]
-      appNameDisplay: "inline", // or "standalone"
-      appIconUrl: "/icon512_rounded.png", // App icon link (square, at least 40 x 40 pixels) [Required]
-      assetUrl: "https://cdn.jsdelivr.net/gh/philfung/add-to-homescreen@3.5/dist/assets/img/", // Link to directory of library image assets [Required]
-      maxModalDisplayCount: -1, // If set, the modal will only show this many times [Optional. Default: -1 (no limit).]
-      displayOptions: { showMobile: true, showDesktop: false }, // show on mobile/desktop [Optional] Default: show everywhere
-      allowClose: true, // allow the user to close the modal by tapping outside of it. [Optional. Default: true]
-      showArrow: true, // show the arrow on the modal [Optional. Default: true]
-      // (Debugging: Use this.clearModalDisplayCount() to reset the count)
-    });
-    //@ts-ignore
-    window.AddToHomeScreenInstance?.show(); // popup is only shown if web app is not already added to homescreen
+  let character: Character = $state({
+    name: "Just-James",
+    image:
+      "https://pub-cdae2c597d234591b04eed47a98f233c.r2.dev/v1/card-header-images/domains/blade/whirlwind.webp",
+    level: 1,
+    proficiency: 2,
+    evasion: 12,
+    damage_thresholds: {
+      major: 9,
+      severe: 19,
+    },
+    armor: {
+      max: 8,
+      marked: 0,
+    },
+    hp: {
+      max: 6,
+      marked: 0,
+    },
+    stress: {
+      max: 7,
+      marked: 0,
+    },
+    hope: {
+      max: HOPE_MAX,
+      marked: 0,
+    },
+    traits: {
+      agility: 2,
+      strength: 1,
+      finesse: 1,
+      instinct: 0,
+      presence: 0,
+      knowledge: -1,
+    },
+    heritage: {
+      ancestry: {
+        name: "Half-Clank",
+        top_feature: {
+          title: "Elven Grace",
+          description: "You have advantage on Dexterity saving throws.",
+        },
+        bottom_feature: {
+          title: "Fey Ancestry",
+          description: "You have resistance to being charmed.",
+        },
+      },
+      community: {
+        name: "Warborne",
+        description: "A close-knit group of adventurers who have sworn to protect the realm.",
+        features: [
+          {
+            title: "Community Bond",
+            description: "You can call upon your community for aid once per long rest.",
+          },
+        ],
+      },
+    },
+    transformation: {
+      features: [
+        {
+          title: "Awakened Potential",
+          description: "Your connection to the magical realm has awakened latent abilities.",
+        },
+      ],
+    },
+    class: {
+      name: "Assassin",
+      hope_feature: {
+        title: "Grim Resolve",
+        description: "<b>Spend 3 Hope</b> to clear 2 Stress.",
+      },
+      primary_domain: "blade",
+      secondary_domain: "midnight",
+      features: [
+        {
+          title: "Marked for Death",
+          description: `<p>On a successful weapon attack, you can <b>mark a Stress</b> to make the target 
+			<i>Marked for Death</i>. Attacks you make against a target that's <i>Marked for 
+			Death</i> gain a bonus to damage equal to <b>+1d4</b> per tier.</p>
+		
+			<p>You can only have one adversary <i>Marked for Death</i> at a time, and can't transfer or 
+			remove the condition except by defeating the target. The GM can spend a number of Fear equal 
+			to your Proficiency to remove the <i>Marked for Death</i> condition. Otherwise, it ends
+			automatically when you take a rest.</p>`,
+        },
+        {
+          title: "Get In & Get Out",
+          description: `<p><b>Spend a Hope</b> to ask the GM for either a quick or inconspicuous way 
+			into or out of a building or structure you can see. The next roll you make that capitalizes 
+			on this information has advantage.</p>`,
+        },
+      ],
+    },
+    subclass: {
+      name: "Guild Executioner",
+      spellcast_trait: "knowledge",
+      foundation_features: [
+        {
+          title: "Spellcasting",
+          description: "You can cast a limited number of spells using your knowledge trait.",
+        },
+      ],
+      specialization_features: [
+        {
+          title: "Mage Hand Legerdemain",
+          description:
+            "Your Mage Hand can perform additional tasks like picking locks and disarming traps.",
+        },
+      ],
+      mastery_features: [
+        {
+          title: "Spell Thief",
+          description: "You can steal spells from enemies and use them yourself.",
+        },
+      ],
+    },
   });
 </script>
 
-<svelte:head>
-  <title>Daggerbrain</title>
-  <!-- pwa instructions credit: https://github.com/philfung/add-to-homescreen -->
-  <link rel="stylesheet" href="/add-to-homescreen/add-to-homescreen.css" />
-  <script type="text/javascript" src="/add-to-homescreen/add-to-homescreen.min.js"></script>
-</svelte:head>
+<div class="h-screen overflow-y-auto pb-12" style="scrollbar-width: none;">
+  <Sheet bind:character class="max-w-2xl mx-auto" />
 
-<!-- Page -->
-<main
-  style="scrollbar-width: none;"
-  class={cn(app.pwa ? "h-lvh w-lvw" : "h-dvh w-dvw", "relative overflow-y-auto overflow-x-hidden")}
->
-  <div
-    class={cn(
-      "pt-[env(safe-area-inset-top)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]",
-      "p-4 sm:p-6 pb-16"
-    )}
-  >
-    <div class="max-w-7xl mx-auto">
-      <!-- Header Section -->
-      <div class="mb-6">
-        <div class="text-center space-y-3 mb-6">
-          <h1 class="text-4xl sm:text-5xl font-bold text-foreground tracking-tight">
-            Daggerbrain
-          </h1>
-          <div class="h-0.5 w-20 bg-primary mx-auto rounded-full"></div>
-        </div>
-        
-        <p class="text-lg sm:text-xl text-foreground/80 leading-relaxed text-center">
-          Character deck management system
-        </p>
-        
-        <p class="text-sm text-muted-foreground max-w-md mx-auto text-center mt-2">
-          Create, organize, and manage your character decks with ease
-        </p>
-        
-        <div class="flex flex-col sm:flex-row gap-3 justify-center items-center pt-6">
-          <Button 
-            href="/characters" 
-            size="lg"
-          >
-            View All Characters
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-          </Button>
-        </div>
-      </div>
-      
-      <!-- Feature highlights -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
-        <div class="bg-card border border-border rounded-lg p-4 card-shadow">
-          <div class="text-2xl mb-2">🎨</div>
-          <h3 class="text-sm font-semibold mb-1">Beautiful</h3>
-          <p class="text-xs text-muted-foreground">Modern interface</p>
-        </div>
-        
-        <div class="bg-card border border-border rounded-lg p-4 card-shadow">
-          <div class="text-2xl mb-2">⚡</div>
-          <h3 class="text-sm font-semibold mb-1">Fast</h3>
-          <p class="text-xs text-muted-foreground">Instant interactions</p>
-        </div>
-        
-        <div class="bg-card border border-border rounded-lg p-4 card-shadow">
-          <div class="text-2xl mb-2">🎯</div>
-          <h3 class="text-sm font-semibold mb-1">Simple</h3>
-          <p class="text-xs text-muted-foreground">Easy to use</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</main>
+  <!-- deck -->
+  <Deck {character} class="mx-2" />
+</div>
