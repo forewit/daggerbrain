@@ -9,6 +9,7 @@
   import Evasion from "./evasion.svelte";
   import Hp from "./hp.svelte";
   import Stress from "./stress.svelte";
+  import Hope from "./hope.svelte";
 
   let { class: className = "", character = $bindable() }: { class?: string; character: Character } =
     $props();
@@ -50,15 +51,20 @@
   <Traits traits={character.traits} class="mx-auto sm:mx-0" />
 
   <!-- evasion and armor -->
-  <div class="flex flex-wrap gap-2 items-center justify-center sm:justify-start">
-    <Evasion evasion={character.evasion} />
-    <Armor armor={character.armor} />
+  <div class="flex flex-wrap gap-x-6 gap-y-2 items-center justify-center sm:justify-start mx-auto">
+    <div class="flex gap-2">
+      <Evasion evasion={character.evasion} />
+      <Armor armor={character.armor} />
+    </div>
     <Thresholds thresholds={character.damage_thresholds} class="my-2" />
   </div>
 
   <!-- hp and stress -->
-   <div class="mx-2 flex flex-col gap-2">
+  <div class="mx-2 flex flex-col gap-2">
     <Hp hp={character.hp} />
     <Stress {character} />
-   </div>
+  </div>
+
+  <!-- hope -->
+   <Hope {character} />
 </div>

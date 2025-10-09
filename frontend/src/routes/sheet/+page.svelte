@@ -1,5 +1,6 @@
 <!-- src/routes/+page.svelte -->
 <script lang="ts">
+  import { HOPE_MAX } from "$lib/components/app/sheet/constants";
   import Sheet from "$lib/components/app/sheet/sheet.svelte";
   import type { Character } from "$lib/components/app/sheet/types";
 
@@ -26,7 +27,7 @@
       marked: 0,
     },
     hope: {
-      max: 3,
+      max: HOPE_MAX,
       marked: 0,
     },
     traits: {
@@ -70,6 +71,10 @@
     },
     class: {
       name: "Assassin",
+      hope_feature: {
+        title: "Grim Resolve",
+        description: "<strong>Spend 3 Hope</strong> to clear 2 Stress.",
+      },
       primary_domain: "blade",
       secondary_domain: "midnight",
       features: [

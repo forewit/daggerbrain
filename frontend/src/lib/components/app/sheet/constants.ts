@@ -75,3 +75,5 @@ export const TRAITS = {
         examples: ["Recall", "Analyze", "Comprehend"]
     }
 } as const
+
+export const HOPE_MAX = 6

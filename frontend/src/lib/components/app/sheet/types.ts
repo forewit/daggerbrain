@@ -67,6 +67,7 @@ export type Transformation = {
 
 export type Class = {
     name: string
+    hope_feature: Feature
     primary_domain: string
     secondary_domain: string
     features: Feature[]
