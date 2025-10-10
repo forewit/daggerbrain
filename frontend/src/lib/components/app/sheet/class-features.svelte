@@ -3,7 +3,6 @@
   import type { Class } from "$lib/ts/types";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import ChevronDown from "@lucide/svelte/icons/chevron-down";
-  import { fade } from "svelte/transition";
 
   let {
     class: className = "",
@@ -32,7 +31,7 @@
   </button>
 
   {#if expanded}
-  <div transition:fade={{duration: 120}} class="flex flex-col gap-4">
+  <div class="flex flex-col gap-4">
   {#each characterClass.features as feature}
     <div class="text-sm relative">
       <p class="font-medium text-[1rem] pb-2">{feature.title}</p>

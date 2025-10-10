@@ -1,7 +1,7 @@
 import type { Character } from './types';
 import { getContext, setContext } from 'svelte';
 import { loadCharacters, saveCharacters } from './data';
-import { MAX_HOPE, ANCESTRY_CARDS, COMMUNITY_CARDS, TRANSFORMATION_CARDS, CLASSES, DOMAINS } from './constants';
+import { MAX_HOPE, ANCESTRY_CARDS, COMMUNITY_CARDS, TRANSFORMATION_CARDS, CLASSES, DOMAINS, JUST_JAMES } from './constants';
 
 const NEW_CHARACTER: Character = {
   uid: "new-character",
@@ -68,12 +68,10 @@ function createApp() {
         characters.push({ ...character, uid })
       }
     } else {
-      characters.push({...NEW_CHARACTER, uid})
+      characters.push({...JUST_JAMES, uid})
     }
     return uid
   }
-
-
 
   function deleteCharacter(uid: string): void {
     characters = characters.filter((c) => c.uid !== uid)
@@ -111,6 +109,7 @@ function createApp() {
 
   return {
     // read only
+    get initialLoad() { return initialLoad },
     get pwa() { return pwa },
     get characters() { return characters },
 

@@ -4,24 +4,14 @@
   import CardCarousel from "./card-carousel.svelte";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import ChevronDown from "@lucide/svelte/icons/chevron-down";
-  import { fade } from "svelte/transition";
-  import { onMount } from "svelte";
-  import { IsMobile } from "$lib/hooks/is-mobile.svelte";
 
-  let { class: className = "", title="Deck", cards }: { class?: string; title: string; cards: Card<any>[] } = $props();
-
-  const isMobile = new IsMobile();
+  let {
+    class: className = "",
+    title = "Deck",
+    cards,
+  }: { class?: string; title: string; cards: Card<any>[] } = $props();
 
   let expanded = $state(true);
-  let scrollToIndex = $state<((index: number) => void) | undefined>();
-
-  // Scroll to middle card when component mounts
-  onMount(() => {
-    if (!isMobile.current && scrollToIndex && cards.length > 0) {
-      const middleIndex = Math.floor(cards.length / 2);
-      scrollToIndex(middleIndex);
-    }
-  });
 </script>
 
 <div class={cn("", className)}>
@@ -37,8 +27,6 @@
     {title}
   </button>
   {#if expanded}
-    <div transition:fade={{ duration: 120 }} class="flex flex-col gap-4">
-      <CardCarousel {cards} bind:scrollToIndex />
-    </div>
+    <CardCarousel {cards} />
   {/if}
 </div>
