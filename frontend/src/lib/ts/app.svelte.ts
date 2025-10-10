@@ -1,9 +1,54 @@
-import type { Character, Deck, } from './types';
+import type { Character } from './types';
 import { getContext, setContext } from 'svelte';
 import { loadCharacters, saveCharacters } from './data';
+import { MAX_HOPE, ANCESTRY_CARDS, COMMUNITY_CARDS, TRANSFORMATION_CARDS, CLASSES, DOMAINS } from './constants';
 
-
-
+const NEW_CHARACTER: Character = {
+  uid: "new-character",
+  name: "New Character",
+  image:
+    "https://pub-cdae2c597d234591b04eed47a98f233c.r2.dev/v1/card-header-images/domains/blade/whirlwind.webp",
+  level: 1,
+  proficiency: 1,
+  evasion: 10,
+  damage_thresholds: {
+    major: 6,
+    severe: 13,
+  },
+  armor: {
+    max: 3,
+    marked: 0,
+  },
+  hp: {
+    max: 6,
+    marked: 0,
+  },
+  stress: {
+    max: 7,
+    marked: 0,
+  },
+  hope: {
+    max: MAX_HOPE,
+    marked: 0,
+  },
+  traits: {
+    agility: 0,
+    strength: 0,
+    finesse: 0,
+    instinct: 0,
+    presence: 0,
+    knowledge: 0,
+  },
+  heritage: {
+    ancestry_card: null,
+    community_card: null,
+  },
+  transformation_card: null,
+  class: null,
+  subclass: null,
+  domain_card_loadout: [],
+  domain_card_vault: [],
+}
 
 function createApp() {
   // --- ephemeral state ---
@@ -23,7 +68,7 @@ function createApp() {
         characters.push({ ...character, uid })
       }
     } else {
-      characters.push({ uid, name: "New Character", image: "", description: "", deck: { heritage: [], domain: [], class: [] } })
+      characters.push({...NEW_CHARACTER, uid})
     }
     return uid
   }

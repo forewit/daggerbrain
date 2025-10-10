@@ -1,14 +1,14 @@
 <script lang="ts">
   import Input from "$lib/components/ui/input/input.svelte";
   import { cn } from "$lib/utils";
-  import type { Traits } from "./types";
-  import { TRAITS } from "./constants";
+  import type { Traits } from "$lib/ts/types";
+  import { TRAITS } from "$lib/ts/constants";
 
   let { class: className = "", traits = $bindable() }: { class?: string; traits: Traits } =
     $props();
 </script>
 
-<div class={cn(" grid grid-cols-[repeat(3,90px))] sm:flex sm:justify-between gap-2", className)}>
+<div class={cn(" grid grid-cols-3 justify-items-center sm:flex sm:justify-between gap-2", className)}>
 
   <div
     class="w-[90px] text-center border-2 rounded-md p-2"

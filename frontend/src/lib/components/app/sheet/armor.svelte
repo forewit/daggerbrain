@@ -1,6 +1,6 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
-  import type { Character } from "./types";
+  import type { Character } from "$lib/ts/types";
 
   let {
     class: className = "",
@@ -15,7 +15,7 @@
     </p>
     <p class="text-sm font-medium">Armor</p>
   </div>
-  <div class="flex flex-col flex-wrap gap-1 h-12">
+  <div class="flex flex-wrap gap-1 w-14">
     {#each Array(armor.max) as _, index}
       <button 
       aria-label="armor-slot"

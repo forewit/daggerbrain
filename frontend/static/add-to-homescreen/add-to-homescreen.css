@@ -23,7 +23,7 @@
 }
 
 .adhs-container .adhs-modal {
-  background-color: #f5f5f5;
+  background-color: var(--background);
   /* border-radius: 7px; */
   border-radius: var(--radius-lg);
   /* box-shadow: 3px 3px 0px 0px #59d98c; */
@@ -164,11 +164,11 @@
   border-radius: 100px;
   display: grid;
   place-items: center;
-  background-color: #000000aa;
+  background-color: var(--foreground);
 }
 
 .adhs-container .adhs-modal .adhs-list .adhs-list-item .adhs-number {
-  color: white;
+  color: var(--background);
   vertical-align: middle;
   margin-top: -1px;
   font-size: var(--text-lg); /* 1.125rem (18px) */
@@ -209,6 +209,9 @@
   display: flex;
   align-items: center;
   gap: 4px;
+
+  background-color: #ffffff !important;
+  color: black !important;
 }
 
 .adhs-container

@@ -1,7 +1,6 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
-  import type { Character } from "./types";
-  import Check from "@lucide/svelte/icons/check";
+  import type { Character } from "$lib/ts/types";
 
   let { class: className = "", character = $bindable() }: { class?: string; character: Character } =
     $props();
@@ -33,17 +32,19 @@
     {/each}
   </div>
 
-  <div class="relative mx-auto">
-    <button
-      class="text-sm p-3 relative"
-      onclick={() => {
-        if (character.hope.marked >= 3) {
-          character.hope.marked -= 3;
-        }
-      }}
-    >
-      <span class="italic font-medium pr-1">{character.class.hope_feature.title}:</span>
-      {@html character.class.hope_feature.description}
-    </button>
-  </div>
+  {#if character.class}
+    <div class="relative mx-auto">
+      <button
+        class="text-sm p-3 relative"
+        onclick={() => {
+          if (character.hope.marked >= 3) {
+            character.hope.marked -= 3;
+          }
+        }}
+      >
+        <span class="italic font-medium pr-1">{character.class.hope_feature.title}:</span>
+        {@html character.class.hope_feature.description}
+      </button>
+    </div>
+  {/if}
 </div>

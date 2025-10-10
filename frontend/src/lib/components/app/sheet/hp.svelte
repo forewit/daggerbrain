@@ -1,6 +1,6 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
-  import type { Character } from "./types";
+  import type { Character } from "$lib/ts/types";
 
   let { class: className = "", hp = $bindable() }: { class?: string; hp: Character["hp"] } =
     $props();
