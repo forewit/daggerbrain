@@ -13,8 +13,8 @@
 				outline:
 					"border border-border bg-card shadow-sm hover:bg-muted hover:text-accent-foreground",
 				secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-				ghost: "hover:bg-accent hover:text-accent-foreground",
-				link: "underline-offset-4 hover:underline text-primary",
+				ghost: "hover:bg-background/50 hover:text-accent",
+				link: "underline-offset-4 hover:underline",
 			},
 			size: {
 				default: "h-9 px-4 py-2 has-[>svg]:px-3",
