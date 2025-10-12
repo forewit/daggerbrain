@@ -1,6 +1,8 @@
 <script lang="ts">
     import { getAppContext } from "$lib/ts/app.svelte";
     import { goto } from "$app/navigation";
+    import { page } from "$app/state";
+    
     let { data, children } = $props();
   
     const app = getAppContext();
@@ -9,13 +11,6 @@
     $effect(() => {
       if (!character && app.initialLoad) {
         goto("/characters");
-      }
-    });
-
-    $effect(() => {
-      app.showFooter = false;
-      return () => {
-        app.showFooter = true;
       }
     });
   </script>

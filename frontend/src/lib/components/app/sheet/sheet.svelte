@@ -90,7 +90,7 @@
         <div class="grow truncate relative">
           <!-- level class subclass -->
 
-          <div class="flex items-center mt-3 mb-2.5 truncate max-w-[400px] h-9">
+          <div class="flex overflow-hidden items-center mt-3 mb-2.5 truncate max-w-[400px] h-9">
             <Dialog.Root>
               <Dialog.Trigger
                 class="min-w-[72px] relative grid place-items-center text-xs font-medium pl-4 pr-3 rounded-l-full bg-accent/10 hover:bg-accent/20 h-full text-accent overflow-hidden group"
@@ -109,10 +109,10 @@
 
             <Button
               href={`/characters/${character.uid}/class/`}
-              class="h-full truncate flex justify-start gap-2 grow border-none rounded-l-none rounded-r-full"
+              class="h-full shrink truncate justify-start gap-2 grow border-none rounded-l-none rounded-r-full"
               variant="outline"
             >
-              <p class="truncate text-xs text-left grow">
+              <p class="truncate text-xs text-left">
                 {character.class?.name || "No class"}&ensp;•&ensp;{character.subclass?.name ||
                   "No subclass"}
               </p>
