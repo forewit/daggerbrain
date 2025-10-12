@@ -215,7 +215,7 @@
   {/if}
 {/snippet}
 
-<div class={cn("relative flex flex-col", className)}>
+<div class={cn("relative h-[120px] w-[75px] flex flex-col", className)}>
   <div class="h-[120px] w-[75px] z-40">
     <img class="h-full w-full" src="/assets/card/banner.webp" alt="banner" />
     <div class="absolute inset-0 flex flex-col items-center justify-center pb-3 gap-1 pt-0.5">

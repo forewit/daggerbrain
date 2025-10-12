@@ -53,6 +53,7 @@ const NEW_CHARACTER: Character = {
 function createApp() {
   // --- ephemeral state ---
   let pwa = $state(false)
+  let showFooter = $state(true);
 
   // --- persistant state --- 
   let characters: Character[] = $state([])
@@ -68,7 +69,7 @@ function createApp() {
         characters.push({ ...character, uid })
       }
     } else {
-      characters.push({...JUST_JAMES, uid})
+      characters.push({ ...JUST_JAMES, uid })
     }
     return uid
   }
@@ -117,6 +118,9 @@ function createApp() {
     destroy,
     newCharacter,
     deleteCharacter,
+
+    get showFooter() { return showFooter },
+    set showFooter(value) { showFooter = value },
   }
 }
 

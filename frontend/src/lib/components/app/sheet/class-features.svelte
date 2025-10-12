@@ -20,7 +20,7 @@
 >
   <button
     onclick={() => (expanded = !expanded)}
-    class="z-20 flex items-center text-muted-foreground p-2 absolute bg-background -top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 font-medium"
+    class="z-20 flex items-center text-nowrap text-muted-foreground p-2 absolute bg-background -top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 font-medium"
   >
     {#if expanded}
       <ChevronDown class="w-k h-4" />

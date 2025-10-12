@@ -13,6 +13,10 @@
   import ClassFeatures from "./class-features.svelte";
   import Deck from "./deck.svelte";
   import { getAppContext } from "$lib/ts/app.svelte";
+  import Button from "$lib/components/ui/button/button.svelte";
+  import Pencil from "@lucide/svelte/icons/pencil";
+  import * as Dialog from "$lib/components/ui/dialog/index";
+  import { fileToDataUrl } from "$lib/utils";
 
   let {
     class: className = "",
@@ -30,38 +34,114 @@
       character?.transformation_card,
     ].filter(Boolean) as Card<any>[]
   );
+
+  let fileInput = $state<HTMLInputElement>();
+
+  async function handleImageUpload(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+
+    if (file && file.type.startsWith("image/")) {
+      // Check file size (5MB = 5 * 1024 * 1024 bytes)
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        alert("Image file must be smaller than 5MB. Please choose a smaller image.");
+        target.value = "";
+        return;
+      }
+
+      try {
+        const dataUrl = await fileToDataUrl(file);
+        if (character) {
+          character.image = dataUrl;
+        }
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        alert("Error uploading image. Please try again.");
+      }
+    }
+
+    // Reset the input so the same file can be selected again
+    target.value = "";
+  }
+
+  function triggerImageUpload() {
+    fileInput?.click();
+  }
 </script>
 
 {#if character}
   <div class={cn("flex flex-col gap-6", className)}>
+    <!-- hidden file input for image upload -->
+    <input
+      bind:this={fileInput}
+      type="file"
+      accept="image/*"
+      onchange={handleImageUpload}
+      class="hidden"
+    />
+
     <!-- main content -->
-    <div class="w-full max-w-2xl mx-auto flex flex-col gap-6">
+    <div
+      class="w-full min-w-[260px] max-w-2xl mx-auto flex flex-col gap-6 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]"
+    >
       <!-- top bar -->
       <div class="flex gap-2 px-2">
-        <!-- character image -->
-        <div class="h-[120px] rounded-md border-4 mt-2">
-          <img
-            class="h-full rounded-md aspect-square object-cover"
-            src={character.image}
-            alt={character.name}
-          />
-        </div>
+        <div class="grow truncate relative">
+          <!-- level class subclass -->
 
-        <!-- name, level, class, subclass -->
-        <div class="grow flex flex-col gap-1 mt-2">
-          <p class="text-2xl font-bold">{character.name}</p>
-          <div class="flex gap-x-2 gap-y-1 items-center flex-wrap text-sm text-muted-foreground">
-            <Level level={character.level} />
-            <p>{character.heritage.ancestry_card?.title || "No ancestry"}</p>
-            <p class="hidden sm:block">•</p>
-            <p class="hidden sm:block">
-              {character.heritage.community_card?.title || "No community"}
-            </p>
+          <div class="flex items-center mt-3 mb-2.5 truncate max-w-[400px] h-9">
+            <Dialog.Root>
+              <Dialog.Trigger
+                class="min-w-[72px] relative grid place-items-center text-xs font-medium pl-4 pr-3 rounded-l-full bg-accent/10 hover:bg-accent/20 h-full text-accent overflow-hidden group"
+              >
+                <span class="transition-transform duration-200 group-hover:-translate-y-[150%]">
+                  Level {character.level}
+                </span>
+                <span
+                  class="absolute inset-0 grid place-items-center text-xs font-medium transition-transform duration-200 translate-y-full group-hover:translate-y-0"
+                >
+                  Level up?
+                </span>
+              </Dialog.Trigger>
+              <Dialog.Content>Test</Dialog.Content>
+            </Dialog.Root>
+
+            <Button
+              href={`/characters/${character.uid}/class/`}
+              class="h-full truncate flex justify-start gap-2 grow border-none rounded-l-none rounded-r-full"
+              variant="outline"
+            >
+              <p class="truncate text-xs text-left grow">
+                {character.class?.name || "No class"}&ensp;•&ensp;{character.subclass?.name ||
+                  "No subclass"}
+              </p>
+              <div class="grow"></div>
+              <Pencil class="size-3 mr-1 stroke-3" />
+            </Button>
           </div>
-          <div class="flex flex-wrap gap-x-2 gap-y-1 text-sm text-muted-foreground">
-            <p>{character.class?.name || "No class"}</p>
-            <p class="hidden sm:block">•</p>
-            <p class="hidden sm:block">{character.subclass?.name || "No subclass"}</p>
+
+          <div class="flex gap-3 ml-1">
+            <!-- character image -->
+            <button
+              class="h-[90px] w-[90px] shrink-0 p-1 aspect-square rounded-lg border-2 overflow-hidden cursor-pointer hover:border-primary/50 transition-colors group"
+              onclick={triggerImageUpload}
+            >
+              <img
+                class="h-full w-full rounded-md object-cover"
+                src={character.image}
+                alt={character.name}
+              />
+            </button>
+
+            <!-- name and heritage -->
+            <div class="grow flex flex-col gap-2 truncate">
+              <p class="text-2xl font-bold truncate">{character.name}</p>
+              <p class="text-xs text-muted-foreground truncate">
+                {character.heritage.ancestry_card?.title || "No ancestry"}&ensp;•&ensp;{character
+                  .heritage.community_card?.title || "No community"}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -72,11 +152,11 @@
       </div>
 
       <!-- traits -->
-      <Traits traits={character.traits} />
+      <Traits traits={character.traits} class="mx-2 " />
 
       <!-- evasion and armor -->
       <div
-        class="flex flex-wrap gap-x-6 gap-y-2 items-center justify-center sm:justify-start mx-auto"
+        class="grid grid-cols-1 sm:grid-cols-[auto_auto] place-items-center mx-auto gap-x-6 gap-y-2"
       >
         <div class="flex gap-2">
           <Evasion evasion={character.evasion} />

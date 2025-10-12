@@ -4,12 +4,18 @@
     let { data, children } = $props();
   
     const app = getAppContext();
-  
     const character = $derived(app.characters.find((c) => c.uid === data.uid));
   
     $effect(() => {
       if (!character && app.initialLoad) {
         goto("/characters");
+      }
+    });
+
+    $effect(() => {
+      app.showFooter = false;
+      return () => {
+        app.showFooter = true;
       }
     });
   </script>

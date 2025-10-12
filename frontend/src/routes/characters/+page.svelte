@@ -8,6 +8,9 @@
   import * as Dialog from "$lib/components/ui/dialog";
   import Plus from "@lucide/svelte/icons/plus";
   import ExternalLink from "@lucide/svelte/icons/external-link";
+  import Pencil from "@lucide/svelte/icons/pencil";
+  import Trash from "@lucide/svelte/icons/trash";
+  import { goto } from "$app/navigation";
 
   const app = getAppContext();
 
@@ -35,79 +38,49 @@
   )}
 >
   <!-- Header -->
-  <div class="flex items-center justify-between py-2">
-    <p class="text-2xl font-bold mb-2 text-nowrap">My Characters</p>
-
+  <div class="flex items-center justify-between gap-2 py-2 mb-2">
+    <p class="text-2xl font-bold text-nowrap">My Characters</p>
     <Button variant="outline" onclick={() => app.newCharacter()}><Plus /> New Character</Button>
   </div>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     {#each app.characters as character}
-      <a href={`/characters/${character.uid}/`} class="rounded bg-border w-full max-w-[500px] mx-auto flex p-2 gap-2">
-        <div class="rounded-lg overflow-hidden h-20 w-20 shrink-0 border-2">
-          <img src={character.image} alt={character.name} class="w-full h-full object-cover" />
-        </div>
-        <div class="truncate">
-          <p class="text-lg font-bold truncate">{character.name}</p>
+      <div class="w-full max-w-[500px] rounded-xl mx-auto overflow-hidden">
+        <a href={`/characters/${character.uid}/`} class="bg-border/80 border border-b-0 hover:bg-border/50 flex p-1 gap-2 ">
+          <div class=" h-16 w-16 shrink-0 rounded-lg border-2 overflow-hidden">
+            <img src={character.image} alt={character.name} class="w-full h-full object-cover" />
+          </div>
+          <div class="truncate">
+            <p class="text-lg font-bold truncate mt-1">{character.name}</p>
 
-          <p class="mt-1 truncate text-sm text-muted-foreground">
-            {character.heritage.ancestry_card?.title || "No ancestry"}
-            &ensp;|&ensp;{character.class?.name || "No class"}
-            &ensp;|&ensp;{character.subclass?.name || "No subclass"}
-          </p>
-        </div>
-      </a>
-      <!-- <div
-        class="w-[300px] h-[246px] bg-muted rounded-lg shadow-md transition-all overflow-hidden group border"
-      >
-        <div class="relative h-32 overflow-hidden">
-          <img
-            src={character.image}
-            alt={character.name}
-            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-          <div
-            class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"
-          ></div>
-
-          <div
-            class="absolute top-2 right-2 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-bold text-slate-900 dark:text-slate-100"
+            <p class="mt-1 truncate text-xs text-muted-foreground">
+              {character.heritage.ancestry_card?.title || "No ancestry"}
+              &ensp;•&ensp;{character.class?.name || "No class"}
+              &ensp;•&ensp;{character.subclass?.name || "No subclass"}
+            </p>
+          </div>
+        </a>
+        <div class="bg-muted flex">
+          <Button
+            variant="ghost"
+            size="sm"
+            class="grow rounded-none hover:text-text border"
+            href={`/characters/${character.uid}/`}>View</Button
           >
-            Level {character.level}
-          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            class="grow rounded-none hover:text-text border border-x-0"
+            href={`/characters/${character.uid}/settings`}>Edit</Button
+          >
+          <Button
+            variant="ghost"
+            size="sm"
+            class=" grow text-destructive hover:text-destructive rounded-none border"
+            onclick={() => handleDeleteCharacter(character)}>Delete</Button
+          >
         </div>
-
-        <div class="p-2">
-          <p class="text-lg font-bold truncate">{character.name}</p>
-
-          <div class="flex gap-3 mb-3 mt-1 text-sm text-muted-foreground">
-            {#if character.heritage.ancestry_card}
-              <p class="truncate">{character.heritage.ancestry_card.title}</p>
-            {/if}
-            {#if character.class}
-              <p class="truncate">{character.class.name}</p>
-            {/if}
-            {#if character.subclass}
-              <p class="truncate">{character.subclass.name}</p>
-            {/if}
-          </div>
-
-          <div class="flex justify-between gap-2">
-            <Button href={`/${character.uid}`} variant="outline" class="grow">
-              <ExternalLink /> View
-            </Button>
-
-            <Button
-              onclick={() => handleDeleteCharacter(character)}
-              aria-label="Delete character"
-              variant="link"
-              class="text-destructive"
-            >
-              Delete
-            </Button>
-          </div>
-        </div>
-      </div> -->
+      </div>
     {/each}
   </div>
 </div>
