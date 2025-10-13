@@ -3,7 +3,7 @@
   import ExternalLink from "@lucide/svelte/icons/external-link";
   import { page } from "$app/state";
   import { cn, capitalize } from "$lib/utils";
-  import ChevronRight from "@lucide/svelte/icons/chevron-right";
+  import Settings from "@lucide/svelte/icons/settings";
   import Button from "$lib/components/ui/button/button.svelte";
 
   let { data, children } = $props();
@@ -11,8 +11,8 @@
   const app = getAppContext();
   const character = $derived(app.characters.find((c) => c.uid === data.uid));
 
-  const tabs = ["settings", "heritage", "class", "experiences", "equipment"];
-  let activeTab = $derived(page.url.pathname.split("/").pop() || "settings");
+  const tabs = ["home", "heritage", "class", "experiences", "equipment"];
+  let activeTab = $derived(page.url.pathname.split("/").pop() || "home");
 
   $effect(() => {
     const el = document.getElementById(activeTab);
@@ -21,36 +21,42 @@
 </script>
 
 {#if character}
-  <div class={cn("pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]", "bg-muted/50")}>
+  <div
+    class={cn("mt-4 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]", "bg-muted/50")}
+  >
     <div
-      class="snap-x snap-mandatory overflow-x-auto max-w-6xl mx-auto h-12 flex items-center"
+      class="snap-x snap-mandatory overflow-x-auto max-w-6xl mx-auto h-16 flex items-center"
       style="scrollbar-width: none;"
     >
-      {#each tabs as tab}
+      <div class="shrink-0 w-[50vw] min-[900px]:w-0"></div>
+
+      {#each tabs as tab, i}
         <Button
           id={tab}
           variant="ghost"
           href={`/characters/${character.uid}/${tab}`}
           class={cn(
-            "group overflow-hidden relative snap-center rounded-none h-full px-10 shadow-none border-x border-primary/50",
-            activeTab === tab && "text-accent bg-primary/50 hover:bg-primary/50 border-none"
+            "font-normal overflow-hidden hover:text-foreground relative snap-center rounded-none h-full px-10 shadow-none",
+            activeTab === tab && "hover:text-accent text-accent"
           )}
         >
-          {capitalize(tab)}
+          {#if i === 0}
+            <Settings class="size-4" />
+          {/if}
+          {i > 0 ? i + ". " : ""}{capitalize(tab)}
           <span
             class={cn(
-              "absolute left-0 -translate-x-1/2 top-1/2 -translate-y-1/2 size-4 bg-primary/50 group-hover:bg-accent rotate-45",
-              activeTab === tab && "bg-accent "
+              "absolute left-full -translate-x-1/2 top-1/2 -translate-y-1/2 h-6 w-[2px] bg-accent/20 "
             )}
           ></span>
         </Button>
       {/each}
-      <div class="min-w-8"></div>
-      <Button href={`/characters/${character.uid}/`} variant="link" class="ml-auto">
-        View Character
+      <Button href={`/characters/${character.uid}/`} variant="link" class="font-normal px-10">
+        Sheet
         <ExternalLink class="size-4" />
       </Button>
-      <div class="min-w-8"></div>
+
+      <div class="shrink-0 w-[50vw] min-[900px]:w-0"></div>
     </div>
   </div>
 

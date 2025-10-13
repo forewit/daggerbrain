@@ -19,18 +19,12 @@
 </script>
 
 <svelte:head>
-  <meta name="theme-color" content="#2d2738" />
+  <meta name="theme-color" content="#1a1625" />
   <link rel="icon" href="/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.json" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-
-  <style>
-    body, html {
-      background-color: #2d2738;
-    }
-  </style>
 </svelte:head>
 
 <ModeWatcher />
@@ -39,22 +33,23 @@
   style="scrollbar-width: none;"
   class={cn(app.pwa ? "h-lvh w-lvw" : "h-dvh w-dvw", "relative overflow-y-auto overflow-x-hidden")}
 >
-  <!-- nav bar -->
   <div class="min-h-full w-full flex flex-col">
+
+      <!-- nav bar -->
     <header
       class={cn(
         "pt-[env(safe-area-inset-top)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]",
-        "bg-muted sticky top-0 z-45"
+        "sticky top-0 z-45 flex justify-center"
       )}
     >
-      <nav class="max-w-6xl mx-auto px-4 pt-1 h-12 flex items-center">
-        <a href="/" class="text-lg font-medium flex items-center gap-2">
+      <nav class=" shadow bg-muted m-2 mb-0 rounded-full max-w-6xl w-full   h-12 flex items-center">
+        <a href="/" class="text-lg font-medium flex items-center gap-2 px-4">
           <img src="/assets/logos/daggerbrain.png" alt="Daggerbrain" class="size-6" />
           Daggerbrain
         </a>
         <div class="grow sm:max-w-0"></div>
-        <Button variant="link" href="/characters" class="font-normal ml-4 h-8 px-3">Characters</Button>
-        <Button variant="link" href="/domains" class="font-normal h-8 px-3">Domains</Button>
+        <Button variant="ghost" href="/characters" class="font-normal rounded-none h-full">Characters</Button>
+        <Button variant="ghost" href="/domains" class="font-normal rounded-none h-full pr-6 sm:pr-4">Domains</Button>
       </nav>
     </header>
 
@@ -68,7 +63,7 @@
       <footer
         class={cn(
           "pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]",
-          "bg-muted sticky"
+          "bg-muted/50 sticky"
         )}
       >
         <div class="max-w-6xl mx-auto px-4 pt-6 pb-8 flex flex-wrap justify-between gap-6">

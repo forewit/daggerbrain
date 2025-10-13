@@ -23,6 +23,11 @@ export type Character = {
     transformation_card: Card<"transformation"> | null,
     domain_card_loadout: Card<"domain">[],
     domain_card_vault: Card<"domain">[],
+    settings: Settings
+}
+
+export type Settings = {
+    void_enabled: boolean
 }
 
 export type Slot = {

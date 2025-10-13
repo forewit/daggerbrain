@@ -48,6 +48,9 @@ const NEW_CHARACTER: Character = {
   subclass: null,
   domain_card_loadout: [],
   domain_card_vault: [],
+  settings: {
+    void_enabled: false,
+  },
 }
 
 function createApp() {

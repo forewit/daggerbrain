@@ -309,4 +309,7 @@ export const JUST_JAMES: Character = {
     subclass: CLASSES.assassin.subclasses.executioners_guild,
     domain_card_loadout: [DOMAINS.blade.cards.whirlwind, DOMAINS.blade.cards.not_good_enough],
     domain_card_vault: [],
+    settings: {
+      void_enabled: true,
+    },
   }

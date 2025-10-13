@@ -34,7 +34,7 @@
 <div
   class={cn(
     "pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]",
-    "max-w-6xl mx-auto p-2"
+    "max-w-6xl mx-auto px-4 py-2"
   )}
 >
   <!-- Header -->
@@ -71,7 +71,7 @@
             variant="ghost"
             size="sm"
             class="grow rounded-none hover:text-text border border-x-0"
-            href={`/characters/${character.uid}/settings`}>Edit</Button
+            href={`/characters/${character.uid}/home`}>Edit</Button
           >
           <Button
             variant="ghost"

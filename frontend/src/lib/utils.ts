@@ -201,3 +201,34 @@ export function fileToDataUrl(file: File): Promise<string> {
 export function capitalize(string: string): string {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
+
+// Handle image upload with validation and conversion to data URL
+export async function handleImageUpload(
+  event: Event,
+  onSuccess: (dataUrl: string) => void,
+  maxSizeMB: number = 5
+): Promise<void> {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+
+  if (file && file.type.startsWith("image/")) {
+    // Check file size
+    const maxSize = maxSizeMB * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert(`Image file must be smaller than ${maxSizeMB}MB. Please choose a smaller image.`);
+      target.value = "";
+      return;
+    }
+
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      onSuccess(dataUrl);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("Error uploading image. Please try again.");
+    }
+  }
+
+  // Reset the input so the same file can be selected again
+  target.value = "";
+}

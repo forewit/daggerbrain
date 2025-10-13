@@ -16,7 +16,7 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import Pencil from "@lucide/svelte/icons/pencil";
   import * as Dialog from "$lib/components/ui/dialog/index";
-  import { fileToDataUrl } from "$lib/utils";
+  import { handleImageUpload } from "$lib/utils";
 
   let {
     class: className = "",
@@ -37,32 +37,10 @@
 
   let fileInput = $state<HTMLInputElement>();
 
-  async function handleImageUpload(event: Event) {
-    const target = event.target as HTMLInputElement;
-    const file = target.files?.[0];
-
-    if (file && file.type.startsWith("image/")) {
-      // Check file size (5MB = 5 * 1024 * 1024 bytes)
-      const maxSize = 5 * 1024 * 1024;
-      if (file.size > maxSize) {
-        alert("Image file must be smaller than 5MB. Please choose a smaller image.");
-        target.value = "";
-        return;
-      }
-
-      try {
-        const dataUrl = await fileToDataUrl(file);
-        if (character) {
-          character.image = dataUrl;
-        }
-      } catch (error) {
-        console.error("Error uploading image:", error);
-        alert("Error uploading image. Please try again.");
-      }
+  function onImageUploadSuccess(dataUrl: string) {
+    if (character) {
+      character.image = dataUrl;
     }
-
-    // Reset the input so the same file can be selected again
-    target.value = "";
   }
 
   function triggerImageUpload() {
@@ -77,7 +55,7 @@
       bind:this={fileInput}
       type="file"
       accept="image/*"
-      onchange={handleImageUpload}
+      onchange={(event) => handleImageUpload(event, onImageUploadSuccess)}
       class="hidden"
     />
 
@@ -86,11 +64,11 @@
       class="w-full min-w-[260px] max-w-2xl mx-auto flex flex-col gap-6 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]"
     >
       <!-- top bar -->
-      <div class="flex gap-2 px-2">
+      <div class="flex gap-2 px-2 pr-6">
         <div class="grow truncate relative">
           <!-- level class subclass -->
 
-          <div class="flex overflow-hidden items-center mt-3 mb-2.5 truncate max-w-[400px] h-9">
+          <div class="flex overflow-hidden items-center mt-4 mb-2.5 truncate max-w-[400px] h-9">
             <Dialog.Root>
               <Dialog.Trigger
                 class="min-w-[72px] relative grid place-items-center text-xs font-medium pl-4 pr-3 rounded-l-full bg-accent/10 hover:bg-accent/20 h-full text-accent overflow-hidden group"
