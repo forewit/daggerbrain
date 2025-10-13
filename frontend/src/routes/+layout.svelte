@@ -29,32 +29,31 @@
 
 <ModeWatcher />
 
+<!-- nav bar -->
+<header
+  class={cn(
+    "pt-[calc(max(env(safe-area-inset-top),--spacing(3)))] pl-[calc(env(safe-area-inset-left)+--spacing(2))] pr-[calc(env(safe-area-inset-right)+--spacing(2))]",
+    "fixed w-full top-0 z-45 flex justify-center"
+  )}
+>
+  <nav class=" shadow bg-muted rounded-full max-w-6xl w-full h-16 flex items-center">
+    <a href="/" class="text-lg font-medium flex items-center gap-2 px-4">
+      <img src="/assets/logos/daggerbrain.png" alt="Daggerbrain" class="size-6" />
+      Daggerbrain
+    </a>
+    <div class="grow sm:max-w-0"></div>
+    <Button variant="ghost" href="/characters" class=" rounded-none h-full">Characters</Button>
+    <Button variant="ghost" href="/rules" class=" rounded-none h-full pr-6 sm:pr-4">Rules</Button>
+  </nav>
+</header>
+
 <div
   style="scrollbar-width: none;"
-  class={cn(app.pwa ? "h-lvh w-lvw" : "h-dvh w-dvw", "relative overflow-y-auto overflow-x-hidden")}
+  class={cn(app.pwa ? "h-lvh w-lvw" : "h-dvh w-dvw", "relative overflow-x-hidden overflow-y-auto")}
 >
   <div class="min-h-full w-full flex flex-col">
-
-      <!-- nav bar -->
-    <header
-      class={cn(
-        "pt-[env(safe-area-inset-top)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]",
-        "sticky top-0 z-45 flex justify-center"
-      )}
-    >
-      <nav class=" shadow bg-muted m-2 mb-0 rounded-full max-w-6xl w-full   h-12 flex items-center">
-        <a href="/" class="text-lg font-medium flex items-center gap-2 px-4">
-          <img src="/assets/logos/daggerbrain.png" alt="Daggerbrain" class="size-6" />
-          Daggerbrain
-        </a>
-        <div class="grow sm:max-w-0"></div>
-        <Button variant="ghost" href="/characters" class="font-normal rounded-none h-full">Characters</Button>
-        <Button variant="ghost" href="/domains" class="font-normal rounded-none h-full pr-6 sm:pr-4">Domains</Button>
-      </nav>
-    </header>
-
     <!-- page -->
-    <main class="grow bg-background">
+    <main class="grow pt-[calc(max(env(safe-area-inset-top),--spacing(3)))] mt-16">
       {@render children?.()}
     </main>
 
@@ -76,9 +75,9 @@
               />
               <p class="text-xs text-muted-foreground italic">
                 Daggerheart™ Compatible. Terms at <a
-                href="https://www.daggerheart.com"
-                class="underline">Daggerheart.com</a
-              >
+                  href="https://www.daggerheart.com"
+                  class="underline">Daggerheart.com</a
+                >
               </p>
             </div>
 

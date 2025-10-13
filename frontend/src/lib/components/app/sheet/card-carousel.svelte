@@ -44,7 +44,7 @@
 
 <div
   bind:this={scrollContainer}
-  class={cn("relative snap-x snap-mandatory overflow-x-auto overflow-y-hidden p-1 ", className)}
+  class={cn("relative snap-x snap-x-mandatory overflow-x-auto overflow-y-hidden p-1 ", className)}
   style="scrollbar-width:none;"
 >
   <div class="flex items-center justify-start min-w-max" style="gap: {gap}px;">

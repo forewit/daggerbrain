@@ -17,6 +17,7 @@
   import Pencil from "@lucide/svelte/icons/pencil";
   import * as Dialog from "$lib/components/ui/dialog/index";
   import { handleImageUpload } from "$lib/utils";
+  import Experiences from "./experiences.svelte";
 
   let {
     class: className = "",
@@ -155,6 +156,11 @@
       <!-- class features -->
       {#if character.class}
         <ClassFeatures bind:characterClass={character.class} class="mx-2" />
+      {/if}
+
+      <!-- experiences -->
+       {#if character.experiences.some((experience) => experience.title !== "")}
+        <Experiences bind:experiences={character.experiences} class="mx-2" />
       {/if}
     </div>
 

@@ -11,8 +11,8 @@
   const app = getAppContext();
   const character = $derived(app.characters.find((c) => c.uid === data.uid));
 
-  const tabs = ["home", "heritage", "class", "experiences", "equipment"];
-  let activeTab = $derived(page.url.pathname.split("/").pop() || "home");
+  const tabs = ["edit", "heritage", "class", "experiences", "equipment"];
+  let activeTab = $derived(page.url.pathname.split("/").pop() || "edit");
 
   $effect(() => {
     const el = document.getElementById(activeTab);
@@ -42,8 +42,10 @@
         >
           {#if i === 0}
             <Settings class="size-4" />
+            Home
+          {:else}
+          {i}. {capitalize(tab)}
           {/if}
-          {i > 0 ? i + ". " : ""}{capitalize(tab)}
           <span
             class={cn(
               "absolute left-full -translate-x-1/2 top-1/2 -translate-y-1/2 h-6 w-[2px] bg-accent/20 "
@@ -51,7 +53,7 @@
           ></span>
         </Button>
       {/each}
-      <Button href={`/characters/${character.uid}/`} variant="link" class="font-normal px-10">
+      <Button href={`/characters/${character.uid}/`} variant="link" class="font-normal px-8">
         Sheet
         <ExternalLink class="size-4" />
       </Button>

@@ -20,10 +20,17 @@ export type Character = {
     }
     class: Class | null,
     subclass: Subclass | null,
+    experiences: Experience[],
     transformation_card: Card<"transformation"> | null,
     domain_card_loadout: Card<"domain">[],
     domain_card_vault: Card<"domain">[],
     settings: Settings
+}
+
+export type Experience = {
+    title: string,
+    description: string,
+    modifier: number
 }
 
 export type Settings = {

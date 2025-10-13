@@ -38,7 +38,7 @@
   )}
 >
   <!-- Header -->
-  <div class="flex items-center justify-between gap-2 py-2 mb-2">
+  <div class="flex justify-between gap-2 py-2 mb-2">
     <p class="text-2xl font-bold text-nowrap">My Characters</p>
     <Button variant="outline" onclick={() => app.newCharacter()}><Plus /> New Character</Button>
   </div>
@@ -71,7 +71,7 @@
             variant="ghost"
             size="sm"
             class="grow rounded-none hover:text-text border border-x-0"
-            href={`/characters/${character.uid}/home`}>Edit</Button
+            href={`/characters/${character.uid}/edit`}>Edit</Button
           >
           <Button
             variant="ghost"

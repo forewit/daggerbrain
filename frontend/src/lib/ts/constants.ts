@@ -249,7 +249,7 @@ export const COMMUNITY_CARDS = {
             "/assets/cards/communities/warborne.png",
         title: "Warborne",
         description:
-            "<p><Being part of a warborne community means you come from a place that is, or was, ravaged by war./p>",
+            "<p>Being part of a warborne community means you come from a place that is, or was, ravaged by war.</p>",
         features: [
             {
                 title: "Brave Face",
@@ -268,41 +268,41 @@ export const JUST_JAMES: Character = {
     uid: "forewit-justjames",
     name: "Just-James",
     image:
-      "https://pub-cdae2c597d234591b04eed47a98f233c.r2.dev/v1/card-header-images/domains/blade/whirlwind.webp",
+        "https://pub-cdae2c597d234591b04eed47a98f233c.r2.dev/v1/card-header-images/domains/blade/whirlwind.webp",
     level: 1,
     proficiency: 1,
     evasion: 12,
     damage_thresholds: {
-      major: 6,
-      severe: 13,
+        major: 6,
+        severe: 13,
     },
     armor: {
-      max: 3,
-      marked: 0,
+        max: 3,
+        marked: 0,
     },
     hp: {
-      max: 6,
-      marked: 0,
+        max: 6,
+        marked: 0,
     },
     stress: {
-      max: 7,
-      marked: 0,
+        max: 7,
+        marked: 0,
     },
     hope: {
-      max: MAX_HOPE,
-      marked: 0,
+        max: MAX_HOPE,
+        marked: 0,
     },
     traits: {
-      agility: 2,
-      strength: -1,
-      finesse: 1,
-      instinct: 0,
-      presence: 0,
-      knowledge: 1,
+        agility: 2,
+        strength: -1,
+        finesse: 1,
+        instinct: 0,
+        presence: 0,
+        knowledge: 1,
     },
     heritage: {
-      ancestry_card: ANCESTRY_CARDS.half_clank,
-      community_card: COMMUNITY_CARDS.warborne,
+        ancestry_card: ANCESTRY_CARDS.half_clank,
+        community_card: COMMUNITY_CARDS.warborne,
     },
     transformation_card: TRANSFORMATION_CARDS.werewolf,
     class: CLASSES.assassin,
@@ -310,6 +310,74 @@ export const JUST_JAMES: Character = {
     domain_card_loadout: [DOMAINS.blade.cards.whirlwind, DOMAINS.blade.cards.not_good_enough],
     domain_card_vault: [],
     settings: {
-      void_enabled: true,
+        void_enabled: true,
     },
-  }
+    experiences: [{
+        title: "Cool Under Pressure",
+        description: "As pressure mounts, your focus tightens and you perform at your best.",
+        modifier: 2,
+    }, {
+        title: "",
+        description: "",
+        modifier: 2,
+    }],
+}
+
+const NEW_CHARACTER: Character = {
+    uid: "new-character",
+    name: "New Character",
+    image:
+        "https://pub-cdae2c597d234591b04eed47a98f233c.r2.dev/v1/card-header-images/domains/blade/whirlwind.webp",
+    level: 1,
+    proficiency: 1,
+    evasion: 10,
+    damage_thresholds: {
+        major: 6,
+        severe: 13,
+    },
+    armor: {
+        max: 3,
+        marked: 0,
+    },
+    hp: {
+        max: 6,
+        marked: 0,
+    },
+    stress: {
+        max: 7,
+        marked: 0,
+    },
+    hope: {
+        max: MAX_HOPE,
+        marked: 0,
+    },
+    traits: {
+        agility: 0,
+        strength: 0,
+        finesse: 0,
+        instinct: 0,
+        presence: 0,
+        knowledge: 0,
+    },
+    heritage: {
+        ancestry_card: null,
+        community_card: null,
+    },
+    transformation_card: null,
+    class: null,
+    subclass: null,
+    domain_card_loadout: [],
+    domain_card_vault: [],
+    settings: {
+        void_enabled: false,
+    },
+    experiences: [{
+        title: "",
+        description: "",
+        modifier: 2,
+    }, {
+        title: "",
+        description: "",
+        modifier: 2,
+    }],
+}

@@ -9,18 +9,20 @@
   const character = $derived(app.characters.find((c) => c.uid === data.uid));
 </script>
 
-<div
-  class={cn(
-    "pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]",
-    "max-w-6xl mx-auto p-2"
-  )}
->
-  <p class="text-2xl font-bold py-2">Class</p>
+{#if character}
+  <div
+    class={cn(
+      "pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]",
+      "max-w-6xl mx-auto p-2"
+    )}
+  >
+    <p class="text-2xl font-bold py-2">Class</p>
 
-  <div class="flex flex-col gap-4 text-nowrap">
-    <Label>Level</Label>
-    <Label>Class</Label>
-    <Label>Subclass</Label>
-    <Label>Domain Cards</Label>
+    <div class="flex flex-col gap-4 text-nowrap">
+      <Label>Level</Label>
+      <Label>Class</Label>
+      <Label>Subclass</Label>
+      <Label>Domain Cards</Label>
+    </div>
   </div>
-</div>
+{/if}

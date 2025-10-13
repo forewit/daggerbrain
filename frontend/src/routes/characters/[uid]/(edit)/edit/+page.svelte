@@ -30,7 +30,7 @@
       "max-w-6xl mx-auto px-4 py-2"
     )}
   >
-    <p class="text-2xl font-bold py-2">Home</p>
+    <p class="text-2xl font-bold py-2">Character Settings</p>
 
     <!-- hidden file input for image upload -->
     <input
@@ -41,8 +41,8 @@
       class="hidden"
     />
 
-    <div class="flex flex-col gap-4 text-nowrap">
-      <Label>
+    <div class="space-y-4 text-nowrap">
+      <Label class="w-min">
         Picture:
         <button
           class="h-[90px] w-[90px] shrink-0 p-1 aspect-square rounded-lg border-2 overflow-hidden cursor-pointer hover:border-primary/50 transition-colors group"
@@ -58,7 +58,7 @@
 
       <Label>
         Name:
-        <Input bind:value={character.name} />
+        <Input bind:value={character.name} class="w-[200px]"/>
       </Label>
 
       <Label>
