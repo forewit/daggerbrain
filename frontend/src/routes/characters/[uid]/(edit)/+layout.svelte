@@ -56,7 +56,7 @@
       "pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]",
       "@container grid grid-cols-[1fr_repeat(6,128px)_1fr] items-center",
       "snap-x snap-mandatory overflow-x-auto ",
-      "bg-muted/50 mt-3 h-18 "
+      "bg-muted/20 mt-3 h-20 "
     )}
     style="scrollbar-width: none;"
   >

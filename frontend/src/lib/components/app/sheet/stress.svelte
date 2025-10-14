@@ -20,12 +20,10 @@
             ? 'bg-muted-foreground'
             : 'bg-transparent'} transition-colors"
           onclick={() => {
-            if (index + 1 <= character.stress.marked) {
-              // Clicking current value or lower subtracts 1 (minimum 0)
+            if (index + 1 === character.stress.marked) {
               character.stress.marked = Math.max(0, character.stress.marked - 1);
             } else {
-              // Clicking higher adds 1 (maximum of character.stress max)
-              character.stress.marked = Math.min(character.stress.max, character.stress.marked + 1);
+              character.stress.marked = index + 1;
             }
           }}
           type="button"

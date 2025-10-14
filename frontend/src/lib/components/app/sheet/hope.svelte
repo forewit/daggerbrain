@@ -12,7 +12,7 @@
 {#if character}
   <div class={cn("flex flex-col justify-center text-center gap-2", className)}>
     <p class="text-sm font-medium text-accent">HOPE</p>
-    <div class="justify-center flex flex-wrap gap-4">
+    <div class="mt-1 justify-center flex flex-wrap gap-4">
       {#each Array(character.hope.max) as _, index}
         <button
           aria-label="hope-slot"
@@ -23,12 +23,10 @@
               "shadow-[0_0_8px_rgba(253,212,113,0.4),0_0_16px_rgba(253,212,113,0.2)]"
           )}
           onclick={() => {
-            if (index + 1 <= character.hope.marked) {
-              // Clicking current value or lower subtracts 1 (minimum 0)
+            if (index + 1 === character.hope.marked) {
               character.hope.marked = Math.max(0, character.hope.marked - 1);
             } else {
-              // Clicking higher adds 1 (maximum of hp max)
-              character.hope.marked = Math.min(character.hope.max, character.hope.marked + 1);
+              character.hope.marked = index + 1;
             }
           }}
           type="button"

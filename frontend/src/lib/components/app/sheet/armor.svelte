@@ -1,6 +1,7 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
   import type { Character } from "$lib/ts/types";
+  import Shield from "@lucide/svelte/icons/shield";
 
   let {
     class: className = "",
@@ -15,22 +16,26 @@
     </p>
     <p class="text-sm font-medium">Armor</p>
   </div>
-  <div class="flex flex-wrap gap-1 w-14">
+  <div class="flex flex-wrap items-center gap-x-1 gap-y-0 w-14">
     {#each Array(armor.max) as _, index}
-      <button 
-      aria-label="armor-slot"
-        class="w-4 h-3 rounded-md border border-muted-foreground {index < armor.marked ? 'bg-muted-foreground' : 'bg-transparent'} transition-colors"
+      <button
+        aria-label="armor-slot"
+        class="size-min outline-offset-2 rounded"
         onclick={() => {
-          if (index + 1 <= armor.marked) {
-            // Clicking current value or lower subtracts 1 (minimum 0)
+          if (index + 1 === armor.marked) {
             armor.marked = Math.max(0, armor.marked - 1);
           } else {
-            // Clicking higher adds 1 (maximum of armor max)
-            armor.marked = Math.min(armor.max, armor.marked + 1);
+            armor.marked = index + 1;
           }
         }}
         type="button"
-      ></button>
+      >
+        <Shield
+          class="size-4 transition-all text-muted-foreground {index < armor.marked
+            ? 'fill-muted-foreground'
+            : 'fill-transparent'}"
+        />
+      </button>
     {/each}
   </div>
 </div>

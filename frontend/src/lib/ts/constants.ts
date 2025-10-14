@@ -273,11 +273,11 @@ export const JUST_JAMES: Character = {
     proficiency: 1,
     evasion: 12,
     damage_thresholds: {
-        major: 6,
-        severe: 13,
+        major: 9,
+        severe: 19,
     },
     armor: {
-        max: 3,
+        max: 4,
         marked: 0,
     },
     hp: {

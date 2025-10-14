@@ -16,12 +16,10 @@
           ? 'bg-muted-foreground'
           : 'bg-transparent'} transition-colors"
         onclick={() => {
-          if (index + 1 <= hp.marked) {
-            // Clicking current value or lower subtracts 1 (minimum 0)
+          if (index + 1 === hp.marked) {
             hp.marked = Math.max(0, hp.marked - 1);
           } else {
-            // Clicking higher adds 1 (maximum of hp max)
-            hp.marked = Math.min(hp.max, hp.marked + 1);
+            hp.marked = index + 1;
           }
         }}
         type="button"

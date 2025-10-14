@@ -67,8 +67,8 @@
       <!-- top bar -->
       <div class="flex gap-2 px-2 pr-6">
         <div class="grow truncate relative">
-          <!-- level class subclass -->
 
+          <!-- level class subclass -->
           <div class="flex overflow-hidden items-center mt-4 mb-2.5 truncate max-w-[400px] h-9">
             <Dialog.Root>
               <Dialog.Trigger
@@ -89,7 +89,7 @@
             <Button
               href={`/characters/${character.uid}/class/`}
               class={cn(
-                "h-full truncate justify-start gap-2 grow rounded-l-none rounded-r-full",
+                "h-full truncate grow justify-start gap-2  rounded-l-none rounded-r-full",
                 "border-0 border-b"
               )}
               variant="outline"
