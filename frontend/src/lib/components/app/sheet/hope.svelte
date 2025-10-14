@@ -45,7 +45,7 @@
           }}
         >
           <span class="italic font-medium pr-1">{character.class.hope_feature.title}:</span>
-          {@html character.class.hope_feature.description}
+          {@html character.class.hope_feature.description_html}
         </button>
       </div>
     {/if}

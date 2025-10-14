@@ -27,7 +27,7 @@
   </button>
 
   {#if open}
-    <div class="z-5 -mt-2 relative p-4 pt-5 rounded-b-lg border-b bg-primary/5">
+    <div class="z-5 -mt-2 relative p-4 pt-6 rounded-b-lg border-b bg-primary/5">
       {@render children?.()}
     </div>
   {/if}

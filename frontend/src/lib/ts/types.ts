@@ -75,14 +75,14 @@ export type Subclass = {
 
 export type Feature = {
     title: string
-    description: string
+    description_html: string
 }
 
 export type Card<T extends "domain" | "ancestry" | "community" | "transformation" | "subclass_foundation" | "subclass_specialization" | "subclass_mastery"> = {
     image_url: string
     full_card_image_url: string
     title: string
-    description: string
+    description_html: string
 } & (
         T extends "domain" ? {
             level: number,

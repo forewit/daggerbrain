@@ -29,14 +29,14 @@
     {/if}
     Class Features
   </button>
-
+description_html
   {#if expanded}
   <div class="flex flex-col gap-4">
   {#each characterClass.features as feature}
     <div class="text-sm relative">
       <p class="font-medium text-[1rem] pb-2">{feature.title}</p>
       <div class="pl-2 leading-relaxed flex flex-col gap-2">
-        {@html feature.description}
+        {@html feature.description_html}
       </div>
     </div>
   {/each}

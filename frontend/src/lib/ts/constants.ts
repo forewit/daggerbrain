@@ -15,13 +15,13 @@ export const DOMAINS = {
                 image_url: "",
                 full_card_image_url: "/assets/cards/domains/blade/whirlwind.png",
                 title: "Whrilwind",
-                description: "",
+                description_html: "",
                 level: 1,
                 recall_cost: 0,
                 features: [
                     {
                         title: "",
-                        description: "<p>When you make a successful attack agains a target within Very Close range, you can <b>spend a Hope</b> to use the attack against all other targets within Very Close range.</p>"
+                        description_html: "<p>When you make a successful attack agains a target within Very Close range, you can <b>spend a Hope</b> to use the attack against all other targets within Very Close range.</p>"
                     }
                 ]
             },
@@ -29,13 +29,13 @@ export const DOMAINS = {
                 image_url: "",
                 full_card_image_url: "/assets/cards/domains/blade/not-good-enough.png",
                 title: "Not Good Enough",
-                description: "",
+                description_html: "",
                 level: 1,
                 recall_cost: 1,
                 features: [
                     {
                         title: "",
-                        description: "<p>When you roll your damage dice, you can reroll any 1s or 2s.</p>"
+                        description_html: "<p>When you roll your damage dice, you can reroll any 1s or 2s.</p>"
                     }
                 ]
             }
@@ -110,14 +110,14 @@ export const CLASSES = {
         name: "Assassin",
         hope_feature: {
             title: "Grim Resolve",
-            description: "<b>Spend 3 Hope</b> to clear 2 Stress.",
+            description_html: "<b>Spend 3 Hope</b> to clear 2 Stress.",
         },
         primary_domain: "blade",
         secondary_domain: "midnight",
         features: [
             {
                 title: "Marked for Death",
-                description: `<p>On a successful weapon attack, you can <b>mark a Stress</b> to make the target 
+                description_html: `<p>On a successful weapon attack, you can <b>mark a Stress</b> to make the target 
               <i>Marked for Death</i>. Attacks you make against a target that's <i>Marked for 
               Death</i> gain a bonus to damage equal to <b>+1d4</b> per tier.</p>
           
@@ -128,7 +128,7 @@ export const CLASSES = {
             },
             {
                 title: "Get In & Get Out",
-                description: `<p><b>Spend a Hope</b> to ask the GM for either a quick or inconspicuous way 
+                description_html: `<p><b>Spend a Hope</b> to ask the GM for either a quick or inconspicuous way 
               into or out of a building or structure you can see. The next roll you make that capitalizes 
               on this information has advantage.</p>`,
             },
@@ -142,17 +142,17 @@ export const CLASSES = {
                     full_card_image_url:
                         "/assets/cards/subclasses/executioners-guild-foundation.png",
                     title: "Executioners Guild",
-                    description: "Foundation",
+                    description_html: "Foundation",
                     spellcast_trait: "agility",
                     features: [
                         {
                             title: "First Strike",
-                            description:
+                            description_html:
                                 "<p>The first time in a scene you succeed on an attack roll, double the damage of the attack.</p>",
                         },
                         {
                             title: "Ambush",
-                            description: '<p>Your "Marked for Death" feature uses <b>d6s</b> instead of <b>d4s</b>.</p>',
+                            description_html: '<p>Your "Marked for Death" feature uses <b>d6s</b> instead of <b>d4s</b>.</p>',
                         },
                     ],
                 },
@@ -162,16 +162,16 @@ export const CLASSES = {
                     full_card_image_url:
                         "",
                     title: "Executioners Guild",
-                    description: "Specialization",
+                    description_html: "Specialization",
                     features: [
                         {
                             title: "Death Strike",
-                            description:
+                            description_html:
                                 "<p>When you deal Severe damage to a creature, you can <b>mark a stress</b> to make them mark an additional Hit Point.</p>",
                         },
                         {
                             title: "Scorpion's Poise",
-                            description: "<p>You gain a <b>+2</b> bonus to your Evasion against any attacks made by a creature <i>Marked for Death</i>.</p>"
+                            description_html: "<p>You gain a <b>+2</b> bonus to your Evasion against any attacks made by a creature <i>Marked for Death</i>.</p>"
                         }
                     ],
                 },
@@ -181,15 +181,15 @@ export const CLASSES = {
                     full_card_image_url:
                         "",
                     title: "Executioners Guild",
-                    description: "Mastery",
+                    description_html: "Mastery",
                     features: [
                         {
                             title: "True Strike",
-                            description: "<p>Once per long rest, when you fail an attack roll, you can <b>spend a hope</b> to make it a success instead.</p>",
+                            description_html: "<p>Once per long rest, when you fail an attack roll, you can <b>spend a hope</b> to make it a success instead.</p>",
                         },
                         {
                             title: "Backstab",
-                            description: '<p>Your "Marked for Death" feature uses <b>d8s</b> instead of <b>d6s</b>.</p>'
+                            description_html: '<p>Your "Marked for Death" feature uses <b>d8s</b> instead of <b>d6s</b>.</p>'
                         }
                     ],
                 },
@@ -205,16 +205,16 @@ export const TRANSFORMATION_CARDS = {
         full_card_image_url:
             "/assets/cards/transformations/werewolf.png",
         title: "Werewolf",
-        description: "<p>Werewolves are creatures who transform into supernatural wolves.</p>",
+        description_html: "<p>Werewolves are creatures who transform into supernatural wolves.</p>",
         features: [
             {
                 title: "Wolf Form",
-                description:
+                description_html:
                     "<p>When you mark one or more Hit Points, you can also <b>mark a stress</b> to enter your Wolf Form. While in this form, gain a <b>d10</b> Wolf Die that you add to all attack and damage rolls. When you would gain a Hope while in Wolf Form, you mark a Stress instead.</p>",
             },
             {
                 title: "Frenzy",
-                description:
+                description_html:
                     "<p>When you mark your last Stress while in Wolf Form, you go into a Frenzy. Roll a number of <b>d20s</b> equal to your tier and automatically deal that much physical damage to all creatures within Very Close Range. Then drop out of Wolf Form.</p>",
             },
         ],
@@ -228,14 +228,14 @@ export const ANCESTRY_CARDS = {
         full_card_image_url:
             "/assets/cards/ancestries/half-clank.png",
         title: "Half-Clank",
-        description: "<p>Half sentient mechanical being, half human.</p>",
+        description_html: "<p>Half sentient mechanical being, half human.</p>",
         top_feature: {
             title: "High Stamina",
-            description: "<p>Gain an additional Stress slot at character creation.</p>",
+            description_html: "<p>Gain an additional Stress slot at character creation.</p>",
         },
         bottom_feature: {
             title: "Efficient",
-            description:
+            description_html:
                 "<p>When you take a short rest, you can choose a long rest move instead of a short rest move.</p>",
         },
     } as Card<"ancestry">
@@ -248,12 +248,12 @@ export const COMMUNITY_CARDS = {
         full_card_image_url:
             "/assets/cards/communities/warborne.png",
         title: "Warborne",
-        description:
+        description_html:
             "<p>Being part of a warborne community means you come from a place that is, or was, ravaged by war.</p>",
         features: [
             {
                 title: "Brave Face",
-                description:
+                description_html:
                     "<p>Once per session, when an attack would cause you to <b>mark a stress</b>, you can <b>spend a hope</b> instead.</p>",
             },
         ],
