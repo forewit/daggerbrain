@@ -72,7 +72,7 @@
           <div class="flex overflow-hidden items-center mt-4 mb-2.5 truncate max-w-[400px] h-9">
             <Dialog.Root>
               <Dialog.Trigger
-                class="min-w-[72px] relative grid place-items-center text-xs font-medium pl-4 pr-3 rounded-l-full bg-accent/10 hover:bg-accent/20 h-full text-accent overflow-hidden group"
+                class="border-b border-accent/10 min-w-[72px] relative grid place-items-center text-xs font-medium pl-4 pr-3 rounded-l-full bg-accent/10 hover:bg-accent/20 h-full text-accent overflow-hidden group"
               >
                 <span class="transition-transform duration-200 group-hover:-translate-y-[150%]">
                   Level {character.level}
@@ -88,7 +88,10 @@
 
             <Button
               href={`/characters/${character.uid}/class/`}
-              class="h-full shrink truncate justify-start gap-2 grow border-none rounded-l-none rounded-r-full"
+              class={cn(
+                "h-full truncate justify-start gap-2 grow rounded-l-none rounded-r-full",
+                "border-0 border-b"
+              )}
               variant="outline"
             >
               <p class="truncate text-xs text-left">
@@ -159,7 +162,7 @@
       {/if}
 
       <!-- experiences -->
-       {#if character.experiences.some((experience) => experience.title !== "")}
+      {#if character.experiences.some((experience) => experience.title !== "")}
         <Experiences bind:experiences={character.experiences} class="mx-2" />
       {/if}
     </div>
