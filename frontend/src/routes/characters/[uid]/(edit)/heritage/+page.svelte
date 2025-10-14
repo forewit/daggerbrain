@@ -26,7 +26,7 @@
       "max-w-2xl mx-auto"
     )}
   >
-    <div class="mx-4 mb-4 flex flex-col gap-4">
+    <div class="m-4 flex flex-col gap-4">
       <Dropdown title="Ancestry" subtitle={character.heritage.ancestry_card?.title}>
         <p class="text-sm italic">
           Ancestries represent your character's lineage which affects their physical appearance and

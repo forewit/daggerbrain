@@ -10,19 +10,19 @@
 </script>
 
 {#if character}
-  <div
-    class={cn(
-      "pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]",
-      "max-w-6xl mx-auto px-4 py-2"
-    )}
-  >
-    <p class="text-2xl font-bold py-2">Equipment</p>
+<div
+class={cn(
+  "pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]",
+  "max-w-2xl mx-auto"
+)}
+>
+<div class="m-4 flex flex-col gap-4">
+  <p class="text-2xl font-medium pb-2 border-b">Equipment</p>
 
-    <div class="flex flex-col gap-4 text-nowrap">
-      <Label>Weapons</Label>
-      <Label>Armor</Label>
-      <Label>Inventory</Label>
-      <Label>Gold</Label>
-    </div>
-  </div>
+  <Label>Weapons</Label>
+  <Label>Armor</Label>
+  <Label>Inventory</Label>
+  <Label>Gold</Label>
+</div>
+</div>
 {/if}

@@ -16,14 +16,14 @@
 <div class="relative">
   <button
     class={cn(
-      "z-10 w-full px-6 border-b bg-primary-muted relative rounded-lg h-14 flex items-center",
+      "truncate z-10 w-full px-6 border-b bg-primary-muted relative rounded-lg h-14 flex items-center",
       className
     )}
     onclick={() => (open = !open)}
   >
     <p class="text-lg font-medium">{title}</p>
-    <p class="font-normal pl-4 text-muted-foreground ml-auto mr-3 text-sm">{subtitle}</p>
-    <ChevronLeft class={cn("text-muted-foreground size-5 transition-all", open && "-rotate-90")} />
+    <p class="truncate font-normal pl-4 text-muted-foreground ml-auto mr-3 text-sm">{subtitle}</p>
+    <ChevronLeft class={cn("shrink-0 text-muted-foreground size-5 transition-all", open && "-rotate-90")} />
   </button>
 
   {#if open}

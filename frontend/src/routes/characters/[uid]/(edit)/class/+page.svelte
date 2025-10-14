@@ -13,12 +13,12 @@
   <div
     class={cn(
       "pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]",
-      "max-w-6xl mx-auto p-2"
+      "max-w-2xl mx-auto"
     )}
   >
-    <p class="text-2xl font-bold py-2">Class</p>
+    <div class="m-4 flex flex-col gap-4">
+      <p class="text-2xl font-medium pb-2 border-b">Class</p>
 
-    <div class="flex flex-col gap-4 text-nowrap">
       <Label>Level</Label>
       <Label>Class</Label>
       <Label>Subclass</Label>

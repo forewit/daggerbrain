@@ -21,9 +21,9 @@
       "max-w-2xl mx-auto"
     )}
   >
-    <div class="mx-4">
-      <p class="text-2xl font-medium pb-2 mb-4">Settings</p>
-
+  <div class="m-4 flex flex-col gap-4">
+    <p class="text-2xl font-medium pb-2 border-b">Settings</p>
+  
       <!-- The Void -->
       <Label>
         The Void:
@@ -31,7 +31,7 @@
       </Label>
 
       <Dialog.Root>
-        <Dialog.Trigger class={cn(buttonVariants({ variant: "link" }), "text-destructive px-0")}
+        <Dialog.Trigger class={cn(buttonVariants({ variant: "link" }), "text-destructive p-0 h-min w-min")}
           >Delete Character</Dialog.Trigger
         >
         <Dialog.Content>

@@ -5,6 +5,7 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import Input from "$lib/components/ui/input/input.svelte";
   import Textarea from "$lib/components/ui/textarea/textarea.svelte";
+  import Dropdown from "$lib/components/app/builder/dropdown.svelte";
 
   let { data } = $props();
 
@@ -16,41 +17,45 @@
   <div
     class={cn(
       "pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]",
-      "max-w-6xl mx-auto px-4 py-4 pt-6"
+      "max-w-2xl mx-auto"
     )}
   >
-    <div class="flex flex-col gap-4 text-nowrap">
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 grow">
-        {#if character.experiences.length >= 2}
-          <div>
-            <p class="font-medium pb-2">1st Experience</p>
-            <div class="flex flex-col gap-3 bg-primary/50 rounded-lg p-4 relative">
-              <div class="flex gap-4 items-center">
-                <p class="font-medium">+{character.experiences[0].modifier}</p>
-                <Input bind:value={character.experiences[0].title} placeholder="Name" />
-              </div>
-              <Textarea
-                bind:value={character.experiences[0].description}
-                placeholder="Description"
-              />
-            </div>
-          </div>
+    <div class="m-4 flex flex-col gap-4">
+      <Dropdown
+        title="Experiences"
+        subtitle={character.experiences
+          .filter((experience) => experience.title !== "")
+          .map((experience) => experience.title)
+          .join(" | ")}
+      >
+        <p class="text-sm italic">
+          An Experience is a word or phrase used to encapsulate a specific set of skills personality
+          traits or aptitudes your character has acquired over the course of their life When your PC
+          makes a move they can spend a Hope to add a relevant Experience's modifier to an action or
+          reaction roll
+        </p>
+        <p class="text-sm italic mt-2">
+          &emsp;•&emsp;You get two Experiences at character creation each with a +2 modifier.
+        </p>
+        <div class="mt-4 flex flex-col gap-3 bg-primary/50 rounded-lg p-4 relative">
+          <p class="font-medium pb-2 -my-2">1st Experience</p>
 
-          <div>
-            <p class="font-medium pb-2">2nd Experience</p>
-            <div class="flex flex-col gap-3 bg-primary/50 rounded-lg p-4 relative">
-              <div class="flex gap-4 items-center">
-                <p class="font-medium">+{character.experiences[1].modifier}</p>
-                <Input bind:value={character.experiences[1].title} placeholder="Name" />
-              </div>
-              <Textarea
-                bind:value={character.experiences[1].description}
-                placeholder="Description"
-              />
-            </div>
+          <div class="flex gap-4 items-center">
+            <p class="font-medium">+{character.experiences[0].modifier}</p>
+            <Input bind:value={character.experiences[0].title} placeholder="Name" />
           </div>
-        {/if}
-      </div>
+          <Textarea bind:value={character.experiences[0].description} placeholder="Description" />
+        </div>
+        <div class="mt-4 flex flex-col gap-3 bg-primary/50 rounded-lg p-4 relative">
+          <p class="font-medium pb-2 -my-2">2nd Experience</p>
+
+          <div class="flex gap-4 items-center">
+            <p class="font-medium">+{character.experiences[0].modifier}</p>
+            <Input bind:value={character.experiences[1].title} placeholder="Name" />
+          </div>
+          <Textarea bind:value={character.experiences[1].description} placeholder="Description" />
+        </div>
+      </Dropdown>
 
       <Label>Description</Label>
       <Label>Background Questions</Label>

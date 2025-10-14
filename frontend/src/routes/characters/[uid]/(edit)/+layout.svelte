@@ -120,7 +120,7 @@
         disabled={tabs.indexOf(activeTab) === 0}
         href={`/characters/${character.uid}/${tabs[tabs.indexOf(activeTab) - 1]}`}
         variant="ghost"
-        class="hidden @3xl:flex text-accent size-12 rounded-full p-0 justify-self-center bg-accent/10 hover:bg-accent/20"
+        class="border-b border-accent/10 hidden @3xl:flex text-accent size-12 rounded-full p-0 justify-self-center bg-accent/10 hover:bg-accent/20"
       >
         <ChevronLeft class="size-6 -ml-[1px]" />
       </Button>
@@ -156,7 +156,7 @@
         <Button
           href={`/characters/${character.uid}/${tabs[tabs.indexOf(activeTab) + 1]}`}
           variant="ghost"
-          class="hidden @3xl:flex text-accent size-12 rounded-full  p-0 justify-self-center bg-accent/10 hover:bg-accent/20"
+          class="border-b border-accent/10 hidden @3xl:flex text-accent size-12 rounded-full  p-0 justify-self-center bg-accent/10 hover:bg-accent/20"
         >
           <ChevronRight class="size-6 -mr-[1px]" />
         </Button>
@@ -165,7 +165,7 @@
           href={`/characters/${character.uid}/`}
           variant="ghost"
           class={cn(
-            "hidden @3xl:flex text-accent size-12 rounded-full  p-0 justify-self-center bg-accent/10 hover:bg-accent/20"
+            "border-b border-accent/10 hidden @3xl:flex text-accent size-12 rounded-full  p-0 justify-self-center bg-accent/10 hover:bg-accent/20"
           )}
         >
           <ExternalLink class="size-4 -mr-[1px]" />
