@@ -30,30 +30,33 @@
 <ModeWatcher />
 
 <!-- nav bar -->
-<header
-  class={cn(
-    "pt-[calc(max(env(safe-area-inset-top),--spacing(3)))] pl-[calc(env(safe-area-inset-left)+--spacing(2))] pr-[calc(env(safe-area-inset-right)+--spacing(2))]",
-    "fixed w-full top-0 z-45 flex justify-center"
-  )}
->
-  <nav class=" shadow bg-muted rounded-full max-w-6xl w-full h-16 flex items-center">
-    <a href="/" class="text-lg font-medium flex items-center gap-2 px-4">
-      <img src="/assets/logos/daggerbrain.png" alt="Daggerbrain" class="size-6" />
-      Daggerbrain
-    </a>
-    <div class="grow sm:max-w-0"></div>
-    <Button variant="ghost" href="/characters" class=" rounded-none h-full">Characters</Button>
-    <Button variant="ghost" href="/rules" class=" rounded-none h-full pr-6 sm:pr-4">Rules</Button>
-  </nav>
-</header>
 
 <div
   style="scrollbar-width: none;"
   class={cn(app.pwa ? "h-lvh w-lvw" : "h-dvh w-dvw", "relative overflow-x-hidden overflow-y-auto")}
 >
   <div class="min-h-full w-full flex flex-col">
+    <header
+      class={cn(
+        "pt-[calc(max(env(safe-area-inset-top),--spacing(3)))] pl-[calc(env(safe-area-inset-left)+--spacing(2))] pr-[calc(env(safe-area-inset-right)+--spacing(2))]",
+        "sticky w-full top-0 z-45 flex justify-center"
+      )}
+    >
+      <nav class=" shadow bg-muted rounded-full max-w-6xl w-full h-16 flex items-center">
+        <a href="/" class="text-lg font-medium flex items-center gap-2 px-4">
+          <img src="/assets/logos/daggerbrain.png" alt="Daggerbrain" class="size-6" />
+          Daggerbrain
+        </a>
+        <div class="grow sm:max-w-0"></div>
+        <Button variant="ghost" href="/characters" class=" rounded-none h-full">Characters</Button>
+        <Button variant="ghost" href="/rules" class=" rounded-none h-full pr-6 sm:pr-4"
+          >Rules</Button
+        >
+      </nav>
+    </header>
+
     <!-- page -->
-    <main class="grow pt-[calc(max(env(safe-area-inset-top),--spacing(3)))] mt-16">
+    <main class="grow">
       {@render children?.()}
     </main>
 

@@ -4,6 +4,9 @@
   import Label from "$lib/components/ui/label/label.svelte";
   import { getAppContext } from "$lib/ts/app.svelte";
   import { cn, handleImageUpload } from "$lib/utils";
+  import * as Dialog from "$lib/components/ui/dialog/index";
+  import { buttonVariants } from "$lib/components/ui/button";
+  import { goto } from "$app/navigation";
 
   let { data } = $props();
 
@@ -58,13 +61,37 @@
 
       <Label>
         Name:
-        <Input bind:value={character.name} class="w-[200px]"/>
+        <Input bind:value={character.name} class="w-[200px]" />
       </Label>
 
       <Label>
         The Void:
         <Checkbox bind:checked={character.settings.void_enabled} />
       </Label>
+
+      <Dialog.Root>
+        <Dialog.Trigger class={cn(buttonVariants({variant:"link"}), "text-destructive")}>Delete Character</Dialog.Trigger>
+        <Dialog.Content>
+          <Dialog.Header>
+            <Dialog.Title>Delete Character</Dialog.Title>
+            <Dialog.Description>
+              Are you sure you want to delete <strong>{character.name}</strong>? This action cannot
+              be undone.
+            </Dialog.Description>
+          </Dialog.Header>
+          <Dialog.Footer >
+            <Dialog.Close class={cn(buttonVariants({ variant: "link" }), "text-muted-foreground")}
+              >Cancel</Dialog.Close
+            >
+            <Dialog.Close
+              class={buttonVariants({ variant: "destructive" })}
+              onclick={() => {
+                app.deleteCharacter(character.uid);
+              }}>Delete</Dialog.Close
+            >
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog.Root>
     </div>
   </div>
 {/if}
