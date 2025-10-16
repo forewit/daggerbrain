@@ -1,9 +1,31 @@
 <script lang="ts">
+  import AncestryCard from "$lib/components/app/cards/ancestry-card.svelte";
+  import Dice from "$lib/components/app/dice/dice.svelte";
+  import { ANCESTRY_CARDS } from "$lib/ts/constants";
   import { getAppContext } from "$lib/ts/app.svelte";
   import { cn } from "$lib/utils";
   import { onMount } from "svelte";
 
   const app = getAppContext();
+
+  let rollFunction: ((rollString: string) => void) | undefined;
+  let customRollString = $state("1d4+1d6+1d8+1d10+1d12+1d20");
+
+  function handleRoll(rollFn: (rollString: string) => void) {
+    rollFunction = rollFn;
+  }
+
+  function rollDice(rollString: string) {
+    if (rollFunction) {
+      rollFunction(rollString);
+    }
+  }
+
+  function rollCustomDice() {
+    if (customRollString.trim()) {
+      rollDice(customRollString.trim());
+    }
+  }
 
   onMount(() => {
     //  pwa instructions credit: https://github.com/philfung/add-to-homescreen
@@ -39,4 +61,6 @@
 >
   <p class="text-2xl font-bold py-2">Welcome</p>
   <p class="text-xs italic font-muted-foreground">Under construction</p>
+
+  <AncestryCard card={ANCESTRY_CARDS.half_clank} size="small" hideCredits hideImage />
 </div>

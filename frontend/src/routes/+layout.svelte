@@ -47,7 +47,7 @@
         class="border-b overflow-x-auto bg-muted rounded-full max-w-6xl w-full h-16 flex items-center"
       >
         <a href="/" class="text-lg font-medium flex items-center gap-2 px-4 shrink-0">
-          <img src="/assets/logos/daggerbrain.png" alt="Daggerbrain" class="size-6" />
+          <img src="/images/logos/daggerbrain.png" alt="Daggerbrain" class="size-6" />
           Daggerbrain
         </a>
         <div class="grow md:max-w-0"></div>
@@ -75,7 +75,7 @@
           <div class="flex flex-col gap-2">
             <div class="flex items-center gap-2">
               <img
-                src="/assets/logos/compatible_with_DH.png"
+                src="/images/logos/compatible_with_DH.png"
                 alt="Compatible with Daggerheart"
                 class="size-6"
               />

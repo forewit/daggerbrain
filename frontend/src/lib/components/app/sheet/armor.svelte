@@ -10,12 +10,16 @@
 </script>
 
 <div class={cn("flex gap-2 h-min text-center border-2 rounded-md p-2", className)}>
-  <div class="">
+  <button
+    onclick={() => {
+      armor.marked = 0;
+    }}
+  >
     <p class="text-lg font-bold">
       {armor.max}
     </p>
     <p class="text-sm font-medium">Armor</p>
-  </div>
+  </button>
   <div class="flex flex-wrap items-center gap-x-1 gap-y-0 w-14">
     {#each Array(armor.max) as _, index}
       <button

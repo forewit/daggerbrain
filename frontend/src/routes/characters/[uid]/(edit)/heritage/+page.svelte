@@ -10,6 +10,7 @@
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import Dropdown from "$lib/components/app/builder/dropdown.svelte";
+  import AncestryCard from "$lib/components/app/cards/ancestry-card.svelte";
 
   let { data } = $props();
 
@@ -29,9 +30,11 @@
     <div class="m-4 flex flex-col gap-4">
       <Dropdown title="Ancestry" subtitle={character.heritage.ancestry_card?.title}>
         <p class="text-sm italic">
-          Ancestries represent your character's lineage which affects their physical appearance and
-          access to certain special abilities.
+          {@html ANCESTRY_CARDS.description_html}
         </p>
+        {#if character.heritage.ancestry_card}
+          <AncestryCard card={character.heritage.ancestry_card} size="small" hideCredits hideImage />
+        {/if}
       </Dropdown>
 
       <Dropdown title="Community" subtitle={character.heritage.community_card?.title}>

@@ -10,8 +10,8 @@
 </script>
 
 {#if character}
-  <div class={cn("flex flex-col justify-center text-center gap-2", className)}>
-    <p class="text-sm font-medium text-accent">HOPE</p>
+  <div class={cn("flex flex-col justify-center text-center gap-3", className)}>
+    <button onclick={()=>{character.hope.marked = 0}} class="text-sm font-medium text-accent">HOPE</button>
     <div class="mt-1 justify-center flex flex-wrap gap-4">
       {#each Array(character.hope.max) as _, index}
         <button

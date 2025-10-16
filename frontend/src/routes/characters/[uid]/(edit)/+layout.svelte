@@ -56,7 +56,7 @@
       "pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]",
       "@container grid grid-cols-[1fr_repeat(6,128px)_1fr] items-center",
       "snap-x snap-mandatory overflow-x-auto ",
-      "bg-muted/20 mt-3 h-20 "
+      "bg-muted md:bg-muted/20 mt-3 h-20"
     )}
     style="scrollbar-width: none;"
   >
@@ -68,11 +68,12 @@
         variant="ghost"
         href={`/characters/${character.uid}/${tab}`}
         class={cn(
-          "border-b h-12 w-[calc(var(--container-3xl)/6)] max-w-[calc(var(--container-3xl)/6)] bg-muted hover:bg-muted",
-          "pr-1 transition-all duration-300 font-normal hover:text-foreground relative snap-center rounded-none shadow-none",
+          "focus-visible:ring-foreground",
+          "border-b-0 @3xl:border-b h-12 w-[calc(var(--container-3xl)/6)] max-w-[calc(var(--container-3xl)/6)] bg-muted hover:bg-muted",
+          "pr-1 transition-colors duration-300 font-normal hover:text-foreground relative snap-center rounded-none shadow-none",
           activeTab === tab &&
             "border-accent/10 hover:text-accent text-accent bg-accent-muted hover:bg-accent-muted",
-          i === 0 && "rounded-l-full"
+          i === 0 && "@3xl:rounded-l-full"
         )}
       >
         {#if i === 0}
@@ -82,14 +83,13 @@
           {i}. {capitalize(tab)}
         {/if}
 
-        {#if i !== 0}
-          <span
-            class={cn(
-              "transition-all duration-300 absolute left-0 ",
-              "size-0 border-y-24 border-l-12 border-y-transparent border-l-muted"
-            )}
-          ></span>
-        {/if}
+        <span
+          class={cn(
+            "transition-all duration-300 absolute left-0 ",
+            "size-0 border-y-24 border-l-12 border-y-transparent border-l-muted",
+            i === 0 && "@3xl:hidden"
+          )}
+        ></span>
         <span
           style="z-index: {tabs.length - i}"
           class={cn(
@@ -104,7 +104,7 @@
     <Button
       href={`/characters/${character.uid}/`}
       variant="link"
-      class="border-b pl-8 pr-7 font-normal bg-muted rounded-r-full h-12 w-[calc(var(--container-3xl)/6)]"
+      class="focus-visible:ring-foreground border-b-0 @3xl:border-b pl-8 pr-7 font-normal bg-muted rounded-r-full h-12 w-[calc(var(--container-3xl)/6)]"
     >
       Sheet
       <ExternalLink class="size-4" />
@@ -120,7 +120,7 @@
         disabled={tabs.indexOf(activeTab) === 0}
         href={`/characters/${character.uid}/${tabs[tabs.indexOf(activeTab) - 1]}`}
         variant="ghost"
-        class="border-b border-accent/10 hidden @3xl:flex text-accent size-12 rounded-full p-0 justify-self-center bg-accent/10 hover:bg-accent/20"
+        class="border-b-0 @3xl:border-b border-accent/10 hidden @3xl:flex text-accent size-12 rounded-full p-0 justify-self-center bg-accent/10 hover:bg-accent/20"
       >
         <ChevronLeft class="size-6 -ml-[1px]" />
       </Button>

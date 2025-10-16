@@ -11,7 +11,7 @@
 
 {#if character}
   <div class={cn("flex items-center gap-4 border-2 rounded-md h-12 px-4", className)}>
-    <p class="text-sm font-medium">STRESS</p>
+    <button onclick={()=>{character.stress.marked = 0}} class="text-sm font-medium">STRESS</button>
     <div class="flex flex-wrap gap-2">
       {#each Array(character.stress.max) as _, index}
         <button

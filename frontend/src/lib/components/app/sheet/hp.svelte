@@ -7,7 +7,7 @@
 </script>
 
 <div class={cn("flex items-center gap-4 border-2 rounded-md h-12 px-4", className)}>
-  <p class="text-sm font-medium">HP</p>
+  <button onclick={()=>{hp.marked = 0}} class="text-sm font-medium">HP</button>
   <div class="flex flex-wrap gap-2">
     {#each Array(hp.max) as _, index}
       <button

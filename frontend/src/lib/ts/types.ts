@@ -83,6 +83,7 @@ export type Card<T extends "domain" | "ancestry" | "community" | "transformation
     full_card_image_url: string
     title: string
     description_html: string
+    artist_name: string
 } & (
         T extends "domain" ? {
             level: number,

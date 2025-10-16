@@ -12,8 +12,9 @@ export const DOMAINS = {
         color: "#af231c",
         cards: {
             whirlwind: {
+                artist_name: "",
                 image_url: "",
-                full_card_image_url: "/assets/cards/domains/blade/whirlwind.png",
+                full_card_image_url: "/images/full_cards/domains/blade/whirlwind.png",
                 title: "Whrilwind",
                 description_html: "",
                 level: 1,
@@ -26,8 +27,9 @@ export const DOMAINS = {
                 ]
             },
             not_good_enough: {
+                artist_name: "",
                 image_url: "",
-                full_card_image_url: "/assets/cards/domains/blade/not-good-enough.png",
+                full_card_image_url: "/images/full_cards/domains/blade/not-good-enough.png",
                 title: "Not Good Enough",
                 description_html: "",
                 level: 1,
@@ -137,10 +139,11 @@ export const CLASSES = {
             executioners_guild: {
                 name: "Executioners Guild",
                 foundation_card: {
+                    artist_name: "",
                     image_url:
                         "",
                     full_card_image_url:
-                        "/assets/cards/subclasses/executioners-guild-foundation.png",
+                        "/images/full_cards/subclasses/executioners-guild-foundation.png",
                     title: "Executioners Guild",
                     description_html: "Foundation",
                     spellcast_trait: "agility",
@@ -157,6 +160,7 @@ export const CLASSES = {
                     ],
                 },
                 specialization_card: {
+                    artist_name: "",
                     image_url:
                         "",
                     full_card_image_url:
@@ -176,6 +180,7 @@ export const CLASSES = {
                     ],
                 },
                 mastery_card: {
+                    artist_name: "",
                     image_url:
                         "",
                     full_card_image_url:
@@ -203,7 +208,7 @@ export const TRANSFORMATION_CARDS = {
         image_url:
             "",
         full_card_image_url:
-            "/assets/cards/transformations/werewolf.png",
+            "/images/full_cards/transformations/werewolf.png",
         title: "Werewolf",
         description_html: "<p>Werewolves are creatures who transform into supernatural wolves.</p>",
         features: [
@@ -222,21 +227,23 @@ export const TRANSFORMATION_CARDS = {
 } as const
 
 export const ANCESTRY_CARDS = {
+    description_html: "Ancestries represent your character's lineage which affects their physical appearance and access to certain special abilities.",
     half_clank: {
         image_url:
-            "",
+            "/images/card/art/ancestries/clank.webp",
         full_card_image_url:
-            "/assets/cards/ancestries/half-clank.png",
+            "/images/full_cards/ancestries/half-clank.png",
         title: "Half-Clank",
-        description_html: "<p>Half sentient mechanical being, half human.</p>",
+        description_html: "Half sentient mechanical being, half human.",
+        artist_name: "Mat Wilma",
         top_feature: {
             title: "High Stamina",
-            description_html: "<p>Gain an additional Stress slot at character creation.</p>",
+            description_html: "Gain an additional Stress slot at character creation.",
         },
         bottom_feature: {
             title: "Efficient",
             description_html:
-                "<p>When you take a short rest, you can choose a long rest move instead of a short rest move.</p>",
+                "When you take a short rest, you can choose a long rest move instead of a short rest move.",
         },
     } as Card<"ancestry">
 } as const
@@ -246,7 +253,7 @@ export const COMMUNITY_CARDS = {
         image_url:
             "",
         full_card_image_url:
-            "/assets/cards/communities/warborne.png",
+            "/images/full_cards/communities/warborne.png",
         title: "Warborne",
         description_html:
             "<p>Being part of a warborne community means you come from a place that is, or was, ravaged by war.</p>",
