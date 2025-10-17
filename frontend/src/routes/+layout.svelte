@@ -39,20 +39,20 @@
     <header
       class={cn(
         "pt-[calc(max(env(safe-area-inset-top),--spacing(3)))] pl-[calc(env(safe-area-inset-left)+--spacing(2))] pr-[calc(env(safe-area-inset-right)+--spacing(2))]",
-        "sticky w-full top-0 z-45 flex justify-center"
+        "sticky w-full top-0 z-45 flex justify-center bg-muted border-b shadow-lg"
       )}
     >
       <nav
         style="scrollbar-width: none;"
-        class="border-b overflow-x-auto bg-muted rounded-full max-w-6xl w-full h-16 flex items-center"
+        class="overflow-x-auto bg-muted max-w-6xl w-full h-16 flex items-center"
       >
         <a href="/" class="text-lg font-medium flex items-center gap-2 px-4 shrink-0">
           <img src="/images/logos/daggerbrain.png" alt="Daggerbrain" class="size-6" />
           Daggerbrain
         </a>
         <div class="grow md:max-w-0"></div>
-        <Button variant="ghost" href="/characters" class=" rounded-none h-full">Characters</Button>
-        <Button variant="ghost" href="/rules" class=" rounded-none h-full pr-6 sm:pr-4"
+        <Button variant="link" href="/characters" class=" rounded-none h-full">Characters</Button>
+        <Button variant="link" href="/rules" class=" rounded-none h-full pr-6 sm:pr-4"
           >Rules</Button
         >
       </nav>

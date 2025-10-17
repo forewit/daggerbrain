@@ -8,7 +8,7 @@
     class: className = "",
     children,
   }: {
-    card: Card<"ancestry">;
+    card: Card<"community">;
     class?: string;
     children?: Snippet;
   } = $props();
@@ -27,14 +27,14 @@
 
   <!-- content -->
   <div class="flex-2 flex flex-col gap-2 px-3 py-2">
-    <!-- title and ancestry label -->
+    <!-- title and community label -->
     <div class="relative flex gap-2 justify-between">
       <p class="text-xl font-eveleth uppercase">
         {card.title}
       </p>
 
       <div class="shadow-md px-2 py-1 bg-accent rounded h-min">
-        <p class=" text-xs uppercase text-black tracking-[2px] font-bold">Ancestry</p>
+        <p class=" text-xs uppercase text-black tracking-[2px] font-bold">Community</p>
       </div>
     </div>
 
@@ -44,14 +44,12 @@
     </p>
 
     <!-- features -->
-    <p class="text-xs">
-      <b><em>{card.top_feature.title}:</em></b>
-      {@html card.top_feature.description_html}
-    </p>
-    <p class="text-xs">
-      <b><em>{card.bottom_feature.title}:</em></b>
-      {@html card.bottom_feature.description_html}
-    </p>
+    {#each card.features as feature}
+      <p class="text-xs">
+        <b><em>{feature.title}:</em></b>
+        {@html feature.description_html}
+      </p>
+    {/each}
     {@render children?.()}
   </div>
 </div>

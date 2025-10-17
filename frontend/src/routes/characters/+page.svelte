@@ -45,7 +45,7 @@
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     {#each app.characters as character}
-      <div class="w-full max-w-[500px] rounded-xl mx-auto overflow-hidden">
+      <div class="w-full max-w-[500px] rounded mx-auto overflow-hidden">
         <a href={`/characters/${character.uid}/`} class="bg-border/80 border border-b-0 hover:bg-border/50 flex p-1 gap-2 ">
           <div class=" h-16 w-16 shrink-0 rounded-lg border-2 overflow-hidden">
             <img src={character.image} alt={character.name} class="w-full h-full object-cover" />

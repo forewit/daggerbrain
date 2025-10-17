@@ -131,11 +131,11 @@
     {#if expanded}
       <div
         class={cn(
-          "w-min flex flex-col gap-1 text-foreground bg-background py-4 px-2 items-center border-2 border-b-0  rounded-full"
+          "w-min flex flex-col gap-1 text-foreground bg-primary-muted shadow-lg py-4 px-2 items-center border-2 border-b-0  rounded-full"
         )}
       >
         <button
-          class="relative p-2 size-12 hover:bg-muted rounded-md"
+          class="relative p-2 size-12 hover:bg-primary/20 rounded-md"
           onclick={() => {
             counts.d4++;
           }}
@@ -186,7 +186,7 @@
           </svg>
         </button>
         <button
-          class="relative p-2 size-12 hover:bg-muted rounded-md"
+          class="relative p-2 size-12 hover:bg-primary/20 rounded-md"
           onclick={() => {
             counts.d6++;
           }}
@@ -248,7 +248,7 @@
           </svg>
         </button>
         <button
-          class="relative p-2 size-12 hover:bg-muted rounded-md"
+          class="relative p-2 size-12 hover:bg-primary/20 rounded-md"
           onclick={() => {
             counts.d8++;
           }}
@@ -310,7 +310,7 @@
           </svg>
         </button>
         <button
-          class="relative p-2 size-12 hover:bg-muted rounded-md"
+          class="relative p-2 size-12 hover:bg-primary/20 rounded-md"
           onclick={() => {
             counts.d10++;
           }}
@@ -383,7 +383,7 @@
           </svg>
         </button>
         <button
-          class="relative p-2 size-12 hover:bg-muted rounded-md"
+          class="relative p-2 size-12 hover:bg-primary/20 rounded-md"
           onclick={() => {
             counts.d12++;
           }}
@@ -456,7 +456,7 @@
           </svg>
         </button>
         <button
-          class="relative p-2 size-12 hover:bg-muted rounded-md"
+          class="relative p-2 size-12 hover:bg-primary/20 rounded-md"
           onclick={() => {
             counts.d20++;
           }}
@@ -562,7 +562,7 @@
           </svg>
         </button>
         <button
-          class="relative p-2 size-12 hover:bg-muted rounded-md"
+          class="relative p-2 size-12 hover:bg-primary/20 rounded-md"
           onclick={() => (counts.duality = 1)}
           oncontextmenu={(e) => {
             e.preventDefault();
@@ -571,7 +571,7 @@
         >
           {#if counts.duality > 0}
             <span
-              class="absolute top-1/2 -translate-y-1/2 left-full -translate-x-4 text-xs font-medium px-2 bg-muted rounded-full"
+              class="z-40 absolute top-1/2 -translate-y-1/2 left-full -translate-x-4 text-xs font-medium px-2 bg-muted rounded-full"
               >{counts.duality}</span
             >
           {/if}
@@ -692,13 +692,13 @@
     {/if}
 
     <div
-      class="flex py-2 px-2 items-center justify-center shrink-0 border-2 rounded-full bg-background"
+      class="flex py-2 px-2 items-center justify-center shrink-0 border-2 rounded-full bg-primary-muted shadow-lg"
     >
       {#if expanded}
         {#if counts.d4 > 0 || counts.d6 > 0 || counts.d8 > 0 || counts.d10 > 0 || counts.d12 > 0 || counts.d20 > 0 || counts.duality > 0}
           <button
             onclick={close}
-            class="text-accent relative size-12 bg-muted/50 hover:bg-muted rounded-l-full border-2 border-accent/10 grid place-items-center"
+            class="text-accent relative size-12 bg-muted/50 hover:bg-accent/20 rounded-l-full border-2 border-accent/10 grid place-items-center"
           >
             <X class="size-6 stroke-1" />
           </button>
@@ -714,7 +714,7 @@
         {:else}
           <button
             onclick={close}
-            class="text-accent relative size-12 bg-muted/50 hover:bg-muted rounded-full border-2 border-accent/10 grid place-items-center"
+            class="text-accent relative size-12 bg-muted/50 hover:bg-accent/20 rounded-full border-2 border-accent/10 grid place-items-center"
           >
             <X class="size-6 stroke-1" />
           </button>
@@ -723,7 +723,7 @@
         <!-- svelte-ignore a11y_consider_explicit_label -->
         <button
           onclick={() => (expanded = true)}
-          class="text-accent relative size-12 bg-muted/50 hover:bg-muted rounded-full border-2 border-accent/10 grid place-items-center"
+          class="text-accent relative size-12 bg-muted/50 hover:bg-accent/20 rounded-full border-2 border-accent/10 grid place-items-center"
         >
           <svg
             class="size-6"

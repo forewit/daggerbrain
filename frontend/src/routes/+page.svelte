@@ -1,7 +1,6 @@
 <script lang="ts">
   import AncestryCard from "$lib/components/app/cards/ancestry-card.svelte";
   import Dice from "$lib/components/app/dice/dice.svelte";
-  import { ANCESTRY_CARDS } from "$lib/ts/constants";
   import { getAppContext } from "$lib/ts/app.svelte";
   import { cn } from "$lib/utils";
   import { onMount } from "svelte";
@@ -61,6 +60,4 @@
 >
   <p class="text-2xl font-bold py-2">Welcome</p>
   <p class="text-xs italic font-muted-foreground">Under construction</p>
-
-  <AncestryCard card={ANCESTRY_CARDS.half_clank} class="rounded-none" size="small" hideCredits  />
 </div>

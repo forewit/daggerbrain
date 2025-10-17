@@ -1,7 +1,7 @@
 import type { Character } from './types';
 import { getContext, setContext } from 'svelte';
 import { loadCharacters, saveCharacters } from './data';
-import { MAX_HOPE, ANCESTRY_CARDS, COMMUNITY_CARDS, TRANSFORMATION_CARDS, CLASSES, DOMAINS, JUST_JAMES } from './constants';
+import { JUST_JAMES } from './constants';
 
 function createApp() {
   // --- ephemeral state ---

@@ -4,18 +4,15 @@
 @custom-variant hover (&:hover);
 
 @font-face {
-  font-family: 'Overpass';
-  src: url('/fonts/overpass/Overpass-VariableFont_wght.ttf') format('truetype');
+  font-family: 'Inter';
+  src: url('/fonts/inter/Inter-VariableFont_opsz,wght.ttf') format('truetype');
   font-weight: 100 900;
   font-style: normal;
-  font-display: swap; 
-  ascent-override: 90%;
-  descent-override: 18%;
+  font-display: swap;
 }
-
 @font-face {
-  font-family: 'Overpass';
-  src: url('/fonts/overpass/Overpass-Italic-VariableFont_wght.ttf') format('truetype');
+  font-family: 'Inter';
+  src: url('/fonts/inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype');
   font-weight: 100 900;
   font-style: italic;
   font-display: swap;
@@ -108,7 +105,7 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    font-family: 'Overpass', sans-serif;
+    font-family: 'Inter', sans-serif;
   }
   body {
     @apply bg-background text-foreground;

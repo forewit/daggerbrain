@@ -56,11 +56,11 @@
       "pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]",
       "@container grid grid-cols-[1fr_repeat(6,128px)_1fr] items-center",
       "snap-x snap-mandatory overflow-x-auto ",
-      "bg-muted md:bg-muted/20 mt-3 h-20"
+      "bg-muted/50 mt-3 h-20"
     )}
     style="scrollbar-width: none;"
   >
-    <div class="shrink-0 w-[50vw] @3xl:w-0"></div>
+    <div class="border-y h-12 bg-muted shrink-0 w-[50vw] @3xl:w-0"></div>
 
     {#each tabs as tab, i}
       <Button
@@ -69,7 +69,7 @@
         href={`/characters/${character.uid}/${tab}`}
         class={cn(
           "focus-visible:ring-foreground",
-          "border-b-0 @3xl:border-b h-12 w-[calc(var(--container-3xl)/6)] max-w-[calc(var(--container-3xl)/6)] bg-muted hover:bg-muted",
+          "border-y h-12 w-[calc(var(--container-3xl)/6)] max-w-[calc(var(--container-3xl)/6)] bg-muted hover:bg-muted",
           "pr-1 transition-colors duration-300 font-normal hover:text-foreground relative snap-center rounded-none shadow-none",
           activeTab === tab &&
             "border-accent/10 hover:text-accent text-accent bg-accent-muted hover:bg-accent-muted",
@@ -104,13 +104,13 @@
     <Button
       href={`/characters/${character.uid}/`}
       variant="link"
-      class="focus-visible:ring-foreground border-b-0 @3xl:border-b pl-8 pr-7 font-normal bg-muted rounded-r-full h-12 w-[calc(var(--container-3xl)/6)]"
+      class="snap-center focus-visible:ring-foreground border-b-0 @3xl:border-b pl-8 pr-7 font-normal bg-muted @3xl:rounded-r-full h-12 w-[calc(var(--container-3xl)/6)]"
     >
       Sheet
       <ExternalLink class="size-4" />
     </Button>
 
-    <div class="shrink-0 w-[50vw] @3xl:w-0"></div>
+    <div class="border-y h-12 bg-muted shrink-0 w-[50vw] @3xl:w-0"></div>
   </div>
 
   <!-- page -->
