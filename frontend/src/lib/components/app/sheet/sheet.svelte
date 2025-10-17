@@ -33,6 +33,16 @@
       character?.heritage.ancestry_card,
       character?.heritage.community_card,
       character?.transformation_card,
+      ...(character?.custom_cards || []),
+    ].filter(Boolean) as Card<any>[]
+  );
+
+  let classCards: Card<any>[] = $derived(
+    [
+      character?.primary_class?.mastery_level && character?.primary_class?.mastery_level >=  1 && character?.primary_class?.subclass?.foundation_card,
+      character?.primary_class?.mastery_level && character?.primary_class?.mastery_level >= 2 && character?.primary_class?.subclass?.specialization_card,
+      character?.primary_class?.mastery_level && character?.primary_class?.mastery_level >= 3 && character?.primary_class?.subclass?.mastery_card,
+      ...(character?.domain_card_loadout || []),
     ].filter(Boolean) as Card<any>[]
   );
 
@@ -95,7 +105,7 @@
               variant="outline"
             >
               <p class="truncate text-xs text-left">
-                {character.class?.name || "No class"}&ensp;•&ensp;{character.subclass?.name ||
+                {character.primary_class?.class?.name || "No class"}&ensp;•&ensp;{character.primary_class?.subclass?.name ||
                   "No subclass"}
               </p>
               <div class="grow"></div>
@@ -128,8 +138,8 @@
         </div>
 
         <!-- class banner -->
-        {#if character.class}
-          <Banner characterClass={character.class} />
+        {#if character.primary_class?.class}
+          <Banner characterClass={character.primary_class.class} />
         {/if}
       </div>
 
@@ -157,8 +167,8 @@
       <Hope {characterUid} />
 
       <!-- class features -->
-      {#if character.class}
-        <ClassFeatures bind:characterClass={character.class} class="mx-2" />
+      {#if character.primary_class?.class}
+        <ClassFeatures bind:characterClass={character.primary_class.class} class="mx-2" />
       {/if}
 
       <!-- experiences -->
@@ -171,6 +181,6 @@
     <Deck title="Heritage Cards" cards={heritageCards} class="mt-2" />
 
     <!-- domain cards -->
-    <Deck title="Domain Card Loadout" cards={character.domain_card_loadout} />
+    <Deck title="Class Cards" cards={classCards} />
   </div>
 {/if}

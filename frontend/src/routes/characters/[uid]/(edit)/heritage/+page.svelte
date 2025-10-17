@@ -32,7 +32,10 @@
     )}
   >
     <div class="m-4 flex flex-col gap-4">
-      <Dropdown title="Ancestry" subtitle={character.heritage.ancestry_card?.title || "Choose an ancestry"}>
+      <Dropdown
+        title="Ancestry"
+        subtitle={character.heritage.ancestry_card?.title || "Choose an ancestry"}
+      >
         <div class="flex flex-col gap-4">
           <p class="text-sm italic">
             {@html ANCESTRIES.description_html}
@@ -40,15 +43,25 @@
           {#if character.heritage.ancestry_card}
             <AncestryCard card={character.heritage.ancestry_card} />
           {/if}
-          <Button class="w-min" onclick={() => (ancestryDialogOpen = true)}
-            >{character.heritage.ancestry_card
-              ? "Change your ancestry"
-              : "Choose an ancestry"}</Button
-          >
+          <div class="flex gap-2 justify-between">
+            <Button onclick={() => (ancestryDialogOpen = true)}
+              >{character.heritage.ancestry_card
+                ? "Change your ancestry"
+                : "Choose an ancestry"}</Button
+            >
+            <Button
+              variant="link"
+              class={cn("text-destructive", !character.heritage.ancestry_card && "hidden")}
+              onclick={() => (character.heritage.ancestry_card = null)}>Remove</Button
+            >
+          </div>
         </div>
       </Dropdown>
 
-      <Dropdown title="Community" subtitle={character.heritage.community_card?.title || "Choose a community"}>
+      <Dropdown
+        title="Community"
+        subtitle={character.heritage.community_card?.title || "Choose a community"}
+      >
         <div class="flex flex-col gap-4">
           <p class="text-sm italic">
             {@html COMMUNITIES.description_html}
@@ -56,15 +69,26 @@
           {#if character.heritage.community_card}
             <CommunityCard card={character.heritage.community_card} />
           {/if}
-          <Button class="w-min" onclick={() => (communityDialogOpen = true)}
-            >{character.heritage.community_card
-              ? "Change your community"
-              : "Choose a community"}</Button
-          >
+
+          <div class="flex gap-2 justify-between">
+            <Button onclick={() => (communityDialogOpen = true)}
+              >{character.heritage.community_card
+                ? "Change your community"
+                : "Choose a community"}</Button
+            >
+            <Button
+              variant="link"
+              class={cn("text-destructive", !character.heritage.community_card && "hidden")}
+              onclick={() => (character.heritage.community_card = null)}>Remove</Button
+            >
+          </div>
         </div>
       </Dropdown>
 
-      <Dropdown title="Transformation" subtitle={character.transformation_card?.title || "Choose a transformation"}>
+      <Dropdown
+        title="Transformation"
+        subtitle={character.transformation_card?.title || "Choose a transformation"}
+      >
         <div class="flex flex-col gap-4">
           <p class="text-sm italic">
             {@html TRANSFORMATIONS.description_html}

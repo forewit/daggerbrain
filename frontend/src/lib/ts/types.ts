@@ -18,12 +18,16 @@ export type Character = {
         ancestry_card: Card<"ancestry"> | null
         community_card: Card<"community"> | null
     }
-    class: Class | null,
-    subclass: Subclass | null,
+    primary_class: {
+        class: Class | null,
+        subclass: Subclass | null,
+        mastery_level: number // 0 = none, 1 = foundation, 2 = specialization, 3 = mastery
+    }
     experiences: Experience[],
     transformation_card: Card<"transformation"> | null,
     domain_card_loadout: Card<"domain">[],
     domain_card_vault: Card<"domain">[],
+    custom_cards: Card<any>[],
     settings: Settings
 }
 
@@ -87,7 +91,8 @@ export type Card<T extends "domain" | "ancestry" | "community" | "transformation
 } & (
         T extends "domain" ? {
             level: number,
-            recall_cost: number
+            recall_cost: number,
+            type: "ability" | "spell"
             features: Feature[]
         } : T extends "ancestry" ? {
             top_feature: Feature

@@ -1,4 +1,4 @@
-import { ANCESTRY_CARDS, BLADE_DOMAIN_CARDS, COMMUNITY_CARDS, TRANSFORMATION_CARDS } from "./cards";
+import { ANCESTRY_CARDS, BLADE_DOMAIN_CARDS, COMMUNITY_CARDS, TRANSFORMATION_CARDS, VALOR_DOMAIN_CARDS } from "./cards";
 import type { Domain, Class, Subclass, Card, Character } from "./types";
 
 
@@ -46,7 +46,7 @@ export const DOMAINS = {
     valor: {
         name: "Valor",
         color: "#e2680e",
-        cards: {}
+        cards: VALOR_DOMAIN_CARDS
     } as Domain
 } as const
 
@@ -100,9 +100,9 @@ export const CLASSES = {
             },
             {
                 title: "Get In & Get Out",
-                description_html: `<p><b>Spend a Hope</b> to ask the GM for either a quick or inconspicuous way 
+                description_html: `<b>Spend a Hope</b> to ask the GM for either a quick or inconspicuous way 
               into or out of a building or structure you can see. The next roll you make that capitalizes 
-              on this information has advantage.</p>`,
+              on this information has advantage.`,
             },
         ],
         subclasses: {
@@ -113,19 +113,18 @@ export const CLASSES = {
                     image_url:
                         "",
                     full_card_image_url:
-                        "/images/full_cards/subclasses/executioners-guild-foundation.png",
+                        "/images/full_cards/subclasses/assassin/executioners-guild-foundation.png",
                     title: "Executioners Guild",
                     description_html: "Foundation",
                     spellcast_trait: "agility",
                     features: [
                         {
                             title: "First Strike",
-                            description_html:
-                                "<p>The first time in a scene you succeed on an attack roll, double the damage of the attack.</p>",
+                            description_html: "The first time in a scene you succeed on an attack roll, double the damage of the attack.",
                         },
                         {
                             title: "Ambush",
-                            description_html: '<p>Your "Marked for Death" feature uses <b>d6s</b> instead of <b>d4s</b>.</p>',
+                            description_html: 'Your "Marked for Death" feature uses <b>d6s</b> instead of <b>d4s</b>.',
                         },
                     ],
                 },
@@ -195,7 +194,7 @@ export const JUST_JAMES: Character = {
     uid: "forewit-justjames",
     name: "Just-James",
     image:
-        "https://pub-cdae2c597d234591b04eed47a98f233c.r2.dev/v1/card-header-images/domains/blade/whirlwind.webp",
+        "/images/portrait-placeholder.png",
     level: 1,
     proficiency: 1,
     evasion: 12,
@@ -232,10 +231,19 @@ export const JUST_JAMES: Character = {
         community_card: COMMUNITY_CARDS.warborne,
     },
     transformation_card: TRANSFORMATION_CARDS.werewolf,
-    class: CLASSES.assassin,
-    subclass: CLASSES.assassin.subclasses.executioners_guild,
-    domain_card_loadout: [DOMAINS.blade.cards.whirlwind, DOMAINS.blade.cards.not_good_enough],
+    primary_class: {
+        class: CLASSES.assassin,
+        subclass: CLASSES.assassin.subclasses.executioners_guild,
+        mastery_level: 1,
+    },
+    domain_card_loadout: [
+        DOMAINS.blade.cards.whirlwind,
+        DOMAINS.blade.cards.not_good_enough,
+    ],
     domain_card_vault: [],
+    custom_cards: [
+        DOMAINS.valor.cards.bare_bones
+    ],
     settings: {
         void_enabled: true,
     },
@@ -253,8 +261,7 @@ export const JUST_JAMES: Character = {
 const NEW_CHARACTER: Character = {
     uid: "new-character",
     name: "New Character",
-    image:
-        "https://pub-cdae2c597d234591b04eed47a98f233c.r2.dev/v1/card-header-images/domains/blade/whirlwind.webp",
+    image: "/images/portrait-placeholder.png",
     level: 1,
     proficiency: 1,
     evasion: 10,
@@ -291,10 +298,14 @@ const NEW_CHARACTER: Character = {
         community_card: null,
     },
     transformation_card: null,
-    class: null,
-    subclass: null,
+    primary_class: {
+        class: null,
+        subclass: null,
+        mastery_level: 0,
+    },
     domain_card_loadout: [],
     domain_card_vault: [],
+    custom_cards: [],
     settings: {
         void_enabled: false,
     },

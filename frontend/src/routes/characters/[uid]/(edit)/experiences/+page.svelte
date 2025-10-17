@@ -6,6 +6,7 @@
   import Input from "$lib/components/ui/input/input.svelte";
   import Textarea from "$lib/components/ui/textarea/textarea.svelte";
   import Dropdown from "$lib/components/app/builder/dropdown.svelte";
+  import { EXPERIENCES } from "$lib/ts/rules.js";
 
   let { data } = $props();
 
@@ -28,15 +29,9 @@
           .map((experience) => experience.title)
           .join(" | ")}
       >
-        <p class="text-sm italic">
-          An Experience is a word or phrase used to encapsulate a specific set of skills personality
-          traits or aptitudes your character has acquired over the course of their life When your PC
-          makes a move they can spend a Hope to add a relevant Experience's modifier to an action or
-          reaction roll
-        </p>
-        <p class="text-sm italic mt-2">
-          &emsp;•&emsp;You get two Experiences at character creation each with a +2 modifier.
-        </p>
+        <div class="text-sm italic flex flex-col gap-2">
+          {@html EXPERIENCES.description_html}
+        </div>
         <div class="mt-4 flex flex-col gap-3 bg-primary/50 rounded-lg p-4 relative">
           <p class="font-medium pb-2 -my-2">1st Experience</p>
 

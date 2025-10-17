@@ -1,9 +1,35 @@
 import type { Card } from "./types";
 
+export const VALOR_DOMAIN_CARDS = {
+    bare_bones: {
+        artist_name: "Simon Pape",
+        image_url: "/images/card/art/domains/valor/bare-bones.webp",
+        type: "ability",
+        full_card_image_url: "/images/full_cards/domains/valor/bare-bones.png",
+        title: "Bare Bones",
+        description_html: "",
+        level: 1,
+        recall_cost: 0,
+        features: [
+            {
+                title: "",
+                description_html: `<p>When you choose not to equip armor, you have a base Armor Score of 3 + your Strength and use the following as your base damage thresholds:</p>
+                                    <ul>
+                                        <li><b><em>Tier 1:</em></b> 9/19</li>
+                                        <li><b><em>Tier 2:</em></b> 11/24</li>
+                                        <li><b><em>Tier 3:</em></b> 13/31</li>
+                                        <li><b><em>Tier 4:</em></b> 15/38</li>
+                                    </ul>`
+            }
+        ]
+    } as Card<"domain">
+}
+
 export const BLADE_DOMAIN_CARDS = {
     whirlwind: {
         artist_name: "",
         image_url: "",
+        type: "ability",
         full_card_image_url: "/images/full_cards/domains/blade/whirlwind.png",
         title: "Whrilwind",
         description_html: "",
@@ -19,6 +45,7 @@ export const BLADE_DOMAIN_CARDS = {
     not_good_enough: {
         artist_name: "",
         image_url: "",
+        type: "ability",
         full_card_image_url: "/images/full_cards/domains/blade/not-good-enough.png",
         title: "Not Good Enough",
         description_html: "",
