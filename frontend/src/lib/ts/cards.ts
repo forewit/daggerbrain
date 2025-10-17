@@ -74,7 +74,24 @@ export const ANCESTRY_CARDS = {
             description_html:
                 "When you take a short rest, you can choose a long rest move instead of a short rest move.",
         },
-    } as Card<"ancestry">
+    } as Card<"ancestry">,
+    drakona: {
+        image_url:
+            "/images/card/art/ancestries/drakona.webp",
+        full_card_image_url:
+            "/images/full_cards/ancestries/drakona.png",
+        title: "Drakona",
+        description_html: "Drakona resemble wingless dragons in humanoid form and possess a powerful elemental breath.",
+        artist_name: "Mat Wilma",
+        top_feature: {
+            title: "Scales",
+            description_html: "Your scales act as natural protection. When you would take Severe damage, you can <b>mark a Stress</b> to mark 1 fewer Hit Points.",
+        },
+        bottom_feature: {
+            title: "Elemental Breath",
+            description_html: "Choose an element for your breath (such as electricity, fire, or ice). You can use this breath against a target or group of targets within Very Close range, treating it as an Instinct weapon that deals <b>d8</b> magic damage using your Proficiency.",
+        }
+    } as Card<"ancestry">,
 } as const
 
 export const COMMUNITY_CARDS = {

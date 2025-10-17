@@ -20,7 +20,7 @@
 
 <svelte:head>
   <meta name="theme-color" content="#1a1625" />
-  <link rel="icon" href="/favicon.png" />
+  <link rel="icon" href="/favicon.svg" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.json" />
   <meta name="mobile-web-app-capable" content="yes" />
@@ -39,15 +39,15 @@
     <header
       class={cn(
         "pt-[calc(max(env(safe-area-inset-top),--spacing(3)))] pl-[calc(env(safe-area-inset-left)+--spacing(2))] pr-[calc(env(safe-area-inset-right)+--spacing(2))]",
-        "sticky w-full top-0 z-45 flex justify-center bg-muted border-b shadow-lg"
+        "sticky w-full top-0 z-45 flex justify-center bg-primary-muted border-b shadow-lg"
       )}
     >
       <nav
         style="scrollbar-width: none;"
-        class="overflow-x-auto bg-muted max-w-6xl w-full h-16 flex items-center"
+        class="overflow-x-auto max-w-6xl w-full h-16 flex items-center"
       >
         <a href="/" class="text-lg font-medium flex items-center gap-2 px-4 shrink-0">
-          <img src="/images/logos/daggerbrain.png" alt="Daggerbrain" class="size-6" />
+          <img src="/images/logos/daggerbrain.svg" alt="Daggerbrain" class="size-6" />
           Daggerbrain
         </a>
         <div class="grow md:max-w-0"></div>

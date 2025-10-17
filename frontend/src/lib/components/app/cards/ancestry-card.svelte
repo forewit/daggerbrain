@@ -16,12 +16,12 @@
 
 <div
   class={cn(
-    "flex overflow-hidden border-accent border-2 rounded-xl bg-white text-black",
+    "flex border-accent border-2 rounded-xl bg-white text-black",
     className
   )}
 >
   <!-- image -->
-  <div class="flex-1 max-w-[180px] border-r-2 border-accent">
+  <div class="flex-1 max-w-[180px] border-r-2 border-accent overflow-hidden rounded-l-xl">
     <img src={card.image_url} alt="art" class="h-full object-cover" />
   </div>
 

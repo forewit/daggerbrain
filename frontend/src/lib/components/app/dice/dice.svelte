@@ -2,6 +2,7 @@
   import { cn } from "$lib/utils";
   import { onDestroy, onMount } from "svelte";
   import X from "@lucide/svelte/icons/x";
+  import { fade, fly, scale, slide } from "svelte/transition";
 
   type Notation = {
     set: string[];
@@ -127,9 +128,10 @@
 </svelte:head>
 
 {#if loaded}
-  <div class={cn("flex flex-col fixed bottom-8 left-8 z-45 gap-2", className)}>
+  <div transition:fade={{duration:200}} class={cn("flex flex-col fixed gap-2", className)}>
     {#if expanded}
       <div
+      transition:slide={{duration:100}}
         class={cn(
           "w-min flex flex-col gap-1 text-foreground bg-primary-muted shadow-lg py-4 px-2 items-center border-2 border-b-0  rounded-full"
         )}

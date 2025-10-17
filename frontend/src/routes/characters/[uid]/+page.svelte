@@ -5,7 +5,6 @@
 </script>
 
 <Sheet characterUid={data.uid || ""} class="mb-24" />
-<Dice onRollEnd={(notation,total)=>{
+<Dice class="bottom-6 left-6 z-45" onRollEnd={(notation,total)=>{
   console.log(notation,total)
-  alert(total)
 }}/>
