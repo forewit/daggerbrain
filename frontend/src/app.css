@@ -3,6 +3,29 @@
 @custom-variant dark (&:is(.dark *));
 @custom-variant hover (&:hover);
 
+@font-face {
+  font-family: 'Overpass';
+  src: url('/fonts/overpass/Overpass-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap; 
+  ascent-override: 90%;
+  descent-override: 18%;
+}
+
+@font-face {
+  font-family: 'Overpass';
+  src: url('/fonts/overpass/Overpass-Italic-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Eveleth Clean';
+  src: url('/fonts/eveleth/EvelethCleanRegular.otf') format('truetype');
+}
+
 :root {
   --radius: 0.375rem;
   --background: #1a1625;
@@ -52,6 +75,7 @@
 }
 
 @theme inline {
+  --font-eveleth: 'Eveleth Clean';
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -78,17 +102,17 @@
   --color-ring: var(--ring);
 }
 
+
+
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    font-family: 'Overpass', sans-serif;
   }
   body {
     @apply bg-background text-foreground;
-    /* min-height: 100dvh */
-  }
 
-  html {
-    /* min-height: 100dvh */
   }
 }
 

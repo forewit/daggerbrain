@@ -29,7 +29,6 @@
     {/if}
     Class Features
   </button>
-description_html
   {#if expanded}
   <div class="flex flex-col gap-4">
   {#each characterClass.features as feature}

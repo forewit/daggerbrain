@@ -62,5 +62,5 @@
   <p class="text-2xl font-bold py-2">Welcome</p>
   <p class="text-xs italic font-muted-foreground">Under construction</p>
 
-  <AncestryCard card={ANCESTRY_CARDS.half_clank} size="small" hideCredits hideImage />
+  <AncestryCard card={ANCESTRY_CARDS.half_clank} class="rounded-none" size="small" hideCredits  />
 </div>

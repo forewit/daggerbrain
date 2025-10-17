@@ -3,7 +3,7 @@
   import { getAppContext } from "$lib/ts/app.svelte";
   import { cn } from "$lib/utils";
   import * as Dialog from "$lib/components/ui/dialog/index";
-  import Button, { buttonVariants } from "$lib/components/ui/button/button.svelte";
+  import { buttonVariants } from "$lib/components/ui/button/button.svelte";
   import { ANCESTRY_CARDS, COMMUNITY_CARDS, TRANSFORMATION_CARDS } from "$lib/ts/constants.js";
   import * as Collapsible from "$lib/components/ui/collapsible/index";
   import ChevronDown from "@lucide/svelte/icons/chevron-down";
@@ -11,6 +11,7 @@
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import Dropdown from "$lib/components/app/builder/dropdown.svelte";
   import AncestryCard from "$lib/components/app/cards/ancestry-card.svelte";
+  import Button from "$lib/components/ui/button/button.svelte";
 
   let { data } = $props();
 
@@ -29,12 +30,23 @@
   >
     <div class="m-4 flex flex-col gap-4">
       <Dropdown title="Ancestry" subtitle={character.heritage.ancestry_card?.title}>
+        <div class="flex flex-col gap-4">
         <p class="text-sm italic">
           {@html ANCESTRY_CARDS.description_html}
         </p>
         {#if character.heritage.ancestry_card}
-          <AncestryCard card={character.heritage.ancestry_card} size="small" hideCredits hideImage />
+          <AncestryCard
+            card={character.heritage.ancestry_card}
+            class="rounded-none"
+            zoom={0.9}
+            size="small"
+            hideCredits
+          />
+          <Button variant="outline">Change yourAncestry</Button>
+        {:else}
+          <Button variant="outline">Choose an Ancestry</Button>
         {/if}
+        </div>
       </Dropdown>
 
       <Dropdown title="Community" subtitle={character.heritage.community_card?.title}>
