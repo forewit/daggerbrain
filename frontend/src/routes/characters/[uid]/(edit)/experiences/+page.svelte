@@ -32,24 +32,15 @@
         <div class="text-sm italic flex flex-col gap-2">
           {@html EXPERIENCES.description_html}
         </div>
+        {#each character.experiences as experience, index}
         <div class="mt-4 flex flex-col gap-3 bg-primary/50 rounded-lg p-4 relative">
-          <p class="font-medium pb-2 -my-2">1st Experience</p>
-
           <div class="flex gap-4 items-center">
-            <p class="font-medium">+{character.experiences[0].modifier}</p>
-            <Input bind:value={character.experiences[0].title} placeholder="Name" />
+            <p class="font-medium">+{experience.modifier}</p>
+            <Input bind:value={experience.title} placeholder="Name" />
           </div>
-          <Textarea bind:value={character.experiences[0].description} placeholder="Description" />
+          <Textarea bind:value={experience.description} placeholder="Description" />
         </div>
-        <div class="mt-4 flex flex-col gap-3 bg-primary/50 rounded-lg p-4 relative">
-          <p class="font-medium pb-2 -my-2">2nd Experience</p>
-
-          <div class="flex gap-4 items-center">
-            <p class="font-medium">+{character.experiences[0].modifier}</p>
-            <Input bind:value={character.experiences[1].title} placeholder="Name" />
-          </div>
-          <Textarea bind:value={character.experiences[1].description} placeholder="Description" />
-        </div>
+        {/each}
       </Dropdown>
 
       <Label>Description</Label>

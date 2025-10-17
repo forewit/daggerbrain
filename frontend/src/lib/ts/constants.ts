@@ -1,4 +1,4 @@
-import { ANCESTRY_CARDS, BLADE_DOMAIN_CARDS, COMMUNITY_CARDS, TRANSFORMATION_CARDS, VALOR_DOMAIN_CARDS } from "./cards";
+import { ANCESTRY_CARDS, BLADE_DOMAIN_CARDS, BONE_DOMAIN_CARDS, COMMUNITY_CARDS, TRANSFORMATION_CARDS, VALOR_DOMAIN_CARDS } from "./cards";
 import type { Domain, Class, Subclass, Card, Character } from "./types";
 
 
@@ -16,7 +16,7 @@ export const DOMAINS = {
     bone: {
         name: "Bone",
         color: "#a4a9a8",
-        cards: {}
+        cards: BONE_DOMAIN_CARDS,
     } as Domain,
     codex: {
         name: "Codex",
@@ -133,7 +133,7 @@ export const CLASSES = {
                     image_url:
                         "",
                     full_card_image_url:
-                        "",
+                        "/images/full_cards/subclasses/assassin/executioners-guild-specialization.png",
                     title: "Executioners Guild",
                     description_html: "Specialization",
                     features: [
@@ -195,19 +195,19 @@ export const JUST_JAMES: Character = {
     name: "Just-James",
     image:
         "/images/portrait-placeholder.png",
-    level: 1,
-    proficiency: 1,
-    evasion: 12,
+    level: 2,
+    proficiency: 2,
+    evasion: 15,
     damage_thresholds: {
-        major: 9,
-        severe: 19,
+        major: 10,
+        severe: 20,
     },
     armor: {
-        max: 4,
+        max: 5,
         marked: 0,
     },
     hp: {
-        max: 6,
+        max: 5,
         marked: 0,
     },
     stress: {
@@ -219,11 +219,11 @@ export const JUST_JAMES: Character = {
         marked: 0,
     },
     traits: {
-        agility: 2,
-        strength: -1,
+        agility: 3,
+        strength: 2,
         finesse: 1,
         instinct: 0,
-        presence: 0,
+        presence: -1,
         knowledge: 1,
     },
     heritage: {
@@ -239,10 +239,12 @@ export const JUST_JAMES: Character = {
     domain_card_loadout: [
         DOMAINS.blade.cards.whirlwind,
         DOMAINS.blade.cards.not_good_enough,
+        DOMAINS.blade.cards.a_soldiers_bond,
     ],
     domain_card_vault: [],
     custom_cards: [
-        DOMAINS.valor.cards.bare_bones
+        DOMAINS.valor.cards.bare_bones,
+        DOMAINS.bone.cards.untouchable
     ],
     settings: {
         void_enabled: true,
@@ -255,6 +257,10 @@ export const JUST_JAMES: Character = {
         title: "",
         description: "",
         modifier: 2,
+    }, {
+        title: "",
+        description: "",
+        modifier: 2
     }],
 }
 

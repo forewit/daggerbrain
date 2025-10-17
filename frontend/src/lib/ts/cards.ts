@@ -1,5 +1,24 @@
 import type { Card } from "./types";
 
+export const BONE_DOMAIN_CARDS = {
+    untouchable: {
+        artist_name: "Henry Peters",
+        image_url: "/images/card/art/domains/bone/untouchable.webp",
+        type: "ability",
+        full_card_image_url: "/images/full_cards/domains/bone/untouchable.png",
+        title: "Untouchable",
+        description_html: "",
+        level: 1,
+        recall_cost: 1,
+        features: [
+            {
+                title: "",
+                description_html: "Gain a bonus to your Evasion equal to half your Agility."
+            }
+        ]
+    } as Card<"domain">
+} as const
+
 export const VALOR_DOMAIN_CARDS = {
     bare_bones: {
         artist_name: "Simon Pape",
@@ -23,7 +42,7 @@ export const VALOR_DOMAIN_CARDS = {
             }
         ]
     } as Card<"domain">
-}
+} as const
 
 export const BLADE_DOMAIN_CARDS = {
     whirlwind: {
@@ -57,6 +76,21 @@ export const BLADE_DOMAIN_CARDS = {
                 description_html: "When you roll your damage dice, you can reroll any 1s or 2s."
             }
         ]
+    } as Card<"domain">,
+    a_soldiers_bond: {
+        artist_name: "Mila Pesic",
+        image_url: "/images/card/art/domains/blade/a-soldiers-bond.webp",
+        type: "ability",
+        full_card_image_url: "/images/full_cards/domains/blade/a-soldiers-bond.png",
+        title: "A Soldier's Bond",
+        description_html: "",
+        level: 2,
+        recall_cost: 1,
+        features: [
+            {
+                title: "",
+                description_html: "Once per long rest, when you compliment someone or ask them about something they're good at, you can both gain 3 Hope."
+            }]
     } as Card<"domain">
 } as const
 
