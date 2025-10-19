@@ -8,7 +8,7 @@ export const BONE_DOMAIN_CARDS = {
         full_card_image_url: "/images/full_cards/domains/bone/untouchable.png",
         title: "Untouchable",
         description_html: "",
-        level: 1,
+        level_requirement: 1,
         recall_cost: 1,
         features: [
             {
@@ -27,7 +27,7 @@ export const VALOR_DOMAIN_CARDS = {
         full_card_image_url: "/images/full_cards/domains/valor/bare-bones.png",
         title: "Bare Bones",
         description_html: "",
-        level: 1,
+        level_requirement: 1,
         recall_cost: 0,
         features: [
             {
@@ -52,7 +52,7 @@ export const BLADE_DOMAIN_CARDS = {
         full_card_image_url: "/images/full_cards/domains/blade/whirlwind.png",
         title: "Whrilwind",
         description_html: "",
-        level: 1,
+        level_requirement: 1,
         recall_cost: 0,
         features: [
             {
@@ -68,7 +68,7 @@ export const BLADE_DOMAIN_CARDS = {
         full_card_image_url: "/images/full_cards/domains/blade/not-good-enough.png",
         title: "Not Good Enough",
         description_html: "",
-        level: 1,
+        level_requirement: 1,
         recall_cost: 1,
         features: [
             {
@@ -84,7 +84,7 @@ export const BLADE_DOMAIN_CARDS = {
         full_card_image_url: "/images/full_cards/domains/blade/a-soldiers-bond.png",
         title: "A Soldier's Bond",
         description_html: "",
-        level: 2,
+        level_requirement: 2,
         recall_cost: 1,
         features: [
             {
@@ -173,4 +173,61 @@ export const COMMUNITY_CARDS = {
         ],
     } as Card<"community">,
 
+} as const
+
+export const SUBCLASS_CARDS = {
+    executioners_guild_foundation: {
+        artist_name: "",
+        image_url: "",
+        full_card_image_url:
+            "/images/full_cards/subclasses/assassin/executioners-guild-foundation.png",
+        title: "Executioners Guild",
+        description_html: "Foundation",
+        spellcast_trait: "agility",
+        features: [
+            {
+                title: "First Strike",
+                description_html: "The first time in a scene you succeed on an attack roll, double the damage of the attack.",
+            },
+            {
+                title: "Ambush",
+                description_html: 'Your "Marked for Death" feature uses <b>d6s</b> instead of <b>d4s</b>.',
+            },
+        ],
+    } as Card<"subclass_foundation">,
+    executioners_guild_specialization: {
+        artist_name: "",
+        image_url: "",
+        full_card_image_url:
+            "/images/full_cards/subclasses/assassin/executioners-guild-specialization.png",
+        title: "Executioners Guild",
+        description_html: "Specialization",
+        features: [
+            {
+                title: "Death Strike",
+                description_html: "When you deal Severe damage to a creature, you can <b>mark a stress</b> to make them mark an additional Hit Point.",
+            },
+            {
+                title: "Scorpion's Poise",
+                description_html: "You gain a <b>+2</b> bonus to your Evasion against any attacks made by a creature <i>Marked for Death</i>."
+            }
+        ],
+    } as Card<"subclass_specialization">,
+    executioners_guild_mastery: {
+        artist_name: "",
+        image_url: "",
+        full_card_image_url: "",
+        title: "Executioners Guild",
+        description_html: "Mastery",
+        features: [
+            {
+                title: "True Strike",
+                description_html: "Once per long rest, when you fail an attack roll, you can <b>spend a hope</b> to make it a success instead.",
+            },
+            {
+                title: "Backstab",
+                description_html: 'Your "Marked for Death" feature uses <b>d8s</b> instead of <b>d6s</b>.'
+            }
+        ],
+    } as Card<"subclass_mastery">,
 } as const

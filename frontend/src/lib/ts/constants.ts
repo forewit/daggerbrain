@@ -1,4 +1,4 @@
-import { ANCESTRY_CARDS, BLADE_DOMAIN_CARDS, BONE_DOMAIN_CARDS, COMMUNITY_CARDS, TRANSFORMATION_CARDS, VALOR_DOMAIN_CARDS } from "./cards";
+import { ANCESTRY_CARDS, BLADE_DOMAIN_CARDS, BONE_DOMAIN_CARDS, COMMUNITY_CARDS, SUBCLASS_CARDS, TRANSFORMATION_CARDS, VALOR_DOMAIN_CARDS } from "./cards";
 import type { Domain, Class, Subclass, Card, Character } from "./types";
 
 
@@ -79,6 +79,16 @@ export const TRAITS = {
 
 export const CLASSES = {
     assassin: {
+        starting_evasion: 12,
+        suggested_traits: {
+            agility: 2,
+            strength: -1,
+            finesse: 1,
+            instinct: 0,
+            presence: 0,
+            knowledge: 1,
+        },
+
         name: "Assassin",
         hope_feature: {
             title: "Grim Resolve",
@@ -86,7 +96,7 @@ export const CLASSES = {
         },
         primary_domain: "blade",
         secondary_domain: "midnight",
-        features: [
+        class_features: [
             {
                 title: "Marked for Death",
                 description_html: `<p>On a successful weapon attack, you can <b>mark a Stress</b> to make the target 
@@ -108,65 +118,10 @@ export const CLASSES = {
         subclasses: {
             executioners_guild: {
                 name: "Executioners Guild",
-                foundation_card: {
-                    artist_name: "",
-                    image_url:
-                        "",
-                    full_card_image_url:
-                        "/images/full_cards/subclasses/assassin/executioners-guild-foundation.png",
-                    title: "Executioners Guild",
-                    description_html: "Foundation",
-                    spellcast_trait: "agility",
-                    features: [
-                        {
-                            title: "First Strike",
-                            description_html: "The first time in a scene you succeed on an attack roll, double the damage of the attack.",
-                        },
-                        {
-                            title: "Ambush",
-                            description_html: 'Your "Marked for Death" feature uses <b>d6s</b> instead of <b>d4s</b>.',
-                        },
-                    ],
-                },
-                specialization_card: {
-                    artist_name: "",
-                    image_url:
-                        "",
-                    full_card_image_url:
-                        "/images/full_cards/subclasses/assassin/executioners-guild-specialization.png",
-                    title: "Executioners Guild",
-                    description_html: "Specialization",
-                    features: [
-                        {
-                            title: "Death Strike",
-                            description_html:
-                                "<p>When you deal Severe damage to a creature, you can <b>mark a stress</b> to make them mark an additional Hit Point.</p>",
-                        },
-                        {
-                            title: "Scorpion's Poise",
-                            description_html: "<p>You gain a <b>+2</b> bonus to your Evasion against any attacks made by a creature <i>Marked for Death</i>.</p>"
-                        }
-                    ],
-                },
-                mastery_card: {
-                    artist_name: "",
-                    image_url:
-                        "",
-                    full_card_image_url:
-                        "",
-                    title: "Executioners Guild",
-                    description_html: "Mastery",
-                    features: [
-                        {
-                            title: "True Strike",
-                            description_html: "<p>Once per long rest, when you fail an attack roll, you can <b>spend a hope</b> to make it a success instead.</p>",
-                        },
-                        {
-                            title: "Backstab",
-                            description_html: '<p>Your "Marked for Death" feature uses <b>d8s</b> instead of <b>d6s</b>.</p>'
-                        }
-                    ],
-                },
+                description_html: "",
+                foundation_card: SUBCLASS_CARDS.executioners_guild_foundation,
+                specialization_card: SUBCLASS_CARDS.executioners_guild_specialization,
+                mastery_card: SUBCLASS_CARDS.executioners_guild_mastery,
             }
         }
     } as Class & { subclasses: Record<string, Subclass> }
@@ -187,141 +142,195 @@ export const TRANSFORMATIONS = {
     cards: TRANSFORMATION_CARDS,
 } as const
 
-export const MAX_HOPE = 6
-export const MAX_DOMAIN_CARD_LOADOUT = 5
-
 export const JUST_JAMES: Character = {
-    uid: "forewit-justjames",
-    name: "Just-James",
-    image:
-        "/images/portrait-placeholder.png",
-    level: 2,
-    proficiency: 2,
-    evasion: 15,
-    damage_thresholds: {
-        major: 10,
-        severe: 20,
-    },
-    armor: {
-        max: 5,
-        marked: 0,
-    },
-    hp: {
-        max: 5,
-        marked: 0,
-    },
-    stress: {
-        max: 7,
-        marked: 0,
-    },
-    hope: {
-        max: MAX_HOPE,
-        marked: 0,
-    },
-    traits: {
-        agility: 3,
-        strength: 2,
-        finesse: 1,
-        instinct: 0,
-        presence: -1,
-        knowledge: 1,
-    },
-    heritage: {
-        ancestry_card: ANCESTRY_CARDS.half_clank,
-        community_card: COMMUNITY_CARDS.warborne,
-    },
-    transformation_card: TRANSFORMATION_CARDS.werewolf,
-    primary_class: {
-        class: CLASSES.assassin,
-        subclass: CLASSES.assassin.subclasses.executioners_guild,
-        mastery_level: 1,
-    },
-    domain_card_loadout: [
-        DOMAINS.blade.cards.whirlwind,
-        DOMAINS.blade.cards.not_good_enough,
-        DOMAINS.blade.cards.a_soldiers_bond,
-    ],
-    domain_card_vault: [],
-    custom_cards: [
-        DOMAINS.valor.cards.bare_bones,
-        DOMAINS.bone.cards.untouchable
-    ],
+
     settings: {
         void_enabled: true,
     },
+    uid: "forewit-justjames",
+    name: "Just-James",
+    image: "/images/portrait-placeholder.png",
+    base_stats: {
+        traits: {
+            agility: 2,
+            strength: 1,
+            finesse: 1,
+            instinct: 0,
+            presence: 0,
+            knowledge: -1,
+        },
+        proficiency: 1,
+        max_experiences: 2,
+        max_domain_card_loadout: 5,
+        primary_class_mastery_level: 0,
+        secondary_class_mastery_level: 0,
+        max_hope: 6,
+    },
+
+    // heritage
+    ancestry_card: ANCESTRY_CARDS.half_clank,
+    community_card: COMMUNITY_CARDS.warborne,
     experiences: [{
         title: "Cool Under Pressure",
-        description: "As pressure mounts, your focus tightens and you perform at your best.",
         modifier: 2,
-    }, {
-        title: "",
-        description: "",
-        modifier: 2,
-    }, {
-        title: "",
-        description: "",
-        modifier: 2
     }],
+
+    // classes
+    primary_class: {
+        class: CLASSES.assassin,
+        subclass: CLASSES.assassin.subclasses.executioners_guild,
+    },
+    secondary_class: null,
+
+    // the void / other
+    transformation_card: TRANSFORMATION_CARDS.werewolf,
+    additional_cards: [
+        DOMAINS.valor.cards.bare_bones,
+        DOMAINS.bone.cards.untouchable
+    ],
+    additional_features: [],
+
+    // set by the player
+    ephemeral_stats: {
+        marked_hp: 0,
+        marked_stress: 0,
+        marked_hope: 0,
+        marked_armor: 0,
+        domain_card_loadout: [0, 1, 2],
+    },
+
+    // level-up choices
+    level: 2,
+    level_1_choices: [],
+    level_2_choices: [],
+    level_3_choices: [],
+    level_4_choices: [],
+    level_5_choices: [],
+    level_6_choices: [],
+    level_7_choices: [],
+    level_8_choices: [],
+    level_9_choices: [],
+    level_10_choices: [],
+
+    // will be overwritten and calculated
+    derived_features: [],
+    derieved_stats: {
+        max_hope: 6,
+        max_domain_card_loadout: 5,
+        max_hp: 5,
+        max_stress: 7,
+        evasion: 15,
+        traits: {
+            agility: 3,
+            strength: 2,
+            finesse: 1,
+            instinct: 0,
+            presence: -1,
+            knowledge: 1,
+        },
+        proficiency: 2,
+        max_experiences: 3,
+        damage_thresholds: {
+            major: 10,
+            severe: 20,
+        },
+        domain_card_vault: [
+            DOMAINS.blade.cards.whirlwind,
+            DOMAINS.blade.cards.not_good_enough,
+            DOMAINS.blade.cards.a_soldiers_bond,
+        ],
+        primary_class_mastery_level: 1,
+        secondary_class_mastery_level: 0,
+        spellcast_trait: "agility",
+    },
 }
 
 const NEW_CHARACTER: Character = {
-    uid: "new-character",
-    name: "New Character",
-    image: "/images/portrait-placeholder.png",
-    level: 1,
-    proficiency: 1,
-    evasion: 10,
-    damage_thresholds: {
-        major: 6,
-        severe: 13,
-    },
-    armor: {
-        max: 3,
-        marked: 0,
-    },
-    hp: {
-        max: 6,
-        marked: 0,
-    },
-    stress: {
-        max: 7,
-        marked: 0,
-    },
-    hope: {
-        max: MAX_HOPE,
-        marked: 0,
-    },
-    traits: {
-        agility: 0,
-        strength: 0,
-        finesse: 0,
-        instinct: 0,
-        presence: 0,
-        knowledge: 0,
-    },
-    heritage: {
-        ancestry_card: null,
-        community_card: null,
-    },
-    transformation_card: null,
-    primary_class: {
-        class: null,
-        subclass: null,
-        mastery_level: 0,
-    },
-    domain_card_loadout: [],
-    domain_card_vault: [],
-    custom_cards: [],
     settings: {
         void_enabled: false,
     },
-    experiences: [{
-        title: "",
-        description: "",
-        modifier: 2,
-    }, {
-        title: "",
-        description: "",
-        modifier: 2,
-    }],
+    uid: "new-character",
+    name: "New Character",
+    image: "/images/portrait-placeholder.png",
+    base_stats: {
+        traits: {
+            agility: 0,
+            strength: 0,
+            finesse: 0,
+            instinct: 0,
+            presence: 0,
+            knowledge: 0,
+        },
+        proficiency: 1,
+        max_experiences: 2,
+        max_domain_card_loadout: 5,
+        primary_class_mastery_level: 0,
+        secondary_class_mastery_level: 0,
+        max_hope: 6,
+    },
+
+    // heritage
+    ancestry_card: null,
+    community_card: null,
+    experiences: [],
+
+    // classes
+    primary_class: null,
+    secondary_class: null,
+
+    // the void / other
+    transformation_card: null,
+    additional_cards: [],
+    additional_features: [],
+
+    // set by the player
+    ephemeral_stats: {
+        marked_hp: 0,
+        marked_stress: 0,
+        marked_hope: 0,
+        marked_armor: 0,
+        domain_card_loadout: [],
+    },
+
+    // level-up choices
+    level: 1,
+    level_1_choices: [],
+    level_2_choices: [],
+    level_3_choices: [],
+    level_4_choices: [],
+    level_5_choices: [],
+    level_6_choices: [],
+    level_7_choices: [],
+    level_8_choices: [],
+    level_9_choices: [],
+    level_10_choices: [],
+
+
+    // will be overwritten and calculated
+    derived_features: [],
+    derieved_stats: {
+        max_hope: 6,
+        max_domain_card_loadout: 5,
+        max_hp: 0,
+        max_stress: 0,
+        evasion: 0,
+        traits: {
+            agility: 0,
+            strength: 0,
+            finesse: 0,
+            instinct: 0,
+            presence: 0,
+            knowledge: 0,
+        },
+        proficiency: 1,
+        max_experiences: 2,
+        damage_thresholds: {
+            major: 0,
+            severe: 0,
+        },
+        domain_card_vault: [],
+        primary_class_mastery_level: 0,
+        secondary_class_mastery_level: 0,
+        spellcast_trait: null,
+    },
 }
