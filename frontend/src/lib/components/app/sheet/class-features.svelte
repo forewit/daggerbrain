@@ -6,8 +6,8 @@
 
   let {
     class: className = "",
-    characterClass = $bindable(),
-  }: { class?: string; characterClass: Class } = $props();
+    character_class,
+  }: { class?: string; character_class: Class } = $props();
 
   let expanded = $state(true);
 </script>
@@ -27,11 +27,11 @@
     {:else}
       <ChevronRight class="w-k h-4" />
     {/if}
-    Class Features
+    {character_class.name} Features
   </button>
   {#if expanded}
   <div class="flex flex-col gap-4">
-  {#each characterClass.features as feature}
+  {#each character_class.class_features as feature}
     <div class="text-sm relative">
       <p class="font-medium text-[1rem] pb-2">{feature.title}</p>
       <div class="pl-2 leading-relaxed flex flex-col gap-2">

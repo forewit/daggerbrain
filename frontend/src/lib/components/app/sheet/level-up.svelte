@@ -1,7 +1,6 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
   import * as Dialog from "$lib/components/ui/dialog/index";
-  import ChevronRight from "@lucide/svelte/icons/triangle";
 
   let { class: className = "", level }: { class?: string; level: number } = $props();
 

@@ -162,9 +162,17 @@ export const JUST_JAMES: Character = {
         proficiency: 1,
         max_experiences: 2,
         max_domain_card_loadout: 5,
+        max_hope: 6,
+        max_armor: 0,
+        max_hp: 0,
+        max_stress: 0,
+        evasion: 0,
+        damage_thresholds: {
+            major: 0,
+            severe: 0,
+        },
         primary_class_mastery_level: 0,
         secondary_class_mastery_level: 0,
-        max_hope: 6,
     },
 
     // heritage
@@ -176,11 +184,10 @@ export const JUST_JAMES: Character = {
     }],
 
     // classes
-    primary_class: {
-        class: CLASSES.assassin,
-        subclass: CLASSES.assassin.subclasses.executioners_guild,
-    },
+    primary_class: CLASSES.assassin,
+    primary_subclass: CLASSES.assassin.subclasses.executioners_guild,
     secondary_class: null,
+    secondary_subclass: null,
 
     // the void / other
     transformation_card: TRANSFORMATION_CARDS.werewolf,
@@ -215,11 +222,7 @@ export const JUST_JAMES: Character = {
     // will be overwritten and calculated
     derived_features: [],
     derieved_stats: {
-        max_hope: 6,
-        max_domain_card_loadout: 5,
-        max_hp: 5,
-        max_stress: 7,
-        evasion: 15,
+        // from base stats
         traits: {
             agility: 3,
             strength: 2,
@@ -230,17 +233,25 @@ export const JUST_JAMES: Character = {
         },
         proficiency: 2,
         max_experiences: 3,
+        max_domain_card_loadout: 5,
+        max_hope: 6,
+        max_armor: 5,
+        max_hp: 5,
+        max_stress: 7,
+        evasion: 15,
         damage_thresholds: {
             major: 10,
             severe: 20,
         },
+        primary_class_mastery_level: 1,
+        secondary_class_mastery_level: 0,
+
+        // other
         domain_card_vault: [
             DOMAINS.blade.cards.whirlwind,
             DOMAINS.blade.cards.not_good_enough,
             DOMAINS.blade.cards.a_soldiers_bond,
         ],
-        primary_class_mastery_level: 1,
-        secondary_class_mastery_level: 0,
         spellcast_trait: "agility",
     },
 }
@@ -264,19 +275,29 @@ const NEW_CHARACTER: Character = {
         proficiency: 1,
         max_experiences: 2,
         max_domain_card_loadout: 5,
+        max_hope: 6,
+        max_armor: 0,
+        max_hp: 0,
+        max_stress: 0,
+        evasion: 0,
+        damage_thresholds: {
+            major: 0,
+            severe: 0,
+        },
         primary_class_mastery_level: 0,
         secondary_class_mastery_level: 0,
-        max_hope: 6,
     },
 
     // heritage
     ancestry_card: null,
     community_card: null,
-    experiences: [],
+    experiences: [],    
 
     // classes
     primary_class: null,
+    primary_subclass: null,
     secondary_class: null,
+    secondary_subclass: null,
 
     // the void / other
     transformation_card: null,
@@ -309,11 +330,7 @@ const NEW_CHARACTER: Character = {
     // will be overwritten and calculated
     derived_features: [],
     derieved_stats: {
-        max_hope: 6,
-        max_domain_card_loadout: 5,
-        max_hp: 0,
-        max_stress: 0,
-        evasion: 0,
+        // from base stats
         traits: {
             agility: 0,
             strength: 0,
@@ -324,13 +341,21 @@ const NEW_CHARACTER: Character = {
         },
         proficiency: 1,
         max_experiences: 2,
+        max_domain_card_loadout: 5,
+        max_hope: 6,
+        max_armor: 0,
+        max_hp: 0,
+        max_stress: 0,
+        evasion: 0,
         damage_thresholds: {
             major: 0,
             severe: 0,
         },
-        domain_card_vault: [],
         primary_class_mastery_level: 0,
         secondary_class_mastery_level: 0,
+
+        // other stats
+        domain_card_vault: [],
         spellcast_trait: null,
     },
 }

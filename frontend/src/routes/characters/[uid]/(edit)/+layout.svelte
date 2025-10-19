@@ -60,7 +60,7 @@
     )}
     style="scrollbar-width: none;"
   >
-    <div class="border-y h-12 bg-muted shrink-0 w-[50vw] @3xl:w-0"></div>
+    <div class="border-y h-12 bg-muted shrink-0 w-[50vw] @3xl:w-0 snap-align-none"></div>
 
     {#each tabs as tab, i}
       <Button
@@ -110,7 +110,7 @@
       <ExternalLink class="size-4" />
     </Button>
 
-    <div class="border-y h-12 bg-muted shrink-0 w-[50vw] @3xl:w-0"></div>
+    <div class="border-y h-12 bg-muted shrink-0 w-[50vw] @3xl:w-0 snap-align-none"></div>
   </div>
 
   <!-- page -->

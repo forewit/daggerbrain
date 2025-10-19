@@ -2,24 +2,24 @@
   import { cn } from "$lib/utils";
   import type { Character } from "$lib/ts/types";
 
-  let { class: className = "", hp = $bindable() }: { class?: string; hp: Character["hp"] } =
+  let { class: className = "", marked_hp = $bindable(), max_hp }: { class?: string; marked_hp: number; max_hp: number } =
     $props();
 </script>
 
 <div class={cn("flex items-center gap-4 border-2 rounded-md h-12 px-4", className)}>
-  <button onclick={()=>{hp.marked = 0}} class="text-sm font-medium">HP</button>
+  <button onclick={()=>{marked_hp = 0}} class="text-sm font-medium">HP</button>
   <div class="flex flex-wrap gap-2">
-    {#each Array(hp.max) as _, index}
+    {#each Array(max_hp) as _, index}
       <button
         aria-label="hp-slot"
-        class="w-6 h-3 rounded-md border border-muted-foreground {index < hp.marked
+        class="w-6 h-3 rounded-md border border-muted-foreground {index < marked_hp
           ? 'bg-muted-foreground'
           : 'bg-transparent'} transition-colors"
         onclick={() => {
-          if (index + 1 === hp.marked) {
-            hp.marked = Math.max(0, hp.marked - 1);
+          if (index + 1 === marked_hp) {
+            marked_hp = Math.max(0, marked_hp - 1);
           } else {
-            hp.marked = index + 1;
+            marked_hp = index + 1;
           }
         }}
         type="button"
@@ -27,7 +27,7 @@
     {/each}
   </div>
 
-  {#if hp.max === hp.marked}
+  {#if max_hp === marked_hp}
     <button
       onclick={() => {
         alert("Death Move");

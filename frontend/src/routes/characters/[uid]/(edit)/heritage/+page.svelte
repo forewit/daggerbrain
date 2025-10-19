@@ -8,11 +8,9 @@
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import Dropdown from "$lib/components/app/builder/dropdown.svelte";
-  import AncestryCard from "$lib/components/app/cards/ancestry-card.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
-  import CommunityCard from "$lib/components/app/cards/transformation-card.svelte";
   import { ANCESTRIES, COMMUNITIES, TRANSFORMATIONS } from "$lib/ts/constants.js";
-  import TransformationCard from "$lib/components/app/cards/transformation-card.svelte";
+  import HeritageCard from "$lib/components/app/cards/heritage-card.svelte";
 
   let { data } = $props();
 
@@ -32,27 +30,22 @@
     )}
   >
     <div class="m-4 flex flex-col gap-4">
-      <Dropdown
-        title="Ancestry"
-        subtitle={character.heritage.ancestry_card?.title || "Choose an ancestry"}
-      >
+      <Dropdown title="Ancestry" subtitle={character.ancestry_card?.title || "Choose an ancestry"}>
         <div class="flex flex-col gap-4">
           <p class="text-sm italic">
             {@html ANCESTRIES.description_html}
           </p>
-          {#if character.heritage.ancestry_card}
-            <AncestryCard card={character.heritage.ancestry_card} />
+          {#if character.ancestry_card}
+            <HeritageCard card={character.ancestry_card} />
           {/if}
           <div class="flex gap-2 justify-between">
             <Button onclick={() => (ancestryDialogOpen = true)}
-              >{character.heritage.ancestry_card
-                ? "Change your ancestry"
-                : "Choose an ancestry"}</Button
+              >{character.ancestry_card ? "Change your ancestry" : "Choose an ancestry"}</Button
             >
             <Button
               variant="link"
-              class={cn("text-destructive", !character.heritage.ancestry_card && "hidden")}
-              onclick={() => (character.heritage.ancestry_card = null)}>Remove</Button
+              class={cn("text-destructive", !character.ancestry_card && "hidden")}
+              onclick={() => (character.ancestry_card = null)}>Remove</Button
             >
           </div>
         </div>
@@ -60,26 +53,24 @@
 
       <Dropdown
         title="Community"
-        subtitle={character.heritage.community_card?.title || "Choose a community"}
+        subtitle={character.community_card?.title || "Choose a community"}
       >
         <div class="flex flex-col gap-4">
           <p class="text-sm italic">
             {@html COMMUNITIES.description_html}
           </p>
-          {#if character.heritage.community_card}
-            <CommunityCard card={character.heritage.community_card} />
+          {#if character.community_card}
+            <HeritageCard card={character.community_card} />
           {/if}
 
           <div class="flex gap-2 justify-between">
             <Button onclick={() => (communityDialogOpen = true)}
-              >{character.heritage.community_card
-                ? "Change your community"
-                : "Choose a community"}</Button
+              >{character.community_card ? "Change your community" : "Choose a community"}</Button
             >
             <Button
               variant="link"
-              class={cn("text-destructive", !character.heritage.community_card && "hidden")}
-              onclick={() => (character.heritage.community_card = null)}>Remove</Button
+              class={cn("text-destructive", !character.community_card && "hidden")}
+              onclick={() => (character.community_card = null)}>Remove</Button
             >
           </div>
         </div>
@@ -94,7 +85,7 @@
             {@html TRANSFORMATIONS.description_html}
           </p>
           {#if character.transformation_card}
-            <TransformationCard card={character.transformation_card} />
+            <HeritageCard card={character.transformation_card} />
           {/if}
 
           <div class="flex gap-2 justify-between">
@@ -121,15 +112,15 @@
       </Dialog.Header>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {#each Object.values(ANCESTRIES.cards) as card}
-          <AncestryCard {card}
+          <HeritageCard {card}
             ><Button
               onclick={() => {
-                character.heritage.ancestry_card = card;
+                character.ancestry_card = card;
                 ancestryDialogOpen = false;
               }}
               class="w-min mt-auto">Select {card.title}</Button
-            ></AncestryCard
-          >
+            >
+          </HeritageCard>
         {/each}
       </div>
       <Dialog.Footer>
@@ -145,15 +136,15 @@
       </Dialog.Header>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {#each Object.values(COMMUNITIES.cards) as card}
-          <CommunityCard {card}
+          <HeritageCard {card}
             ><Button
               onclick={() => {
-                character.heritage.community_card = card;
+                character.community_card = card;
                 communityDialogOpen = false;
               }}
               class="w-min mt-auto">Select {card.title}</Button
-            ></CommunityCard
-          >
+            >
+          </HeritageCard>
         {/each}
       </div>
       <Dialog.Footer>
@@ -169,15 +160,15 @@
       </Dialog.Header>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {#each Object.values(TRANSFORMATIONS.cards) as card}
-          <TransformationCard {card}
+          <HeritageCard {card}
             ><Button
               onclick={() => {
                 character.transformation_card = card;
                 transformationDialogOpen = false;
               }}
               class="w-min mt-auto">Select {card.title}</Button
-            ></TransformationCard
-          >
+            >
+          </HeritageCard>
         {/each}
       </div>
       <Dialog.Footer>

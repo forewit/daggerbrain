@@ -10,25 +10,29 @@ export type Character = {
         proficiency: 1
         max_experiences: 2
         max_domain_card_loadout: 5
+        max_hope: 6
+        max_armor: 0
+        max_hp: 0
+        max_stress: 0
+        evasion: 0
+        damage_thresholds: {
+            major: 0,
+            severe: 0,
+        }
         primary_class_mastery_level: 0
         secondary_class_mastery_level: 0
-        max_hope: 6
     }
 
     // heritage
     ancestry_card: Card<"ancestry"> | null
     community_card: Card<"community"> | null
-    experiences: { title: string, modifier: number }[],
+    experiences: Experience[],
 
     // classes
-    primary_class: {
-        class: Class | null,
-        subclass: Subclass | null,
-    } | null
-    secondary_class: {
-        class: Class | null,
-        subclass: Subclass | null,
-    } | null
+    primary_class: Class | null
+    primary_subclass: Subclass | null
+    secondary_class: Class | null
+    secondary_subclass: Subclass | null
 
     // the void / other
     transformation_card: Card<"transformation"> | null,
@@ -60,21 +64,25 @@ export type Character = {
     // will be overwritten and calculated
     derived_features: Feature[]
     derieved_stats: {
-        max_hope: number,
-        max_domain_card_loadout: number,
-        max_hp: number,
-        max_stress: number,
-        evasion: number
+        // from base stats
         traits: Traits
         proficiency: number
         max_experiences: number
+        max_domain_card_loadout: number,
+        max_hope: number,
+        max_armor: number,
+        max_hp: number,
+        max_stress: number,
+        evasion: number
         damage_thresholds: {
             major: number,
             severe: number
         }
-        domain_card_vault: Card<"domain">[],
         primary_class_mastery_level: number // 0 = none, 1 = foundation, 2 = specialization, 3 = mastery
         secondary_class_mastery_level: number // 0 = none, 1 = foundation, 2 = specialization, 3 = mastery
+        
+        // other 
+        domain_card_vault: Card<"domain">[],
         spellcast_trait: keyof Traits | null
     }
 }
@@ -105,6 +113,11 @@ export type Subclass = {
     foundation_card: Card<"subclass_foundation">
     specialization_card: Card<"subclass_specialization">
     mastery_card: Card<"subclass_mastery">
+}
+
+export type Experience = {
+    title: string
+    modifier: number
 }
 
 export type Feature = {
@@ -144,7 +157,7 @@ export type Card<T extends "domain" | "ancestry" | "community" | "transformation
             type: "ability" | "spell"
         } : T extends "subclass_foundation" ? {
             spellcast_trait: keyof Traits | null
-        } : never
+        } : {}
     )
 
 export type Domain = {

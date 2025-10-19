@@ -1,7 +1,7 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
   import type { Character, Card } from "$lib/ts/types";
-  import CardCarousel from "./card-carousel.svelte";
+  import CardCarousel from "../cards/card-carousel.svelte";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import ChevronDown from "@lucide/svelte/icons/chevron-down";
 

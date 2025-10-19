@@ -4,8 +4,8 @@
 
   let {
     class: className = "",
-    thresholds = $bindable(),
-  }: { class?: string; thresholds: Character["damage_thresholds"] } = $props();
+    thresholds,
+  }: { class?: string; thresholds: Character["derieved_stats"]["damage_thresholds"] } = $props();
 </script>
 
 <div class={cn("w-[360px] relative text-muted-foreground", className)}>

@@ -33,16 +33,11 @@
   {#if expanded}
     <div class="flex flex-col gap-4">
       {#each experiences as experience}
-        {#if experience.title !== ""}
-          <div class="text-sm relative">
-            <p class="font-medium text-[1rem] pb-2">
-              <span class="text-muted-foreground font-medium mr-2">+{experience.modifier}</span>
-              {experience.title}
-            </p>
-            <div class="pl-2 leading-relaxed flex flex-col gap-2">
-              {experience.description}
-            </div>
-          </div>
+        {#if experience.title.trim() !== ""}
+          <p class="font-medium text-[1rem] text-sm">
+            <span class="text-muted-foreground font-medium mr-3 ml-1">+{experience.modifier}</span>
+            {experience.title}
+          </p>
         {/if}
       {/each}
     </div>

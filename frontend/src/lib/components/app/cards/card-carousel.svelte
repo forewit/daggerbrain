@@ -19,7 +19,9 @@
   let selectedIndex = $state(0);
 
   function handleScroll() {
-    selectedIndex = Math.round(scrollContainer.scrollLeft / cardWidth);
+    const vw = window.innerWidth;
+    const cw = cardWidth + gap;
+    selectedIndex = Math.round((scrollContainer.scrollLeft + cw / 2) / cw) - 1;
   }
 
   onMount(() => {
@@ -47,15 +49,13 @@
   class={cn("relative snap-x snap-x-mandatory overflow-x-auto overflow-y-hidden p-1 ", className)}
   style="scrollbar-width:none;"
 >
-  <div class="flex items-center justify-start min-w-max" style="gap: {gap}px;">
-    <div
-      class="flex-shrink-0"
-      style="width: calc(50vw - {gap * (cards.length - 1) + cardWidth / 2}px);"
-    ></div>
+  <div class="flex items-center justify-start min-w-max">
+    <div class="shrink-0 w-[50vw] snap-align-none"></div>
 
     {#each cards as card, index}
       <button
-        style="height: {cardHeight}px; width: {cardWidth}px;"
+        style="height: {cardHeight}px; width: {cardWidth}px; margin-left: {gap /
+          2}px; margin-right: {gap / 2}px;"
         class={cn(
           "rounded-xl snap-center transition-transform scale-95 will-change-transform",
           selectedIndex === index && "scale-100"
@@ -79,9 +79,6 @@
         />
       </button>
     {/each}
-    <div
-      class="flex-shrink-0"
-      style="width: calc(50vw - {gap * (cards.length - 1) + cardWidth / 2}px);"
-    ></div>
+    <div class="shrink-0 w-[50vw] snap-align-none"></div>
   </div>
 </div>

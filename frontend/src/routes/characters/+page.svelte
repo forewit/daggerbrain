@@ -54,9 +54,9 @@
             <p class="text-lg font-bold truncate mt-1">{character.name}</p>
 
             <p class="mt-1 truncate text-xs text-muted-foreground">
-              {character.heritage.ancestry_card?.title || "No ancestry"}
-              &ensp;•&ensp;{character.primary_class?.class?.name || "No class"}
-              &ensp;•&ensp;{character.primary_class?.subclass?.name || "No subclass"}
+              {character.ancestry_card?.title || "No ancestry"}
+              &ensp;•&ensp;{character.primary_class?.name || "No class"}
+              &ensp;•&ensp;{character.primary_subclass?.name || "No subclass"}
             </p>
           </div>
         </a>

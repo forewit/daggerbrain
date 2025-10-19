@@ -3,7 +3,7 @@
   import Traits from "./traits.svelte";
   import type { Character, Card } from "$lib/ts/types";
   import Banner from "./banner.svelte";
-  import Level from "./level.svelte";
+  import Level from "./level-up.svelte";
   import Thresholds from "./thresholds.svelte";
   import Armor from "./armor.svelte";
   import Evasion from "./evasion.svelte";
@@ -30,19 +30,20 @@
 
   let heritageCards: Card<any>[] = $derived(
     [
-      character?.heritage.ancestry_card,
-      character?.heritage.community_card,
+      character?.ancestry_card,
+      character?.community_card,
       character?.transformation_card,
-      ...(character?.custom_cards || []),
+      ...(character?.additional_cards || []),
     ].filter(Boolean) as Card<any>[]
   );
 
   let classCards: Card<any>[] = $derived(
     [
-      character?.primary_class?.mastery_level && character?.primary_class?.mastery_level >=  1 && character?.primary_class?.subclass?.foundation_card,
-      character?.primary_class?.mastery_level && character?.primary_class?.mastery_level >= 2 && character?.primary_class?.subclass?.specialization_card,
-      character?.primary_class?.mastery_level && character?.primary_class?.mastery_level >= 3 && character?.primary_class?.subclass?.mastery_card,
-      ...(character?.domain_card_loadout || []),
+      character?.derieved_stats.primary_class_mastery_level && character?.derieved_stats.primary_class_mastery_level >=  1 && character?.primary_subclass?.foundation_card,
+      character?.derieved_stats.primary_class_mastery_level && character?.derieved_stats.primary_class_mastery_level >= 2 && character?.primary_subclass?.specialization_card,
+      character?.derieved_stats.primary_class_mastery_level && character?.derieved_stats.primary_class_mastery_level >= 3 && character?.primary_subclass?.mastery_card,
+      // should get the matching cards from the vault based on the indicies in domain card loadout
+      ...(character?.derieved_stats.domain_card_vault.filter((card, i) => character?.ephemeral_stats.domain_card_loadout.includes(i)) || []),
     ].filter(Boolean) as Card<any>[]
   );
 
@@ -105,7 +106,7 @@
               variant="outline"
             >
               <p class="truncate text-xs text-left">
-                {character.primary_class?.class?.name || "No class"}&ensp;•&ensp;{character.primary_class?.subclass?.name ||
+                {character.primary_class?.name || "No class"}&ensp;•&ensp;{character.primary_subclass?.name ||
                   "No subclass"}
               </p>
               <div class="grow"></div>
@@ -130,36 +131,36 @@
             <div class="grow flex flex-col gap-2 truncate">
               <p class="text-2xl font-bold truncate">{character.name}</p>
               <p class="text-xs text-muted-foreground truncate">
-                {character.heritage.ancestry_card?.title || "No ancestry"}&ensp;•&ensp;{character
-                  .heritage.community_card?.title || "No community"}
+                {character.ancestry_card?.title || "No ancestry"}&ensp;•&ensp;{character
+                  .community_card?.title || "No community"}
               </p>
             </div>
           </div>
         </div>
 
         <!-- class banner -->
-        {#if character.primary_class?.class}
-          <Banner characterClass={character.primary_class.class} />
+        {#if character.primary_class}
+          <Banner primary_class={character.primary_class} />
         {/if}
       </div>
 
       <!-- traits -->
-      <Traits traits={character.traits} class="mx-2 " />
+      <Traits traits={character.derieved_stats.traits} class="mx-2 " />
 
       <!-- evasion and armor -->
       <div
         class="grid grid-cols-1 sm:grid-cols-[auto_auto] place-items-center mx-auto gap-x-6 gap-y-2"
       >
         <div class="flex gap-2">
-          <Evasion evasion={character.evasion} />
-          <Armor bind:armor={character.armor} />
+          <Evasion evasion={character.derieved_stats.evasion} />
+          <Armor bind:marked_armor={character.ephemeral_stats.marked_armor} max_armor={character.derieved_stats.max_armor} />
         </div>
-        <Thresholds thresholds={character.damage_thresholds} class="my-2" />
+        <Thresholds thresholds={character.derieved_stats.damage_thresholds} class="my-2" />
       </div>
 
       <!-- hp and stress -->
       <div class="mx-2 flex flex-col gap-2">
-        <Hp bind:hp={character.hp} class="justify-center sm:justify-start" />
+        <Hp bind:marked_hp={character.ephemeral_stats.marked_hp} max_hp={character.derieved_stats.max_hp} class="justify-center sm:justify-start" />
         <Stress {characterUid} class="justify-center sm:justify-start" />
       </div>
 
@@ -167,8 +168,11 @@
       <Hope {characterUid} />
 
       <!-- class features -->
-      {#if character.primary_class?.class}
-        <ClassFeatures bind:characterClass={character.primary_class.class} class="mx-2" />
+      {#if character.primary_class}
+        <ClassFeatures character_class={character.primary_class} class="mx-2" />
+      {/if}
+      {#if character.secondary_class}
+        <ClassFeatures character_class={character.secondary_class} class="mx-2" />
       {/if}
 
       <!-- experiences -->

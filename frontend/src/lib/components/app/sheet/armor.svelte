@@ -5,37 +5,34 @@
 
   let {
     class: className = "",
-    armor = $bindable(),
-  }: { class?: string; armor: Character["armor"] } = $props();
+    max_armor,
+    marked_armor = $bindable(),
+  }: { class?: string; max_armor: number; marked_armor: number } = $props();
 </script>
 
 <div class={cn("flex gap-2 h-min text-center border-2 rounded-md p-2", className)}>
-  <button
-    onclick={() => {
-      armor.marked = 0;
-    }}
-  >
+  <button onclick={() => (marked_armor = 0)}>
     <p class="text-lg font-bold">
-      {armor.max}
+      {max_armor}
     </p>
     <p class="text-sm font-medium">Armor</p>
   </button>
   <div class="flex flex-wrap items-center gap-x-1 gap-y-0 w-14">
-    {#each Array(armor.max) as _, index}
+    {#each Array(max_armor) as _, index}
       <button
         aria-label="armor-slot"
         class="size-min outline-offset-2 rounded"
         onclick={() => {
-          if (index + 1 === armor.marked) {
-            armor.marked = Math.max(0, armor.marked - 1);
+          if (index + 1 === marked_armor) {
+            marked_armor = Math.max(0, marked_armor - 1);
           } else {
-            armor.marked = index + 1;
+            marked_armor = index + 1;
           }
         }}
         type="button"
       >
         <Shield
-          class="size-4 transition-all text-muted-foreground {index < armor.marked
+          class="size-4 transition-all text-muted-foreground {index < marked_armor
             ? 'fill-muted-foreground'
             : 'fill-transparent'}"
         />
