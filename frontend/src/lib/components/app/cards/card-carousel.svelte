@@ -19,9 +19,8 @@
   let selectedIndex = $state(0);
 
   function handleScroll() {
-    const vw = window.innerWidth;
     const cw = cardWidth + gap;
-    selectedIndex = Math.round((scrollContainer.scrollLeft + cw / 2) / cw) - 1;
+    selectedIndex = Math.round((scrollContainer.scrollLeft) / cw);
   }
 
   onMount(() => {
@@ -50,14 +49,14 @@
   style="scrollbar-width:none;"
 >
   <div class="flex items-center justify-start min-w-max">
-    <div class="shrink-0 w-[50vw] snap-align-none"></div>
+    <div style="width: calc(50vw - {(cardWidth+gap)/2}px)" class="shrink-0 snap-align-none"></div>
 
     {#each cards as card, index}
       <button
         style="height: {cardHeight}px; width: {cardWidth}px; margin-left: {gap /
           2}px; margin-right: {gap / 2}px;"
         class={cn(
-          "rounded-xl snap-center transition-transform scale-95 will-change-transform",
+          "rounded-xl snap-center transition-[scale] scale-95",
           selectedIndex === index && "scale-100"
         )}
         onclick={(e) => {
@@ -79,6 +78,6 @@
         />
       </button>
     {/each}
-    <div class="shrink-0 w-[50vw] snap-align-none"></div>
+    <div style="width: calc(50vw - {(cardWidth+gap)/2}px)" class="shrink-0 snap-align-none"></div>
   </div>
 </div>

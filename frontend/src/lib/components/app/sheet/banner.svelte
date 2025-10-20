@@ -3,11 +3,11 @@
   import type { Class } from "$lib/ts/types";
   import { DOMAINS } from "$lib/ts/constants";
 
-  let { class: className = "", primary_class }: { class?: string; primary_class: Class } =
+  let { class: className = "", character_class }: { class?: string; character_class: Class } =
     $props();
 
-    let primaryDomain = $state(DOMAINS[primary_class.primary_domain as keyof typeof DOMAINS])
-    let secondaryDomain = $state(DOMAINS[primary_class.secondary_domain as keyof typeof DOMAINS])
+    let primaryDomain = $state(DOMAINS[character_class.primary_domain as keyof typeof DOMAINS])
+    let secondaryDomain = $state(DOMAINS[character_class.secondary_domain as keyof typeof DOMAINS])
 </script>
 
 {#snippet domainSVG(name: keyof typeof DOMAINS)}
@@ -220,10 +220,10 @@
     <img class="h-full w-full" src="/images/card/banner.webp" alt="banner" />
     <div class="absolute inset-0 flex flex-col items-center justify-center pb-3 gap-1 pt-0.5">
       <div class="w-9 h-auto aspect-contain">
-        {@render domainSVG(primary_class.primary_domain as keyof typeof DOMAINS)}
+        {@render domainSVG(character_class.primary_domain as keyof typeof DOMAINS)}
       </div>
       <div class="w-9 h-auto aspect-contain">
-        {@render domainSVG(primary_class.secondary_domain as keyof typeof DOMAINS)}
+        {@render domainSVG(character_class.secondary_domain as keyof typeof DOMAINS)}
       </div>
     </div>
   </div>

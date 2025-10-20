@@ -79,7 +79,9 @@ export const TRAITS = {
 
 export const CLASSES = {
     assassin: {
+        source: "The Void 1.5",
         starting_evasion: 12,
+        starting_max_hp: 5,
         suggested_traits: {
             agility: 2,
             strength: -1,
@@ -90,9 +92,11 @@ export const CLASSES = {
         },
 
         name: "Assassin",
+        image_url: "/images/wip.avif",
+        description_html: "As an assassin, you utilize unmatched stealth and precision to ambush the unwary.",
         hope_feature: {
             title: "Grim Resolve",
-            description_html: "<b>Spend 3 Hope</b> to clear 2 Stress.",
+            description_html: "<p><b>Spend 3 Hope</b> to clear 2 Stress.</p>",
         },
         primary_domain: "blade",
         secondary_domain: "midnight",
@@ -110,15 +114,15 @@ export const CLASSES = {
             },
             {
                 title: "Get In & Get Out",
-                description_html: `<b>Spend a Hope</b> to ask the GM for either a quick or inconspicuous way 
+                description_html: `<p><b>Spend a Hope</b> to ask the GM for either a quick or inconspicuous way 
               into or out of a building or structure you can see. The next roll you make that capitalizes 
-              on this information has advantage.`,
+              on this information has advantage.</p>`,
             },
         ],
         subclasses: {
             executioners_guild: {
                 name: "Executioners Guild",
-                description_html: "",
+                description_html: "<p>Skilled in the art of assassination, the Executioners Guild is known for their precision and efficiency.</p>",
                 foundation_card: SUBCLASS_CARDS.executioners_guild_foundation,
                 specialization_card: SUBCLASS_CARDS.executioners_guild_specialization,
                 mastery_card: SUBCLASS_CARDS.executioners_guild_mastery,
@@ -208,7 +212,6 @@ export const JUST_JAMES: Character = {
 
     // level-up choices
     level: 2,
-    level_1_choices: [],
     level_2_choices: [],
     level_3_choices: [],
     level_4_choices: [],
@@ -240,8 +243,8 @@ export const JUST_JAMES: Character = {
         max_stress: 7,
         evasion: 15,
         damage_thresholds: {
-            major: 10,
-            severe: 20,
+            major: 12,
+            severe: 25,
         },
         primary_class_mastery_level: 1,
         secondary_class_mastery_level: 0,
@@ -315,7 +318,6 @@ const NEW_CHARACTER: Character = {
 
     // level-up choices
     level: 1,
-    level_1_choices: [],
     level_2_choices: [],
     level_3_choices: [],
     level_4_choices: [],

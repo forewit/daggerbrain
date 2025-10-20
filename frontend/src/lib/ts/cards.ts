@@ -16,8 +16,8 @@ export const BONE_DOMAIN_CARDS = {
                 description_html: "Gain a bonus to your Evasion equal to half your Agility."
             }
         ]
-    } as Card<"domain">
-} as const
+    }
+} as const satisfies Record<string, Card<"domain">>
 
 export const VALOR_DOMAIN_CARDS = {
     bare_bones: {
@@ -41,8 +41,8 @@ export const VALOR_DOMAIN_CARDS = {
                                     </ul>`
             }
         ]
-    } as Card<"domain">
-} as const
+    }
+} as const satisfies Record<string, Card<"domain">>
 
 export const BLADE_DOMAIN_CARDS = {
     whirlwind: {
@@ -60,7 +60,7 @@ export const BLADE_DOMAIN_CARDS = {
                 description_html: "When you make a successful attack agains a target within Very Close range, you can <b>spend a Hope</b> to use the attack against all other targets within Very Close range."
             }
         ]
-    } as Card<"domain">,
+    },
     not_good_enough: {
         artist_name: "",
         image_url: "",
@@ -76,7 +76,7 @@ export const BLADE_DOMAIN_CARDS = {
                 description_html: "When you roll your damage dice, you can reroll any 1s or 2s."
             }
         ]
-    } as Card<"domain">,
+    },
     a_soldiers_bond: {
         artist_name: "Mila Pesic",
         image_url: "/images/card/art/domains/blade/a-soldiers-bond.webp",
@@ -91,13 +91,14 @@ export const BLADE_DOMAIN_CARDS = {
                 title: "",
                 description_html: "Once per long rest, when you compliment someone or ask them about something they're good at, you can both gain 3 Hope."
             }]
-    } as Card<"domain">
-} as const
+    }
+} as const satisfies Record<string, Card<"domain">>
 
 export const TRANSFORMATION_CARDS = {
     werewolf: {
+        artist_name: "",
         image_url:
-            "/images/card/art/wip.avif",
+            "/images/wip.avif",
         full_card_image_url:
             "/images/full_cards/transformations/werewolf.png",
         title: "Werewolf",
@@ -114,8 +115,8 @@ export const TRANSFORMATION_CARDS = {
                     "When you mark your last Stress while in Wolf Form, you go into a Frenzy. Roll a number of <b>d20s</b> equal to your tier and automatically deal that much physical damage to all creatures within Very Close Range. Then drop out of Wolf Form.",
             },
         ],
-    } as Card<"transformation">
-} as const
+    }
+} as const satisfies Record<string, Card<"transformation">>
 
 export const ANCESTRY_CARDS = {
     half_clank: {
@@ -126,7 +127,7 @@ export const ANCESTRY_CARDS = {
         title: "Half-Clank",
         description_html: "Half sentient mechanical being, half human.",
         artist_name: "Mat Wilma",
-        features: [ {
+        features: [{
             title: "High Stamina",
             description_html: "Gain an additional Stress slot at character creation.",
         },
@@ -135,7 +136,7 @@ export const ANCESTRY_CARDS = {
             description_html:
                 "When you take a short rest, you can choose a long rest move instead of a short rest move.",
         }]
-    } as Card<"ancestry">,
+    },
     drakona: {
         image_url:
             "/images/card/art/ancestries/drakona.webp",
@@ -144,21 +145,22 @@ export const ANCESTRY_CARDS = {
         title: "Drakona",
         description_html: "Drakona resemble wingless dragons in humanoid form and possess a powerful elemental breath.",
         artist_name: "Mat Wilma",
-        features: [ {
+        features: [{
             title: "Scales",
             description_html: "Your scales act as natural protection. When you would take Severe damage, you can <b>mark a Stress</b> to mark 1 fewer Hit Points.",
         },
-         {
+        {
             title: "Elemental Breath",
             description_html: "Choose an element for your breath (such as electricity, fire, or ice). You can use this breath against a target or group of targets within Very Close range, treating it as an Instinct weapon that deals <b>d8</b> magic damage using your Proficiency.",
         }]
-    } as Card<"ancestry">,
-} as const
+    },
+} as const satisfies Record<string, Card<"ancestry">>
 
 export const COMMUNITY_CARDS = {
     warborne: {
+        artist_name: "",
         image_url:
-            "/images/card/art/wip.avif",
+            "/images/wip.avif",
         full_card_image_url:
             "/images/full_cards/communities/warborne.png",
         title: "Warborne",
@@ -171,14 +173,13 @@ export const COMMUNITY_CARDS = {
                     "Once per session, when an attack would cause you to <b>mark a stress</b>, you can <b>spend a hope</b> instead.",
             },
         ],
-    } as Card<"community">,
-
-} as const
+    }
+} as const satisfies Record<string, Card<"community">>
 
 export const SUBCLASS_CARDS = {
-    executioners_guild_foundation: {
+    executioners_guild_foundation: <Card<"subclass_foundation">>{
         artist_name: "",
-        image_url: "",
+        image_url: "/images/wip.avif",
         full_card_image_url:
             "/images/full_cards/subclasses/assassin/executioners-guild-foundation.png",
         title: "Executioners Guild",
@@ -194,10 +195,10 @@ export const SUBCLASS_CARDS = {
                 description_html: 'Your "Marked for Death" feature uses <b>d6s</b> instead of <b>d4s</b>.',
             },
         ],
-    } as Card<"subclass_foundation">,
-    executioners_guild_specialization: {
+    },
+    executioners_guild_specialization: <Card<"subclass_specialization">>{
         artist_name: "",
-        image_url: "",
+        image_url: "/images/wip.avif",
         full_card_image_url:
             "/images/full_cards/subclasses/assassin/executioners-guild-specialization.png",
         title: "Executioners Guild",
@@ -212,10 +213,10 @@ export const SUBCLASS_CARDS = {
                 description_html: "You gain a <b>+2</b> bonus to your Evasion against any attacks made by a creature <i>Marked for Death</i>."
             }
         ],
-    } as Card<"subclass_specialization">,
-    executioners_guild_mastery: {
+    },
+    executioners_guild_mastery: <Card<"subclass_mastery">>{
         artist_name: "",
-        image_url: "",
+        image_url: "/images/wip.avif",
         full_card_image_url: "",
         title: "Executioners Guild",
         description_html: "Mastery",
@@ -229,5 +230,5 @@ export const SUBCLASS_CARDS = {
                 description_html: 'Your "Marked for Death" feature uses <b>d8s</b> instead of <b>d6s</b>.'
             }
         ],
-    } as Card<"subclass_mastery">,
-} as const
+    },
+} as const satisfies Record<string, Card<"subclass_foundation" | "subclass_specialization" | "subclass_mastery">>

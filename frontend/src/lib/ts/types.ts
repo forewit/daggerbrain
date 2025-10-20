@@ -50,16 +50,15 @@ export type Character = {
 
     // level-up choices
     level: number,
-    level_1_choices: { id: string }[]
-    level_2_choices: { id: string }[]
-    level_3_choices: { id: string }[]
-    level_4_choices: { id: string }[]
-    level_5_choices: { id: string }[]
-    level_6_choices: { id: string }[]
-    level_7_choices: { id: string }[]
-    level_8_choices: { id: string }[]
-    level_9_choices: { id: string }[]
-    level_10_choices: { id: string }[]
+    level_2_choices: string[]
+    level_3_choices: string[]
+    level_4_choices: string[]
+    level_5_choices: string[]
+    level_6_choices: string[]
+    level_7_choices: string[]
+    level_8_choices: string[]
+    level_9_choices: string[]
+    level_10_choices: string[]
 
     // will be overwritten and calculated
     derived_features: Feature[]
@@ -80,7 +79,7 @@ export type Character = {
         }
         primary_class_mastery_level: number // 0 = none, 1 = foundation, 2 = specialization, 3 = mastery
         secondary_class_mastery_level: number // 0 = none, 1 = foundation, 2 = specialization, 3 = mastery
-        
+
         // other 
         domain_card_vault: Card<"domain">[],
         spellcast_trait: keyof Traits | null
@@ -97,8 +96,12 @@ export type Traits = {
 }
 
 export type Class = {
+    source: Source
     name: string
+    image_url: string
+    description_html: string
     starting_evasion: number
+    starting_max_hp: number
     suggested_traits: Traits
     hope_feature: Feature
     primary_domain: string
@@ -130,6 +133,8 @@ export type Feature = {
 }
 
 export type Modifier = ({
+    min_level: number; // -1 = no limit
+    max_level: number; // -1 = no limit
     target: "trait" | "evasion" | "max_hp" | "max_stress" | "max_experiences" | "major_damage_threshold" | "severe_damage_threshold" | "primary_class_mastery_level" | "secondary_class_mastery_level" | "max_domain_card_loadout" | "max_hope"
 } | {
     target: "experience"
@@ -157,7 +162,7 @@ export type Card<T extends "domain" | "ancestry" | "community" | "transformation
             type: "ability" | "spell"
         } : T extends "subclass_foundation" ? {
             spellcast_trait: keyof Traits | null
-        } : {}
+        } : unknown
     )
 
 export type Domain = {
@@ -165,3 +170,5 @@ export type Domain = {
     color: string
     cards: Record<string, Card<"domain">>
 }
+
+export type Source = "Core" | "The Void 1.0" | "The Void 1.5"

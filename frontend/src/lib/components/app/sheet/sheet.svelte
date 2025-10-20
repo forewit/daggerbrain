@@ -76,7 +76,7 @@
       class="w-full min-w-[260px] max-w-2xl mx-auto flex flex-col gap-6 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]"
     >
       <!-- top bar -->
-      <div class="flex gap-2 px-2 pr-6">
+      <div class="flex gap-2 px-2 pr-4">
         <div class="grow truncate relative">
 
           <!-- level class subclass -->
@@ -140,7 +140,7 @@
 
         <!-- class banner -->
         {#if character.primary_class}
-          <Banner primary_class={character.primary_class} />
+          <Banner character_class={character.primary_class} />
         {/if}
       </div>
 

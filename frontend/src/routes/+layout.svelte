@@ -34,7 +34,7 @@
   <header
     class={cn(
       "pt-[calc(max(env(safe-area-inset-top),--spacing(3)))] pl-[calc(env(safe-area-inset-left)+--spacing(2))] pr-[calc(env(safe-area-inset-right)+--spacing(2))]",
-      "sticky w-full top-0 z-45 flex justify-center bg-primary-muted border-b shadow-lg"
+      "sticky sm:relative w-full top-0 z-45 flex justify-center bg-primary-muted border-b shadow-lg"
     )}
   >
     <nav
