@@ -5,27 +5,11 @@
   import { getAppContext } from "$lib/ts/app.svelte";
   import { cn } from "$lib/utils";
   import Dropdown from "$lib/components/app/builder/dropdown.svelte";
+  import { getCharacterContext } from "$lib/ts/character.svelte.js";
 
-  let { data } = $props();
-
-  const app = getAppContext();
-  const character = $derived(app.characters.find((c) => c.uid === data.uid));
+  const context = getCharacterContext();
+  let character = $derived(context.character);
 </script>
-
-{#snippet tierBonuses(tier: 2 | 3 | 4)}
-  <div
-    class="relative flex flex-col gap-2 text-accent bg-accent/5 p-4 mx-4 rounded-lg border border-accent/20"
-  >
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2">
-      {#each Array(tier) as _}
-        <span class="size-2 rounded-xs rotate-45 bg-accent"></span>
-      {/each}
-    </div>
-
-    <p class="text-xs">•&emsp;Gain an additional Experience at +2</p>
-    <p class="text-xs">•&emsp;Gain a +1 bonus to your Proficiency</p>
-  </div>
-{/snippet}
 
 {#if character}
   <div
@@ -35,28 +19,61 @@
     )}
   >
     <div class="m-4 flex flex-col gap-4">
-      <LevelSelect bind:level={character.level} />
+      <LevelSelect
+        bind:level={character.level}
+        bind:level_up_choices={character.level_up_choices}
+      />
 
       <!-- tier 1 options -->
       <Tier1Options {character} />
 
       {#if character.level >= 2}
-        {@render tierBonuses(2)}
-        <Dropdown title="Level 2 Options">
-          <Tier2Options {character} />
+        <Dropdown title="Tier 2" class="bg-accent/10 text-accent border-accent/20">
+          <div class="flex flex-col gap-2">
+            <p class="text-xs">•&emsp;Gain an additional Experience at +2</p>
+            <p class="text-xs">•&emsp;Gain a +1 bonus to your Proficiency</p>
+          </div>
+        </Dropdown>
+        <Dropdown
+          title="Level 2"
+          highlighted={!character.level_up_choices[2] ||
+            character.level_up_choices[2].filter((choice) => choice !== null).length < 2}
+          subtitle={character.level_up_choices[2]?.map((choice) => choice.short_title).join(", ")}
+        >
+          <Tier2Options bind:character bind:level_up_choices={character.level_up_choices} level={2} experiences={character.experiences} />
         </Dropdown>
       {/if}
 
       {#if character.level >= 3}
-        <Dropdown title="Level 3 Options" />
+        <Dropdown
+          title="Level 3"
+          highlighted={!character.level_up_choices[3] ||
+            character.level_up_choices[3].filter((choice) => choice !== null).length < 2}
+          subtitle={character.level_up_choices[3]?.map((choice) => choice.short_title).join(", ")}
+        >
+          <Tier2Options bind:character bind:level_up_choices={character.level_up_choices} level={3} experiences={character.experiences} />
+        </Dropdown>
       {/if}
 
       {#if character.level >= 4}
-        <Dropdown title="Level 4 Options" />
+        <Dropdown
+          title="Level 4"
+          highlighted={!character.level_up_choices[4] ||
+            character.level_up_choices[4].filter((choice) => choice !== null).length < 2}
+          subtitle={character.level_up_choices[4]?.map((choice) => choice.short_title).join(", ")}
+        >
+          <Tier2Options bind:character bind:level_up_choices={character.level_up_choices} level={4} experiences={character.experiences} />
+        </Dropdown>
       {/if}
 
       {#if character.level >= 5}
-        {@render tierBonuses(3)}
+        <Dropdown title="Tier 3" class="bg-accent/10 text-accent border-accent/20">
+          <div class="flex flex-col gap-2">
+            <p class="text-xs">•&emsp;Gain an additional Experience at +2</p>
+            <p class="text-xs">•&emsp;Clear all marked character traits</p>
+            <p class="text-xs">•&emsp;Gain a +1 bonus to your Proficiency</p>
+          </div>
+        </Dropdown>
         <Dropdown title="Level 5 Options" />
       {/if}
 
@@ -69,7 +86,13 @@
       {/if}
 
       {#if character.level >= 8}
-        {@render tierBonuses(4)}
+        <Dropdown title="Tier 4" class="bg-accent/10 text-accent border-accent/20">
+          <div class="flex flex-col gap-2">
+            <p class="text-xs">•&emsp;Gain an additional Experience at +2</p>
+            <p class="text-xs">•&emsp;Clear all marked character traits</p>
+            <p class="text-xs">•&emsp;Gain a +1 bonus to your Proficiency</p>
+          </div>
+        </Dropdown>
         <Dropdown title="Level 8 Options" />
       {/if}
 

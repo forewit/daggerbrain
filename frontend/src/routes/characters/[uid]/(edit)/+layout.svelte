@@ -175,4 +175,5 @@
   </div>
 
   {@render children?.()}
+  <div class="h-36"></div>
 {/if}

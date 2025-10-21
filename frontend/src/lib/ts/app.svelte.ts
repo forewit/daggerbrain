@@ -5,7 +5,6 @@ import { JUST_JAMES } from './constants';
 
 function createApp() {
   // --- ephemeral state ---
-  let pwa = $state(false)
   let showFooter = $state(true);
 
   // --- persistant state --- 
@@ -44,27 +43,12 @@ function createApp() {
     saveCharacters(characters)
   })
 
-
-  // --- pwa ---
-  $effect(() => {
-    const displayModes = ["fullscreen", "standalone", "minimal-ui"];
-    try {
-      pwa = displayModes.some(
-        (displayMode) => window.matchMedia(`(display-mode: ${displayMode})`).matches
-      );
-    } catch (e) {
-      // In case matchMedia isn't supported or other errors, keep pwa=false
-      pwa = false;
-    }
-  })
-
   // --- cleanup ---
   const destroy = () => { }
 
   return {
     // read only
     get initialLoad() { return initialLoad },
-    get pwa() { return pwa },
     get characters() { return characters },
 
     // helper functions

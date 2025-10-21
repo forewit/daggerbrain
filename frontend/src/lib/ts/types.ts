@@ -48,17 +48,12 @@ export type Character = {
         domain_card_loadout: number[], // domain card vault indices
     }
 
-    // level-up choices
+    // level-up choices. levels 2-10
     level: number,
-    level_2_choices: string[]
-    level_3_choices: string[]
-    level_4_choices: string[]
-    level_5_choices: string[]
-    level_6_choices: string[]
-    level_7_choices: string[]
-    level_8_choices: string[]
-    level_9_choices: string[]
-    level_10_choices: string[]
+    level_up_choices: LevelUpOption[][],
+    tier_2_marked_traits: (keyof Traits)[],
+    tier_3_marked_traits: (keyof Traits)[],
+    tier_4_marked_traits: (keyof Traits)[],
 
     // will be overwritten and calculated
     derived_features: Feature[]
@@ -169,6 +164,17 @@ export type Domain = {
     name: string
     color: string
     cards: Record<string, Card<"domain">>
+}
+
+export type LevelUpOption = {
+    id: string
+    title: string
+    short_title: string
+    max: number
+    marked_traits: (keyof Traits | "")[]
+    experience_indexes: number[]
+    domain_cards_added: Card<"domain">[]
+    features: Feature[]
 }
 
 export type Source = "Core" | "The Void 1.0" | "The Void 1.5"

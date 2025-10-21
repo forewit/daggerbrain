@@ -212,15 +212,10 @@ export const JUST_JAMES: Character = {
 
     // level-up choices
     level: 2,
-    level_2_choices: [],
-    level_3_choices: [],
-    level_4_choices: [],
-    level_5_choices: [],
-    level_6_choices: [],
-    level_7_choices: [],
-    level_8_choices: [],
-    level_9_choices: [],
-    level_10_choices: [],
+    level_up_choices: [],
+    tier_2_marked_traits: [],
+    tier_3_marked_traits: [],
+    tier_4_marked_traits: [],
 
     // will be overwritten and calculated
     derived_features: [],
@@ -318,16 +313,10 @@ const NEW_CHARACTER: Character = {
 
     // level-up choices
     level: 1,
-    level_2_choices: [],
-    level_3_choices: [],
-    level_4_choices: [],
-    level_5_choices: [],
-    level_6_choices: [],
-    level_7_choices: [],
-    level_8_choices: [],
-    level_9_choices: [],
-    level_10_choices: [],
-
+    level_up_choices: [],
+    tier_2_marked_traits: ["agility", "strength"],
+    tier_3_marked_traits: [],
+    tier_4_marked_traits: [],
 
     // will be overwritten and calculated
     derived_features: [],

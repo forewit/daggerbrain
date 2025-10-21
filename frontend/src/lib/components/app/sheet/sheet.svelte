@@ -21,12 +21,8 @@
 
   let {
     class: className = "",
-    characterUid = $bindable(),
-  }: { class?: string; characterUid: string } = $props();
-
-  const app = getAppContext();
-
-  const character = $derived(app.characters.find((c) => c.uid === characterUid));
+    character = $bindable(),
+  }: { class?: string; character: Character } = $props();
 
   let heritageCards: Card<any>[] = $derived(
     [
@@ -161,11 +157,11 @@
       <!-- hp and stress -->
       <div class="mx-2 flex flex-col gap-2">
         <Hp bind:marked_hp={character.ephemeral_stats.marked_hp} max_hp={character.derieved_stats.max_hp} class="justify-center sm:justify-start" />
-        <Stress {characterUid} class="justify-center sm:justify-start" />
+        <Stress bind:character class="justify-center sm:justify-start" />
       </div>
 
       <!-- hope -->
-      <Hope {characterUid} />
+      <Hope bind:character />
 
       <!-- class features -->
       {#if character.primary_class}

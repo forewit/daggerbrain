@@ -1,13 +1,20 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
-  import type { Character } from "$lib/ts/types";
 
-  let { class: className = "", marked_hp = $bindable(), max_hp }: { class?: string; marked_hp: number; max_hp: number } =
-    $props();
+  let {
+    class: className = "",
+    marked_hp = $bindable(),
+    max_hp,
+  }: { class?: string; marked_hp: number; max_hp: number } = $props();
 </script>
 
 <div class={cn("flex items-center gap-4 border-2 rounded-md h-12 px-4", className)}>
-  <button onclick={()=>{marked_hp = 0}} class="text-sm font-medium">HP</button>
+  <button
+    onclick={() => {
+      marked_hp = 0;
+    }}
+    class="text-sm font-medium">HP</button
+  >
   <div class="flex flex-wrap gap-2">
     {#each Array(max_hp) as _, index}
       <button

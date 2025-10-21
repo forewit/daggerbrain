@@ -18,6 +18,7 @@
   let cardHeight = $derived(cardWidth * (503 / 360));
   let selectedIndex = $state(0);
 
+
   function handleScroll() {
     const cw = cardWidth + gap;
     selectedIndex = Math.round((scrollContainer.scrollLeft) / cw);

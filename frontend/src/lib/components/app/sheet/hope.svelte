@@ -1,12 +1,9 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
-  import { getAppContext } from "$lib/ts/app.svelte";
+  import type { Character } from "$lib/ts/types";
 
-  let { class: className = "", characterUid }: { class?: string; characterUid: string } = $props();
+  let { class: className = "", character = $bindable() }: { class?: string; character: Character } = $props();
 
-  const app = getAppContext();
-
-  const character = $derived(app.characters.find((c) => c.uid === characterUid));
 </script>
 
 {#if character}

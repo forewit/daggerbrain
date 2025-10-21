@@ -2,8 +2,13 @@
   import * as Dialog from "$lib/components/ui/dialog";
   import { buttonVariants } from "$lib/components/ui/button";
   import { cn } from "$lib/utils";
+  import type { LevelUpOption } from "$lib/ts/types";
 
-  let { level = $bindable(), class: className = "" }: { level: number, class?: string } = $props();
+  let {
+    level = $bindable(),
+    level_up_choices = $bindable(),
+    class: className = "",
+  }: { level: number; level_up_choices: LevelUpOption[][]; class?: string } = $props();
 
   let open = $state(false);
   let newLevel = $derived(level);
@@ -52,6 +57,7 @@
         onclick={() => {
           level = newLevel;
           selectElm.value = level.toString();
+          level_up_choices = level_up_choices.slice(0, newLevel);
         }}
       >
         Level Down
