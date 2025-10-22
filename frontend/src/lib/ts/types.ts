@@ -50,10 +50,18 @@ export type Character = {
 
     // level-up choices. levels 2-10
     level: number,
-    level_up_choices: LevelUpOption[][],
-    tier_2_marked_traits: (keyof Traits)[],
-    tier_3_marked_traits: (keyof Traits)[],
-    tier_4_marked_traits: (keyof Traits)[],
+    level_up_choices: {
+        1: LevelUpOption[],
+        2: LevelUpOption[],
+        3: LevelUpOption[],
+        4: LevelUpOption[],
+        5: LevelUpOption[],
+        6: LevelUpOption[],
+        7: LevelUpOption[],
+        8: LevelUpOption[],
+        9: LevelUpOption[],
+        10: LevelUpOption[],
+    }
 
     // will be overwritten and calculated
     derived_features: Feature[]
@@ -152,6 +160,7 @@ export type Card<T extends "domain" | "ancestry" | "community" | "transformation
     features: Feature[]
 } & (
         T extends "domain" ? {
+            domain_name: string
             level_requirement: number,
             recall_cost: number,
             type: "ability" | "spell"
@@ -162,6 +171,7 @@ export type Card<T extends "domain" | "ancestry" | "community" | "transformation
 
 export type Domain = {
     name: string
+    description_html: string
     color: string
     cards: Record<string, Card<"domain">>
 }
@@ -172,7 +182,7 @@ export type LevelUpOption = {
     short_title: string
     max: number
     marked_traits: (keyof Traits | "")[]
-    experience_indexes: number[]
+    selected_experiences: number[] // indexes of the experiences array
     domain_cards_added: Card<"domain">[]
     features: Feature[]
 }

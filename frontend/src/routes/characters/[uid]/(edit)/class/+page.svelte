@@ -25,7 +25,7 @@
       />
 
       <!-- tier 1 options -->
-      <Tier1Options {character} />
+      <Tier1Options bind:character />
 
       {#if character.level >= 2}
         <Dropdown title="Tier 2" class="bg-accent/10 text-accent border-accent/20">

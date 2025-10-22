@@ -2,6 +2,7 @@ import type { Card } from "./types";
 
 export const BONE_DOMAIN_CARDS = {
     untouchable: {
+        domain_name: "bone",
         artist_name: "Henry Peters",
         image_url: "/images/card/art/domains/bone/untouchable.webp",
         type: "ability",
@@ -21,6 +22,7 @@ export const BONE_DOMAIN_CARDS = {
 
 export const VALOR_DOMAIN_CARDS = {
     bare_bones: {
+        domain_name: "valor",
         artist_name: "Simon Pape",
         image_url: "/images/card/art/domains/valor/bare-bones.webp",
         type: "ability",
@@ -46,6 +48,7 @@ export const VALOR_DOMAIN_CARDS = {
 
 export const BLADE_DOMAIN_CARDS = {
     whirlwind: {
+        domain_name: "blade",
         artist_name: "",
         image_url: "",
         type: "ability",
@@ -62,6 +65,7 @@ export const BLADE_DOMAIN_CARDS = {
         ]
     },
     not_good_enough: {
+        domain_name: "blade",
         artist_name: "",
         image_url: "",
         type: "ability",
@@ -78,6 +82,7 @@ export const BLADE_DOMAIN_CARDS = {
         ]
     },
     a_soldiers_bond: {
+        domain_name: "blade",
         artist_name: "Mila Pesic",
         image_url: "/images/card/art/domains/blade/a-soldiers-bond.webp",
         type: "ability",

@@ -12,9 +12,6 @@ function createCharacter(uid: string) {
         character = app.characters.find((c) => c.uid === uid) || null;
     });
 
-
-    function updateLevelUpChoice(level: number, choice: LevelUpOption) {}
-
     // keep experiences array length in sync with max_experiences
     $effect(() => {
         if (!character) return;

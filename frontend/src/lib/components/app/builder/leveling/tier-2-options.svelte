@@ -19,7 +19,7 @@
     level,
     character = $bindable(),
   }: {
-    level_up_choices: LevelUpOption[][];
+    level_up_choices: typeof character.level_up_choices;
     experiences: Experience[];
     class?: string;
     max_choices?: number;
@@ -29,17 +29,20 @@
 
   let domain_card_dialog_open = $state(false);
 
-  let all_previous_tier_2_choices: LevelUpOption[] = $derived(
-    level_up_choices
-      .filter((choices, i) => choices !== null && i < level)
-      .flatMap((choices) => choices)
-      .filter((choice, i) => choice !== null)
-      .filter((choice) => TIER_2_BASE_OPTIONS.some((option) => option.id === choice.id))
-  );
+  let all_previous_tier_2_choices: LevelUpOption[] = $derived.by(() => {
+    let previous_choices: LevelUpOption[] = [];
+    for (let i = 1; i < level; i++) {
+      const level_choices = level_up_choices[i as keyof typeof level_up_choices];
+      previous_choices = previous_choices.concat(level_choices);
+    }
+    return previous_choices.filter((choice) =>
+      TIER_2_BASE_OPTIONS.some((option) => option.id === choice.id)
+    );
+  });
 
   let tier_2_options_used: (Omit<
     LevelUpOption,
-    "marked_traits" | "experience_indexes" | "domain_cards_added"
+    "marked_traits" | "selected_experiences" | "domain_cards_added"
   > & {
     used: number;
     previously_marked_traits: (keyof Traits | "")[];
@@ -62,14 +65,14 @@
   let choices: {
     id: string;
     marked_traits: (keyof Traits | "")[];
-    experience_indexes: number[];
+    selected_experiences: number[];
     domain_cards_added: Card<"domain">[];
   }[] = $state(
     (() => {
       // If we have existing choices for this level, use them
-      if (level_up_choices[level] && level_up_choices[level].length > 0) {
+      if (level_up_choices[level as keyof typeof level_up_choices].length > 0) {
         // Ensure we have the right number of choices, filling with defaults if needed
-        const existingChoices = level_up_choices[level];
+        const existingChoices = level_up_choices[level as keyof typeof level_up_choices];
         const result = Array(max_choices)
           .fill(null)
           .map((_, i) => {
@@ -80,14 +83,14 @@
                   | keyof Traits
                   | ""
                 )[],
-                experience_indexes: existingChoices[i].experience_indexes || [-1, -1],
+                selected_experiences: existingChoices[i].selected_experiences || [-1, -1],
                 domain_cards_added: existingChoices[i].domain_cards_added || [],
               };
             }
             return {
               id: "",
               marked_traits: ["", ""] as (keyof Traits | "")[],
-              experience_indexes: [-1, -1],
+              selected_experiences: [-1, -1],
               domain_cards_added: [],
             };
           });
@@ -99,7 +102,7 @@
         .map(() => ({
           id: "",
           marked_traits: ["", ""] as (keyof Traits | "")[],
-          experience_indexes: [-1, -1],
+          selected_experiences: [-1, -1],
           domain_cards_added: [],
         }));
     })()
@@ -122,14 +125,14 @@
 
   // update the appropriate character level_up_choices
   $effect(() => {
-    level_up_choices[level] = choices
+    level_up_choices[level as keyof typeof level_up_choices] = choices
       .map((choice) => {
         let base_option = TIER_2_BASE_OPTIONS.find((option) => option.id === choice.id);
         if (base_option) {
           return {
             ...base_option,
             marked_traits: choice.marked_traits,
-            experience_indexes: choice.experience_indexes,
+            selected_experiences: choice.selected_experiences,
             domain_cards_added: choice.domain_cards_added,
           };
         }
@@ -193,7 +196,7 @@
         choice.marked_traits = ["", ""];
       }
       if (choice.id !== "tier_2_experience_bonus") {
-        choice.experience_indexes = [-1, -1];
+        choice.selected_experiences = [-1, -1];
       }
       if (choice.id !== "tier_2_domain_card") {
         choice.domain_cards_added = [];
@@ -206,9 +209,11 @@
 <div class={cn("flex flex-col gap-4", className)} bind:clientWidth={width}>
   {#each Array(max_choices) as _, i}
     <Select.Root type="single" bind:value={choices[i].id}>
-      <Select.Trigger class="w-full">
-        {TIER_2_BASE_OPTIONS.find((option) => option.id === choices[i].id)?.short_title ||
-          "Select a tier 2 option"}
+      <Select.Trigger class="w-full truncate">
+        <p class="truncate">
+          {TIER_2_BASE_OPTIONS.find((option) => option.id === choices[i].id)?.short_title ||
+            "Select a tier 2 option"}
+        </p>
       </Select.Trigger>
       <Select.Content class="rounded-md " align="start">
         <div style="max-width: {width}px;" class="p-2">
@@ -245,11 +250,13 @@
         <p class="p-2 pb-0 pt-1 text-xs italic font-medium">Choose 2 unmarked character traits.</p>
         <div class="flex gap-2">
           <Select.Root type="single" bind:value={choices[i].marked_traits[0]}>
-            <Select.Trigger class="w-full"
-              >{choices[i].marked_traits[0]
-                ? TRAITS[choices[i].marked_traits[0] as keyof typeof TRAITS].name
-                : "Select a trait"}</Select.Trigger
-            >
+            <Select.Trigger class="w-full truncate">
+              <p class="truncate">
+                {choices[i].marked_traits[0]
+                  ? TRAITS[choices[i].marked_traits[0] as keyof typeof TRAITS].name
+                  : "Select a trait"}
+              </p>
+            </Select.Trigger>
 
             <Select.Content class="rounded-md " align="start">
               <div style="max-width: {width}px;" class="p-2">
@@ -275,12 +282,14 @@
             </Select.Content>
           </Select.Root>
           <Select.Root type="single" bind:value={choices[i].marked_traits[1]}>
-            <Select.Trigger class="w-full"
-              >{choices[i].marked_traits[1]
-                ? TRAITS[choices[i].marked_traits[1] as keyof typeof TRAITS].name
-                : "Select a trait"}</Select.Trigger
-            >
-            <Select.Content class="rounded-md " align="start">
+            <Select.Trigger class="w-full truncate">
+              <p class="truncate">
+                {choices[i].marked_traits[1]
+                  ? TRAITS[choices[i].marked_traits[1] as keyof typeof TRAITS].name
+                  : "Select a trait"}
+              </p>
+            </Select.Trigger>
+            <Select.Content class="rounded-md " align="end">
               <div style="max-width: {width}px;" class="p-2">
                 <Select.Item value="" class="justify-center hover:cursor-pointer text-sm">
                   -- none selected --
@@ -311,13 +320,15 @@
         <div class="flex gap-2">
           <Select.Root
             type="single"
-            value={choices[i].experience_indexes[0].toString()}
-            onValueChange={(value) => (choices[i].experience_indexes[0] = parseInt(value))}
+            value={choices[i].selected_experiences[0].toString()}
+            onValueChange={(value) => (choices[i].selected_experiences[0] = parseInt(value))}
           >
-            <Select.Trigger class="w-full">
-              {choices[i].experience_indexes[0] >= 0
-                ? experiences[choices[i].experience_indexes[0]].title || "Unnamed Experience"
-                : "Select an Experience"}
+            <Select.Trigger class="w-full truncate">
+              <p class="truncate">
+                {choices[i].selected_experiences[0] >= 0
+                  ? experiences[choices[i].selected_experiences[0]].title || "Unnamed Experience"
+                  : "Select an Experience"}
+              </p>
             </Select.Trigger>
             <Select.Content class="rounded-md" align="start">
               <div style="max-width: {width}px;" class="p-2">
@@ -327,7 +338,7 @@
                 <Select.Label>Experiences</Select.Label>
                 {#each experiences as experience, j}
                   <Select.Item
-                    disabled={choices[i].experience_indexes[1] === j}
+                    disabled={choices[i].selected_experiences[1] === j}
                     value={j.toString()}>{experience.title || "Unnamed Experience"}</Select.Item
                   >
                 {/each}
@@ -336,15 +347,17 @@
           </Select.Root>
           <Select.Root
             type="single"
-            value={choices[i].experience_indexes[1].toString()}
-            onValueChange={(value) => (choices[i].experience_indexes[1] = parseInt(value))}
+            value={choices[i].selected_experiences[1].toString()}
+            onValueChange={(value) => (choices[i].selected_experiences[1] = parseInt(value))}
           >
-            <Select.Trigger class="w-full">
-              {choices[i].experience_indexes[1] >= 0
-                ? experiences[choices[i].experience_indexes[1]].title || "Unnamed Experience"
-                : "Select an Experience"}
+            <Select.Trigger class="w-full truncate">
+              <p class="truncate">
+                {choices[i].selected_experiences[1] >= 0
+                  ? experiences[choices[i].selected_experiences[1]].title || "Unnamed Experience"
+                  : "Select an Experience"}
+              </p>
             </Select.Trigger>
-            <Select.Content class="rounded-md" align="start">
+            <Select.Content class="rounded-md" align="end">
               <div style="max-width: {width}px;" class="p-2">
                 <Select.Item value="" class="justify-center hover:cursor-pointer text-sm">
                   -- none selected --
@@ -352,7 +365,7 @@
                 <Select.Label>Experiences</Select.Label>
                 {#each experiences as experience, j}
                   <Select.Item
-                    disabled={choices[i].experience_indexes[0] === j}
+                    disabled={choices[i].selected_experiences[0] === j}
                     value={j.toString()}>{experience.title || "Unnamed Experience"}</Select.Item
                   >
                 {/each}

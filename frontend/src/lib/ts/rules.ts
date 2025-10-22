@@ -5,6 +5,15 @@ export const EXPERIENCES = {
     <p>You get two Experiences at character creation each with a +2 modifier.</p>`
 } as const
 
+export const TIER_1_BASE_OPTIONS = [
+    {
+        id: "tier_1_domain_card",
+        title: "Choose 2 level 1 domain cards from the domains available to you.",
+        short_title: "Starting Domain Cards",
+        max: 1,
+        features: []
+    }
+] as const satisfies Omit<LevelUpOption, "marked_traits" | "selected_experiences" | "domain_cards_added">[]
 
 export const TIER_2_BASE_OPTIONS = [
     {
@@ -49,4 +58,4 @@ export const TIER_2_BASE_OPTIONS = [
         max: 1,
         features: []
     }
-] as const satisfies Omit<LevelUpOption, "marked_traits" | "experience_indexes" | "domain_cards_added">[]
+] as const satisfies Omit<LevelUpOption, "marked_traits" | "selected_experiences" | "domain_cards_added">[]
