@@ -25,7 +25,7 @@
       />
 
       <!-- tier 1 options -->
-      <Tier1Options bind:character />
+      <!-- <Tier1Options bind:character />
 
       {#if character.level >= 2}
         <Dropdown title="Tier 2" class="bg-accent/10 text-accent border-accent/20">
@@ -64,7 +64,7 @@
         >
           <Tier2Options bind:character bind:level_up_choices={character.level_up_choices} level={4} experiences={character.experiences} />
         </Dropdown>
-      {/if}
+      {/if} -->
 
       {#if character.level >= 5}
         <Dropdown title="Tier 3" class="bg-accent/10 text-accent border-accent/20">

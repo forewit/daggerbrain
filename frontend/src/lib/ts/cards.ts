@@ -14,9 +14,10 @@ export const BONE_DOMAIN_CARDS = {
         features: [
             {
                 title: "",
-                description_html: "Gain a bonus to your Evasion equal to half your Agility."
+                description_html: "Gain a bonus to your Evasion equal to half your Agility.",
             }
-        ]
+        ],
+        effect_ids: []
     }
 } as const satisfies Record<string, Card<"domain">>
 
@@ -40,9 +41,10 @@ export const VALOR_DOMAIN_CARDS = {
                                         <li><b><em>Tier 2:</em></b> 11/24</li>
                                         <li><b><em>Tier 3:</em></b> 13/31</li>
                                         <li><b><em>Tier 4:</em></b> 15/38</li>
-                                    </ul>`
+                                    </ul>`,
             }
-        ]
+        ],
+        effect_ids: []
     }
 } as const satisfies Record<string, Card<"domain">>
 
@@ -60,9 +62,10 @@ export const BLADE_DOMAIN_CARDS = {
         features: [
             {
                 title: "",
-                description_html: "When you make a successful attack agains a target within Very Close range, you can <b>spend a Hope</b> to use the attack against all other targets within Very Close range."
+                description_html: "When you make a successful attack agains a target within Very Close range, you can <b>spend a Hope</b> to use the attack against all other targets within Very Close range.",
             }
-        ]
+        ],
+        effect_ids: []
     },
     not_good_enough: {
         domain_name: "blade",
@@ -77,9 +80,10 @@ export const BLADE_DOMAIN_CARDS = {
         features: [
             {
                 title: "",
-                description_html: "When you roll your damage dice, you can reroll any 1s or 2s."
+                description_html: "When you roll your damage dice, you can reroll any 1s or 2s.",
             }
-        ]
+        ],
+        effect_ids: []
     },
     a_soldiers_bond: {
         domain_name: "blade",
@@ -94,8 +98,10 @@ export const BLADE_DOMAIN_CARDS = {
         features: [
             {
                 title: "",
-                description_html: "Once per long rest, when you compliment someone or ask them about something they're good at, you can both gain 3 Hope."
-            }]
+                description_html: "Once per long rest, when you compliment someone or ask them about something they're good at, you can both gain 3 Hope.",
+            }
+        ],
+        effect_ids: []
     }
 } as const satisfies Record<string, Card<"domain">>
 
@@ -120,6 +126,7 @@ export const TRANSFORMATION_CARDS = {
                     "When you mark your last Stress while in Wolf Form, you go into a Frenzy. Roll a number of <b>d20s</b> equal to your tier and automatically deal that much physical damage to all creatures within Very Close Range. Then drop out of Wolf Form.",
             },
         ],
+        effect_ids: []
     }
 } as const satisfies Record<string, Card<"transformation">>
 
@@ -140,7 +147,8 @@ export const ANCESTRY_CARDS = {
             title: "Efficient",
             description_html:
                 "When you take a short rest, you can choose a long rest move instead of a short rest move.",
-        }]
+        }],
+        effect_ids: []
     },
     drakona: {
         image_url:
@@ -157,7 +165,8 @@ export const ANCESTRY_CARDS = {
         {
             title: "Elemental Breath",
             description_html: "Choose an element for your breath (such as electricity, fire, or ice). You can use this breath against a target or group of targets within Very Close range, treating it as an Instinct weapon that deals <b>d8</b> magic damage using your Proficiency.",
-        }]
+        }],
+        effect_ids: []
     },
 } as const satisfies Record<string, Card<"ancestry">>
 
@@ -178,6 +187,7 @@ export const COMMUNITY_CARDS = {
                     "Once per session, when an attack would cause you to <b>mark a stress</b>, you can <b>spend a hope</b> instead.",
             },
         ],
+        effect_ids: []
     }
 } as const satisfies Record<string, Card<"community">>
 

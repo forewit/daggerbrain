@@ -3,6 +3,7 @@
   import { buttonVariants } from "$lib/components/ui/button";
   import { cn } from "$lib/utils";
   import type { LevelUpOption, Character } from "$lib/ts/types";
+  import { BLANK_LEVEL_UP_OPTION } from "$lib/ts/rules";
 
   let {
     level = $bindable(),
@@ -16,7 +17,7 @@
 </script>
 
 <select
-  class={cn("bg-primary-muted p-2 rounded-md w-36 border-r-6 border-primary-muted", className)}
+  class={cn("bg-primary-muted p-2 rounded-md w-36 border-r-6 border-primary-muted hover:cursor-pointer", className)}
   value={level}
   bind:this={selectElm}
   onchange={(e) => {
@@ -32,7 +33,7 @@
   }}
 >
   {#each [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as i}
-    <option value={i}>Level {i}</option>
+    <option class="hover:cursor-pointer" value={i}>Level {i}</option>
   {/each}
 </select>
 
@@ -57,9 +58,6 @@
         onclick={() => {
           level = newLevel;
           selectElm.value = level.toString();
-          for (let i = 0; i < newLevel; i++) {
-            level_up_choices[i as keyof typeof level_up_choices] = [];
-          }
         }}
       >
         Level Down

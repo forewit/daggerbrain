@@ -10,6 +10,7 @@
   import CardCarousel from "../../cards/card-carousel.svelte";
   import DialogClose from "$lib/components/ui/dialog/dialog-close.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
+  import DomainCard from "../../cards/domain-card.svelte";
 
   let {
     level_up_choices = $bindable(),
@@ -27,8 +28,6 @@
     character: Character;
   } = $props();
 
-  let domain_card_dialog_open = $state(false);
-
   let all_previous_tier_2_choices: LevelUpOption[] = $derived.by(() => {
     let previous_choices: LevelUpOption[] = [];
     for (let i = 1; i < level; i++) {
@@ -45,7 +44,7 @@
     "marked_traits" | "selected_experiences" | "domain_cards_added"
   > & {
     used: number;
-    previously_marked_traits: (keyof Traits | "")[];
+    previously_marked_traits: (keyof Traits)[];
     previously_domain_cards_added: Card<"domain">[];
   })[] = $derived(
     TIER_2_BASE_OPTIONS.map((option) => ({
@@ -64,7 +63,7 @@
 
   let choices: {
     id: string;
-    marked_traits: (keyof Traits | "")[];
+    marked_traits: (keyof Traits)[];
     selected_experiences: number[];
     domain_cards_added: Card<"domain">[];
   }[] = $state(
@@ -78,19 +77,16 @@
           .map((_, i) => {
             if (i < existingChoices.length) {
               return {
-                id: existingChoices[i].id || "",
-                marked_traits: (existingChoices[i].marked_traits || ["", ""]) as (
-                  | keyof Traits
-                  | ""
-                )[],
-                selected_experiences: existingChoices[i].selected_experiences || [-1, -1],
+                id: existingChoices[i].id,
+                marked_traits: (existingChoices[i].marked_traits || []) as (keyof Traits)[],
+                selected_experiences: existingChoices[i].selected_experiences || [],
                 domain_cards_added: existingChoices[i].domain_cards_added || [],
               };
             }
             return {
               id: "",
-              marked_traits: ["", ""] as (keyof Traits | "")[],
-              selected_experiences: [-1, -1],
+              marked_traits: [] as (keyof Traits)[],
+              selected_experiences: [],
               domain_cards_added: [],
             };
           });
@@ -101,8 +97,8 @@
         .fill(null)
         .map(() => ({
           id: "",
-          marked_traits: ["", ""] as (keyof Traits | "")[],
-          selected_experiences: [-1, -1],
+          marked_traits: [] as (keyof Traits)[],
+          selected_experiences: [],
           domain_cards_added: [],
         }));
     })()
@@ -119,7 +115,8 @@
     return domain_cards.filter(
       (card) =>
         card.level_requirement <= level &&
-        !choices.some((choice) => choice.domain_cards_added.includes(card))
+        !choices.some((choice) => choice.domain_cards_added.includes(card)) &&
+        !character.level_up_choices[1][0].domain_cards_added.includes(card)
     );
   });
 
@@ -149,7 +146,7 @@
         choices.forEach((choice) => {
           if (choice.id === option.id) {
             choice.id = "";
-            choice.marked_traits = ["", ""];
+            choice.marked_traits = [];
           }
         });
       }
@@ -168,7 +165,7 @@
             )
           ) {
             console.warn(`Trait ${trait} is already used in another option`);
-            choice.marked_traits[i] = "";
+            choice.marked_traits.splice(i, 1);
           }
         });
       }
@@ -193,10 +190,10 @@
   $effect(() => {
     choices.forEach((choice) => {
       if (choice.id !== "tier_2_traits") {
-        choice.marked_traits = ["", ""];
+        choice.marked_traits = [];
       }
       if (choice.id !== "tier_2_experience_bonus") {
-        choice.selected_experiences = [-1, -1];
+        choice.selected_experiences = [];
       }
       if (choice.id !== "tier_2_domain_card") {
         choice.domain_cards_added = [];
@@ -208,7 +205,18 @@
 
 <div class={cn("flex flex-col gap-4", className)} bind:clientWidth={width}>
   {#each Array(max_choices) as _, i}
-    <Select.Root type="single" bind:value={choices[i].id}>
+    <Select.Root
+      type="single"
+      value={choices[i]?.id || ""}
+      onValueChange={(value) => {
+        const option = TIER_2_BASE_OPTIONS.find((option) => option.id === value);
+        if (option) {
+          choices[i].id = option.id;
+        } else {
+          choices.splice(i, 1);
+        }
+      }}
+    >
       <Select.Trigger class="w-full truncate">
         <p class="truncate">
           {TIER_2_BASE_OPTIONS.find((option) => option.id === choices[i].id)?.short_title ||
@@ -247,9 +255,22 @@
     <!-- secondary choices based on the selected option -->
     {#if choices[i].id === "tier_2_traits"}
       <div class="flex flex-col gap-2 bg-primary-muted p-2 rounded-md">
-        <p class="p-2 pb-0 pt-1 text-xs italic font-medium">Choose 2 unmarked character traits.</p>
+        <p class="p-2 pb-0 pt-1 text-xs italic text-muted-foreground">
+          Choose 2 unmarked character traits.
+        </p>
         <div class="flex gap-2">
-          <Select.Root type="single" bind:value={choices[i].marked_traits[0]}>
+          <Select.Root
+            type="single"
+            value={choices[i].marked_traits[0]?.toString() || ""}
+            onValueChange={(value) => {
+              const trait = value as keyof Traits;
+              if (trait) {
+                choices[i].marked_traits.push(trait);
+              } else {
+                choices[i].marked_traits.splice(choices[i].marked_traits.indexOf(trait), 1);
+              }
+            }}
+          >
             <Select.Trigger class="w-full truncate">
               <p class="truncate">
                 {choices[i].marked_traits[0]
@@ -281,7 +302,18 @@
               </div>
             </Select.Content>
           </Select.Root>
-          <Select.Root type="single" bind:value={choices[i].marked_traits[1]}>
+          <Select.Root
+            type="single"
+            value={choices[i].marked_traits[1]?.toString() || ""}
+            onValueChange={(value) => {
+              const trait = value as keyof Traits;
+              if (trait) {
+                choices[i].marked_traits.push(trait);
+              } else {
+                choices[i].marked_traits.splice(choices[i].marked_traits.indexOf(trait), 1);
+              }
+            }}
+          >
             <Select.Trigger class="w-full truncate">
               <p class="truncate">
                 {choices[i].marked_traits[1]
@@ -375,25 +407,53 @@
         </div>
       </div>
     {:else if choices[i].id === "tier_2_domain_card"}
-      <div class="flex flex-col gap-2 bg-primary-muted p-2 rounded-md">
-        <p class="p-2 pb-0 pt-1 text-xs italic font-medium">
-          Choose an additional domain card of your level or lower from a domain you have access to
-          (up to level 4).
+      <div class="flex flex-col gap-2 bg-primary-muted p-2 rounded-md" bind:clientWidth={width}>
+        <p class="p-2 pb-0 text-xs italic text-muted-foreground">
+          Select up to 2 level 1 domain cards from the
+          <b>{DOMAINS[character.primary_class?.primary_domain as keyof typeof DOMAINS].name}</b>
+          and
+          <b>{DOMAINS[character.primary_class?.secondary_domain as keyof typeof DOMAINS].name}</b>
+          domains.
         </p>
 
-        {#each available_domain_cards as card}
-          <div class="flex flex-col gap-2">
-            <p>{card.title}</p>
-            <Button
-              disabled={choices[i].domain_cards_added.includes(card)}
-              onclick={() => {
-                choices[i].domain_cards_added.push(card);
-              }}
-            >
-              {choices[i].domain_cards_added.includes(card) ? "Selected" : "Select"}
-            </Button>
-          </div>
-        {/each}
+        <Select.Root
+          type="single"
+          value={choices[i].domain_cards_added[0]?.title || ""}
+          onValueChange={(value) => {
+            const card = available_domain_cards.find((card) => card.title === value);
+            if (card) {
+              choices[i].domain_cards_added = [card];
+            } else {
+              choices[i].domain_cards_added = [];
+            }
+          }}
+        >
+          <Select.Trigger class="w-full truncate">
+            <p class="truncate">
+              {choices[i].domain_cards_added[0]?.title || "Select a domain card"}
+            </p>
+          </Select.Trigger>
+          <Select.Content class="rounded-md w-full" align="start">
+            <div style="max-width: {width}px;" class="p-2">
+              <Select.Item value="" class="justify-center hover:cursor-pointer text-sm">
+                -- none selected --
+              </Select.Item>
+              <Select.Label>Level 1 Domain Cards</Select.Label>
+              {#each available_domain_cards as card}
+                <Select.Item
+                  class="w-full hover:cursor-pointer data-[highlighted]:bg-primary"
+                  value={card.title}
+                  disabled={choices[i].domain_cards_added[0]?.title !== card.title &&
+                    level_up_choices[1][0].domain_cards_added.some(
+                      (c) => c !== null && c.title === card.title
+                    )}
+                >
+                  <DomainCard {card} class="w-full" />
+                </Select.Item>
+              {/each}
+            </div>
+          </Select.Content>
+        </Select.Root>
       </div>
     {/if}
   {/each}

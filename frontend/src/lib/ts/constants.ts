@@ -1,4 +1,5 @@
 import { ANCESTRY_CARDS, BLADE_DOMAIN_CARDS, BONE_DOMAIN_CARDS, COMMUNITY_CARDS, SUBCLASS_CARDS, TRANSFORMATION_CARDS, VALOR_DOMAIN_CARDS } from "./cards";
+import { BLANK_LEVEL_UP_OPTION } from "./rules";
 import type { Domain, Class, Subclass, Card, Character } from "./types";
 
 
@@ -156,9 +157,11 @@ export const CLASSES = {
                 specialization_card: SUBCLASS_CARDS.executioners_guild_specialization,
                 mastery_card: SUBCLASS_CARDS.executioners_guild_mastery,
             }
-        }
-    } as Class & { subclasses: Record<string, Subclass> }
-} as const
+        },
+        effect_ids: [],
+
+    }
+} as const satisfies Record<string, Class>
 
 export const ANCESTRIES = {
     description_html: "Ancestries represent your character's lineage which affects their physical appearance and access to certain special abilities.",
@@ -193,6 +196,7 @@ export const JUST_JAMES: Character = {
             knowledge: -1,
         },
         proficiency: 1,
+        experience_modifier: 2,
         max_experiences: 2,
         max_domain_card_loadout: 5,
         max_hope: 6,
@@ -211,10 +215,7 @@ export const JUST_JAMES: Character = {
     // heritage
     ancestry_card: ANCESTRY_CARDS.half_clank,
     community_card: COMMUNITY_CARDS.warborne,
-    experiences: [{
-        title: "Cool Under Pressure",
-        modifier: 2,
-    }],
+    experiences: ["Cool Under Pressure"],
 
     // classes
     primary_class: CLASSES.assassin,
@@ -228,7 +229,7 @@ export const JUST_JAMES: Character = {
         DOMAINS.valor.cards.bare_bones,
         DOMAINS.bone.cards.untouchable
     ],
-    additional_features: [],
+    additional_effect_ids: [],
 
     // set by the player
     ephemeral_stats: {
@@ -242,20 +243,20 @@ export const JUST_JAMES: Character = {
     // level-up choices
     level: 2,
     level_up_choices: {
-        1: [],
-        2: [],
-        3: [],
-        4: [],
-        5: [],
-        6: [],
-        7: [],
-        8: [],
-        9: [],
-        10: [],
+        1: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION }, // level one only has one choice
+        2: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
+        3: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
+        4: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
+        5: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
+        6: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
+        7: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
+        8: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
+        9: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
+        10: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
     },
 
     // will be overwritten and calculated
-    derived_features: [],
+    derived_effects: [],
     derieved_stats: {
         // from base stats
         traits: {
@@ -267,6 +268,9 @@ export const JUST_JAMES: Character = {
             knowledge: 1,
         },
         proficiency: 2,
+        experience_modifiers: {
+            "Cool Under Pressure": 2,
+        },
         max_experiences: 3,
         max_domain_card_loadout: 5,
         max_hope: 6,
@@ -308,6 +312,7 @@ const NEW_CHARACTER: Character = {
             knowledge: 0,
         },
         proficiency: 1,
+        experience_modifier: 2,
         max_experiences: 2,
         max_domain_card_loadout: 5,
         max_hope: 6,
@@ -337,7 +342,7 @@ const NEW_CHARACTER: Character = {
     // the void / other
     transformation_card: null,
     additional_cards: [],
-    additional_features: [],
+    additional_effect_ids: [],
 
     // set by the player
     ephemeral_stats: {
@@ -351,20 +356,20 @@ const NEW_CHARACTER: Character = {
     // level-up choices
     level: 1,
     level_up_choices: {
-        1: [],
-        2: [],
-        3: [],
-        4: [],
-        5: [],
-        6: [],
-        7: [],
-        8: [],
-        9: [],
-        10: [],
+        1: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION }, // level one only has one choice
+        2: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
+        3: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
+        4: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
+        5: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
+        6: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
+        7: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
+        8: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
+        9: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
+        10: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
     },
 
     // will be overwritten and calculated
-    derived_features: [],
+    derived_effects: [],
     derieved_stats: {
         // from base stats
         traits: {
@@ -376,6 +381,7 @@ const NEW_CHARACTER: Character = {
             knowledge: 0,
         },
         proficiency: 1,
+        experience_modifiers: {},
         max_experiences: 2,
         max_domain_card_loadout: 5,
         max_hope: 6,

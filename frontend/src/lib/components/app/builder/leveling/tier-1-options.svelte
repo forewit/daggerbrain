@@ -1,7 +1,7 @@
 <script lang="ts">
   import Dropdown from "$lib/components/app/builder/dropdown.svelte";
   import SubclassCard from "$lib/components/app/cards/subclass-card.svelte";
-  import type { Card, Character } from "$lib/ts/types";
+  import type { Card, Character, LevelUpOption } from "$lib/ts/types";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import * as Collapsible from "$lib/components/ui/collapsible/";
   import * as Dialog from "$lib/components/ui/dialog/index";
@@ -20,8 +20,8 @@
   let removeClassDialogOpen = $state(false);
   let subclassDialogOpen = $state(false);
   let subclassCardsOpen = $state(false);
-  let domainCardsOpen = $state(false);
   let width: number = $state(300);
+
 
   let available_domain_cards: Card<"domain">[] = $derived.by(() => {
     if (!character.primary_class) return [];
@@ -33,20 +33,6 @@
 
     return domain_cards.filter((card) => card.level_requirement === 1);
   });
-
-  // make sure level up choices are available
-  $effect(() => {
-    if (character.level_up_choices[1].length === 0) {
-      character.level_up_choices[1].push({
-        ...TIER_1_BASE_OPTIONS[0],
-        domain_cards_added: [],
-        marked_traits: ["", ""],
-        selected_experiences: [-1, -1],
-      });
-    }
-  });
-
-  // clear the other selection if the domain card was already selected
 </script>
 
 <div class={cn("flex flex-col gap-4", className)}>
@@ -91,7 +77,11 @@
 
   <!-- Select a Subclass -->
   {#if !character.primary_subclass}
-    <Dropdown title="Subclass" disabled={!character.primary_class} highlighted={!!character.primary_class}>
+    <Dropdown
+      title="Subclass"
+      disabled={!character.primary_class}
+      highlighted={!!character.primary_class}
+    >
       <Button onclick={() => (subclassDialogOpen = true)}>Choose a subclass</Button>
     </Dropdown>
   {:else}
@@ -143,14 +133,12 @@
 
   <!-- Domain Cards -->
   {#if !character.primary_class}
-<Dropdown title="Domain Cards" disabled={true} highlighted={!!character.primary_class}/>
+    <Dropdown title="Domain Cards" disabled={true} highlighted={!!character.primary_class} />
   {:else}
     <Dropdown
       title="Domain Cards"
-      highlighted={character.level_up_choices[1][0].domain_cards_added.filter(c=>c !== null).length < 2}
-      subtitle={DOMAINS[character.primary_class.primary_domain as keyof typeof DOMAINS].name +
-        ", " +
-        DOMAINS[character.primary_class.secondary_domain as keyof typeof DOMAINS].name}
+      highlighted={!character.level_up_choices[1].A.id || character.level_up_choices[1].B.id}
+      subtitle={character.level_up_choices[1].A?.domain_cards_added.map((c) => c.title).join(", ")}
     >
       <div class="flex flex-col gap-2" bind:clientWidth={width}>
         <p class="text-xs italic text-muted-foreground">
@@ -163,14 +151,13 @@
 
         <Select.Root
           type="single"
-          value={character.level_up_choices[1][0].domain_cards_added[0]?.title || ""}
+          value={character.level_up_choices[1].A?.domain_cards_added[0]?.title || ""}
           onValueChange={(value) => {
             const card = available_domain_cards.find((card) => card.title === value);
             if (card) {
-              character.level_up_choices[1][0].domain_cards_added[0] = card;
-            } else {
-              character.level_up_choices[1][0].domain_cards_added[0] =
-                null as unknown as Card<"domain">;
+             character.level_up_choices[1].A?.domain_cards_added.push(card);
+            } else  {
+              character.level_up_choices[1].A.domain_cards_added = character.level_up_choices[1].A!.domain_cards_added.filter((c) => c.title !== value);
             }
           }}
         >
@@ -190,8 +177,9 @@
                 <Select.Item
                   class="w-full hover:cursor-pointer data-[highlighted]:bg-primary"
                   value={card.title}
-                  disabled={character.level_up_choices[1][0].domain_cards_added[1]?.title ===
-                    card.title}
+                  disabled={character.level_up_choices[1][0].domain_cards_added.some(
+                    (c) => c.title === card.title
+                  )}
                 >
                   <DomainCard {card} class="w-full" />
                 </Select.Item>
@@ -201,20 +189,21 @@
         </Select.Root>
         <Select.Root
           type="single"
-          value={character.level_up_choices[1][0].domain_cards_added[1]?.title || ""}
+          value={character.level_up_choices[1][0].domain_cards_added.find((c) => c.title === value)?.title || ""}
           onValueChange={(value) => {
             const card = available_domain_cards.find((card) => card.title === value);
             if (card) {
-              character.level_up_choices[1][0].domain_cards_added[1] = card;
+              character.level_up_choices[1][0].domain_cards_added.push(card);
             } else {
-              character.level_up_choices[1][0].domain_cards_added[1] =
-                null as unknown as Card<"domain">;
+              character.level_up_choices[1][0].domain_cards_added = character.level_up_choices[1][0].domain_cards_added.filter(
+                (c) => c.title !== value
+              );
             }
           }}
         >
           <Select.Trigger class="w-full truncate">
             <p class="truncate">
-              {character.level_up_choices[1][0].domain_cards_added[1]?.title ||
+              {valu ||
                 "Select a domain card"}
             </p>
           </Select.Trigger>

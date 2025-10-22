@@ -5,13 +5,25 @@ export const EXPERIENCES = {
     <p>You get two Experiences at character creation each with a +2 modifier.</p>`
 } as const
 
+export const BLANK_LEVEL_UP_OPTION: LevelUpOption = {
+    id: null,
+    title: null,
+    short_title: null,
+    max: 0,
+    marked_traits: {A: null, B: null},
+    selected_experiences: {A: null, B: null},
+    domain_cards_added: {A: null, B: null},
+    effect_ids: [],
+}
+
+
 export const TIER_1_BASE_OPTIONS = [
     {
         id: "tier_1_domain_card",
         title: "Choose 2 level 1 domain cards from the domains available to you.",
         short_title: "Starting Domain Cards",
         max: 1,
-        features: []
+        effect_ids: []
     }
 ] as const satisfies Omit<LevelUpOption, "marked_traits" | "selected_experiences" | "domain_cards_added">[]
 
@@ -21,41 +33,43 @@ export const TIER_2_BASE_OPTIONS = [
         title: "Gain a +1 bonus to two unmarked character traits and mark them.",
         short_title: "+1 to 2 Traits",
         max: 3,
-        features: []
+        effect_ids: []
     },
     {
         id: "tier_2_max_hp",
         title: "Permanently gain 1 Hit Point slot.",
         short_title: "+1 HP Slot",
         max: 2,
-        features: []
+        effect_ids: []
     },
     {
         id: "tier_2_max_stress",
         title: "Permanently gain 1 Stress slot.",
         short_title: "+1 Stress Slot",
         max: 2,
-        features: []
+        effect_ids: []
     },
     {
         id: "tier_2_experience_bonus",
         title: "Permanently gain a +1 bonus to two Experiences.",
         short_title: "+1 to 2 Experiences",
         max: 1,
-        features: []
+        effect_ids: []
     },
     {
         id: "tier_2_domain_card",
         title: "Choose an additional domain card of your level or lower from a domain you have access to (up to level 4).",
         short_title: "+1 Domain Card",
         max: 1,
-        features: []
+        effect_ids: []
     },
     {
         id: "tier_2_evasion",
         title:"Permanently gain a +1 bonus to your Evasion.",
         short_title: "+1 Evasion",
         max: 1,
-        features: []
+        effect_ids: []
     }
 ] as const satisfies Omit<LevelUpOption, "marked_traits" | "selected_experiences" | "domain_cards_added">[]
+
+export const ALL_LEVEL_UP_OPTIONS = [...TIER_1_BASE_OPTIONS, ...TIER_2_BASE_OPTIONS] 

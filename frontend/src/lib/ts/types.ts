@@ -8,6 +8,7 @@ export type Character = {
     base_stats: {
         traits: Traits
         proficiency: 1
+        experience_modifier: 2
         max_experiences: 2
         max_domain_card_loadout: 5
         max_hope: 6
@@ -26,7 +27,7 @@ export type Character = {
     // heritage
     ancestry_card: Card<"ancestry"> | null
     community_card: Card<"community"> | null
-    experiences: Experience[],
+    experiences: string[],
 
     // classes
     primary_class: Class | null
@@ -37,7 +38,7 @@ export type Character = {
     // the void / other
     transformation_card: Card<"transformation"> | null,
     additional_cards: Card<any>[],
-    additional_features: Feature[]
+    additional_effect_ids: string[]
 
     // set by the player
     ephemeral_stats: {
@@ -51,20 +52,20 @@ export type Character = {
     // level-up choices. levels 2-10
     level: number,
     level_up_choices: {
-        1: LevelUpOption[],
-        2: LevelUpOption[],
-        3: LevelUpOption[],
-        4: LevelUpOption[],
-        5: LevelUpOption[],
-        6: LevelUpOption[],
-        7: LevelUpOption[],
-        8: LevelUpOption[],
-        9: LevelUpOption[],
-        10: LevelUpOption[],
+        1: {A: LevelUpOption, B: LevelUpOption},
+        2: {A: LevelUpOption, B: LevelUpOption},
+        3: {A: LevelUpOption, B: LevelUpOption}, 
+        4: {A: LevelUpOption, B: LevelUpOption},
+        5: {A: LevelUpOption, B: LevelUpOption},
+        6: {A: LevelUpOption, B: LevelUpOption},
+        7: {A: LevelUpOption, B: LevelUpOption},
+        8: {A: LevelUpOption, B: LevelUpOption},
+        9: {A: LevelUpOption, B: LevelUpOption},
+        10: {A: LevelUpOption, B: LevelUpOption},
     }
 
     // will be overwritten and calculated
-    derived_features: Feature[]
+    derived_effects: Effect[]
     derieved_stats: {
         // from base stats
         traits: Traits
@@ -82,6 +83,7 @@ export type Character = {
         }
         primary_class_mastery_level: number // 0 = none, 1 = foundation, 2 = specialization, 3 = mastery
         secondary_class_mastery_level: number // 0 = none, 1 = foundation, 2 = specialization, 3 = mastery
+        experience_modifiers: Record<string, number>
 
         // other 
         domain_card_vault: Card<"domain">[],
@@ -106,10 +108,17 @@ export type Class = {
     starting_evasion: number
     starting_max_hp: number
     suggested_traits: Traits
-    hope_feature: Feature
+    hope_feature: {
+        title: string
+        description_html: string
+    }
     primary_domain: string
     secondary_domain: string
-    class_features: Feature[]
+    class_features: {
+        title: string
+        description_html: string
+    }[]
+    effect_ids: string[]
     subclasses: Record<string, Subclass>
 }
 
@@ -124,15 +133,6 @@ export type Subclass = {
 export type Experience = {
     title: string
     modifier: number
-}
-
-export type Feature = {
-    title: string
-    description_html: string
-    add_class_domain_card_to_vault?: Card<"domain">[]
-    add_any_domain_card_to_vault?: Card<"domain">[]
-    modifiers?: Modifier[]
-    overrides?: Modifier[]
 }
 
 export type Modifier = ({
@@ -151,13 +151,22 @@ export type Modifier = ({
     value: number
 })
 
+export type Effect = ({
+    modifiers?: Modifier[]
+    overrides?: Modifier[]
+})
+
 export type Card<T extends "domain" | "ancestry" | "community" | "transformation" | "subclass_foundation" | "subclass_specialization" | "subclass_mastery"> = {
     image_url: string
     full_card_image_url: string
     title: string
     description_html: string
     artist_name: string
-    features: Feature[]
+    features: {
+        title: string
+        description_html: string
+    }[]
+    effect_ids: string[]
 } & (
         T extends "domain" ? {
             domain_name: string
@@ -166,7 +175,7 @@ export type Card<T extends "domain" | "ancestry" | "community" | "transformation
             type: "ability" | "spell"
         } : T extends "subclass_foundation" ? {
             spellcast_trait: keyof Traits | null
-        } : unknown
+        } : {}
     )
 
 export type Domain = {
@@ -177,14 +186,14 @@ export type Domain = {
 }
 
 export type LevelUpOption = {
-    id: string
-    title: string
-    short_title: string
+    id: string | null
+    title: string | null
+    short_title: string | null
     max: number
-    marked_traits: (keyof Traits | "")[]
-    selected_experiences: number[] // indexes of the experiences array
-    domain_cards_added: Card<"domain">[]
-    features: Feature[]
+    marked_traits: {A: keyof Traits | null, B: keyof Traits | null}
+    selected_experiences: {A: number | null, B: number | null}
+    domain_cards_added: {A: Card<"domain"> | null, B: Card<"domain"> | null}
+    effect_ids: string[]
 }
 
 export type Source = "Core" | "The Void 1.0" | "The Void 1.5"

@@ -7,11 +7,13 @@
   import * as Dialog from "$lib/components/ui/dialog/index";
   import * as Collapsible from "$lib/components/ui/collapsible/index";
   import { buttonVariants } from "$lib/components/ui/button";
+  import { getCharacterContext } from "$lib/ts/character.svelte.js";
 
   let { data } = $props();
 
   const app = getAppContext();
-  const character = $derived(app.characters.find((c) => c.uid === data.uid));
+  const context = getCharacterContext();
+  let character = $derived(context.character);
 </script>
 
 {#if character}
@@ -21,9 +23,9 @@
       "max-w-2xl mx-auto"
     )}
   >
-  <div class="m-4 flex flex-col gap-4">
-    <p class="text-2xl font-medium pb-2 border-b">Settings</p>
-  
+    <div class="m-4 flex flex-col gap-4">
+      <p class="text-2xl font-medium pb-2 border-b">Settings</p>
+
       <!-- The Void -->
       <Label>
         The Void:
@@ -31,7 +33,8 @@
       </Label>
 
       <Dialog.Root>
-        <Dialog.Trigger class={cn(buttonVariants({ variant: "link" }), "text-destructive p-0 h-min w-min")}
+        <Dialog.Trigger
+          class={cn(buttonVariants({ variant: "link" }), "text-destructive p-0 h-min w-min")}
           >Delete Character</Dialog.Trigger
         >
         <Dialog.Content>

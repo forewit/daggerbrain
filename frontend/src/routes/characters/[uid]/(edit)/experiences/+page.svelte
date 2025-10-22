@@ -7,11 +7,12 @@
   import Textarea from "$lib/components/ui/textarea/textarea.svelte";
   import Dropdown from "$lib/components/app/builder/dropdown.svelte";
   import { EXPERIENCES } from "$lib/ts/rules.js";
+  import { getCharacterContext } from "$lib/ts/character.svelte.js";
 
   let { data } = $props();
 
-  const app = getAppContext();
-  const character = $derived(app.characters.find((c) => c.uid === data.uid));
+  const context = getCharacterContext();
+  let character = $derived(context.character);
 </script>
 
 {#if character}
@@ -25,17 +26,16 @@
       <Dropdown
         title="Experiences"
         subtitle={character.experiences
-          .filter((experience) => experience.title !== "")
-          .map((experience) => experience.title)
+          .filter((experience) => experience !== "")
           .join(" | ")}
       >
         <div class="text-sm italic flex flex-col gap-2">
           {@html EXPERIENCES.description_html}
         </div>
-        {#each character.experiences as experience}
+        {#each character.experiences as experience, i}
           <div class="flex items-center mt-4 bg-primary/50 rounded-lg p-4">
-            <Input bind:value={experience.title} placeholder="Name" />
-            <p class="font-medium pr-4 pl-5">+{experience.modifier}</p>
+            <Input bind:value={character.experiences[i]} placeholder="Name" />
+            <p class="font-medium pr-4 pl-5">+{character.derieved_stats.experience_modifiers[experience]}</p>
           </div>
         {/each}
       </Dropdown>
