@@ -26,11 +26,15 @@
 
   let previously_chosen_domain_cards: Card<"domain">[] = $derived.by(() => {
     if (!character) return [];
-    const domain_cards = Object.values(character.level_1_domain_cards).filter(
+    const domain_cards = Object.values(character.level_up_domain_cards[1]).filter(
       (card) => card !== null
     );
 
     for (let i = 2; i <= level; i++) {
+      const level_up_domain_cards =
+        character.level_up_domain_cards[i as keyof typeof character.level_up_domain_cards];
+      if (level_up_domain_cards.A !== null) domain_cards.push(level_up_domain_cards.A);
+
       const choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
       if (choices.A.id === "tier_2_domain_card") {
         if (choices.A.domain_cards_added.A !== null)
@@ -68,6 +72,7 @@
     return (
       !choices.A.id ||
       !choices.B.id ||
+      character.level_up_domain_cards[level as keyof typeof character.level_up_domain_cards].A === null ||
       (choices.A.id === "tier_2_domain_card" && choices.A.domain_cards_added.A === null) ||
       (choices.B.id === "tier_2_domain_card" && choices.B.domain_cards_added.A === null) ||
       (choices.A.id === "tier_2_traits" &&
@@ -84,6 +89,8 @@
 
 {#if character}
   {@const choices = character.level_up_choices[level as keyof typeof character.level_up_choices]}
+  {@const level_up_domain_cards =
+    character.level_up_domain_cards[level as keyof typeof character.level_up_domain_cards]}
 
   <div class={cn(className)}>
     <Dropdown
@@ -94,6 +101,76 @@
         .join(", ")}
     >
       <div class="flex flex-col gap-4" bind:clientWidth={width}>
+        <!-- level up domain cards -->
+        <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md" bind:clientWidth={width}>
+          <p class="py-1 px-2 text-xs italic text-muted-foreground">
+            Take an additional domain card of your level or lower from a domain you have access to.
+          </p>
+          <Dialog.Root>
+            <Dialog.Trigger
+              class={cn(
+                buttonVariants({ variant: "outline" }),
+                "w-full truncate flex items-center justify-between bg-card/50 hover:bg-card/70",
+                level_up_domain_cards.A === null &&
+                  "text-muted-foreground hover:text-muted-foreground"
+              )}
+              style={level_up_domain_cards.A === null &&
+                "outline-offset: 2px; outline-width: 2px; outline-color: var(--primary); outline-style: solid;"}
+            >
+              <p class="truncate">
+                {level_up_domain_cards.A?.title || "Select a domain card"}
+              </p>
+              <ChevronRight class="size-4 opacity-50" />
+            </Dialog.Trigger>
+
+            <Dialog.Content
+              class="flex flex-col gap-4 min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%]"
+            >
+              <Dialog.Header>
+                <Dialog.Title>Select a Domain Card</Dialog.Title>
+              </Dialog.Header>
+              <Dialog.Description>
+                <p class="text-xs italic text-muted-foreground">
+                  Take an additional domain card of your level or lower from a domain you have
+                  access to.
+                </p>
+              </Dialog.Description>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto p-2">
+                {#each available_domain_cards as card}
+                  <Dialog.Close
+                    class={cn(
+                      "w-full rounded-xl outline-offset-3 outline-primary hover:outline-4 hover:cursor-pointer disabled:pointer-events-none disabled:opacity-50 disabled:cursor-default",
+                      level_up_domain_cards.A?.title === card.title && "outline-4"
+                    )}
+                    onclick={() => {
+                      level_up_domain_cards.A = card;
+                    }}
+                    disabled={level_up_domain_cards.A?.title !== card.title &&
+                      previously_chosen_domain_cards.some((c) => c.title === card.title)}
+                  >
+                    <DomainCard {card} class="w-full h-full" />
+                  </Dialog.Close>
+                {/each}
+              </div>
+              <Dialog.Footer>
+                {#if level_up_domain_cards.A === null}
+                  <Dialog.Close class={cn(buttonVariants({ variant: "link" }))}>
+                    Cancel
+                  </Dialog.Close>
+                {:else}
+                  <Dialog.Close
+                    class={cn(buttonVariants({ variant: "link" }), "text-destructive")}
+                    onclick={() => (level_up_domain_cards.A = null)}
+                  >
+                    Clear selection
+                  </Dialog.Close>
+                {/if}
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Root>
+        </div>
+
+        <!-- level up choices -->
         {#each ["A" as keyof typeof choices, "B" as keyof typeof choices] as key}
           <div class="flex flex-col gap-2">
             <Select.Root
@@ -344,7 +421,7 @@
                         have access to (up to level 4).
                       </p>
                     </Dialog.Description>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto ">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto p-2">
                       {#each available_domain_cards as card}
                         <Dialog.Close
                           class={cn(
@@ -362,12 +439,18 @@
                       {/each}
                     </div>
                     <Dialog.Footer>
-                      <Dialog.Close
-                        class={cn(buttonVariants({ variant: "link" }), "text-destructive")}
-                        onclick={() => (choices[key].domain_cards_added.A = null)}
-                      >
-                        Clear selection
-                      </Dialog.Close>
+                      {#if choices[key].domain_cards_added.A === null}
+                        <Dialog.Close class={cn(buttonVariants({ variant: "link" }))}>
+                          Cancel
+                        </Dialog.Close>
+                      {:else}
+                        <Dialog.Close
+                          class={cn(buttonVariants({ variant: "link" }), "text-destructive")}
+                          onclick={() => (choices[key].domain_cards_added.A = null)}
+                        >
+                          Clear selection
+                        </Dialog.Close>
+                      {/if}
                     </Dialog.Footer>
                   </Dialog.Content>
                 </Dialog.Root>

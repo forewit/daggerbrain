@@ -51,7 +51,18 @@ export type Character = {
 
     // level-up choices. levels 2-10
     level: number,
-    level_1_domain_cards: { A: Card<"domain"> | null, B: Card<"domain"> | null },
+    level_up_domain_cards: {
+        1: { A: Card<"domain"> | null, B: Card<"domain"> | null },
+        2: { A: Card<"domain"> | null },
+        3: { A: Card<"domain"> | null },
+        4: { A: Card<"domain"> | null },
+        5: { A: Card<"domain"> | null },
+        6: { A: Card<"domain"> | null },
+        7: { A: Card<"domain"> | null },
+        8: { A: Card<"domain"> | null },
+        9: { A: Card<"domain"> | null },
+        10: { A: Card<"domain"> | null },
+    }
     level_up_choices: {
         2: { A: LevelUpOption, B: LevelUpOption },
         3: { A: LevelUpOption, B: LevelUpOption },
@@ -66,7 +77,8 @@ export type Character = {
 
     // will be overwritten and calculated
     derived_effects: Effect[]
-    derieved_stats: {
+    derived_domain_card_vault: Card<"domain">[],
+    derived_stats: {
         // from base stats
         traits: Traits
         proficiency: number
@@ -83,10 +95,7 @@ export type Character = {
         }
         primary_class_mastery_level: number // 0 = none, 1 = foundation, 2 = specialization, 3 = mastery
         secondary_class_mastery_level: number // 0 = none, 1 = foundation, 2 = specialization, 3 = mastery
-        experience_modifiers: Record<string, number>
-
-        // other 
-        domain_card_vault: Card<"domain">[],
+        experience_modifiers: number[] // index matches the experiences array, value is the modifier
         spellcast_trait: keyof Traits | null
     }
 }
@@ -172,7 +181,6 @@ export type Card<T extends CardType> = {
         } : T extends "subclass_foundation" ? {
             spellcast_trait: keyof Traits | null
             class_name: string
-
         } : T extends "subclass_specialization" ? {
             class_name: string
         } : T extends "subclass_mastery" ? {

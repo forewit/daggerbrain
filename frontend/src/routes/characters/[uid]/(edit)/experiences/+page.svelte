@@ -35,7 +35,7 @@
         {#each character.experiences as experience, i}
           <div class="flex items-center mt-4 bg-primary/50 rounded-lg p-4">
             <Input bind:value={character.experiences[i]} placeholder="Name" />
-            <p class="font-medium pr-4 pl-5">+{character.derieved_stats.experience_modifiers[experience]}</p>
+            <p class="font-medium pr-4 pl-5">+{character.derived_stats.experience_modifiers[i]}</p>
           </div>
         {/each}
       </Dropdown>

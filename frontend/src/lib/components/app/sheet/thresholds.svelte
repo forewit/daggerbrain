@@ -5,7 +5,7 @@
   let {
     class: className = "",
     thresholds,
-  }: { class?: string; thresholds: Character["derieved_stats"]["damage_thresholds"] } = $props();
+  }: { class?: string; thresholds: Character["derived_stats"]["damage_thresholds"] } = $props();
 </script>
 
 <div class={cn("w-[360px] relative text-muted-foreground", className)}>

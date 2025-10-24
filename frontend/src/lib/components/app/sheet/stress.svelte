@@ -13,7 +13,7 @@
     class="text-sm font-medium">STRESS</button
   >
   <div class="flex flex-wrap gap-2">
-    {#each Array(character.derieved_stats.max_stress) as _, index}
+    {#each Array(character.derived_stats.max_stress) as _, index}
       <button
         aria-label="character.stress-slot"
         class="w-6 h-3 rounded-md border border-muted-foreground {index <
@@ -35,10 +35,10 @@
     {/each}
   </div>
 
-  {#if character.derieved_stats.max_stress === character.ephemeral_stats.marked_stress}
+  {#if character.derived_stats.max_stress === character.ephemeral_stats.marked_stress}
     <button
       onclick={() => {
-        if (character.ephemeral_stats.marked_hp < character.derieved_stats.max_hp)
+        if (character.ephemeral_stats.marked_hp < character.derived_stats.max_hp)
           character.ephemeral_stats.marked_hp++;
       }}
       class="p-2 text-xs text-nowrap bg-border rounded-md hover:bg-muted-foreground/20 grid place-items-center leading-none"

@@ -1,7 +1,7 @@
 import type { Character } from './types';
 import { getContext, setContext } from 'svelte';
 import { loadCharacters, saveCharacters } from './data';
-import { JUST_JAMES } from './constants';
+import { JUST_JAMES, NEW_CHARACTER } from './constants';
 
 function createApp() {
   // --- ephemeral state ---

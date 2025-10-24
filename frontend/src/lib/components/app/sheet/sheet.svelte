@@ -18,14 +18,25 @@
   import * as Dialog from "$lib/components/ui/dialog/index";
   import { handleImageUpload } from "$lib/utils";
   import Experiences from "./experiences.svelte";
+  import ChevronDown from "@lucide/svelte/icons/chevron-down";
+  import ChevronRight from "@lucide/svelte/icons/chevron-right";
+  import CardCarousel from "../cards/card-carousel.svelte";
 
-  let {
-    class: className = "",
-    character = $bindable(),
-  }: { class?: string; character: Character } = $props();
+  let { class: className = "", character = $bindable() }: { class?: string; character: Character } =
+    $props();
 
-  let heritageCards: Card<any>[] = $derived(
+  let character_cards_expanded = $state(true);
+  let character_cards: Card<any>[] = $derived(
     [
+      character?.derived_stats.primary_class_mastery_level &&
+        character?.derived_stats.primary_class_mastery_level >= 1 &&
+        character?.primary_subclass?.foundation_card,
+      character?.derived_stats.primary_class_mastery_level &&
+        character?.derived_stats.primary_class_mastery_level >= 2 &&
+        character?.primary_subclass?.specialization_card,
+      character?.derived_stats.primary_class_mastery_level &&
+        character?.derived_stats.primary_class_mastery_level >= 3 &&
+        character?.primary_subclass?.mastery_card,
       character?.ancestry_card,
       character?.community_card,
       character?.transformation_card,
@@ -33,13 +44,15 @@
     ].filter(Boolean) as Card<any>[]
   );
 
-  let classCards: Card<any>[] = $derived(
+  let domain_card_loadout_expanded = $state(true);
+  let domain_card_loadout: Card<any>[] = $derived(
     [
-      character?.derieved_stats.primary_class_mastery_level && character?.derieved_stats.primary_class_mastery_level >=  1 && character?.primary_subclass?.foundation_card,
-      character?.derieved_stats.primary_class_mastery_level && character?.derieved_stats.primary_class_mastery_level >= 2 && character?.primary_subclass?.specialization_card,
-      character?.derieved_stats.primary_class_mastery_level && character?.derieved_stats.primary_class_mastery_level >= 3 && character?.primary_subclass?.mastery_card,
       // should get the matching cards from the vault based on the indicies in domain card loadout
-      ...(character?.derieved_stats.domain_card_vault.filter((card, i) => character?.ephemeral_stats.domain_card_loadout.includes(i)) || []),
+      ...(
+        character?.derived_domain_card_vault.filter((_, i) =>
+          character?.ephemeral_stats.domain_card_loadout.includes(i)
+        ) || []
+      ).slice(0, character?.derived_stats.max_domain_card_loadout),
     ].filter(Boolean) as Card<any>[]
   );
 
@@ -74,7 +87,6 @@
       <!-- top bar -->
       <div class="flex gap-2 px-2 pr-4">
         <div class="grow truncate relative">
-
           <!-- level class subclass -->
           <div class="flex overflow-hidden items-center mt-4 mb-2.5 truncate max-w-[400px] h-9">
             <Dialog.Root>
@@ -102,8 +114,8 @@
               variant="outline"
             >
               <p class="truncate text-xs text-left">
-                {character.primary_class?.name || "No class"}&ensp;•&ensp;{character.primary_subclass?.name ||
-                  "No subclass"}
+                {character.primary_class?.name || "No class"}&ensp;•&ensp;{character
+                  .primary_subclass?.name || "No subclass"}
               </p>
               <div class="grow"></div>
               <Pencil class="size-3 mr-1 stroke-3" />
@@ -141,22 +153,29 @@
       </div>
 
       <!-- traits -->
-      <Traits traits={character.derieved_stats.traits} class="mx-2 " />
+      <Traits traits={character.derived_stats.traits} class="mx-2 " />
 
       <!-- evasion and armor -->
       <div
         class="grid grid-cols-1 sm:grid-cols-[auto_auto] place-items-center mx-auto gap-x-6 gap-y-2"
       >
         <div class="flex gap-2">
-          <Evasion evasion={character.derieved_stats.evasion} />
-          <Armor bind:marked_armor={character.ephemeral_stats.marked_armor} max_armor={character.derieved_stats.max_armor} />
+          <Evasion evasion={character.derived_stats.evasion} />
+          <Armor
+            bind:marked_armor={character.ephemeral_stats.marked_armor}
+            max_armor={character.derived_stats.max_armor}
+          />
         </div>
-        <Thresholds thresholds={character.derieved_stats.damage_thresholds} class="my-2" />
+        <Thresholds thresholds={character.derived_stats.damage_thresholds} class="my-2" />
       </div>
 
       <!-- hp and stress -->
       <div class="mx-2 flex flex-col gap-2">
-        <Hp bind:marked_hp={character.ephemeral_stats.marked_hp} max_hp={character.derieved_stats.max_hp} class="justify-center sm:justify-start" />
+        <Hp
+          bind:marked_hp={character.ephemeral_stats.marked_hp}
+          max_hp={character.derived_stats.max_hp}
+          class="justify-center sm:justify-start"
+        />
         <Stress bind:character class="justify-center sm:justify-start" />
       </div>
 
@@ -177,10 +196,40 @@
       {/if}
     </div>
 
-    <!-- heritage cards -->
-    <Deck title="Heritage Cards" cards={heritageCards} class="mt-2" />
+    <!-- Character cards -->
+    <div class={cn(!character_cards_expanded && "-mb-4")}>
+      <button
+        onclick={() => (character_cards_expanded = !character_cards_expanded)}
+        class="z-20 mx-auto text-nowrap flex items-center font-medium text-muted-foreground mb-4"
+      >
+        {#if character_cards_expanded}
+          <ChevronDown class="w-k h-4" />
+        {:else}
+          <ChevronRight class="w-k h-4" />
+        {/if}
+        Character Cards
+      </button>
+      {#if character_cards_expanded}
+        <CardCarousel cards={character_cards} />
+      {/if}
+    </div>
 
-    <!-- domain cards -->
-    <Deck title="Class Cards" cards={classCards} />
+    <!-- domain card loadout -->
+    <div class={cn(!domain_card_loadout_expanded && "-mb-4")}>
+      <button
+        onclick={() => (domain_card_loadout_expanded = !domain_card_loadout_expanded)}
+        class="z-20 mx-auto text-nowrap flex items-center font-medium text-muted-foreground mb-4"
+      >
+        {#if domain_card_loadout_expanded}
+          <ChevronDown class="w-k h-4" />
+        {:else}
+          <ChevronRight class="w-k h-4" />
+        {/if}
+        Domain Card Loadout
+      </button>
+      {#if domain_card_loadout_expanded}
+        <CardCarousel cards={domain_card_loadout} />
+      {/if}
+    </div>
   </div>
 {/if}

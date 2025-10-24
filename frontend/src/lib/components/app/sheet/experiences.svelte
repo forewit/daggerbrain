@@ -32,10 +32,10 @@
 
   {#if expanded}
     <div class="flex flex-col gap-4">
-      {#each character.experiences as experience}
+      {#each character.experiences as experience, i}
         {#if experience.trim() !== ""}
           <p class="font-medium text-[1rem] text-sm">
-            <span class="text-muted-foreground font-medium mr-3 ml-1">+{character.derieved_stats.experience_modifiers[experience]}</span>
+            <span class="text-muted-foreground font-medium mr-3 ml-1">+{character.derived_stats.experience_modifiers[i]}</span>
             {experience}
           </p>
         {/if}

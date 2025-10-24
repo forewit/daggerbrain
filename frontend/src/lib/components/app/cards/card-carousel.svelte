@@ -56,7 +56,7 @@
         style="height: {cardHeight}px; width: {cardWidth}px; margin-left: {gap /
           2}px; margin-right: {gap / 2}px;"
         class={cn(
-          "rounded-xl snap-center transition-[scale] scale-95",
+          "rounded-xl snap-center transition-[scale] scale-95 relative",
           selectedIndex === index && "scale-100"
         )}
         onclick={(e) => {

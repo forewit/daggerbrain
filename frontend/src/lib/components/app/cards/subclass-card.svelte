@@ -78,8 +78,8 @@
     bind:clientWidth
   >
     <div
-      class="flex flex-col h-full bg-white rounded-[24px] border-[4px] border-accent overflow-hidden"
-      style="zoom: {clientWidth / 360}"
+      class="text-left flex flex-col h-[503px] w-[360px] bg-white rounded-[24px] border-[4px] border-accent overflow-hidden"
+      style="transform: scale({clientWidth / 360}); transform-origin: top left;"
     >
       <!-- image and divider -->
       <div
@@ -100,9 +100,7 @@
           class="clip-card-type absolute left-[110px] bottom-[5px] w-[129px] h-[21px]"
         ></div>
         <p
-          style="color: {DOMAINS[character_class.primary_domain as keyof typeof DOMAINS]
-            .foreground_color};"
-          class="z-5 absolute uppercase leading-none bottom-[9px] left-[175px] -translate-x-1/2 text-[12px] font-bold"
+          class="z-5 absolute uppercase leading-none bottom-[9px] left-[175px] -translate-x-1/2 text-[12px] font-bold text-white"
         >
           {character_class.name}
         </p>
@@ -112,9 +110,22 @@
       <div
         class="z-5 flex flex-col shrink-0 gap-[12px] px-[12px] pb-[6px] pt-[16px] -mt-[2px] bg-white"
       >
-        <p class="font-eveleth text-center uppercase text-[20px] text-black leading-none">
-          {card.title}
-        </p>
+        <div class="flex flex-col gap-[4px]">
+          <p class="font-eveleth text-center uppercase text-[20px] text-black leading-none">
+            {card.title}
+          </p>
+
+          <p class="text-[14px] text-black italic text-center">
+            {card.description_html}
+          </p>
+
+          {#if card.card_type === "subclass_foundation" && (card as Card<"subclass_foundation">).spellcast_trait}
+            <p class="text-[14px] text-black text-center uppercase">
+              <b>Spellcast Trait:</b>
+              {(card as Card<"subclass_foundation">).spellcast_trait}
+            </p>
+          {/if}
+        </div>
 
         {#each card.features as feature}
           <p class="text-[12px] text-black">

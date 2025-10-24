@@ -60,14 +60,14 @@
   </div>
 {:else if variant === "card"}
   <div
-    class={cn(
-      "text-left max-w-[360px] min-w-[140px]",
-      className
-    )}
+    class={cn("text-left max-w-[360px] min-w-[140px]", className)}
     style="height: {(clientWidth * 503) / 360}px;"
     bind:clientWidth
   >
-    <div class="flex flex-col h-full bg-white rounded-[24px] border-[4px] border-accent overflow-hidden" style="zoom: {clientWidth / 360}">
+    <div
+      class="flex flex-col h-[503px] w-[360px] bg-white rounded-[24px] border-[4px] border-accent overflow-hidden"
+      style="transform: scale({clientWidth / 360}); transform-origin: top left;"
+    >
       <!-- image and divider -->
       <div
         class="max-h-[55%] grow relative shrink"

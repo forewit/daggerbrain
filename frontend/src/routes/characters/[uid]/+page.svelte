@@ -5,6 +5,8 @@
   let { data } = $props();
 
   const context = getCharacterContext();
+
+  $inspect(context.character?.ephemeral_stats.domain_card_loadout)
 </script>
 
 {#if context.character}

@@ -92,14 +92,14 @@
 
         <SubclassCard card={character.primary_subclass.foundation_card} />
 
-        {#if character.derieved_stats.primary_class_mastery_level >= 2}
+        {#if character.derived_stats.primary_class_mastery_level >= 2}
           <SubclassCard card={character.primary_subclass.specialization_card} />
         {/if}
-        {#if character.derieved_stats.primary_class_mastery_level >= 3}
+        {#if character.derived_stats.primary_class_mastery_level >= 3}
           <SubclassCard card={character.primary_subclass.mastery_card} />
         {/if}
 
-        {#if character.derieved_stats.primary_class_mastery_level < 3}
+        {#if character.derived_stats.primary_class_mastery_level < 3}
           <Collapsible.Root bind:open={subclassCardsOpen}>
             <Collapsible.Trigger class="flex items-center text-left text-sm text-muted-foreground">
               <ChevronRight
@@ -108,7 +108,7 @@
               Available at higher levels
             </Collapsible.Trigger>
             <Collapsible.Content class="flex flex-col gap-3 py-4 opacity-70">
-              {#if character.derieved_stats.primary_class_mastery_level < 2}
+              {#if character.derived_stats.primary_class_mastery_level < 2}
                 <SubclassCard card={character.primary_subclass.specialization_card} />
               {/if}
               <SubclassCard card={character.primary_subclass.mastery_card} />
@@ -131,11 +131,11 @@
 
   <!-- Domain Cards -->
   <Dropdown
-    title="Domain Cards"
+    title="Level 1"
     disabled={!character.primary_class}
-    highlighted={character.level_1_domain_cards.A === null ||
-      character.level_1_domain_cards.B === null}
-    subtitle={[character.level_1_domain_cards.A?.title, character.level_1_domain_cards.B?.title]
+    highlighted={character.level_up_domain_cards[1].A === null ||
+      character.level_up_domain_cards[1].B === null}
+    subtitle={[character.level_up_domain_cards[1].A?.title, character.level_up_domain_cards[1].B?.title]
       .filter((title) => title !== undefined)
       .join(", ")}
   >
@@ -155,14 +155,14 @@
               class={cn(
                 buttonVariants({ variant: "outline" }),
                 "w-full truncate flex items-center justify-between bg-card/50 hover:bg-card/70",
-                character.level_1_domain_cards.A === null &&
+                character.level_up_domain_cards[1].A === null &&
                   "text-muted-foreground hover:text-muted-foreground"
               )}
-              style={character.level_1_domain_cards.A === null &&
+              style={character.level_up_domain_cards[1].A === null &&
                 "outline-offset: 2px; outline-width: 2px; outline-color: var(--primary); outline-style: solid;"}
             >
               <p class="truncate">
-                {character.level_1_domain_cards.A?.title || "Select a domain card"}
+                {character.level_up_domain_cards[1].A?.title || "Select a domain card"}
               </p>
               <ChevronRight class="size-4 opacity-50" />
             </Dialog.Trigger>
@@ -193,11 +193,11 @@
                   <Dialog.Close
                     class={cn(
                       "w-full rounded-xl outline-offset-3 outline-primary hover:outline-4 hover:cursor-pointer disabled:pointer-events-none disabled:opacity-50 disabled:cursor-default",
-                      character.level_1_domain_cards.A?.title === card.title && "outline-4"
+                      character.level_up_domain_cards[1].A?.title === card.title && "outline-4"
                     )}
-                    onclick={() => (character.level_1_domain_cards.A = card)}
-                    disabled={character.level_1_domain_cards.A?.title !== card.title &&
-                      character.derieved_stats.domain_card_vault.some(
+                    onclick={() => (character.level_up_domain_cards[1].A = card)}
+                    disabled={character.level_up_domain_cards[1].A?.title !== card.title &&
+                      character.derived_domain_card_vault.some(
                         (c) => c.title === card.title
                       )}
                   >
@@ -208,7 +208,7 @@
               <Dialog.Footer>
                 <Dialog.Close
                   class={cn(buttonVariants({ variant: "link" }), "text-destructive")}
-                  onclick={() => (character.level_1_domain_cards.A = null)}
+                  onclick={() => (character.level_up_domain_cards[1].A = null)}
                 >
                   Clear selection
                 </Dialog.Close>
@@ -221,14 +221,14 @@
               class={cn(
                 buttonVariants({ variant: "outline" }),
                 "w-full truncate flex items-center justify-between bg-card/50 hover:bg-card/70",
-                character.level_1_domain_cards.B === null &&
+                character.level_up_domain_cards[1].B === null &&
                   "text-muted-foreground hover:text-muted-foreground"
               )}
-              style={character.level_1_domain_cards.B === null &&
+              style={character.level_up_domain_cards[1].B === null &&
                 "outline-offset: 2px; outline-width: 2px; outline-color: var(--primary); outline-style: solid;"}
             >
               <p class="truncate">
-                {character.level_1_domain_cards.B?.title || "Select a domain card"}
+                {character.level_up_domain_cards[1].B?.title || "Select a domain card"}
               </p>
               <ChevronRight class="size-4 opacity-50" />
             </Dialog.Trigger>
@@ -259,11 +259,11 @@
                   <Dialog.Close
                     class={cn(
                       "w-full rounded-xl outline-offset-3 outline-primary hover:outline-4 hover:cursor-pointer disabled:pointer-events-none disabled:opacity-50 disabled:cursor-default",
-                      character.level_1_domain_cards.B?.title === card.title && "outline-4"
+                      character.level_up_domain_cards[1].B?.title === card.title && "outline-4"
                     )}
-                    onclick={() => (character.level_1_domain_cards.B = card)}
-                    disabled={character.level_1_domain_cards.B?.title !== card.title &&
-                      character.derieved_stats.domain_card_vault.some(
+                    onclick={() => (character.level_up_domain_cards[1].B = card)}
+                    disabled={character.level_up_domain_cards[1].B?.title !== card.title &&
+                      character.derived_domain_card_vault.some(
                         (c) => c.title === card.title
                       )}
                   >
@@ -274,7 +274,7 @@
               <Dialog.Footer>
                 <Dialog.Close
                   class={cn(buttonVariants({ variant: "link" }), "text-destructive")}
-                  onclick={() => (character.level_1_domain_cards.B = null)}
+                  onclick={() => (character.level_up_domain_cards[1].B = null)}
                 >
                   Clear selection
                 </Dialog.Close>

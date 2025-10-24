@@ -1,7 +1,7 @@
 import { getAppContext } from './app.svelte';
 import { ALL_LEVEL_UP_OPTIONS, BLANK_LEVEL_UP_OPTION, TIER_1_BASE_OPTIONS, TIER_2_BASE_OPTIONS } from './rules';
 import type { Card, Character, LevelUpOption, Traits } from './types';
-import { getContext, setContext, untrack } from 'svelte';
+import { getContext, setContext } from 'svelte';
 
 function createCharacter(uid: string) {
     const app = getAppContext();
@@ -15,9 +15,9 @@ function createCharacter(uid: string) {
     // ! keep experiences array length in sync with max_experiences
     $effect(() => {
         if (!character) return;
-        if (character.experiences.length < character.derieved_stats.max_experiences) {
+        if (character.experiences.length < character.derived_stats.max_experiences) {
             character.experiences.push("");
-        } else if (character.experiences.length > character.derieved_stats.max_experiences) {
+        } else if (character.experiences.length > character.derived_stats.max_experiences) {
             character.experiences.pop();
         }
     });
@@ -38,10 +38,10 @@ function createCharacter(uid: string) {
     })
 
     // ! clear subclass if class is null
-    $effect(()=>{
-        if(!character) return;
-        if(!character.primary_class) character.primary_subclass = null;
-        if(!character.secondary_class) character.secondary_subclass = null;
+    $effect(() => {
+        if (!character) return;
+        if (!character.primary_class) character.primary_subclass = null;
+        if (!character.secondary_class) character.secondary_subclass = null;
     })
 
     // ! Clear level up option if it's used more than it's max
@@ -260,13 +260,24 @@ function createCharacter(uid: string) {
         if (!character) return;
 
         if (!character.primary_class) {
-            character.level_1_domain_cards.A = null;
-            character.level_1_domain_cards.B = null;
+            character.level_up_domain_cards[1] = { A: null, B: null }
+            return;
         }
 
-        let domain_card_vault: Card<"domain">[] = Object.values(character.level_1_domain_cards).filter((card) => card !== null)
+        let domain_card_vault: Card<"domain">[] = Object.values(character.level_up_domain_cards[1]).filter((card) => card !== null)
 
         for (let i = 2; i <= 10; i++) {
+            // ? add domain cards to the vault
+            // ? level up domain cards and domain card choices
+            const level_up_domain_cards = character.level_up_domain_cards[i as keyof typeof character.level_up_domain_cards];
+            if (level_up_domain_cards.A !== null && domain_card_vault.some(card => card.title === level_up_domain_cards.A?.title)) {
+                console.warn(`Domain card ${level_up_domain_cards.A?.title} is already in the vault`);
+                level_up_domain_cards.A = null;
+            } else if (level_up_domain_cards.A !== null) {
+                domain_card_vault.push(level_up_domain_cards.A);
+            }
+
+
             const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
             const choice_A = level_choices.A;
             const choice_B = level_choices.B;
@@ -291,27 +302,80 @@ function createCharacter(uid: string) {
             if (choice_A.domain_cards_added.A !== null && domain_card_vault.some(card => card.title === choice_A.domain_cards_added.A?.title)) {
                 console.warn(`Domain card ${choice_A.domain_cards_added.A?.title} is already in the vault`);
                 choice_A.domain_cards_added.A = null;
+            } else if (choice_A.domain_cards_added.A !== null) {
+                domain_card_vault.push(choice_A.domain_cards_added.A);
             }
+
             if (choice_A.domain_cards_added.B !== null && domain_card_vault.some(card => card.title === choice_A.domain_cards_added.B?.title)) {
                 console.warn(`Domain card ${choice_A.domain_cards_added.B?.title} is already in the vault`);
                 choice_A.domain_cards_added.B = null;
+            } else if (choice_A.domain_cards_added.B !== null) {
+                domain_card_vault.push(choice_A.domain_cards_added.B);
             }
+
             if (choice_B.domain_cards_added.A !== null && domain_card_vault.some(card => card.title === choice_B.domain_cards_added.A?.title)) {
                 console.warn(`Domain card ${choice_B.domain_cards_added.A?.title} is already in the vault`);
                 choice_B.domain_cards_added.A = null;
+            } else if (choice_B.domain_cards_added.A !== null) {
+                domain_card_vault.push(choice_B.domain_cards_added.A);
             }
             if (choice_B.domain_cards_added.B !== null && domain_card_vault.some(card => card.title === choice_B.domain_cards_added.B?.title)) {
                 console.warn(`Domain card ${choice_B.domain_cards_added.B?.title} is already in the vault`);
                 choice_B.domain_cards_added.B = null;
+            } else if (choice_B.domain_cards_added.B !== null) {
+                domain_card_vault.push(choice_B.domain_cards_added.B);
             }
         }
 
-        character.derieved_stats.domain_card_vault = domain_card_vault;
+        // * derived domain card vault
+        character.derived_domain_card_vault = domain_card_vault;
+    })
+
+    // ! remove invalid indices from the domain card loadout (>max or not in the domain card vault)
+    $effect(() => {
+        if (!character) return;
+        const max = character.derived_stats.max_domain_card_loadout;
+        const unique_indices = [...new Set(character.ephemeral_stats.domain_card_loadout)];
+        const valid_indices = unique_indices.filter((i) => i >= 0 && i < max && i < (character?.derived_domain_card_vault.length || 0));
+
+        if (valid_indices.length !== unique_indices.length) {
+            console.warn(`Removing invalid indices from the domain card loadout`);
+            character.ephemeral_stats.domain_card_loadout = valid_indices;
+        }
     })
 
     // TODO:
-    // ! derive experience modifiers
     // ! calculate derived stats
+
+    // * derived effects -- used to calculate most stats --
+    $effect(() => { })
+    // * derived traits
+    $effect(() => { })
+    // * derived proficiency
+    $effect(() => { })
+    // * derived max_experiences
+    $effect(() => { })
+    // * derived max_domain_card_loadout
+    $effect(() => { })
+    // * derived max_hope
+    $effect(() => { })
+    // * derived max_armor
+    $effect(() => { })
+    // * derived max_hp
+    $effect(() => { })
+    // * derived max_stress
+    $effect(() => { })
+    // * derived evasion
+    $effect(() => { })
+    // * derived damage_thresholds
+    $effect(() => { })
+    // * derived primary_class_mastery_level
+    $effect(() => { })
+    // * derived secondary_class_mastery_level
+    $effect(() => { })
+    // * derived experience_modifiers
+    $effect(() => { })
+
 
     // --- cleanup ---
     const destroy = () => { }

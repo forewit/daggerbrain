@@ -13,8 +13,7 @@
     variant?: "responsive" | "card";
     class?: string;
     children?: Snippet;
-  }
-   = $props();
+  } = $props();
 
   let clientWidth = $state(360);
 </script>
@@ -61,15 +60,15 @@
   </div>
 {:else if variant === "card"}
   <div
-    class={cn(
-      "max-w-[360px] min-w-[140px]",
-      className
-    )}
+    class={cn("max-w-[360px] min-w-[140px]", className)}
     style="height: {(clientWidth * 503) / 360}px;"
     bind:clientWidth
   >
-  <div class="text-left flex flex-col h-full bg-white rounded-[24px] border-[4px] border-accent overflow-hidden" style="zoom: {clientWidth / 360}">
-    <!-- image and divider -->
+    <div
+      class="text-left flex flex-col h-[503px] w-[360px] bg-white rounded-[24px] border-[4px] border-accent overflow-hidden"
+      style="transform: scale({clientWidth / 360}); transform-origin: top left;"
+    >
+      <!-- image and divider -->
       <div
         class="max-h-[55%] grow relative"
         style="background-image: url({card.image_url}); background-size: cover; background-position: center;"
