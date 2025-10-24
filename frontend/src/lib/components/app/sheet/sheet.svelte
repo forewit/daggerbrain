@@ -2,7 +2,7 @@
   import { cn } from "$lib/utils";
   import Traits from "./traits.svelte";
   import type { Character, Card } from "$lib/ts/types";
-  import Banner from "./class-banner.svelte";
+  import Banner from "../cards/class-banner.svelte";
   import Level from "./level-up.svelte";
   import Thresholds from "./thresholds.svelte";
   import Armor from "./armor.svelte";

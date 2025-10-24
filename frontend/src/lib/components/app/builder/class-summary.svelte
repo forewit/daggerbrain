@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Banner from "$lib/components/app/sheet/class-banner.svelte";
+  import Banner from "$lib/components/app/cards/class-banner.svelte";
   import { DOMAINS } from "$lib/ts/constants";
   import type { Class } from "$lib/ts/types";
   import { cn } from "$lib/utils";

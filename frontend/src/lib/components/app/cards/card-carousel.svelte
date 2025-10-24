@@ -1,14 +1,19 @@
 <script lang="ts">
-  import type { Card } from "$lib/ts/types";
+  import type { Card, CardType } from "$lib/ts/types";
   import { cn } from "$lib/utils";
   import { onMount } from "svelte";
+  import AncestryCard from "./ancestry-card.svelte";
+  import CommunityCard from "./community-card.svelte";
+  import DomainCard from "./domain-card.svelte";
+  import TransformationCard from "./transformation-card.svelte";
+  import SubclassCard from "./subclass-card.svelte";
 
   let {
     class: className = "",
     cards = $bindable(),
   }: {
     class?: string;
-    cards: Card<any>[];
+    cards: Card<CardType>[];
   } = $props();
 
   let scrollContainer: HTMLDivElement;
@@ -18,10 +23,9 @@
   let cardHeight = $derived(cardWidth * (503 / 360));
   let selectedIndex = $state(0);
 
-
   function handleScroll() {
     const cw = cardWidth + gap;
-    selectedIndex = Math.round((scrollContainer.scrollLeft) / cw);
+    selectedIndex = Math.round(scrollContainer.scrollLeft / cw);
   }
 
   onMount(() => {
@@ -36,21 +40,16 @@
   });
 </script>
 
-<svelte:head>
-  {#each cards as card}
-    {#if card.full_card_image_url}
-      <link rel="preload" as="image" href={card.full_card_image_url} />
-    {/if}
-  {/each}
-</svelte:head>
-
 <div
   bind:this={scrollContainer}
   class={cn("relative snap-x snap-x-mandatory overflow-x-auto overflow-y-hidden p-1 ", className)}
   style="scrollbar-width:none;"
 >
   <div class="flex items-center justify-start min-w-max">
-    <div style="width: calc(50vw - {(cardWidth+gap)/2}px)" class="shrink-0 snap-align-none"></div>
+    <div
+      style="width: calc(50vw - {(cardWidth + gap) / 2}px)"
+      class="shrink-0 snap-align-none"
+    ></div>
 
     {#each cards as card, index}
       <button
@@ -69,16 +68,27 @@
           });
         }}
       >
-        <img
-          src={card.full_card_image_url}
-          alt={card.title}
-          class="object-cover select-none"
-          draggable="false"
-          decoding="async"
-          loading="eager"
-        />
+        {#if card.card_type === "domain"}
+          <DomainCard card={card as Card<"domain">} variant="card" />
+        {:else if card.card_type === "ancestry"}
+          <AncestryCard card={card as Card<"ancestry">} variant="card" />
+        {:else if card.card_type === "community"}
+          <CommunityCard card={card as Card<"community">} variant="card" />
+        {:else if card.card_type === "transformation"}
+          <TransformationCard card={card as Card<"transformation">} variant="card" />
+        {:else if card.card_type === "subclass_foundation" || card.card_type === "subclass_specialization" || card.card_type === "subclass_mastery"}
+          <SubclassCard
+            card={card as Card<
+              "subclass_foundation" | "subclass_specialization" | "subclass_mastery"
+            >}
+            variant="card"
+          />
+        {/if}
       </button>
     {/each}
-    <div style="width: calc(50vw - {(cardWidth+gap)/2}px)" class="shrink-0 snap-align-none"></div>
+    <div
+      style="width: calc(50vw - {(cardWidth + gap) / 2}px)"
+      class="shrink-0 snap-align-none"
+    ></div>
   </div>
 </div>

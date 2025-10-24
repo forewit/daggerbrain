@@ -96,7 +96,7 @@
     bind:clientWidth
   >
     <div
-      class="flex flex-col h-full bg-white rounded-[24px] border-[4px] border-accent overflow-hidden"
+      class="text-left flex flex-col h-full bg-white rounded-[24px] border-[4px] border-accent overflow-hidden"
       style="zoom: {clientWidth / 360}"
     >
       <!-- image and divider -->
@@ -115,35 +115,35 @@
           class="absolute -top-[9px] left-[14px] w-[75px]"
         />
         <div
-        class={cn(
-          "scale-90 text-white  absolute top-[16px] right-[16px] size-[38px] border-2 border-accent rounded-full bg-gray-800",
-          card.recall_cost > 9 && "size-[48px]"
-        )}
-      >
-        <div
-          class="pb-[2px] border border-gray-500 rounded-full size-full flex items-center justify-center"
+          class={cn(
+            "scale-90 text-white  absolute top-[16px] right-[16px] size-[38px] border-2 border-accent rounded-full bg-gray-800",
+            card.recall_cost > 9 && "size-[48px]"
+          )}
         >
-          <p class="text-[18px] font-medium text-right pt-[4px] pl-[4px]">{card.recall_cost}</p>
-          <svg
-            stroke="currentColor"
-            fill="currentColor"
-            stroke-width="0"
-            viewBox="0 0 16 16"
-            class="size-[12px] shrink-0"
-            xmlns="http://www.w3.org/2000/svg"
-            ><path
-              d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"
-            ></path></svg
+          <div
+            class="pb-[2px] border border-gray-500 rounded-full size-full flex items-center justify-center"
           >
+            <p class="text-[18px] font-medium text-right pt-[4px] pl-[4px]">{card.recall_cost}</p>
+            <svg
+              stroke="currentColor"
+              fill="currentColor"
+              stroke-width="0"
+              viewBox="0 0 16 16"
+              class="size-[12px] shrink-0"
+              xmlns="http://www.w3.org/2000/svg"
+              ><path
+                d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"
+              ></path></svg
+            >
+          </div>
         </div>
-      </div>
         <div
           style="background: {DOMAINS[card.domain_name as keyof typeof DOMAINS].color};"
           class="clip-card-type absolute left-[111px] bottom-[3px] w-[135px] h-[23px]"
         ></div>
         <p
           style="color: {DOMAINS[card.domain_name as keyof typeof DOMAINS].foreground_color};"
-          class="z-5 absolute uppercase leading-none bottom-[8px] left-1/2 -translate-x-1/2 text-[12px] font-bold"
+          class="z-5 absolute uppercase leading-none bottom-[8px] left-[180px] -translate-x-1/2 text-[12px] font-bold"
         >
           {card.type}
         </p>
@@ -156,17 +156,17 @@
         </p>
 
         {#each card.features as feature}
-          <p class="text-[12px] text-black">
+          <div class="text-[12px] text-black flex flex-col gap-[12px]">
             {@html feature.description_html}
-          </p>
+          </div>
         {/each}
       </div>
 
       <!-- credits -->
       <div class="flex items-end px-3 pb-2 mt-auto leading-none shrink-0">
         <img src="/images/card/quill-icon.png" alt="quill" class="size-[14px]" />
-        <p class="text-[10px] italic text-black grow">{card.artist_name}</p>
-        <p class="text-[8px] text-muted-foreground italic text-black">
+        <p class="text-[9px] italic text-black grow">{card.artist_name}</p>
+        <p class="text-[8px] px-[2px] text-muted-foreground italic text-black">
           Daggerheart™ Compatible. Terms at Daggerheart.com
         </p>
         <img src="/images/card/cgl-logo.svg" alt="CGL" class="size-[16px]" />

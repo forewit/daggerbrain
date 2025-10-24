@@ -9,7 +9,7 @@
     variant = "responsive",
     children,
   }: {
-    card: Card<"community">;
+    card: Card<"transformation">;
     variant?: "responsive" | "card";
     class?: string;
     children?: Snippet;
@@ -68,7 +68,7 @@
     style="height: {(clientWidth * 503) / 360}px;"
     bind:clientWidth
   >
-  <div class="flex flex-col h-full bg-white rounded-[24px] border-[4px] border-accent overflow-hidden" style="zoom: {clientWidth / 360}">
+  <div class="text-left flex flex-col h-full bg-white rounded-[24px] border-[4px] border-accent overflow-hidden" style="zoom: {clientWidth / 360}">
     <!-- image and divider -->
       <div
         class="max-h-[55%] grow relative"
@@ -103,8 +103,8 @@
       <!-- credits -->
       <div class="flex items-end px-3 pb-2 mt-auto leading-none shrink-0">
         <img src="/images/card/quill-icon.png" alt="quill" class="size-[14px]" />
-        <p class="text-[10px] italic text-black grow">{card.artist_name}</p>
-        <p class="text-[8px] text-muted-foreground italic text-black">
+        <p class="text-[9px] italic text-black grow">{card.artist_name}</p>
+        <p class="text-[8px] px-[2px] text-muted-foreground italic text-black">
           Daggerheart™ Compatible. Terms at Daggerheart.com
         </p>
         <img src="/images/card/cgl-logo.svg" alt="CGL" class="size-[16px]" />

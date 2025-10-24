@@ -51,17 +51,17 @@ export type Character = {
 
     // level-up choices. levels 2-10
     level: number,
-    level_1_domain_cards: {A: Card<"domain"> | null, B: Card<"domain"> | null},
+    level_1_domain_cards: { A: Card<"domain"> | null, B: Card<"domain"> | null },
     level_up_choices: {
-        2: {A: LevelUpOption, B: LevelUpOption},
-        3: {A: LevelUpOption, B: LevelUpOption}, 
-        4: {A: LevelUpOption, B: LevelUpOption},
-        5: {A: LevelUpOption, B: LevelUpOption},
-        6: {A: LevelUpOption, B: LevelUpOption},
-        7: {A: LevelUpOption, B: LevelUpOption},
-        8: {A: LevelUpOption, B: LevelUpOption},
-        9: {A: LevelUpOption, B: LevelUpOption},
-        10: {A: LevelUpOption, B: LevelUpOption},
+        2: { A: LevelUpOption, B: LevelUpOption },
+        3: { A: LevelUpOption, B: LevelUpOption },
+        4: { A: LevelUpOption, B: LevelUpOption },
+        5: { A: LevelUpOption, B: LevelUpOption },
+        6: { A: LevelUpOption, B: LevelUpOption },
+        7: { A: LevelUpOption, B: LevelUpOption },
+        8: { A: LevelUpOption, B: LevelUpOption },
+        9: { A: LevelUpOption, B: LevelUpOption },
+        10: { A: LevelUpOption, B: LevelUpOption },
     }
 
     // will be overwritten and calculated
@@ -151,9 +151,10 @@ export type Effect = ({
     overrides?: Modifier[]
 })
 
-export type Card<T extends "domain" | "ancestry" | "community" | "transformation" | "subclass_foundation" | "subclass_specialization" | "subclass_mastery"> = {
+export type CardType = "domain" | "ancestry" | "community" | "transformation" | "subclass_foundation" | "subclass_specialization" | "subclass_mastery";
+export type Card<T extends CardType> = {
+    card_type: T
     image_url: string
-    full_card_image_url: string
     title: string
     description_html: string
     artist_name: string
@@ -170,6 +171,12 @@ export type Card<T extends "domain" | "ancestry" | "community" | "transformation
             type: "ability" | "spell"
         } : T extends "subclass_foundation" ? {
             spellcast_trait: keyof Traits | null
+            class_name: string
+
+        } : T extends "subclass_specialization" ? {
+            class_name: string
+        } : T extends "subclass_mastery" ? {
+            class_name: string
         } : {}
     )
 
@@ -186,9 +193,9 @@ export type LevelUpOption = {
     title: string | null
     short_title: string | null
     max: number
-    marked_traits: {A: keyof Traits | null, B: keyof Traits | null}
-    selected_experiences: {A: number | null, B: number | null}
-    domain_cards_added: {A: Card<"domain"> | null, B: Card<"domain"> | null}
+    marked_traits: { A: keyof Traits | null, B: keyof Traits | null }
+    selected_experiences: { A: number | null, B: number | null }
+    domain_cards_added: { A: Card<"domain"> | null, B: Card<"domain"> | null }
     effect_ids: string[]
 }
 

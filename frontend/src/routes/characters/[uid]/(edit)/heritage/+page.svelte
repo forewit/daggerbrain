@@ -11,6 +11,9 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import { ANCESTRIES, COMMUNITIES, TRANSFORMATIONS } from "$lib/ts/constants.js";
   import HeritageCard from "$lib/components/app/cards/ancestry-card.svelte";
+  import TransformationCard from "$lib/components/app/cards/transformation-card.svelte";
+  import CommunityCard from "$lib/components/app/cards/community-card.svelte";
+  import AncestryCard from "$lib/components/app/cards/ancestry-card.svelte";
 
   let { data } = $props();
 
@@ -65,7 +68,7 @@
             {@html COMMUNITIES.description_html}
           </p>
           {#if character.community_card}
-            <HeritageCard card={character.community_card} />
+            <CommunityCard card={character.community_card} />
           {/if}
 
           <div class="flex gap-2 justify-between">
@@ -91,7 +94,7 @@
             {@html TRANSFORMATIONS.description_html}
           </p>
           {#if character.transformation_card}
-            <HeritageCard card={character.transformation_card} />
+            <TransformationCard card={character.transformation_card} />
           {/if}
 
           <div class="flex gap-2 justify-between">
@@ -119,7 +122,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto p-2">
         {#each Object.values(ANCESTRIES.cards) as card}
           <div>
-            <HeritageCard {card}
+            <AncestryCard {card}
               ><Button
                 onclick={() => {
                   character.ancestry_card = card;
@@ -127,7 +130,7 @@
                 }}
                 class="w-min mt-auto">Select {card.title}</Button
               >
-            </HeritageCard>
+            </AncestryCard>
           </div>
         {/each}
       </div>
@@ -145,7 +148,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto p-2">
         {#each Object.values(COMMUNITIES.cards) as card}
           <div>
-            <HeritageCard {card}
+            <CommunityCard {card}
               ><Button
                 onclick={() => {
                   character.community_card = card;
@@ -153,7 +156,7 @@
                 }}
                 class="w-min mt-auto">Select {card.title}</Button
               >
-            </HeritageCard>
+            </CommunityCard>
           </div>
         {/each}
       </div>
@@ -171,7 +174,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto p-2">
         {#each Object.values(TRANSFORMATIONS.cards) as card}
           <div>
-            <HeritageCard {card}
+            <TransformationCard {card}
               ><Button
                 onclick={() => {
                   character.transformation_card = card;
@@ -179,7 +182,7 @@
                 }}
                 class="w-min mt-auto">Select {card.title}</Button
               >
-            </HeritageCard>
+            </TransformationCard>
           </div>
         {/each}
       </div>

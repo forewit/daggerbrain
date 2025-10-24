@@ -2,9 +2,16 @@
   import AncestryCard from "$lib/components/app/cards/ancestry-card.svelte";
   import CommunityCard from "$lib/components/app/cards/community-card.svelte";
   import DomainCard from "$lib/components/app/cards/domain-card.svelte";
+  import SubclassCard from "$lib/components/app/cards/subclass-card.svelte";
   import TransformationCard from "$lib/components/app/cards/transformation-card.svelte";
   import { getAppContext } from "$lib/ts/app.svelte";
-  import { ANCESTRY_CARDS, BONE_DOMAIN_CARDS, COMMUNITY_CARDS, TRANSFORMATION_CARDS } from "$lib/ts/cards";
+  import {
+    ANCESTRY_CARDS,
+    BONE_DOMAIN_CARDS,
+    COMMUNITY_CARDS,
+    SUBCLASS_CARDS,
+    TRANSFORMATION_CARDS,
+  } from "$lib/ts/cards";
   import { cn } from "$lib/utils";
 
   const app = getAppContext();
@@ -21,9 +28,15 @@
   <p class="text-xs italic font-muted-foreground">Under construction</p>
 
   <div class="flex gap-3">
-    <DomainCard card={BONE_DOMAIN_CARDS.untouchable} variant="card" class="min-w-[360px]" />
-    <TransformationCard card={TRANSFORMATION_CARDS.werewolf} variant="card" class="min-w-[360px]"/>
-    <CommunityCard card={COMMUNITY_CARDS.warborne} variant="card" />
-    <AncestryCard card={ANCESTRY_CARDS.half_clank} variant="card" />
+    <SubclassCard
+      card={SUBCLASS_CARDS.executioners_guild_foundation}
+      variant="card"
+      class="w-40"
+    />
+    <DomainCard card={BONE_DOMAIN_CARDS.untouchable} variant="card" class="w-40" />
+    <TransformationCard card={TRANSFORMATION_CARDS.werewolf} variant="card" class="w-40" />
+
+    <CommunityCard card={COMMUNITY_CARDS.warborne} variant="card" class="w-40" />
+    <AncestryCard card={ANCESTRY_CARDS.half_clank} variant="card" class="w-40" />
   </div>
 </div>

@@ -2,11 +2,11 @@ import type { Card } from "./types";
 
 export const BONE_DOMAIN_CARDS = {
     untouchable: {
+        card_type: "domain",
         domain_name: "bone",
         artist_name: "Henry Peters",
         image_url: "/images/card/art/domains/bone/untouchable.webp",
         type: "ability",
-        full_card_image_url: "/images/full_cards/domains/bone/untouchable.png",
         title: "Untouchable",
         description_html: "",
         level_requirement: 1,
@@ -23,11 +23,11 @@ export const BONE_DOMAIN_CARDS = {
 
 export const VALOR_DOMAIN_CARDS = {
     bare_bones: {
+        card_type: "domain",
         domain_name: "valor",
         artist_name: "Simon Pape",
         image_url: "/images/card/art/domains/valor/bare-bones.webp",
         type: "ability",
-        full_card_image_url: "/images/full_cards/domains/valor/bare-bones.png",
         title: "Bare Bones",
         description_html: "",
         level_requirement: 1,
@@ -36,7 +36,7 @@ export const VALOR_DOMAIN_CARDS = {
             {
                 title: "",
                 description_html: `<p>When you choose not to equip armor, you have a base Armor Score of 3 + your Strength and use the following as your base damage thresholds:</p>
-                                    <ul>
+                                    <ul class="list-disc list-inside ml-2">
                                         <li><b><em>Tier 1:</em></b> 9/19</li>
                                         <li><b><em>Tier 2:</em></b> 11/24</li>
                                         <li><b><em>Tier 3:</em></b> 13/31</li>
@@ -50,11 +50,11 @@ export const VALOR_DOMAIN_CARDS = {
 
 export const BLADE_DOMAIN_CARDS = {
     whirlwind: {
+        card_type: "domain",
         domain_name: "blade",
-        artist_name: "",
-        image_url: "",
+        artist_name: "Mike Pape",
+        image_url: "/images/card/art/domains/blade/whirlwind.webp",
         type: "ability",
-        full_card_image_url: "/images/full_cards/domains/blade/whirlwind.png",
         title: "Whrilwind",
         description_html: "",
         level_requirement: 1,
@@ -62,17 +62,17 @@ export const BLADE_DOMAIN_CARDS = {
         features: [
             {
                 title: "",
-                description_html: "When you make a successful attack agains a target within Very Close range, you can <b>spend a Hope</b> to use the attack against all other targets within Very Close range.",
+                description_html: "<p>When you make a successful attack agains a target within Very Close range, you can <b>spend a Hope</b> to use the attack against all other targets within Very Close range.</p>",
             }
         ],
         effect_ids: []
     },
     not_good_enough: {
+        card_type: "domain",
         domain_name: "blade",
-        artist_name: "",
-        image_url: "",
+        artist_name: "Juan S. Almencion",
+        image_url: "/images/card/art/domains/blade/not-good-enough.webp",
         type: "ability",
-        full_card_image_url: "/images/full_cards/domains/blade/not-good-enough.png",
         title: "Not Good Enough",
         description_html: "",
         level_requirement: 1,
@@ -80,17 +80,17 @@ export const BLADE_DOMAIN_CARDS = {
         features: [
             {
                 title: "",
-                description_html: "When you roll your damage dice, you can reroll any 1s or 2s.",
+                description_html: "<p>When you roll your damage dice, you can reroll any 1s or 2s.</p>",
             }
         ],
         effect_ids: []
     },
     a_soldiers_bond: {
+        card_type: "domain",
         domain_name: "blade",
         artist_name: "Mila Pesic",
         image_url: "/images/card/art/domains/blade/a-soldiers-bond.webp",
         type: "ability",
-        full_card_image_url: "/images/full_cards/domains/blade/a-soldiers-bond.png",
         title: "A Soldier's Bond",
         description_html: "",
         level_requirement: 2,
@@ -107,11 +107,9 @@ export const BLADE_DOMAIN_CARDS = {
 
 export const TRANSFORMATION_CARDS = {
     werewolf: {
+        card_type: "transformation",
         artist_name: "",
-        image_url:
-            "/images/wip.avif",
-        full_card_image_url:
-            "/images/full_cards/transformations/werewolf.png",
+        image_url: "/images/wip.avif",
         title: "Werewolf",
         description_html: "Werewolves are creatures who transform into supernatural wolves.",
         features: [
@@ -132,10 +130,8 @@ export const TRANSFORMATION_CARDS = {
 
 export const ANCESTRY_CARDS = {
     half_clank: {
-        image_url:
-            "/images/card/art/ancestries/clank.webp",
-        full_card_image_url:
-            "/images/full_cards/ancestries/half-clank.png",
+        card_type: "ancestry",
+        image_url: "/images/card/art/ancestries/clank.webp",
         title: "Half-Clank",
         description_html: "Half sentient mechanical being, half human.",
         artist_name: "Mat Wilma",
@@ -151,10 +147,8 @@ export const ANCESTRY_CARDS = {
         effect_ids: []
     },
     drakona: {
-        image_url:
-            "/images/card/art/ancestries/drakona.webp",
-        full_card_image_url:
-            "/images/full_cards/ancestries/drakona.png",
+        card_type: "ancestry",
+        image_url: "/images/card/art/ancestries/drakona.webp",
         title: "Drakona",
         description_html: "Drakona resemble wingless dragons in humanoid form and possess a powerful elemental breath.",
         artist_name: "Mat Wilma",
@@ -172,11 +166,9 @@ export const ANCESTRY_CARDS = {
 
 export const COMMUNITY_CARDS = {
     warborne: {
+        card_type: "community",
         artist_name: "",
-        image_url:
-            "/images/wip.avif",
-        full_card_image_url:
-            "/images/full_cards/communities/warborne.png",
+        image_url: "/images/wip.avif",
         title: "Warborne",
         description_html:
             "Being part of a warborne community means you come from a place that is, or was, ravaged by war.",
@@ -192,14 +184,15 @@ export const COMMUNITY_CARDS = {
 } as const satisfies Record<string, Card<"community">>
 
 export const SUBCLASS_CARDS = {
-    executioners_guild_foundation: <Card<"subclass_foundation">>{
+    executioners_guild_foundation: {
+        card_type: "subclass_foundation",
         artist_name: "",
         image_url: "/images/wip.avif",
-        full_card_image_url:
-            "/images/full_cards/subclasses/assassin/executioners-guild-foundation.png",
         title: "Executioners Guild",
         description_html: "Foundation",
         spellcast_trait: "agility",
+        effect_ids: [],
+        class_name: "assassin",
         features: [
             {
                 title: "First Strike",
@@ -210,14 +203,15 @@ export const SUBCLASS_CARDS = {
                 description_html: 'Your "Marked for Death" feature uses <b>d6s</b> instead of <b>d4s</b>.',
             },
         ],
-    },
-    executioners_guild_specialization: <Card<"subclass_specialization">>{
+    } satisfies Card<"subclass_foundation">,
+    executioners_guild_specialization: {
+        card_type: "subclass_specialization",
         artist_name: "",
         image_url: "/images/wip.avif",
-        full_card_image_url:
-            "/images/full_cards/subclasses/assassin/executioners-guild-specialization.png",
         title: "Executioners Guild",
         description_html: "Specialization",
+        effect_ids: [],
+        class_name: "assassin",
         features: [
             {
                 title: "Death Strike",
@@ -228,13 +222,15 @@ export const SUBCLASS_CARDS = {
                 description_html: "You gain a <b>+2</b> bonus to your Evasion against any attacks made by a creature <i>Marked for Death</i>."
             }
         ],
-    },
-    executioners_guild_mastery: <Card<"subclass_mastery">>{
+    } satisfies Card<"subclass_specialization">,
+    executioners_guild_mastery: {
+        card_type: "subclass_mastery",
         artist_name: "",
         image_url: "/images/wip.avif",
-        full_card_image_url: "",
         title: "Executioners Guild",
         description_html: "Mastery",
+        effect_ids: [],
+        class_name: "assassin",
         features: [
             {
                 title: "True Strike",
@@ -245,5 +241,5 @@ export const SUBCLASS_CARDS = {
                 description_html: 'Your "Marked for Death" feature uses <b>d8s</b> instead of <b>d6s</b>.'
             }
         ],
-    },
+    } satisfies Card<"subclass_mastery">,
 } as const satisfies Record<string, Card<"subclass_foundation" | "subclass_specialization" | "subclass_mastery">>
