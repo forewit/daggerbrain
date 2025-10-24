@@ -8,10 +8,12 @@ export const DOMAINS = {
         name: "Arcana",
         description_html: "",
         color: "#4e345b",
+        foreground_color: "#ffffff",
         cards: {}
     },
     blade: {
         name: "Blade",
+        foreground_color: "#ffffff",
         description_html: `<p>Blade is the domain of <b>weapon mastery</b>. Whether by steel,
             bow, or perhaps a more specialized arm, those who follow this
             path have the skill to cut short the lives of others. Wielders of
@@ -24,6 +26,7 @@ export const DOMAINS = {
     bone: {
         name: "Bone",
         color: "#a4a9a8",
+        foreground_color: "#000000",
         description_html: `<p>Bone is the domain of <b>tactics and the body</b>. Practitioners
             of this domain have an uncanny control over their own
             physical abilities and an eye for predicting the behaviors of
@@ -36,12 +39,14 @@ export const DOMAINS = {
         name: "Codex",
         description_html: "",
         color: "#24395d",
+        foreground_color: "#ffffff",
         cards: {}
     },
     grace: {
         name: "Grace",
         description_html: "",
         color: "#8d3965",
+        foreground_color: "#ffffff",
         cards: {}
     },
     midnight: {
@@ -53,18 +58,21 @@ export const DOMAINS = {
             the power to control and create enigmas. The Midnight
             domain can be accessed by the <b>Rogue</b> and <b>Sorcerer</b> classes.</p>`,
         color: "#1e201f",
+        foreground_color: "#ffffff",
         cards: {}
     },
     sage: {
         name: "Sage",
         description_html: "",
         color: "#244e30",
+        foreground_color: "#ffffff",
         cards: {}
     },
     splendor: {
         name: "Splendor",
         description_html: "",
         color: "#b8a342",
+        foreground_color: "#000000",
         cards: {}
     },
     valor: {
@@ -76,6 +84,7 @@ export const DOMAINS = {
             The Valor domain can be accessed by the <b>Guardian</b> and
             <b>Seraph</b> classes.</p>`,
         color: "#e2680e",
+        foreground_color: "#ffffff",
         cards: VALOR_DOMAIN_CARDS
     }
 } as const satisfies Record<string, Domain>
@@ -242,8 +251,8 @@ export const JUST_JAMES: Character = {
 
     // level-up choices
     level: 2,
+    level_1_domain_cards: {A: DOMAINS.blade.cards.whirlwind, B: DOMAINS.blade.cards.not_good_enough},
     level_up_choices: {
-        1: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION }, // level one only has one choice
         2: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
         3: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
         4: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
@@ -355,8 +364,8 @@ const NEW_CHARACTER: Character = {
 
     // level-up choices
     level: 1,
+    level_1_domain_cards: {A: null, B: null},
     level_up_choices: {
-        1: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION }, // level one only has one choice
         2: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
         3: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
         4: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },

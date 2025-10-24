@@ -27,7 +27,7 @@
         title="Experiences"
         subtitle={character.experiences
           .filter((experience) => experience !== "")
-          .join(" | ")}
+          .join(", ")}
       >
         <div class="text-sm italic flex flex-col gap-2">
           {@html EXPERIENCES.description_html}

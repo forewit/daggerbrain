@@ -2,16 +2,16 @@
   import { cn } from "$lib/utils";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import ChevronDown from "@lucide/svelte/icons/chevron-down";
-  import type { Experience } from "$lib/ts/types";
+  import { getCharacterContext } from "$lib/ts/character.svelte";
 
-  let {
-    class: className = "",
-    experiences = $bindable(),
-  }: { class?: string; experiences: Experience[] } = $props();
+  let {    class: className = "" }= $props();
 
   let expanded = $state(true);
+  const context = getCharacterContext();
+  let character = $derived(context.character);
 </script>
 
+{#if character}
 <div
   class={cn(
     "text-left flex flex-col relative p-4 gap-4 border-2 rounded-md transition-all",
@@ -32,14 +32,15 @@
 
   {#if expanded}
     <div class="flex flex-col gap-4">
-      {#each experiences as experience}
-        {#if experience.title.trim() !== ""}
+      {#each character.experiences as experience}
+        {#if experience.trim() !== ""}
           <p class="font-medium text-[1rem] text-sm">
-            <span class="text-muted-foreground font-medium mr-3 ml-1">+{experience.modifier}</span>
-            {experience.title}
+            <span class="text-muted-foreground font-medium mr-3 ml-1">+{character.derieved_stats.experience_modifiers[experience]}</span>
+            {experience}
           </p>
         {/if}
       {/each}
     </div>
   {/if}
 </div>
+{/if}

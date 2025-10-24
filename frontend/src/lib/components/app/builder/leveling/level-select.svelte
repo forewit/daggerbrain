@@ -1,5 +1,6 @@
 <script lang="ts">
   import * as Dialog from "$lib/components/ui/dialog";
+  import * as Select from "$lib/components/ui/select";
   import { buttonVariants } from "$lib/components/ui/button";
   import { cn } from "$lib/utils";
   import type { LevelUpOption, Character } from "$lib/ts/types";
@@ -13,29 +14,43 @@
 
   let open = $state(false);
   let newLevel = $derived(level);
-  let selectElm: HTMLSelectElement = $state(null!);
+
+  let value = $state(level.toString());
 </script>
 
-<select
-  class={cn("bg-primary-muted p-2 rounded-md w-36 border-r-6 border-primary-muted hover:cursor-pointer", className)}
-  value={level}
-  bind:this={selectElm}
-  onchange={(e) => {
-    newLevel = parseInt(selectElm.value);
-
+<Select.Root
+  type="single"
+  bind:value
+  onValueChange={(v) => {
+    newLevel = parseInt(v);
     if (newLevel < level) {
-      selectElm.value = level.toString();
       open = true;
-      e.preventDefault();
     } else {
       level = newLevel;
     }
   }}
 >
-  {#each [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as i}
-    <option class="hover:cursor-pointer" value={i}>Level {i}</option>
-  {/each}
-</select>
+  <Select.Trigger
+    class={cn(
+      "bg-primary-muted hover:bg-primary-muted/70 p-2 rounded-md w-36 hover:cursor-pointer",
+      className
+    )}
+  >
+    <p class="text">Level {level}</p>
+  </Select.Trigger>
+  <Select.Content>
+    {#each [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as i}
+      {#if i === 2}
+        <Select.Label class="text-xs text-accent/50 text-center">-- Tier 2 --</Select.Label>
+      {:else if i === 5}
+        <Select.Label class="text-xs text-accent/50 text-center">-- Tier 3 --</Select.Label>
+      {:else if i === 8}
+        <Select.Label class="text-xs text-accent/50 text-center">-- Tier 4 --</Select.Label>
+      {/if}
+      <Select.Item class="hover:cursor-pointer" value={i.toString()}>Level {i}</Select.Item>
+    {/each}
+  </Select.Content>
+</Select.Root>
 
 <Dialog.Root bind:open>
   <Dialog.Content>
@@ -57,7 +72,7 @@
         class={cn(buttonVariants({ variant: "destructive" }))}
         onclick={() => {
           level = newLevel;
-          selectElm.value = level.toString();
+          value = level.toString();
         }}
       >
         Level Down

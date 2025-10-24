@@ -51,8 +51,8 @@ export type Character = {
 
     // level-up choices. levels 2-10
     level: number,
+    level_1_domain_cards: {A: Card<"domain"> | null, B: Card<"domain"> | null},
     level_up_choices: {
-        1: {A: LevelUpOption, B: LevelUpOption},
         2: {A: LevelUpOption, B: LevelUpOption},
         3: {A: LevelUpOption, B: LevelUpOption}, 
         4: {A: LevelUpOption, B: LevelUpOption},
@@ -130,11 +130,6 @@ export type Subclass = {
     mastery_card: Card<"subclass_mastery">
 }
 
-export type Experience = {
-    title: string
-    modifier: number
-}
-
 export type Modifier = ({
     min_level: number; // -1 = no limit
     max_level: number; // -1 = no limit
@@ -182,6 +177,7 @@ export type Domain = {
     name: string
     description_html: string
     color: string
+    foreground_color: string
     cards: Record<string, Card<"domain">>
 }
 

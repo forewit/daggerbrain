@@ -11,7 +11,6 @@
   import ClassSummary from "../class-summary.svelte";
   import { CLASSES, DOMAINS } from "$lib/ts/constants";
   import DomainCard from "../../cards/domain-card.svelte";
-  import { TIER_1_BASE_OPTIONS } from "$lib/ts/rules";
 
   let { character = $bindable(), class: className = "" }: { character: Character; class?: string } =
     $props();
@@ -20,8 +19,6 @@
   let removeClassDialogOpen = $state(false);
   let subclassDialogOpen = $state(false);
   let subclassCardsOpen = $state(false);
-  let width: number = $state(300);
-
 
   let available_domain_cards: Card<"domain">[] = $derived.by(() => {
     if (!character.primary_class) return [];
@@ -37,15 +34,16 @@
 
 <div class={cn("flex flex-col gap-4", className)}>
   <!-- Select a Class -->
-  {#if !character.primary_class}
-    <Dropdown title="Class" highlighted>
+  <Dropdown
+    title="Class"
+    highlighted={!character.primary_class}
+    subtitle={character.primary_class
+      ? character.primary_class.name + ", " + character.primary_class.source
+      : ""}
+  >
+    {#if !character.primary_class}
       <Button onclick={() => (classDialogOpen = true)}>Choose a class</Button>
-    </Dropdown>
-  {:else}
-    <Dropdown
-      title="Class"
-      subtitle={character.primary_class.name + ", " + character.primary_class.source}
-    >
+    {:else}
       <div class="flex flex-col gap-2">
         <ClassSummary character_class={character.primary_class} bannerClasses="-mt-4" />
         <div class="mt-4 flex flex-col gap-2">
@@ -72,20 +70,20 @@
           >
         </div>
       </div>
-    </Dropdown>
-  {/if}
+    {/if}
+  </Dropdown>
 
   <!-- Select a Subclass -->
-  {#if !character.primary_subclass}
-    <Dropdown
-      title="Subclass"
-      disabled={!character.primary_class}
-      highlighted={!!character.primary_class}
-    >
+  <Dropdown
+    highlighted={!character.primary_subclass}
+    disabled={!character.primary_class}
+    
+    title="Subclass"
+    subtitle={character.primary_subclass?.name}
+  >
+    {#if !character.primary_subclass}
       <Button onclick={() => (subclassDialogOpen = true)}>Choose a subclass</Button>
-    </Dropdown>
-  {:else}
-    <Dropdown title="Subclass" subtitle={character.primary_subclass.name}>
+    {:else}
       <div class="flex flex-col gap-4">
         <p class="text-lg font-medium">{character.primary_subclass.name}</p>
         <p class="-mt-2 text-xs italic text-muted-foreground">
@@ -128,116 +126,174 @@
           >
         </div>
       </div>
-    </Dropdown>
-  {/if}
+    {/if}
+  </Dropdown>
 
   <!-- Domain Cards -->
-  {#if !character.primary_class}
-    <Dropdown title="Domain Cards" disabled={true} highlighted={!!character.primary_class} />
-  {:else}
-    <Dropdown
-      title="Domain Cards"
-      highlighted={!character.level_up_choices[1].A.id || character.level_up_choices[1].B.id}
-      subtitle={character.level_up_choices[1].A?.domain_cards_added.map((c) => c.title).join(", ")}
-    >
-      <div class="flex flex-col gap-2" bind:clientWidth={width}>
-        <p class="text-xs italic text-muted-foreground">
-          Select up to 2 level 1 domain cards from the
+  <Dropdown
+    title="Domain Cards"
+    disabled={!character.primary_class}
+    highlighted={character.level_1_domain_cards.A === null ||
+      character.level_1_domain_cards.B === null}
+    subtitle={[character.level_1_domain_cards.A?.title, character.level_1_domain_cards.B?.title]
+      .filter((title) => title !== undefined)
+      .join(", ")}
+  >
+    {#if character.primary_class}
+      <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md">
+        <p class="py-1 px-2 text-xs italic text-muted-foreground">
+          Choose up to 2 level 1 domain cards from the
           <b>{DOMAINS[character.primary_class.primary_domain as keyof typeof DOMAINS].name}</b>
           and
           <b>{DOMAINS[character.primary_class.secondary_domain as keyof typeof DOMAINS].name}</b>
           domains.
         </p>
 
-        <Select.Root
-          type="single"
-          value={character.level_up_choices[1].A?.domain_cards_added[0]?.title || ""}
-          onValueChange={(value) => {
-            const card = available_domain_cards.find((card) => card.title === value);
-            if (card) {
-             character.level_up_choices[1].A?.domain_cards_added.push(card);
-            } else  {
-              character.level_up_choices[1].A.domain_cards_added = character.level_up_choices[1].A!.domain_cards_added.filter((c) => c.title !== value);
-            }
-          }}
-        >
-          <Select.Trigger class="w-full truncate">
-            <p class="truncate">
-              {character.level_up_choices[1][0].domain_cards_added[0]?.title ||
-                "Select a domain card"}
-            </p>
-          </Select.Trigger>
-          <Select.Content class="rounded-md w-full" align="start">
-            <div style="max-width: {width}px;" class="p-2">
-              <Select.Item value="" class="justify-center hover:cursor-pointer text-sm">
-                -- none selected --
-              </Select.Item>
-              <Select.Label>Level 1 Domain Cards</Select.Label>
-              {#each available_domain_cards as card}
-                <Select.Item
-                  class="w-full hover:cursor-pointer data-[highlighted]:bg-primary"
-                  value={card.title}
-                  disabled={character.level_up_choices[1][0].domain_cards_added.some(
-                    (c) => c.title === card.title
-                  )}
+        <div class="flex flex gap-2.5">
+          <Dialog.Root>
+            <Dialog.Trigger
+              class={cn(
+                buttonVariants({ variant: "outline" }),
+                "w-full truncate flex items-center justify-between bg-card/50 hover:bg-card/70",
+                character.level_1_domain_cards.A === null &&
+                  "text-muted-foreground hover:text-muted-foreground"
+              )}
+              style={character.level_1_domain_cards.A === null &&
+                "outline-offset: 2px; outline-width: 2px; outline-color: var(--primary); outline-style: solid;"}
+            >
+              <p class="truncate">
+                {character.level_1_domain_cards.A?.title || "Select a domain card"}
+              </p>
+              <ChevronRight class="size-4 opacity-50" />
+            </Dialog.Trigger>
+
+            <Dialog.Content
+              class="flex flex-col gap-4 min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%]"
+            >
+              <Dialog.Header>
+                <Dialog.Title>Select a Level 1 Domain Card</Dialog.Title>
+              </Dialog.Header>
+              <Dialog.Description>
+                <p class="text-xs italic text-muted-foreground">
+                  Choose a domain card from the
+                  <b
+                    >{DOMAINS[character.primary_class.primary_domain as keyof typeof DOMAINS]
+                      .name}</b
+                  >
+                  and
+                  <b
+                    >{DOMAINS[character.primary_class.secondary_domain as keyof typeof DOMAINS]
+                      .name}</b
+                  >
+                  domains.
+                </p>
+              </Dialog.Description>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto p-2">
+                {#each available_domain_cards as card}
+                  <Dialog.Close
+                    class={cn(
+                      "w-full rounded-xl outline-offset-3 outline-primary hover:outline-4 hover:cursor-pointer disabled:pointer-events-none disabled:opacity-50 disabled:cursor-default",
+                      character.level_1_domain_cards.A?.title === card.title && "outline-4"
+                    )}
+                    onclick={() => (character.level_1_domain_cards.A = card)}
+                    disabled={character.level_1_domain_cards.A?.title !== card.title &&
+                      character.derieved_stats.domain_card_vault.some(
+                        (c) => c.title === card.title
+                      )}
+                  >
+                    <DomainCard {card} class="w-full h-full" />
+                  </Dialog.Close>
+                {/each}
+              </div>
+              <Dialog.Footer>
+                <Dialog.Close
+                  class={cn(buttonVariants({ variant: "link" }), "text-destructive")}
+                  onclick={() => (character.level_1_domain_cards.A = null)}
                 >
-                  <DomainCard {card} class="w-full" />
-                </Select.Item>
-              {/each}
-            </div>
-          </Select.Content>
-        </Select.Root>
-        <Select.Root
-          type="single"
-          value={character.level_up_choices[1][0].domain_cards_added.find((c) => c.title === value)?.title || ""}
-          onValueChange={(value) => {
-            const card = available_domain_cards.find((card) => card.title === value);
-            if (card) {
-              character.level_up_choices[1][0].domain_cards_added.push(card);
-            } else {
-              character.level_up_choices[1][0].domain_cards_added = character.level_up_choices[1][0].domain_cards_added.filter(
-                (c) => c.title !== value
-              );
-            }
-          }}
-        >
-          <Select.Trigger class="w-full truncate">
-            <p class="truncate">
-              {valu ||
-                "Select a domain card"}
-            </p>
-          </Select.Trigger>
-          <Select.Content class="rounded-md w-full" align="start">
-            <div style="max-width: {width}px;" class="p-2">
-              <Select.Item value="" class="justify-center hover:cursor-pointer text-sm">
-                -- none selected --
-              </Select.Item>
-              <Select.Label>Level 1 Domain Cards</Select.Label>
-              {#each available_domain_cards as card}
-                <Select.Item
-                  class="w-full hover:cursor-pointer data-[highlighted]:bg-primary"
-                  value={card.title}
-                  disabled={character.level_up_choices[1][0].domain_cards_added[0]?.title ===
-                    card.title}
+                  Clear selection
+                </Dialog.Close>
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Root>
+
+          <Dialog.Root>
+            <Dialog.Trigger
+              class={cn(
+                buttonVariants({ variant: "outline" }),
+                "w-full truncate flex items-center justify-between bg-card/50 hover:bg-card/70",
+                character.level_1_domain_cards.B === null &&
+                  "text-muted-foreground hover:text-muted-foreground"
+              )}
+              style={character.level_1_domain_cards.B === null &&
+                "outline-offset: 2px; outline-width: 2px; outline-color: var(--primary); outline-style: solid;"}
+            >
+              <p class="truncate">
+                {character.level_1_domain_cards.B?.title || "Select a domain card"}
+              </p>
+              <ChevronRight class="size-4 opacity-50" />
+            </Dialog.Trigger>
+
+            <Dialog.Content
+              class="flex flex-col gap-4 min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%]"
+            >
+              <Dialog.Header>
+                <Dialog.Title>Select a Level 1 Domain Card</Dialog.Title>
+              </Dialog.Header>
+              <Dialog.Description>
+                <p class="text-xs italic text-muted-foreground">
+                  Choose a domain card from the
+                  <b
+                    >{DOMAINS[character.primary_class.primary_domain as keyof typeof DOMAINS]
+                      .name}</b
+                  >
+                  and
+                  <b
+                    >{DOMAINS[character.primary_class.secondary_domain as keyof typeof DOMAINS]
+                      .name}</b
+                  >
+                  domains.
+                </p>
+              </Dialog.Description>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto p-2">
+                {#each available_domain_cards as card}
+                  <Dialog.Close
+                    class={cn(
+                      "w-full rounded-xl outline-offset-3 outline-primary hover:outline-4 hover:cursor-pointer disabled:pointer-events-none disabled:opacity-50 disabled:cursor-default",
+                      character.level_1_domain_cards.B?.title === card.title && "outline-4"
+                    )}
+                    onclick={() => (character.level_1_domain_cards.B = card)}
+                    disabled={character.level_1_domain_cards.B?.title !== card.title &&
+                      character.derieved_stats.domain_card_vault.some(
+                        (c) => c.title === card.title
+                      )}
+                  >
+                    <DomainCard {card} class="w-full h-full" />
+                  </Dialog.Close>
+                {/each}
+              </div>
+              <Dialog.Footer>
+                <Dialog.Close
+                  class={cn(buttonVariants({ variant: "link" }), "text-destructive")}
+                  onclick={() => (character.level_1_domain_cards.B = null)}
                 >
-                  <DomainCard {card} class="w-full" />
-                </Select.Item>
-              {/each}
-            </div>
-          </Select.Content>
-        </Select.Root>
+                  Clear selection
+                </Dialog.Close>
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Root>
+        </div>
       </div>
-    </Dropdown>
-  {/if}
+    {/if}
+  </Dropdown>
 </div>
 
 <!-- Choose a Class dialog -->
 <Dialog.Root bind:open={classDialogOpen}>
-  <Dialog.Content class="min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%] overflow-y-auto">
+  <Dialog.Content class="flex flex-col min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%]">
     <Dialog.Header>
       <Dialog.Title>Select a Class</Dialog.Title>
     </Dialog.Header>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto">
       <!-- each class -->
       {#each Object.values(CLASSES) as c}
         <div class="flex gap-3 border-2 rounded-md p-3 bg-primary-muted">
@@ -264,18 +320,20 @@
 
 <!-- Remove a Class dialog -->
 <Dialog.Root bind:open={removeClassDialogOpen}>
-  <Dialog.Content>
+  <Dialog.Content class="flex flex-col min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%]">
     <Dialog.Header>
       <Dialog.Title>Remove your class</Dialog.Title>
     </Dialog.Header>
-    <Dialog.Description>Removing your class will</Dialog.Description>
+    <Dialog.Description>
+      Removing your class will remove your subclass and domain card selections. This action cannot
+      be undone.
+    </Dialog.Description>
     <Dialog.Footer>
       <Dialog.Close class={buttonVariants({ variant: "link" })}>Cancel</Dialog.Close>
       <Dialog.Close
         class={buttonVariants({ variant: "destructive" })}
         onclick={() => {
           character.primary_class = null;
-          character.primary_subclass = null;
         }}>Remove</Dialog.Close
       >
     </Dialog.Footer>
@@ -284,11 +342,11 @@
 
 <!-- Choose a Subclass dialog -->
 <Dialog.Root bind:open={subclassDialogOpen}>
-  <Dialog.Content class="min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%] overflow-y-auto">
+  <Dialog.Content class="flex flex-col min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%]">
     <Dialog.Header>
       <Dialog.Title>Select a Subclass</Dialog.Title>
     </Dialog.Header>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto">
       <!-- each class -->
       {#if character.primary_class}
         {#each Object.values(character.primary_class.subclasses) as subclass}

@@ -22,7 +22,7 @@
   let open = $state(false);
 </script>
 
-<div class={cn("relative", highlighted && "outline-2 outline-primary outline-offset-2 rounded-lg")}>
+<div class={cn("relative", highlighted && !disabled && "outline-2 outline-primary outline-offset-2 rounded-lg")}>
   <button
     class={cn(
       "truncate h-14 z-10 w-full px-6 border-b bg-primary-muted relative rounded-lg flex items-center",
@@ -41,7 +41,7 @@
   </button>
 
   {#if open && !disabled}
-    <div class="z-5 -mt-2 relative p-4 pt-6 rounded-b-lg border-b bg-primary/5">
+    <div class="z-5 -mt-2 relative p-4 pt-6 rounded-b-lg border-b border-x bg-primary/5">
       {@render children?.()}
     </div>
   {/if}

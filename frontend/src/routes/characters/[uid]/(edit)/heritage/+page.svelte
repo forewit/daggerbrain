@@ -10,7 +10,7 @@
   import Dropdown from "$lib/components/app/builder/dropdown.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import { ANCESTRIES, COMMUNITIES, TRANSFORMATIONS } from "$lib/ts/constants.js";
-  import HeritageCard from "$lib/components/app/cards/heritage-card.svelte";
+  import HeritageCard from "$lib/components/app/cards/ancestry-card.svelte";
 
   let { data } = $props();
 
@@ -30,7 +30,11 @@
     )}
   >
     <div class="m-4 flex flex-col gap-4">
-      <Dropdown title="Ancestry" subtitle={character.ancestry_card?.title || "Choose an ancestry"}>
+      <Dropdown
+        highlighted={!character.ancestry_card}
+        title="Ancestry"
+        subtitle={character.ancestry_card?.title || "Choose an ancestry"}
+      >
         <div class="flex flex-col gap-4">
           <p class="text-sm italic">
             {@html ANCESTRIES.description_html}
@@ -52,6 +56,7 @@
       </Dropdown>
 
       <Dropdown
+        highlighted={!character.community_card}
         title="Community"
         subtitle={character.community_card?.title || "Choose a community"}
       >
@@ -77,6 +82,7 @@
       </Dropdown>
 
       <Dropdown
+        highlighted={!character.transformation_card}
         title="Transformation"
         subtitle={character.transformation_card?.title || "Choose a transformation"}
       >
@@ -106,21 +112,23 @@
   </div>
 
   <Dialog.Root bind:open={ancestryDialogOpen}>
-    <Dialog.Content class="min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%] overflow-y-auto">
+    <Dialog.Content class="flex flex-col min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%]">
       <Dialog.Header>
         <Dialog.Title>Select an ancestry</Dialog.Title>
       </Dialog.Header>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto p-2">
         {#each Object.values(ANCESTRIES.cards) as card}
-          <HeritageCard {card}
-            ><Button
-              onclick={() => {
-                character.ancestry_card = card;
-                ancestryDialogOpen = false;
-              }}
-              class="w-min mt-auto">Select {card.title}</Button
-            >
-          </HeritageCard>
+          <div>
+            <HeritageCard {card}
+              ><Button
+                onclick={() => {
+                  character.ancestry_card = card;
+                  ancestryDialogOpen = false;
+                }}
+                class="w-min mt-auto">Select {card.title}</Button
+              >
+            </HeritageCard>
+          </div>
         {/each}
       </div>
       <Dialog.Footer>
@@ -130,21 +138,23 @@
   </Dialog.Root>
 
   <Dialog.Root bind:open={communityDialogOpen}>
-    <Dialog.Content class="min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%] overflow-y-auto">
+    <Dialog.Content class="flex flex-col min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%]">
       <Dialog.Header>
         <Dialog.Title>Select a community</Dialog.Title>
       </Dialog.Header>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto p-2">
         {#each Object.values(COMMUNITIES.cards) as card}
-          <HeritageCard {card}
-            ><Button
-              onclick={() => {
-                character.community_card = card;
-                communityDialogOpen = false;
-              }}
-              class="w-min mt-auto">Select {card.title}</Button
-            >
-          </HeritageCard>
+          <div>
+            <HeritageCard {card}
+              ><Button
+                onclick={() => {
+                  character.community_card = card;
+                  communityDialogOpen = false;
+                }}
+                class="w-min mt-auto">Select {card.title}</Button
+              >
+            </HeritageCard>
+          </div>
         {/each}
       </div>
       <Dialog.Footer>
@@ -154,21 +164,23 @@
   </Dialog.Root>
 
   <Dialog.Root bind:open={transformationDialogOpen}>
-    <Dialog.Content class="min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%] overflow-y-auto">
+    <Dialog.Content class="flex flex-col min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%]">
       <Dialog.Header>
         <Dialog.Title>Select a transformation</Dialog.Title>
       </Dialog.Header>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto p-2">
         {#each Object.values(TRANSFORMATIONS.cards) as card}
-          <HeritageCard {card}
-            ><Button
-              onclick={() => {
-                character.transformation_card = card;
-                transformationDialogOpen = false;
-              }}
-              class="w-min mt-auto">Select {card.title}</Button
-            >
-          </HeritageCard>
+          <div>
+            <HeritageCard {card}
+              ><Button
+                onclick={() => {
+                  character.transformation_card = card;
+                  transformationDialogOpen = false;
+                }}
+                class="w-min mt-auto">Select {card.title}</Button
+              >
+            </HeritageCard>
+          </div>
         {/each}
       </div>
       <Dialog.Footer>

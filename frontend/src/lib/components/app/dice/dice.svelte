@@ -82,10 +82,10 @@
   }
 
   function handleResize() {
-    const w = document.body.clientWidth;
-    const h = document.body.clientHeight;
-
-    box.reinit(diceBox, { w: w / 2, h: h / 2 });
+    box.reinit(diceBox, {
+      w: window.innerWidth / 2,
+      h: window.innerHeight / 2,
+    });
   }
 
   onMount(async () => {
@@ -105,8 +105,8 @@
     // don't forget the "new" keyword
     //@ts-ignore
     box = new window.teal.dice.dice_box(diceBox, {
-      w: document.body.clientWidth / 2,
-      h: document.body.clientHeight / 2,
+      w: window.innerWidth / 2,
+      h: window.innerHeight / 2,
     });
 
     window.addEventListener("resize", handleResize);
@@ -128,10 +128,10 @@
 </svelte:head>
 
 {#if loaded}
-  <div transition:fade={{duration:200}} class={cn("flex flex-col fixed gap-2", className)}>
+  <div transition:fade={{ duration: 200 }} class={cn("flex flex-col fixed gap-2", className)}>
     {#if expanded}
       <div
-      transition:slide={{duration:100}}
+        transition:slide={{ duration: 100 }}
         class={cn(
           "w-min flex flex-col gap-1 text-foreground bg-primary-muted shadow-lg py-4 px-2 items-center border-2 border-b-0  rounded-full"
         )}

@@ -172,8 +172,8 @@
       {/if}
 
       <!-- experiences -->
-      {#if character.experiences.some((experience) => experience.title !== "")}
-        <Experiences bind:experiences={character.experiences} class="mx-2" />
+      {#if character.experiences.some((experience) => experience !== "")}
+        <Experiences class="mx-2" />
       {/if}
     </div>
 

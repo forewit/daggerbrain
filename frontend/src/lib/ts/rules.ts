@@ -5,7 +5,7 @@ export const EXPERIENCES = {
     <p>You get two Experiences at character creation each with a +2 modifier.</p>`
 } as const
 
-export const BLANK_LEVEL_UP_OPTION: LevelUpOption = {
+export const BLANK_LEVEL_UP_OPTION = {
     id: null,
     title: null,
     short_title: null,
@@ -14,12 +14,12 @@ export const BLANK_LEVEL_UP_OPTION: LevelUpOption = {
     selected_experiences: {A: null, B: null},
     domain_cards_added: {A: null, B: null},
     effect_ids: [],
-}
+} as const satisfies LevelUpOption
 
 
 export const TIER_1_BASE_OPTIONS = [
     {
-        id: "tier_1_domain_card",
+        id: "tier_1_domain_cards",
         title: "Choose 2 level 1 domain cards from the domains available to you.",
         short_title: "Starting Domain Cards",
         max: 1,

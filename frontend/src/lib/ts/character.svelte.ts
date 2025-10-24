@@ -1,7 +1,7 @@
 import { getAppContext } from './app.svelte';
 import { ALL_LEVEL_UP_OPTIONS, BLANK_LEVEL_UP_OPTION, TIER_1_BASE_OPTIONS, TIER_2_BASE_OPTIONS } from './rules';
-import type { Character, LevelUpOption, Traits } from './types';
-import { getContext, setContext } from 'svelte';
+import type { Card, Character, LevelUpOption, Traits } from './types';
+import { getContext, setContext, untrack } from 'svelte';
 
 function createCharacter(uid: string) {
     const app = getAppContext();
@@ -37,6 +37,13 @@ function createCharacter(uid: string) {
         if (character.level < 10) character.level_up_choices[10] = { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION };
     })
 
+    // ! clear subclass if class is null
+    $effect(()=>{
+        if(!character) return;
+        if(!character.primary_class) character.primary_subclass = null;
+        if(!character.secondary_class) character.secondary_subclass = null;
+    })
+
     // ! Clear level up option if it's used more than it's max
     let options_used: Record<string, number> = $derived.by(() => {
         if (!character) return {};
@@ -62,7 +69,7 @@ function createCharacter(uid: string) {
 
     $effect(() => {
         if (!character) return;
-        for (let i = 10; i > 1; i--) {
+        for (let i = 10; i >= 2; i--) {
             const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
 
             if (level_choices.A.id && options_max[level_choices.A.id] > -1 && options_used[level_choices.A.id] > options_max[level_choices.A.id]) {
@@ -77,29 +84,55 @@ function createCharacter(uid: string) {
     });
 
     // ! clear conflicting marked traits at each tier
-    function clear_duplicated_marked_traits(level_choice_id: string, tier_marked_traits: Record<keyof Traits, boolean>, level_choices: { A: LevelUpOption, B: LevelUpOption }) {
+    let tier_2_marked_traits: Record<keyof Traits, boolean> = $state({
+        agility: false,
+        strength: false,
+        finesse: false,
+        instinct: false,
+        presence: false,
+        knowledge: false,
+    });
+    let tier_3_marked_traits: Record<keyof Traits, boolean> = $state({
+        agility: false,
+        strength: false,
+        finesse: false,
+        instinct: false,
+        presence: false,
+        knowledge: false,
+    });
+    let tier_4_marked_traits: Record<keyof Traits, boolean> = $state({
+        agility: false,
+        strength: false,
+        finesse: false,
+        instinct: false,
+        presence: false,
+        knowledge: false,
+    });
+
+    function clear_duplicated_marked_traits(level_choice_ids: string[], tier_marked_traits: Record<keyof Traits, boolean>, level_choices: { A: LevelUpOption, B: LevelUpOption }) {
         const choice_A = level_choices.A;
         const choice_B = level_choices.B;
-        if (choice_A.id === level_choice_id) {
+        if (choice_A.id && level_choice_ids.includes(choice_A.id)) {
             if (choice_A.marked_traits.A) {
                 if (tier_marked_traits[choice_A.marked_traits.A]) {
+                    console.warn(`Trait ${choice_A.marked_traits.A} is already used in another option`);
                     choice_A.marked_traits.A = null;
-                    console.warn(`${level_choice_id}: Trait ${choice_A.marked_traits.A} is already used in another option`);
                 } else {
                     tier_marked_traits[choice_A.marked_traits.A] = true;
                 }
             }
             if (choice_A.marked_traits.B) {
                 if (tier_marked_traits[choice_A.marked_traits.B]) {
+                    console.warn(`Trait ${choice_A.marked_traits.B} is already used in another option`);
                     choice_A.marked_traits.B = null;
-                    console.warn(`${level_choice_id}: Trait ${choice_A.marked_traits.B} is already used in another option`);
                 } else {
                     tier_marked_traits[choice_A.marked_traits.B] = true;
                 }
             }
-        } else if (choice_B.id === level_choice_id) {
+        } else if (choice_B.id && level_choice_ids.includes(choice_B.id)) {
             if (choice_B.marked_traits.A) {
                 if (tier_marked_traits[choice_B.marked_traits.A]) {
+                    console.warn(`Trait ${choice_B.marked_traits.A} is already used in another option`);
                     choice_B.marked_traits.A = null;
                 } else {
                     tier_marked_traits[choice_B.marked_traits.A] = true;
@@ -107,6 +140,7 @@ function createCharacter(uid: string) {
             }
             if (choice_B.marked_traits.B) {
                 if (tier_marked_traits[choice_B.marked_traits.B]) {
+                    console.warn(`Trait ${choice_B.marked_traits.B} is already used in another option`);
                     choice_B.marked_traits.B = null;
                 } else {
                     tier_marked_traits[choice_B.marked_traits.B] = true;
@@ -116,9 +150,8 @@ function createCharacter(uid: string) {
     }
 
     $effect(() => {
-        // tier 2
         if (!character) return;
-        const tier_2_marked_traits: Record<keyof Traits, boolean> = {
+        let mt: Record<keyof Traits, boolean> = {
             agility: false,
             strength: false,
             finesse: false,
@@ -126,7 +159,7 @@ function createCharacter(uid: string) {
             presence: false,
             knowledge: false,
         }
-        const tier_3_marked_traits: Record<keyof Traits, boolean> = {
+        let tier_2_mt: Record<keyof Traits, boolean> = {
             agility: false,
             strength: false,
             finesse: false,
@@ -134,7 +167,7 @@ function createCharacter(uid: string) {
             presence: false,
             knowledge: false,
         }
-        const tier_4_marked_traits: Record<keyof Traits, boolean> = {
+        let tier_3_mt: Record<keyof Traits, boolean> = {
             agility: false,
             strength: false,
             finesse: false,
@@ -142,23 +175,156 @@ function createCharacter(uid: string) {
             presence: false,
             knowledge: false,
         }
-        for (let i = 1; i <= 10; i++) {
+
+        for (let i = 2; i <= character.level; i++) {
+            // clear marks at tier 3
+            if (i === 5) {
+                tier_2_mt = mt;
+                mt = {
+                    agility: false,
+                    strength: false,
+                    finesse: false,
+                    instinct: false,
+                    presence: false,
+                    knowledge: false,
+                }
+            }
+
+            // clear marks at tier 4
+            if (i === 8) {
+                tier_3_mt = mt;
+                mt = {
+                    agility: false,
+                    strength: false,
+                    finesse: false,
+                    instinct: false,
+                    presence: false,
+                    knowledge: false,
+                }
+            }
+
             const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
-            clear_duplicated_marked_traits("tier_2_traits", tier_2_marked_traits, level_choices);
-            clear_duplicated_marked_traits("tier_3_traits", tier_3_marked_traits, level_choices);
-            clear_duplicated_marked_traits("tier_4_traits", tier_4_marked_traits, level_choices);
+            if (i <= 4) {
+                clear_duplicated_marked_traits(["tier_2_traits"], tier_2_mt, level_choices);
+            } else if (i <= 7) {
+                clear_duplicated_marked_traits(["tier_2_traits", "tier_3_traits"], tier_3_mt, level_choices);
+            } else {
+                clear_duplicated_marked_traits(["tier_2_traits", "tier_3_traits", "tier_4_traits"], mt, level_choices);
+            }
+        }
+
+        tier_2_marked_traits = tier_2_mt;
+        tier_3_marked_traits = tier_3_mt;
+        tier_4_marked_traits = mt;
+    })
+
+    // ! clear conflicting selected experience choices at each level
+    $effect(() => {
+        if (!character) return;
+
+        for (let i = 2; i <= 10; i++) {
+            const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
+            const choice_A = level_choices.A;
+            const choice_B = level_choices.B;
+
+            // clear selected experiences if the level choice is not an experience bonus choice
+            if (!choice_A.id || !["tier_2_experience_bonus", "tier_3_experience_bonus", "tier_4_experience_bonus"].includes(choice_A.id)) {
+                if (choice_A.selected_experiences.A !== null || choice_A.selected_experiences.B !== null) {
+                    console.warn(`Clearing selected experiences because level choice was changed to ${choice_A.id}`)
+                    choice_A.selected_experiences.A = null;
+                    choice_A.selected_experiences.B = null;
+                }
+            }
+            if (!choice_B.id || !["tier_2_experience_bonus", "tier_3_experience_bonus", "tier_4_experience_bonus"].includes(choice_B.id)) {
+                if (choice_B.selected_experiences.A !== null || choice_B.selected_experiences.B !== null) {
+                    console.warn(`Clearing selected experiences because level choice was changed to ${choice_B.id}`)
+                    choice_B.selected_experiences.A = null;
+                    choice_B.selected_experiences.B = null;
+                }
+            }
+
+            // clear conflicting selected experiences
+            if (choice_A.selected_experiences.A !== null && choice_A.selected_experiences.B !== null && choice_A.selected_experiences.A === choice_A.selected_experiences.B) {
+                console.warn(`Experience ${choice_A.selected_experiences.A} is already used in another option`);
+                choice_A.selected_experiences.B = null;
+            }
+            if (choice_B.selected_experiences.A !== null && choice_B.selected_experiences.B !== null && choice_B.selected_experiences.A === choice_B.selected_experiences.B) {
+                console.warn(`Experience ${choice_B.selected_experiences.A} is already used in another option`);
+                choice_B.selected_experiences.B = null;
+            }
         }
     })
 
+    // ! clear conflicting domain card choices at each level and update the domain card vault
+    $effect(() => {
+        if (!character) return;
 
-    // todo:
-    // ! clear conflicting selected experiences at each tier
-    // ! clear conflicting domain cards at each tier
+        if (!character.primary_class) {
+            character.level_1_domain_cards.A = null;
+            character.level_1_domain_cards.B = null;
+        }
+
+        let domain_card_vault: Card<"domain">[] = Object.values(character.level_1_domain_cards).filter((card) => card !== null)
+
+        for (let i = 2; i <= 10; i++) {
+            const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
+            const choice_A = level_choices.A;
+            const choice_B = level_choices.B;
+
+            // clear domain card choices if the level choice is not a domain card choice
+            if (!choice_A.id || !["tier_2_domain_card", "tier_3_domain_card", "tier_4_domain_card"].includes(choice_A.id)) {
+                if (choice_A.domain_cards_added.A !== null || choice_A.domain_cards_added.B !== null) {
+                    console.warn(`Clearing domain card choices because level choice was changed to ${choice_A.id}`)
+                    choice_A.domain_cards_added.A = null;
+                    choice_A.domain_cards_added.B = null;
+                }
+            }
+            if (!choice_B.id || !["tier_2_domain_card", "tier_3_domain_card", "tier_4_domain_card"].includes(choice_B.id)) {
+                if (choice_B.domain_cards_added.A !== null || choice_B.domain_cards_added.B !== null) {
+                    console.warn(`Clearing domain card choices because level choice was changed to ${choice_B.id}`)
+                    choice_B.domain_cards_added.A = null;
+                    choice_B.domain_cards_added.B = null;
+                }
+            }
+
+            // clear domain card choices that are already in the vault
+            if (choice_A.domain_cards_added.A !== null && domain_card_vault.some(card => card.title === choice_A.domain_cards_added.A?.title)) {
+                console.warn(`Domain card ${choice_A.domain_cards_added.A?.title} is already in the vault`);
+                choice_A.domain_cards_added.A = null;
+            }
+            if (choice_A.domain_cards_added.B !== null && domain_card_vault.some(card => card.title === choice_A.domain_cards_added.B?.title)) {
+                console.warn(`Domain card ${choice_A.domain_cards_added.B?.title} is already in the vault`);
+                choice_A.domain_cards_added.B = null;
+            }
+            if (choice_B.domain_cards_added.A !== null && domain_card_vault.some(card => card.title === choice_B.domain_cards_added.A?.title)) {
+                console.warn(`Domain card ${choice_B.domain_cards_added.A?.title} is already in the vault`);
+                choice_B.domain_cards_added.A = null;
+            }
+            if (choice_B.domain_cards_added.B !== null && domain_card_vault.some(card => card.title === choice_B.domain_cards_added.B?.title)) {
+                console.warn(`Domain card ${choice_B.domain_cards_added.B?.title} is already in the vault`);
+                choice_B.domain_cards_added.B = null;
+            }
+        }
+
+        character.derieved_stats.domain_card_vault = domain_card_vault;
+    })
+
+    // TODO:
+    // ! derive experience modifiers
+    // ! calculate derived stats
 
     // --- cleanup ---
     const destroy = () => { }
 
     return {
+        // read only
+        get tier_2_marked_traits() { return tier_2_marked_traits },
+        get tier_3_marked_traits() { return tier_3_marked_traits },
+        get tier_4_marked_traits() { return tier_4_marked_traits },
+        get options_used() { return options_used },
+        get options_max() { return options_max },
+
+        // read/write
         get character() { return character },
         set character(value) { character = value },
 

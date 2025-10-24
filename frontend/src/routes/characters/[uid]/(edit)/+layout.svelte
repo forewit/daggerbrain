@@ -35,7 +35,6 @@
     el?.scrollIntoView({
       behavior: event ? "instant" : "smooth",
       inline: "center",
-      block: "center",
     });
   }
 
@@ -43,6 +42,7 @@
 
   onMount(() => {
     window.addEventListener("resize", scrollToActiveTab);
+
     return () => {
       window.removeEventListener("resize", scrollToActiveTab);
     };
