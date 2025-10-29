@@ -23,7 +23,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.json" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <!-- <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" /> -->
 </svelte:head>
 
 <ModeWatcher />
@@ -32,7 +32,8 @@
 <div style="scrollbar-width: none;" class="relative">
   <header
     class={cn(
-      "pt-[calc(max(env(safe-area-inset-top),--spacing(3)))] pl-[calc(env(safe-area-inset-left)+--spacing(2))] pr-[calc(env(safe-area-inset-right)+--spacing(2))]",
+      //pt-[calc(max(env(safe-area-inset-top),--spacing(3)))] pl-[calc(env(safe-area-inset-left)+--spacing(2))] pr-[calc(env(safe-area-inset-right)+--spacing(2))]
+      "pt-3 px-2",
       "sticky sm:relative w-full top-0 z-45 flex justify-center bg-primary-muted border-b shadow-lg"
     )}
   >
@@ -60,7 +61,7 @@
     <footer
       class={cn(
         //
-        "pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]",
+        //"pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]",
         "bg-muted/50"
       )}
     >

@@ -19,7 +19,7 @@
 {#if character}
   <div
     class={cn(
-      "pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]",
+      //"pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]",
       "max-w-2xl mx-auto"
     )}
   >

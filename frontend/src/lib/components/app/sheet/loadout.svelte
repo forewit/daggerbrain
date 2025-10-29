@@ -8,13 +8,12 @@
   import { cn } from "$lib/utils";
   import Tent from "@lucide/svelte/icons/tent";
   import ArrowUp from "@lucide/svelte/icons/arrow-up";
-  import ArrowDown from "@lucide/svelte/icons/arrow-down";
   import ArrowUpRight from "@lucide/svelte/icons/arrow-up-right";
   import * as Drawer from "$lib/components/ui/drawer";
+  import * as Dialog from "$lib/components/ui/dialog";
   import ChevronDown from "@lucide/svelte/icons/chevron-down";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import ArrowLeftRight from "@lucide/svelte/icons/arrow-left-right";
-  import SquareStack from "@lucide/svelte/icons/square-stack";
 
   let { character = $bindable(), class: className = "" }: { character: Character; class?: string } =
     $props();
@@ -46,7 +45,7 @@
 </script>
 
 {#if character}
-  <div class={cn("", !expanded && "-mb-4")}>
+  <div class={cn(!expanded && "-mb-4", className)}>
     <div class="flex items-center justify-center gap-4 z-20 mb-4">
       <button
         onclick={() => (expanded = !expanded)}
@@ -59,32 +58,30 @@
         {/if}
         Loadout
       </button>
-      <div class="flex items-center text-sm h-6 px-3 rounded-full font-medium text-muted-foreground border bg-muted">
+      <div
+        class="flex items-center text-sm h-6 px-3 rounded-full font-medium text-muted-foreground border bg-muted"
+      >
         {loadout.length} / {character?.derived_stats.max_domain_card_loadout}
       </div>
-      <Drawer.Root>
-        <Drawer.Trigger class={cn(buttonVariants({ size: "sm" }))}>
-            <ArrowLeftRight class="size-3" />
-
+      <Dialog.Root>
+        <Dialog.Trigger class={cn(buttonVariants({ size: "sm" }))}>
+          <ArrowLeftRight class="size-3" />
           Vault
-        </Drawer.Trigger>
-        <Drawer.Content>
-          <div class="overflow-y-auto w-full">
+        </Dialog.Trigger>
+        <Dialog.Content class="px-0 flex flex-col min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%]">
+          <Dialog.Header class="px-6">
+            <Dialog.Title>
+              Vault
+              <span class="ml-1 py-1 px-3 bg-accent/20 rounded-full font-medium text-md">
+                {vault.length}
+              </span>
+            </Dialog.Title>
+          </Dialog.Header>
+          <div class="flex flex-col overflow-y-auto">
             <!-- vault -->
-            <div class="relative mb-4 mt-3 w-full">
-              <p class="text-center font-medium text-xl font-eveleth">
-                Vault
-                <span class="ml-2 py-1 px-3 bg-accent/20 rounded-xl font-bold text-lg">
-                  {vault.length}
-                </span>
-              </p>
-
+            <div class="relative mb-5 shrink">
               {#if vault.length > 0}
-                <CardCarousel
-                  cards={vault}
-                  bind:selectedIndex={selectedVaultIndex}
-                  cardWidth={200}
-                />
+                <CardCarousel cards={vault} bind:selectedIndex={selectedVaultIndex} />
               {/if}
               {#if restMode}
                 <Button
@@ -101,7 +98,7 @@
                       character.ephemeral_stats.domain_card_loadout.push(vaultIndex);
                     }
                   }}
-                  class="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full"
+                  class="absolute -bottom-[2px] left-1/2 -translate-x-1/2 rounded-full"
                   size="sm"
                 >
                   <ArrowUp class="size-4" />
@@ -142,7 +139,10 @@
             </div>
 
             <!-- Rest Mode -->
-            <div class="flex justify-center gap-4 pb-6 flex-wrap">
+            <div class="px-6 flex flex-col justify-center items-center gap-3">
+              {#if !restMode}
+                <Stress {character} class="bg-muted h-10 rounded-full" displayOnly />
+              {/if}
               <Label
                 class={cn(
                   "flex items-center px-3 h-10 rounded-full border w-min hover:cursor-pointer text-nowrap",
@@ -156,13 +156,13 @@
                 <Tent class="size-4" />
                 <p>Rest Mode</p>
               </Label>
-              {#if !restMode}
-                <Stress {character} class="bg-muted h-10 rounded-full" displayOnly />
-              {/if}
             </div>
           </div>
-        </Drawer.Content>
-      </Drawer.Root>
+          <Dialog.Footer class="px-6">
+            <Dialog.Close class={buttonVariants({ variant: "link" })}>Close</Dialog.Close>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog.Root>
     </div>
     {#if expanded}
       <div class="relative">
@@ -173,7 +173,7 @@
           onclick={() => {
             character.ephemeral_stats.domain_card_loadout.splice(selectedLoadoutIndex, 1);
           }}
-          class="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full"
+          class="absolute -bottom-[2px] left-1/2 -translate-x-1/2 rounded-full"
         >
           Move to Vault
           <ArrowUpRight class="size-4" />

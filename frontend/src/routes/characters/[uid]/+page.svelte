@@ -9,10 +9,10 @@
 
 {#if context.character}
   <Sheet bind:character={context.character} class="mb-24" />
-  <Dice
+  <!-- <Dice
     class="bottom-6 left-6 z-45"
     onRollEnd={(notation, total) => {
       console.log(notation, total);
     }}
-  />
+  /> -->
 {/if}

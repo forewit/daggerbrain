@@ -33,7 +33,7 @@
 
 <div
   class={cn(
-    "pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]",
+    //"pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]",
     "max-w-6xl mx-auto px-4 py-2"
   )}
 >

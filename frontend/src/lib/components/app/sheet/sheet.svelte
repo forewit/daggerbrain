@@ -3,7 +3,6 @@
   import Traits from "./traits.svelte";
   import type { Character, Card } from "$lib/ts/types";
   import Banner from "../cards/class-banner.svelte";
-  import Level from "./level-up.svelte";
   import Thresholds from "./thresholds.svelte";
   import Armor from "./armor.svelte";
   import Evasion from "./evasion.svelte";
@@ -11,8 +10,7 @@
   import Stress from "./stress.svelte";
   import Hope from "./hope.svelte";
   import ClassFeatures from "./class-features.svelte";
-  import { getAppContext } from "$lib/ts/app.svelte";
-  import Button, { buttonVariants } from "$lib/components/ui/button/button.svelte";
+  import Button from "$lib/components/ui/button/button.svelte";
   import Pencil from "@lucide/svelte/icons/pencil";
   import * as Dialog from "$lib/components/ui/dialog/index";
   import { handleImageUpload } from "$lib/utils";
@@ -20,9 +18,7 @@
   import ChevronDown from "@lucide/svelte/icons/chevron-down";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import CardCarousel from "../cards/card-carousel.svelte";
-  import * as Drawer from "$lib/components/ui/drawer";
   import Loadout from "./loadout.svelte";
-  import ShieldPlus from "@lucide/svelte/icons/shield-plus";
 
   let { class: className = "", character = $bindable() }: { class?: string; character: Character } =
     $props();
@@ -84,7 +80,7 @@
 
     <!-- main content -->
     <div
-      class="w-full min-w-[260px] max-w-2xl mx-auto flex flex-col gap-6 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]"
+      class="w-full min-w-[260px] max-w-2xl mx-auto flex flex-col gap-6"
     >
       <!-- top bar -->
       <div class="flex gap-2 px-2 pr-4">

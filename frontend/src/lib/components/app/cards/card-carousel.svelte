@@ -41,11 +41,10 @@
 
 <div
   bind:this={scrollContainer}
-  class={cn("relative snap-x snap-x-mandatory overflow-x-auto overflow-y-hidden p-2 ", className)}
+  class={cn("relative snap-x snap-x-mandatory overflow-x-auto overflow-y-hidden p-2 flex items-center", className)}
   style="scrollbar-width:none;"
 >
-  <div class="flex items-center justify-start min-w-max">
-    <div class="shrink-0 snap-align-none" style="width: calc(50vw - {cardWidth / 2}px);"></div>
+    <div class="shrink-0 snap-align-none" style="width: calc(50% - {cardWidth / 2}px);"></div>
 
     {#each cards as card, index (card.title)}
       <button
@@ -81,6 +80,6 @@
         {/if}
       </button>
     {/each}
-    <div class="shrink-0 snap-align-none" style="width: calc(50vw - {cardWidth / 2}px);"></div>
-  </div>
+
+    <div class="shrink-0 snap-align-none" style="width: calc(50% - {cardWidth / 2}px);"></div>
 </div>

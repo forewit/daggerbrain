@@ -53,7 +53,7 @@
   <!-- tabs -->
   <div
     class={cn(
-      "pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]",
+      //"pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]",
       "@container grid grid-cols-[1fr_repeat(7,auto)_1fr] items-center",
       "snap-x snap-mandatory overflow-x-auto ",
       "bg-muted/50 mt-3 h-20"
@@ -114,7 +114,7 @@
   </div>
 
   <!-- page -->
-  <div class="@container pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
+  <div class="@container">
     <div class="max-w-3xl mx-auto @3xl:grid @3xl:grid-cols-[auto_1fr_auto] gap-4 items-center m-3">
       <Button
         disabled={tabs.indexOf(activeTab) === 0}
