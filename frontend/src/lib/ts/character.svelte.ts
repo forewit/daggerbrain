@@ -338,7 +338,7 @@ function createCharacter(uid: string) {
         const unique_indices = [...new Set(character.ephemeral_stats.domain_card_loadout)];
         const valid_indices = unique_indices.filter((i) => i >= 0 && i < max && i < (character?.derived_domain_card_vault.length || 0));
 
-        if (valid_indices.length !== unique_indices.length) {
+        if (valid_indices.length !== unique_indices.length || valid_indices.length !== character.ephemeral_stats.domain_card_loadout.length) {
             console.warn(`Removing invalid indices from the domain card loadout`);
             character.ephemeral_stats.domain_card_loadout = valid_indices;
         }

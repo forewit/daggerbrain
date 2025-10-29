@@ -4,6 +4,7 @@
   import DomainCard from "$lib/components/app/cards/domain-card.svelte";
   import SubclassCard from "$lib/components/app/cards/subclass-card.svelte";
   import TransformationCard from "$lib/components/app/cards/transformation-card.svelte";
+  import Traits from "$lib/components/app/sheet/traits.svelte";
   import { getAppContext } from "$lib/ts/app.svelte";
   import {
     ANCESTRY_CARDS,
@@ -12,6 +13,7 @@
     SUBCLASS_CARDS,
     TRANSFORMATION_CARDS,
   } from "$lib/ts/cards";
+  import { TRAITS } from "$lib/ts/constants";
   import { cn } from "$lib/utils";
 
   const app = getAppContext();
@@ -27,16 +29,31 @@
   <p class="text-2xl font-bold py-2">Welcome</p>
   <p class="text-xs italic font-muted-foreground">Under construction</p>
 
-  <div class="flex gap-3">
-    <SubclassCard
-      card={SUBCLASS_CARDS.executioners_guild_foundation}
-      variant="card"
-      class="w-40"
-    />
-    <DomainCard card={BONE_DOMAIN_CARDS.untouchable} variant="card" class="w-40" />
-    <TransformationCard card={TRANSFORMATION_CARDS.werewolf} variant="card" class="w-40" />
+  <div class="w-[70px]">
+    <div class="w-full h-[70px] relative">
+      <div class="absolute inset-0 border-[2px] rounded-[6px] fancy-border"></div>
+      <div class="absolute inset-[1px] border-2  rounded-[18px] rounded-b-[6px] fancy-border"></div>
 
-    <CommunityCard card={COMMUNITY_CARDS.warborne} variant="card" class="w-40" />
-    <AncestryCard card={ANCESTRY_CARDS.half_clank} variant="card" class="w-40" />
+      <div class="grid justify-center text-center py-3.5 px-4 gap-2 z-10">
+        <p class="text-lg font-bold leading-none">+2</p>
+        <p class="text-sm font-medium leading-none">{TRAITS.agility.name}</p>
+      </div>
+    </div>
+    <div class="text-center mt-1">
+      {#each TRAITS.agility.examples as example}
+        <p class="text-xs text-muted-foreground">{example}</p>
+      {/each}
+    </div>
   </div>
 </div>
+
+<style>
+  .fancy-border {
+    background-image: url("/images/card/gold.jpg");
+    background-size: cover;
+    mask: /*4*/
+      linear-gradient(#000 0 0) padding-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude; /*5*/
+  }
+</style>

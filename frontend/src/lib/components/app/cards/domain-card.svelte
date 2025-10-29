@@ -96,7 +96,7 @@
     bind:clientWidth
   >
     <div
-      class="text-left flex flex-col h-[503px] w-[360px] bg-white rounded-[24px] border-[4px] border-accent overflow-hidden"
+      class="transition-none text-left flex flex-col h-[503px] w-[360px] bg-white rounded-[24px] border-[4px] border-accent overflow-hidden"
       style="transform: scale({clientWidth / 360}); transform-origin: top left;"
     >
       <!-- image and divider -->
@@ -150,7 +150,7 @@
       </div>
 
       <!-- content -->
-      <div class="z-5 flex flex-col shrink-0 gap-[12px] px-[12px] pb-[6px] pt-[16px]">
+      <div class="z-5 flex flex-col shrink-0 gap-[12px] px-[12px] pb-[6px] pt-[16px] -mt-[2px] bg-white">
         <p class="font-eveleth text-center uppercase text-[20px] text-black leading-none">
           {card.title}
         </p>

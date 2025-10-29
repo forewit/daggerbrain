@@ -15,7 +15,7 @@
   const app = getAppContext();
   const character = $derived(app.characters.find((c) => c.uid === data.uid));
 
-  const tabs = ["edit", "heritage", "class", "experiences", "equipment"];
+  const tabs = ["edit", "heritage", "class", "traits", "experiences", "equipment"];
   let activeTab = $derived(page.url.pathname.split("/").pop() || "edit");
 
   let fileInput = $state<HTMLInputElement>();
@@ -54,7 +54,7 @@
   <div
     class={cn(
       "pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]",
-      "@container grid grid-cols-[1fr_repeat(6,128px)_1fr] items-center",
+      "@container grid grid-cols-[1fr_repeat(7,auto)_1fr] items-center",
       "snap-x snap-mandatory overflow-x-auto ",
       "bg-muted/50 mt-3 h-20"
     )}
@@ -69,8 +69,8 @@
         href={`/characters/${character.uid}/${tab}`}
         class={cn(
           "focus-visible:ring-foreground",
-          "border-y h-12 w-[calc(var(--container-3xl)/6)] max-w-[calc(var(--container-3xl)/6)] bg-muted hover:bg-muted",
-          "pr-1 transition-colors duration-300 font-normal hover:text-foreground relative snap-center rounded-none shadow-none",
+          "border-y h-12 bg-muted hover:bg-muted",
+          "pr-3 pl-6.5 transition-colors duration-300 font-normal hover:text-foreground relative snap-center rounded-none shadow-none",
           activeTab === tab &&
             "border-accent/10 hover:text-accent text-accent bg-accent-muted hover:bg-accent-muted",
           i === 0 && "@3xl:rounded-l-full"
@@ -104,7 +104,7 @@
     <Button
       href={`/characters/${character.uid}/`}
       variant="link"
-      class="snap-center focus-visible:ring-foreground border-b-0 @3xl:border-b pl-8 pr-7 font-normal bg-muted @3xl:rounded-r-full h-12 w-[calc(var(--container-3xl)/6)]"
+      class="snap-center focus-visible:ring-foreground border-y pl-7 pr-7 font-normal bg-muted @3xl:rounded-r-full h-12"
     >
       Sheet
       <ExternalLink class="size-4" />

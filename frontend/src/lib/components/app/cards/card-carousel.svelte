@@ -11,21 +11,20 @@
   let {
     class: className = "",
     cards = $bindable(),
+    cardWidth = $bindable(240),
+    selectedIndex = $bindable(0),
   }: {
     class?: string;
     cards: Card<CardType>[];
+    cardWidth?: number;
+    selectedIndex?: number;
   } = $props();
 
   let scrollContainer: HTMLDivElement;
 
-  let gap = $state(10);
-  let cardWidth = $state(240);
-  let cardHeight = $derived(cardWidth * (503 / 360));
-  let selectedIndex = $state(0);
-
   function handleScroll() {
-    const cw = cardWidth + gap;
-    selectedIndex = Math.round(scrollContainer.scrollLeft / cw);
+    const i = Math.round(scrollContainer.scrollLeft / cardWidth);
+    selectedIndex = Math.max(Math.min(i, cards.length - 1), 0);
   }
 
   onMount(() => {
@@ -42,21 +41,17 @@
 
 <div
   bind:this={scrollContainer}
-  class={cn("relative snap-x snap-x-mandatory overflow-x-auto overflow-y-hidden p-1 ", className)}
+  class={cn("relative snap-x snap-x-mandatory overflow-x-auto overflow-y-hidden p-2 ", className)}
   style="scrollbar-width:none;"
 >
   <div class="flex items-center justify-start min-w-max">
-    <div
-      style="width: calc(50vw - {(cardWidth + gap) / 2}px)"
-      class="shrink-0 snap-align-none"
-    ></div>
+    <div class="shrink-0 snap-align-none" style="width: calc(50vw - {cardWidth / 2}px);"></div>
 
-    {#each cards as card, index}
+    {#each cards as card, index (card.title)}
       <button
-        style="height: {cardHeight}px; width: {cardWidth}px; margin-left: {gap /
-          2}px; margin-right: {gap / 2}px;"
+        style="width: {cardWidth}px;"
         class={cn(
-          "rounded-xl snap-center transition-[scale] scale-95 relative",
+          "rounded-xl snap-center scale-95 relative transition-scale duration-200",
           selectedIndex === index && "scale-100"
         )}
         onclick={(e) => {
@@ -86,9 +81,6 @@
         {/if}
       </button>
     {/each}
-    <div
-      style="width: calc(50vw - {(cardWidth + gap) / 2}px)"
-      class="shrink-0 snap-align-none"
-    ></div>
+    <div class="shrink-0 snap-align-none" style="width: calc(50vw - {cardWidth / 2}px);"></div>
   </div>
 </div>

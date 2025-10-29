@@ -65,7 +65,7 @@
     bind:clientWidth
   >
     <div
-      class="flex flex-col h-[503px] w-[360px] bg-white rounded-[24px] border-[4px] border-accent overflow-hidden"
+      class="transition-none flex flex-col h-[503px] w-[360px] bg-white rounded-[24px] border-[4px] border-accent overflow-hidden"
       style="transform: scale({clientWidth / 360}); transform-origin: top left;"
     >
       <!-- image and divider -->

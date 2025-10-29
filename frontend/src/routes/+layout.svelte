@@ -1,11 +1,10 @@
 <script lang="ts">
   import "../app.css";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
   import { setAppContext } from "$lib/ts/app.svelte";
   import { ModeWatcher, setMode } from "mode-watcher";
   import { cn } from "$lib/utils";
   import { Button } from "$lib/components/ui/button";
-  import { page } from "$app/stores";
 
   let { children } = $props();
 

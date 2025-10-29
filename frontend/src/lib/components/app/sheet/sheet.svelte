@@ -11,9 +11,8 @@
   import Stress from "./stress.svelte";
   import Hope from "./hope.svelte";
   import ClassFeatures from "./class-features.svelte";
-  import Deck from "./deck.svelte";
   import { getAppContext } from "$lib/ts/app.svelte";
-  import Button from "$lib/components/ui/button/button.svelte";
+  import Button, { buttonVariants } from "$lib/components/ui/button/button.svelte";
   import Pencil from "@lucide/svelte/icons/pencil";
   import * as Dialog from "$lib/components/ui/dialog/index";
   import { handleImageUpload } from "$lib/utils";
@@ -21,6 +20,9 @@
   import ChevronDown from "@lucide/svelte/icons/chevron-down";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import CardCarousel from "../cards/card-carousel.svelte";
+  import * as Drawer from "$lib/components/ui/drawer";
+  import Loadout from "./loadout.svelte";
+  import ShieldPlus from "@lucide/svelte/icons/shield-plus";
 
   let { class: className = "", character = $bindable() }: { class?: string; character: Character } =
     $props();
@@ -215,21 +217,6 @@
     </div>
 
     <!-- domain card loadout -->
-    <div class={cn(!domain_card_loadout_expanded && "-mb-4")}>
-      <button
-        onclick={() => (domain_card_loadout_expanded = !domain_card_loadout_expanded)}
-        class="z-20 mx-auto text-nowrap flex items-center font-medium text-muted-foreground mb-4"
-      >
-        {#if domain_card_loadout_expanded}
-          <ChevronDown class="w-k h-4" />
-        {:else}
-          <ChevronRight class="w-k h-4" />
-        {/if}
-        Domain Card Loadout
-      </button>
-      {#if domain_card_loadout_expanded}
-        <CardCarousel cards={domain_card_loadout} />
-      {/if}
-    </div>
+    <Loadout bind:character />
   </div>
 {/if}

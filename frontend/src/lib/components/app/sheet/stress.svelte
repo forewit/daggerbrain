@@ -2,10 +2,26 @@
   import { cn } from "$lib/utils";
   import type { Character } from "$lib/ts/types";
 
-  let { class: className = "", character = $bindable() }: { class?: string; character: Character } = $props();
+  let {
+    class: className = "",
+    character = $bindable(),
+    displayOnly = false,
+    slotClasses = "",
+  }: {
+    class?: string;
+    character: Character;
+    displayOnly?: boolean;
+    slotClasses?: string;
+  } = $props();
 </script>
 
-<div class={cn("flex items-center gap-4 border-2 rounded-md h-12 px-4", className)}>
+<div
+  class={cn(
+    "flex items-center gap-4 border-2 rounded-md h-12 px-4",
+    displayOnly && "pointer-events-none",
+    className
+  )}
+>
   <button
     onclick={() => {
       character.ephemeral_stats.marked_stress = 0;
@@ -16,10 +32,13 @@
     {#each Array(character.derived_stats.max_stress) as _, index}
       <button
         aria-label="character.stress-slot"
-        class="w-6 h-3 rounded-md border border-muted-foreground {index <
-        character.ephemeral_stats.marked_stress
-          ? 'bg-muted-foreground'
-          : 'bg-transparent'} transition-colors"
+        class={cn(
+          "w-6 h-3 rounded-md border border-muted-foreground transition-colors",
+          index < character.ephemeral_stats.marked_stress
+            ? "bg-muted-foreground"
+            : "bg-transparent",
+          slotClasses
+        )}
         onclick={() => {
           if (index + 1 === character.ephemeral_stats.marked_stress) {
             character.ephemeral_stats.marked_stress = Math.max(
@@ -35,7 +54,7 @@
     {/each}
   </div>
 
-  {#if character.derived_stats.max_stress === character.ephemeral_stats.marked_stress}
+  {#if character.derived_stats.max_stress === character.ephemeral_stats.marked_stress && !displayOnly}
     <button
       onclick={() => {
         if (character.ephemeral_stats.marked_hp < character.derived_stats.max_hp)
