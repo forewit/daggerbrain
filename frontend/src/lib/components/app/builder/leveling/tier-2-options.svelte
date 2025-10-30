@@ -72,7 +72,8 @@
     return (
       !choices.A.id ||
       !choices.B.id ||
-      character.level_up_domain_cards[level as keyof typeof character.level_up_domain_cards].A === null ||
+      character.level_up_domain_cards[level as keyof typeof character.level_up_domain_cards].A ===
+        null ||
       (choices.A.id === "tier_2_domain_card" && choices.A.domain_cards_added.A === null) ||
       (choices.B.id === "tier_2_domain_card" && choices.B.domain_cards_added.A === null) ||
       (choices.A.id === "tier_2_traits" &&
@@ -114,8 +115,10 @@
                 level_up_domain_cards.A === null &&
                   "text-muted-foreground hover:text-muted-foreground"
               )}
-              style={level_up_domain_cards.A === null &&
-                "outline-offset: 2px; outline-width: 2px; outline-color: var(--primary); outline-style: solid;"}
+              style={cn(
+                level_up_domain_cards.A === null &&
+                  "outline-offset: 2px; outline-width: 2px; outline-color: var(--primary); outline-style: solid;"
+              )}
             >
               <p class="truncate">
                 {level_up_domain_cards.A?.title || "Select a domain card"}
@@ -400,8 +403,10 @@
                       choices[key].domain_cards_added.A === null &&
                         "text-muted-foreground hover:text-muted-foreground"
                     )}
-                    style={choices[key].domain_cards_added.A === null &&
-                      "outline-offset: 2px; outline-width: 2px; outline-color: var(--primary); outline-style: solid;"}
+                    style={cn(
+                      choices[key].domain_cards_added.A === null &&
+                        "outline-offset: 2px; outline-width: 2px; outline-color: var(--primary); outline-style: solid;"
+                    )}
                   >
                     <p class="truncate">
                       {choices[key].domain_cards_added.A?.title || "Select a domain card"}

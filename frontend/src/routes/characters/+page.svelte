@@ -39,7 +39,7 @@
 >
   <!-- Header -->
   <div class="flex justify-between gap-2 py-2 mb-2">
-    <p class="text-2xl font-bold text-nowrap">My Characters</p>
+    <p class="text-2xl font-bold">Characters</p>
     <Button variant="outline" onclick={() => app.newCharacter()}><Plus /> New Character</Button>
   </div>
 

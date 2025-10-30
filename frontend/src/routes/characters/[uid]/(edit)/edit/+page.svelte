@@ -1,11 +1,9 @@
 <script lang="ts">
   import Checkbox from "$lib/components/ui/checkbox/checkbox.svelte";
-  import Input from "$lib/components/ui/input/input.svelte";
   import Label from "$lib/components/ui/label/label.svelte";
   import { getAppContext } from "$lib/ts/app.svelte";
-  import { cn, handleImageUpload } from "$lib/utils";
+  import { cn } from "$lib/utils";
   import * as Dialog from "$lib/components/ui/dialog/index";
-  import * as Collapsible from "$lib/components/ui/collapsible/index";
   import { buttonVariants } from "$lib/components/ui/button";
   import { getCharacterContext } from "$lib/ts/character.svelte.js";
 

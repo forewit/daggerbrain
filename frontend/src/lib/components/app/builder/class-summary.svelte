@@ -20,7 +20,7 @@
 
 <div class={cn("flex flex-col gap-3", className)}>
   <div class="flex text-left gap-3">
-    <div class="grow max-w-[120px]">
+    <div class="grow max-w-[120px] min-w-[60px]">
       <img src={character_class.image_url} alt="art" class="h-full object-cover" />
     </div>
     <div class="grow flex flex-col gap-2 grow-4">

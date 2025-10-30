@@ -60,9 +60,7 @@
             </div>
           </div>
         {/each}
-        <div class="flex justify-between">
-          <Button onclick={() => (classDialogOpen = true)}>Change class</Button>
-
+        <div class="flex justify-center sm:justify-end">
           <Button
             variant="link"
             class="text-destructive"
@@ -116,8 +114,7 @@
           </Collapsible.Root>
         {/if}
 
-        <div class="flex justify-between">
-          <Button onclick={() => (subclassDialogOpen = true)}>Change subclass</Button>
+        <div class="flex justify-center sm:justify-end">
 
           <Button
             variant="link"
@@ -158,8 +155,8 @@
                 character.level_up_domain_cards[1].A === null &&
                   "text-muted-foreground hover:text-muted-foreground"
               )}
-              style={character.level_up_domain_cards[1].A === null &&
-                "outline-offset: 2px; outline-width: 2px; outline-color: var(--primary); outline-style: solid;"}
+              style={cn(character.level_up_domain_cards[1].A === null &&
+                "outline-offset: 2px; outline-width: 2px; outline-color: var(--primary); outline-style: solid;")}
             >
               <p class="truncate">
                 {character.level_up_domain_cards[1].A?.title || "Select a domain card"}
@@ -224,8 +221,8 @@
                 character.level_up_domain_cards[1].B === null &&
                   "text-muted-foreground hover:text-muted-foreground"
               )}
-              style={character.level_up_domain_cards[1].B === null &&
-                "outline-offset: 2px; outline-width: 2px; outline-color: var(--primary); outline-style: solid;"}
+              style={cn(character.level_up_domain_cards[1].B === null &&
+                "outline-offset: 2px; outline-width: 2px; outline-color: var(--primary); outline-style: solid;")}
             >
               <p class="truncate">
                 {character.level_up_domain_cards[1].B?.title || "Select a domain card"}

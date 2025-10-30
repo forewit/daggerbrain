@@ -8,6 +8,7 @@
     max_armor,
     marked_armor = $bindable(),
   }: { class?: string; max_armor: number; marked_armor: number } = $props();
+
 </script>
 
 <div class={cn("flex gap-2 h-min text-center border-2 rounded-md p-2", className)}>
@@ -17,7 +18,15 @@
     </p>
     <p class="text-sm font-medium">Armor</p>
   </button>
-  <div class="flex flex-wrap items-center gap-x-1 gap-y-0 w-14">
+  <div
+    class={cn(
+      "grid grid-cols-4 place-items-center gap-x-1 gap-y-1.5 my-auto",
+      max_armor === 0 && "hidden",
+      max_armor < 7 && "grid-cols-3",
+      max_armor < 3 && "grid-cols-2",
+      max_armor < 2 && "grid-cols-1"
+    )}
+  >
     {#each Array(max_armor) as _, index}
       <button
         aria-label="armor-slot"

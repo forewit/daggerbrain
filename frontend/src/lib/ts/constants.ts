@@ -211,7 +211,7 @@ export const JUST_JAMES: Character = {
         max_hope: 6,
         max_armor: 0,
         max_hp: 0,
-        max_stress: 0,
+        max_stress: 6,
         evasion: 0,
         damage_thresholds: {
             major: 0,
@@ -340,12 +340,12 @@ export const NEW_CHARACTER: Character = {
     image: "/images/portrait-placeholder.png",
     base_stats: {
         traits: {
-            agility: 0,
-            strength: 0,
-            finesse: 0,
-            instinct: 0,
-            presence: 0,
-            knowledge: 0,
+            agility: null,
+            strength: null,
+            finesse: null,
+            instinct: null,
+            presence: null,
+            knowledge: null,
         },
         proficiency: 1,
         experience_modifier: 2,
@@ -354,7 +354,7 @@ export const NEW_CHARACTER: Character = {
         max_hope: 6,
         max_armor: 0,
         max_hp: 0,
-        max_stress: 0,
+        max_stress: 6,
         evasion: 0,
         damage_thresholds: {
             major: 0,

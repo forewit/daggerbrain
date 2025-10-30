@@ -21,7 +21,7 @@ function createApp() {
         characters.push({ ...character, uid })
       }
     } else {
-      characters.push({ ...JUST_JAMES, uid })
+      characters.push({ ...NEW_CHARACTER, uid })
     }
     return uid
   }

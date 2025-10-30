@@ -52,7 +52,7 @@
   </header>
 
   <!-- page -->
-  <main class="grow relative">
+  <main class="grow relative overflow-x-hidden">
     {@render children?.()}
   </main>
 

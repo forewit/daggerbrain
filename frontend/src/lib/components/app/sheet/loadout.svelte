@@ -9,7 +9,6 @@
   import Tent from "@lucide/svelte/icons/tent";
   import ArrowUp from "@lucide/svelte/icons/arrow-up";
   import ArrowUpRight from "@lucide/svelte/icons/arrow-up-right";
-  import * as Drawer from "$lib/components/ui/drawer";
   import * as Dialog from "$lib/components/ui/dialog";
   import ChevronDown from "@lucide/svelte/icons/chevron-down";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
@@ -32,7 +31,6 @@
 
   let selectedVaultIndex = $state(0);
   let selectedVaultCard = $derived(vault[selectedVaultIndex]);
-  $inspect(selectedVaultCard);
 
   let selectedLoadoutIndex = $state(0);
 
@@ -72,76 +70,99 @@
           <Dialog.Header class="px-6">
             <Dialog.Title>
               Vault
-              <span class="ml-1 py-1 px-3 bg-accent/20 rounded-full font-medium text-md">
+              <!-- <span class="ml-1 py-1 px-3 bg-accent/20 rounded-full font-medium text-md">
                 {vault.length}
-              </span>
+              </span> -->
             </Dialog.Title>
           </Dialog.Header>
           <div class="flex flex-col overflow-y-auto">
             <!-- vault -->
             <div class="relative mb-5 shrink">
+              <CardCarousel
+                cards={vault}
+                bind:selectedIndex={selectedVaultIndex}
+                emptyMessage="Vault Empty"
+              />
               {#if vault.length > 0}
-                <CardCarousel cards={vault} bind:selectedIndex={selectedVaultIndex} />
-              {/if}
-              {#if restMode}
-                <Button
-                  hidden={vault.length === 0}
-                  onclick={() => {
-                    if (!character) return;
-                    if (
-                      character.ephemeral_stats.domain_card_loadout.length <
-                      character.derived_stats.max_domain_card_loadout
-                    ) {
-                      const vaultIndex = character.derived_domain_card_vault.findIndex(
-                        (card) => card.title === vault[selectedVaultIndex].title
-                      );
-                      character.ephemeral_stats.domain_card_loadout.push(vaultIndex);
-                    }
-                  }}
-                  class="absolute -bottom-[2px] left-1/2 -translate-x-1/2 rounded-full"
-                  size="sm"
-                >
-                  <ArrowUp class="size-4" />
-                  Add to loadout
-                </Button>
-              {:else}
-                <Button
-                  hidden={vault.length === 0}
-                  size="sm"
-                  onclick={() => {
-                    if (!character) return;
-                    if (
-                      character.ephemeral_stats.domain_card_loadout.length <
-                        character.derived_stats.max_domain_card_loadout &&
-                      selectedVaultCard?.recall_cost <= remainingStress
-                    ) {
-                      character.ephemeral_stats.marked_stress += selectedVaultCard.recall_cost;
-                      const vaultIndex = character.derived_domain_card_vault.findIndex(
-                        (card) => card.title === vault[selectedVaultIndex].title
-                      );
-                      character.ephemeral_stats.domain_card_loadout.push(vaultIndex);
-                    }
-                  }}
-                  class={cn(
-                    "absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full",
-                    selectedVaultCard?.recall_cost > remainingStress &&
-                      "border-destructive border-3 bg-muted hover:bg-muted cursor-default"
-                  )}
-                >
-                  {#if selectedVaultCard?.recall_cost > remainingStress}
-                    Not enough stress slots
-                  {:else}
-                    <ArrowUp class="size-4" />
-                    Recall ({selectedVaultCard?.recall_cost} stress)
-                  {/if}
-                </Button>
+                {#if restMode}
+                  <Button
+                    hidden={vault.length === 0}
+                    onclick={() => {
+                      if (!character) return;
+                      if (
+                        character.ephemeral_stats.domain_card_loadout.length <
+                        character.derived_stats.max_domain_card_loadout
+                      ) {
+                        const vaultIndex = character.derived_domain_card_vault.findIndex(
+                          (card) => card.title === vault[selectedVaultIndex].title
+                        );
+                        character.ephemeral_stats.domain_card_loadout.push(vaultIndex);
+                      }
+                    }}
+                    class={cn(
+                      "absolute -bottom-[2px] left-1/2 -translate-x-1/2 rounded-full",
+                      loadout.length >= character.derived_stats.max_domain_card_loadout &&
+                        "border-destructive border-3 bg-muted hover:bg-muted cursor-default"
+                    )}
+                    size="sm"
+                  >
+                    {#if loadout.length >= character.derived_stats.max_domain_card_loadout}
+                      Loadout is full
+                    {:else}
+                      <ArrowUp class="size-4" />
+                      Add to loadout
+                    {/if}
+                  </Button>
+                {:else}
+                  <Button
+                    hidden={vault.length === 0}
+                    size="sm"
+                    onclick={() => {
+                      if (!character) return;
+                      if (
+                        character.ephemeral_stats.domain_card_loadout.length <
+                          character.derived_stats.max_domain_card_loadout &&
+                        selectedVaultCard?.recall_cost <= remainingStress
+                      ) {
+                        character.ephemeral_stats.marked_stress += selectedVaultCard.recall_cost;
+                        const vaultIndex = character.derived_domain_card_vault.findIndex(
+                          (card) => card.title === vault[selectedVaultIndex].title
+                        );
+                        character.ephemeral_stats.domain_card_loadout.push(vaultIndex);
+                      }
+                    }}
+                    class={cn(
+                      "absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full",
+                      (selectedVaultCard?.recall_cost > remainingStress ||
+                        loadout.length >= character.derived_stats.max_domain_card_loadout) &&
+                        "border-destructive border-3 bg-muted hover:bg-muted cursor-default"
+                    )}
+                  >
+                    {#if loadout.length >= character.derived_stats.max_domain_card_loadout}
+                      Loadout is full
+                    {:else if selectedVaultCard?.recall_cost > remainingStress}
+                      Not enough stress slots
+                    {:else}
+                      <ArrowUp class="size-4" />
+                      Recall ({selectedVaultCard?.recall_cost} stress)
+                    {/if}
+                  </Button>
+                {/if}
               {/if}
             </div>
 
             <!-- Rest Mode -->
             <div class="px-6 flex flex-col justify-center items-center gap-3">
               {#if !restMode}
-                <Stress {character} class="bg-muted h-10 rounded-full" displayOnly />
+                <Stress
+                  {character}
+                  class={cn(
+                    "bg-muted h-10 rounded-full"
+                    // character.ephemeral_stats.marked_stress >= character.derived_stats.max_stress &&
+                    //"border-3 border-destructive"
+                  )}
+                  displayOnly
+                />
               {/if}
               <Label
                 class={cn(
@@ -151,7 +172,7 @@
               >
                 <Switch
                   bind:checked={restMode}
-                  class="data-[state=checked]:bg-primary-muted/20 data-[state=unchecked]:bg-foreground/10"
+                  class="data-[state=checked]:bg-primary-muted/50 data-[state=unchecked]:bg-foreground/20"
                 />
                 <Tent class="size-4" />
                 <p>Rest Mode</p>
@@ -166,7 +187,11 @@
     </div>
     {#if expanded}
       <div class="relative">
-        <CardCarousel cards={loadout} bind:selectedIndex={selectedLoadoutIndex} />
+        <CardCarousel
+          cards={loadout}
+          bind:selectedIndex={selectedLoadoutIndex}
+          emptyMessage="Loadout Empty"
+        />
         <Button
           hidden={loadout.length === 0}
           size="sm"

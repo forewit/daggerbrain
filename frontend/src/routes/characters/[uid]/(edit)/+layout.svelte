@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { getAppContext } from "$lib/ts/app.svelte";
   import ExternalLink from "@lucide/svelte/icons/external-link";
-  import { page } from "$app/state";
+import { page } from "$app/state";
   import { cn, capitalize, handleImageUpload } from "$lib/utils";
   import Settings from "@lucide/svelte/icons/settings";
   import Button from "$lib/components/ui/button/button.svelte";
@@ -9,15 +8,15 @@
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import { onMount } from "svelte";
   import Input from "$lib/components/ui/input/input.svelte";
+  import { getCharacterContext } from "$lib/ts/character.svelte.js";
 
   let { data, children } = $props();
 
-  const app = getAppContext();
-  const character = $derived(app.characters.find((c) => c.uid === data.uid));
+  const context = getCharacterContext();
+  const character = $derived(context.character);
 
   const tabs = ["edit", "heritage", "class", "traits", "experiences", "equipment"];
-  let activeTab = $derived(page.url.pathname.split("/").pop() || "edit");
-
+  let activeTab = $derived( page.url.pathname.split("/").filter(Boolean).pop() || "edit");
   let fileInput = $state<HTMLInputElement>();
 
   function onImageUploadSuccess(dataUrl: string) {
@@ -66,11 +65,11 @@
       <Button
         id={tab}
         variant="ghost"
-        href={`/characters/${character.uid}/${tab}`}
+        href={`/characters/${character.uid}/${tab}/`}
         class={cn(
           "focus-visible:ring-foreground",
           "border-y h-12 bg-muted hover:bg-muted",
-          "pr-3 pl-6.5 transition-colors duration-300 font-normal hover:text-foreground relative snap-center rounded-none shadow-none",
+          "pr-3 pl-6.5 transition-colors duration-100 font-normal hover:text-foreground relative snap-center rounded-none shadow-none",
           activeTab === tab &&
             "border-accent/10 hover:text-accent text-accent bg-accent-muted hover:bg-accent-muted",
           i === 0 && "@3xl:rounded-l-full"
@@ -85,7 +84,7 @@
 
         <span
           class={cn(
-            "transition-all duration-300 absolute left-0 ",
+            "transition-all transition-discreet duration-100 absolute left-0 ",
             "size-0 border-y-24 border-l-12 border-y-transparent border-l-muted",
             i === 0 && "@3xl:hidden"
           )}
@@ -93,7 +92,7 @@
         <span
           style="z-index: {tabs.length - i}"
           class={cn(
-            "transition-all duration-300 absolute right-0 translate-x-full",
+            "transition-colors duration-100 absolute right-0 translate-x-full",
             "size-0 border-y-24 border-l-12 border-y-transparent border-l-muted",
             activeTab === tab && "border-l-accent-muted"
           )}
@@ -128,7 +127,7 @@
       <!-- image and name -->
       <main class="max-w-2xl flex gap-3 px-4 @3xl:px-0 mx-auto @3xl:mx-0">
         <button
-          class="h-[90px] w-[90px] shrink-0 p-1 aspect-square rounded-lg border-2 overflow-hidden cursor-pointer hover:border-primary/50 transition-colors group"
+          class="transition-colors h-[90px] w-[90px] shrink-0 p-1 aspect-square rounded-lg border-2 overflow-hidden cursor-pointer hover:border-primary/50 group"
           onclick={triggerImageUpload}
         >
           <img

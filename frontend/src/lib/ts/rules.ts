@@ -5,6 +5,8 @@ export const EXPERIENCES = {
     <p>You get two Experiences at character creation each with a +2 modifier.</p>`
 } as const
 
+export const TRAIT_OPTIONS = [2,1,1,0,0,-1] as const
+
 export const BLANK_LEVEL_UP_OPTION = {
     id: null,
     title: null,

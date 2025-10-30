@@ -1,5 +1,5 @@
 import { getAppContext } from './app.svelte';
-import { ALL_LEVEL_UP_OPTIONS, BLANK_LEVEL_UP_OPTION, TIER_1_BASE_OPTIONS, TIER_2_BASE_OPTIONS } from './rules';
+import { ALL_LEVEL_UP_OPTIONS, BLANK_LEVEL_UP_OPTION, TIER_1_BASE_OPTIONS, TIER_2_BASE_OPTIONS, TRAIT_OPTIONS } from './rules';
 import type { Card, Character, LevelUpOption, Traits } from './types';
 import { getContext, setContext } from 'svelte';
 
@@ -21,6 +21,26 @@ function createCharacter(uid: string) {
             character.experiences.pop();
         }
     });
+
+    // ! clear invalid base traits
+    $effect(() => {
+        if (!character) return;
+
+        let available_options = [...TRAIT_OPTIONS];
+        for (const key in character.base_stats.traits) {
+            const value = character.base_stats.traits[key as keyof Traits]
+            const i = available_options.findIndex(option => option === value)
+
+            if (value === null) {
+                continue
+            } else if (i !== -1) {
+                available_options.splice(i, 1)
+            } else {
+                console.warn(`${value} was not a valid trait option. setting to ${key} to null`)
+                character.base_stats.traits[key as keyof Traits] = null
+            }
+        }
+    })
 
     // ! clear level up options above the current level
     $effect(() => {
@@ -344,37 +364,186 @@ function createCharacter(uid: string) {
         }
     })
 
-    // TODO:
     // ! calculate derived stats
-
     // * derived effects -- used to calculate most stats --
-    $effect(() => { })
+    $effect(() => {
+        // ! need to implement (think about best way to handle/store effects)
+    })
+
     // * derived traits
-    $effect(() => { })
+    $effect(() => {
+        if (!character) return
+        let traits = {
+            agility:
+                (character.base_stats.traits.agility || 0) +
+                (tier_2_marked_traits.agility ? 1 : 0) +
+                (tier_3_marked_traits.agility ? 1 : 0) +
+                (tier_4_marked_traits.agility ? 1 : 0),
+            strength:
+                (character.base_stats.traits.strength || 0) +
+                (tier_2_marked_traits.strength ? 1 : 0) +
+                (tier_3_marked_traits.strength ? 1 : 0) +
+                (tier_4_marked_traits.strength ? 1 : 0),
+            finesse:
+                (character.base_stats.traits.finesse || 0) +
+                (tier_2_marked_traits.finesse ? 1 : 0) +
+                (tier_3_marked_traits.finesse ? 1 : 0) +
+                (tier_4_marked_traits.finesse ? 1 : 0),
+            instinct:
+                (character.base_stats.traits.instinct || 0) +
+                (tier_2_marked_traits.instinct ? 1 : 0) +
+                (tier_3_marked_traits.instinct ? 1 : 0) +
+                (tier_4_marked_traits.instinct ? 1 : 0),
+            presence:
+                (character.base_stats.traits.presence || 0) +
+                (tier_2_marked_traits.presence ? 1 : 0) +
+                (tier_3_marked_traits.presence ? 1 : 0) +
+                (tier_4_marked_traits.presence ? 1 : 0),
+            knowledge:
+                (character.base_stats.traits.knowledge || 0) +
+                (tier_2_marked_traits.knowledge ? 1 : 0) +
+                (tier_3_marked_traits.knowledge ? 1 : 0) +
+                (tier_4_marked_traits.knowledge ? 1 : 0),
+        }
+
+        // todo: include effects
+        character.derived_stats.traits = traits
+    })
+
     // * derived proficiency
-    $effect(() => { })
-    // * derived max_experiences
-    $effect(() => { })
-    // * derived max_domain_card_loadout
-    $effect(() => { })
-    // * derived max_hope
-    $effect(() => { })
-    // * derived max_armor
-    $effect(() => { })
-    // * derived max_hp
-    $effect(() => { })
-    // * derived max_stress
-    $effect(() => { })
+    $effect(() => {
+        if (!character) return
+        let prof = character.base_stats.proficiency
+        if (character.level >= 2) prof++
+        if (character.level >= 5) prof++
+        if (character.level >= 8) prof++
+
+        // todo: include tier 3 and tier 4 level up choices
+        // todo: include effects
+        character.derived_stats.proficiency = prof;
+
+    })
+
     // * derived evasion
-    $effect(() => { })
-    // * derived damage_thresholds
-    $effect(() => { })
+    $effect(() => {
+        if (!character) return
+        let evasion: number = character.base_stats.evasion;
+
+        // override with primary class's starting max hp
+        if (character.primary_class) {
+            evasion = character.primary_class.starting_evasion
+        }
+
+        // todo: include effects
+        character.derived_stats.evasion = evasion
+    })
+
+    // * derived max_hp
+    $effect(() => {
+        if (!character) return
+        let max_hp: number = character.base_stats.max_hp;
+
+        // override with primary class's starting max hp
+        if (character.primary_class) {
+            max_hp = character.primary_class.starting_max_hp
+        }
+
+        // todo: include effects
+        character.derived_stats.max_hp = max_hp
+    })
+
+    // * derived max_stress
+    $effect(() => {
+        if (!character) return
+        let max_stress = character.base_stats.max_stress;
+
+        // todo: include effects
+        character.derived_stats.max_stress = max_stress
+    })
+
     // * derived primary_class_mastery_level
-    $effect(() => { })
+    $effect(() => {
+        if (!character) return;
+        let mastery: 0 | 1 | 2 | 3 = character.base_stats.primary_class_mastery_level
+
+        if (character.primary_class) mastery = 1;
+
+        // todo: include tier 3 and tier 4 level up choices
+        // todo: include effects
+        character.derived_stats.primary_class_mastery_level = mastery
+    })
+
     // * derived secondary_class_mastery_level
-    $effect(() => { })
+    $effect(() => {
+        if (!character) return;
+        let mastery: 0 | 1 | 2 | 3 = character.base_stats.secondary_class_mastery_level
+
+        if (character.secondary_class) mastery = 1;
+
+        // todo: include tier 3 and tier 4 level up choices
+        // todo: include effects
+        character.derived_stats.secondary_class_mastery_level = mastery
+    })
+
+    // * derived max_hope
+    $effect(() => {
+        if (!character) return;
+        let max_hope: number = character.base_stats.max_hope
+
+        // todo: include effects
+        character.derived_stats.max_hope = max_hope
+    })
+
+    // * derived max_armor
+    $effect(() => {
+        if (!character) return;
+        let max_armor: number = character.base_stats.max_armor
+
+        // todo: include effects (including armor)
+        max_armor = Math.min(max_armor, 12)
+        character.derived_stats.max_armor = max_armor
+    })
+
+
     // * derived experience_modifiers
-    $effect(() => { })
+    $effect(() => {
+        // ! need to implement
+    })
+
+    // * derived damage_thresholds
+    $effect(() => {
+        if (!character) return
+
+        let thresholds = { ...character.base_stats.damage_thresholds }
+
+        thresholds.major += character.level;
+        thresholds.severe += character.level;
+
+        // todo: include effects (including armor)
+        // ! need to implement: While unarmored, your character’s base Armor Score is 0,
+        // ! their Major threshold is equal to their level, and their Severe
+        // ! threshold is equal to twice their level.
+
+        character.derived_stats.damage_thresholds = thresholds
+    })
+
+
+    // * derived max_experiences
+    $effect(() => {
+        if (!character) return;
+        let max_experiences: number = character.base_stats.max_experiences;
+
+        // todo: include effects
+        character.derived_stats.max_experiences = max_experiences
+    })
+    // * derived max_domain_card_loadout
+    $effect(() => {
+        if (!character) return;
+        let max_domain_card_loadout: number = character.base_stats.max_domain_card_loadout
+
+        // todo: include effects
+        character.derived_stats.max_domain_card_loadout = max_domain_card_loadout
+    })
 
 
     // --- cleanup ---

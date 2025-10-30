@@ -14,7 +14,7 @@ export type Character = {
         max_hope: 6
         max_armor: 0
         max_hp: 0
-        max_stress: 0
+        max_stress: 6
         evasion: 0
         damage_thresholds: {
             major: 0,
@@ -101,12 +101,12 @@ export type Character = {
 }
 
 export type Traits = {
-    agility: number,
-    strength: number,
-    finesse: number,
-    instinct: number,
-    presence: number,
-    knowledge: number
+    agility: number | null,
+    strength: number | null,
+    finesse: number | null,
+    instinct: number | null,
+    presence: number | null,
+    knowledge: number | null
 }
 
 export type Class = {

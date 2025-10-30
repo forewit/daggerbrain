@@ -79,9 +79,7 @@
     />
 
     <!-- main content -->
-    <div
-      class="w-full min-w-[260px] max-w-2xl mx-auto flex flex-col gap-6"
-    >
+    <div class="w-full min-w-[260px] max-w-2xl mx-auto flex flex-col gap-6">
       <!-- top bar -->
       <div class="flex gap-2 px-2 pr-4">
         <div class="grow truncate relative">
@@ -140,6 +138,7 @@
                 {character.ancestry_card?.title || "No ancestry"}&ensp;•&ensp;{character
                   .community_card?.title || "No community"}
               </p>
+              <p class="text-xs text-muted-foreground truncate">Proficiency: {character.derived_stats.proficiency}</p>
             </div>
           </div>
         </div>
@@ -208,7 +207,7 @@
         Character Cards
       </button>
       {#if character_cards_expanded}
-        <CardCarousel cards={character_cards} />
+        <CardCarousel cards={character_cards} emptyMessage="None" />
       {/if}
     </div>
 
