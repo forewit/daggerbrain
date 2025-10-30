@@ -11,6 +11,7 @@
   import Pencil from "@lucide/svelte/icons/pencil";
   import Trash from "@lucide/svelte/icons/trash";
   import { goto } from "$app/navigation";
+  import { fade } from "svelte/transition";
 
   const app = getAppContext();
 
@@ -29,61 +30,78 @@
       showDeleteDialog = false;
     }
   }
+
+  let redirecting = $state(false);
 </script>
 
-<div
-  class={cn(
-    //"pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]",
-    "max-w-6xl mx-auto px-4 py-2"
-  )}
->
-  <!-- Header -->
-  <div class="flex justify-between gap-2 py-2 mb-2">
-    <p class="text-2xl font-bold">Characters</p>
-    <Button variant="outline" onclick={() => app.newCharacter()}><Plus /> New Character</Button>
-  </div>
+{#if !redirecting}
+  <div
+    class={cn(
+      //"pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]",
+      "max-w-6xl mx-auto px-4 py-2"
+    )}
+  >
+    <!-- Header -->
+    <div class="flex justify-between gap-2 py-2 mb-2">
+      <p class="text-2xl font-bold">Characters</p>
+      <Button
+        variant="outline"
+        onclick={() => {
+          redirecting = true;
+          const uid = app.newCharacter();
+          goto(`/characters/${uid}/edit/`).catch((err) => {
+            console.error(err);
+            redirecting = false;
+          });
+        }}><Plus /> New Character</Button
+      >
+    </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-    {#each app.characters as character}
-      <div class="w-full max-w-[500px] rounded mx-auto overflow-hidden">
-        <a href={`/characters/${character.uid}/`} class="bg-primary-muted border hover:bg-primary-muted/80 flex p-1 gap-2 ">
-          <div class=" h-16 w-16 shrink-0 rounded-lg border-2 overflow-hidden">
-            <img src={character.image} alt={character.name} class="w-full h-full object-cover" />
-          </div>
-          <div class="truncate">
-            <p class="text-lg font-bold truncate mt-1">{character.name}</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {#each app.characters as character}
+        <div class="w-full max-w-[500px] rounded mx-auto overflow-hidden">
+          <a
+            href={`/characters/${character.uid}/`}
+            class="bg-primary-muted border hover:bg-primary-muted/80 flex p-1 gap-2"
+          >
+            <div class=" h-16 w-16 shrink-0 rounded-lg border-2 overflow-hidden">
+              <img src={character.image} alt={character.name} class="w-full h-full object-cover" />
+            </div>
+            <div class="truncate">
+              <p class="text-lg font-bold truncate mt-1">{character.name}</p>
 
-            <p class="mt-1 truncate text-xs text-muted-foreground">
-              {character.ancestry_card?.title || "No ancestry"}
-              &ensp;•&ensp;{character.primary_class?.name || "No class"}
-              &ensp;•&ensp;{character.primary_subclass?.name || "No subclass"}
-            </p>
+              <p class="mt-1 truncate text-xs text-muted-foreground">
+                {character.ancestry_card?.title || "No ancestry"}
+                &ensp;•&ensp;{character.primary_class?.name || "No class"}
+                &ensp;•&ensp;{character.primary_subclass?.name || "No subclass"}
+              </p>
+            </div>
+          </a>
+          <div class="bg-muted flex">
+            <Button
+              variant="ghost"
+              size="sm"
+              class="grow rounded-none hover:text-text border"
+              href={`/characters/${character.uid}/`}>View</Button
+            >
+            <Button
+              variant="ghost"
+              size="sm"
+              class="grow rounded-none hover:text-text border border-x-0"
+              href={`/characters/${character.uid}/edit`}>Edit</Button
+            >
+            <Button
+              variant="ghost"
+              size="sm"
+              class=" grow text-destructive hover:text-destructive rounded-none border"
+              onclick={() => handleDeleteCharacter(character)}>Delete</Button
+            >
           </div>
-        </a>
-        <div class="bg-muted flex">
-          <Button
-            variant="ghost"
-            size="sm"
-            class="grow rounded-none hover:text-text border"
-            href={`/characters/${character.uid}/`}>View</Button
-          >
-          <Button
-            variant="ghost"
-            size="sm"
-            class="grow rounded-none hover:text-text border border-x-0"
-            href={`/characters/${character.uid}/edit`}>Edit</Button
-          >
-          <Button
-            variant="ghost"
-            size="sm"
-            class=" grow text-destructive hover:text-destructive rounded-none border"
-            onclick={() => handleDeleteCharacter(character)}>Delete</Button
-          >
         </div>
-      </div>
-    {/each}
+      {/each}
+    </div>
   </div>
-</div>
+{/if}
 
 <!-- Delete Confirmation Dialog -->
 <Dialog.Root bind:open={showDeleteDialog}>
