@@ -30,7 +30,7 @@
     fileInput?.click();
   }
 
-  function scrollToActiveTab(instant?: Event | boolean) {
+  function scrollToActiveTab(instant?: boolean) {
     const el = document.getElementById(activeTab);
     el?.scrollIntoView({
       behavior: instant ? "instant" : "smooth",
@@ -41,11 +41,11 @@
 
   onMount(() => {
     scrollToActiveTab(true);
-    window.addEventListener("resize", scrollToActiveTab);
+    // window.addEventListener("resize", scrollToActiveTab);
 
-    return () => {
-      window.removeEventListener("resize", scrollToActiveTab);
-    };
+    // return () => {
+    //   window.removeEventListener("resize", scrollToActiveTab);
+    // };
   });
 </script>
 
