@@ -1,7 +1,6 @@
 {
   "image": "mcr.microsoft.com/devcontainers/universal:2",
   "features": {},
-  "remoteUser": "node",
   "containerEnv": {
     "PATH": "/home/node/.bun/bin:${PATH}"
   },
