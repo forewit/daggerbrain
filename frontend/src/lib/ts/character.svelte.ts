@@ -1,7 +1,7 @@
 import { getAppContext } from './app.svelte';
 import { ALL_LEVEL_UP_OPTIONS, BLANK_LEVEL_UP_CHOICE, BLANK_LEVEL_UP_OPTION, TIER_1_BASE_OPTIONS, TIER_2_BASE_OPTIONS, TRAIT_OPTIONS } from './constants/rules';
-import { EFFECTS } from './constants/effects';
-import type { Card, Character, Effect, LevelUpChoice, LevelUpOption, Traits } from './types';
+import { MODIFIERS } from './constants/modifiers';
+import type { Card, Character, Modifier, LevelUpChoice, LevelUpOption, Traits } from './types';
 import { getContext, setContext } from 'svelte';
 
 function createCharacter(uid: string) {
@@ -348,6 +348,12 @@ function createCharacter(uid: string) {
         }
     })
 
+    // ! clear invalid active weapons
+    // todo: implement
+
+    // ! clear invalid active armor
+    // todo: implement
+
     // * derived experience_modifiers (no effects)
     $effect(() => {
         if (!character) return;
@@ -377,75 +383,75 @@ function createCharacter(uid: string) {
     })
 
     // * derived effects -- used to calculate most stats --
-    let base_effects: Effect[] = $state([])
-    let bonus_effects: Effect[] = $state([])
-    let override_effects: Effect[] = $state([])
+    let base_modifiers: Modifier[] = $state([])
+    let bonus_modifiers: Modifier[] = $state([])
+    let override_modifiers: Modifier[] = $state([])
     $effect(() => {
         if (!character) return
 
-        let all_effects: Effect[] = []
+        let all_modifiers: Modifier[] = []
 
         const level = character.level
 
-        function pushEffectIds(effectIds: (keyof typeof EFFECTS)[] | undefined) {
-            if (!effectIds || effectIds.length === 0) return
-            for (const id of effectIds) {
-                const effect = EFFECTS[id]
+        function push_modifier_ids(modifier_ids: (keyof typeof MODIFIERS)[] | undefined) {
+            if (!modifier_ids || modifier_ids.length === 0) return
+            for (const id of modifier_ids) {
+                const effect = MODIFIERS[id]
                 if (!effect) continue
                 const withinMin = effect.min_level === null || level >= effect.min_level
                 const withinMax = effect.max_level === null || level <= effect.max_level
-                if (withinMin && withinMax) all_effects.push(effect)
+                if (withinMin && withinMax) all_modifiers.push(effect)
             }
         }
 
         // ancestry card
         if (character.ancestry_card) {
-            character.ancestry_card.features.forEach(f => pushEffectIds(f.effect_ids))
+            character.ancestry_card.features.forEach(f => push_modifier_ids(f.modifier_ids))
         }
 
         // community card
         if (character.community_card) {
-            character.community_card.features.forEach(f => pushEffectIds(f.effect_ids))
+            character.community_card.features.forEach(f => push_modifier_ids(f.modifier_ids))
         }
 
         // transformation card
         if (character.transformation_card) {
-            character.transformation_card.features.forEach(f => pushEffectIds(f.effect_ids))
+            character.transformation_card.features.forEach(f => push_modifier_ids(f.modifier_ids))
         }
 
         // primary class
         if (character.primary_class) {
-            pushEffectIds(character.primary_class.hope_feature.effect_ids)
-            character.primary_class.class_features.forEach(f => pushEffectIds(f.effect_ids))
+            push_modifier_ids(character.primary_class.hope_feature.modifier_ids)
+            character.primary_class.class_features.forEach(f => push_modifier_ids(f.modifier_ids))
         }
 
         // primary subclass cards (gate by mastery level)
         if (character.primary_subclass) {
             const primaryMastery = character.derived_stats.primary_class_mastery_level
-            pushEffectIds(character.primary_subclass.foundation_card.features.flatMap(f => f.effect_ids))
+            push_modifier_ids(character.primary_subclass.foundation_card.features.flatMap(f => f.modifier_ids))
             if (primaryMastery >= 2) {
-                pushEffectIds(character.primary_subclass.specialization_card.features.flatMap(f => f.effect_ids))
+                push_modifier_ids(character.primary_subclass.specialization_card.features.flatMap(f => f.modifier_ids))
             }
             if (primaryMastery >= 3) {
-                pushEffectIds(character.primary_subclass.mastery_card.features.flatMap(f => f.effect_ids))
+                push_modifier_ids(character.primary_subclass.mastery_card.features.flatMap(f => f.modifier_ids))
             }
         }
 
         // secondary class
         if (character.secondary_class) {
-            pushEffectIds(character.secondary_class.hope_feature.effect_ids)
-            character.secondary_class.class_features.forEach(f => pushEffectIds(f.effect_ids))
+            push_modifier_ids(character.secondary_class.hope_feature.modifier_ids)
+            character.secondary_class.class_features.forEach(f => push_modifier_ids(f.modifier_ids))
         }
 
         // secondary subclass cards (gate by mastery level)
         if (character.secondary_subclass) {
             const secondaryMastery = character.derived_stats.secondary_class_mastery_level
-            pushEffectIds(character.secondary_subclass.foundation_card.features.flatMap(f => f.effect_ids))
+            push_modifier_ids(character.secondary_subclass.foundation_card.features.flatMap(f => f.modifier_ids))
             if (secondaryMastery >= 2) {
-                pushEffectIds(character.secondary_subclass.specialization_card.features.flatMap(f => f.effect_ids))
+                push_modifier_ids(character.secondary_subclass.specialization_card.features.flatMap(f => f.modifier_ids))
             }
             if (secondaryMastery >= 3) {
-                pushEffectIds(character.secondary_subclass.mastery_card.features.flatMap(f => f.effect_ids))
+                push_modifier_ids(character.secondary_subclass.mastery_card.features.flatMap(f => f.modifier_ids))
             }
         }
 
@@ -459,30 +465,73 @@ function createCharacter(uid: string) {
                 if (!choice || !choice.option_id) continue;
                 const option = ALL_LEVEL_UP_OPTIONS[choice.option_id];
                 if (!option) continue;
-                pushEffectIds(option.effect_ids);
+                push_modifier_ids(option.modifier_ids);
             }
         }
 
         // additional cards
         character.additional_cards.forEach(card => {
-            card.features.forEach(f => pushEffectIds(f.effect_ids))
+            card.features.forEach(f => push_modifier_ids(f.modifier_ids))
         })
 
         // additional effect ids
-        pushEffectIds(character.additional_effect_ids)
+        push_modifier_ids(character.additional_modifier_ids)
 
         // derived domain card vault
         character.derived_domain_card_vault.forEach(card => {
-            card.features.forEach(f => pushEffectIds(f.effect_ids))
+            card.features.forEach(f => push_modifier_ids(f.modifier_ids))
         })
 
         // categorize by behavior
-        base_effects = all_effects.filter((e) => 'behavior' in e && e.behavior === 'base') as Effect[]
-        bonus_effects = all_effects.filter((e) => 'behavior' in e && e.behavior === 'bonus') as Effect[]
-        override_effects = all_effects.filter((e) => 'behavior' in e && e.behavior === 'override') as Effect[]
+        base_modifiers = all_modifiers.filter((e) => 'behavior' in e && e.behavior === 'base') as Modifier[]
+        bonus_modifiers = all_modifiers.filter((e) => 'behavior' in e && e.behavior === 'bonus') as Modifier[]
+        override_modifiers = all_modifiers.filter((e) => 'behavior' in e && e.behavior === 'override') as Modifier[]
 
-        console.warn("Updated effect list...")
+        console.warn("Updated modifier list...")
     })
+
+    /**
+     * Applies modifiers of a specific behavior type to a stat value
+     * @param modifiers - List of modifiers to filter and apply
+     * @param target - The stat target (e.g., 'max_hp', 'evasion', etc.)
+     * @param currentValue - The current value of the stat
+     * @param behavior - The behavior type to apply ('base', 'bonus', or 'override')
+     * @returns The modified value after applying modifiers
+     */
+    function apply_modifiers(
+        modifiers: Modifier[],
+        target: Modifier['target'],
+        currentValue: number,
+        behavior: 'base' | 'bonus' | 'override'
+    ): number {
+        if (!character) return currentValue;
+
+        let value = currentValue;
+
+        for (const modifier of modifiers) {
+            if (modifier.target !== target || ('behavior' in modifier && modifier.behavior !== behavior)) {
+                continue;
+            }
+
+            if (modifier.type === 'flat') {
+                if (behavior === 'base' || behavior === 'override') {
+                    value = modifier.value;
+                } else if (behavior === 'bonus') {
+                    value = value + modifier.value;
+                }
+            } else if (modifier.type === 'derived_from_trait' && target !== 'trait') {
+                const src = Number(character.derived_stats.traits[modifier.trait]);
+                const calculated = Math.ceil(src * modifier.multiplier);
+                if (behavior === 'base' || behavior === 'override') {
+                    value = calculated;
+                } else if (behavior === 'bonus') {
+                    value = value + calculated;
+                }
+            }
+        }
+
+        return value;
+    }
 
     // * derived traits
     $effect(() => {
@@ -498,17 +547,13 @@ function createCharacter(uid: string) {
         ) return
 
         // apply base effects targeting traits (set base values)
-        for (const effect of base_effects) {
+        for (const effect of base_modifiers) {
             if (effect.target === 'trait') {
                 const targetTrait = effect.trait
                 if (effect.type === 'flat') {
                     base_traits[targetTrait] = effect.value
                 }
                 // ! can't derive a trait from a trait
-                // else if (effect.type === 'derived_from_trait') {
-                //     const source = Number(base_traits[effect.trait])
-                //     base_traits[targetTrait] = Math.ceil(source * effect.multiplier)
-                // }
             }
         }
 
@@ -547,32 +592,24 @@ function createCharacter(uid: string) {
         }
 
         // apply bonus effects targeting traits (additive or derived)
-        for (const effect of bonus_effects) {
+        for (const effect of bonus_modifiers) {
             if (effect.target === 'trait') {
                 const targetTrait = effect.trait
                 if (effect.type === 'flat') {
                     traits[targetTrait] = traits[targetTrait] + effect.value
                 }
                 // ! can't derive a trait from a trait
-                // else if (effect.type === 'derived_from_trait') {
-                //     const source = Number(traits[effect.trait])
-                //     traits[targetTrait] = traits[targetTrait] + Math.ceil(source * effect.multiplier)
-                // }
             }
         }
 
         // apply override effects targeting traits (set final values)
-        for (const effect of override_effects) {
+        for (const effect of override_modifiers) {
             if (effect.target === 'trait') {
                 const targetTrait = effect.trait
                 if (effect.type === 'flat') {
                     traits[targetTrait] = effect.value
                 }
                 // ! can't derive a trait from a trait
-                // else if (effect.type === 'derived_from_trait') {
-                //     const source = Number(traits[effect.trait])
-                //     traits[targetTrait] = Math.ceil(source * effect.multiplier)
-                // }
             }
         }
 
@@ -584,46 +621,15 @@ function createCharacter(uid: string) {
         if (!character) return
         let prof: number = character.base_stats.proficiency
 
-        // apply base effects targeting proficiency (set base value)
-        for (const effect of base_effects) {
-            if (effect.target === 'proficiency') {
-                if (effect.type === 'flat') {
-                    prof = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    prof = Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
+        prof = apply_modifiers(base_modifiers, 'proficiency', prof, 'base')
 
         // tier-based increases
         if (character.level >= 2) prof++
         if (character.level >= 5) prof++
         if (character.level >= 8) prof++
 
-        // apply bonus effects targeting proficiency (additive)
-        for (const effect of bonus_effects) {
-            if (effect.target === 'proficiency') {
-                if (effect.type === 'flat') {
-                    prof = prof + effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    prof = prof + Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
-
-        // apply override effects targeting proficiency (final value)
-        for (const effect of override_effects) {
-            if (effect.target === 'proficiency') {
-                if (effect.type === 'flat') {
-                    prof = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    prof = Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
+        prof = apply_modifiers(bonus_modifiers, 'proficiency', prof, 'bonus')
+        prof = apply_modifiers(override_modifiers, 'proficiency', prof, 'override')
 
         character.derived_stats.proficiency = prof;
 
@@ -639,41 +645,9 @@ function createCharacter(uid: string) {
             evasion = character.primary_class.starting_evasion
         }
 
-        // apply base effects targeting evasion (set base value)
-        for (const effect of base_effects) {
-            if (effect.target === 'evasion') {
-                if (effect.type === 'flat') {
-                    evasion = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    evasion = Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
-
-        // apply bonus effects targeting evasion (additive)
-        for (const effect of bonus_effects) {
-            if (effect.target === 'evasion') {
-                if (effect.type === 'flat') {
-                    evasion = evasion + effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    evasion = evasion + Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
-
-        // apply override effects targeting evasion (final value)
-        for (const effect of override_effects) {
-            if (effect.target === 'evasion') {
-                if (effect.type === 'flat') {
-                    evasion = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    evasion = Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
+        evasion = apply_modifiers(base_modifiers, 'evasion', evasion, 'base')
+        evasion = apply_modifiers(bonus_modifiers, 'evasion', evasion, 'bonus')
+        evasion = apply_modifiers(override_modifiers, 'evasion', evasion, 'override')
 
         character.derived_stats.evasion = evasion
     })
@@ -688,41 +662,9 @@ function createCharacter(uid: string) {
             max_hp = character.primary_class.starting_max_hp
         }
 
-        // apply base effects targeting max_hp (set base value)
-        for (const effect of base_effects) {
-            if (effect.target === 'max_hp') {
-                if (effect.type === 'flat') {
-                    max_hp = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    max_hp = Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
-
-        // apply bonus effects targeting max_hp (additive)
-        for (const effect of bonus_effects) {
-            if (effect.target === 'max_hp') {
-                if (effect.type === 'flat') {
-                    max_hp = max_hp + effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    max_hp = max_hp + Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
-
-        // apply override effects targeting max_hp (final value)
-        for (const effect of override_effects) {
-            if (effect.target === 'max_hp') {
-                if (effect.type === 'flat') {
-                    max_hp = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    max_hp = Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
+        max_hp = apply_modifiers(base_modifiers, 'max_hp', max_hp, 'base')
+        max_hp = apply_modifiers(bonus_modifiers, 'max_hp', max_hp, 'bonus')
+        max_hp = apply_modifiers(override_modifiers, 'max_hp', max_hp, 'override')
 
         character.derived_stats.max_hp = max_hp
     })
@@ -732,41 +674,9 @@ function createCharacter(uid: string) {
         if (!character) return
         let max_stress: number = character.base_stats.max_stress;
 
-        // apply base effects targeting max_stress (set base value)
-        for (const effect of base_effects) {
-            if (effect.target === 'max_stress') {
-                if (effect.type === 'flat') {
-                    max_stress = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    max_stress = Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
-
-        // apply bonus effects targeting max_stress (additive)
-        for (const effect of bonus_effects) {
-            if (effect.target === 'max_stress') {
-                if (effect.type === 'flat') {
-                    max_stress = max_stress + effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    max_stress = max_stress + Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
-
-        // apply override effects targeting max_stress (final value)
-        for (const effect of override_effects) {
-            if (effect.target === 'max_stress') {
-                if (effect.type === 'flat') {
-                    max_stress = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    max_stress = Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
+        max_stress = apply_modifiers(base_modifiers, 'max_stress', max_stress, 'base')
+        max_stress = apply_modifiers(bonus_modifiers, 'max_stress', max_stress, 'bonus')
+        max_stress = apply_modifiers(override_modifiers, 'max_stress', max_stress, 'override')
 
         character.derived_stats.max_stress = max_stress
     })
@@ -779,47 +689,9 @@ function createCharacter(uid: string) {
         // having a primary class guarantees at least foundation (1)
         if (character.primary_class) masteryNum = Math.max(masteryNum, 1);
 
-        // base effects (set mastery directly)
-        for (const effect of base_effects) {
-            if (effect.target === 'primary_class_mastery_level') {
-                if (effect.type === 'flat') {
-                    masteryNum = effect.value
-                }
-                // ! can't derive a mastery level from a trait
-                // else if (effect.type === 'derived_from_trait') {
-                //     const src = Number(character.derived_stats.traits[effect.trait])
-                //     masteryNum = Math.ceil(src * effect.multiplier)
-                // }
-            }
-        }
-
-        // bonus effects (additive)
-        for (const effect of bonus_effects) {
-            if (effect.target === 'primary_class_mastery_level') {
-                if (effect.type === 'flat') {
-                    masteryNum = masteryNum + effect.value
-                }
-                // ! can't derive a mastery level from a trait
-                // else if (effect.type === 'derived_from_trait') {
-                //     const src = Number(character.derived_stats.traits[effect.trait])
-                //     masteryNum = masteryNum + Math.ceil(src * effect.multiplier)
-                // }
-            }
-        }
-
-        // override effects (final)
-        for (const effect of override_effects) {
-            if (effect.target === 'primary_class_mastery_level') {
-                if (effect.type === 'flat') {
-                    masteryNum = effect.value
-                }
-                // ! can't derive a mastery level from a trait
-                // else if (effect.type === 'derived_from_trait') {
-                //     const src = Number(character.derived_stats.traits[effect.trait])
-                //     masteryNum = Math.ceil(src * effect.multiplier)
-                // }
-            }
-        }
+        masteryNum = apply_modifiers(base_modifiers, 'primary_class_mastery_level', masteryNum, 'base')
+        masteryNum = apply_modifiers(bonus_modifiers, 'primary_class_mastery_level', masteryNum, 'bonus')
+        masteryNum = apply_modifiers(override_modifiers, 'primary_class_mastery_level', masteryNum, 'override')
 
         // clamp 0..3 and assign with proper literal type
         const masteryClamped = Math.max(0, Math.min(3, Math.trunc(masteryNum))) as 0 | 1 | 2 | 3
@@ -834,47 +706,9 @@ function createCharacter(uid: string) {
         // having a secondary class guarantees at least foundation (1)
         if (character.secondary_class) masteryNum = Math.max(masteryNum, 1);
 
-        // base effects (set mastery directly)
-        for (const effect of base_effects) {
-            if (effect.target === 'secondary_class_mastery_level') {
-                if (effect.type === 'flat') {
-                    masteryNum = effect.value
-                }
-                // ! can't derive a mastery level from a trait
-                // else if (effect.type === 'derived_from_trait') {
-                //     const src = Number(character.derived_stats.traits[effect.trait])
-                //     masteryNum = Math.ceil(src * effect.multiplier)
-                // }
-            }
-        }
-
-        // bonus effects (additive)
-        for (const effect of bonus_effects) {
-            if (effect.target === 'secondary_class_mastery_level') {
-                if (effect.type === 'flat') {
-                    masteryNum = masteryNum + effect.value
-                }
-                // ! can't derive a mastery level from a trait
-                // else if (effect.type === 'derived_from_trait') {
-                //     const src = Number(character.derived_stats.traits[effect.trait])
-                //     masteryNum = masteryNum + Math.ceil(src * effect.multiplier)
-                // }
-            }
-        }
-
-        // override effects (final)
-        for (const effect of override_effects) {
-            if (effect.target === 'secondary_class_mastery_level') {
-                if (effect.type === 'flat') {
-                    masteryNum = effect.value
-                }
-                // ! can't derive a mastery level from a trait
-                // else if (effect.type === 'derived_from_trait') {
-                //     const src = Number(character.derived_stats.traits[effect.trait])
-                //     masteryNum = Math.ceil(src * effect.multiplier)
-                // }
-            }
-        }
+        masteryNum = apply_modifiers(base_modifiers, 'secondary_class_mastery_level', masteryNum, 'base')
+        masteryNum = apply_modifiers(bonus_modifiers, 'secondary_class_mastery_level', masteryNum, 'bonus')
+        masteryNum = apply_modifiers(override_modifiers, 'secondary_class_mastery_level', masteryNum, 'override')
 
         // clamp 0..3 and assign with proper literal type
         const masteryClamped = Math.max(0, Math.min(3, Math.trunc(masteryNum))) as 0 | 1 | 2 | 3
@@ -886,41 +720,9 @@ function createCharacter(uid: string) {
         if (!character) return;
         let max_hope: number = character.base_stats.max_hope
 
-        // apply base effects targeting max_hope (set base value)
-        for (const effect of base_effects) {
-            if (effect.target === 'max_hope') {
-                if (effect.type === 'flat') {
-                    max_hope = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    max_hope = Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
-
-        // apply bonus effects targeting max_hope (additive)
-        for (const effect of bonus_effects) {
-            if (effect.target === 'max_hope') {
-                if (effect.type === 'flat') {
-                    max_hope = max_hope + effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    max_hope = max_hope + Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
-
-        // apply override effects targeting max_hope (final value)
-        for (const effect of override_effects) {
-            if (effect.target === 'max_hope') {
-                if (effect.type === 'flat') {
-                    max_hope = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    max_hope = Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
+        max_hope = apply_modifiers(base_modifiers, 'max_hope', max_hope, 'base')
+        max_hope = apply_modifiers(bonus_modifiers, 'max_hope', max_hope, 'bonus')
+        max_hope = apply_modifiers(override_modifiers, 'max_hope', max_hope, 'override')
 
         character.derived_stats.max_hope = max_hope
     })
@@ -930,41 +732,9 @@ function createCharacter(uid: string) {
         if (!character) return;
         let max_armor: number = character.base_stats.max_armor
 
-        // apply base effects targeting max_armor (set base value)
-        for (const effect of base_effects) {
-            if (effect.target === 'max_armor') {
-                if (effect.type === 'flat') {
-                    max_armor = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    max_armor = Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
-
-        // apply bonus effects targeting max_armor (additive)
-        for (const effect of bonus_effects) {
-            if (effect.target === 'max_armor') {
-                if (effect.type === 'flat') {
-                    max_armor = max_armor + effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    max_armor = max_armor + Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
-
-        // apply override effects targeting max_armor (final value)
-        for (const effect of override_effects) {
-            if (effect.target === 'max_armor') {
-                if (effect.type === 'flat') {
-                    max_armor = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    max_armor = Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
+        max_armor = apply_modifiers(base_modifiers, 'max_armor', max_armor, 'base')
+        max_armor = apply_modifiers(bonus_modifiers, 'max_armor', max_armor, 'bonus')
+        max_armor = apply_modifiers(override_modifiers, 'max_armor', max_armor, 'override')
 
         max_armor = Math.min(max_armor, 12)
         character.derived_stats.max_armor = max_armor
@@ -973,68 +743,32 @@ function createCharacter(uid: string) {
     // * derived damage_thresholds
     $effect(() => {
         if (!character) return
-        let thresholds: { major: number, severe: number } = { ...character.base_stats.damage_thresholds }
-
-        // apply base effects (set base values)
-        for (const effect of base_effects) {
-            if (effect.target === 'major_damage_threshold') {
-                if (effect.type === 'flat') {
-                    thresholds.major = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    thresholds.major = Math.ceil(src * effect.multiplier)
-                }
-            } else if (effect.target === 'severe_damage_threshold') {
-                if (effect.type === 'flat') {
-                    thresholds.severe = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    thresholds.severe = Math.ceil(src * effect.multiplier)
-                }
-            }
+        // default unarmored thresholds
+        let thresholds: { major: number, severe: number } = {
+            major: character.level,
+            severe: character.level * 2
         }
+
+        // override with currently equiped armor
+        if (character.active_armor !== null) {
+            thresholds.major = character.active_armor.damage_thresholds.major
+            thresholds.severe = character.active_armor.damage_thresholds.severe
+        }
+
+        thresholds.major = apply_modifiers(base_modifiers, 'major_damage_threshold', thresholds.major, 'base')
+        thresholds.severe = apply_modifiers(base_modifiers, 'severe_damage_threshold', thresholds.severe, 'base')
 
         // level-based bump
-        thresholds.major += character.level;
-        thresholds.severe += character.level;
-
-        // apply bonus effects (additive)
-        for (const effect of bonus_effects) {
-            if (effect.target === 'major_damage_threshold') {
-                if (effect.type === 'flat') {
-                    thresholds.major = thresholds.major + effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    thresholds.major = thresholds.major + Math.ceil(src * effect.multiplier)
-                }
-            } else if (effect.target === 'severe_damage_threshold') {
-                if (effect.type === 'flat') {
-                    thresholds.severe = thresholds.severe + effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    thresholds.severe = thresholds.severe + Math.ceil(src * effect.multiplier)
-                }
-            }
+        if (thresholds.major !== character.level && thresholds.severe !== character.level * 2) {
+            thresholds.major += character.level;
+            thresholds.severe += character.level;
         }
 
-        // apply override effects (final values)
-        for (const effect of override_effects) {
-            if (effect.target === 'major_damage_threshold') {
-                if (effect.type === 'flat') {
-                    thresholds.major = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    thresholds.major = Math.ceil(src * effect.multiplier)
-                }
-            } else if (effect.target === 'severe_damage_threshold') {
-                if (effect.type === 'flat') {
-                    thresholds.severe = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    thresholds.severe = Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
+        thresholds.major = apply_modifiers(bonus_modifiers, 'major_damage_threshold', thresholds.major, 'bonus')
+        thresholds.severe = apply_modifiers(bonus_modifiers, 'severe_damage_threshold', thresholds.severe, 'bonus')
+
+        thresholds.major = apply_modifiers(override_modifiers, 'major_damage_threshold', thresholds.major, 'override')
+        thresholds.severe = apply_modifiers(override_modifiers, 'severe_damage_threshold', thresholds.severe, 'override')
 
         character.derived_stats.damage_thresholds = thresholds
     })
@@ -1044,46 +778,15 @@ function createCharacter(uid: string) {
         if (!character) return;
         let max_experiences: number = character.base_stats.max_experiences;
 
-        // apply base effects targeting max_experiences (set base value)
-        for (const effect of base_effects) {
-            if (effect.target === 'max_experiences') {
-                if (effect.type === 'flat') {
-                    max_experiences = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    max_experiences = Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
+        max_experiences = apply_modifiers(base_modifiers, 'max_experiences', max_experiences, 'base')
 
         // tier-based increases
         if (character.level >= 2) max_experiences++
         if (character.level >= 5) max_experiences++
         if (character.level >= 8) max_experiences++
 
-        // apply bonus effects targeting max_experiences (additive)
-        for (const effect of bonus_effects) {
-            if (effect.target === 'max_experiences') {
-                if (effect.type === 'flat') {
-                    max_experiences = max_experiences + effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    max_experiences = max_experiences + Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
-
-        // apply override effects targeting max_experiences (final value)
-        for (const effect of override_effects) {
-            if (effect.target === 'max_experiences') {
-                if (effect.type === 'flat') {
-                    max_experiences = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    max_experiences = Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
+        max_experiences = apply_modifiers(bonus_modifiers, 'max_experiences', max_experiences, 'bonus')
+        max_experiences = apply_modifiers(override_modifiers, 'max_experiences', max_experiences, 'override')
 
         character.derived_stats.max_experiences = max_experiences
     })
@@ -1093,41 +796,9 @@ function createCharacter(uid: string) {
         if (!character) return;
         let max_domain_card_loadout: number = character.base_stats.max_domain_card_loadout
 
-        // apply base effects targeting max_domain_card_loadout (set base value)
-        for (const effect of base_effects) {
-            if (effect.target === 'max_domain_card_loadout') {
-                if (effect.type === 'flat') {
-                    max_domain_card_loadout = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    max_domain_card_loadout = Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
-
-        // apply bonus effects targeting max_domain_card_loadout (additive)
-        for (const effect of bonus_effects) {
-            if (effect.target === 'max_domain_card_loadout') {
-                if (effect.type === 'flat') {
-                    max_domain_card_loadout = max_domain_card_loadout + effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    max_domain_card_loadout = max_domain_card_loadout + Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
-
-        // apply override effects targeting max_domain_card_loadout (final value)
-        for (const effect of override_effects) {
-            if (effect.target === 'max_domain_card_loadout') {
-                if (effect.type === 'flat') {
-                    max_domain_card_loadout = effect.value
-                } else if (effect.type === 'derived_from_trait') {
-                    const src = Number(character.derived_stats.traits[effect.trait])
-                    max_domain_card_loadout = Math.ceil(src * effect.multiplier)
-                }
-            }
-        }
+        max_domain_card_loadout = apply_modifiers(base_modifiers, 'max_domain_card_loadout', max_domain_card_loadout, 'base')
+        max_domain_card_loadout = apply_modifiers(bonus_modifiers, 'max_domain_card_loadout', max_domain_card_loadout, 'bonus')
+        max_domain_card_loadout = apply_modifiers(override_modifiers, 'max_domain_card_loadout', max_domain_card_loadout, 'override')
 
         character.derived_stats.max_domain_card_loadout = max_domain_card_loadout
     })

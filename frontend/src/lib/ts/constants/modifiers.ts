@@ -1,6 +1,6 @@
-import type { Effect } from "../types";
+import type { Modifier } from "../types";
 
-export const EFFECTS = {
+export const MODIFIERS = {
     max_hp_plus_1: {
         min_level: null,
         max_level: null,
@@ -166,4 +166,4 @@ export const EFFECTS = {
         type: "flat",
         value: 38
     },
-} as const satisfies Record<string, Effect>
+} as const satisfies Record<string, Modifier>

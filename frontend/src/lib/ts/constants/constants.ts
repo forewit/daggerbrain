@@ -1,6 +1,7 @@
 import { ANCESTRY_CARDS, BLADE_DOMAIN_CARDS, BONE_DOMAIN_CARDS, COMMUNITY_CARDS, SUBCLASS_CARDS, TRANSFORMATION_CARDS, VALOR_DOMAIN_CARDS } from "./cards";
 import { BLANK_LEVEL_UP_CHOICE, BLANK_LEVEL_UP_OPTION, TIER_1_BASE_OPTIONS } from "./rules";
 import type { Domain, Class, Subclass, Card, Character } from "../types";
+import { TIER_1_ARMOR, TIER_1_WEAPONS } from "./equipment";
 
 
 export const DOMAINS = {
@@ -136,7 +137,7 @@ export const CLASSES = {
         hope_feature: {
             title: "Grim Resolve",
             description_html: "<p><b>Spend 3 Hope</b> to clear 2 Stress.</p>",
-            effect_ids: []
+            modifier_ids: []
         },
         primary_domain: "blade",
         secondary_domain: "midnight",
@@ -151,14 +152,14 @@ export const CLASSES = {
               remove the condition except by defeating the target. The GM can spend a number of Fear equal 
               to your Proficiency to remove the <i>Marked for Death</i> condition. Otherwise, it ends
               automatically when you take a rest.</p>`,
-                effect_ids: []
+                modifier_ids: []
             },
             {
                 title: "Get In & Get Out",
                 description_html: `<p><b>Spend a Hope</b> to ask the GM for either a quick or inconspicuous way 
               into or out of a building or structure you can see. The next roll you make that capitalizes 
               on this information has advantage.</p>`,
-                effect_ids: []
+                modifier_ids: []
             },
         ],
         subclasses: {
@@ -214,10 +215,6 @@ export const JUST_JAMES: Character = {
         max_hp: 0,
         max_stress: 6,
         evasion: 0,
-        damage_thresholds: {
-            major: 0,
-            severe: 0,
-        },
         primary_class_mastery_level: 0,
         secondary_class_mastery_level: 0,
     },
@@ -233,13 +230,17 @@ export const JUST_JAMES: Character = {
     secondary_class: null,
     secondary_subclass: null,
 
+    // equipment
+    active_armor: null,
+    active_weapons: [],
+
     // the void / other
     transformation_card: TRANSFORMATION_CARDS.werewolf,
     additional_cards: [
         DOMAINS.valor.cards.bare_bones,
         DOMAINS.bone.cards.untouchable
     ],
-    additional_effect_ids: [],
+    additional_modifier_ids: [],
 
     // set by the player
     ephemeral_stats: {
@@ -348,10 +349,6 @@ export const NEW_CHARACTER: Character = {
         max_hp: 0,
         max_stress: 6,
         evasion: 0,
-        damage_thresholds: {
-            major: 0,
-            severe: 0,
-        },
         primary_class_mastery_level: 0,
         secondary_class_mastery_level: 0,
     },
@@ -359,7 +356,7 @@ export const NEW_CHARACTER: Character = {
     // heritage
     ancestry_card: null,
     community_card: null,
-    experiences: ["",""],
+    experiences: ["", ""],
 
     // classes
     primary_class: null,
@@ -367,10 +364,14 @@ export const NEW_CHARACTER: Character = {
     secondary_class: null,
     secondary_subclass: null,
 
+    // equipment
+    active_armor: TIER_1_ARMOR.leather_armor,
+    active_weapons: [TIER_1_WEAPONS.longsword],
+
     // the void / other
     transformation_card: null,
     additional_cards: [],
-    additional_effect_ids: [],
+    additional_modifier_ids: [],
 
     // set by the player
     ephemeral_stats: {

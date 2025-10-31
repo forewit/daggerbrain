@@ -228,7 +228,6 @@
             </Select.Root>
 
             <!-- secondary choices based on the selected option -->
-
             {#if choices[key].option_id === "tier_2_traits"}
               <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md">
                 <p class="py-1 px-2 text-xs italic text-muted-foreground">

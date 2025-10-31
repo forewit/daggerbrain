@@ -1,7 +1,6 @@
-import type { EFFECTS } from "./constants/effects"
+import type { MODIFIERS } from "./constants/modifiers"
 import type { ALL_LEVEL_UP_OPTIONS } from "./constants/rules"
 
-// todo: Need to add armor (and it's effect) as well as an "unarmored" default -- will do later (ignore for now)
 
 export type Character = {
     settings: {
@@ -21,10 +20,6 @@ export type Character = {
         max_hp: 0
         max_stress: 6
         evasion: 0
-        damage_thresholds: {
-            major: 0,
-            severe: 0,
-        }
         primary_class_mastery_level: 0
         secondary_class_mastery_level: 0
     }
@@ -40,10 +35,14 @@ export type Character = {
     secondary_class: Class | null
     secondary_subclass: Subclass | null
 
+    // equipment
+    active_armor: Armor | null;
+    active_weapons: Weapon[];
+
     // the void / other
     transformation_card: Card<"transformation"> | null,
     additional_cards: Card<any>[],
-    additional_effect_ids: (keyof typeof EFFECTS)[]
+    additional_modifier_ids: (keyof typeof MODIFIERS)[]
 
     // set by the player
     ephemeral_stats: {
@@ -136,7 +135,7 @@ export type Subclass = {
     mastery_card: Card<"subclass_mastery">
 }
 
-export type Effect = ({
+export type Modifier = ({
     behavior: "bonus" | "base" | "override"
     min_level: number | null;
     max_level: number | null;
@@ -156,7 +155,7 @@ export type Effect = ({
 export type Feature = {
     title: string,
     description_html: string,
-    effect_ids: (keyof typeof EFFECTS)[]
+    modifier_ids: (keyof typeof MODIFIERS)[]
 }
 
 export type CardType = "domain" | "ancestry" | "community" | "transformation" | "subclass_foundation" | "subclass_specialization" | "subclass_mastery";
@@ -201,7 +200,34 @@ export type LevelUpOption = {
     title: string | null
     short_title: string | null
     max: number
-    effect_ids: (keyof typeof EFFECTS)[]
+    modifier_ids: (keyof typeof MODIFIERS)[]
 }
 
 export type Source = "Core" | "The Void 1.0" | "The Void 1.5"
+
+export type Armor = {
+    level_requirement: number,
+    title: string,
+    description_html: string,
+    max_armor: number,
+    damage_thresholds: {
+        major: number,
+        severe: number
+    }
+    features: Feature[],
+}
+
+export type Range = "Melee" | "Very Close" | "Close" | "Far" | "Very Far";
+
+export type Weapon = {
+    title: string,
+    description_html: string,
+    level_requirement: number,
+    category: "Primary" | "Secondary";
+    trait: keyof Traits;
+    range: Range;
+    features: Feature[];
+    damage: string;
+    damage_type: "phy" | "mag";
+    burden: 1 | 2 // represents number of hands required to wield
+}

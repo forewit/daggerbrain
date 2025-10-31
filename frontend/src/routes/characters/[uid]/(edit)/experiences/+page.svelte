@@ -25,17 +25,20 @@
     <div class="m-4 flex flex-col gap-4">
       <Dropdown
         title="Experiences"
-        subtitle={character.experiences
-          .filter((experience) => experience !== "")
-          .join(", ")}
+        subtitle={character.experiences.filter((experience) => experience !== "").join(", ")}
       >
         <div class="text-sm italic flex flex-col gap-2">
           {@html EXPERIENCES.description_html}
         </div>
         {#each character.experiences as experience, i}
-          <div class="flex items-center mt-4 bg-primary/50 rounded-lg p-4">
-            <Input bind:value={character.experiences[i]} placeholder="Name" />
-            <p class="font-medium pr-4 pl-5">+{character.derived_stats.experience_modifiers[i]}</p>
+          <div class="mt-4 bg-primary/50 p-2 rounded-md">
+            <p class="text-xs italic pb-1 px-2">Experience name</p>
+            <div class="flex items-center">
+              <Input bind:value={character.experiences[i]} placeholder="Name" />
+              <p class="font-medium pr-4 pl-5">
+                +{character.derived_stats.experience_modifiers[i]}
+              </p>
+            </div>
           </div>
         {/each}
       </Dropdown>

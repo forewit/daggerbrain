@@ -11,7 +11,7 @@ export const BLANK_LEVEL_UP_OPTION = {
     title: null,
     short_title: null,
     max: 0,
-    effect_ids: [],
+    modifier_ids: [],
 } as const satisfies LevelUpOption
 
 export const BLANK_LEVEL_UP_CHOICE = {
@@ -27,7 +27,7 @@ export const TIER_1_BASE_OPTIONS = {
         title: "Choose 2 level 1 domain cards from the domains available to you.",
         short_title: "Starting Domain Cards",
         max: 1,
-        effect_ids: []
+        modifier_ids: []
     }
  } as const satisfies Record<string, LevelUpOption>
 
@@ -36,37 +36,37 @@ export const TIER_2_BASE_OPTIONS = {
         title: "Gain a +1 bonus to two unmarked character traits and mark them.",
         short_title: "+1 to 2 Traits",
         max: 3,
-        effect_ids: []
+        modifier_ids: []
     },
     tier_2_max_hp: {
         title: "Permanently gain 1 Hit Point slot.",
         short_title: "+1 HP Slot",
         max: 2,
-        effect_ids: ["max_hp_plus_1"]
+        modifier_ids: ["max_hp_plus_1"]
     },
     tier_2_max_stress: {
         title: "Permanently gain 1 Stress slot.",
         short_title: "+1 Stress Slot",
         max: 2,
-        effect_ids: ["max_stress_plus_1"]
+        modifier_ids: ["max_stress_plus_1"]
     },
     tier_2_experience_bonus: {
         title: "Permanently gain a +1 bonus to two Experiences.",
         short_title: "+1 to 2 Experiences",
         max: 1,
-        effect_ids: []
+        modifier_ids: []
     },
     tier_2_domain_card: {
         title: "Choose an additional domain card of your level or lower from a domain you have access to (up to level 4).",
         short_title: "+1 Domain Card",
         max: 1,
-        effect_ids: []
+        modifier_ids: []
     },
     tier_2_evasion: {
         title:"Permanently gain a +1 bonus to your Evasion.",
         short_title: "+1 Evasion",
         max: 1,
-        effect_ids: ["evasion_plus_1"]
+        modifier_ids: ["evasion_plus_1"]
     }
  } as const satisfies Record<string, LevelUpOption>
 
