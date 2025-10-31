@@ -46,6 +46,20 @@
       <p class="text-2xl font-bold">Characters</p>
       <Button
         variant="outline"
+        class="ml-auto"
+        onclick={() => {
+          redirecting = true;
+          const uid = app.newJustJames();
+          goto(`/characters/${uid}/edit/`).catch((err) => {
+            console.error(err);
+            redirecting = false;
+          });
+        }}
+      >
+        +JJ
+      </Button>
+      <Button
+        variant="outline"
         onclick={() => {
           redirecting = true;
           const uid = app.newCharacter();
@@ -53,8 +67,10 @@
             console.error(err);
             redirecting = false;
           });
-        }}><Plus /> New Character</Button
+        }}
       >
+        <Plus /> New Character
+      </Button>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

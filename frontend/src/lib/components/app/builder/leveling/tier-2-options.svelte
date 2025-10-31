@@ -5,8 +5,13 @@
   import SquareCheck from "@lucide/svelte/icons/square-check";
   import * as Select from "$lib/components/ui/select/";
   import * as Dialog from "$lib/components/ui/dialog/";
-  import { BLANK_LEVEL_UP_OPTION, TIER_2_BASE_OPTIONS } from "$lib/ts/rules";
-  import { DOMAINS, TRAITS } from "$lib/ts/constants";
+  import {
+    ALL_LEVEL_UP_OPTIONS,
+    BLANK_LEVEL_UP_CHOICE,
+    BLANK_LEVEL_UP_OPTION,
+    TIER_2_BASE_OPTIONS,
+  } from "$lib/ts/constants/rules";
+  import { DOMAINS, TRAITS } from "$lib/ts/constants/constants";
   import DomainCard from "../../cards/domain-card.svelte";
   import { getCharacterContext } from "$lib/ts/character.svelte";
   import { buttonVariants } from "$lib/components/ui/button";
@@ -36,17 +41,13 @@
       if (level_up_domain_cards.A !== null) domain_cards.push(level_up_domain_cards.A);
 
       const choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
-      if (choices.A.id === "tier_2_domain_card") {
-        if (choices.A.domain_cards_added.A !== null)
-          domain_cards.push(choices.A.domain_cards_added.A);
-        if (choices.A.domain_cards_added.B !== null)
-          domain_cards.push(choices.A.domain_cards_added.B);
+      if (choices.A.option_id === "tier_2_domain_card") {
+        if (choices.A.selected_domain_card !== null)
+          domain_cards.push(choices.A.selected_domain_card);
       }
-      if (choices.B.id === "tier_2_domain_card") {
-        if (choices.B.domain_cards_added.A !== null)
-          domain_cards.push(choices.B.domain_cards_added.A);
-        if (choices.B.domain_cards_added.B !== null)
-          domain_cards.push(choices.B.domain_cards_added.B);
+      if (choices.B.option_id === "tier_2_domain_card") {
+        if (choices.B.selected_domain_card !== null)
+          domain_cards.push(choices.B.selected_domain_card);
       }
     }
     return domain_cards;
@@ -70,19 +71,19 @@
     const choices = character.level_up_choices[level as keyof typeof character.level_up_choices];
 
     return (
-      !choices.A.id ||
-      !choices.B.id ||
+      !choices.A.option_id ||
+      !choices.B.option_id ||
       character.level_up_domain_cards[level as keyof typeof character.level_up_domain_cards].A ===
         null ||
-      (choices.A.id === "tier_2_domain_card" && choices.A.domain_cards_added.A === null) ||
-      (choices.B.id === "tier_2_domain_card" && choices.B.domain_cards_added.A === null) ||
-      (choices.A.id === "tier_2_traits" &&
+      (choices.A.option_id === "tier_2_domain_card" && choices.A.selected_domain_card === null) ||
+      (choices.B.option_id === "tier_2_domain_card" && choices.B.selected_domain_card === null) ||
+      (choices.A.option_id === "tier_2_traits" &&
         (choices.A.marked_traits.A === null || choices.A.marked_traits.B === null)) ||
-      (choices.B.id === "tier_2_traits" &&
+      (choices.B.option_id === "tier_2_traits" &&
         (choices.B.marked_traits.A === null || choices.B.marked_traits.B === null)) ||
-      (choices.A.id === "tier_2_experience_bonus" &&
+      (choices.A.option_id === "tier_2_experience_bonus" &&
         (choices.A.selected_experiences.A === null || choices.A.selected_experiences.B === null)) ||
-      (choices.B.id === "tier_2_experience_bonus" &&
+      (choices.B.option_id === "tier_2_experience_bonus" &&
         (choices.B.selected_experiences.A === null || choices.B.selected_experiences.B === null))
     );
   });
@@ -90,6 +91,10 @@
 
 {#if character}
   {@const choices = character.level_up_choices[level as keyof typeof character.level_up_choices]}
+  {@const chosen_options = {
+    A: choices.A.option_id === null ? BLANK_LEVEL_UP_OPTION : ALL_LEVEL_UP_OPTIONS[choices.A.option_id],
+    B: choices.B.option_id === null ? BLANK_LEVEL_UP_OPTION : ALL_LEVEL_UP_OPTIONS[choices.B.option_id],
+  }}
   {@const level_up_domain_cards =
     character.level_up_domain_cards[level as keyof typeof character.level_up_domain_cards]}
 
@@ -97,7 +102,7 @@
     <Dropdown
       title="Level {level}"
       {highlighted}
-      subtitle={[choices.A.short_title, choices.B.short_title]
+      subtitle={[chosen_options.A.short_title, chosen_options.B.short_title]
         .filter((title) => title !== null)
         .join(", ")}
     >
@@ -178,23 +183,18 @@
           <div class="flex flex-col gap-2">
             <Select.Root
               type="single"
-              value={choices[key].id || ""}
+              value={choices[key].option_id || ""}
               onValueChange={(value) => {
-                const option = TIER_2_BASE_OPTIONS.find((option) => option.id === value);
-                if (option) {
-                  choices[key] = { ...choices[key], ...option };
-                } else {
-                  choices[key] = BLANK_LEVEL_UP_OPTION;
-                }
+                const option_id = Object.keys(TIER_2_BASE_OPTIONS).find((key) => key === value);
+                choices[key] = option_id === undefined ? BLANK_LEVEL_UP_CHOICE : {...BLANK_LEVEL_UP_CHOICE, option_id:(option_id as keyof typeof TIER_2_BASE_OPTIONS)}
               }}
             >
               <Select.Trigger
-                highlighted={choices[key].id === null}
+                highlighted={choices[key].option_id === null}
                 class="w-full truncate bg-muted/80 hover:bg-muted/50"
               >
                 <p class="truncate">
-                  {TIER_2_BASE_OPTIONS.find((option) => option.id === choices[key].id)
-                    ?.short_title || "Select a tier 2 option"}
+                  {choices[key].option_id === null ? "Select a tier 2 option" : ALL_LEVEL_UP_OPTIONS[choices[key].option_id].short_title}
                 </p>
               </Select.Trigger>
               <Select.Content class="rounded-md " align="start">
@@ -204,16 +204,16 @@
                   </Select.Item>
                   <Select.Label>Tier 2 Options</Select.Label>
 
-                  {#each TIER_2_BASE_OPTIONS as option}
+                  {#each Object.entries(TIER_2_BASE_OPTIONS) as [option_id, option]}
                     <Select.Item
-                      value={option.id}
-                      disabled={context.options_used[option.id] >= context.options_max[option.id] &&
-                        choices[key].id !== option.id}
+                      value={option_id}
+                      disabled={context.options_used[option_id] >= option.max &&
+                        choices[key].option_id !== option_id}
                       class="hover:cursor-pointer"
                     >
                       <div class="flex gap-1 w-14 shrink-0 justify-end">
                         {#each Array(option.max) as _, i}
-                          {#if i < context.options_used[option.id]}
+                          {#if i < context.options_used[option_id]}
                             <SquareCheck class="size-4" />
                           {:else}
                             <Square class="size-4" />
@@ -229,7 +229,7 @@
 
             <!-- secondary choices based on the selected option -->
 
-            {#if choices[key].id === "tier_2_traits"}
+            {#if choices[key].option_id === "tier_2_traits"}
               <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md">
                 <p class="py-1 px-2 text-xs italic text-muted-foreground">
                   Choose 2 unmarked character traits.
@@ -304,7 +304,7 @@
                   </Select.Root>
                 </div>
               </div>
-            {:else if choices[key].id === "tier_2_experience_bonus"}
+            {:else if choices[key].option_id === "tier_2_experience_bonus"}
               <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md">
                 <p class="py-1 px-2 text-xs italic font-medium text-muted-foreground">
                   Choose 2 Experiences.
@@ -386,7 +386,7 @@
                   </Select.Root>
                 </div>
               </div>
-            {:else if choices[key].id === "tier_2_domain_card"}
+            {:else if choices[key].option_id === "tier_2_domain_card"}
               <div
                 class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md"
                 bind:clientWidth={width}
@@ -400,16 +400,16 @@
                     class={cn(
                       buttonVariants({ variant: "outline" }),
                       "w-full truncate flex items-center justify-between bg-card/50 hover:bg-card/70",
-                      choices[key].domain_cards_added.A === null &&
+                      choices[key].selected_domain_card === null &&
                         "text-muted-foreground hover:text-muted-foreground"
                     )}
                     style={cn(
-                      choices[key].domain_cards_added.A === null &&
+                      choices[key].selected_domain_card === null &&
                         "outline-offset: 2px; outline-width: 2px; outline-color: var(--primary); outline-style: solid;"
                     )}
                   >
                     <p class="truncate">
-                      {choices[key].domain_cards_added.A?.title || "Select a domain card"}
+                      {choices[key].selected_domain_card?.title || "Select a domain card"}
                     </p>
                     <ChevronRight class="size-4 opacity-50" />
                   </Dialog.Trigger>
@@ -431,12 +431,12 @@
                         <Dialog.Close
                           class={cn(
                             "w-full rounded-xl outline-offset-3 outline-primary hover:outline-4 hover:cursor-pointer disabled:pointer-events-none disabled:opacity-50 disabled:cursor-default",
-                            choices[key].domain_cards_added.A?.title === card.title && "outline-4"
+                            choices[key].selected_domain_card?.title === card.title && "outline-4"
                           )}
                           onclick={() => {
-                            choices[key].domain_cards_added.A = card;
+                            choices[key].selected_domain_card = card;
                           }}
-                          disabled={choices[key].domain_cards_added.A?.title !== card.title &&
+                          disabled={choices[key].selected_domain_card?.title !== card.title &&
                             previously_chosen_domain_cards.some((c) => c.title === card.title)}
                         >
                           <DomainCard {card} class="w-full h-full" />
@@ -444,14 +444,14 @@
                       {/each}
                     </div>
                     <Dialog.Footer>
-                      {#if choices[key].domain_cards_added.A === null}
+                      {#if choices[key].selected_domain_card === null}
                         <Dialog.Close class={cn(buttonVariants({ variant: "link" }))}>
                           Cancel
                         </Dialog.Close>
                       {:else}
                         <Dialog.Close
                           class={cn(buttonVariants({ variant: "link" }), "text-destructive")}
-                          onclick={() => (choices[key].domain_cards_added.A = null)}
+                          onclick={() => (choices[key].selected_domain_card = null)}
                         >
                           Clear selection
                         </Dialog.Close>

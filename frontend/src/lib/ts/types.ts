@@ -1,3 +1,8 @@
+import type { EFFECTS } from "./constants/effects"
+import type { ALL_LEVEL_UP_OPTIONS } from "./constants/rules"
+
+// todo: Need to add armor (and it's effect) as well as an "unarmored" default -- will do later (ignore for now)
+
 export type Character = {
     settings: {
         void_enabled: boolean
@@ -38,7 +43,7 @@ export type Character = {
     // the void / other
     transformation_card: Card<"transformation"> | null,
     additional_cards: Card<any>[],
-    additional_effect_ids: string[]
+    additional_effect_ids: (keyof typeof EFFECTS)[]
 
     // set by the player
     ephemeral_stats: {
@@ -64,19 +69,18 @@ export type Character = {
         10: { A: Card<"domain"> | null },
     }
     level_up_choices: {
-        2: { A: LevelUpOption, B: LevelUpOption },
-        3: { A: LevelUpOption, B: LevelUpOption },
-        4: { A: LevelUpOption, B: LevelUpOption },
-        5: { A: LevelUpOption, B: LevelUpOption },
-        6: { A: LevelUpOption, B: LevelUpOption },
-        7: { A: LevelUpOption, B: LevelUpOption },
-        8: { A: LevelUpOption, B: LevelUpOption },
-        9: { A: LevelUpOption, B: LevelUpOption },
-        10: { A: LevelUpOption, B: LevelUpOption },
+        2: { A: LevelUpChoice, B: LevelUpChoice },
+        3: { A: LevelUpChoice, B: LevelUpChoice },
+        4: { A: LevelUpChoice, B: LevelUpChoice },
+        5: { A: LevelUpChoice, B: LevelUpChoice },
+        6: { A: LevelUpChoice, B: LevelUpChoice },
+        7: { A: LevelUpChoice, B: LevelUpChoice },
+        8: { A: LevelUpChoice, B: LevelUpChoice },
+        9: { A: LevelUpChoice, B: LevelUpChoice },
+        10: { A: LevelUpChoice, B: LevelUpChoice },
     }
 
     // will be overwritten and calculated
-    derived_effects: Effect[]
     derived_domain_card_vault: Card<"domain">[],
     derived_stats: {
         // from base stats
@@ -117,17 +121,10 @@ export type Class = {
     starting_evasion: number
     starting_max_hp: number
     suggested_traits: Traits
-    hope_feature: {
-        title: string
-        description_html: string
-    }
+    hope_feature: Feature
     primary_domain: string
     secondary_domain: string
-    class_features: {
-        title: string
-        description_html: string
-    }[]
-    effect_ids: string[]
+    class_features: Feature[]
     subclasses: Record<string, Subclass>
 }
 
@@ -139,26 +136,28 @@ export type Subclass = {
     mastery_card: Card<"subclass_mastery">
 }
 
-export type Modifier = ({
-    min_level: number; // -1 = no limit
-    max_level: number; // -1 = no limit
-    target: "trait" | "evasion" | "max_hp" | "max_stress" | "max_experiences" | "major_damage_threshold" | "severe_damage_threshold" | "primary_class_mastery_level" | "secondary_class_mastery_level" | "max_domain_card_loadout" | "max_hope"
+export type Effect = ({
+    behavior: "bonus" | "base" | "override"
+    min_level: number | null;
+    max_level: number | null;
+    target: "evasion" | "max_hp" | "max_stress" | "max_experiences" | "major_damage_threshold" | "severe_damage_threshold" | "primary_class_mastery_level" | "secondary_class_mastery_level" | "max_domain_card_loadout" | "max_hope" | "proficiency" | "max_armor"
 } | {
-    target: "experience"
-    experience_name: string
+    target: "trait"
+    trait: keyof Traits
 }) & ({
     type: "derived_from_trait"
     trait: keyof Traits
-    multiplier: number // always rounded up
+    multiplier: number
 } | {
     type: "flat"
     value: number
 })
 
-export type Effect = ({
-    modifiers?: Modifier[]
-    overrides?: Modifier[]
-})
+export type Feature = {
+    title: string,
+    description_html: string,
+    effect_ids: (keyof typeof EFFECTS)[]
+}
 
 export type CardType = "domain" | "ancestry" | "community" | "transformation" | "subclass_foundation" | "subclass_specialization" | "subclass_mastery";
 export type Card<T extends CardType> = {
@@ -167,11 +166,7 @@ export type Card<T extends CardType> = {
     title: string
     description_html: string
     artist_name: string
-    features: {
-        title: string
-        description_html: string
-    }[]
-    effect_ids: string[]
+    features: Feature[]
 } & (
         T extends "domain" ? {
             domain_name: string
@@ -196,15 +191,17 @@ export type Domain = {
     cards: Record<string, Card<"domain">>
 }
 
+export type LevelUpChoice = {
+    option_id: keyof typeof ALL_LEVEL_UP_OPTIONS | null
+    marked_traits: { A: keyof Traits | null, B: keyof Traits | null }
+    selected_experiences: { A: number | null, B: number | null }
+    selected_domain_card: Card<"domain"> | null,
+}
 export type LevelUpOption = {
-    id: string | null
     title: string | null
     short_title: string | null
     max: number
-    marked_traits: { A: keyof Traits | null, B: keyof Traits | null }
-    selected_experiences: { A: number | null, B: number | null }
-    domain_cards_added: { A: Card<"domain"> | null, B: Card<"domain"> | null }
-    effect_ids: string[]
+    effect_ids: (keyof typeof EFFECTS)[]
 }
 
 export type Source = "Core" | "The Void 1.0" | "The Void 1.5"

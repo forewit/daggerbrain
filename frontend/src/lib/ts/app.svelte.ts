@@ -1,7 +1,7 @@
 import type { Character } from './types';
 import { getContext, setContext } from 'svelte';
 import { loadCharacters, saveCharacters } from './data';
-import { JUST_JAMES, NEW_CHARACTER } from './constants';
+import { JUST_JAMES, NEW_CHARACTER } from './constants/constants';
 
 function createApp() {
   // --- ephemeral state ---
@@ -18,11 +18,18 @@ function createApp() {
     if (from) {
       const character = characters.find((c) => c.uid === from)
       if (character) {
-        characters.push({ ...character, uid })
+        characters.push({ ...JSON.parse(JSON.stringify(character)), uid })
       }
     } else {
-      characters.push({ ...NEW_CHARACTER, uid })
+      characters.push({ ...JSON.parse(JSON.stringify(NEW_CHARACTER)), uid })
     }
+    return uid
+  }
+
+  function newJustJames(from?: string): string {
+    const uid = crypto.randomUUID()
+    characters.push({ ...JSON.parse(JSON.stringify(JUST_JAMES)), uid })
+
     return uid
   }
 
@@ -54,6 +61,7 @@ function createApp() {
     // helper functions
     destroy,
     newCharacter,
+    newJustJames,
     deleteCharacter,
 
     get showFooter() { return showFooter },

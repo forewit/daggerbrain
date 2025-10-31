@@ -6,7 +6,7 @@
   import Input from "$lib/components/ui/input/input.svelte";
   import Textarea from "$lib/components/ui/textarea/textarea.svelte";
   import Dropdown from "$lib/components/app/builder/dropdown.svelte";
-  import { EXPERIENCES } from "$lib/ts/rules.js";
+  import { EXPERIENCES } from "$lib/ts/constants/rules";
   import { getCharacterContext } from "$lib/ts/character.svelte.js";
 
   let { data } = $props();

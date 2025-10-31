@@ -1,6 +1,6 @@
 import { ANCESTRY_CARDS, BLADE_DOMAIN_CARDS, BONE_DOMAIN_CARDS, COMMUNITY_CARDS, SUBCLASS_CARDS, TRANSFORMATION_CARDS, VALOR_DOMAIN_CARDS } from "./cards";
-import { BLANK_LEVEL_UP_OPTION, TIER_1_BASE_OPTIONS } from "./rules";
-import type { Domain, Class, Subclass, Card, Character } from "./types";
+import { BLANK_LEVEL_UP_CHOICE, BLANK_LEVEL_UP_OPTION, TIER_1_BASE_OPTIONS } from "./rules";
+import type { Domain, Class, Subclass, Card, Character } from "../types";
 
 
 export const DOMAINS = {
@@ -136,6 +136,7 @@ export const CLASSES = {
         hope_feature: {
             title: "Grim Resolve",
             description_html: "<p><b>Spend 3 Hope</b> to clear 2 Stress.</p>",
+            effect_ids: []
         },
         primary_domain: "blade",
         secondary_domain: "midnight",
@@ -150,12 +151,14 @@ export const CLASSES = {
               remove the condition except by defeating the target. The GM can spend a number of Fear equal 
               to your Proficiency to remove the <i>Marked for Death</i> condition. Otherwise, it ends
               automatically when you take a rest.</p>`,
+                effect_ids: []
             },
             {
                 title: "Get In & Get Out",
                 description_html: `<p><b>Spend a Hope</b> to ask the GM for either a quick or inconspicuous way 
               into or out of a building or structure you can see. The next roll you make that capitalizes 
               on this information has advantage.</p>`,
+                effect_ids: []
             },
         ],
         subclasses: {
@@ -167,8 +170,6 @@ export const CLASSES = {
                 mastery_card: SUBCLASS_CARDS.executioners_guild_mastery,
             }
         },
-        effect_ids: [],
-
     }
 } as const satisfies Record<string, Class>
 
@@ -224,7 +225,7 @@ export const JUST_JAMES: Character = {
     // heritage
     ancestry_card: ANCESTRY_CARDS.half_clank,
     community_card: COMMUNITY_CARDS.warborne,
-    experiences: ["Cool under pressure", "Astronomer in the making", ""],
+    experiences: ["Cool under pressure", "Astronomer in the making", "Paranoid"],
 
     // classes
     primary_class: CLASSES.assassin,
@@ -266,37 +267,28 @@ export const JUST_JAMES: Character = {
     level_up_choices: {
         2: {
             A: {
-                id: "tier_2_traits",
-                title: "Gain a +1 bonus to two unmarked character traits and mark them.",
-                short_title: "+1 to 2 Traits",
-                max: 3,
-                effect_ids: [],
+                option_id: "tier_2_traits",
                 marked_traits: { A: "agility", B: "strength" },
                 selected_experiences: { A: null, B: null },
-                domain_cards_added: { A: null, B: null },
+                selected_domain_card: null,
             }, B: {
-                id: "tier_2_evasion",
-                title: "Permanently gain a +1 bonus to your Evasion.",
-                short_title: "+1 Evasion",
-                max: 1,
-                effect_ids: [],
+                option_id: "tier_2_evasion",
                 marked_traits: { A: null, B: null },
                 selected_experiences: { A: null, B: null },
-                domain_cards_added: { A: null, B: null },
+                selected_domain_card: null,
             }
         },
-        3: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
-        4: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
-        5: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
-        6: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
-        7: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
-        8: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
-        9: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
-        10: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
+        3: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
+        4: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
+        5: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
+        6: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
+        7: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
+        8: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
+        9: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
+        10: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
     },
 
     // will be overwritten and calculated
-    derived_effects: [],
     derived_domain_card_vault: [
         DOMAINS.blade.cards.whirlwind,
         DOMAINS.blade.cards.not_good_enough,
@@ -313,7 +305,7 @@ export const JUST_JAMES: Character = {
             knowledge: -1,
         },
         proficiency: 2,
-        experience_modifiers: [2,2,2],
+        experience_modifiers: [2, 2, 2],
         max_experiences: 3,
         max_domain_card_loadout: 5,
         max_hope: 6,
@@ -367,7 +359,7 @@ export const NEW_CHARACTER: Character = {
     // heritage
     ancestry_card: null,
     community_card: null,
-    experiences: [],
+    experiences: ["",""],
 
     // classes
     primary_class: null,
@@ -404,19 +396,18 @@ export const NEW_CHARACTER: Character = {
         10: { A: null },
     },
     level_up_choices: {
-        2: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
-        3: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
-        4: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
-        5: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
-        6: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
-        7: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
-        8: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
-        9: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
-        10: { A: BLANK_LEVEL_UP_OPTION, B: BLANK_LEVEL_UP_OPTION },
+        2: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
+        3: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
+        4: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
+        5: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
+        6: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
+        7: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
+        8: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
+        9: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
+        10: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
     },
 
     // will be overwritten and calculated
-    derived_effects: [],
     derived_domain_card_vault: [],
     derived_stats: {
         // from base stats

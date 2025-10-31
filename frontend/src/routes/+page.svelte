@@ -12,8 +12,8 @@
     COMMUNITY_CARDS,
     SUBCLASS_CARDS,
     TRANSFORMATION_CARDS,
-  } from "$lib/ts/cards";
-  import { TRAITS } from "$lib/ts/constants";
+  } from "$lib/ts/constants/cards";
+  import { TRAITS } from "$lib/ts/constants/constants";
   import { cn } from "$lib/utils";
 
   const app = getAppContext();

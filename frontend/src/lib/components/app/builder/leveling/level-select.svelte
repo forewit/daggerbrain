@@ -4,7 +4,7 @@
   import { buttonVariants } from "$lib/components/ui/button";
   import { cn } from "$lib/utils";
   import type { LevelUpOption, Character } from "$lib/ts/types";
-  import { BLANK_LEVEL_UP_OPTION } from "$lib/ts/rules";
+  import { BLANK_LEVEL_UP_OPTION } from "$lib/ts/constants/rules";
 
   let {
     level = $bindable(),

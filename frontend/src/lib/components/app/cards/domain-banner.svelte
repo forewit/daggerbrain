@@ -1,7 +1,7 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
   import type { Class, Domain } from "$lib/ts/types";
-  import { DOMAINS } from "$lib/ts/constants";
+  import { DOMAINS } from "$lib/ts/constants/constants";
 
   let {
     class: className = "",

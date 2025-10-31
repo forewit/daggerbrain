@@ -9,7 +9,7 @@
   import Button, { buttonVariants } from "$lib/components/ui/button/button.svelte";
   import { cn } from "$lib/utils";
   import ClassSummary from "../class-summary.svelte";
-  import { CLASSES, DOMAINS } from "$lib/ts/constants";
+  import { CLASSES, DOMAINS } from "$lib/ts/constants/constants";
   import DomainCard from "../../cards/domain-card.svelte";
 
   let { character = $bindable(), class: className = "" }: { character: Character; class?: string } =

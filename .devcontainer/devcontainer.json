@@ -1,6 +1,10 @@
 {
-  "image": "mcr.microsoft.com/devcontainers/base:alpine",
-  "features": {
-    "ghcr.io/devcontainer-community/devcontainer-features/bun.sh:1": {}
-  }
+  "name": "Bun Dev Container",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {},
+  "postCreateCommand": "curl -fsSL https://bun.sh/install | bash",
+  "containerEnv": {
+    "PATH": "/home/vscode/.bun/bin:${PATH}"
+  },
+  "remoteUser": "vscode"
 }

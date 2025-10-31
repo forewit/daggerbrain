@@ -1,6 +1,6 @@
 <script lang="ts">
   import ExternalLink from "@lucide/svelte/icons/external-link";
-import { page } from "$app/state";
+  import { page } from "$app/state";
   import { cn, capitalize, handleImageUpload } from "$lib/utils";
   import Settings from "@lucide/svelte/icons/settings";
   import Button from "$lib/components/ui/button/button.svelte";
@@ -9,6 +9,7 @@ import { page } from "$app/state";
   import { onMount } from "svelte";
   import Input from "$lib/components/ui/input/input.svelte";
   import { getCharacterContext } from "$lib/ts/character.svelte.js";
+  import { goto } from "$app/navigation";
 
   let { data, children } = $props();
 
@@ -16,7 +17,7 @@ import { page } from "$app/state";
   const character = $derived(context.character);
 
   const tabs = ["edit", "heritage", "class", "traits", "experiences", "equipment"];
-  let activeTab = $derived( page.url.pathname.split("/").filter(Boolean).pop() || "edit");
+  let activeTab = $derived(page.url.pathname.split("/").filter(Boolean).pop() || "edit");
   let fileInput = $state<HTMLInputElement>();
 
   function onImageUploadSuccess(dataUrl: string) {
@@ -29,17 +30,17 @@ import { page } from "$app/state";
     fileInput?.click();
   }
 
-  function scrollToActiveTab(event?: Event) {
+  function scrollToActiveTab(instant?: Event | boolean) {
     const el = document.getElementById(activeTab);
     el?.scrollIntoView({
-      behavior: event ? "instant" : "smooth",
+      behavior: instant ? "instant" : "smooth",
       inline: "center",
+      block: "end"
     });
   }
 
-  $effect(scrollToActiveTab);
-
   onMount(() => {
+    scrollToActiveTab(true);
     window.addEventListener("resize", scrollToActiveTab);
 
     return () => {
@@ -65,7 +66,6 @@ import { page } from "$app/state";
       <Button
         id={tab}
         variant="ghost"
-        href={`/characters/${character.uid}/${tab}/`}
         class={cn(
           "focus-visible:ring-foreground",
           "border-y h-12 bg-muted hover:bg-muted",
@@ -74,6 +74,7 @@ import { page } from "$app/state";
             "border-accent/10 hover:text-accent text-accent bg-accent-muted hover:bg-accent-muted",
           i === 0 && "@3xl:rounded-l-full"
         )}
+        onclick={() => goto(`/characters/${character.uid}/${tab}/`).then(() => scrollToActiveTab())}
       >
         {#if i === 0}
           <Settings class="size-4" />

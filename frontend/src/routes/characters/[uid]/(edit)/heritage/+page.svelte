@@ -9,7 +9,7 @@
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import Dropdown from "$lib/components/app/builder/dropdown.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
-  import { ANCESTRIES, COMMUNITIES, TRANSFORMATIONS } from "$lib/ts/constants.js";
+  import { ANCESTRIES, COMMUNITIES, TRANSFORMATIONS } from "$lib/ts/constants/constants.js";
   import HeritageCard from "$lib/components/app/cards/ancestry-card.svelte";
   import TransformationCard from "$lib/components/app/cards/transformation-card.svelte";
   import CommunityCard from "$lib/components/app/cards/community-card.svelte";
