@@ -1,7 +1,7 @@
 import { getAppContext } from './app.svelte';
 import { ALL_LEVEL_UP_OPTIONS, BLANK_LEVEL_UP_CHOICE, BLANK_LEVEL_UP_OPTION, TIER_1_BASE_OPTIONS, TIER_2_BASE_OPTIONS, TRAIT_OPTIONS } from './constants/rules';
 import { MODIFIERS } from './constants/modifiers';
-import type { Card, Character, Modifier, LevelUpChoice, LevelUpOption, Traits } from './types';
+import type { Card, Character, Modifier, LevelUpChoice, LevelUpOption, Traits, Weapon } from './types';
 import { getContext, setContext } from 'svelte';
 
 function createCharacter(uid: string) {
@@ -349,10 +349,39 @@ function createCharacter(uid: string) {
     })
 
     // ! clear invalid active weapons
-    // todo: implement
+    $effect(() => {
+        if (!character) return;
+
+        const valid_weapons = character.active_weapons.filter(
+            (weapon) => weapon.level_requirement <= (character?.level || 0)
+        );
+
+        let total_burden = 0;
+        const selected_categories = new Set<"Primary" | "Secondary">();
+        const active_weapons: Weapon[] = [];
+
+        for (const weapon of valid_weapons) {
+            if (total_burden + weapon.burden > 2) continue;
+            if (selected_categories.has(weapon.category)) continue;
+
+            selected_categories.add(weapon.category);
+            total_burden += weapon.burden;
+            active_weapons.push(weapon);
+        }
+
+        character.active_weapons = active_weapons;
+    })
 
     // ! clear invalid active armor
-    // todo: implement
+    $effect(() => {
+        if (!character) return;
+        if (character.active_armor === null) return;
+        if (character.active_armor.level_requirement <= character.level) return
+
+        console.warn(`Removing active armor. level requirement not met`);
+        character.active_armor = null;
+
+    })
 
     // * derived experience_modifiers (no effects)
     $effect(() => {
@@ -469,12 +498,22 @@ function createCharacter(uid: string) {
             }
         }
 
+        // modifiers from active armor
+        if (character.active_armor) {
+            character.active_armor.features.forEach(f => push_modifier_ids(f.modifier_ids))
+        }
+
+        // modifiers from active weapons
+        character.active_weapons.forEach(weapon => {
+            weapon.features.forEach(f => push_modifier_ids(f.modifier_ids))
+        })
+
         // additional cards
         character.additional_cards.forEach(card => {
             card.features.forEach(f => push_modifier_ids(f.modifier_ids))
         })
 
-        // additional effect ids
+        // additional modifier ids
         push_modifier_ids(character.additional_modifier_ids)
 
         // derived domain card vault
