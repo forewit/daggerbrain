@@ -3,5 +3,6 @@
   "postCreateCommand": "npm install -g bun && bun --version",
   "containerEnv": {
     "PATH": "/usr/local/bin:${PATH}"
-  }
+  },
+  "remoteUser": "codespace"
 }
