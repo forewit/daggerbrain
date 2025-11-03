@@ -10,8 +10,6 @@
 
   const context = getCharacterContext();
   let character = $derived(context.character);
-
-  $inspect(context.options_used["tier_3_subclass_upgrade"])
 </script>
 
 {#if character}

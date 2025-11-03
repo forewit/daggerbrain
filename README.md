@@ -1,9 +1,15 @@
-# whatareyoudoing.app
+# Daggerbrain
+todos:
+[ ] add followup selections for subclass upgrade an multiclass options
+[ ] make sure class mastery levels are derived correctly
+[ ] make sure secondary class is derived correctly
 
-inspiration: https://uiverse.io/mi-series/spotty-goose-56
-web manifest generator: https://progressier.com/pwa-manifest-generator
-Splash screen generator: https://progressier.com/pwa-icons-and-ios-splash-screen-generator
-### Todos
-- [ ] add an option to delete events in the calendar
-- [ ] add an option to delete event in the action bar after it was saved
-- [ ] add a settings page (merge similar events, minimum event duration, ...)
+## When on zscaler:
+NODE_TLS_REJECT_UNAUTHORIZED=0 bun i
+
+## how to enable Sentry:
+uncomment the following:
+*  /routes/hooks.client.ts
+*  /routes/hooks.server.ts
+*  /routes/instrumentation.server.ts
+*  svelte.config.js --> experimental section

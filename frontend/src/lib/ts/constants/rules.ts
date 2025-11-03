@@ -19,7 +19,8 @@ export const BLANK_LEVEL_UP_CHOICE = {
     option_id: null,
     marked_traits: { A: null, B: null },
     selected_experiences: { A: null, B: null },
-    selected_domain_card: null
+    selected_domain_card: null,
+    selected_subclass_upgrade: null
 } as const satisfies LevelUpChoice
 
 
@@ -126,7 +127,7 @@ export const TIER_3_BASE_OPTIONS = {
         short_title: "Upgrade Subclass",
         max: 1,
         costs_two_choices: false,
-        modifier_ids: ["max_primary_class_mastery_level_plus_1"]
+        modifier_ids: []
     },
     tier_3_proficiency: {
         title_html: "<p>Increase your Proficiency by +1.</p>",
@@ -192,7 +193,7 @@ export const TIER_4_BASE_OPTIONS = {
         short_title: "Upgrade Subclass",
         max: 1,
         costs_two_choices: false,
-        modifier_ids: ["max_primary_class_mastery_level_plus_1"]
+        modifier_ids: []
     },
     tier_4_proficiency: {
         title_html: "<p>Increase your Proficiency by +1.</p>",

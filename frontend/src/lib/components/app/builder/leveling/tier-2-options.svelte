@@ -71,10 +71,20 @@
   let highlighted = $derived.by(() => {
     if (!character) return false;
     const choices = character.level_up_choices[level as keyof typeof character.level_up_choices];
+    const chosen_options = {
+      A:
+        choices.A.option_id === null
+          ? BLANK_LEVEL_UP_OPTION
+          : ALL_LEVEL_UP_OPTIONS[choices.A.option_id],
+      B:
+        choices.B.option_id === null
+          ? BLANK_LEVEL_UP_OPTION
+          : ALL_LEVEL_UP_OPTIONS[choices.B.option_id],
+    };
 
     return (
-      !choices.A.option_id ||
-      !choices.B.option_id ||
+      ((choices.A.option_id === null || choices.B.option_id === null) &&
+        !(chosen_options.A.costs_two_choices || chosen_options.B.costs_two_choices)) ||
       character.level_up_domain_cards[level as keyof typeof character.level_up_domain_cards].A ===
         null ||
       (choices.A.option_id === "tier_2_domain_card" && choices.A.selected_domain_card === null) ||
@@ -189,14 +199,15 @@
         <!-- level up choices -->
         <Select.Root type="single">
           <Select.Trigger
-            highlighted={choices.A.option_id === null || choices.B.option_id === null}
+            highlighted={(choices.A.option_id === null || choices.B.option_id === null) &&
+              !(chosen_options.A.costs_two_choices || chosen_options.B.costs_two_choices)}
             class="w-full truncate bg-muted/80 hover:bg-muted/50"
           >
             <p class="truncate">
               {choices.A.option_id === null && choices.B.option_id === null
                 ? "Select 2 level up options"
                 : [chosen_options.A.short_title, chosen_options.B.short_title]
-                    .filter((title) => title !== null)
+                    .map((title) => title || "(Choose 1 more)")
                     .join(", ")}
             </p>
           </Select.Trigger>
@@ -216,12 +227,12 @@
 
               {#each Object.entries(TIER_2_BASE_OPTIONS) as [option_id, option]}
                 <button
-                disabled={context.options_used[option_id] >= option.max ||
-                  (choices.A.option_id !== null && choices.B.option_id !== null) ||
-                  chosen_options.A.costs_two_choices ||
-                  chosen_options.B.costs_two_choices ||
-                  (option.costs_two_choices &&
-                    (choices.A.option_id !== null || choices.B.option_id !== null))}
+                  disabled={context.options_used[option_id] >= option.max ||
+                    (choices.A.option_id !== null && choices.B.option_id !== null) ||
+                    chosen_options.A.costs_two_choices ||
+                    chosen_options.B.costs_two_choices ||
+                    (option.costs_two_choices &&
+                      (choices.A.option_id !== null || choices.B.option_id !== null))}
                   class="text-left hover:cursor-pointer hover:bg-muted disabled:opacity-50 disabled:pointer-events-none disabled:cursor-default flex w-full select-none items-center gap-2 rounded-sm py-1.5 px-2 text-sm"
                   onclick={() => {
                     // if one choice is available, set it to the selected option

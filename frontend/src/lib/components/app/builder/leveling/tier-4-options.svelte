@@ -22,6 +22,7 @@
   import Dropdown from "$lib/components/app/builder/dropdown.svelte";
   import CheckCheck from "@lucide/svelte/icons/check-check";
   import Check from "@lucide/svelte/icons/check";
+  import SubclassCard from "../../cards/subclass-card.svelte";
 
   let {
     class: className = "",
@@ -90,10 +91,19 @@
   let highlighted = $derived.by(() => {
     if (!character) return false;
     const choices = character.level_up_choices[level as keyof typeof character.level_up_choices];
-
+    const chosen_options = {
+      A:
+        choices.A.option_id === null
+          ? BLANK_LEVEL_UP_OPTION
+          : ALL_LEVEL_UP_OPTIONS[choices.A.option_id],
+      B:
+        choices.B.option_id === null
+          ? BLANK_LEVEL_UP_OPTION
+          : ALL_LEVEL_UP_OPTIONS[choices.B.option_id],
+    };
     return (
-      !choices.A.option_id ||
-      !choices.B.option_id ||
+      ((choices.A.option_id === null || choices.B.option_id === null) &&
+        !(chosen_options.A.costs_two_choices || chosen_options.B.costs_two_choices)) ||
       character.level_up_domain_cards[level as keyof typeof character.level_up_domain_cards].A ===
         null ||
       (choices.A.option_id === "tier_2_domain_card" && choices.A.selected_domain_card === null) ||
@@ -116,6 +126,10 @@
         (choices.A.selected_experiences.A === null || choices.A.selected_experiences.B === null)) ||
       (choices.B.option_id === "tier_3_experience_bonus" &&
         (choices.B.selected_experiences.A === null || choices.B.selected_experiences.B === null)) ||
+      (choices.A.option_id === "tier_3_subclass_upgrade" &&
+        choices.A.selected_subclass_upgrade === null) ||
+      (choices.B.option_id === "tier_3_subclass_upgrade" &&
+        choices.B.selected_subclass_upgrade === null) ||
       (choices.A.option_id === "tier_4_domain_card" && choices.A.selected_domain_card === null) ||
       (choices.B.option_id === "tier_4_domain_card" && choices.B.selected_domain_card === null) ||
       (choices.A.option_id === "tier_4_traits" &&
@@ -125,7 +139,11 @@
       (choices.A.option_id === "tier_4_experience_bonus" &&
         (choices.A.selected_experiences.A === null || choices.A.selected_experiences.B === null)) ||
       (choices.B.option_id === "tier_4_experience_bonus" &&
-        (choices.B.selected_experiences.A === null || choices.B.selected_experiences.B === null))
+        (choices.B.selected_experiences.A === null || choices.B.selected_experiences.B === null)) ||
+      (choices.A.option_id === "tier_4_subclass_upgrade" &&
+        choices.A.selected_subclass_upgrade === null) ||
+      (choices.B.option_id === "tier_4_subclass_upgrade" &&
+        choices.B.selected_subclass_upgrade === null)
     );
   });
 
@@ -245,14 +263,15 @@
           }}
         >
           <Select.Trigger
-            highlighted={choices.A.option_id === null || choices.B.option_id === null}
+            highlighted={(choices.A.option_id === null || choices.B.option_id === null) &&
+              !(chosen_options.A.costs_two_choices || chosen_options.B.costs_two_choices)}
             class="w-full truncate bg-muted/80 hover:bg-muted/50"
           >
             <p class="truncate">
               {choices.A.option_id === null && choices.B.option_id === null
                 ? "Select 2 level up options"
                 : [chosen_options.A.short_title, chosen_options.B.short_title]
-                    .filter((title) => title !== null)
+                    .map((title) => title || "(Choose 1 more)")
                     .join(", ")}
             </p>
           </Select.Trigger>
@@ -738,6 +757,87 @@
                   </Dialog.Footer>
                 </Dialog.Content>
               </Dialog.Root>
+            </div>
+          {:else if choices[key].option_id === "tier_3_subclass_upgrade" || choices[key].option_id === "tier_4_subclass_upgrade"}
+            <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md" bind:clientWidth={width}>
+              <p class="py-1 px-2 text-xs italic text-muted-foreground">
+                Take the next card for your subclass. If you have only the foundation card, take a
+                specialization; if you have a specialization already, take a mastery.
+              </p>
+
+              <Select.Root
+                value={choices[key].selected_subclass_upgrade || ""}
+                type="single"
+                onValueChange={(value) => {
+                  if (value === "") choices[key].selected_subclass_upgrade = null;
+                  else {
+                    choices[key].selected_subclass_upgrade = value as "primary" | "secondary";
+                  }
+                }}
+              >
+                <Select.Trigger
+                  class="w-full truncate"
+                  highlighted={choices[key].selected_subclass_upgrade === null}
+                >
+                  {choices[key].selected_subclass_upgrade === "primary"
+                    ? character.primary_class?.name + " • " + character.primary_subclass?.name
+                    : choices[key].selected_subclass_upgrade === "secondary"
+                      ? character.secondary_class?.name + " • " + character.secondary_subclass?.name
+                      : "Select a subclass to upgrade"}
+                </Select.Trigger>
+                <Select.Content class="rounded-md" align="start">
+                  <div style="max-width: {width}px;" class="p-2">
+                    <Select.Item value="" class="justify-center hover:cursor-pointer text-sm">
+                      -- none selected --
+                    </Select.Item>
+                    <Select.Label>Choose a subclass to upgrade</Select.Label>
+                    {#if character.primary_subclass !== null && character.primary_class !== null}
+                      <Select.Item value="primary">
+                        {character.primary_class.name} • {character.primary_subclass.name}
+                      </Select.Item>
+                    {/if}
+                    {#if character.secondary_subclass !== null && character.secondary_class !== null}
+                      <Select.Item value="secondary">
+                        {character.secondary_class.name} • {character.secondary_subclass.name}
+                      </Select.Item>
+                    {/if}
+                  </div>
+                </Select.Content>
+              </Select.Root>
+
+              {#if choices[key].selected_subclass_upgrade !== null && character.primary_subclass !== null}
+                <p class="p-2">
+                  {#if choices[key].selected_subclass_upgrade === "primary"}
+                    {#if context.options_used["tier_3_subclass_upgrade"] >= 1 && context.options_used["tier_4_subclass_upgrade"] >= 1}
+                      <!-- level that "tier_3_subclass_upgrade" was used at -->
+                      {@const tier_3_subclass_upgrade_level = Object.values(
+                        character.level_up_choices
+                      ).findIndex(
+                        (choice) =>
+                          choice.A.option_id === "tier_3_subclass_upgrade" ||
+                          choice.B.option_id === "tier_3_subclass_upgrade"
+                      )}
+                      {@const tier_4_subclass_upgrade_level = Object.values(
+                        character.level_up_choices
+                      ).findIndex(
+                        (choice) =>
+                          choice.A.option_id === "tier_4_subclass_upgrade" ||
+                          choice.B.option_id === "tier_4_subclass_upgrade"
+                      )}
+
+                      {#if (choices[key].option_id === "tier_4_subclass_upgrade" && tier_3_subclass_upgrade_level < tier_4_subclass_upgrade_level) || (choices[key].option_id === "tier_3_subclass_upgrade" && tier_4_subclass_upgrade_level < tier_3_subclass_upgrade_level)}
+                        <SubclassCard card={character.primary_subclass.mastery_card} />
+                      {:else}
+                        <SubclassCard card={character.primary_subclass.specialization_card} />
+                      {/if}
+                    {:else}
+                      <SubclassCard card={character.primary_subclass.specialization_card} />
+                    {/if}
+                  {:else if choices[key].selected_subclass_upgrade === "secondary" && character.secondary_subclass !== null}
+                    <SubclassCard card={character.secondary_subclass.specialization_card} />
+                  {/if}
+                </p>
+              {/if}
             </div>
           {/if}
         {/each}

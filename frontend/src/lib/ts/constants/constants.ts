@@ -273,11 +273,13 @@ export const JUST_JAMES: Character = {
                 marked_traits: { A: "agility", B: "strength" },
                 selected_experiences: { A: null, B: null },
                 selected_domain_card: null,
+                selected_subclass_upgrade: null,
             }, B: {
                 option_id: "tier_2_evasion",
                 marked_traits: { A: null, B: null },
                 selected_experiences: { A: null, B: null },
                 selected_domain_card: null,
+                selected_subclass_upgrade: null,
             }
         },
         3: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },

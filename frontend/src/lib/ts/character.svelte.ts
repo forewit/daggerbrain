@@ -90,7 +90,7 @@ function createCharacter(uid: string) {
 
 
 
-    // ! Clear level up option if it's used more than it's max
+    // ! Clear level up chocie if it's used more than it's max
     let options_used: Record<string, number> = $derived.by(() => {
         if (!character) return {};
         const used: Record<string, number> = {};
@@ -322,6 +322,35 @@ function createCharacter(uid: string) {
         }
     })
 
+    // ! clear conflicting subclass upgrade choices at each level
+    $effect(() => {
+        if (!character) return;
+        for (let i = 2; i <= 10; i++) {
+            const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
+            const choice_A = level_choices.A;
+            const choice_B = level_choices.B;
+
+            // clear subclass upgrade choices if the level choice is not a subclass upgrade choice
+            if (!choice_A.option_id || !["tier_3_subclass_upgrade", "tier_4_subclass_upgrade"].includes(choice_A.option_id)) {
+                if (choice_A.selected_subclass_upgrade !== null) {
+                    console.warn(`Clearing selected subclass upgrade because level choice was changed to ${choice_A.option_id}`)
+                    choice_A.selected_subclass_upgrade = null;
+                }
+            }
+            if (!choice_B.option_id || !["tier_3_subclass_upgrade", "tier_4_subclass_upgrade"].includes(choice_B.option_id)) {
+                if (choice_B.selected_subclass_upgrade !== null) {
+                    console.warn(`Clearing selected subclass upgrade because level choice was changed to ${choice_B.option_id}`)
+                    choice_B.selected_subclass_upgrade = null;
+                }
+            }
+
+            // todo: clear conflicting subclass upgrade choices 
+            // ? (can't choose secondary subclass upgrade if multiclass option isn't used before)
+            // ? (can't use secondary subclass upgrade if it's already been used before)
+            // ? (can't use primary subclass upgrade if multiclass was used in the same tier)            
+        }
+    })
+
     // ! clear conflicting domain card choices at each level and update the domain card vault
     $effect(() => {
         if (!character) return;
@@ -334,8 +363,6 @@ function createCharacter(uid: string) {
         let domain_card_vault: Card<"domain">[] = Object.values(character.level_up_domain_cards[1]).filter((card) => card !== null)
 
         for (let i = 2; i <= 10; i++) {
-            // ? add domain cards to the vault
-            // ? level up domain cards and domain card choices
             const level_up_domain_cards = character.level_up_domain_cards[i as keyof typeof character.level_up_domain_cards];
             if (level_up_domain_cards.A !== null && domain_card_vault.some(card => card.title === level_up_domain_cards.A?.title)) {
                 console.warn(`Domain card ${level_up_domain_cards.A?.title} is already in the vault`);
@@ -343,7 +370,6 @@ function createCharacter(uid: string) {
             } else if (level_up_domain_cards.A !== null) {
                 domain_card_vault.push(level_up_domain_cards.A);
             }
-
 
             const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
             const choice_A = level_choices.A;
@@ -534,7 +560,7 @@ function createCharacter(uid: string) {
             }
         }
 
-        // effects from level up choices
+        // modifiers from level up choices
         for (let i = 2; i <= character.level; i++) {
             const levelChoices = character.level_up_choices[i as keyof typeof character.level_up_choices];
             if (!levelChoices) continue;
@@ -787,6 +813,9 @@ function createCharacter(uid: string) {
         if (character.primary_class) masteryNum = Math.max(masteryNum, 1);
 
         masteryNum = apply_modifiers(base_modifiers, 'primary_class_mastery_level', masteryNum, 'base')
+        
+        // todo: derive based on level up choices
+        
         masteryNum = apply_modifiers(bonus_modifiers, 'primary_class_mastery_level', masteryNum, 'bonus')
         masteryNum = apply_modifiers(override_modifiers, 'primary_class_mastery_level', masteryNum, 'override')
 

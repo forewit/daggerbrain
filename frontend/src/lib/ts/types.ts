@@ -197,6 +197,7 @@ export type LevelUpChoice = {
     marked_traits: { A: keyof Traits | null, B: keyof Traits | null }
     selected_experiences: { A: number | null, B: number | null }
     selected_domain_card: Card<"domain"> | null,
+    selected_subclass_upgrade: "primary" | "secondary" | null
 }
 export type LevelUpOption = {
     title_html: string | null
