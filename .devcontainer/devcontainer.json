@@ -1,8 +1,7 @@
 {
   "name": "Bun Dev Container",
-  "features": {},
-  "postCreateCommand": "curl -fsSL https://bun.sh/install | bash",
+  "postCreateCommand": "npm install -g bun && bun --version",
   "containerEnv": {
-    "PATH": "/home/vscode/.bun/bin:${PATH}"
+    "PATH": "/usr/local/bin:${PATH}"
   }
 }
