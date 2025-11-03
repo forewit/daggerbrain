@@ -17,11 +17,27 @@ export const MODIFIERS = {
         type: "flat",
         value: 1
     },
+    max_primary_class_mastery_level_plus_1: {
+        min_level: null,
+        max_level: null,
+        behavior: "bonus",
+        target: "primary_class_mastery_level",
+        type: "flat",
+        value: 1
+    },
     evasion_plus_1: {
         min_level: null,
         max_level: null,
         behavior: "bonus",
         target: "evasion",
+        type: "flat",
+        value: 1
+    },
+    proficiency_plus_1: {
+        min_level: null,
+        max_level: null,
+        behavior: "bonus",
+        target: "proficiency",
         type: "flat",
         value: 1
     },

@@ -5,11 +5,14 @@
   import SquareCheck from "@lucide/svelte/icons/square-check";
   import * as Select from "$lib/components/ui/select/";
   import * as Dialog from "$lib/components/ui/dialog/";
+  import * as Collapsible from "$lib/components/ui/collapsible/";
   import {
     ALL_LEVEL_UP_OPTIONS,
     BLANK_LEVEL_UP_CHOICE,
     BLANK_LEVEL_UP_OPTION,
     TIER_2_BASE_OPTIONS,
+    TIER_3_BASE_OPTIONS,
+    TIER_4_BASE_OPTIONS,
   } from "$lib/ts/constants/rules";
   import { DOMAINS, TRAITS } from "$lib/ts/constants/constants";
   import DomainCard from "../../cards/domain-card.svelte";
@@ -17,8 +20,8 @@
   import { buttonVariants } from "$lib/components/ui/button";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import Dropdown from "$lib/components/app/builder/dropdown.svelte";
-  import Check from "@lucide/svelte/icons/check";
   import CheckCheck from "@lucide/svelte/icons/check-check";
+  import Check from "@lucide/svelte/icons/check";
 
   let {
     class: className = "",
@@ -51,6 +54,22 @@
         if (choices.B.selected_domain_card !== null)
           domain_cards.push(choices.B.selected_domain_card);
       }
+      if (choices.A.option_id === "tier_3_domain_card") {
+        if (choices.A.selected_domain_card !== null)
+          domain_cards.push(choices.A.selected_domain_card);
+      }
+      if (choices.B.option_id === "tier_3_domain_card") {
+        if (choices.B.selected_domain_card !== null)
+          domain_cards.push(choices.B.selected_domain_card);
+      }
+      if (choices.A.option_id === "tier_4_domain_card") {
+        if (choices.A.selected_domain_card !== null)
+          domain_cards.push(choices.A.selected_domain_card);
+      }
+      if (choices.B.option_id === "tier_4_domain_card") {
+        if (choices.B.selected_domain_card !== null)
+          domain_cards.push(choices.B.selected_domain_card);
+      }
     }
     return domain_cards;
   });
@@ -63,7 +82,7 @@
       DOMAINS[primary_domain as keyof typeof DOMAINS].cards
     ).concat(Object.values(DOMAINS[secondary_domain as keyof typeof DOMAINS].cards));
 
-    return domain_cards.filter((card) => card.level_requirement <= Math.min(level, 4));
+    return domain_cards.filter((card) => card.level_requirement <= level);
   });
 
   let width: number = $state(300);
@@ -86,9 +105,33 @@
       (choices.A.option_id === "tier_2_experience_bonus" &&
         (choices.A.selected_experiences.A === null || choices.A.selected_experiences.B === null)) ||
       (choices.B.option_id === "tier_2_experience_bonus" &&
+        (choices.B.selected_experiences.A === null || choices.B.selected_experiences.B === null)) ||
+      (choices.A.option_id === "tier_3_domain_card" && choices.A.selected_domain_card === null) ||
+      (choices.B.option_id === "tier_3_domain_card" && choices.B.selected_domain_card === null) ||
+      (choices.A.option_id === "tier_3_traits" &&
+        (choices.A.marked_traits.A === null || choices.A.marked_traits.B === null)) ||
+      (choices.B.option_id === "tier_3_traits" &&
+        (choices.B.marked_traits.A === null || choices.B.marked_traits.B === null)) ||
+      (choices.A.option_id === "tier_3_experience_bonus" &&
+        (choices.A.selected_experiences.A === null || choices.A.selected_experiences.B === null)) ||
+      (choices.B.option_id === "tier_3_experience_bonus" &&
+        (choices.B.selected_experiences.A === null || choices.B.selected_experiences.B === null)) ||
+      (choices.A.option_id === "tier_4_domain_card" && choices.A.selected_domain_card === null) ||
+      (choices.B.option_id === "tier_4_domain_card" && choices.B.selected_domain_card === null) ||
+      (choices.A.option_id === "tier_4_traits" &&
+        (choices.A.marked_traits.A === null || choices.A.marked_traits.B === null)) ||
+      (choices.B.option_id === "tier_4_traits" &&
+        (choices.B.marked_traits.A === null || choices.B.marked_traits.B === null)) ||
+      (choices.A.option_id === "tier_4_experience_bonus" &&
+        (choices.A.selected_experiences.A === null || choices.A.selected_experiences.B === null)) ||
+      (choices.B.option_id === "tier_4_experience_bonus" &&
         (choices.B.selected_experiences.A === null || choices.B.selected_experiences.B === null))
     );
   });
+
+  let tier_2_options_open = $state(false);
+  let tier_3_options_open = $state(false);
+  let tier_4_options_open = $state(true);
 </script>
 
 {#if character}
@@ -187,7 +230,20 @@
         </div>
 
         <!-- level up choices -->
-        <Select.Root type="single">
+        <Select.Root
+          type="single"
+          onOpenChange={(open) => {
+            if (open) {
+              tier_2_options_open =
+                (choices.A.option_id !== null && choices.A.option_id.startsWith("tier_2")) ||
+                (choices.B.option_id !== null && choices.B.option_id.startsWith("tier_2"));
+              tier_3_options_open =
+                (choices.A.option_id !== null && choices.A.option_id.startsWith("tier_3")) ||
+                (choices.B.option_id !== null && choices.B.option_id.startsWith("tier_3"));
+              tier_4_options_open = true;
+            }
+          }}
+        >
           <Select.Trigger
             highlighted={choices.A.option_id === null || choices.B.option_id === null}
             class="w-full truncate bg-muted/80 hover:bg-muted/50"
@@ -203,6 +259,7 @@
           <Select.Content class="rounded-md " align="start">
             <div style="max-width: {width}px;" class="p-2">
               <button
+                data-slot="select-item"
                 disabled={choices.A.option_id === null && choices.B.option_id === null}
                 class="justify-center font-bold text-destructive hover:cursor-pointer hover:bg-muted disabled:opacity-50 disabled:pointer-events-none disabled:cursor-default flex w-full select-none items-center gap-2 rounded-sm py-1.5 px-2 text-sm"
                 onclick={() => {
@@ -212,77 +269,249 @@
               >
                 -- Clear selection --
               </button>
-              <Select.Label class="text-accent">Tier 2 Options</Select.Label>
-
-              {#each Object.entries(TIER_2_BASE_OPTIONS) as [option_id, option]}
-                <button
-                disabled={context.options_used[option_id] >= option.max ||
-                  (choices.A.option_id !== null && choices.B.option_id !== null) ||
-                  chosen_options.A.costs_two_choices ||
-                  chosen_options.B.costs_two_choices ||
-                  (option.costs_two_choices &&
-                    (choices.A.option_id !== null || choices.B.option_id !== null))}
-                  class="text-left hover:cursor-pointer hover:bg-muted disabled:opacity-50 disabled:pointer-events-none disabled:cursor-default flex w-full select-none items-center gap-2 rounded-sm py-1.5 px-2 text-sm"
-                  onclick={() => {
-                    // if one choice is available, set it to the selected option
-                    if (choices.A.option_id === null) {
-                      choices.A.option_id = option_id as keyof typeof TIER_2_BASE_OPTIONS;
-                    } else if (choices.B.option_id === null) {
-                      choices.B.option_id = option_id as keyof typeof TIER_2_BASE_OPTIONS;
-                    } else if (choices.A.option_id !== null && choices.B.option_id !== null) {
-                      if (choices.A.option_id === option_id && choices.B.option_id === option_id) {
-                        choices.A.option_id = null;
-                        choices.B.option_id = null;
-                      } else if (choices.A.option_id === option_id) {
-                        choices.A.option_id = null;
-                      } else if (choices.B.option_id === option_id) {
-                        choices.B.option_id = null;
-                      }
-                    }
-                  }}
-                >
-                  <div class="flex gap-1 w-14 shrink-0 justify-end">
-                    {#each Array(option.max) as _, i}
-                      {#if i < context.options_used[option_id]}
-                        {#if option.costs_two_choices}
-                          <div
-                            class="flex gap-1 rounded-xs outline-offset-1 outline-muted-foreground outline-2"
-                          >
-                            <SquareCheck class="size-4" />
-                            <SquareCheck class="size-4" />
-                          </div>
-                        {:else}
-                          <SquareCheck class="size-4" />
-                        {/if}
-                      {:else if option.costs_two_choices}
-                        <div
-                          class="flex gap-1 rounded-xs outline-offset-1 outline-muted-foreground outline-2"
-                        >
-                          <Square class="size-4" />
-                          <Square class="size-4" />
+              <Select.Group>
+                <Collapsible.Root bind:open={tier_2_options_open}>
+                  <Collapsible.Trigger class="w-full">
+                    <Select.GroupHeading
+                      class="flex items-center gap-2 hover:bg-muted text-accent my-0.5 py-1"
+                    >
+                      <ChevronRight
+                        class={cn("size-4 opacity-50 stroke-3", tier_2_options_open && "rotate-90")}
+                      />
+                      Tier 2 Options
+                    </Select.GroupHeading>
+                  </Collapsible.Trigger>
+                  <Collapsible.Content>
+                    {#each Object.entries(TIER_2_BASE_OPTIONS) as [option_id, option]}
+                      <button
+                        disabled={context.options_used[option_id] >= option.max ||
+                          (choices.A.option_id !== null && choices.B.option_id !== null) ||
+                          chosen_options.A.costs_two_choices ||
+                          chosen_options.B.costs_two_choices ||
+                          (option.costs_two_choices &&
+                            (choices.A.option_id !== null || choices.B.option_id !== null))}
+                        class="text-left hover:cursor-pointer hover:bg-muted disabled:opacity-50 disabled:pointer-events-none disabled:cursor-default flex w-full select-none items-center gap-2 rounded-sm py-1.5 px-2 text-sm"
+                        onclick={() => {
+                          // if one choice is available, set it to the selected option
+                          if (choices.A.option_id === null) {
+                            choices.A.option_id = option_id as keyof typeof TIER_2_BASE_OPTIONS;
+                          } else if (choices.B.option_id === null) {
+                            choices.B.option_id = option_id as keyof typeof TIER_2_BASE_OPTIONS;
+                          } else if (choices.A.option_id !== null && choices.B.option_id !== null) {
+                            if (
+                              choices.A.option_id === option_id &&
+                              choices.B.option_id === option_id
+                            ) {
+                              choices.A.option_id = null;
+                              choices.B.option_id = null;
+                            } else if (choices.A.option_id === option_id) {
+                              choices.A.option_id = null;
+                            } else if (choices.B.option_id === option_id) {
+                              choices.B.option_id = null;
+                            }
+                          }
+                        }}
+                      >
+                        <div class="flex gap-1 w-14 shrink-0 justify-end">
+                          {#each Array(option.max) as _, i}
+                            {#if i < context.options_used[option_id]}
+                              <SquareCheck class="size-4" />
+                            {:else}
+                              <Square class="size-4" />
+                            {/if}
+                          {/each}
                         </div>
-                      {:else}
-                        <Square class="size-4" />
-                      {/if}
+                        <p class="grow">{@html option.title_html}</p>
+                        <div class="size-4">
+                          {#if (option_id === choices.A.option_id && option_id === choices.B.option_id) || (option_id === choices.A.option_id && option.costs_two_choices) || (option_id === choices.B.option_id && option.costs_two_choices)}
+                            <CheckCheck class="size-4" />
+                          {:else if option_id === choices.A.option_id || option_id === choices.B.option_id}
+                            <Check class="size-4" />
+                          {/if}
+                        </div>
+                      </button>
                     {/each}
-                  </div>
-                  <p class="grow">{@html option.title_html}</p>
-                  <div class="size-4">
-                    {#if (option_id === choices.A.option_id && option_id === choices.B.option_id) || (option_id === choices.A.option_id && option.costs_two_choices) || (option_id === choices.B.option_id && option.costs_two_choices)}
-                      <CheckCheck class="size-4" />
-                    {:else if option_id === choices.A.option_id || option_id === choices.B.option_id}
-                      <Check class="size-4" />
-                    {/if}
-                  </div>
-                </button>
-              {/each}
+                  </Collapsible.Content>
+                </Collapsible.Root>
+              </Select.Group>
+              <Select.Group>
+                <Collapsible.Root bind:open={tier_3_options_open}>
+                  <Collapsible.Trigger class="w-full">
+                    <Select.GroupHeading
+                      class="flex items-center gap-2 hover:bg-muted text-accent my-0.5 py-1"
+                    >
+                      <ChevronRight
+                        class={cn("size-4 opacity-50 stroke-3", tier_3_options_open && "rotate-90")}
+                      />
+                      Tier 3 Options
+                    </Select.GroupHeading>
+                  </Collapsible.Trigger>
+                  <Collapsible.Content>
+                    {#each Object.entries(TIER_3_BASE_OPTIONS) as [option_id, option]}
+                      <button
+                        disabled={context.options_used[option_id] >= option.max ||
+                          (choices.A.option_id !== null && choices.B.option_id !== null) ||
+                          chosen_options.A.costs_two_choices ||
+                          chosen_options.B.costs_two_choices ||
+                          (option.costs_two_choices &&
+                            (choices.A.option_id !== null || choices.B.option_id !== null))}
+                        class="text-left hover:cursor-pointer hover:bg-muted disabled:opacity-50 disabled:pointer-events-none disabled:cursor-default flex w-full select-none items-center gap-2 rounded-sm py-1.5 px-2 text-sm"
+                        onclick={() => {
+                          // if one choice is available, set it to the selected option
+                          if (choices.A.option_id === null) {
+                            choices.A.option_id = option_id as keyof typeof TIER_3_BASE_OPTIONS;
+                          } else if (choices.B.option_id === null) {
+                            choices.B.option_id = option_id as keyof typeof TIER_3_BASE_OPTIONS;
+                          } else if (choices.A.option_id !== null && choices.B.option_id !== null) {
+                            if (
+                              choices.A.option_id === option_id &&
+                              choices.B.option_id === option_id
+                            ) {
+                              choices.A.option_id = null;
+                              choices.B.option_id = null;
+                            } else if (choices.A.option_id === option_id) {
+                              choices.A.option_id = null;
+                            } else if (choices.B.option_id === option_id) {
+                              choices.B.option_id = null;
+                            }
+                          }
+                        }}
+                      >
+                        <div class="flex gap-1 w-14 shrink-0 justify-end">
+                          {#each Array(option.max) as _, i}
+                            {#if i < context.options_used[option_id]}
+                              {#if option.costs_two_choices}
+                                <div
+                                  class="flex gap-1 rounded-xs outline-offset-1 outline-muted-foreground outline-2"
+                                >
+                                  <SquareCheck class="size-4" />
+                                  <SquareCheck class="size-4" />
+                                </div>
+                              {:else}
+                                <SquareCheck class="size-4" />
+                              {/if}
+                            {:else if option.costs_two_choices}
+                              <div
+                                class="flex gap-1 rounded-xs outline-offset-1 outline-muted-foreground outline-2"
+                              >
+                                <Square class="size-4" />
+                                <Square class="size-4" />
+                              </div>
+                            {:else}
+                              <Square class="size-4" />
+                            {/if}
+                          {/each}
+                        </div>
+                        <p class="grow">{@html option.title_html}</p>
+                        <div class="size-4">
+                          {#if (option_id === choices.A.option_id && option_id === choices.B.option_id) || (option_id === choices.A.option_id && option.costs_two_choices) || (option_id === choices.B.option_id && option.costs_two_choices)}
+                            <CheckCheck class="size-4" />
+                          {:else if option_id === choices.A.option_id || option_id === choices.B.option_id}
+                            <Check class="size-4" />
+                          {/if}
+                        </div>
+                      </button>
+                    {/each}
+                  </Collapsible.Content>
+                </Collapsible.Root>
+              </Select.Group>
+              <Select.Group>
+                <Collapsible.Root bind:open={tier_4_options_open}>
+                  <Collapsible.Trigger class="w-full">
+                    <Select.GroupHeading
+                      class="flex items-center gap-2 hover:bg-muted text-accent my-0.5 py-1"
+                    >
+                      <ChevronRight
+                        class={cn("size-4 opacity-50 stroke-3", tier_4_options_open && "rotate-90")}
+                      />
+                      Tier 4 Options
+                    </Select.GroupHeading>
+                  </Collapsible.Trigger>
+                  <Collapsible.Content>
+                    {#each Object.entries(TIER_4_BASE_OPTIONS) as [option_id, option]}
+                      {@const disabled =
+                        (option_id === "tier_4_multiclass" &&
+                          (context.options_used["tier_3_multiclass"] >= 1 ||
+                            context.options_used["tier_4_subclass_upgrade"] >= 1)) ||
+                        (option_id === "tier_4_subclass_upgrade" &&
+                          context.options_used["tier_4_multiclass"] >= 1)}
+                      <button
+                        disabled={context.options_used[option_id] >= option.max ||
+                          (choices.A.option_id !== null && choices.B.option_id !== null) ||
+                          chosen_options.A.costs_two_choices ||
+                          chosen_options.B.costs_two_choices ||
+                          (option.costs_two_choices &&
+                            (choices.A.option_id !== null || choices.B.option_id !== null)) ||
+                          disabled}
+                        class="text-left hover:cursor-pointer hover:bg-muted disabled:opacity-50 disabled:pointer-events-none disabled:cursor-default flex w-full select-none items-center gap-2 rounded-sm py-1.5 px-2 text-sm"
+                        onclick={() => {
+                          // if one choice is available, set it to the selected option
+                          if (choices.A.option_id === null) {
+                            choices.A.option_id = option_id as keyof typeof TIER_4_BASE_OPTIONS;
+                          } else if (choices.B.option_id === null) {
+                            choices.B.option_id = option_id as keyof typeof TIER_4_BASE_OPTIONS;
+                          } else if (choices.A.option_id !== null && choices.B.option_id !== null) {
+                            if (
+                              choices.A.option_id === option_id &&
+                              choices.B.option_id === option_id
+                            ) {
+                              choices.A.option_id = null;
+                              choices.B.option_id = null;
+                            } else if (choices.A.option_id === option_id) {
+                              choices.A.option_id = null;
+                            } else if (choices.B.option_id === option_id) {
+                              choices.B.option_id = null;
+                            }
+                          }
+                        }}
+                      >
+                        <div class="w-14 shrink-0 flex justify-end">
+                          <div class={cn("gap-1 flex w-min relative")}>
+                            {#if disabled}
+                              <span
+                                class="absolute top-1/2 -translate-y-1/2 -left-1 -right-1 h-[1px] bg-foreground"
+                              ></span>
+                            {/if}
+                            {#each Array(option.max) as _, i}
+                              {@const Icon =
+                                i < context.options_used[option_id] ? SquareCheck : Square}
+                              {@const double = option.costs_two_choices}
+
+                              {#if double}
+                                <div
+                                  class="flex gap-1 rounded-xs outline-offset-1 outline-muted-foreground outline-2"
+                                >
+                                  <Icon class="size-4" />
+                                  <Icon class="size-4" />
+                                </div>
+                              {:else}
+                                <Icon class="size-4" />
+                              {/if}
+                            {/each}
+                          </div>
+                        </div>
+                        <p class={cn("grow" /*, disabled && "line-through"*/)}>
+                          {@html option.title_html}
+                        </p>
+                        <div class="size-4">
+                          {#if (option_id === choices.A.option_id && option_id === choices.B.option_id) || (option_id === choices.A.option_id && option.costs_two_choices) || (option_id === choices.B.option_id && option.costs_two_choices)}
+                            <CheckCheck class="size-4" />
+                          {:else if option_id === choices.A.option_id || option_id === choices.B.option_id}
+                            <Check class="size-4" />
+                          {/if}
+                        </div>
+                      </button>
+                    {/each}
+                  </Collapsible.Content>
+                </Collapsible.Root>
+              </Select.Group>
             </div>
           </Select.Content>
         </Select.Root>
 
         <!-- secondary choices based on the selected option -->
         {#each ["A" as keyof typeof choices, "B" as keyof typeof choices] as key}
-          {#if choices[key].option_id === "tier_2_traits"}
+          {#if choices[key].option_id === "tier_2_traits" || choices[key].option_id === "tier_3_traits" || choices[key].option_id === "tier_4_traits"}
             <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md">
               <p class="py-1 px-2 text-xs italic text-muted-foreground">
                 Choose 2 unmarked character traits.
@@ -315,7 +544,7 @@
                       <Select.Label>Traits</Select.Label>
                       {#each Object.keys(TRAITS) as trait}
                         <Select.Item
-                          disabled={context.tier_2_marked_traits[trait as keyof Traits]}
+                          disabled={context.tier_4_marked_traits[trait as keyof Traits]}
                           value={trait}>{TRAITS[trait as keyof typeof TRAITS].name}</Select.Item
                         >
                       {/each}
@@ -348,7 +577,7 @@
                       <Select.Label>Traits</Select.Label>
                       {#each Object.keys(TRAITS) as trait}
                         <Select.Item
-                          disabled={context.tier_2_marked_traits[trait as keyof Traits]}
+                          disabled={context.tier_4_marked_traits[trait as keyof Traits]}
                           value={trait}>{TRAITS[trait as keyof typeof TRAITS].name}</Select.Item
                         >
                       {/each}
@@ -357,7 +586,7 @@
                 </Select.Root>
               </div>
             </div>
-          {:else if choices[key].option_id === "tier_2_experience_bonus"}
+          {:else if choices[key].option_id === "tier_2_experience_bonus" || choices[key].option_id === "tier_3_experience_bonus" || choices[key].option_id === "tier_4_experience_bonus"}
             <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md">
               <p class="py-1 px-2 text-xs italic font-medium text-muted-foreground">
                 Choose 2 Experiences.
@@ -439,7 +668,7 @@
                 </Select.Root>
               </div>
             </div>
-          {:else if choices[key].option_id === "tier_2_domain_card"}
+          {:else if choices[key].option_id === "tier_2_domain_card" || choices[key].option_id === "tier_3_domain_card" || choices[key].option_id === "tier_4_domain_card"}
             <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md" bind:clientWidth={width}>
               <p class="py-1 px-2 text-xs italic text-muted-foreground">
                 Choose an additional domain card of your level or lower from a domain you have

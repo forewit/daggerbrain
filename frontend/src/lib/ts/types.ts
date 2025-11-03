@@ -19,6 +19,7 @@ export type Character = {
         max_armor: 0
         max_hp: 0
         max_stress: 6
+        max_burden: 2
         evasion: 0
         primary_class_mastery_level: 0
         secondary_class_mastery_level: 0
@@ -91,6 +92,7 @@ export type Character = {
         max_armor: number,
         max_hp: number,
         max_stress: number,
+        max_burden: number,
         evasion: number
         damage_thresholds: {
             major: number,
@@ -139,7 +141,7 @@ export type Modifier = ({
     behavior: "bonus" | "base" | "override"
     min_level: number | null;
     max_level: number | null;
-    target: "evasion" | "max_hp" | "max_stress" | "max_experiences" | "major_damage_threshold" | "severe_damage_threshold" | "primary_class_mastery_level" | "secondary_class_mastery_level" | "max_domain_card_loadout" | "max_hope" | "proficiency" | "max_armor"
+    target: "evasion" | "max_hp" | "max_stress" | "max_experiences" | "major_damage_threshold" | "severe_damage_threshold" | "primary_class_mastery_level" | "secondary_class_mastery_level" | "max_domain_card_loadout" | "max_hope" | "proficiency" | "max_armor" | "max_burden"
 } | {
     target: "trait"
     trait: keyof Traits
@@ -197,9 +199,10 @@ export type LevelUpChoice = {
     selected_domain_card: Card<"domain"> | null,
 }
 export type LevelUpOption = {
-    title: string | null
+    title_html: string | null
     short_title: string | null
     max: number
+    costs_two_choices: boolean
     modifier_ids: (keyof typeof MODIFIERS)[]
 }
 

@@ -45,7 +45,14 @@ function createCharacter(uid: string) {
         }
     })
 
-    // ! clear level up options above the current level
+    // ! clear subclass if class is null
+    $effect(() => {
+        if (!character) return;
+        if (!character.primary_class) character.primary_subclass = null;
+        if (!character.secondary_class) character.secondary_subclass = null;
+    })
+
+    // ! clear level up choices above the current level
     $effect(() => {
         if (!character) return;
         console.warn("Cleared level_up_choices above level", character.level);
@@ -60,12 +67,28 @@ function createCharacter(uid: string) {
         if (character.level < 10) character.level_up_choices[10] = { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE };
     })
 
-    // ! clear subclass if class is null
+    // ! Clear level up choice if the other choice costs two 
     $effect(() => {
         if (!character) return;
-        if (!character.primary_class) character.primary_subclass = null;
-        if (!character.secondary_class) character.secondary_subclass = null;
+        for (let i = 2; i <= 10; i++) {
+            const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
+            const choice_A = level_choices.A;
+            const choice_B = level_choices.B;
+            if (
+                choice_A.option_id !== null && ALL_LEVEL_UP_OPTIONS[choice_A.option_id].costs_two_choices && choice_B.option_id !== null
+            ) {
+                console.warn(`Clearing level up option because the other option costs two choices`);
+                level_choices.B = { ...BLANK_LEVEL_UP_CHOICE };
+            } else if (
+                choice_B.option_id !== null && ALL_LEVEL_UP_OPTIONS[choice_B.option_id].costs_two_choices && choice_A.option_id !== null
+            ) {
+                console.warn(`Clearing level up option because the other option costs two choices`);
+                level_choices.A = { ...BLANK_LEVEL_UP_CHOICE };
+            }
+        }
     })
+
+
 
     // ! Clear level up option if it's used more than it's max
     let options_used: Record<string, number> = $derived.by(() => {
@@ -102,6 +125,30 @@ function createCharacter(uid: string) {
         }
     });
 
+    // ! Clear conflicting multiclass / subclass upgrade level up choices
+    $effect(() => {
+        if (!character) return;
+        for (let i = 2; i <= 10; i++) {
+            const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
+
+            if (level_choices.A.option_id === "tier_3_multiclass" && (options_used["tier_4_multiclass"] >= 1 || options_used["tier_3_subclass_upgrade"] >= 1)) {
+                console.warn(`Clearing invalid multiclass choice at tier ${i}`);
+                level_choices.A = BLANK_LEVEL_UP_CHOICE;
+            } else if (level_choices.A.option_id === "tier_4_multiclass" && (options_used["tier_3_multiclass"] >= 1 || options_used["tier_4_subclass_upgrade"] >= 1)) {
+                console.warn(`Clearing invalid multiclass choice at tier ${i}`);
+                level_choices.A = BLANK_LEVEL_UP_CHOICE;
+            }
+
+            if (level_choices.B.option_id === "tier_3_multiclass" && (options_used["tier_4_multiclass"] >= 1 || options_used["tier_3_subclass_upgrade"] >= 1)) {
+                console.warn(`Clearing invalid multiclass choice at tier ${i}`);
+                level_choices.B = BLANK_LEVEL_UP_CHOICE;
+            } else if (level_choices.B.option_id === "tier_4_multiclass" && (options_used["tier_3_multiclass"] >= 1 || options_used["tier_4_subclass_upgrade"] >= 1)) {
+                console.warn(`Clearing invalid multiclass choice at tier ${i}`);
+                level_choices.B = BLANK_LEVEL_UP_CHOICE;
+            }
+        }
+    })
+
     // ! clear conflicting marked traits at each tier
     let tier_2_marked_traits: Record<keyof Traits, boolean> = $state({
         agility: false,
@@ -128,7 +175,7 @@ function createCharacter(uid: string) {
         knowledge: false,
     });
 
-    function clear_duplicated_marked_traits(level_choice_ids: string[], tier_marked_traits: Record<keyof Traits, boolean>, level_choices: { A: LevelUpChoice, B: LevelUpChoice }) {
+    function clear_duplicated_marked_traits(level_choice_ids: (keyof typeof ALL_LEVEL_UP_OPTIONS)[], tier_marked_traits: Record<keyof Traits, boolean>, level_choices: { A: LevelUpChoice, B: LevelUpChoice }) {
         const choice_A = level_choices.A;
         const choice_B = level_choices.B;
         if (choice_A.option_id && level_choice_ids.includes(choice_A.option_id)) {
@@ -148,7 +195,8 @@ function createCharacter(uid: string) {
                     tier_marked_traits[choice_A.marked_traits.B] = true;
                 }
             }
-        } else if (choice_B.option_id && level_choice_ids.includes(choice_B.option_id)) {
+        }
+        if (choice_B.option_id && level_choice_ids.includes(choice_B.option_id)) {
             if (choice_B.marked_traits.A) {
                 if (tier_marked_traits[choice_B.marked_traits.A]) {
                     console.warn(`Trait ${choice_B.marked_traits.A} is already used in another option`);
@@ -369,7 +417,9 @@ function createCharacter(uid: string) {
             active_weapons.push(weapon);
         }
 
-        character.active_weapons = active_weapons;
+        if (active_weapons.some((weapon, index) => weapon.title !== character?.active_weapons[index]?.title)) {
+            character.active_weapons = active_weapons;
+        }
     })
 
     // ! clear invalid active armor
@@ -383,7 +433,7 @@ function createCharacter(uid: string) {
 
     })
 
-    // * derived experience_modifiers (no effects)
+    // * derived experience_modifiers (can't be done with modifiers)
     $effect(() => {
         if (!character) return;
         const count = character.experiences.length;
@@ -411,7 +461,7 @@ function createCharacter(uid: string) {
         character.derived_stats.experience_modifiers = modifiers;
     })
 
-    // * derived effects -- used to calculate most stats --
+    // * derived modifiers -- used to calculate most stats --
     let base_modifiers: Modifier[] = $state([])
     let bonus_modifiers: Modifier[] = $state([])
     let override_modifiers: Modifier[] = $state([])
@@ -498,6 +548,16 @@ function createCharacter(uid: string) {
             }
         }
 
+        // modifiers from the domain card loadout
+        const vault = character.derived_domain_card_vault;
+        const loadout = character.ephemeral_stats.domain_card_loadout;
+        loadout.forEach(index => {
+            const card = vault[index];
+            if (card) {
+                card.features.forEach(f => push_modifier_ids(f.modifier_ids))
+            }
+        })
+
         // modifiers from active armor
         if (character.active_armor) {
             character.active_armor.features.forEach(f => push_modifier_ids(f.modifier_ids))
@@ -508,6 +568,7 @@ function createCharacter(uid: string) {
             weapon.features.forEach(f => push_modifier_ids(f.modifier_ids))
         })
 
+
         // additional cards
         character.additional_cards.forEach(card => {
             card.features.forEach(f => push_modifier_ids(f.modifier_ids))
@@ -516,10 +577,7 @@ function createCharacter(uid: string) {
         // additional modifier ids
         push_modifier_ids(character.additional_modifier_ids)
 
-        // derived domain card vault
-        character.derived_domain_card_vault.forEach(card => {
-            card.features.forEach(f => push_modifier_ids(f.modifier_ids))
-        })
+
 
         // categorize by behavior
         base_modifiers = all_modifiers.filter((e) => 'behavior' in e && e.behavior === 'base') as Modifier[]
@@ -777,6 +835,18 @@ function createCharacter(uid: string) {
 
         max_armor = Math.min(max_armor, 12)
         character.derived_stats.max_armor = max_armor
+    })
+
+    // * derived max_burden
+    $effect(() => {
+        if (!character) return;
+        let max_burden: number = character.base_stats.max_burden
+
+        max_burden = apply_modifiers(base_modifiers, 'max_burden', max_burden, 'base')
+        max_burden = apply_modifiers(bonus_modifiers, 'max_burden', max_burden, 'bonus')
+        max_burden = apply_modifiers(override_modifiers, 'max_burden', max_burden, 'override')
+
+        character.derived_stats.max_burden = max_burden
     })
 
     // * derived damage_thresholds

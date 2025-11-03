@@ -1,6 +1,8 @@
 <script lang="ts">
   import Tier1Options from "$lib/components/app/builder/leveling/tier-1-options.svelte";
   import Tier2Options from "$lib/components/app/builder/leveling/tier-2-options.svelte";
+  import Tier3Options from "$lib/components/app/builder/leveling/tier-3-options.svelte";
+  import Tier4Options from "$lib/components/app/builder/leveling/tier-4-options.svelte";
   import LevelSelect from "$lib/components/app/builder/leveling/level-select.svelte";
   import { cn } from "$lib/utils";
   import Dropdown from "$lib/components/app/builder/dropdown.svelte";
@@ -8,6 +10,8 @@
 
   const context = getCharacterContext();
   let character = $derived(context.character);
+
+  $inspect(context.options_used["tier_3_subclass_upgrade"])
 </script>
 
 {#if character}
@@ -52,15 +56,15 @@
             <p class="text-xs">•&emsp;Gain a +1 bonus to your Proficiency</p>
           </div>
         </Dropdown>
-        <Dropdown title="Level 5 Options" />
+        <Tier3Options level={5} />
       {/if}
 
       {#if character.level >= 6}
-        <Dropdown title="Level 6 Options" />
+        <Tier3Options level={6} />
       {/if}
 
       {#if character.level >= 7}
-        <Dropdown title="Level 7 Options" />
+        <Tier3Options level={7} />
       {/if}
 
       {#if character.level >= 8}
@@ -71,15 +75,15 @@
             <p class="text-xs">•&emsp;Gain a +1 bonus to your Proficiency</p>
           </div>
         </Dropdown>
-        <Dropdown title="Level 8 Options" />
+        <Tier4Options level={8} />
       {/if}
 
       {#if character.level >= 9}
-        <Dropdown title="Level 9 Options" />
+        <Tier4Options level={9} />
       {/if}
 
       {#if character.level >= 10}
-        <Dropdown title="Level 10 Options" />
+        <Tier4Options level={10} />
       {/if}
     </div>
   </div>

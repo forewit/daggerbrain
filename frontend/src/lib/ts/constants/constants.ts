@@ -214,6 +214,7 @@ export const JUST_JAMES: Character = {
         max_armor: 0,
         max_hp: 0,
         max_stress: 6,
+        max_burden: 2,
         evasion: 0,
         primary_class_mastery_level: 0,
         secondary_class_mastery_level: 0,
@@ -252,7 +253,7 @@ export const JUST_JAMES: Character = {
     },
 
     // level-up choices
-    level: 2,
+    level: 5,
     level_up_domain_cards: {
         1: { A: DOMAINS.blade.cards.whirlwind, B: DOMAINS.blade.cards.not_good_enough },
         2: { A: DOMAINS.blade.cards.a_soldiers_bond },
@@ -313,6 +314,7 @@ export const JUST_JAMES: Character = {
         max_armor: 5,
         max_hp: 5,
         max_stress: 7,
+        max_burden: 2,
         evasion: 15,
         damage_thresholds: {
             major: 12,
@@ -348,6 +350,7 @@ export const NEW_CHARACTER: Character = {
         max_armor: 0,
         max_hp: 0,
         max_stress: 6,
+        max_burden: 2,
         evasion: 0,
         primary_class_mastery_level: 0,
         secondary_class_mastery_level: 0,
@@ -365,8 +368,8 @@ export const NEW_CHARACTER: Character = {
     secondary_subclass: null,
 
     // equipment
-    active_armor: TIER_1_ARMOR.leather_armor,
-    active_weapons: [TIER_1_WEAPONS.longsword],
+    active_armor: null,
+    active_weapons: [],
 
     // the void / other
     transformation_card: null,
@@ -428,6 +431,7 @@ export const NEW_CHARACTER: Character = {
         max_armor: 0,
         max_hp: 0,
         max_stress: 0,
+        max_burden: 2,
         evasion: 0,
         damage_thresholds: {
             major: 0,

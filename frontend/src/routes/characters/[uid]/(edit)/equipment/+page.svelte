@@ -64,7 +64,7 @@
             <div class="grow">
               <p class="text-sm font-medium pb-1 pt-4 px-1">Active Weapons</p>
               <p class="text-xs italic text-muted-foreground pb-2 px-1">
-                Maximum burden is 2 hands. You can only equip one primary and one secondary weapon.
+                You can only equip one primary and one secondary weapon. Maximum burden is 2 hands.
               </p>
 
               {#each character.active_weapons as weapon, i}
