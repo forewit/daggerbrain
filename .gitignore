@@ -38,3 +38,6 @@ vite.config.ts.timestamp-*
 
 # logs
 *.log
+
+# Sentry
+.env.sentry-build-plugin
