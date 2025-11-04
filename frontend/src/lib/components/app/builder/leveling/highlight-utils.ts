@@ -5,13 +5,13 @@ import { ALL_LEVEL_UP_OPTIONS, BLANK_LEVEL_UP_OPTION } from "$lib/ts/constants/r
  * Calculate if the level-up section should be highlighted (indicating incomplete selections).
  * @param character - The character object
  * @param level - The current level
- * @param tiers_to_check - Array of tier prefixes to check (e.g., ["tier_2", "tier_3", "tier_4"])
+ * @param option_ids_to_check - Array of tier prefixes to check (e.g., ["tier_2", "tier_3", "tier_4"])
  * @returns true if the section should be highlighted (has incomplete selections)
  */
 export function calculate_highlighted(
   character: Character | null,
   level: number,
-  tiers_to_check: string[]
+  option_ids_to_check: string[]
 ): boolean {
   if (!character) return false;
   const choices = character.level_up_choices[level as keyof typeof character.level_up_choices];
@@ -29,7 +29,7 @@ export function calculate_highlighted(
   // Build checks for each tier in tiers_to_check
   const tier_checks: boolean[] = [];
 
-  for (const tier_prefix of tiers_to_check) {
+  for (const tier_prefix of option_ids_to_check) {
     const domain_card_option = `${tier_prefix}_domain_card`;
     const traits_option = `${tier_prefix}_traits`;
     const experience_bonus_option = `${tier_prefix}_experience_bonus`;

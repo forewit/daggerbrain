@@ -5,13 +5,13 @@ import { DOMAINS } from "$lib/ts/constants/constants";
  * Calculate previously chosen domain cards up to the given level.
  * @param character - The character object
  * @param level - The current level (up to which to check)
- * @param tiers_to_check - Array of tier option IDs to check (e.g., ["tier_2_domain_card", "tier_3_domain_card"])
+ * @param option_ids_to_check - Array of tier option IDs to check (e.g., ["tier_2_domain_card", "tier_3_domain_card"])
  * @returns Array of previously chosen domain cards
  */
 export function get_previously_chosen_domain_cards(
   character: Character | null,
   level: number,
-  tiers_to_check: string[]
+  option_ids_to_check: string[]
 ): Card<"domain">[] {
   if (!character) return [];
   const domain_cards = Object.values(character.level_up_domain_cards[1]).filter(
@@ -24,11 +24,11 @@ export function get_previously_chosen_domain_cards(
     if (level_up_domain_cards.A !== null) domain_cards.push(level_up_domain_cards.A);
 
     const choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
-    if (tiers_to_check.includes(choices.A.option_id || "")) {
+    if (option_ids_to_check.includes(choices.A.option_id || "")) {
       if (choices.A.selected_domain_card !== null)
         domain_cards.push(choices.A.selected_domain_card);
     }
-    if (tiers_to_check.includes(choices.B.option_id || "")) {
+    if (option_ids_to_check.includes(choices.B.option_id || "")) {
       if (choices.B.selected_domain_card !== null)
         domain_cards.push(choices.B.selected_domain_card);
     }
