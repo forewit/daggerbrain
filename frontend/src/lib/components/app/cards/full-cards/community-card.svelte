@@ -34,7 +34,7 @@
     <div class="flex-2 flex flex-col gap-2 px-3 py-2">
       <!-- title and community label -->
       <div class="relative flex gap-2 justify-between">
-        <p class="text-xl font-eveleth uppercase">
+        <p class="font-eveleth uppercase">
           {card.title}
         </p>
 

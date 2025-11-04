@@ -48,7 +48,7 @@
           </p>
         </div>
 
-        <p class="grow text-xl font-eveleth uppercase">
+        <p class="grow font-eveleth uppercase">
           {card.title}
         </p>
       </div>

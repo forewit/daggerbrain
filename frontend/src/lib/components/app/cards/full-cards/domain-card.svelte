@@ -66,7 +66,7 @@
           <p class="text-xs uppercase text-black tracking-[2px] font-bold">{card.type}</p>
         </div>
 
-        <p class="grow text-wrap text-xl font-eveleth uppercase">
+        <p class="grow text-wrap font-eveleth uppercase">
           {card.title}
         </p>
       </div>
