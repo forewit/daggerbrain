@@ -111,7 +111,7 @@
                 }
               }}
             >
-              <Select.Trigger highlighted={modifier === null} class="w-full truncate bg-muted-foreground/15 hover:bg-muted-foreground/10">
+              <Select.Trigger highlighted={modifier === null} class="w-full truncate bg-muted-foreground/8 hover:bg-muted-foreground/5">
                 <p class="truncate">
                   {#if modifier === null}
                     Select

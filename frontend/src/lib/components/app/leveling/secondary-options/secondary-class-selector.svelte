@@ -120,7 +120,7 @@
     </Dialog.Header>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto">
       <!-- each class -->
-      {#each Object.values(CLASSES) as c}
+      {#each Object.values(CLASSES).filter((c) => c.name !== character.primary_class?.name) as c}
         <div class="flex gap-3 border-2 rounded-md p-3 bg-primary-muted">
           <ClassSummary hide_starting_stats character_class={c} bannerClasses="-mt-3">
             <Button

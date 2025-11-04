@@ -92,18 +92,26 @@ function createCharacter(uid: string) {
         }
     })
 
-    // ! clear secondary class if multiclass is not selected as a level up choice
+    // ! clear invalid secondary classes
     $effect(() => {
         if (!character || !character.secondary_class) return;
 
+        // clear secondary class if multiclass is not selected as a level up choice
         if (!options_used["tier_3_multiclass"] && !options_used["tier_4_multiclass"]) {
             console.warn(`Clearing secondary class because multiclass is not selected as a level up choice`);
             character.secondary_class = null;
             character.secondary_class_domain = null;
             character.secondary_subclass = null;
         }
-    })
 
+        // clear secondary class if it's the same as the primary class
+        if (character.secondary_class?.name === character.primary_class?.name) {
+            console.warn(`Clearing secondary class because it's the same as the primary class`);
+            character.secondary_class = null;
+            character.secondary_class_domain = null;
+            character.secondary_subclass = null;
+        }
+    })
 
 
     // ! Clear level up chocie if it's used more than it's max

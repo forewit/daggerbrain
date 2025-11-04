@@ -50,7 +50,7 @@
           >
             <Select.Trigger
               highlighted={domain_selection === null}
-              class="w-full truncate bg-muted-foreground/10 hover:bg-muted-foreground/8"
+              class="w-full truncate bg-muted-foreground/8 hover:bg-muted-foreground/5"
             >
               <p class="truncate">
                 {domain_selection
