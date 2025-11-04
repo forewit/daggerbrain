@@ -160,9 +160,7 @@
                 options={TIER_2_BASE_OPTIONS}
                 on_close={() => (select_open = false)}
                 bind:open={tier_2_options_open}
-                bind:choices={
-                  character.level_up_choices[level as keyof typeof character.level_up_choices]
-                }
+                bind:choices
                 {chosen_options}
               />
               <TierOptionsGroup
@@ -170,9 +168,7 @@
                 options={TIER_3_BASE_OPTIONS}
                 on_close={() => (select_open = false)}
                 bind:open={tier_3_options_open}
-                bind:choices={
-                  character.level_up_choices[level as keyof typeof character.level_up_choices]
-                }
+                bind:choices
                 {chosen_options}
               />
               <TierOptionsGroup
@@ -180,9 +176,7 @@
                 options={TIER_4_BASE_OPTIONS}
                 on_close={() => (select_open = false)}
                 bind:open={tier_4_options_open}
-                bind:choices={
-                  character.level_up_choices[level as keyof typeof character.level_up_choices]
-                }
+                bind:choices
                 {chosen_options}
               />
             </div>

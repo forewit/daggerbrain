@@ -129,9 +129,7 @@
                 options={TIER_2_BASE_OPTIONS}
                 on_close={() => (select_open = false)}
                 bind:open={tier_2_options_open}
-                bind:choices={
-                  character.level_up_choices[level as keyof typeof character.level_up_choices]
-                }
+                bind:choices
                 {chosen_options}
               />
             </div>

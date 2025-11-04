@@ -23,11 +23,10 @@
       type="single"
       value={selected_traits.A || ""}
       onValueChange={(value) => {
-        const trait = value as keyof Traits;
         if (value === "") {
           selected_traits.A = null;
         } else {
-          selected_traits.A = trait;
+          selected_traits.A = value as keyof Traits;
         }
       }}
     >
