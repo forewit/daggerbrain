@@ -11,14 +11,17 @@
   } from "$lib/ts/constants/rules";
   import { getCharacterContext } from "$lib/ts/character.svelte";
   import Dropdown from "$lib/components/app/builder/dropdown.svelte";
-  import { get_previously_chosen_domain_cards, get_available_domain_cards } from "./domain-card-utils";
+  import {
+    get_previously_chosen_domain_cards,
+    get_available_domain_cards,
+  } from "./domain-card-utils";
   import { calculate_highlighted } from "./highlight-utils";
-  import DomainCardSelector from "./selectors/domain-card-selector.svelte";
-  import TraitsSelector from "./selectors/traits-selector.svelte";
-  import ExperienceBonusSelector from "./selectors/experience-bonus-selector.svelte";
+  import DomainCardSelector from "./secondary-options/domain-card-selector.svelte";
+  import TraitsSelector from "./secondary-options/traits-bonus-selector.svelte";
+  import ExperienceBonusSelector from "./secondary-options/experience-bonus-selector.svelte";
   import TierOptionsGroup from "./tier-options-group.svelte";
-  import SubclassUpgradeSelector from "./selectors/subclass-upgrade-selector.svelte";
-  import MulticlassSelector from "./selectors/multiclass-selector.svelte";
+  import SubclassUpgradeSelector from "./secondary-options/secondary-subclass-selector.svelte";
+  import MulticlassSelector from "./secondary-options/secondary-class-selector.svelte";
 
   let {
     class: className = "",
@@ -32,7 +35,10 @@
   let character = $derived(context.character);
 
   let previously_chosen_domain_cards = $derived.by(() => {
-    return get_previously_chosen_domain_cards(character, level, ["tier_2_domain_card", "tier_3_domain_card"]);
+    return get_previously_chosen_domain_cards(character, level, [
+      "tier_2_domain_card",
+      "tier_3_domain_card",
+    ]);
   });
 
   let available_domain_cards = $derived.by(() => {
@@ -49,23 +55,32 @@
   let tier_3_options_open = $state(true);
 
   let after_remove_secondary_class: (() => void) | null = $state(null);
-</script>
 
-{#if character}
-  {@const choices = character.level_up_choices[level as keyof typeof character.level_up_choices]}
-  {@const chosen_options = {
+  let choices = $derived(
+    character?.level_up_choices[level as keyof typeof character.level_up_choices] || {
+      A: BLANK_LEVEL_UP_CHOICE,
+      B: BLANK_LEVEL_UP_CHOICE,
+    }
+  );
+  let chosen_options = $derived({
     A:
-      choices.A.option_id === null
+      !choices || choices.A.option_id === null
         ? BLANK_LEVEL_UP_OPTION
         : ALL_LEVEL_UP_OPTIONS[choices.A.option_id],
     B:
-      choices.B.option_id === null
+      !choices || choices.B.option_id === null
         ? BLANK_LEVEL_UP_OPTION
         : ALL_LEVEL_UP_OPTIONS[choices.B.option_id],
-  }}
-  {@const level_up_domain_cards =
-    character.level_up_domain_cards[level as keyof typeof character.level_up_domain_cards]}
+  });
+  let level_up_domain_cards = $derived(
+    character?.level_up_domain_cards[level as keyof typeof character.level_up_domain_cards] || {
+      A: null,
+      B: null,
+    }
+  );
+</script>
 
+{#if character}
   <div class={cn(className)}>
     <Dropdown
       title="Level {level}"
@@ -80,8 +95,7 @@
           bind:selected_card={level_up_domain_cards.A}
           available_cards={available_domain_cards}
           previously_chosen_cards={previously_chosen_domain_cards}
-          description="Take an additional domain card of your level or lower from a domain you have access to."
-          {width}
+          description_html="Take an additional domain card of your level or lower from a domain you have access to."
         />
 
         <!-- level up choices select -->
@@ -142,14 +156,18 @@
                 tier_number={2}
                 options={TIER_2_BASE_OPTIONS}
                 bind:open={tier_2_options_open}
-                {choices}
+                bind:choices={
+                  character.level_up_choices[level as keyof typeof character.level_up_choices]
+                }
                 {chosen_options}
               />
               <TierOptionsGroup
                 tier_number={3}
                 options={TIER_3_BASE_OPTIONS}
                 bind:open={tier_3_options_open}
-                {choices}
+                bind:choices={
+                  character.level_up_choices[level as keyof typeof character.level_up_choices]
+                }
                 {chosen_options}
               />
             </div>
@@ -179,8 +197,7 @@
               bind:selected_card={choices[key].selected_domain_card}
               available_cards={filtered_available_domain_cards}
               previously_chosen_cards={previously_chosen_domain_cards}
-              description={ALL_LEVEL_UP_OPTIONS[choices[key].option_id].title_html}
-              {width}
+              description_html={ALL_LEVEL_UP_OPTIONS[choices[key].option_id].title_html}
             />
           {:else if choices[key].option_id === "tier_3_subclass_upgrade"}
             <SubclassUpgradeSelector

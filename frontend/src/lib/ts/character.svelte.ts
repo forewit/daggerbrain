@@ -234,14 +234,7 @@ function createCharacter(uid: string) {
 
     $effect(() => {
         if (!character) return;
-        let mt: Record<keyof Traits, boolean> = {
-            agility: false,
-            strength: false,
-            finesse: false,
-            instinct: false,
-            presence: false,
-            knowledge: false,
-        }
+
         let tier_2_mt: Record<keyof Traits, boolean> = {
             agility: false,
             strength: false,
@@ -258,47 +251,28 @@ function createCharacter(uid: string) {
             presence: false,
             knowledge: false,
         }
-
+        let tier_4_mt: Record<keyof Traits, boolean> = {
+            agility: false,
+            strength: false,
+            finesse: false,
+            instinct: false,
+            presence: false,
+            knowledge: false,
+        }
         for (let i = 2; i <= character.level; i++) {
-            // clear marks at tier 3
-            if (i === 5) {
-                tier_2_mt = mt;
-                mt = {
-                    agility: false,
-                    strength: false,
-                    finesse: false,
-                    instinct: false,
-                    presence: false,
-                    knowledge: false,
-                }
-            }
-
-            // clear marks at tier 4
-            if (i === 8) {
-                tier_3_mt = mt;
-                mt = {
-                    agility: false,
-                    strength: false,
-                    finesse: false,
-                    instinct: false,
-                    presence: false,
-                    knowledge: false,
-                }
-            }
-
             const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
             if (i <= 4) {
                 clear_duplicated_marked_traits(["tier_2_traits"], tier_2_mt, level_choices);
             } else if (i <= 7) {
                 clear_duplicated_marked_traits(["tier_2_traits", "tier_3_traits"], tier_3_mt, level_choices);
             } else {
-                clear_duplicated_marked_traits(["tier_2_traits", "tier_3_traits", "tier_4_traits"], mt, level_choices);
+                clear_duplicated_marked_traits(["tier_2_traits", "tier_3_traits", "tier_4_traits"], tier_4_mt, level_choices);
             }
         }
 
         tier_2_marked_traits = tier_2_mt;
         tier_3_marked_traits = tier_3_mt;
-        tier_4_marked_traits = mt;
+        tier_4_marked_traits = tier_4_mt;
     })
 
     // ! clear conflicting selected experience choices at each level
@@ -457,7 +431,7 @@ function createCharacter(uid: string) {
             }
             //***** END level up domain cards *****/
 
-            
+
             //***** domain card choices *****/
             // clear domain card choices if the level choice is not a domain card choice
             if (!choice_A.option_id || !["tier_2_domain_card", "tier_3_domain_card", "tier_4_domain_card"].includes(choice_A.option_id)) {

@@ -15,9 +15,9 @@
     get_available_domain_cards,
   } from "./domain-card-utils";
   import { calculate_highlighted } from "./highlight-utils";
-  import DomainCardSelector from "./selectors/domain-card-selector.svelte";
-  import TraitsSelector from "./selectors/traits-selector.svelte";
-  import ExperienceBonusSelector from "./selectors/experience-bonus-selector.svelte";
+  import DomainCardSelector from "./secondary-options/domain-card-selector.svelte";
+  import TraitsSelector from "./secondary-options/traits-bonus-selector.svelte";
+  import ExperienceBonusSelector from "./secondary-options/experience-bonus-selector.svelte";
   import TierOptionsGroup from "./tier-options-group.svelte";
 
   let {
@@ -46,23 +46,32 @@
   });
 
   let tier_2_options_open = $state(true);
-</script>
 
-{#if character}
-  {@const choices = character.level_up_choices[level as keyof typeof character.level_up_choices]}
-  {@const chosen_options = {
+  let choices = $derived(
+    character?.level_up_choices[level as keyof typeof character.level_up_choices] || {
+      A: BLANK_LEVEL_UP_CHOICE,
+      B: BLANK_LEVEL_UP_CHOICE,
+    }
+  );
+  let chosen_options = $derived({
     A:
-      choices.A.option_id === null
+      !choices || choices.A.option_id === null
         ? BLANK_LEVEL_UP_OPTION
         : ALL_LEVEL_UP_OPTIONS[choices.A.option_id],
     B:
-      choices.B.option_id === null
+      !choices || choices.B.option_id === null
         ? BLANK_LEVEL_UP_OPTION
         : ALL_LEVEL_UP_OPTIONS[choices.B.option_id],
-  }}
-  {@const level_up_domain_cards =
-    character.level_up_domain_cards[level as keyof typeof character.level_up_domain_cards]}
+  });
+  let level_up_domain_cards = $derived(
+    character?.level_up_domain_cards[level as keyof typeof character.level_up_domain_cards] || {
+      A: null,
+      B: null,
+    }
+  );
+</script>
 
+{#if character}
   <div class={cn(className)}>
     <Dropdown
       title="Level {level}"
@@ -77,8 +86,7 @@
           bind:selected_card={level_up_domain_cards.A}
           available_cards={available_domain_cards}
           previously_chosen_cards={previously_chosen_domain_cards}
-          description="Take an additional domain card of your level or lower from a domain you have access to."
-          {width}
+          description_html="Take an additional domain card of your level or lower from a domain you have access to."
         />
 
         <!-- level up choices -->
@@ -117,7 +125,9 @@
                 tier_number={2}
                 options={TIER_2_BASE_OPTIONS}
                 bind:open={tier_2_options_open}
-                {choices}
+                bind:choices={
+                  character.level_up_choices[level as keyof typeof character.level_up_choices]
+                }
                 {chosen_options}
               />
             </div>
@@ -129,7 +139,7 @@
           {#if choices[key].option_id === "tier_2_traits"}
             <TraitsSelector
               bind:selected_traits={choices[key].marked_traits}
-              marked_traits={context.tier_2_marked_traits}
+              bind:marked_traits={context.tier_2_marked_traits}
               {width}
             />
           {:else if choices[key].option_id === "tier_2_experience_bonus"}
@@ -146,8 +156,7 @@
               bind:selected_card={choices[key].selected_domain_card}
               available_cards={filtered_available_domain_cards}
               previously_chosen_cards={previously_chosen_domain_cards}
-              description={ALL_LEVEL_UP_OPTIONS[choices[key].option_id].title_html}
-              {width}
+              description_html={ALL_LEVEL_UP_OPTIONS[choices[key].option_id].title_html}
             />
           {/if}
         {/each}
