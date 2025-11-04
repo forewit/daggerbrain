@@ -1,9 +1,9 @@
 <script lang="ts">
-  import AncestryCard from "$lib/components/app/cards/ancestry-card.svelte";
-  import CommunityCard from "$lib/components/app/cards/community-card.svelte";
-  import DomainCard from "$lib/components/app/cards/domain-card.svelte";
-  import SubclassCard from "$lib/components/app/cards/subclass-card.svelte";
-  import TransformationCard from "$lib/components/app/cards/transformation-card.svelte";
+  import AncestryCard from "$lib/components/app/cards/full-cards/ancestry-card.svelte";
+  import CommunityCard from "$lib/components/app/cards/full-cards/community-card.svelte";
+  import DomainCard from "$lib/components/app/cards/full-cards/domain-card.svelte";
+  import SubclassCard from "$lib/components/app/cards/full-cards/subclass-card.svelte";
+  import TransformationCard from "$lib/components/app/cards/full-cards/transformation-card.svelte";
   import Traits from "$lib/components/app/sheet/traits.svelte";
   import { getAppContext } from "$lib/ts/app.svelte";
   import {

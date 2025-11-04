@@ -2,7 +2,7 @@
   import { getAppContext } from "$lib/ts/app.svelte";
   import { cn, capitalize } from "$lib/utils";
   import Label from "$lib/components/ui/label/label.svelte";
-  import Dropdown from "$lib/components/app/builder/dropdown.svelte";
+  import Dropdown from "$lib/components/app/leveling/dropdown.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import Shield from "@lucide/svelte/icons/shield";
   import Hand from "@lucide/svelte/icons/hand";

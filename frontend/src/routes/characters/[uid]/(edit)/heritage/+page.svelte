@@ -7,13 +7,13 @@
   import ChevronDown from "@lucide/svelte/icons/chevron-down";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
-  import Dropdown from "$lib/components/app/builder/dropdown.svelte";
+  import Dropdown from "$lib/components/app/leveling/dropdown.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import { ANCESTRIES, COMMUNITIES, TRANSFORMATIONS } from "$lib/ts/constants/constants.js";
-  import HeritageCard from "$lib/components/app/cards/ancestry-card.svelte";
-  import TransformationCard from "$lib/components/app/cards/transformation-card.svelte";
-  import CommunityCard from "$lib/components/app/cards/community-card.svelte";
-  import AncestryCard from "$lib/components/app/cards/ancestry-card.svelte";
+  import HeritageCard from "$lib/components/app/cards/full-cards/ancestry-card.svelte";
+  import TransformationCard from "$lib/components/app/cards/full-cards/transformation-card.svelte";
+  import CommunityCard from "$lib/components/app/cards/full-cards/community-card.svelte";
+  import AncestryCard from "$lib/components/app/cards/full-cards/ancestry-card.svelte";
 
   let { data } = $props();
 

@@ -4,7 +4,7 @@
   import { buttonVariants } from "$lib/components/ui/button";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import * as Dialog from "$lib/components/ui/dialog/";
-  import DomainCard from "../../../cards/domain-card.svelte";
+  import DomainCard from "$lib/components/app/cards/full-cards/domain-card.svelte";
 
   let {
     selected_card = $bindable(),

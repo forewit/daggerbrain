@@ -2,11 +2,11 @@
   import type { Card, CardType } from "$lib/ts/types";
   import { cn } from "$lib/utils";
   import { onMount } from "svelte";
-  import AncestryCard from "./ancestry-card.svelte";
-  import CommunityCard from "./community-card.svelte";
-  import DomainCard from "./domain-card.svelte";
-  import TransformationCard from "./transformation-card.svelte";
-  import SubclassCard from "./subclass-card.svelte";
+  import AncestryCard from "./full-cards/ancestry-card.svelte";
+  import CommunityCard from "./full-cards/community-card.svelte";
+  import DomainCard from "./full-cards/domain-card.svelte";
+  import TransformationCard from "./full-cards/transformation-card.svelte";
+  import SubclassCard from "./full-cards/subclass-card.svelte";
 
   let {
     class: className = "",

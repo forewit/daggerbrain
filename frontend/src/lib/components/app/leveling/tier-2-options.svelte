@@ -9,7 +9,7 @@
     TIER_2_BASE_OPTIONS,
   } from "$lib/ts/constants/rules";
   import { getCharacterContext } from "$lib/ts/character.svelte";
-  import Dropdown from "$lib/components/app/builder/dropdown.svelte";
+  import Dropdown from "./dropdown.svelte";
   import {
     get_previously_chosen_domain_cards,
     get_available_domain_cards,

@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Character } from "$lib/ts/types";
   import { cn } from "$lib/utils";
-  import Dropdown from "$lib/components/app/builder/dropdown.svelte";
+  import Dropdown from "./dropdown.svelte";
   import PrimaryClassSelector from "./secondary-options/primary-class-selector.svelte";
   import PrimarySubclassSelector from "./secondary-options/primary-subclass-selector.svelte";
   import Level1DomainCardsSelector from "./secondary-options/level-1-domain-cards-selector.svelte";

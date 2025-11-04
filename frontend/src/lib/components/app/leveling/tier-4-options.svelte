@@ -8,9 +8,10 @@
     BLANK_LEVEL_UP_OPTION,
     TIER_2_BASE_OPTIONS,
     TIER_3_BASE_OPTIONS,
+    TIER_4_BASE_OPTIONS,
   } from "$lib/ts/constants/rules";
   import { getCharacterContext } from "$lib/ts/character.svelte";
-  import Dropdown from "$lib/components/app/builder/dropdown.svelte";
+  import Dropdown from "./dropdown.svelte";
   import {
     get_previously_chosen_domain_cards,
     get_available_domain_cards,
@@ -38,6 +39,7 @@
     return get_previously_chosen_domain_cards(character, level, [
       "tier_2_domain_card",
       "tier_3_domain_card",
+      "tier_4_domain_card",
     ]);
   });
 
@@ -48,11 +50,12 @@
   let width: number = $state(300);
 
   let highlighted = $derived.by(() => {
-    return calculate_highlighted(character, level, ["tier_2", "tier_3"]);
+    return calculate_highlighted(character, level, ["tier_2", "tier_3", "tier_4"]);
   });
 
   let tier_2_options_open = $state(false);
-  let tier_3_options_open = $state(true);
+  let tier_3_options_open = $state(false);
+  let tier_4_options_open = $state(true);
 
   let after_remove_secondary_class: (() => void) | null = $state(null);
 
@@ -109,7 +112,10 @@
               tier_2_options_open =
                 (choices.A.option_id !== null && choices.A.option_id.startsWith("tier_2")) ||
                 (choices.B.option_id !== null && choices.B.option_id.startsWith("tier_2"));
-              tier_3_options_open = true;
+              tier_3_options_open =
+                (choices.A.option_id !== null && choices.A.option_id.startsWith("tier_3")) ||
+                (choices.B.option_id !== null && choices.B.option_id.startsWith("tier_3"));
+              tier_4_options_open = true;
             }
           }}
         >
@@ -121,16 +127,12 @@
             <p class="truncate">
               {choices.A.option_id === null && choices.B.option_id === null
                 ? "Select 2 level up options"
-                : chosen_options.A !== null && chosen_options.A.costs_two_choices
-                  ? chosen_options.A.short_title
-                  : chosen_options.B !== null && chosen_options.B.costs_two_choices
-                    ? chosen_options.B.short_title
-                    : [chosen_options.A.short_title, chosen_options.B.short_title]
-                        .map((title) => title || "(Choose 1 more)")
-                        .join(", ")}
+                : [chosen_options.A.short_title, chosen_options.B.short_title]
+                    .map((title) => title || "(Choose 1 more)")
+                    .join(", ")}
             </p>
           </Select.Trigger>
-          <Select.Content class="rounded-md z-49" align="start">
+          <Select.Content class="rounded-md " align="start">
             <div style="max-width: {width}px;" class="p-2">
               <button
                 data-slot="select-item"
@@ -145,8 +147,6 @@
                       choices.A = BLANK_LEVEL_UP_CHOICE;
                       choices.B = BLANK_LEVEL_UP_CHOICE;
                     };
-                    // This will be handled by MulticlassSelector component
-                    // For now, we'll need to expose this callback
                   } else {
                     choices.A = BLANK_LEVEL_UP_CHOICE;
                     choices.B = BLANK_LEVEL_UP_CHOICE;
@@ -171,25 +171,33 @@
                 bind:choices
                 {chosen_options}
               />
+              <TierOptionsGroup
+                tier_number={4}
+                options={TIER_4_BASE_OPTIONS}
+                on_close={() => (select_open = false)}
+                bind:open={tier_4_options_open}
+                bind:choices
+                {chosen_options}
+              />
             </div>
           </Select.Content>
         </Select.Root>
 
         <!-- secondary choices based on the selected option -->
         {#each ["A" as keyof typeof choices, "B" as keyof typeof choices] as key}
-          {#if choices[key].option_id === "tier_2_traits" || choices[key].option_id === "tier_3_traits"}
+          {#if choices[key].option_id === "tier_2_traits" || choices[key].option_id === "tier_3_traits" || choices[key].option_id === "tier_4_traits"}
             <TraitsSelector
               bind:selected_traits={choices[key].marked_traits}
-              marked_traits={context.tier_3_marked_traits}
+              marked_traits={context.tier_4_marked_traits}
               {width}
             />
-          {:else if choices[key].option_id === "tier_2_experience_bonus" || choices[key].option_id === "tier_3_experience_bonus"}
+          {:else if choices[key].option_id === "tier_2_experience_bonus" || choices[key].option_id === "tier_3_experience_bonus" || choices[key].option_id === "tier_4_experience_bonus"}
             <ExperienceSelector
               bind:selected_experiences={choices[key].selected_experiences}
               experiences={character.experiences}
               {width}
             />
-          {:else if choices[key].option_id === "tier_2_domain_card" || choices[key].option_id === "tier_3_domain_card"}
+          {:else if choices[key].option_id === "tier_2_domain_card" || choices[key].option_id === "tier_3_domain_card" || choices[key].option_id === "tier_4_domain_card"}
             {@const max_level = choices[key].option_id === "tier_2_domain_card" ? 4 : 7}
             {@const filtered_available_domain_cards = available_domain_cards.filter((card) => {
               card.level_requirement <= max_level;
@@ -200,7 +208,7 @@
               previously_chosen_cards={previously_chosen_domain_cards}
               description_html={ALL_LEVEL_UP_OPTIONS[choices[key].option_id].title_html}
             />
-          {:else if choices[key].option_id === "tier_3_subclass_upgrade"}
+          {:else if choices[key].option_id === "tier_3_subclass_upgrade" || choices[key].option_id === "tier_4_subclass_upgrade"}
             <SecondarySubclassSelector
               bind:selected_upgrade={choices[key].selected_subclass_upgrade}
               {character}
@@ -208,7 +216,7 @@
               options_used={context.options_used}
               {width}
             />
-          {:else if choices[key].option_id === "tier_3_multiclass"}
+          {:else if choices[key].option_id === "tier_3_multiclass" || choices[key].option_id === "tier_4_multiclass"}
             <SecondaryClassSelector
               bind:character
               after_remove_secondary_class={() => {

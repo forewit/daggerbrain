@@ -2,7 +2,7 @@
   import type { Card } from "$lib/ts/types";
   import { cn } from "$lib/utils";
   import type { Snippet } from "svelte";
-  import DomainBanner from "./domain-banner.svelte";
+  import DomainBanner from "../domain-banner.svelte";
   import { DOMAINS } from "$lib/ts/constants/constants";
 
   let {

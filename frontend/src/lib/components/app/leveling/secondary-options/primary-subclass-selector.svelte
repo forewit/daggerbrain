@@ -3,7 +3,7 @@
   import { Button, buttonVariants } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog/";
   import * as Collapsible from "$lib/components/ui/collapsible/";
-  import SubclassCard from "../../../cards/subclass-card.svelte";
+  import SubclassCard from "$lib/components/app/cards/full-cards/subclass-card.svelte";
   import { cn } from "$lib/utils";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
 

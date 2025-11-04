@@ -5,7 +5,7 @@
   import { cn } from "$lib/utils";
   import type { Snippet } from "svelte";
   import * as Select from "$lib/components/ui/select/";
-  import DomainBanner from "../cards/domain-banner.svelte";
+  import DomainBanner from "$lib/components/app/cards/domain-banner.svelte";
 
   let {
     character_class,

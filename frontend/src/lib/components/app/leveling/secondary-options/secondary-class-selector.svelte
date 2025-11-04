@@ -6,8 +6,8 @@
   import { cn } from "$lib/utils";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import { CLASSES } from "$lib/ts/constants/constants";
-  import ClassSummary from "../../class-summary.svelte";
-  import SubclassCard from "../../../cards/subclass-card.svelte";
+  import ClassSummary from "../class-summary.svelte";
+  import SubclassCard from "$lib/components/app/cards/full-cards/subclass-card.svelte";
 
   let {
     character = $bindable(),

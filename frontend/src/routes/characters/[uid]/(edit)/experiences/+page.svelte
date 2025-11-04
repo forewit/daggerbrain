@@ -5,7 +5,7 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import Input from "$lib/components/ui/input/input.svelte";
   import Textarea from "$lib/components/ui/textarea/textarea.svelte";
-  import Dropdown from "$lib/components/app/builder/dropdown.svelte";
+  import Dropdown from "$lib/components/app/leveling/dropdown.svelte";
   import { EXPERIENCES } from "$lib/ts/constants/rules";
   import { getCharacterContext } from "$lib/ts/character.svelte.js";
 

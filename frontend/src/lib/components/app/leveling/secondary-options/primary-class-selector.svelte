@@ -3,7 +3,7 @@
   import { Button, buttonVariants } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog/";
   import { CLASSES } from "$lib/ts/constants/constants";
-  import ClassSummary from "../../class-summary.svelte";
+  import ClassSummary from "../class-summary.svelte";
 
   let {
     character = $bindable(),
