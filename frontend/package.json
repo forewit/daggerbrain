@@ -25,6 +25,7 @@
     "@types/three": "^0.180.0",
     "bits-ui": "^2.14.1",
     "embla-carousel-svelte": "^8.6.0",
+    "jsdom": "^27.1.0",
     "mode-watcher": "^1.1.0",
     "svelte": "^5.39.5",
     "svelte-check": "^4.3.2",
