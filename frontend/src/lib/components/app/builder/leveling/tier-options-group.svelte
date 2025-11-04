@@ -3,9 +3,12 @@
   import { ALL_LEVEL_UP_OPTIONS } from "$lib/ts/constants/rules";
   import { cn } from "$lib/utils";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
+  import Square from "@lucide/svelte/icons/square";
+  import SquareCheck from "@lucide/svelte/icons/square-check";
+  import Check from "@lucide/svelte/icons/check";
+  import CheckCheck from "@lucide/svelte/icons/check-check";
   import * as Select from "$lib/components/ui/select/";
   import * as Collapsible from "$lib/components/ui/collapsible/";
-  import OptionButton from "./option-button.svelte";
   import { getCharacterContext } from "$lib/ts/character.svelte";
 
   let {
@@ -14,12 +17,14 @@
     open = $bindable(),
     choices = $bindable(),
     chosen_options,
+    on_close = ()=>{}
   }: {
     tier_number: number;
     options: Record<string, LevelUpOption>;
     open?: boolean;
     choices: { A: LevelUpChoice; B: LevelUpChoice };
     chosen_options: { A: LevelUpOption; B: LevelUpOption };
+    on_close?: () => void;
   } = $props();
 
   const context = getCharacterContext();
@@ -62,15 +67,10 @@
       choices.A.option_id = option_id as keyof typeof ALL_LEVEL_UP_OPTIONS;
     } else if (choices.B.option_id === null) {
       choices.B.option_id = option_id as keyof typeof ALL_LEVEL_UP_OPTIONS;
-    } else if (choices.A.option_id !== null && choices.B.option_id !== null) {
-      if (choices.A.option_id === option_id && choices.B.option_id === option_id) {
-        choices.A.option_id = null;
-        choices.B.option_id = null;
-      } else if (choices.A.option_id === option_id) {
-        choices.A.option_id = null;
-      } else if (choices.B.option_id === option_id) {
-        choices.B.option_id = null;
-      }
+    }
+    // if both choices are !== null then call on_close
+    if (choices.A.option_id !== null && choices.B.option_id !== null) {
+      on_close();
     }
   }
 </script>
@@ -86,18 +86,45 @@
     <Collapsible.Content>
       {#each Object.entries(options) as [option_id, option]}
         {@const { disabled, rule_disabled } = calculate_disabled(option_id, option, tier_number)}
-        <OptionButton
-          {option_id}
-          {option}
-          selected_choices={{
-            A: choices.A.option_id,
-            B: choices.B.option_id,
-          }}
-          options_used={context.options_used}
+
+        <button
           {disabled}
-          {rule_disabled}
-          on_click={() => handle_option_click(option_id)}
-        />
+          class="text-left hover:cursor-pointer hover:bg-muted disabled:opacity-50 disabled:pointer-events-none disabled:cursor-default flex w-full select-none items-center gap-2 rounded-sm py-1.5 px-2 text-sm"
+          onclick={() => handle_option_click(option_id)}
+        >
+          <div class="w-14 shrink-0 flex justify-end">
+            <div class={cn("gap-1 flex w-min relative")}>
+              {#if rule_disabled}
+                <span
+                  class="absolute top-1/2 -translate-y-1/2 -left-1 -right-1 h-[1px] bg-foreground"
+                ></span>
+              {/if}
+              {#each Array(option.max) as _, i}
+                {@const Icon = i < context.options_used[option_id] ? SquareCheck : Square}
+                {@const double = option.costs_two_choices}
+
+                {#if double}
+                  <div
+                    class="flex gap-1 rounded-xs outline-offset-1 outline-muted-foreground outline-2"
+                  >
+                    <Icon class="size-4" />
+                    <Icon class="size-4" />
+                  </div>
+                {:else}
+                  <Icon class="size-4" />
+                {/if}
+              {/each}
+            </div>
+          </div>
+          <p class={cn("grow")}>{@html option.title_html}</p>
+          <div class="size-4">
+            {#if (option_id === choices.A.option_id && option_id === choices.B.option_id) || (option_id === choices.A.option_id && option.costs_two_choices) || (option_id === choices.B.option_id && option.costs_two_choices)}
+              <CheckCheck class="size-4" />
+            {:else if option_id === choices.A.option_id || option_id === choices.B.option_id}
+              <Check class="size-4" />
+            {/if}
+          </div>
+        </button>
       {/each}
     </Collapsible.Content>
   </Collapsible.Root>

@@ -16,8 +16,8 @@
   } from "./domain-card-utils";
   import { calculate_highlighted } from "./highlight-utils";
   import DomainCardSelector from "./secondary-options/domain-card-selector.svelte";
-  import TraitsSelector from "./secondary-options/traits-bonus-selector.svelte";
-  import ExperienceBonusSelector from "./secondary-options/experience-bonus-selector.svelte";
+  import TraitsSelector from "./secondary-options/traits-selector.svelte";
+  import ExperienceSelector from "./secondary-options/experience-selector.svelte";
   import TierOptionsGroup from "./tier-options-group.svelte";
 
   let {
@@ -69,6 +69,8 @@
       B: null,
     }
   );
+
+  let select_open = $state(false);
 </script>
 
 {#if character}
@@ -92,6 +94,7 @@
         <!-- level up choices -->
         <Select.Root
           type="single"
+          bind:open={select_open}
           onOpenChange={(open) => {
             if (open) tier_2_options_open = true;
           }}
@@ -124,6 +127,7 @@
               <TierOptionsGroup
                 tier_number={2}
                 options={TIER_2_BASE_OPTIONS}
+                on_close={() => (select_open = false)}
                 bind:open={tier_2_options_open}
                 bind:choices={
                   character.level_up_choices[level as keyof typeof character.level_up_choices]
@@ -143,7 +147,7 @@
               {width}
             />
           {:else if choices[key].option_id === "tier_2_experience_bonus"}
-            <ExperienceBonusSelector
+            <ExperienceSelector
               bind:selected_experiences={choices[key].selected_experiences}
               experiences={character.experiences}
               {width}

@@ -2,9 +2,9 @@
   import type { Character } from "$lib/ts/types";
   import { cn } from "$lib/utils";
   import Dropdown from "$lib/components/app/builder/dropdown.svelte";
-  import ClassSelector from "./secondary-options/primary-class-selector.svelte";
-  import SubclassSelector from "./secondary-options/primary-subclass-selector.svelte";
-  import Level1DomainCards from "./secondary-options/level-1-domain-cards-selector.svelte";
+  import PrimaryClassSelector from "./secondary-options/primary-class-selector.svelte";
+  import PrimarySubclassSelector from "./secondary-options/primary-subclass-selector.svelte";
+  import Level1DomainCardsSelector from "./secondary-options/level-1-domain-cards-selector.svelte";
 
   let { character = $bindable(), class: className = "" }: { character: Character; class?: string } =
     $props();
@@ -19,7 +19,7 @@
       ? character.primary_class.name + ", " + character.primary_class.source
       : ""}
   >
-    <ClassSelector bind:character />
+    <PrimaryClassSelector bind:character />
   </Dropdown>
 
   <!-- Select a Subclass -->
@@ -29,7 +29,7 @@
     title="Subclass"
     subtitle={character.primary_subclass?.name}
   >
-    <SubclassSelector bind:character />
+    <PrimarySubclassSelector bind:character />
   </Dropdown>
 
   <!-- Domain Cards -->
@@ -45,6 +45,6 @@
       .filter((title) => title !== undefined)
       .join(", ")}
   >
-    <Level1DomainCards bind:character />
+    <Level1DomainCardsSelector bind:character />
   </Dropdown>
 </div>

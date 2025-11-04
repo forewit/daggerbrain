@@ -18,11 +18,11 @@
   } from "./domain-card-utils";
   import { calculate_highlighted } from "./highlight-utils";
   import DomainCardSelector from "./secondary-options/domain-card-selector.svelte";
-  import TraitsSelector from "./secondary-options/traits-bonus-selector.svelte";
-  import ExperienceBonusSelector from "./secondary-options/experience-bonus-selector.svelte";
+  import TraitsSelector from "./secondary-options/traits-selector.svelte";
+  import ExperienceSelector from "./secondary-options/experience-selector.svelte";
   import TierOptionsGroup from "./tier-options-group.svelte";
-  import SubclassUpgradeSelector from "./secondary-options/secondary-subclass-selector.svelte";
-  import MulticlassSelector from "./secondary-options/secondary-class-selector.svelte";
+  import SecondarySubclassSelector from "./secondary-options/secondary-subclass-selector.svelte";
+  import SecondaryClassSelector from "./secondary-options/secondary-class-selector.svelte";
 
   let {
     class: className = "",
@@ -81,6 +81,8 @@
       B: null,
     }
   );
+
+  let select_open = $state(false);
 </script>
 
 {#if character}
@@ -104,6 +106,7 @@
         <!-- level up choices select -->
         <Select.Root
           type="single"
+          bind:open={select_open}
           onOpenChange={(open) => {
             if (open) {
               tier_2_options_open =
@@ -155,6 +158,7 @@
               <TierOptionsGroup
                 tier_number={2}
                 options={TIER_2_BASE_OPTIONS}
+                on_close={() => (select_open = false)}
                 bind:open={tier_2_options_open}
                 bind:choices={
                   character.level_up_choices[level as keyof typeof character.level_up_choices]
@@ -164,6 +168,7 @@
               <TierOptionsGroup
                 tier_number={3}
                 options={TIER_3_BASE_OPTIONS}
+                on_close={() => (select_open = false)}
                 bind:open={tier_3_options_open}
                 bind:choices={
                   character.level_up_choices[level as keyof typeof character.level_up_choices]
@@ -173,6 +178,7 @@
               <TierOptionsGroup
                 tier_number={4}
                 options={TIER_4_BASE_OPTIONS}
+                on_close={() => (select_open = false)}
                 bind:open={tier_4_options_open}
                 bind:choices={
                   character.level_up_choices[level as keyof typeof character.level_up_choices]
@@ -192,7 +198,7 @@
               {width}
             />
           {:else if choices[key].option_id === "tier_2_experience_bonus" || choices[key].option_id === "tier_3_experience_bonus" || choices[key].option_id === "tier_4_experience_bonus"}
-            <ExperienceBonusSelector
+            <ExperienceSelector
               bind:selected_experiences={choices[key].selected_experiences}
               experiences={character.experiences}
               {width}
@@ -209,7 +215,7 @@
               description_html={ALL_LEVEL_UP_OPTIONS[choices[key].option_id].title_html}
             />
           {:else if choices[key].option_id === "tier_3_subclass_upgrade" || choices[key].option_id === "tier_4_subclass_upgrade"}
-            <SubclassUpgradeSelector
+            <SecondarySubclassSelector
               bind:selected_upgrade={choices[key].selected_subclass_upgrade}
               {character}
               option_id={choices[key].option_id}
@@ -217,7 +223,7 @@
               {width}
             />
           {:else if choices[key].option_id === "tier_3_multiclass" || choices[key].option_id === "tier_4_multiclass"}
-            <MulticlassSelector
+            <SecondaryClassSelector
               bind:character
               after_remove_secondary_class={() => {
                 if (after_remove_secondary_class) {
