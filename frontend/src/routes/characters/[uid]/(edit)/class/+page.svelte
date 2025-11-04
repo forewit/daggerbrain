@@ -3,7 +3,7 @@
   import Tier2Options from "$lib/components/app/builder/leveling/tier-2-options.svelte";
   import Tier3Options from "$lib/components/app/builder/leveling/tier-3-options.svelte";
   import Tier4Options from "$lib/components/app/builder/leveling/tier-4-options.svelte";
-  import LevelSelect from "$lib/components/app/builder/leveling/level-select.svelte";
+  import LevelSelect from "$lib/components/app/builder/leveling/selectors/level-selector.svelte";
   import { cn } from "$lib/utils";
   import Dropdown from "$lib/components/app/builder/dropdown.svelte";
   import { getCharacterContext } from "$lib/ts/character.svelte.js";

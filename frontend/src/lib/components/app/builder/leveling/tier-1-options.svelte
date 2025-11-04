@@ -8,15 +8,13 @@
   import * as Select from "$lib/components/ui/select/";
   import Button, { buttonVariants } from "$lib/components/ui/button/button.svelte";
   import { cn } from "$lib/utils";
-  import ClassSummary from "../class-summary.svelte";
-  import { CLASSES, DOMAINS } from "$lib/ts/constants/constants";
+  import { DOMAINS } from "$lib/ts/constants/constants";
   import DomainCard from "../../cards/domain-card.svelte";
+  import ClassSelector from "./selectors/class-selector.svelte";
 
   let { character = $bindable(), class: className = "" }: { character: Character; class?: string } =
     $props();
 
-  let classDialogOpen = $state(false);
-  let removeClassDialogOpen = $state(false);
   let subclassDialogOpen = $state(false);
   let subclassCardsOpen = $state(false);
 
@@ -34,42 +32,7 @@
 
 <div class={cn("flex flex-col gap-4", className)}>
   <!-- Select a Class -->
-  <Dropdown
-    title="Class"
-    highlighted={!character.primary_class}
-    subtitle={character.primary_class
-      ? character.primary_class.name + ", " + character.primary_class.source
-      : ""}
-  >
-    {#if !character.primary_class}
-      <Button onclick={() => (classDialogOpen = true)}>Choose a class</Button>
-    {:else}
-      <div class="flex flex-col gap-2">
-        <ClassSummary character_class={character.primary_class} bannerClasses="-mt-4" />
-        <div class="mt-4 flex flex-col gap-2">
-          <p class="text font-medium">{character.primary_class.hope_feature.title}</p>
-          <div class="text-muted-foreground mb-2 text-sm flex flex-col gap-2">
-            {@html character.primary_class.hope_feature.description_html}
-          </div>
-        </div>
-        {#each character.primary_class.class_features as feature}
-          <div class="flex flex-col gap-2">
-            <p class="text font-medium">{feature.title}</p>
-            <div class="text-muted-foreground mb-2 text-sm flex flex-col gap-2">
-              {@html feature.description_html}
-            </div>
-          </div>
-        {/each}
-        <div class="flex justify-center sm:justify-end">
-          <Button
-            variant="link"
-            class="text-destructive"
-            onclick={() => (removeClassDialogOpen = true)}>Remove</Button
-          >
-        </div>
-      </div>
-    {/if}
-  </Dropdown>
+  <ClassSelector bind:character />
 
   <!-- Select a Subclass -->
   <Dropdown
@@ -275,59 +238,6 @@
     {/if}
   </Dropdown>
 </div>
-
-<!-- Choose a Class dialog -->
-<Dialog.Root bind:open={classDialogOpen}>
-  <Dialog.Content class="flex flex-col min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%]">
-    <Dialog.Header>
-      <Dialog.Title>Select a Class</Dialog.Title>
-    </Dialog.Header>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto">
-      <!-- each class -->
-      {#each Object.values(CLASSES) as c}
-        <div class="flex gap-3 border-2 rounded-md p-3 bg-primary-muted">
-          <ClassSummary character_class={c} bannerClasses="-mt-3">
-            <Button
-              disabled={character.primary_class?.name === c.name}
-              onclick={() => {
-                character.primary_class = c;
-                character.primary_subclass = null;
-                classDialogOpen = false;
-              }}
-            >
-              {character.primary_class?.name === c.name ? "Selected" : "Select " + c.name}
-            </Button>
-          </ClassSummary>
-        </div>
-      {/each}
-    </div>
-    <Dialog.Footer>
-      <Dialog.Close class={buttonVariants({ variant: "link" })}>Cancel</Dialog.Close>
-    </Dialog.Footer>
-  </Dialog.Content>
-</Dialog.Root>
-
-<!-- Remove a Class dialog -->
-<Dialog.Root bind:open={removeClassDialogOpen}>
-  <Dialog.Content class="flex flex-col min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%]">
-    <Dialog.Header>
-      <Dialog.Title>Remove your class</Dialog.Title>
-    </Dialog.Header>
-    <Dialog.Description>
-      Removing your class will remove your subclass and domain card selections. This action cannot
-      be undone.
-    </Dialog.Description>
-    <Dialog.Footer>
-      <Dialog.Close class={buttonVariants({ variant: "link" })}>Cancel</Dialog.Close>
-      <Dialog.Close
-        class={buttonVariants({ variant: "destructive" })}
-        onclick={() => {
-          character.primary_class = null;
-        }}>Remove</Dialog.Close
-      >
-    </Dialog.Footer>
-  </Dialog.Content>
-</Dialog.Root>
 
 <!-- Choose a Subclass dialog -->
 <Dialog.Root bind:open={subclassDialogOpen}>

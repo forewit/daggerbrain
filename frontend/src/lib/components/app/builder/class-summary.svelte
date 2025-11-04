@@ -14,12 +14,14 @@
     children,
     multiclass = false,
     domain_selection = $bindable(null),
+    hide_starting_stats = false,
   }: {
     character_class: Class;
     class?: string;
     bannerClasses?: string;
     children?: Snippet;
     multiclass?: boolean;
+    hide_starting_stats?: boolean;
     domain_selection?: keyof typeof DOMAINS | null;
   } = $props();
 </script>
@@ -79,23 +81,24 @@
             {DOMAINS[character_class.secondary_domain as keyof typeof DOMAINS].name}
           </p>
 
-          <p class="text-xs text-muted-foreground">
-            <b class="text-foreground"><i>Evasion:</i></b>
-            {character_class.starting_evasion}
-          </p>
-          <p class="text-xs text-muted-foreground">
-            <b class="text-foreground"><i>HP:</i></b>
-            {character_class.starting_max_hp}
-          </p>
+          {#if !hide_starting_stats}
+            <p class="text-xs text-muted-foreground">
+              <b class="text-foreground"><i>Evasion:</i></b>
+              {character_class.starting_evasion}
+            </p>
+            <p class="text-xs text-muted-foreground">
+              <b class="text-foreground"><i>HP:</i></b>
+              {character_class.starting_max_hp}
+            </p>
+          {/if}
         {/if}
       </div>
     </div>
 
     {#if multiclass && domain_selection !== null}
-    <DomainBanner domain_name={domain_selection}  />
-
+      <DomainBanner domain_name={domain_selection} />
     {:else}
-    <Banner {character_class} class={bannerClasses} />
+      <Banner {character_class} class={bannerClasses} />
     {/if}
   </div>
   {@render children?.()}
