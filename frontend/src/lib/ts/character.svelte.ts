@@ -3,6 +3,7 @@ import { ALL_LEVEL_UP_OPTIONS, BLANK_LEVEL_UP_CHOICE, BLANK_LEVEL_UP_OPTION, TIE
 import { MODIFIERS } from './constants/modifiers';
 import type { Card, Character, Modifier, LevelUpChoice, LevelUpOption, Traits, Weapon } from './types';
 import { getContext, setContext } from 'svelte';
+import type { DOMAINS } from './constants/constants';
 
 function createCharacter(uid: string) {
     const app = getAppContext();
@@ -49,7 +50,10 @@ function createCharacter(uid: string) {
     $effect(() => {
         if (!character) return;
         if (!character.primary_class) character.primary_subclass = null;
-        if (!character.secondary_class) character.secondary_subclass = null;
+        if (!character.secondary_class) {
+            character.secondary_subclass = null;
+            character.secondary_class_domain = null;
+        }
     })
 
     // ! clear level up choices above the current level
@@ -85,6 +89,18 @@ function createCharacter(uid: string) {
                 console.warn(`Clearing level up option because the other option costs two choices`);
                 level_choices.A = { ...BLANK_LEVEL_UP_CHOICE };
             }
+        }
+    })
+
+    // ! clear secondary class if multiclass is not selected as a level up choice
+    $effect(() => {
+        if (!character || !character.secondary_class) return;
+
+        if (!options_used["tier_3_multiclass"] && !options_used["tier_4_multiclass"]) {
+            console.warn(`Clearing secondary class because multiclass is not selected as a level up choice`);
+            character.secondary_class = null;
+            character.secondary_class_domain = null;
+            character.secondary_subclass = null;
         }
     })
 
@@ -322,15 +338,19 @@ function createCharacter(uid: string) {
         }
     })
 
-    // ! clear conflicting subclass upgrade choices at each level
+    // ! clear invalid subclass upgrade choices (mastery level) at each level
     $effect(() => {
         if (!character) return;
+        let multiclass_used = false;
+
         for (let i = 2; i <= 10; i++) {
             const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
             const choice_A = level_choices.A;
             const choice_B = level_choices.B;
 
-            // clear subclass upgrade choices if the level choice is not a subclass upgrade choice
+            multiclass_used = multiclass_used || choice_A.option_id === "tier_3_multiclass" || choice_A.option_id === "tier_4_multiclass" || choice_B.option_id === "tier_3_multiclass" || choice_B.option_id === "tier_4_multiclass";
+
+            // clear subclass upgrade selection if the level choice is not a subclass upgrade choice
             if (!choice_A.option_id || !["tier_3_subclass_upgrade", "tier_4_subclass_upgrade"].includes(choice_A.option_id)) {
                 if (choice_A.selected_subclass_upgrade !== null) {
                     console.warn(`Clearing selected subclass upgrade because level choice was changed to ${choice_A.option_id}`)
@@ -344,14 +364,42 @@ function createCharacter(uid: string) {
                 }
             }
 
-            // todo: clear conflicting subclass upgrade choices 
-            // ? (can't choose secondary subclass upgrade if multiclass option isn't used before)
-            // ? (can't use secondary subclass upgrade if it's already been used before)
-            // ? (can't use primary subclass upgrade if multiclass was used in the same tier)            
+            // clear level up choice if multiclass is already chosen in that tier
+            if (options_used["tier_3_multiclass"] >= 1) {
+                if (choice_A.option_id === "tier_3_subclass_upgrade") {
+                    console.warn(`Clearing selected subclass upgrade because multiclass is already chosen in tier 3`)
+                    character.level_up_choices[i as keyof typeof character.level_up_choices].A = BLANK_LEVEL_UP_CHOICE;
+                }
+                if (choice_B.option_id === "tier_3_subclass_upgrade") {
+                    console.warn(`Clearing selected subclass upgrade because multiclass is already chosen in tier 3`)
+                    character.level_up_choices[i as keyof typeof character.level_up_choices].B = BLANK_LEVEL_UP_CHOICE;
+                }
+            }
+            if (options_used["tier_4_multiclass"] >= 1) {
+                if (choice_A.option_id === "tier_4_subclass_upgrade") {
+                    console.warn(`Clearing selected subclass upgrade because multiclass is already chosen in tier 4`)
+                    character.level_up_choices[i as keyof typeof character.level_up_choices].A = BLANK_LEVEL_UP_CHOICE;
+                }
+                if (choice_B.option_id === "tier_4_subclass_upgrade") {
+                    console.warn(`Clearing selected subclass upgrade because multiclass is already chosen in tier 4`)
+                    character.level_up_choices[i as keyof typeof character.level_up_choices].B = BLANK_LEVEL_UP_CHOICE;
+                }
+            }
+
+            // clear "secondary" subclass upgrade chocie if multiclass was not used before
+            if (choice_A.selected_subclass_upgrade === "secondary" && !multiclass_used) {
+                console.warn(`Clearing "secondary" subclass upgrade because multiclass was not used before`)
+                choice_A.selected_subclass_upgrade = null;
+            }
+            if (choice_B.selected_subclass_upgrade === "secondary" && !multiclass_used) {
+                console.warn(`Clearing "secondary" subclass upgrade because multiclass was not used before`)
+                choice_B.selected_subclass_upgrade = null;
+            }
         }
     })
 
-    // ! clear conflicting domain card choices at each level and update the domain card vault
+    // ! clear invalid domain card choices at each level and update the domain card vault
+    // * derived domain card vault (can't be done with modifiers)
     $effect(() => {
         if (!character) return;
 
@@ -360,21 +408,57 @@ function createCharacter(uid: string) {
             return;
         }
 
-        let domain_card_vault: Card<"domain">[] = Object.values(character.level_up_domain_cards[1]).filter((card) => card !== null)
+        let domain_card_vault: Card<"domain">[] =
+            Object.values(character.level_up_domain_cards[1])
+                .filter((card) => card !== null && card.level_requirement <= 1) as Card<"domain">[]
+
+        let multiclass_used = false;
 
         for (let i = 2; i <= 10; i++) {
             const level_up_domain_cards = character.level_up_domain_cards[i as keyof typeof character.level_up_domain_cards];
+
+            const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
+            const choice_A = level_choices.A;
+            const choice_B = level_choices.B;
+
+            multiclass_used =
+                multiclass_used ||
+                choice_A.option_id === "tier_3_multiclass" ||
+                choice_A.option_id === "tier_4_multiclass" ||
+                choice_B.option_id === "tier_3_multiclass" ||
+                choice_B.option_id === "tier_4_multiclass";
+
+            const available_domain_names =
+                [character.primary_class.primary_domain,
+                character.primary_class.secondary_domain,
+                multiclass_used ? character.secondary_class_domain : null]
+                    .filter(domain => domain !== null) as (keyof typeof DOMAINS)[];
+
+
+            //***** level up domain cards *****/
+            // filter out cards that are not valid for the current level
+            if (level_up_domain_cards.A !== null && level_up_domain_cards.A.level_requirement > i) {
+                console.warn(`Domain card ${level_up_domain_cards.A?.title} is not valid for level ${i}`);
+                level_up_domain_cards.A = null;
+            }
+
+            // filter out cards that aren't in available domains
+            if (level_up_domain_cards.A !== null && !available_domain_names.includes(level_up_domain_cards.A.domain_name as keyof typeof DOMAINS)) {
+                console.warn(`Domain card ${level_up_domain_cards.A?.title} is not in available domains`);
+                level_up_domain_cards.A = null;
+            }
+
+            // add to vault if it's not already in there
             if (level_up_domain_cards.A !== null && domain_card_vault.some(card => card.title === level_up_domain_cards.A?.title)) {
                 console.warn(`Domain card ${level_up_domain_cards.A?.title} is already in the vault`);
                 level_up_domain_cards.A = null;
             } else if (level_up_domain_cards.A !== null) {
                 domain_card_vault.push(level_up_domain_cards.A);
             }
+            //***** END level up domain cards *****/
 
-            const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
-            const choice_A = level_choices.A;
-            const choice_B = level_choices.B;
-
+            
+            //***** domain card choices *****/
             // clear domain card choices if the level choice is not a domain card choice
             if (!choice_A.option_id || !["tier_2_domain_card", "tier_3_domain_card", "tier_4_domain_card"].includes(choice_A.option_id)) {
                 if (choice_A.selected_domain_card !== null) {
@@ -389,7 +473,27 @@ function createCharacter(uid: string) {
                 }
             }
 
-            // clear domain card choices that are already in the vault
+            // filter domain card choices that are not valid for the current level
+            if (choice_A.selected_domain_card !== null && choice_A.selected_domain_card.level_requirement > i) {
+                console.warn(`Domain card ${choice_A.selected_domain_card?.title} is not valid for level ${i}`);
+                choice_A.selected_domain_card = null;
+            }
+            if (choice_B.selected_domain_card !== null && choice_B.selected_domain_card.level_requirement > i) {
+                console.warn(`Domain card ${choice_B.selected_domain_card?.title} is not valid for level ${i}`);
+                choice_B.selected_domain_card = null;
+            }
+
+            // filter out level up choices that aren't in available domains
+            if (choice_A.selected_domain_card !== null && !available_domain_names.includes(choice_A.selected_domain_card.domain_name as keyof typeof DOMAINS)) {
+                console.warn(`Domain card ${choice_A.selected_domain_card?.title} is not in available domains`);
+                choice_A.selected_domain_card = null;
+            }
+            if (choice_B.selected_domain_card !== null && !available_domain_names.includes(choice_B.selected_domain_card.domain_name as keyof typeof DOMAINS)) {
+                console.warn(`Domain card ${choice_B.selected_domain_card?.title} is not in available domains`);
+                choice_B.selected_domain_card = null;
+            }
+
+            // add to vault if it's not already in there
             if (choice_A.selected_domain_card !== null && domain_card_vault.some(card => card.title === choice_A.selected_domain_card?.title)) {
                 console.warn(`Domain card ${choice_A.selected_domain_card?.title} is already in the vault`);
                 choice_A.selected_domain_card = null;
@@ -403,6 +507,7 @@ function createCharacter(uid: string) {
             } else if (choice_B.selected_domain_card !== null) {
                 domain_card_vault.push(choice_B.selected_domain_card);
             }
+            //***** END domain card choices *****/
         }
 
         // * derived domain card vault
@@ -544,7 +649,7 @@ function createCharacter(uid: string) {
 
         // secondary class
         if (character.secondary_class) {
-            push_modifier_ids(character.secondary_class.hope_feature.modifier_ids)
+            // no hope feature for secondary class
             character.secondary_class.class_features.forEach(f => push_modifier_ids(f.modifier_ids))
         }
 
@@ -612,6 +717,8 @@ function createCharacter(uid: string) {
 
         console.warn("Updated modifier list...")
     })
+
+    // * do NOT derive secondary class and subclass from level up choices. 
 
     /**
      * Applies modifiers of a specific behavior type to a stat value
@@ -804,7 +911,7 @@ function createCharacter(uid: string) {
         character.derived_stats.max_stress = max_stress
     })
 
-    // * derived primary_class_mastery_level
+    // * derived primary_class_mastery_level and secondary_class_mastery_level
     $effect(() => {
         if (!character) return;
         let masteryNum: number = character.base_stats.primary_class_mastery_level
@@ -813,9 +920,21 @@ function createCharacter(uid: string) {
         if (character.primary_class) masteryNum = Math.max(masteryNum, 1);
 
         masteryNum = apply_modifiers(base_modifiers, 'primary_class_mastery_level', masteryNum, 'base')
-        
-        // todo: derive based on level up choices
-        
+
+        for (let i = 2; i <= character.level; i++) {
+            const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
+            const choice_A = level_choices.A;
+            const choice_B = level_choices.B;
+
+            if ((choice_A.option_id === "tier_3_subclass_upgrade" || choice_A.option_id === "tier_4_subclass_upgrade") && choice_A.selected_subclass_upgrade === "primary") {
+                masteryNum++;
+            }
+
+            if ((choice_B.option_id === "tier_3_subclass_upgrade" || choice_B.option_id === "tier_4_subclass_upgrade") && choice_B.selected_subclass_upgrade === "primary") {
+                masteryNum++;
+            }
+        }
+
         masteryNum = apply_modifiers(bonus_modifiers, 'primary_class_mastery_level', masteryNum, 'bonus')
         masteryNum = apply_modifiers(override_modifiers, 'primary_class_mastery_level', masteryNum, 'override')
 
@@ -833,11 +952,25 @@ function createCharacter(uid: string) {
         if (character.secondary_class) masteryNum = Math.max(masteryNum, 1);
 
         masteryNum = apply_modifiers(base_modifiers, 'secondary_class_mastery_level', masteryNum, 'base')
+
+        for (let i = 2; i <= character.level; i++) {
+            const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
+            const choice_A = level_choices.A;
+            const choice_B = level_choices.B;
+
+            if ((choice_A.option_id === "tier_3_subclass_upgrade" || choice_A.option_id === "tier_4_subclass_upgrade") && choice_A.selected_subclass_upgrade === "secondary") {
+                masteryNum++;
+            }
+            if ((choice_B.option_id === "tier_3_subclass_upgrade" || choice_B.option_id === "tier_4_subclass_upgrade") && choice_B.selected_subclass_upgrade === "secondary") {
+                masteryNum++;
+            }
+        }
+
         masteryNum = apply_modifiers(bonus_modifiers, 'secondary_class_mastery_level', masteryNum, 'bonus')
         masteryNum = apply_modifiers(override_modifiers, 'secondary_class_mastery_level', masteryNum, 'override')
 
         // clamp 0..3 and assign with proper literal type
-        const masteryClamped = Math.max(0, Math.min(3, Math.trunc(masteryNum))) as 0 | 1 | 2 | 3
+        const masteryClamped = Math.max(0, Math.min(2, Math.trunc(masteryNum))) as 0 | 1 | 2 | 3
         character.derived_stats.secondary_class_mastery_level = masteryClamped
     })
 

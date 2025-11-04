@@ -230,6 +230,7 @@ export const JUST_JAMES: Character = {
     primary_subclass: CLASSES.assassin.subclasses.executioners_guild,
     secondary_class: null,
     secondary_subclass: null,
+    secondary_class_domain: null,
 
     // equipment
     active_armor: null,
@@ -368,6 +369,7 @@ export const NEW_CHARACTER: Character = {
     primary_subclass: null,
     secondary_class: null,
     secondary_subclass: null,
+    secondary_class_domain: null,
 
     // equipment
     active_armor: null,

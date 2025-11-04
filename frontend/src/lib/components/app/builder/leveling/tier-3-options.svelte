@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { LevelUpOption, Traits, Character, Card } from "$lib/ts/types";
+  import type { LevelUpOption, Traits, Character, Card, Subclass } from "$lib/ts/types";
   import { cn } from "$lib/utils";
   import Square from "@lucide/svelte/icons/square";
   import SquareCheck from "@lucide/svelte/icons/square-check";
@@ -13,16 +13,17 @@
     TIER_2_BASE_OPTIONS,
     TIER_3_BASE_OPTIONS,
   } from "$lib/ts/constants/rules";
-  import { DOMAINS, TRAITS } from "$lib/ts/constants/constants";
+  import { CLASSES, DOMAINS, TRAITS } from "$lib/ts/constants/constants";
   import DomainCard from "../../cards/domain-card.svelte";
   import { getCharacterContext } from "$lib/ts/character.svelte";
-  import { buttonVariants } from "$lib/components/ui/button";
+  import { Button, buttonVariants } from "$lib/components/ui/button";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import Dropdown from "$lib/components/app/builder/dropdown.svelte";
   import CheckCheck from "@lucide/svelte/icons/check-check";
   import Check from "@lucide/svelte/icons/check";
   import SquareMinus from "@lucide/svelte/icons/square-minus";
   import SubclassCard from "../../cards/subclass-card.svelte";
+  import ClassSummary from "../class-summary.svelte";
 
   let {
     class: className = "",
@@ -47,19 +48,17 @@
       if (level_up_domain_cards.A !== null) domain_cards.push(level_up_domain_cards.A);
 
       const choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
-      if (choices.A.option_id === "tier_2_domain_card") {
+      if (
+        choices.A.option_id === "tier_2_domain_card" ||
+        choices.A.option_id === "tier_3_domain_card"
+      ) {
         if (choices.A.selected_domain_card !== null)
           domain_cards.push(choices.A.selected_domain_card);
       }
-      if (choices.B.option_id === "tier_2_domain_card") {
-        if (choices.B.selected_domain_card !== null)
-          domain_cards.push(choices.B.selected_domain_card);
-      }
-      if (choices.A.option_id === "tier_3_domain_card") {
-        if (choices.A.selected_domain_card !== null)
-          domain_cards.push(choices.A.selected_domain_card);
-      }
-      if (choices.B.option_id === "tier_3_domain_card") {
+      if (
+        choices.B.option_id === "tier_2_domain_card" ||
+        choices.B.option_id === "tier_3_domain_card"
+      ) {
         if (choices.B.selected_domain_card !== null)
           domain_cards.push(choices.B.selected_domain_card);
       }
@@ -71,9 +70,15 @@
     if (!character?.primary_class) return [];
     const primary_domain = character.primary_class.primary_domain;
     const secondary_domain = character.primary_class.secondary_domain;
-    const domain_cards = Object.values(
-      DOMAINS[primary_domain as keyof typeof DOMAINS].cards
-    ).concat(Object.values(DOMAINS[secondary_domain as keyof typeof DOMAINS].cards));
+    const domain_cards = Object.values(DOMAINS[primary_domain as keyof typeof DOMAINS].cards)
+      .concat(Object.values(DOMAINS[secondary_domain as keyof typeof DOMAINS].cards))
+      .concat(
+        character.secondary_class_domain !== null &&
+          character.secondary_class_domain !== primary_domain &&
+          character.secondary_class_domain !== secondary_domain
+          ? Object.values(DOMAINS[character.secondary_class_domain as keyof typeof DOMAINS].cards)
+          : []
+      );
 
     return domain_cards.filter((card) => card.level_requirement <= Math.min(level, 7));
   });
@@ -121,12 +126,27 @@
       (choices.A.option_id === "tier_3_subclass_upgrade" &&
         choices.A.selected_subclass_upgrade === null) ||
       (choices.B.option_id === "tier_3_subclass_upgrade" &&
-        choices.B.selected_subclass_upgrade === null)
+        choices.B.selected_subclass_upgrade === null) ||
+      (choices.A.option_id === "tier_3_multiclass" &&
+        (character.secondary_class === null ||
+          character.secondary_class_domain === null ||
+          character.secondary_subclass === null)) ||
+      (choices.B.option_id === "tier_3_multiclass" &&
+        (character.secondary_class === null ||
+          character.secondary_class_domain === null ||
+          character.secondary_subclass === null))
     );
   });
 
   let tier_2_options_open = $state(false);
   let tier_3_options_open = $state(true);
+
+  let secondary_class_dialog_open = $state(false);
+  let remove_secondary_class_dialog_open = $state(false);
+  let secondary_subclass_dialog_open = $state(false);
+  let secondary_subclass_cards_open = $state(false);
+
+  let after_remove_secondary_class: () => void = () => {};
 </script>
 
 {#if character}
@@ -224,7 +244,7 @@
           </Dialog.Root>
         </div>
 
-        <!-- level up choices -->
+        <!-- level up choices select -->
         <Select.Root
           type="single"
           onOpenChange={(open) => {
@@ -244,20 +264,35 @@
             <p class="truncate">
               {choices.A.option_id === null && choices.B.option_id === null
                 ? "Select 2 level up options"
-                : [chosen_options.A.short_title, chosen_options.B.short_title]
-                    .map((title) => title || "(Choose 1 more)")
-                    .join(", ")}
+                : chosen_options.A !== null && chosen_options.A.costs_two_choices
+                  ? chosen_options.A.short_title
+                  : chosen_options.B !== null && chosen_options.B.costs_two_choices
+                    ? chosen_options.B.short_title
+                    : [chosen_options.A.short_title, chosen_options.B.short_title]
+                        .map((title) => title || "(Choose 1 more)")
+                        .join(", ")}
             </p>
           </Select.Trigger>
-          <Select.Content class="rounded-md " align="start">
+          <Select.Content class="rounded-md z-49" align="start">
             <div style="max-width: {width}px;" class="p-2">
               <button
                 data-slot="select-item"
                 disabled={choices.A.option_id === null && choices.B.option_id === null}
                 class="justify-center font-bold text-destructive hover:cursor-pointer hover:bg-muted disabled:opacity-50 disabled:pointer-events-none disabled:cursor-default flex w-full select-none items-center gap-2 rounded-sm py-1.5 px-2 text-sm"
                 onclick={() => {
-                  choices.A = BLANK_LEVEL_UP_CHOICE;
-                  choices.B = BLANK_LEVEL_UP_CHOICE;
+                  if (
+                    choices.A.option_id === "tier_3_multiclass" ||
+                    choices.A.option_id === "tier_4_multiclass"
+                  ) {
+                    after_remove_secondary_class = () => {
+                      choices.A = BLANK_LEVEL_UP_CHOICE;
+                      choices.B = BLANK_LEVEL_UP_CHOICE;
+                    };
+                    remove_secondary_class_dialog_open = true;
+                  } else {
+                    choices.A = BLANK_LEVEL_UP_CHOICE;
+                    choices.B = BLANK_LEVEL_UP_CHOICE;
+                  }
                 }}
               >
                 -- Clear selection --
@@ -581,10 +616,17 @@
               </div>
             </div>
           {:else if choices[key].option_id === "tier_2_domain_card" || choices[key].option_id === "tier_3_domain_card"}
+            {@const filtered_available_domain_cards = available_domain_cards.filter((card) => {
+              card.level_requirement <=
+                (choices[key].option_id === "tier_2_domain_card"
+                  ? 4
+                  : choices[key].option_id === "tier_3_domain_card"
+                    ? 7
+                    : 10);
+            })}
             <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md" bind:clientWidth={width}>
               <p class="py-1 px-2 text-xs italic text-muted-foreground">
-                Choose an additional domain card of your level or lower from a domain you have
-                access to (up to level 4).
+                {@html ALL_LEVEL_UP_OPTIONS[choices[key].option_id].title_html}
               </p>
               <Dialog.Root>
                 <Dialog.Trigger
@@ -613,12 +655,11 @@
                   </Dialog.Header>
                   <Dialog.Description>
                     <p class="text-xs italic text-muted-foreground">
-                      Choose an additional domain card of your level or lower from a domain you have
-                      access to (up to level 4).
+                      {@html ALL_LEVEL_UP_OPTIONS[choices[key].option_id].title_html}
                     </p>
                   </Dialog.Description>
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto p-2">
-                    {#each available_domain_cards as card}
+                    {#each filtered_available_domain_cards as card}
                       <Dialog.Close
                         class={cn(
                           "w-full rounded-xl outline-offset-3 outline-primary hover:outline-4 hover:cursor-pointer disabled:pointer-events-none disabled:opacity-50 disabled:cursor-default",
@@ -708,9 +749,200 @@
                 </p>
               {/if}
             </div>
+          {:else if choices[key].option_id === "tier_3_multiclass"}
+            <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md">
+              <p class="py-1 px-2 text-xs italic text-muted-foreground">
+                Choose an additional class, select one of its domains, gain its class features, and
+                take the foundation card from one of its subclasses.
+              </p>
+
+              <!-- secondary class -->
+              <div class="p-2 rounded-lg border bg-primary-muted">
+                {#if !character.secondary_class}
+                  <Button onclick={() => (secondary_class_dialog_open = true)}>
+                    Choose an additional class
+                  </Button>
+                {:else}
+                  <div class="flex flex-col gap-2">
+                    <ClassSummary
+                      character_class={character.secondary_class}
+                      multiclass
+                      bind:domain_selection={character.secondary_class_domain}
+                      class="mb-2"
+                    />
+
+                    {#each character.secondary_class.class_features as feature}
+                      <div class="flex flex-col gap-2">
+                        <p class="text-sm font-medium">{feature.title}</p>
+                        <div class="text-muted-foreground mb-2 text-xs flex flex-col gap-2">
+                          {@html feature.description_html}
+                        </div>
+                      </div>
+                    {/each}
+                    <div class="flex justify-center sm:justify-end">
+                      <Button
+                        variant="link"
+                        class="text-destructive"
+                        onclick={() => (remove_secondary_class_dialog_open = true)}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                {/if}
+              </div>
+
+              <!-- secondary subclass -->
+              <div class="p-2 rounded-lg border bg-primary-muted">
+                {#if !character.secondary_subclass}
+                  <Button onclick={() => (secondary_subclass_dialog_open = true)}
+                    >Choose a subclass</Button
+                  >
+                {:else}
+                  <div class="flex flex-col gap-4">
+                    <p class="text-lg font-medium">{character.secondary_subclass.name}</p>
+                    <p class="-mt-2 text-xs italic text-muted-foreground">
+                      {@html character.secondary_subclass.description_html}
+                    </p>
+
+                    <SubclassCard card={character.secondary_subclass.foundation_card} />
+
+                    <!-- only show available at higher levels if the primary mastery level is only 1 -->
+                    {#if character.derived_stats.secondary_class_mastery_level < 3 && character.derived_stats.primary_class_mastery_level <= 1}
+                      <Collapsible.Root bind:open={secondary_subclass_cards_open}>
+                        <Collapsible.Trigger
+                          class="flex items-center text-left text-sm text-muted-foreground"
+                        >
+                          <ChevronRight
+                            class={cn(
+                              "w-k h-4 transition-transform",
+                              secondary_subclass_cards_open && "rotate-90"
+                            )}
+                          />
+                          Specialization and Mastery Cards
+                        </Collapsible.Trigger>
+                        <Collapsible.Content class="flex flex-col gap-3 py-4 opacity-70">
+                          <SubclassCard card={character.secondary_subclass.specialization_card} />
+                          <SubclassCard card={character.secondary_subclass.mastery_card} />
+                        </Collapsible.Content>
+                      </Collapsible.Root>
+                    {/if}
+
+                    <div class="flex justify-center sm:justify-end">
+                      <Button
+                        variant="link"
+                        class="text-destructive"
+                        onclick={() => (character.secondary_subclass = null)}>Remove</Button
+                      >
+                    </div>
+                  </div>
+                {/if}
+              </div>
+            </div>
           {/if}
         {/each}
       </div>
     </Dropdown>
   </div>
+
+  <!-- Choose a Class dialog -->
+  <Dialog.Root bind:open={secondary_class_dialog_open}>
+    <Dialog.Content class="flex flex-col min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%]">
+      <Dialog.Header>
+        <Dialog.Title>Select an Additional Class</Dialog.Title>
+      </Dialog.Header>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto">
+        <!-- each class -->
+        {#each Object.values(CLASSES) as c}
+          <div class="flex gap-3 border-2 rounded-md p-3 bg-primary-muted">
+            <ClassSummary character_class={c} bannerClasses="-mt-3">
+              <Button
+                disabled={character.secondary_class?.name === c.name}
+                onclick={() => {
+                  character.secondary_class = c;
+                  character.secondary_subclass = null;
+                  character.secondary_class_domain = null;
+                  secondary_class_dialog_open = false;
+                }}
+              >
+                {character.secondary_class?.name === c.name ? "Selected" : "Select " + c.name}
+              </Button>
+            </ClassSummary>
+          </div>
+        {/each}
+      </div>
+      <Dialog.Footer>
+        <Dialog.Close class={buttonVariants({ variant: "link" })}>Cancel</Dialog.Close>
+      </Dialog.Footer>
+    </Dialog.Content>
+  </Dialog.Root>
+
+  <!-- Remove a Class dialog -->
+  <Dialog.Root bind:open={remove_secondary_class_dialog_open}>
+    <Dialog.Content class="flex flex-col min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%]">
+      <Dialog.Header>
+        <Dialog.Title>Remove your Multiclass Selection</Dialog.Title>
+      </Dialog.Header>
+      <Dialog.Description>
+        Removing your multiclass selection will remove your related subclass and domain card
+        selections. This action cannot be undone.
+      </Dialog.Description>
+      <Dialog.Footer>
+        <Dialog.Close class={buttonVariants({ variant: "link" })}>Cancel</Dialog.Close>
+        <Dialog.Close
+          class={buttonVariants({ variant: "destructive" })}
+          onclick={() => {
+            character.secondary_class = null;
+            character.secondary_subclass = null;
+            character.secondary_class_domain = null;
+            after_remove_secondary_class();
+            after_remove_secondary_class = () => {};
+          }}>Remove</Dialog.Close
+        >
+      </Dialog.Footer>
+    </Dialog.Content>
+  </Dialog.Root>
+
+  <!-- Choose a Subclass dialog -->
+  <Dialog.Root bind:open={secondary_subclass_dialog_open}>
+    <Dialog.Content class="flex flex-col min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%]">
+      <Dialog.Header>
+        <Dialog.Title>Select a Subclass</Dialog.Title>
+      </Dialog.Header>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto">
+        <!-- each class -->
+        {#if character.secondary_class}
+          {#each Object.values(character.secondary_class.subclasses) as subclass}
+            <div class="flex flex-col gap-3 border-2 rounded-md p-3 bg-primary-muted">
+              <p class="text-lg font-medium">{subclass.name}</p>
+              <p class="-mt-2 text-xs italic text-muted-foreground">
+                {@html subclass.description_html}
+              </p>
+              {#if subclass.foundation_card.spellcast_trait}
+                <p class="text-xs italic text-muted-foreground">
+                  <b class="text-foreground"><em>Spellcast Trait:</em></b>
+                  {subclass.foundation_card.spellcast_trait}
+                </p>
+              {/if}
+              <Button
+                class="mt-2"
+                disabled={character.secondary_subclass?.name === subclass.name}
+                onclick={() => {
+                  character.secondary_subclass = subclass;
+                  secondary_subclass_dialog_open = false;
+                }}
+              >
+                {character.secondary_subclass?.name === subclass.name
+                  ? "Selected"
+                  : "Select " + subclass.name}
+              </Button>
+            </div>
+          {/each}
+        {/if}
+      </div>
+      <Dialog.Footer>
+        <Dialog.Close class={buttonVariants({ variant: "link" })}>Cancel</Dialog.Close>
+      </Dialog.Footer>
+    </Dialog.Content>
+  </Dialog.Root>
 {/if}

@@ -1,3 +1,4 @@
+import type { CLASSES, DOMAINS } from "./constants/constants"
 import type { MODIFIERS } from "./constants/modifiers"
 import type { ALL_LEVEL_UP_OPTIONS } from "./constants/rules"
 
@@ -33,8 +34,10 @@ export type Character = {
     // classes
     primary_class: Class | null
     primary_subclass: Subclass | null
+
     secondary_class: Class | null
     secondary_subclass: Subclass | null
+    secondary_class_domain: keyof typeof DOMAINS | null
 
     // equipment
     active_armor: Armor | null;
@@ -98,8 +101,8 @@ export type Character = {
             major: number,
             severe: number
         }
-        primary_class_mastery_level: number // 0 = none, 1 = foundation, 2 = specialization, 3 = mastery
-        secondary_class_mastery_level: number // 0 = none, 1 = foundation, 2 = specialization, 3 = mastery
+        primary_class_mastery_level: 0 | 1 | 2 | 3 // 0 = none, 1 = foundation, 2 = specialization, 3 = mastery
+        secondary_class_mastery_level: 0 | 1 | 2 | 3// 0 = none, 1 = foundation, 2 = specialization, 3 = mastery
         experience_modifiers: number[] // index matches the experiences array, value is the modifier
         spellcast_trait: keyof Traits | null
     }
@@ -197,7 +200,7 @@ export type LevelUpChoice = {
     marked_traits: { A: keyof Traits | null, B: keyof Traits | null }
     selected_experiences: { A: number | null, B: number | null }
     selected_domain_card: Card<"domain"> | null,
-    selected_subclass_upgrade: "primary" | "secondary" | null
+    selected_subclass_upgrade: "primary" | "secondary" | null,
 }
 export type LevelUpOption = {
     title_html: string | null

@@ -20,7 +20,7 @@ export const BLANK_LEVEL_UP_CHOICE = {
     marked_traits: { A: null, B: null },
     selected_experiences: { A: null, B: null },
     selected_domain_card: null,
-    selected_subclass_upgrade: null
+    selected_subclass_upgrade: null,
 } as const satisfies LevelUpChoice
 
 

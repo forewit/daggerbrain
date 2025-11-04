@@ -12,10 +12,10 @@
     style?: string;
     class?: string;
     domain_name: keyof typeof DOMAINS;
-    level_requirement: number;
+    level_requirement?: number;
   } = $props();
 
-  let domain = DOMAINS[domain_name];
+  let domain = $derived(DOMAINS[domain_name]);
 </script>
 
 {#snippet domainSVG(name: keyof typeof DOMAINS)}
