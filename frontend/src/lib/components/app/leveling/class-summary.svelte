@@ -1,7 +1,7 @@
 <script lang="ts">
   import Banner from "$lib/components/app/cards/class-banner.svelte";
   import { DOMAINS } from "$lib/ts/constants/constants";
-  import type { Class } from "$lib/ts/character/types";
+  import type { Class, DomainIds } from "$lib/ts/character/types";
   import { cn } from "$lib/utils";
   import type { Snippet } from "svelte";
   import * as Select from "$lib/components/ui/select/";
@@ -13,7 +13,7 @@
     bannerClasses = "",
     children,
     multiclass = false,
-    domain_selection = $bindable(null),
+    domain_id_selection: domain_selection = $bindable(null),
     hide_starting_stats = false,
   }: {
     character_class: Class;
@@ -22,7 +22,7 @@
     children?: Snippet;
     multiclass?: boolean;
     hide_starting_stats?: boolean;
-    domain_selection?: keyof typeof DOMAINS | null;
+    domain_id_selection?: DomainIds | null;
   } = $props();
 </script>
 
@@ -45,7 +45,7 @@
             value={domain_selection ?? ""}
             onValueChange={(value) => {
               if (value === "") domain_selection = null;
-              else domain_selection = value as keyof typeof DOMAINS;
+              else domain_selection = value as DomainIds;
             }}
           >
             <Select.Trigger
@@ -54,7 +54,7 @@
             >
               <p class="truncate">
                 {domain_selection
-                  ? DOMAINS[domain_selection as keyof typeof DOMAINS].name
+                  ? DOMAINS[domain_selection].name
                   : "Select a domain"}
               </p>
             </Select.Trigger>
@@ -64,12 +64,12 @@
               >
               <Select.Label>Domains</Select.Label>
               <!-- primary domain -->
-              <Select.Item value={character_class.primary_domain}
-                >{DOMAINS[character_class.primary_domain as keyof typeof DOMAINS].name}</Select.Item
+              <Select.Item value={character_class.primary_domain_id}
+                >{DOMAINS[character_class.primary_domain_id].name}</Select.Item
               >
               <!-- secondary domain -->
-              <Select.Item value={character_class.secondary_domain}
-                >{DOMAINS[character_class.secondary_domain as keyof typeof DOMAINS]
+              <Select.Item value={character_class.secondary_domain_id}
+                >{DOMAINS[character_class.secondary_domain_id]
                   .name}</Select.Item
               >
             </Select.Content>
@@ -77,8 +77,8 @@
         {:else}
           <p class="text-xs text-muted-foreground">
             <b class="text-foreground"><i>Domains:</i></b>
-            {DOMAINS[character_class.primary_domain as keyof typeof DOMAINS].name} /
-            {DOMAINS[character_class.secondary_domain as keyof typeof DOMAINS].name}
+            {DOMAINS[character_class.primary_domain_id].name} /
+            {DOMAINS[character_class.secondary_domain_id].name}
           </p>
 
           {#if !hide_starting_stats}
@@ -96,7 +96,7 @@
     </div>
 
     {#if multiclass && domain_selection !== null}
-      <DomainBanner domain_name={domain_selection} />
+      <DomainBanner domain_id={domain_selection} />
     {:else}
       <Banner {character_class} class={bannerClasses} />
     {/if}

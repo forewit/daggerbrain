@@ -1,7 +1,4 @@
-import type { CLASSES, DOMAINS } from "../constants/constants"
 import type { MODIFIERS } from "../constants/modifiers"
-import type { ALL_LEVEL_UP_OPTIONS } from "../constants/rules"
-
 
 export type Character = {
     settings: {
@@ -11,7 +8,6 @@ export type Character = {
     name: string,
     image: string,
     base_stats: {
-        traits: Traits
         proficiency: 1
         experience_modifier: 2
         max_experiences: 2
@@ -26,26 +22,36 @@ export type Character = {
         secondary_class_mastery_level: 0
     }
 
+    selected_traits: Traits
+
+    // descriptors (used to so that data isn't fetched too often)
+    descriptors: {
+        ancestry_name: string
+        primary_class_name: string
+        primary_subclass_name: string
+        secondary_class_name: string
+        secondary_subclass_name: string
+    }
+
     // heritage
-    ancestry_card: Card<"ancestry"> | null
-    community_card: Card<"community"> | null
+    ancestry_card_id: string | null
+    community_card_id: string | null
     experiences: string[],
 
     // classes
-    primary_class: Class | null
-    primary_subclass: Subclass | null
-
-    secondary_class: Class | null
-    secondary_subclass: Subclass | null
-    secondary_class_domain: keyof typeof DOMAINS | null
+    primary_class_id: string | null
+    primary_subclass_id: string | null
+    secondary_class_id: string | null
+    secondary_subclass_id: string | null
+    secondary_class_domain_id_choice: DomainIds | null
 
     // equipment
-    active_armor: Armor | null;
-    active_weapons: Weapon[];
+    active_armor_id: string | null;
+    active_weapon_ids: string[];
 
     // the void / other
-    transformation_card: Card<"transformation"> | null,
-    additional_cards: Card<any>[],
+    transformation_card_id: string | null,
+    additional_domain_cards: Card<"domain">[],
     additional_modifier_ids: (keyof typeof MODIFIERS)[]
 
     // set by the player
@@ -59,17 +65,17 @@ export type Character = {
 
     // level-up choices. levels 2-10
     level: number,
-    level_up_domain_cards: {
-        1: { A: Card<"domain"> | null, B: Card<"domain"> | null },
-        2: { A: Card<"domain"> | null },
-        3: { A: Card<"domain"> | null },
-        4: { A: Card<"domain"> | null },
-        5: { A: Card<"domain"> | null },
-        6: { A: Card<"domain"> | null },
-        7: { A: Card<"domain"> | null },
-        8: { A: Card<"domain"> | null },
-        9: { A: Card<"domain"> | null },
-        10: { A: Card<"domain"> | null },
+    level_up_domain_card_ids: {
+        1: { A: string | null, B: string | null },
+        2: { A: string | null },
+        3: { A: string | null },
+        4: { A: string | null },
+        5: { A: string | null },
+        6: { A: string | null },
+        7: { A: string | null },
+        8: { A: string | null },
+        9: { A: string | null },
+        10: { A: string | null },
     }
     level_up_choices: {
         2: { A: LevelUpChoice, B: LevelUpChoice },
@@ -81,7 +87,7 @@ export type Character = {
         8: { A: LevelUpChoice, B: LevelUpChoice },
         9: { A: LevelUpChoice, B: LevelUpChoice },
         10: { A: LevelUpChoice, B: LevelUpChoice },
-    }    
+    }
 }
 
 export type Traits = {
@@ -102,8 +108,8 @@ export type Class = {
     starting_max_hp: number
     suggested_traits: Traits
     hope_feature: Feature
-    primary_domain: string
-    secondary_domain: string
+    primary_domain_id: DomainIds
+    secondary_domain_id: DomainIds
     class_features: Feature[]
     subclasses: Record<string, Subclass>
 }
@@ -140,6 +146,7 @@ export type Feature = {
 }
 
 export type CardType = "domain" | "ancestry" | "community" | "transformation" | "subclass_foundation" | "subclass_specialization" | "subclass_mastery";
+
 export type Card<T extends CardType> = {
     card_type: T
     image_url: string
@@ -149,7 +156,7 @@ export type Card<T extends CardType> = {
     features: Feature[]
 } & (
         T extends "domain" ? {
-            domain_name: string
+            domain_id: DomainIds
             level_requirement: number,
             recall_cost: number,
             type: "ability" | "spell"
@@ -163,6 +170,8 @@ export type Card<T extends CardType> = {
         } : {}
     )
 
+export type DomainIds = "arcana" | "blade" | "bone" | "codex" | "grace" | "midnight" | "sage" | "splendor" | "valor";
+
 export type Domain = {
     name: string
     description_html: string
@@ -171,11 +180,17 @@ export type Domain = {
     cards: Record<string, Card<"domain">>
 }
 
+export type Tier1OptionIds = "tier_1_domain_cards";
+export type Tier2OptionIds = "tier_2_domain_card" | "tier_2_traits" | "tier_2_experience_bonus" | "tier_2_max_hp" | "tier_2_max_stress" | "tier_2_evasion";
+export type Tier3OptionIds = "tier_3_domain_card" | "tier_3_traits" | "tier_3_experience_bonus" | "tier_3_max_hp" | "tier_3_max_stress" | "tier_3_evasion" | "tier_3_proficiency" | "tier_3_subclass_upgrade" | "tier_3_multiclass";
+export type Tier4OptionIds = "tier_4_domain_card" | "tier_4_traits" | "tier_4_experience_bonus" | "tier_4_max_hp" | "tier_4_max_stress" | "tier_4_evasion" | "tier_4_proficiency" | "tier_4_subclass_upgrade" | "tier_4_multiclass";
+export type AllTierOptionIds = Tier1OptionIds | Tier2OptionIds | Tier3OptionIds | Tier4OptionIds;
+
 export type LevelUpChoice = {
-    option_id: keyof typeof ALL_LEVEL_UP_OPTIONS | null
+    option_id: AllTierOptionIds | null
     marked_traits: { A: keyof Traits | null, B: keyof Traits | null }
     selected_experiences: { A: number | null, B: number | null }
-    selected_domain_card: Card<"domain"> | null,
+    selected_domain_card_id: string | null,
     selected_subclass_upgrade: "primary" | "secondary" | null,
 }
 export type LevelUpOption = {

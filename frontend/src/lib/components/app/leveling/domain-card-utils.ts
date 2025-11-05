@@ -1,4 +1,5 @@
-import type { Character, Card } from "$lib/ts/character/types";
+import type { getCharacterContext } from "$lib/ts/character/character.svelte";
+import type { Character, Card, Class } from "$lib/ts/character/types";
 import { DOMAINS } from "$lib/ts/constants/constants";
 
 /**
@@ -8,66 +9,78 @@ import { DOMAINS } from "$lib/ts/constants/constants";
  * @param option_ids_to_check - Array of tier option IDs to check (e.g., ["tier_2_domain_card", "tier_3_domain_card"])
  * @returns Array of previously chosen domain cards
  */
-export function get_previously_chosen_domain_cards(
-  character: Character | null,
+export function get_previously_chosen_domain_card_ids(
+  context: ReturnType<typeof getCharacterContext>,
   level: number,
   option_ids_to_check: string[]
-): Card<"domain">[] {
-  if (!character) return [];
-  const domain_cards = Object.values(character.level_up_domain_cards[1]).filter(
-    (card) => card !== null
-  ) as Card<"domain">[];
+): string[] {
+  if (!context.character) return [];
+  const domain_card_ids = Object.values(context.character.level_up_domain_card_ids[1]).filter(
+    (id) => id !== null
+  );
 
   for (let i = 2; i <= level; i++) {
-    const level_up_domain_cards =
-      character.level_up_domain_cards[i as keyof typeof character.level_up_domain_cards];
-    if (level_up_domain_cards.A !== null) domain_cards.push(level_up_domain_cards.A);
+    const level_up_domain_card_ids =
+      context.character.level_up_domain_card_ids[i as keyof typeof context.character.level_up_domain_card_ids];
+    if (level_up_domain_card_ids.A !== null) domain_card_ids.push(level_up_domain_card_ids.A);
 
-    const choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
+    const choices = context.character.level_up_choices[i as keyof typeof context.character.level_up_choices];
     if (option_ids_to_check.includes(choices.A.option_id || "")) {
-      if (choices.A.selected_domain_card !== null)
-        domain_cards.push(choices.A.selected_domain_card);
+      if (choices.A.selected_domain_card_id !== null)
+        domain_card_ids.push(choices.A.selected_domain_card_id);
     }
     if (option_ids_to_check.includes(choices.B.option_id || "")) {
-      if (choices.B.selected_domain_card !== null)
-        domain_cards.push(choices.B.selected_domain_card);
+      if (choices.B.selected_domain_card_id !== null)
+        domain_card_ids.push(choices.B.selected_domain_card_id);
     }
   }
-  return domain_cards;
+  return domain_card_ids;
 }
 
 /**
  * Calculate available domain cards based on character's domains.
- * @param character - The character object
+ * @param primary_class - The primary class object
+ * @param secondary_class_domain_id_choice - The secondary class domain ID choice
  * @param level - The current level
  * @param max_level - Maximum level requirement for cards (e.g., 4 for tier-2, 7 for tier-3/4)
  * @param include_secondary_class_domain - Whether to include secondary_class_domain if it exists
  * @returns Array of available domain cards
  */
 export function get_available_domain_cards(
-  character: Character | null,
+  context: ReturnType<typeof getCharacterContext>,
   level: number,
   max_level: number,
   include_secondary_class_domain: boolean = false
-): Card<"domain">[] {
-  if (!character?.primary_class) return [];
-  const primary_domain = character.primary_class.primary_domain;
-  const secondary_domain = character.primary_class.secondary_domain;
-  let domain_cards = Object.values(DOMAINS[primary_domain as keyof typeof DOMAINS].cards).concat(
-    Object.values(DOMAINS[secondary_domain as keyof typeof DOMAINS].cards)
-  );
+): Record<string, Card<"domain">> {
+  if (!context.primary_class) return {};
+  const primary_domain_id = context.primary_class.primary_domain_id;
+  const secondary_domain_id = context.primary_class.secondary_domain_id;
+  const secondary_class_domain_id_choice = context.character?.secondary_class_domain_id_choice;
 
-  if (
-    include_secondary_class_domain &&
-    character.secondary_class_domain !== null &&
-    character.secondary_class_domain !== primary_domain &&
-    character.secondary_class_domain !== secondary_domain
-  ) {
-    domain_cards = domain_cards.concat(
-      Object.values(DOMAINS[character.secondary_class_domain as keyof typeof DOMAINS].cards)
-    );
+  let domain_cards: Record<string, Card<"domain">> = {
+    ...DOMAINS[primary_domain_id].cards,
+    ...DOMAINS[secondary_domain_id].cards
   }
 
-  return domain_cards.filter((card) => card.level_requirement <= Math.min(level, max_level));
+  if (
+    secondary_class_domain_id_choice &&
+    include_secondary_class_domain &&
+    secondary_class_domain_id_choice !== primary_domain_id &&
+    secondary_class_domain_id_choice !== secondary_domain_id
+  ) {
+    domain_cards = {
+      ...domain_cards,
+      ...DOMAINS[secondary_class_domain_id_choice].cards
+    }
+  }
+
+  // remove any cards that are not valid for the current level
+  for (const [id, card] of Object.entries(domain_cards)) {
+    if (card.level_requirement > Math.min(level, max_level)) {
+      delete domain_cards[id];
+    }
+  }
+
+  return domain_cards;
 }
 

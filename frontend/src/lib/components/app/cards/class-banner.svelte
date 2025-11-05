@@ -1,17 +1,17 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
-  import type { Class } from "$lib/ts/character/types";
+  import type { Class, DomainIds } from "$lib/ts/character/types";
   import { DOMAINS } from "$lib/ts/constants/constants";
 
   let { class: className = "", character_class }: { class?: string; character_class: Class } =
     $props();
 
-  let primaryDomain = $state(DOMAINS[character_class.primary_domain as keyof typeof DOMAINS]);
-  let secondaryDomain = $state(DOMAINS[character_class.secondary_domain as keyof typeof DOMAINS]);
+  let primaryDomain = $state(DOMAINS[character_class.primary_domain_id]);
+  let secondaryDomain = $state(DOMAINS[character_class.secondary_domain_id]);
 </script>
 
-{#snippet domainSVG(name: keyof typeof DOMAINS)}
-  {#if name === "arcana"}
+{#snippet domainSVG(domain_id: DomainIds)}
+  {#if domain_id === "arcana"}
     <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -52,7 +52,7 @@
         transform="translate(133,135)"
       ></path></svg
     >
-  {:else if name === "blade"}
+  {:else if domain_id === "blade"}
     <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -69,7 +69,7 @@
         transform="translate(127,111)"
       ></path></svg
     >
-  {:else if name === "bone"}
+  {:else if domain_id === "bone"}
     <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -95,7 +95,7 @@
         transform="translate(68,129)"
       ></path></svg
     >
-  {:else if name === "codex"}
+  {:else if domain_id === "codex"}
     <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -121,7 +121,7 @@
         transform="translate(205,22)"
       ></path></svg
     >
-  {:else if name === "grace"}
+  {:else if domain_id === "grace"}
     <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -135,7 +135,7 @@
         transform="translate(8,17)"
       ></path></svg
     >
-  {:else if name === "midnight"}
+  {:else if domain_id === "midnight"}
     <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -152,7 +152,7 @@
         transform="translate(146,17)"
       ></path></svg
     >
-  {:else if name === "sage"}
+  {:else if domain_id === "sage"}
     <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -169,7 +169,7 @@
         transform="translate(146,17)"
       ></path></svg
     >
-  {:else if name === "splendor"}
+  {:else if domain_id === "splendor"}
     <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -198,7 +198,7 @@
         transform="translate(52,91)"
       ></path></svg
     >
-  {:else if name === "valor"}
+  {:else if domain_id === "valor"}
     <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -220,14 +220,14 @@
     <img class="h-full w-full" src="/images/card/banner.webp" alt="banner" />
     <div
       class="absolute inset-0 flex flex-col items-center justify-center pb-3 gap-1 pt-0.5"
-      style="color: {DOMAINS[character_class.primary_domain as keyof typeof DOMAINS]
+      style="color: {DOMAINS[character_class.primary_domain_id]
         .foreground_color};"
     >
       <div class="w-9 h-auto aspect-contain">
-        {@render domainSVG(character_class.primary_domain as keyof typeof DOMAINS)}
+        {@render domainSVG(character_class.primary_domain_id)}
       </div>
       <div class="w-9 h-auto aspect-contain">
-        {@render domainSVG(character_class.secondary_domain as keyof typeof DOMAINS)}
+        {@render domainSVG(character_class.secondary_domain_id)}
       </div>
     </div>
   </div>

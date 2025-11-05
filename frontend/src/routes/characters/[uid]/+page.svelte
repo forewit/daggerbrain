@@ -19,10 +19,10 @@
 </script>
 
 {#if character}
-  {#if Object.values(character.base_stats.traits).includes(null) || !character.primary_class}
+  {#if Object.values(character.selected_traits).includes(null) || !character.primary_class_id}
     <div class="flex flex-col items-center justify-center gap-4 py-12 px-4">
       <p class="text-sm font-muted-foreground italic">Ready to finish setting up your character?</p>
-      <Button href={!character.primary_class ? "class/" : "traits/"}>Edit Character</Button>
+      <Button href={!character.primary_class_id ? "class/" : "traits/"}>Edit Character</Button>
     </div>
   {:else}
     <Sheet class="mb-24" />

@@ -33,7 +33,7 @@
       {/each}
     </div>
 
-    {#if character.primary_class}
+    {#if context.primary_class}
       <div class="relative mx-auto">
         <button
           class="text-sm p-3 relative"
@@ -43,8 +43,8 @@
             }
           }}
         >
-          <span class="italic font-medium pr-1">{character.primary_class.hope_feature.title}:</span>
-          {@html character.primary_class.hope_feature.description_html}
+          <span class="italic font-medium pr-1">{context.primary_class.hope_feature.title}:</span>
+          {@html context.primary_class.hope_feature.description_html}
         </button>
       </div>
     {/if}

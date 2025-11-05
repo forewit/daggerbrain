@@ -1,6 +1,6 @@
 import type { Armor, Weapon } from "../character/types";
 
-export const TIER_1_ARMOR = {
+export const ARMOR = {
     leather_armor: {
         title: "Leather Armor",
         description_html: "",
@@ -15,7 +15,7 @@ export const TIER_1_ARMOR = {
 } as const satisfies Record<string, Armor>
 
 
-export const TIER_1_WEAPONS = {
+export const WEAPONS = {
     longsword: {
         title: "Longsword",
         description_html: "",

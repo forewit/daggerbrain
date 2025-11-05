@@ -1,4 +1,4 @@
-import type { LevelUpChoice, LevelUpOption } from "../character/types"
+import type { AllTierOptionIds, LevelUpChoice, LevelUpOption, Tier1OptionIds, Tier2OptionIds, Tier3OptionIds, Tier4OptionIds } from "../character/types"
 
 export const EXPERIENCES = {
     description_html: `<p>An Experience is a word or phrase used to encapsulate a specific set of skills personality traits or aptitudes your character has acquired over the course of their life When your PC makes a move they can spend a Hope to add a relevant Experience's modifier to an action or reaction roll.</p>
@@ -19,7 +19,7 @@ export const BLANK_LEVEL_UP_CHOICE = {
     option_id: null,
     marked_traits: { A: null, B: null },
     selected_experiences: { A: null, B: null },
-    selected_domain_card: null,
+    selected_domain_card_id: null,
     selected_subclass_upgrade: null,
 } as const satisfies LevelUpChoice
 
@@ -32,7 +32,7 @@ export const TIER_1_BASE_OPTIONS = {
         costs_two_choices: false,
         modifier_ids: []
     }
-} as const satisfies Record<string, LevelUpOption>
+} as const satisfies Record<Tier1OptionIds, LevelUpOption>
 
 export const TIER_2_BASE_OPTIONS = {
     tier_2_traits: {
@@ -77,7 +77,7 @@ export const TIER_2_BASE_OPTIONS = {
         costs_two_choices: false,
         modifier_ids: ["evasion_plus_1"]
     }
-} as const satisfies Record<string, LevelUpOption>
+} as const satisfies Record<Tier2OptionIds, LevelUpOption>
 
 export const TIER_3_BASE_OPTIONS = {
     tier_3_traits: {
@@ -135,7 +135,7 @@ export const TIER_3_BASE_OPTIONS = {
         max: 1,
         costs_two_choices: true,
         modifier_ids: ["proficiency_plus_1"]
-    }, 
+    },
     tier_3_multiclass: {
         title_html: "<p>Multiclass: Choose an additional class for your character (disables <b>Take an upgraded subclass card</b> for this tier and the <b>Tier 4 Multiclass</b> option).</p>",
         short_title: "Multiclass",
@@ -143,7 +143,7 @@ export const TIER_3_BASE_OPTIONS = {
         costs_two_choices: true,
         modifier_ids: []
     }
-} as const satisfies Record<string, LevelUpOption>
+} as const satisfies Record<Tier3OptionIds, LevelUpOption>
 
 export const TIER_4_BASE_OPTIONS = {
     tier_4_traits: {
@@ -209,6 +209,11 @@ export const TIER_4_BASE_OPTIONS = {
         costs_two_choices: true,
         modifier_ids: []
     }
-} as const satisfies Record<string, LevelUpOption>
+} as const satisfies Record<Tier4OptionIds, LevelUpOption>
 
-export const ALL_LEVEL_UP_OPTIONS = { ...TIER_1_BASE_OPTIONS, ...TIER_2_BASE_OPTIONS, ...TIER_3_BASE_OPTIONS, ...TIER_4_BASE_OPTIONS }
+export const ALL_LEVEL_UP_OPTIONS = {
+    ...TIER_1_BASE_OPTIONS,
+    ...TIER_2_BASE_OPTIONS,
+    ...TIER_3_BASE_OPTIONS,
+    ...TIER_4_BASE_OPTIONS
+} as const satisfies Record<AllTierOptionIds, LevelUpOption>

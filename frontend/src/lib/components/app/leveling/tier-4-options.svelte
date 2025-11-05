@@ -3,9 +3,7 @@
   import { cn } from "$lib/utils";
   import * as Select from "$lib/components/ui/select/";
   import {
-    ALL_LEVEL_UP_OPTIONS,
     BLANK_LEVEL_UP_CHOICE,
-    BLANK_LEVEL_UP_OPTION,
     TIER_2_BASE_OPTIONS,
     TIER_3_BASE_OPTIONS,
     TIER_4_BASE_OPTIONS,
@@ -13,7 +11,7 @@
   import { getCharacterContext } from "$lib/ts/character/character.svelte";
   import Dropdown from "./dropdown.svelte";
   import {
-    get_previously_chosen_domain_cards,
+    get_previously_chosen_domain_card_ids,
     get_available_domain_cards,
   } from "./domain-card-utils";
   import { calculate_highlighted } from "./highlight-utils";
@@ -36,21 +34,17 @@
   let character = $derived(context.character);
 
   let previously_chosen_domain_cards = $derived.by(() => {
-    return get_previously_chosen_domain_cards(character, level, [
+    return get_previously_chosen_domain_card_ids(context, level, [
       "tier_2_domain_card",
       "tier_3_domain_card",
       "tier_4_domain_card",
     ]);
   });
 
-  let available_domain_cards = $derived.by(() => {
-    return get_available_domain_cards(character, level, 7, true);
-  });
-
   let width: number = $state(300);
 
   let highlighted = $derived.by(() => {
-    return calculate_highlighted(character, level, ["tier_2", "tier_3", "tier_4"]);
+    return calculate_highlighted(context, level, ["tier_2", "tier_3", "tier_4"]);
   });
 
   let tier_2_options_open = $state(false);
@@ -65,18 +59,11 @@
       B: BLANK_LEVEL_UP_CHOICE,
     }
   );
-  let chosen_options = $derived({
-    A:
-      !choices || choices.A.option_id === null
-        ? BLANK_LEVEL_UP_OPTION
-        : ALL_LEVEL_UP_OPTIONS[choices.A.option_id],
-    B:
-      !choices || choices.B.option_id === null
-        ? BLANK_LEVEL_UP_OPTION
-        : ALL_LEVEL_UP_OPTIONS[choices.B.option_id],
-  });
+  let chosen_options = context.level_up_chosen_options[level as keyof typeof context.level_up_chosen_options];
   let level_up_domain_cards = $derived(
-    character?.level_up_domain_cards[level as keyof typeof character.level_up_domain_cards] || {
+    character?.level_up_domain_card_ids[
+      level as keyof typeof character.level_up_domain_card_ids
+    ] || {
       A: null,
       B: null,
     }
@@ -90,16 +77,16 @@
     <Dropdown
       title="Level {level}"
       {highlighted}
-      subtitle={[chosen_options.A.short_title, chosen_options.B.short_title]
+      subtitle={[chosen_options.A?.short_title, chosen_options.B?.short_title]
         .filter((title) => title !== null)
         .join(", ")}
     >
       <div class="flex flex-col gap-4" bind:clientWidth={width}>
         <!-- level up domain cards -->
         <DomainCardSelector
-          bind:selected_card={level_up_domain_cards.A}
-          available_cards={available_domain_cards}
-          previously_chosen_cards={previously_chosen_domain_cards}
+          bind:selected_card_id={level_up_domain_cards.A}
+          available_cards={get_available_domain_cards(context, level, 10, true)}
+          previously_chosen_card_ids={previously_chosen_domain_cards}
           description_html="Take an additional domain card of your level or lower from a domain you have access to."
         />
 
@@ -121,13 +108,13 @@
         >
           <Select.Trigger
             highlighted={(choices.A.option_id === null || choices.B.option_id === null) &&
-              !(chosen_options.A.costs_two_choices || chosen_options.B.costs_two_choices)}
+              !(chosen_options.A?.costs_two_choices || chosen_options.B?.costs_two_choices)}
             class="w-full truncate bg-muted/80 hover:bg-muted/50"
           >
             <p class="truncate">
               {choices.A.option_id === null && choices.B.option_id === null
                 ? "Select 2 level up options"
-                : [chosen_options.A.short_title, chosen_options.B.short_title]
+                : [chosen_options.A?.short_title, chosen_options.B?.short_title]
                     .map((title) => title || "(Choose 1 more)")
                     .join(", ")}
             </p>
@@ -198,15 +185,18 @@
               {width}
             />
           {:else if choices[key].option_id === "tier_2_domain_card" || choices[key].option_id === "tier_3_domain_card" || choices[key].option_id === "tier_4_domain_card"}
-            {@const max_level = choices[key].option_id === "tier_2_domain_card" ? 4 : 7}
-            {@const filtered_available_domain_cards = available_domain_cards.filter((card) => {
-              card.level_requirement <= max_level;
-            })}
+            {@const max_level =
+              choices[key].option_id === "tier_2_domain_card"
+                ? 4
+                : choices[key].option_id === "tier_3_domain_card"
+                  ? 7
+                  : 10}
+
             <DomainCardSelector
-              bind:selected_card={choices[key].selected_domain_card}
-              available_cards={filtered_available_domain_cards}
-              previously_chosen_cards={previously_chosen_domain_cards}
-              description_html={ALL_LEVEL_UP_OPTIONS[choices[key].option_id].title_html}
+              bind:selected_card_id={choices[key].selected_domain_card_id}
+              available_cards={get_available_domain_cards(context, level, max_level, true)}
+              previously_chosen_card_ids={previously_chosen_domain_cards}
+              description_html={chosen_options[key]?.title_html || ""}
             />
           {:else if choices[key].option_id === "tier_3_subclass_upgrade" || choices[key].option_id === "tier_4_subclass_upgrade"}
             <SecondarySubclassSelector

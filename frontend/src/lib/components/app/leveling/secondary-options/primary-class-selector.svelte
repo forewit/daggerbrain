@@ -14,18 +14,18 @@
 </script>
 
 {#if character}
-  {#if !character.primary_class}
+  {#if !context.primary_class}
     <Button onclick={() => (class_dialog_open = true)}>Choose a class</Button>
   {:else}
     <div class="flex flex-col gap-2">
-      <ClassSummary character_class={character.primary_class} bannerClasses="-mt-4" />
+      <ClassSummary character_class={context.primary_class} bannerClasses="-mt-4" />
       <div class="mt-4 flex flex-col gap-2">
-        <p class="text font-medium">{character.primary_class.hope_feature.title}</p>
+        <p class="text font-medium">{context.primary_class.hope_feature.title}</p>
         <div class="text-muted-foreground mb-2 text-sm flex flex-col gap-2">
-          {@html character.primary_class.hope_feature.description_html}
+          {@html context.primary_class.hope_feature.description_html}
         </div>
       </div>
-      {#each character.primary_class.class_features as feature}
+      {#each context.primary_class.class_features as feature}
         <div class="flex flex-col gap-2">
           <p class="text font-medium">{feature.title}</p>
           <div class="text-muted-foreground mb-2 text-sm flex flex-col gap-2">
@@ -51,18 +51,18 @@
       </Dialog.Header>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto">
         <!-- each class -->
-        {#each Object.values(CLASSES) as c}
+        {#each Object.entries(CLASSES) as [id, c]}
           <div class="flex gap-3 border-2 rounded-md p-3 bg-primary-muted">
             <ClassSummary character_class={c} bannerClasses="-mt-3">
               <Button
-                disabled={character.primary_class?.name === c.name}
+                disabled={context.primary_class?.name === c.name}
                 onclick={() => {
-                  character.primary_class = c;
-                  character.primary_subclass = null;
+                  character.primary_class_id = id;
+                  character.primary_subclass_id = null;
                   class_dialog_open = false;
                 }}
               >
-                {character.primary_class?.name === c.name ? "Selected" : "Select " + c.name}
+                {context.primary_class?.name === c.name ? "Selected" : "Select " + c.name}
               </Button>
             </ClassSummary>
           </div>
@@ -89,7 +89,7 @@
         <Dialog.Close
           class={buttonVariants({ variant: "destructive" })}
           onclick={() => {
-            character.primary_class = null;
+            character.primary_class_id = null;
           }}>Remove</Dialog.Close
         >
       </Dialog.Footer>

@@ -31,17 +31,17 @@
     [
       context.primary_class_mastery_level &&
         context.primary_class_mastery_level >= 1 &&
-        character?.primary_subclass?.foundation_card,
+        context.primary_subclass?.foundation_card,
       context.primary_class_mastery_level &&
         context.primary_class_mastery_level >= 2 &&
-        character?.primary_subclass?.specialization_card,
+        context.primary_subclass?.specialization_card,
       context.primary_class_mastery_level &&
         context.primary_class_mastery_level >= 3 &&
-        character?.primary_subclass?.mastery_card,
-      character?.ancestry_card,
-      character?.community_card,
-      character?.transformation_card,
-      ...(character?.additional_cards || []),
+        context.primary_subclass?.mastery_card,
+      context.ancestry_card,
+      context.community_card,
+      context.transformation_card,
+      ...(character?.additional_domain_cards || []),
     ].filter(Boolean) as Card<any>[]
   );
 
@@ -110,8 +110,9 @@
               variant="outline"
             >
               <p class="truncate text-xs text-left">
-                {character.primary_class?.name || "No class"}&ensp;•&ensp;{character
-                  .primary_subclass?.name || "No subclass"}
+                {context.primary_class?.name || "No class"}
+                &ensp;•&ensp;
+                {context.primary_subclass?.name || "No subclass"}
               </p>
               <div class="grow"></div>
               <Pencil class="size-3 mr-1 stroke-3" />
@@ -135,8 +136,9 @@
             <div class="grow flex flex-col gap-2 truncate">
               <p class="text-2xl font-bold truncate">{character.name}</p>
               <p class="text-xs text-muted-foreground truncate">
-                {character.ancestry_card?.title || "No ancestry"}&ensp;•&ensp;{character
-                  .community_card?.title || "No community"}
+                {context.ancestry_card?.title || "No ancestry"}
+                &ensp;•&ensp;
+                {context.community_card?.title || "No community"}
               </p>
               <p class="text-xs text-muted-foreground truncate">
                 Proficiency: {context.proficiency}
@@ -146,8 +148,8 @@
         </div>
 
         <!-- class banner -->
-        {#if character.primary_class}
-          <Banner character_class={character.primary_class} />
+        {#if context.primary_class}
+          <Banner character_class={context.primary_class} />
         {/if}
       </div>
 
@@ -175,11 +177,11 @@
       <Hope />
 
       <!-- class features -->
-      {#if character.primary_class}
-        <ClassFeatures character_class={character.primary_class} class="mx-2" />
+      {#if context.primary_class}
+        <ClassFeatures character_class={context.primary_class} class="mx-2" />
       {/if}
-      {#if character.secondary_class}
-        <ClassFeatures character_class={character.secondary_class} class="mx-2" />
+      {#if context.secondary_class}
+        <ClassFeatures character_class={context.secondary_class} class="mx-2" />
       {/if}
 
       <!-- experiences -->

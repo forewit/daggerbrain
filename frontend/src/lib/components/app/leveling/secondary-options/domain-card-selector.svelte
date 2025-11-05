@@ -7,15 +7,15 @@
   import DomainCard from "$lib/components/app/cards/full-cards/domain-card.svelte";
 
   let {
-    selected_card = $bindable(),
+    selected_card_id = $bindable(),
     available_cards,
-    previously_chosen_cards,
+    previously_chosen_card_ids,
     description_html,
     title = "Select a Domain Card",
   }: {
-    selected_card: Card<"domain"> | null;
-    available_cards: Card<"domain">[];
-    previously_chosen_cards: Card<"domain">[];
+    selected_card_id: string | null;
+    available_cards: Record<string, Card<"domain">>;
+    previously_chosen_card_ids: string[];
     description_html: string;
     title?: string;
   } = $props();
@@ -30,15 +30,15 @@
       class={cn(
         buttonVariants({ variant: "outline" }),
         "w-full truncate flex items-center justify-between bg-card/50 hover:bg-card/70",
-        selected_card === null && "text-muted-foreground hover:text-muted-foreground"
+        selected_card_id === null && "text-muted-foreground hover:text-muted-foreground"
       )}
       style={cn(
-        selected_card === null &&
+        selected_card_id === null &&
           "outline-offset: 2px; outline-width: 2px; outline-color: var(--primary); outline-style: solid;"
       )}
     >
       <p class="truncate">
-        {selected_card?.title || "Select a domain card"}
+        {selected_card_id ? available_cards[selected_card_id]?.title : "Select a domain card"}
       </p>
       <ChevronRight class="size-4 opacity-50" />
     </Dialog.Trigger>
@@ -53,29 +53,29 @@
         </p>
       </Dialog.Description>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto p-2">
-        {#each available_cards as card}
+        {#each Object.entries(available_cards) as [id, card]}
           <Dialog.Close
             class={cn(
               "w-full rounded-xl outline-offset-3 outline-primary hover:outline-4 hover:cursor-pointer disabled:pointer-events-none disabled:opacity-50 disabled:cursor-default",
-              selected_card?.title === card.title && "outline-4"
+              selected_card_id === id && "outline-4"
             )}
             onclick={() => {
-              selected_card = card;
+              selected_card_id = id;
             }}
-            disabled={selected_card?.title !== card.title &&
-              previously_chosen_cards.some((c) => c.title === card.title)}
+            disabled={selected_card_id !== id &&
+              previously_chosen_card_ids.some((card_id) => card_id === id)}
           >
             <DomainCard {card} class="w-full h-full" />
           </Dialog.Close>
         {/each}
       </div>
       <Dialog.Footer>
-        {#if selected_card === null}
+        {#if selected_card_id === null}
           <Dialog.Close class={cn(buttonVariants({ variant: "link" }))}>Cancel</Dialog.Close>
         {:else}
           <Dialog.Close
             class={cn(buttonVariants({ variant: "link" }), "text-destructive")}
-            onclick={() => (selected_card = null)}
+            onclick={() => (selected_card_id = null)}
           >
             Clear selection
           </Dialog.Close>

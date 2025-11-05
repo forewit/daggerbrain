@@ -30,20 +30,20 @@
 
     <!-- secondary class -->
     <div class="p-2 rounded-lg border bg-primary-muted">
-      {#if !character.secondary_class}
+      {#if !context.secondary_class}
         <Button onclick={() => (secondary_class_dialog_open = true)}>
           Choose an additional class
         </Button>
       {:else}
         <div class="flex flex-col gap-2">
           <ClassSummary
-            character_class={character.secondary_class}
+            character_class={context.secondary_class}
             multiclass
-            bind:domain_selection={character.secondary_class_domain}
+            bind:domain_id_selection={character.secondary_class_domain_id_choice}
             class="mb-2"
           />
 
-          {#each character.secondary_class.class_features as feature}
+          {#each context.secondary_class.class_features as feature}
             <div class="flex flex-col gap-2">
               <p class="text-sm font-medium">{feature.title}</p>
               <div class="text-muted-foreground mb-2 text-xs flex flex-col gap-2">
@@ -66,19 +66,19 @@
 
     <!-- secondary subclass -->
     <div class="p-2 rounded-lg border bg-primary-muted">
-      {#if !character.secondary_subclass}
+      {#if !context.secondary_subclass}
         <Button
-          disabled={character.secondary_class === null}
+          disabled={character.secondary_class_id === null}
           onclick={() => (secondary_subclass_dialog_open = true)}>Choose a subclass</Button
         >
       {:else}
         <div class="flex flex-col gap-4">
-          <p class="text-lg font-medium">{character.secondary_subclass.name}</p>
+          <p class="text-lg font-medium">{context.secondary_subclass.name}</p>
           <p class="-mt-2 text-xs italic text-muted-foreground">
-            {@html character.secondary_subclass.description_html}
+            {@html context.secondary_subclass.description_html}
           </p>
 
-          <SubclassCard card={character.secondary_subclass.foundation_card} />
+          <SubclassCard card={context.secondary_subclass.foundation_card} />
 
           <!-- only show available at higher levels if the primary mastery level is only 1 -->
           {#if context.secondary_class_mastery_level < 3 && context.primary_class_mastery_level <= 1}
@@ -95,8 +95,8 @@
                 Specialization and Mastery Cards
               </Collapsible.Trigger>
               <Collapsible.Content class="flex flex-col gap-3 py-4 opacity-70">
-                <SubclassCard card={character.secondary_subclass.specialization_card} />
-                <SubclassCard card={character.secondary_subclass.mastery_card} />
+                <SubclassCard card={context.secondary_subclass.specialization_card} />
+                <SubclassCard card={context.secondary_subclass.mastery_card} />
               </Collapsible.Content>
             </Collapsible.Root>
           {/if}
@@ -105,7 +105,7 @@
             <Button
               variant="link"
               class="text-destructive"
-              onclick={() => (character.secondary_subclass = null)}>Remove</Button
+              onclick={() => (character.secondary_subclass_id = null)}>Remove</Button
             >
           </div>
         </div>
@@ -121,19 +121,19 @@
       </Dialog.Header>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto">
         <!-- each class -->
-        {#each Object.values(CLASSES).filter((c) => c.name !== character.primary_class?.name) as c}
+        {#each Object.entries(CLASSES).filter(([id, c]) => c.name !== context.primary_class?.name) as [id, c]}
           <div class="flex gap-3 border-2 rounded-md p-3 bg-primary-muted">
             <ClassSummary hide_starting_stats character_class={c} bannerClasses="-mt-3">
               <Button
-                disabled={character.secondary_class?.name === c.name}
+                disabled={context.secondary_class?.name === c.name}
                 onclick={() => {
-                  character.secondary_class = c;
-                  character.secondary_subclass = null;
-                  character.secondary_class_domain = null;
+                  character.secondary_class_id = id;
+                  character.secondary_subclass_id = null;
+                  character.secondary_class_domain_id_choice = null;
                   secondary_class_dialog_open = false;
                 }}
               >
-                {character.secondary_class?.name === c.name ? "Selected" : "Select " + c.name}
+                {context.secondary_class?.name === c.name ? "Selected" : "Select " + c.name}
               </Button>
             </ClassSummary>
           </div>
@@ -160,9 +160,9 @@
         <Dialog.Close
           class={buttonVariants({ variant: "destructive" })}
           onclick={() => {
-            character.secondary_class = null;
-            character.secondary_subclass = null;
-            character.secondary_class_domain = null;
+            character.secondary_class_id = null;
+            character.secondary_subclass_id = null;
+            character.secondary_class_domain_id_choice = null;
             if (after_remove_secondary_class) {
               after_remove_secondary_class();
             }
@@ -180,8 +180,8 @@
       </Dialog.Header>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto">
         <!-- each class -->
-        {#if character.secondary_class}
-          {#each Object.values(character.secondary_class.subclasses) as subclass}
+        {#if context.secondary_class}
+          {#each Object.entries(context.secondary_class.subclasses) as [id, subclass]}
             <div class="flex flex-col gap-3 border-2 rounded-md p-3 bg-primary-muted">
               <p class="text-lg font-medium">{subclass.name}</p>
               <p class="-mt-2 text-xs italic text-muted-foreground">
@@ -195,13 +195,13 @@
               {/if}
               <Button
                 class="mt-2"
-                disabled={character.secondary_subclass?.name === subclass.name}
+                disabled={context.secondary_subclass?.name === subclass.name}
                 onclick={() => {
-                  character.secondary_subclass = subclass;
+                  character.secondary_subclass_id = id;
                   secondary_subclass_dialog_open = false;
                 }}
               >
-                {character.secondary_subclass?.name === subclass.name
+                {context.secondary_subclass?.name === subclass.name
                   ? "Selected"
                   : "Select " + subclass.name}
               </Button>

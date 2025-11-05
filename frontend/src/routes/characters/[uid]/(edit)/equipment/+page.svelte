@@ -6,11 +6,12 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import Shield from "@lucide/svelte/icons/shield";
   import Hand from "@lucide/svelte/icons/hand";
+  import { getCharacterContext } from "$lib/ts/character/character.svelte.js";
 
   let { data } = $props();
 
-  const app = getAppContext();
-  const character = $derived(app.characters.find((c) => c.uid === data.uid));
+ const context = getCharacterContext()
+ let character = $derived(context.character);
 </script>
 
 {#if character}
@@ -28,20 +29,20 @@
             <!-- Armor Slot -->
             <p class="text-sm font-medium pb-2 pt-1 px-1">Active Armor</p>
             <div class="flex gap-2 items-center flex-wrap justify-end">
-              {#if character.active_armor !== null}
+              {#if context.active_armor !== null}
                 <div
                   class="bg-card/50 rounded-md px-4 min-h-10 py-2 flex justify-end items-center gap-3 grow"
                 >
-                  <p class="text-sm grow">{character.active_armor.title}</p>
+                  <p class="text-sm grow">{context.active_armor.title}</p>
 
                   <div class="flex flex-wrap items-center gap-1 justify-end">
                     <div
                       class="text-xs flex items-center gap-1 bg-primary-muted rounded-full px-2 py-1"
                     >
-                      {character.active_armor.max_armor}<Shield class="size-3.5" />
+                      {context.active_armor.max_armor}<Shield class="size-3.5" />
                     </div>
                     <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
-                      {character.active_armor.damage_thresholds.major} / {character.active_armor
+                      {context.active_armor.damage_thresholds.major} / {context.active_armor
                         .damage_thresholds.severe}
                     </div>
                   </div>
@@ -49,7 +50,7 @@
                 <Button
                   variant="link"
                   class="text-destructive"
-                  onclick={() => (character.active_armor = null)}>Unequip</Button
+                  onclick={() => (character.active_armor_id = null)}>Unequip</Button
                 >
               {:else}
                 <div
@@ -67,7 +68,7 @@
                 You can only equip one primary and one secondary weapon. Maximum burden is 2 hands.
               </p>
 
-              {#each character.active_weapons as weapon, i}
+              {#each context.active_weapons as weapon, i}
                 <div class="flex gap-2 items-center flex-wrap justify-end">
                   <div
                     class="relative bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center justify-end gap-3 grow"
@@ -99,12 +100,12 @@
                   <Button
                     variant="link"
                     class="text-destructive"
-                    onclick={() => character.active_weapons.splice(i, 1)}>Unequip</Button
+                    onclick={() => character.active_weapon_ids.splice(i, 1)}>Unequip</Button
                   >
                 </div>
               {/each}
 
-              {#if character.active_weapons.length === 0}
+              {#if context.active_weapons.length === 0}
                 <div
                   class="bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center gap-3 grow truncate"
                 >

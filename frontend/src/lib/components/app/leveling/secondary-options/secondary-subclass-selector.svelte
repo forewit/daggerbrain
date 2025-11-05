@@ -23,7 +23,7 @@
   // Calculate which card to show for tier-4 primary subclass upgrade
   // This is complex logic that depends on the level order of tier_3_subclass_upgrade and tier_4_subclass_upgrade
   function get_card_to_show(): Card<"subclass_specialization"> | Card<"subclass_mastery"> | null {
-    if (selected_upgrade !== "primary" || !character?.primary_subclass) return null;
+    if (selected_upgrade !== "primary" || !context.primary_subclass || !character) return null;
 
     // Only applies when both tier_3 and tier_4 subclass upgrades are used
     if (
@@ -50,14 +50,14 @@
         (option_id === "tier_3_subclass_upgrade" &&
           tier_4_subclass_upgrade_level < tier_3_subclass_upgrade_level)
       ) {
-        return character.primary_subclass.mastery_card;
+        return context.primary_subclass.mastery_card;
       } else {
-        return character.primary_subclass.specialization_card;
+        return context.primary_subclass.specialization_card;
       }
     }
 
     // Default: show specialization card
-    return character.primary_subclass.specialization_card;
+    return context.primary_subclass.specialization_card;
   }
 </script>
 
@@ -80,9 +80,9 @@
     >
       <Select.Trigger class="w-full truncate" highlighted={selected_upgrade === null}>
         {selected_upgrade === "primary"
-          ? character.primary_class?.name + " • " + character.primary_subclass?.name
+          ? context.primary_class?.name + " • " + context.primary_subclass?.name
           : selected_upgrade === "secondary"
-            ? character.secondary_class?.name + " • " + character.secondary_subclass?.name
+            ? context.secondary_class?.name + " • " + context.secondary_subclass?.name
             : "Select a subclass to upgrade"}
       </Select.Trigger>
       <Select.Content class="rounded-md" align="start">
@@ -91,29 +91,29 @@
             -- none selected --
           </Select.Item>
           <Select.Label>Choose a subclass to upgrade</Select.Label>
-          {#if character.primary_subclass !== null && character.primary_class !== null}
+          {#if context.primary_subclass && context.primary_class}
             <Select.Item value="primary">
-              {character.primary_class.name} • {character.primary_subclass.name}
+              {context.primary_class.name} • {context.primary_subclass.name}
             </Select.Item>
           {/if}
-          {#if character.secondary_subclass !== null && character.secondary_class !== null}
+          {#if context.secondary_subclass && context.secondary_class}
             <Select.Item value="secondary">
-              {character.secondary_class.name} • {character.secondary_subclass.name}
+              {context.secondary_class.name} • {context.secondary_subclass.name}
             </Select.Item>
           {/if}
         </div>
       </Select.Content>
     </Select.Root>
 
-    {#if selected_upgrade !== null && character.primary_subclass !== null}
+    {#if selected_upgrade !== null && context.primary_subclass}
       <p class="p-2">
         {#if selected_upgrade === "primary"}
           {@const card_to_show = get_card_to_show()}
           {#if card_to_show}
             <SubclassCard card={card_to_show} />
           {/if}
-        {:else if selected_upgrade === "secondary" && character.secondary_subclass !== null}
-          <SubclassCard card={character.secondary_subclass.specialization_card} />
+        {:else if selected_upgrade === "secondary" && context.secondary_subclass}
+          <SubclassCard card={context.secondary_subclass.specialization_card} />
         {/if}
       </p>
     {/if}

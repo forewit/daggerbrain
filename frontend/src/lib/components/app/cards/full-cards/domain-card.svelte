@@ -83,7 +83,7 @@
     <!-- banner -->
     <div class="shrink-0">
       <DomainBanner
-        domain_name={card.domain_name as keyof typeof DOMAINS}
+        domain_id={card.domain_id}
         level_requirement={card.level_requirement}
         style="zoom: 0.75"
       />
@@ -110,7 +110,7 @@
           class="absolute bottom-0 left-0 w-full object-cover z-4"
         />
         <DomainBanner
-          domain_name={card.domain_name as keyof typeof DOMAINS}
+          domain_id={card.domain_id}
           level_requirement={card.level_requirement}
           class="absolute -top-[9px] left-[14px] w-[75px]"
         />
@@ -138,11 +138,11 @@
           </div>
         </div>
         <div
-          style="background: {DOMAINS[card.domain_name as keyof typeof DOMAINS].color};"
+          style="background: {DOMAINS[card.domain_id].color};"
           class="clip-card-type absolute left-[111px] bottom-[3px] w-[135px] h-[23px]"
         ></div>
         <p
-          style="color: {DOMAINS[card.domain_name as keyof typeof DOMAINS].foreground_color};"
+          style="color: {DOMAINS[card.domain_id].foreground_color};"
           class="z-5 absolute uppercase leading-none bottom-[8px] left-[180px] -translate-x-1/2 text-[12px] font-bold"
         >
           {card.type}

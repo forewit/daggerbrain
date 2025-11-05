@@ -1,6 +1,5 @@
 <script lang="ts">
-  import type { LevelUpOption, LevelUpChoice } from "$lib/ts/character/types";
-  import { ALL_LEVEL_UP_OPTIONS } from "$lib/ts/constants/rules";
+  import type { AllTierOptionIds, LevelUpChoice, LevelUpOption } from "$lib/ts/character/types";
   import { cn } from "$lib/utils";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import Square from "@lucide/svelte/icons/square";
@@ -20,10 +19,10 @@
     on_close = ()=>{}
   }: {
     tier_number: number;
-    options: Record<string, LevelUpOption>;
+    options: Partial<Record<AllTierOptionIds, LevelUpOption>>;
     open?: boolean;
     choices: { A: LevelUpChoice; B: LevelUpChoice };
-    chosen_options: { A: LevelUpOption; B: LevelUpOption };
+    chosen_options: { A: LevelUpOption | null; B: LevelUpOption | null };
     on_close?: () => void;
   } = $props();
 
@@ -38,8 +37,8 @@
     const base_disabled =
       context.options_used[option_id] >= option.max ||
       (choices.A.option_id !== null && choices.B.option_id !== null) ||
-      chosen_options.A.costs_two_choices ||
-      chosen_options.B.costs_two_choices ||
+      chosen_options.A?.costs_two_choices ||
+      chosen_options.B?.costs_two_choices ||
       (option.costs_two_choices && (choices.A.option_id !== null || choices.B.option_id !== null));
 
     // Tier-specific disabled logic (rule-based conflicts)
@@ -61,12 +60,12 @@
     return { disabled: base_disabled || rule_disabled, rule_disabled };
   }
 
-  function handle_option_click(option_id: string) {
+  function handle_option_click(option_id: AllTierOptionIds) {
     // if one choice is available, set it to the selected option
     if (choices.A.option_id === null) {
-      choices.A.option_id = option_id as keyof typeof ALL_LEVEL_UP_OPTIONS;
+      choices.A.option_id = option_id;
     } else if (choices.B.option_id === null) {
-      choices.B.option_id = option_id as keyof typeof ALL_LEVEL_UP_OPTIONS;
+      choices.B.option_id = option_id;
     }
     // if both choices are !== null then call on_close
     if (choices.A.option_id !== null && choices.B.option_id !== null) {
@@ -90,7 +89,7 @@
         <button
           {disabled}
           class="text-left hover:cursor-pointer hover:bg-muted disabled:opacity-50 disabled:pointer-events-none disabled:cursor-default flex w-full select-none items-center gap-2 rounded-sm py-1.5 px-2 text-sm"
-          onclick={() => handle_option_click(option_id)}
+          onclick={() => handle_option_click(option_id as AllTierOptionIds)}
         >
           <div class="w-14 shrink-0 flex justify-end">
             <div class={cn("gap-1 flex w-min relative")}>

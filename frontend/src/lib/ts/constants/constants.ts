@@ -1,7 +1,7 @@
 import { ANCESTRY_CARDS, BLADE_DOMAIN_CARDS, BONE_DOMAIN_CARDS, COMMUNITY_CARDS, SUBCLASS_CARDS, TRANSFORMATION_CARDS, VALOR_DOMAIN_CARDS } from "./cards";
 import { BLANK_LEVEL_UP_CHOICE, BLANK_LEVEL_UP_OPTION, TIER_1_BASE_OPTIONS } from "./rules";
-import type { Domain, Class, Subclass, Card, Character } from "../character/types";
-import { TIER_1_ARMOR, TIER_1_WEAPONS } from "./equipment";
+import type { Domain, Class, Subclass, Card, Character, DomainIds } from "../character/types";
+import { ARMOR, WEAPONS } from "./equipment";
 
 
 export const DOMAINS = {
@@ -88,7 +88,7 @@ export const DOMAINS = {
         foreground_color: "#ffffff",
         cards: VALOR_DOMAIN_CARDS
     }
-} as const satisfies Record<string, Domain>
+} as const satisfies Record<DomainIds, Domain>
 
 export const TRAITS = {
     agility: {
@@ -130,7 +130,6 @@ export const CLASSES = {
             presence: 0,
             knowledge: 1,
         },
-
         name: "Assassin",
         image_url: "/images/wip.avif",
         description_html: "As an assassin, you utilize unmatched stealth and precision to ambush the unwary.",
@@ -139,8 +138,8 @@ export const CLASSES = {
             description_html: "<p><b>Spend 3 Hope</b> to clear 2 Stress.</p>",
             modifier_ids: []
         },
-        primary_domain: "blade",
-        secondary_domain: "midnight",
+        primary_domain_id: "blade",
+        secondary_domain_id: "midnight",
         class_features: [
             {
                 title: "Marked for Death",
@@ -198,14 +197,6 @@ export const JUST_JAMES: Character = {
     name: "Just-James",
     image: "/images/portrait-placeholder.png",
     base_stats: {
-        traits: {
-            agility: 2,
-            strength: 1,
-            finesse: 1,
-            instinct: 0,
-            presence: 0,
-            knowledge: -1,
-        },
         proficiency: 1,
         experience_modifier: 2,
         max_experiences: 2,
@@ -220,25 +211,42 @@ export const JUST_JAMES: Character = {
         secondary_class_mastery_level: 0,
     },
 
+    selected_traits: {
+        agility: 2,
+        strength: 1,
+        finesse: 1,
+        instinct: 0,
+        presence: 0,
+        knowledge: -1,
+    },
+
+    descriptors: {
+        ancestry_name: "Half-Clank",
+        primary_class_name: "Assassin",
+        primary_subclass_name: "Executioners Guild",
+        secondary_class_name: "",
+        secondary_subclass_name: "",
+    },
+
     // heritage
-    ancestry_card: ANCESTRY_CARDS.half_clank,
-    community_card: COMMUNITY_CARDS.warborne,
+    ancestry_card_id: "half_clank",
+    community_card_id: "warborne",
     experiences: ["Cool under pressure", "Astronomer in the making", "Paranoid"],
 
     // classes
-    primary_class: CLASSES.assassin,
-    primary_subclass: CLASSES.assassin.subclasses.executioners_guild,
-    secondary_class: null,
-    secondary_subclass: null,
-    secondary_class_domain: null,
+    primary_class_id: "assassin",
+    primary_subclass_id: "executioners_guild",
+    secondary_class_id: null,
+    secondary_subclass_id: null,
+    secondary_class_domain_id_choice: null,
 
     // equipment
-    active_armor: null,
-    active_weapons: [],
+    active_armor_id: null,
+    active_weapon_ids: [],
 
     // the void / other
-    transformation_card: TRANSFORMATION_CARDS.werewolf,
-    additional_cards: [
+    transformation_card_id: "werewolf",
+    additional_domain_cards: [
         DOMAINS.valor.cards.bare_bones,
         DOMAINS.bone.cards.untouchable
     ],
@@ -255,9 +263,9 @@ export const JUST_JAMES: Character = {
 
     // level-up choices
     level: 5,
-    level_up_domain_cards: {
-        1: { A: DOMAINS.blade.cards.whirlwind, B: DOMAINS.blade.cards.not_good_enough },
-        2: { A: DOMAINS.blade.cards.a_soldiers_bond },
+    level_up_domain_card_ids: {
+        1: { A: "whirlwind", B: "not_good_enough" },
+        2: { A: "a_soldiers_bond" },
         3: { A: null },
         4: { A: null },
         5: { A: null },
@@ -273,13 +281,13 @@ export const JUST_JAMES: Character = {
                 option_id: "tier_2_traits",
                 marked_traits: { A: "agility", B: "strength" },
                 selected_experiences: { A: null, B: null },
-                selected_domain_card: null,
+                selected_domain_card_id: null,
                 selected_subclass_upgrade: null,
             }, B: {
                 option_id: "tier_2_evasion",
                 marked_traits: { A: null, B: null },
                 selected_experiences: { A: null, B: null },
-                selected_domain_card: null,
+                selected_domain_card_id: null,
                 selected_subclass_upgrade: null,
             }
         },
@@ -337,14 +345,6 @@ export const NEW_CHARACTER: Character = {
     name: "New Character",
     image: "/images/portrait-placeholder.png",
     base_stats: {
-        traits: {
-            agility: null,
-            strength: null,
-            finesse: null,
-            instinct: null,
-            presence: null,
-            knowledge: null,
-        },
         proficiency: 1,
         experience_modifier: 2,
         max_experiences: 2,
@@ -359,25 +359,42 @@ export const NEW_CHARACTER: Character = {
         secondary_class_mastery_level: 0,
     },
 
+    selected_traits: {
+        agility: null,
+        strength: null,
+        finesse: null,
+        instinct: null,
+        presence: null,
+        knowledge: null,
+    },
+
+    descriptors: {
+        ancestry_name: "",
+        primary_class_name: "",
+        primary_subclass_name: "",
+        secondary_class_name: "",
+        secondary_subclass_name: "",
+    },
+
     // heritage
-    ancestry_card: null,
-    community_card: null,
+    ancestry_card_id: null,
+    community_card_id: null,
     experiences: ["", ""],
 
     // classes
-    primary_class: null,
-    primary_subclass: null,
-    secondary_class: null,
-    secondary_subclass: null,
-    secondary_class_domain: null,
+    primary_class_id: null,
+    primary_subclass_id: null,
+    secondary_class_id: null,
+    secondary_subclass_id: null,
+    secondary_class_domain_id_choice: null,
 
     // equipment
-    active_armor: null,
-    active_weapons: [],
+    active_armor_id: null,
+    active_weapon_ids: [],
 
     // the void / other
-    transformation_card: null,
-    additional_cards: [],
+    transformation_card_id: null,
+    additional_domain_cards: [],
     additional_modifier_ids: [],
 
     // set by the player
@@ -391,7 +408,7 @@ export const NEW_CHARACTER: Character = {
 
     // level-up choices
     level: 1,
-    level_up_domain_cards: {
+    level_up_domain_card_ids: {
         1: { A: null, B: null },
         2: { A: null },
         3: { A: null },
@@ -414,5 +431,5 @@ export const NEW_CHARACTER: Character = {
         9: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
         10: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
     },
-    
+
 }

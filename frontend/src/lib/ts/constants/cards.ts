@@ -3,7 +3,7 @@ import type { Card } from "../character/types";
 export const BONE_DOMAIN_CARDS = {
     untouchable: {
         card_type: "domain",
-        domain_name: "bone",
+        domain_id: "bone",
         artist_name: "Henry Peters",
         image_url: "/images/card/art/domains/bone/untouchable.webp",
         type: "ability",
@@ -25,7 +25,7 @@ export const BONE_DOMAIN_CARDS = {
 export const VALOR_DOMAIN_CARDS = {
     bare_bones: {
         card_type: "domain",
-        domain_name: "valor",
+        domain_id: "valor",
         artist_name: "Simon Pape",
         image_url: "/images/card/art/domains/valor/bare-bones.webp",
         type: "ability",
@@ -70,7 +70,7 @@ export const VALOR_DOMAIN_CARDS = {
 export const BLADE_DOMAIN_CARDS = {
     whirlwind: {
         card_type: "domain",
-        domain_name: "blade",
+        domain_id: "blade",
         artist_name: "Mike Pape",
         image_url: "/images/card/art/domains/blade/whirlwind.webp",
         type: "ability",
@@ -88,7 +88,7 @@ export const BLADE_DOMAIN_CARDS = {
     },
     not_good_enough: {
         card_type: "domain",
-        domain_name: "blade",
+        domain_id: "blade",
         artist_name: "Juan S. Almencion",
         image_url: "/images/card/art/domains/blade/not-good-enough.webp",
         type: "ability",
@@ -106,7 +106,7 @@ export const BLADE_DOMAIN_CARDS = {
     },
     a_soldiers_bond: {
         card_type: "domain",
-        domain_name: "blade",
+        domain_id: "blade",
         artist_name: "Mila Pesic",
         image_url: "/images/card/art/domains/blade/a-soldiers-bond.webp",
         type: "ability",

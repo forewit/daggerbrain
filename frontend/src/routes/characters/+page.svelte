@@ -3,16 +3,11 @@
   import type { Character } from "$lib/ts/character/types";
   import { getAppContext } from "$lib/ts/app.svelte";
   import { cn } from "$lib/utils";
-  import { onMount } from "svelte";
   import Button, { buttonVariants } from "$lib/components/ui/button/button.svelte";
   import * as Dialog from "$lib/components/ui/dialog";
   import Plus from "@lucide/svelte/icons/plus";
-  import ExternalLink from "@lucide/svelte/icons/external-link";
-  import Pencil from "@lucide/svelte/icons/pencil";
-  import Trash from "@lucide/svelte/icons/trash";
   import { goto } from "$app/navigation";
-  import { fade } from "svelte/transition";
-
+  
   const app = getAppContext();
 
   let characterToDelete = $state<Character | null>(null);
@@ -87,9 +82,11 @@
               <p class="text-lg font-bold truncate mt-1">{character.name}</p>
 
               <p class="mt-1 truncate text-xs text-muted-foreground">
-                {character.ancestry_card?.title || "No ancestry"}
-                &ensp;•&ensp;{character.primary_class?.name || "No class"}
-                &ensp;•&ensp;{character.primary_subclass?.name || "No subclass"}
+                {character.descriptors.ancestry_name || "No ancestry"}
+                &ensp;•&ensp;
+                {character.descriptors.primary_class_name || "No class"}
+                &ensp;•&ensp;
+                {character.descriptors.primary_subclass_name || "No subclass"}
               </p>
             </div>
           </a>

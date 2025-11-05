@@ -94,9 +94,8 @@
         <ClassBanner {character_class} class="absolute -top-[2px] left-[14px] w-[75px]" />
 
         <div
-          style="background: linear-gradient(to right, {DOMAINS[
-            character_class.primary_domain as keyof typeof DOMAINS
-          ].color}, {DOMAINS[character_class.secondary_domain as keyof typeof DOMAINS].color});"
+          style="background: linear-gradient(to right, {DOMAINS[character_class.primary_domain_id]
+            .color}, {DOMAINS[character_class.secondary_domain_id].color});"
           class="clip-card-type absolute left-[110px] bottom-[5px] w-[129px] h-[21px]"
         ></div>
         <p

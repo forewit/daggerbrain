@@ -16,16 +16,16 @@
 </script>
 
 {#if character}
-  {#if !character.primary_subclass}
+  {#if !context.primary_subclass}
     <Button onclick={() => (subclass_dialog_open = true)}>Choose a subclass</Button>
   {:else}
     <div class="flex flex-col gap-4">
-      <p class="text-lg font-medium">{character.primary_subclass.name}</p>
+      <p class="text-lg font-medium">{context.primary_subclass?.name}</p>
       <p class="-mt-2 text-xs italic text-muted-foreground">
-        {@html character.primary_subclass.description_html}
+        {@html context.primary_subclass?.description_html}
       </p>
 
-      <SubclassCard card={character.primary_subclass.foundation_card} />
+      <SubclassCard card={context.primary_subclass.foundation_card} />
 
       {#if context.primary_class_mastery_level < 3}
         <Collapsible.Root bind:open={subclass_cards_open}>
@@ -36,8 +36,8 @@
             Specialization and Mastery Cards
           </Collapsible.Trigger>
           <Collapsible.Content class="flex flex-col gap-3 py-4 opacity-70">
-            <SubclassCard card={character.primary_subclass.specialization_card} />
-            <SubclassCard card={character.primary_subclass.mastery_card} />
+            <SubclassCard card={context.primary_subclass.specialization_card} />
+            <SubclassCard card={context.primary_subclass.mastery_card} />
           </Collapsible.Content>
         </Collapsible.Root>
       {/if}
@@ -46,7 +46,7 @@
         <Button
           variant="link"
           class="text-destructive"
-          onclick={() => (character.primary_subclass = null)}>Remove</Button
+          onclick={() => (character.primary_subclass_id = null)}>Remove</Button
         >
       </div>
     </div>
@@ -60,8 +60,8 @@
       </Dialog.Header>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto">
         <!-- each class -->
-        {#if character.primary_class}
-          {#each Object.values(character.primary_class.subclasses) as subclass}
+        {#if context.primary_class}
+          {#each Object.entries(context.primary_class.subclasses) as [id, subclass]}
             <div class="flex flex-col gap-3 border-2 rounded-md p-3 bg-primary-muted">
               <p class="text-lg font-medium">{subclass.name}</p>
               <p class="-mt-2 text-xs italic text-muted-foreground">
@@ -75,13 +75,13 @@
               {/if}
               <Button
                 class="mt-2"
-                disabled={character.primary_subclass?.name === subclass.name}
+                disabled={context.primary_subclass?.name === subclass.name}
                 onclick={() => {
-                  character.primary_subclass = subclass;
+                  character.primary_subclass_id = id;
                   subclass_dialog_open = false;
                 }}
               >
-                {character.primary_subclass?.name === subclass.name
+                {context.primary_subclass?.name === subclass.name
                   ? "Selected"
                   : "Select " + subclass.name}
               </Button>

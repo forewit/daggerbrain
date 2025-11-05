@@ -18,9 +18,9 @@
   <!-- Select a Class -->
   <Dropdown
     title="Class"
-    highlighted={!character.primary_class}
-    subtitle={character.primary_class
-      ? character.primary_class.name + ", " + character.primary_class.source
+    highlighted={!character.primary_class_id}
+    subtitle={character.primary_class_id
+      ? character.descriptors.primary_class_name + ", " + context.primary_class?.source
       : ""}
   >
     <PrimaryClassSelector />
@@ -28,10 +28,10 @@
 
   <!-- Select a Subclass -->
   <Dropdown
-    highlighted={!character.primary_subclass}
-    disabled={!character.primary_class}
+    highlighted={!character.primary_subclass_id}
+    disabled={!character.primary_class_id}
     title="Subclass"
-    subtitle={character.primary_subclass?.name}
+    subtitle={character.descriptors.primary_subclass_name}
   >
     <PrimarySubclassSelector />
   </Dropdown>
@@ -39,12 +39,12 @@
   <!-- Domain Cards -->
   <Dropdown
     title="Level 1"
-    disabled={!character.primary_class}
-    highlighted={character.level_up_domain_cards[1].A === null ||
-      character.level_up_domain_cards[1].B === null}
+    disabled={!character.primary_class_id}
+    highlighted={context.level_up_domain_cards[1].A === null ||
+      context.level_up_domain_cards[1].B === null}
     subtitle={[
-      character.level_up_domain_cards[1].A?.title,
-      character.level_up_domain_cards[1].B?.title,
+      context.level_up_domain_cards[1].A?.title,
+      context.level_up_domain_cards[1].B?.title,
     ]
       .filter((title) => title !== undefined)
       .join(", ")}

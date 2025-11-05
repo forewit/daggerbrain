@@ -16,8 +16,8 @@
     if (!character) return {};
     const indices: Record<string, number | null> = {};
     const used: Set<number> = new Set();
-    for (const trait of Object.keys(character.base_stats.traits)) {
-      const val = character.base_stats.traits[trait as keyof Traits];
+    for (const trait of Object.keys(character.selected_traits)) {
+      const val = character.selected_traits[trait as keyof Traits];
       if (val === null) {
         indices[trait] = null;
       } else {
@@ -48,23 +48,23 @@
     )}
   >
     <div class="m-4 flex flex-col gap-2">
-      {#if character.primary_class}
+      {#if context.primary_class}
         <Dialog.Root>
           <Dialog.Trigger class={cn(buttonVariants({ variant: "link" }), "ml-auto")}>
             Suggested traits?
           </Dialog.Trigger>
           <Dialog.Content>
             <Dialog.Header
-              ><Dialog.Title>Suggested Traits: {character.primary_class.name}</Dialog.Title
+              ><Dialog.Title>Suggested Traits: {character.descriptors.primary_class_name}</Dialog.Title
               ></Dialog.Header
             >
             <Dialog.Description>
               <div class="flex flex-wrap gap-1">
-                {#each Object.entries(character.primary_class.suggested_traits) as [trait, modifier], i}
+                {#each Object.entries(context.primary_class.suggested_traits) as [trait, modifier], i}
                   <p class="text-nowrap">
                     {modifier && modifier > 0 ? "+" + modifier : modifier}
                     {capitalize(trait)}{i <
-                    Object.entries(character.primary_class.suggested_traits).length - 1
+                    Object.entries(context.primary_class.suggested_traits).length - 1
                       ? ","
                       : ""}
                   </p>
@@ -76,8 +76,8 @@
               <Dialog.Close
                 class={buttonVariants()}
                 onclick={() => {
-                  if (!character.primary_class) return;
-                  character.base_stats.traits = character.primary_class.suggested_traits;
+                  if (!context.primary_class) return;
+                  character.selected_traits = {...context.primary_class.suggested_traits};
                 }}
               >
                 Use Suggested Traits
@@ -89,7 +89,7 @@
 
       <!-- traits -->
       <div class="grid grid-cols-1 @xs:grid-cols-2 @lg:grid-cols-3 gap-5 justify-items-center">
-        {#each Object.entries(character.base_stats.traits) as [trait, modifier], i}
+        {#each Object.entries(character.selected_traits) as [trait, modifier], i}
           {@const total = context.traits[trait as keyof Traits] || 0}
           {@const bonus = total - (modifier || 0)}
 
@@ -103,11 +103,11 @@
               onValueChange={(value) => {
                 if (value === "") {
                   trait_option_indices[trait] = null;
-                  character.base_stats.traits[trait as keyof Traits] = null;
+                  character.selected_traits[trait as keyof Traits] = null;
                 } else {
                   const idx = parseInt(value);
                   trait_option_indices[trait] = idx;
-                  character.base_stats.traits[trait as keyof Traits] = TRAIT_OPTIONS[idx];
+                  character.selected_traits[trait as keyof Traits] = TRAIT_OPTIONS[idx];
                 }
               }}
             >

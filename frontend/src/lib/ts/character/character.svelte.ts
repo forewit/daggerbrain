@@ -4,22 +4,31 @@ import { MODIFIERS } from '$lib/ts/constants/modifiers';
 import type { Card, Character, Modifier, LevelUpChoice, LevelUpOption, Traits, Weapon, DamageThresholds, Class, Subclass, Armor } from './types';
 import { getContext, setContext } from 'svelte';
 import type { DOMAINS } from '$lib/ts/constants/constants';
+import { ANCESTRY_CARDS } from '../constants/cards';
+import { get_ancestry_card, get_armor, get_class, get_community_card, get_domain_card, get_transformation_card, get_weapon } from './helpers';
 
 function createCharacter(uid: string) {
     const app = getAppContext();
-    let character: Character | null = $state(null);
+    let character = <Character | null>$state(null);
 
     // derived references
-    let ancestry_card: Card<"ancestry"> | null = $derived(null);
-    let community_card: Card<"community"> | null = $derived(null);
-    let transformation_card: Card<"transformation"> | null = $derived(null);
-    let additional_cards: Card<any>[] = $derived([]);
-    let primary_class: Class | null = $derived(null);
-    let primary_subclass: Subclass | null = $derived(null);
-    let secondary_class: Class | null = $derived(null);
-    let secondary_subclass: Subclass | null = $derived(null);
-    let active_armor: Armor | null = $derived(null);
-    let active_weapons: Weapon[] = $derived([]);
+    let ancestry_card: Card<"ancestry"> | null = $derived(get_ancestry_card(character?.ancestry_card_id));
+    let community_card: Card<"community"> | null = $derived(get_community_card(character?.community_card_id));
+    let transformation_card: Card<"transformation"> | null = $derived(get_transformation_card(character?.transformation_card_id));
+    let primary_class: Class | null = $derived(get_class(character?.primary_class_id));
+    let primary_subclass: Subclass | null = $derived.by(() => {
+        const primary_class = get_class(character?.primary_class_id);
+        if (!primary_class || !character?.primary_subclass_id) return null;
+        return primary_class.subclasses[character.primary_subclass_id]
+    })
+    let secondary_class: Class | null = $derived(get_class(character?.secondary_class_id));
+    let secondary_subclass: Subclass | null = $derived.by(() => {
+        const secondary_class = get_class(character?.secondary_class_id);
+        if (!secondary_class || !character?.secondary_subclass_id) return null;
+        return secondary_class.subclasses[character.secondary_subclass_id]
+    })
+    let active_armor = $derived(get_armor(character?.active_armor_id));
+    let active_weapons = $derived(character?.active_weapon_ids.map(id => get_weapon(id)).filter(w => w !== null) || []);
     let level_up_domain_cards: {
         1: { A: Card<"domain"> | null, B: Card<"domain"> | null },
         2: { A: Card<"domain"> | null },
@@ -32,22 +41,73 @@ function createCharacter(uid: string) {
         9: { A: Card<"domain"> | null },
         10: { A: Card<"domain"> | null },
     } = $derived({
-        1: { A: null, B: null },
-        2: { A: null },
-        3: { A: null },
-        4: { A: null },
-        5: { A: null },
-        6: { A: null },
-        7: { A: null },
-        8: { A: null },
-        9: { A: null },
-        10: { A: null },
+        1: { A: get_domain_card(character?.level_up_domain_card_ids[1]?.A), B: get_domain_card(character?.level_up_domain_card_ids[1]?.B) },
+        2: { A: get_domain_card(character?.level_up_domain_card_ids[2]?.A) },
+        3: { A: get_domain_card(character?.level_up_domain_card_ids[3]?.A) },
+        4: { A: get_domain_card(character?.level_up_domain_card_ids[4]?.A) },
+        5: { A: get_domain_card(character?.level_up_domain_card_ids[5]?.A) },
+        6: { A: get_domain_card(character?.level_up_domain_card_ids[6]?.A) },
+        7: { A: get_domain_card(character?.level_up_domain_card_ids[7]?.A) },
+        8: { A: get_domain_card(character?.level_up_domain_card_ids[8]?.A) },
+        9: { A: get_domain_card(character?.level_up_domain_card_ids[9]?.A) },
+        10: { A: get_domain_card(character?.level_up_domain_card_ids[10]?.A) },
     });
+
+    let level_up_chosen_options: {
+        2: { A: LevelUpOption | null, B: LevelUpOption | null }
+        3: { A: LevelUpOption | null, B: LevelUpOption | null },
+        4: { A: LevelUpOption | null, B: LevelUpOption | null },
+        5: { A: LevelUpOption | null, B: LevelUpOption | null },
+        6: { A: LevelUpOption | null, B: LevelUpOption | null },
+        7: { A: LevelUpOption | null, B: LevelUpOption | null },
+        8: { A: LevelUpOption | null, B: LevelUpOption | null },
+        9: { A: LevelUpOption | null, B: LevelUpOption | null },
+        10: { A: LevelUpOption | null, B: LevelUpOption | null },
+    } = $derived({
+        2: {
+            A: character?.level_up_choices[2].A.option_id ? ALL_LEVEL_UP_OPTIONS[character.level_up_choices[2].A.option_id] : null,
+            B: character?.level_up_choices[2].B.option_id ? ALL_LEVEL_UP_OPTIONS[character.level_up_choices[2].B.option_id] : null
+        },
+        3: {
+            A: character?.level_up_choices[3].A.option_id ? ALL_LEVEL_UP_OPTIONS[character.level_up_choices[3].A.option_id] : null,
+            B: character?.level_up_choices[3].B.option_id ? ALL_LEVEL_UP_OPTIONS[character.level_up_choices[3].B.option_id] : null
+        },
+        4: {
+            A: character?.level_up_choices[4].A.option_id ? ALL_LEVEL_UP_OPTIONS[character.level_up_choices[4].A.option_id] : null,
+            B: character?.level_up_choices[4].B.option_id ? ALL_LEVEL_UP_OPTIONS[character.level_up_choices[4].B.option_id] : null
+        },
+        5: {
+            A: character?.level_up_choices[5].A.option_id ? ALL_LEVEL_UP_OPTIONS[character.level_up_choices[5].A.option_id] : null,
+            B: character?.level_up_choices[5].B.option_id ? ALL_LEVEL_UP_OPTIONS[character.level_up_choices[5].B.option_id] : null
+        },
+        6: {
+            A: character?.level_up_choices[6].A.option_id ? ALL_LEVEL_UP_OPTIONS[character.level_up_choices[6].A.option_id] : null,
+            B: character?.level_up_choices[6].B.option_id ? ALL_LEVEL_UP_OPTIONS[character.level_up_choices[6].B.option_id] : null
+        },
+        7: {
+            A: character?.level_up_choices[7].A.option_id ? ALL_LEVEL_UP_OPTIONS[character.level_up_choices[7].A.option_id] : null,
+            B: character?.level_up_choices[7].B.option_id ? ALL_LEVEL_UP_OPTIONS[character.level_up_choices[7].B.option_id] : null
+        },
+        8: {
+            A: character?.level_up_choices[8].A.option_id ? ALL_LEVEL_UP_OPTIONS[character.level_up_choices[8].A.option_id] : null,
+            B: character?.level_up_choices[8].B.option_id ? ALL_LEVEL_UP_OPTIONS[character.level_up_choices[8].B.option_id] : null
+        },
+        9: {
+            A: character?.level_up_choices[9].A.option_id ? ALL_LEVEL_UP_OPTIONS[character.level_up_choices[9].A.option_id] : null,
+            B: character?.level_up_choices[9].B.option_id ? ALL_LEVEL_UP_OPTIONS[character.level_up_choices[9].B.option_id] : null
+        },
+        10: {
+            A: character?.level_up_choices[10].A.option_id ? ALL_LEVEL_UP_OPTIONS[character.level_up_choices[10].A.option_id] : null,
+            B: character?.level_up_choices[10].B.option_id ? ALL_LEVEL_UP_OPTIONS[character.level_up_choices[10].B.option_id] : null
+        },
+    });
+    let additional_domain_cards: Card<"domain">[] = $derived([]);
+
 
     // derived stats
     let domain_card_vault: Card<"domain">[] = $state([]);
     let traits: Traits = $state({
-        agility: 0, 
+        agility: 0,
         strength: 0,
         finesse: 0,
         instinct: 0,
@@ -95,8 +155,8 @@ function createCharacter(uid: string) {
         if (!character) return;
 
         let available_options = [...TRAIT_OPTIONS];
-        for (const key in character.base_stats.traits) {
-            const value = character.base_stats.traits[key as keyof Traits]
+        for (const key in character.selected_traits) {
+            const value = character.selected_traits[key as keyof Traits]
             const i = available_options.findIndex(option => option === value)
 
             if (value === null) {
@@ -105,7 +165,7 @@ function createCharacter(uid: string) {
                 available_options.splice(i, 1)
             } else {
                 console.warn(`${value} was not a valid trait option. setting to ${key} to null`)
-                character.base_stats.traits[key as keyof Traits] = null
+                character.selected_traits[key as keyof Traits] = null
             }
         }
     })
@@ -113,10 +173,10 @@ function createCharacter(uid: string) {
     // ! clear subclass if class is null
     $effect(() => {
         if (!character) return;
-        if (!character.primary_class) character.primary_subclass = null;
-        if (!character.secondary_class) {
-            character.secondary_subclass = null;
-            character.secondary_class_domain = null;
+        if (!character.primary_class_id) character.primary_subclass_id = null;
+        if (!character.secondary_class_id) {
+            character.secondary_subclass_id = null;
+            character.secondary_class_domain_id_choice = null;
         }
     })
 
@@ -140,15 +200,19 @@ function createCharacter(uid: string) {
         if (!character) return;
         for (let i = 2; i <= 10; i++) {
             const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
-            const choice_A = level_choices.A;
-            const choice_B = level_choices.B;
+            const chosen_options = level_up_chosen_options[i as keyof typeof level_up_chosen_options];
+            const A_id = level_choices.A.option_id;
+            const B_id = level_choices.B.option_id;
+            const A_costs_two_choices = chosen_options.A?.costs_two_choices || false;
+            const B_costs_two_choices = chosen_options.B?.costs_two_choices || false;
+
             if (
-                choice_A.option_id !== null && ALL_LEVEL_UP_OPTIONS[choice_A.option_id].costs_two_choices && choice_B.option_id !== null
+                A_id !== null && A_costs_two_choices && B_id !== null
             ) {
                 console.warn(`Clearing level up option because the other option costs two choices`);
                 level_choices.B = { ...BLANK_LEVEL_UP_CHOICE };
             } else if (
-                choice_B.option_id !== null && ALL_LEVEL_UP_OPTIONS[choice_B.option_id].costs_two_choices && choice_A.option_id !== null
+                B_id !== null && B_costs_two_choices && A_id !== null
             ) {
                 console.warn(`Clearing level up option because the other option costs two choices`);
                 level_choices.A = { ...BLANK_LEVEL_UP_CHOICE };
@@ -158,22 +222,22 @@ function createCharacter(uid: string) {
 
     // ! clear invalid secondary classes
     $effect(() => {
-        if (!character || !character.secondary_class) return;
+        if (!character || !character.secondary_class_id) return;
 
         // clear secondary class if multiclass is not selected as a level up choice
         if (!options_used["tier_3_multiclass"] && !options_used["tier_4_multiclass"]) {
             console.warn(`Clearing secondary class because multiclass is not selected as a level up choice`);
-            character.secondary_class = null;
-            character.secondary_class_domain = null;
-            character.secondary_subclass = null;
+            character.secondary_class_id = null;
+            character.secondary_class_domain_id_choice = null;
+            character.secondary_subclass_id = null;
         }
 
         // clear secondary class if it's the same as the primary class
-        if (character.secondary_class?.name === character.primary_class?.name) {
+        if (secondary_class?.name === primary_class?.name) {
             console.warn(`Clearing secondary class because it's the same as the primary class`);
-            character.secondary_class = null;
-            character.secondary_class_domain = null;
-            character.secondary_subclass = null;
+            character.secondary_class_id = null;
+            character.secondary_class_domain_id_choice = null;
+            character.secondary_subclass_id = null;
         }
     })
 
@@ -201,13 +265,19 @@ function createCharacter(uid: string) {
         if (!character) return;
         for (let i = 10; i >= 2; i--) {
             const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
+            const chosen_options = level_up_chosen_options[i as keyof typeof level_up_chosen_options];
+            const A_id = level_choices.A.option_id;
+            const B_id = level_choices.B.option_id;
+            const A_max = chosen_options.A?.max || -1;
+            const B_max = chosen_options.B?.max || -1;
 
-            if (level_choices.A.option_id && ALL_LEVEL_UP_OPTIONS[level_choices.A.option_id].max > -1 && options_used[level_choices.A.option_id] > ALL_LEVEL_UP_OPTIONS[level_choices.A.option_id].max) {
-                console.warn(`Option ${level_choices.A.option_id} used more than the max of ${ALL_LEVEL_UP_OPTIONS[level_choices.A.option_id].max}`);
+
+            if (A_id && A_max > -1 && options_used[A_id] > A_max) {
+                console.warn(`Option ${A_id} used more than the max of ${A_max}`);
                 level_choices.A = BLANK_LEVEL_UP_CHOICE;
             }
-            if (level_choices.B.option_id && ALL_LEVEL_UP_OPTIONS[level_choices.B.option_id].max > -1 && options_used[level_choices.B.option_id] > ALL_LEVEL_UP_OPTIONS[level_choices.B.option_id].max) {
-                console.warn(`Option ${level_choices.B.option_id} used more than the max of ${ALL_LEVEL_UP_OPTIONS[level_choices.B.option_id].max}`);
+            if (B_id && B_max > -1 && options_used[B_id] > B_max) {
+                console.warn(`Option ${B_id} used more than the max of ${B_max}`);
                 level_choices.B = BLANK_LEVEL_UP_CHOICE;
             }
         }
@@ -444,24 +514,36 @@ function createCharacter(uid: string) {
         }
     })
 
+
+    // * update descriptors
+    $effect(() => {
+        if (!character) return;
+        character.descriptors.ancestry_name = ancestry_card ? ancestry_card.title : "";
+        character.descriptors.primary_class_name = primary_class ? primary_class.name : "";
+        character.descriptors.primary_subclass_name = primary_subclass ? primary_subclass.name : "";
+        character.descriptors.secondary_class_name = secondary_class ? secondary_class.name : "";
+        character.descriptors.secondary_subclass_name = secondary_subclass ? secondary_subclass.name : "";
+    })
+
+
     // ! clear invalid domain card choices at each level and update the domain card vault
     // * derived domain card vault (can't be done with modifiers)
     $effect(() => {
         if (!character) return;
 
-        if (!character.primary_class) {
-            character.level_up_domain_cards[1] = { A: null, B: null }
+        if (!character.primary_class_id) {
+            character.level_up_domain_card_ids[1] = { A: null, B: null }
             return;
         }
 
         let new_domain_card_vault: Card<"domain">[] =
-            Object.values(character.level_up_domain_cards[1])
+            Object.values(level_up_domain_cards[1])
                 .filter((card) => card !== null && card.level_requirement <= 1) as Card<"domain">[]
 
         let multiclass_used = false;
 
         for (let i = 2; i <= 10; i++) {
-            const level_up_domain_cards = character.level_up_domain_cards[i as keyof typeof character.level_up_domain_cards];
+            const level_up_domain_card = level_up_domain_cards[i as keyof typeof character.level_up_domain_card_ids].A;
 
             const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
             const choice_A = level_choices.A;
@@ -475,31 +557,31 @@ function createCharacter(uid: string) {
                 choice_B.option_id === "tier_4_multiclass";
 
             const available_domain_names =
-                [character.primary_class.primary_domain,
-                character.primary_class.secondary_domain,
-                multiclass_used ? character.secondary_class_domain : null]
-                    .filter(domain => domain !== null) as (keyof typeof DOMAINS)[];
+                [primary_class?.primary_domain_id,
+                primary_class?.secondary_domain_id,
+                multiclass_used ? character.secondary_class_domain_id_choice : null]
+                    .filter(id => id !== null);
 
 
             //***** level up domain cards *****/
             // filter out cards that are not valid for the current level
-            if (level_up_domain_cards.A !== null && level_up_domain_cards.A.level_requirement > i) {
-                console.warn(`Domain card ${level_up_domain_cards.A?.title} is not valid for level ${i}`);
-                level_up_domain_cards.A = null;
+            if (level_up_domain_card !== null && level_up_domain_card.level_requirement > i) {
+                console.warn(`Domain card ${level_up_domain_card?.title} is not valid for level ${i}`);
+                character.level_up_domain_card_ids[i as keyof typeof character.level_up_domain_card_ids].A = null;
             }
 
             // filter out cards that aren't in available domains
-            if (level_up_domain_cards.A !== null && !available_domain_names.includes(level_up_domain_cards.A.domain_name as keyof typeof DOMAINS)) {
-                console.warn(`Domain card ${level_up_domain_cards.A?.title} is not in available domains`);
-                level_up_domain_cards.A = null;
+            if (level_up_domain_card !== null && !available_domain_names.includes(level_up_domain_card.domain_id)) {
+                console.warn(`Domain card ${level_up_domain_card?.title} is not in available domains`);
+                character.level_up_domain_card_ids[i as keyof typeof character.level_up_domain_card_ids].A = null;
             }
 
             // add to vault if it's not already in there
-            if (level_up_domain_cards.A !== null && new_domain_card_vault.some(card => card.title === level_up_domain_cards.A?.title)) {
-                console.warn(`Domain card ${level_up_domain_cards.A?.title} is already in the vault`);
-                level_up_domain_cards.A = null;
-            } else if (level_up_domain_cards.A !== null) {
-                new_domain_card_vault.push(level_up_domain_cards.A);
+            if (level_up_domain_card !== null && new_domain_card_vault.some(card => card.title === level_up_domain_card?.title)) {
+                console.warn(`Domain card ${level_up_domain_card?.title} is already in the vault`);
+                character.level_up_domain_card_ids[i as keyof typeof character.level_up_domain_card_ids].A = null;
+            } else if (level_up_domain_card !== null) {
+                new_domain_card_vault.push(level_up_domain_card);
             }
             //***** END level up domain cards *****/
 
@@ -507,51 +589,54 @@ function createCharacter(uid: string) {
             //***** domain card choices *****/
             // clear domain card choices if the level choice is not a domain card choice
             if (!choice_A.option_id || !["tier_2_domain_card", "tier_3_domain_card", "tier_4_domain_card"].includes(choice_A.option_id)) {
-                if (choice_A.selected_domain_card !== null) {
+                if (choice_A.selected_domain_card_id !== null) {
                     console.warn(`Clearing selected domain card because level choice was changed to ${choice_A.option_id}`)
-                    choice_A.selected_domain_card = null;
+                    choice_A.selected_domain_card_id = null;
                 }
             }
             if (!choice_B.option_id || !["tier_2_domain_card", "tier_3_domain_card", "tier_4_domain_card"].includes(choice_B.option_id)) {
-                if (choice_B.selected_domain_card !== null) {
+                if (choice_B.selected_domain_card_id !== null) {
                     console.warn(`Clearing selected domain card because level choice was changed to ${choice_B.option_id}`)
-                    choice_B.selected_domain_card = null;
+                    choice_B.selected_domain_card_id = null;
                 }
             }
 
+            const choice_A_selected_domain_card = get_domain_card(choice_A.selected_domain_card_id);
+            const choice_B_selected_domain_card = get_domain_card(choice_B.selected_domain_card_id);
+
             // filter domain card choices that are not valid for the current level
-            if (choice_A.selected_domain_card !== null && choice_A.selected_domain_card.level_requirement > i) {
-                console.warn(`Domain card ${choice_A.selected_domain_card?.title} is not valid for level ${i}`);
-                choice_A.selected_domain_card = null;
+            if (choice_A_selected_domain_card !== null && choice_A_selected_domain_card.level_requirement > i) {
+                console.warn(`Domain card ${choice_A_selected_domain_card.title} is not valid for level ${i}`);
+                choice_A.selected_domain_card_id = null;
             }
-            if (choice_B.selected_domain_card !== null && choice_B.selected_domain_card.level_requirement > i) {
-                console.warn(`Domain card ${choice_B.selected_domain_card?.title} is not valid for level ${i}`);
-                choice_B.selected_domain_card = null;
+            if (choice_B_selected_domain_card !== null && choice_B_selected_domain_card.level_requirement > i) {
+                console.warn(`Domain card ${choice_B_selected_domain_card.title} is not valid for level ${i}`);
+                choice_B.selected_domain_card_id = null;
             }
 
             // filter out level up choices that aren't in available domains
-            if (choice_A.selected_domain_card !== null && !available_domain_names.includes(choice_A.selected_domain_card.domain_name as keyof typeof DOMAINS)) {
-                console.warn(`Domain card ${choice_A.selected_domain_card?.title} is not in available domains`);
-                choice_A.selected_domain_card = null;
+            if (choice_A_selected_domain_card !== null && !available_domain_names.includes(choice_A_selected_domain_card.domain_id)) {
+                console.warn(`Domain card ${choice_A_selected_domain_card.title} is not in available domains`);
+                choice_A.selected_domain_card_id = null;
             }
-            if (choice_B.selected_domain_card !== null && !available_domain_names.includes(choice_B.selected_domain_card.domain_name as keyof typeof DOMAINS)) {
-                console.warn(`Domain card ${choice_B.selected_domain_card?.title} is not in available domains`);
-                choice_B.selected_domain_card = null;
+            if (choice_B_selected_domain_card !== null && !available_domain_names.includes(choice_B_selected_domain_card.domain_id)) {
+                console.warn(`Domain card ${choice_B_selected_domain_card.title} is not in available domains`);
+                choice_B.selected_domain_card_id = null;
             }
 
             // add to vault if it's not already in there
-            if (choice_A.selected_domain_card !== null && new_domain_card_vault.some(card => card.title === choice_A.selected_domain_card?.title)) {
-                console.warn(`Domain card ${choice_A.selected_domain_card?.title} is already in the vault`);
-                choice_A.selected_domain_card = null;
-            } else if (choice_A.selected_domain_card !== null) {
-                new_domain_card_vault.push(choice_A.selected_domain_card);
+            if (choice_A_selected_domain_card !== null && new_domain_card_vault.some(card => card.title === choice_A_selected_domain_card.title)) {
+                console.warn(`Domain card ${choice_A_selected_domain_card.title} is already in the vault`);
+                choice_A.selected_domain_card_id = null;
+            } else if (choice_A_selected_domain_card !== null) {
+                new_domain_card_vault.push(choice_A_selected_domain_card);
             }
 
-            if (choice_B.selected_domain_card !== null && new_domain_card_vault.some(card => card.title === choice_B.selected_domain_card?.title)) {
-                console.warn(`Domain card ${choice_B.selected_domain_card?.title} is already in the vault`);
-                choice_B.selected_domain_card = null;
-            } else if (choice_B.selected_domain_card !== null) {
-                new_domain_card_vault.push(choice_B.selected_domain_card);
+            if (choice_B_selected_domain_card !== null && new_domain_card_vault.some(card => card.title === choice_B_selected_domain_card.title)) {
+                console.warn(`Domain card ${choice_B_selected_domain_card.title} is already in the vault`);
+                choice_B.selected_domain_card_id = null;
+            } else if (choice_B_selected_domain_card !== null) {
+                new_domain_card_vault.push(choice_B_selected_domain_card);
             }
             //***** END domain card choices *****/
         }
@@ -577,36 +662,43 @@ function createCharacter(uid: string) {
     $effect(() => {
         if (!character) return;
 
-        const valid_weapons = character.active_weapons.filter(
-            (weapon) => weapon.level_requirement <= (character?.level || 0)
+        const valid_weapon_ids = character.active_weapon_ids.filter(
+            (id) => {
+                const weapon = get_weapon(id);
+                if (!weapon) return false;
+                return weapon.level_requirement <= (character?.level || 0);
+            }
         );
 
         let total_burden = 0;
         const selected_categories = new Set<"Primary" | "Secondary">();
-        const active_weapons: Weapon[] = [];
+        const new_active_weapon_ids: string[] = [];
 
-        for (const weapon of valid_weapons) {
+        for (const id of valid_weapon_ids) {
+            const weapon = get_weapon(id);
+            if (!weapon) continue;
             if (total_burden + weapon.burden > 2) continue;
             if (selected_categories.has(weapon.category)) continue;
 
             selected_categories.add(weapon.category);
             total_burden += weapon.burden;
-            active_weapons.push(weapon);
+            new_active_weapon_ids.push(id);
         }
 
-        if (active_weapons.some((weapon, index) => weapon.title !== character?.active_weapons[index]?.title)) {
-            character.active_weapons = active_weapons;
+        if (new_active_weapon_ids.some((id, index) => id !== character?.active_weapon_ids[index])) {
+            console.warn(`Removing invalid active weapons`);
+            character.active_weapon_ids = new_active_weapon_ids;
         }
     })
 
     // ! clear invalid active armor
     $effect(() => {
         if (!character) return;
-        if (character.active_armor === null) return;
-        if (character.active_armor.level_requirement <= character.level) return
+        if (active_armor === null) return;
+        if (active_armor.level_requirement <= character.level) return
 
         console.warn(`Removing active armor. level requirement not met`);
-        character.active_armor = null;
+        character.active_armor_id = null;
 
     })
 
@@ -661,68 +753,62 @@ function createCharacter(uid: string) {
         }
 
         // ancestry card
-        if (character.ancestry_card) {
-            character.ancestry_card.features.forEach(f => push_modifier_ids(f.modifier_ids))
+        if (ancestry_card) {
+            ancestry_card.features.forEach(f => push_modifier_ids(f.modifier_ids))
         }
 
         // community card
-        if (character.community_card) {
-            character.community_card.features.forEach(f => push_modifier_ids(f.modifier_ids))
+        if (community_card) {
+            community_card.features.forEach(f => push_modifier_ids(f.modifier_ids))
         }
 
         // transformation card
-        if (character.transformation_card) {
-            character.transformation_card.features.forEach(f => push_modifier_ids(f.modifier_ids))
+        if (transformation_card) {
+            transformation_card.features.forEach(f => push_modifier_ids(f.modifier_ids))
         }
 
         // primary class
-        if (character.primary_class) {
-            push_modifier_ids(character.primary_class.hope_feature.modifier_ids)
-            character.primary_class.class_features.forEach(f => push_modifier_ids(f.modifier_ids))
+        if (primary_class) {
+            push_modifier_ids(primary_class.hope_feature.modifier_ids)
+            primary_class.class_features.forEach(f => push_modifier_ids(f.modifier_ids))
         }
 
         // primary subclass cards (gate by mastery level)
-        if (character.primary_subclass) {
+        if (primary_subclass) {
             const primaryMastery = primary_class_mastery_level
-            push_modifier_ids(character.primary_subclass.foundation_card.features.flatMap(f => f.modifier_ids))
+            push_modifier_ids(primary_subclass.foundation_card.features.flatMap(f => f.modifier_ids))
             if (primaryMastery >= 2) {
-                push_modifier_ids(character.primary_subclass.specialization_card.features.flatMap(f => f.modifier_ids))
+                push_modifier_ids(primary_subclass.specialization_card.features.flatMap(f => f.modifier_ids))
             }
             if (primaryMastery >= 3) {
-                push_modifier_ids(character.primary_subclass.mastery_card.features.flatMap(f => f.modifier_ids))
+                push_modifier_ids(primary_subclass.mastery_card.features.flatMap(f => f.modifier_ids))
             }
         }
 
         // secondary class
-        if (character.secondary_class) {
+        if (secondary_class) {
             // no hope feature for secondary class
-            character.secondary_class.class_features.forEach(f => push_modifier_ids(f.modifier_ids))
+            secondary_class.class_features.forEach(f => push_modifier_ids(f.modifier_ids))
         }
 
         // secondary subclass cards (gate by mastery level)
-        if (character.secondary_subclass) {
+        if (secondary_subclass) {
             const secondaryMastery = secondary_class_mastery_level
-            push_modifier_ids(character.secondary_subclass.foundation_card.features.flatMap(f => f.modifier_ids))
+            push_modifier_ids(secondary_subclass.foundation_card.features.flatMap(f => f.modifier_ids))
             if (secondaryMastery >= 2) {
-                push_modifier_ids(character.secondary_subclass.specialization_card.features.flatMap(f => f.modifier_ids))
+                push_modifier_ids(secondary_subclass.specialization_card.features.flatMap(f => f.modifier_ids))
             }
             if (secondaryMastery >= 3) {
-                push_modifier_ids(character.secondary_subclass.mastery_card.features.flatMap(f => f.modifier_ids))
+                push_modifier_ids(secondary_subclass.mastery_card.features.flatMap(f => f.modifier_ids))
             }
         }
 
-        // modifiers from level up choices
+        // modifiers from chosen level up options
         for (let i = 2; i <= character.level; i++) {
-            const levelChoices = character.level_up_choices[i as keyof typeof character.level_up_choices];
-            if (!levelChoices) continue;
-
-            const choices = [levelChoices.A, levelChoices.B];
-            for (const choice of choices) {
-                if (!choice || !choice.option_id) continue;
-                const option = ALL_LEVEL_UP_OPTIONS[choice.option_id];
-                if (!option) continue;
-                push_modifier_ids(option.modifier_ids);
-            }
+            const chosen_options = level_up_chosen_options[i as keyof typeof level_up_chosen_options];
+            if (!chosen_options) continue;
+            push_modifier_ids(chosen_options.A?.modifier_ids);
+            push_modifier_ids(chosen_options.B?.modifier_ids);
         }
 
         // modifiers from the domain card loadout
@@ -736,18 +822,18 @@ function createCharacter(uid: string) {
         })
 
         // modifiers from active armor
-        if (character.active_armor) {
-            character.active_armor.features.forEach(f => push_modifier_ids(f.modifier_ids))
+        if (active_armor) {
+            active_armor.features.forEach(f => push_modifier_ids(f.modifier_ids))
         }
 
         // modifiers from active weapons
-        character.active_weapons.forEach(weapon => {
+        active_weapons.forEach(weapon => {
             weapon.features.forEach(f => push_modifier_ids(f.modifier_ids))
         })
 
 
         // additional cards
-        character.additional_cards.forEach(card => {
+        character.additional_domain_cards.forEach(card => {
             card.features.forEach(f => push_modifier_ids(f.modifier_ids))
         })
 
@@ -812,7 +898,7 @@ function createCharacter(uid: string) {
     // * derived traits
     $effect(() => {
         if (!character) return
-        const base_traits = { ...character.base_stats.traits }
+        const base_traits = { ...character.selected_traits }
         if (
             base_traits.agility === null ||
             base_traits.strength === null ||
@@ -916,8 +1002,8 @@ function createCharacter(uid: string) {
         let new_evasion: number = character.base_stats.evasion;
 
         // initialize with primary class's starting max hp
-        if (character.primary_class) {
-            new_evasion = character.primary_class.starting_evasion
+        if (primary_class) {
+            new_evasion = primary_class.starting_evasion
         }
 
         new_evasion = apply_modifiers(base_modifiers, 'evasion', new_evasion, 'base')
@@ -933,8 +1019,8 @@ function createCharacter(uid: string) {
         let new_max_hp: number = character.base_stats.max_hp;
 
         // initialize with primary class's starting max hp
-        if (character.primary_class) {
-            new_max_hp = character.primary_class.starting_max_hp
+        if (primary_class) {
+            new_max_hp = primary_class.starting_max_hp
         }
 
         new_max_hp = apply_modifiers(base_modifiers, 'max_hp', new_max_hp, 'base')
@@ -962,7 +1048,7 @@ function createCharacter(uid: string) {
         let masteryNum: number = character.base_stats.primary_class_mastery_level
 
         // having a primary class guarantees at least foundation (1)
-        if (character.primary_class) masteryNum = Math.max(masteryNum, 1);
+        if (character.primary_class_id) masteryNum = Math.max(masteryNum, 1);
 
         masteryNum = apply_modifiers(base_modifiers, 'primary_class_mastery_level', masteryNum, 'base')
 
@@ -994,7 +1080,7 @@ function createCharacter(uid: string) {
         let masteryNum: number = character.base_stats.secondary_class_mastery_level
 
         // having a secondary class guarantees at least foundation (1)
-        if (character.secondary_class) masteryNum = Math.max(masteryNum, 1);
+        if (character.secondary_class_id) masteryNum = Math.max(masteryNum, 1);
 
         masteryNum = apply_modifiers(base_modifiers, 'secondary_class_mastery_level', masteryNum, 'base')
 
@@ -1065,9 +1151,9 @@ function createCharacter(uid: string) {
         }
 
         // override with currently equiped armor
-        if (character.active_armor !== null) {
-            thresholds.major = character.active_armor.damage_thresholds.major
-            thresholds.severe = character.active_armor.damage_thresholds.severe
+        if (active_armor) {
+            thresholds.major = active_armor.damage_thresholds.major
+            thresholds.severe = active_armor.damage_thresholds.severe
         }
 
         thresholds.major = apply_modifiers(base_modifiers, 'major_damage_threshold', thresholds.major, 'base')
@@ -1127,6 +1213,21 @@ function createCharacter(uid: string) {
         get tier_3_marked_traits() { return tier_3_marked_traits },
         get tier_4_marked_traits() { return tier_4_marked_traits },
         get options_used() { return options_used },
+
+        // referenced objects
+        get ancestry_card() { return ancestry_card },
+        get community_card() { return community_card },
+        get transformation_card() { return transformation_card },
+        get primary_class() { return primary_class },
+        get primary_subclass() { return primary_subclass },
+        get secondary_class() { return secondary_class },
+        get secondary_subclass() { return secondary_subclass },
+        get active_armor() { return active_armor },
+        get active_weapons() { return active_weapons },
+        get level_up_domain_cards() { return level_up_domain_cards },
+        get level_up_chosen_options() { return level_up_chosen_options },
+
+        // derived stats
         get domain_card_vault() { return domain_card_vault },
         get traits() { return traits },
         get proficiency() { return proficiency },
