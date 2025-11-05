@@ -1,6 +1,6 @@
 <!-- src/routes/+page.svelte -->
 <script lang="ts">
-  import type { Character } from "$lib/ts/types";
+  import type { Character } from "$lib/ts/character/types";
   import { getAppContext } from "$lib/ts/app.svelte";
   import { cn } from "$lib/utils";
   import { onMount } from "svelte";

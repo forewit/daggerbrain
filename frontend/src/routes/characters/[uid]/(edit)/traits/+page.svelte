@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getAppContext } from "$lib/ts/app.svelte";
-  import { getCharacterContext } from "$lib/ts/character.svelte";
-  import { type Traits } from "$lib/ts/types.js";
+  import { getCharacterContext } from "$lib/ts/character/character.svelte";
+  import { type Traits } from "$lib/ts/character/types";
   import * as Select from "$lib/components/ui/select";
   import { capitalize } from "$lib/utils";
   import { cn } from "$lib/utils";
@@ -90,7 +90,7 @@
       <!-- traits -->
       <div class="grid grid-cols-1 @xs:grid-cols-2 @lg:grid-cols-3 gap-5 justify-items-center">
         {#each Object.entries(character.base_stats.traits) as [trait, modifier], i}
-          {@const total = character.derived_stats.traits[trait as keyof Traits] || 0}
+          {@const total = context.traits[trait as keyof Traits] || 0}
           {@const bonus = total - (modifier || 0)}
 
           <div

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Character } from "$lib/ts/types";
+  import type { Character } from "$lib/ts/character/types";
   import { Button, buttonVariants } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog/";
   import * as Collapsible from "$lib/components/ui/collapsible/";
@@ -8,7 +8,7 @@
   import { CLASSES } from "$lib/ts/constants/constants";
   import ClassSummary from "../class-summary.svelte";
   import SubclassCard from "$lib/components/app/cards/full-cards/subclass-card.svelte";
-  import { getCharacterContext } from "$lib/ts/character.svelte";
+  import { getCharacterContext } from "$lib/ts/character/character.svelte";
 
   let { after_remove_secondary_class = () => {} } = $props();
 

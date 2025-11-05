@@ -1,4 +1,4 @@
-import type { Armor, Weapon } from "../types";
+import type { Armor, Weapon } from "../character/types";
 
 export const TIER_1_ARMOR = {
     leather_armor: {

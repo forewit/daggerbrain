@@ -7,7 +7,7 @@
   import Textarea from "$lib/components/ui/textarea/textarea.svelte";
   import Dropdown from "$lib/components/app/leveling/dropdown.svelte";
   import { EXPERIENCES } from "$lib/ts/constants/rules";
-  import { getCharacterContext } from "$lib/ts/character.svelte.js";
+  import { getCharacterContext } from "$lib/ts/character/character.svelte";
 
   let { data } = $props();
 
@@ -36,7 +36,7 @@
             <div class="flex items-center">
               <Input bind:value={character.experiences[i]} placeholder="Name" />
               <p class="font-medium pr-4 pl-5">
-                +{character.derived_stats.experience_modifiers[i]}
+                +{context.experience_modifiers[i]}
               </p>
             </div>
           </div>

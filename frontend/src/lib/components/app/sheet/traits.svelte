@@ -1,7 +1,7 @@
 <script lang="ts">
   import Input from "$lib/components/ui/input/input.svelte";
   import { cn } from "$lib/utils";
-  import type { Traits } from "$lib/ts/types";
+  import type { Traits } from "$lib/ts/character/types";
   import { TRAITS } from "$lib/ts/constants/constants";
 
   let { class: className = "", traits = $bindable() }: { class?: string; traits: Traits } =

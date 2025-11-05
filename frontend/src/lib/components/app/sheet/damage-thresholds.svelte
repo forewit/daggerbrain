@@ -1,6 +1,6 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
-  import { getCharacterContext } from "$lib/ts/character.svelte";
+  import { getCharacterContext } from "$lib/ts/character/character.svelte";
 
   let {
     class: className = "",

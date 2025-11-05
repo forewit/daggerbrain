@@ -1,4 +1,4 @@
-import type { Character, Card } from "$lib/ts/types";
+import type { Character, Card } from "$lib/ts/character/types";
 import { DOMAINS } from "$lib/ts/constants/constants";
 
 /**

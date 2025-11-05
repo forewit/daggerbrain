@@ -1,7 +1,7 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
   import Shield from "@lucide/svelte/icons/shield";
-  import { getCharacterContext } from "$lib/ts/character.svelte";
+  import { getCharacterContext } from "$lib/ts/character/character.svelte";
 
   let { class: className = "" }: { class?: string } = $props();
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { LevelUpOption, Character } from "$lib/ts/types";
+  import type { LevelUpOption, Character } from "$lib/ts/character/types";
   import { cn } from "$lib/utils";
   import * as Select from "$lib/components/ui/select/";
   import {
@@ -9,7 +9,7 @@
     TIER_2_BASE_OPTIONS,
     TIER_3_BASE_OPTIONS,
   } from "$lib/ts/constants/rules";
-  import { getCharacterContext } from "$lib/ts/character.svelte";
+  import { getCharacterContext } from "$lib/ts/character/character.svelte";
   import Dropdown from "./dropdown.svelte";
   import {
     get_previously_chosen_domain_cards,

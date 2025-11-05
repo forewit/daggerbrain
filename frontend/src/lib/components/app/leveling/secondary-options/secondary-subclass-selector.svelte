@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { Character, Card } from "$lib/ts/types";
+  import type { Character, Card } from "$lib/ts/character/types";
   import { cn } from "$lib/utils";
   import * as Select from "$lib/components/ui/select/";
   import SubclassCard from "$lib/components/app/cards/full-cards/subclass-card.svelte";
-  import { getCharacterContext } from "$lib/ts/character.svelte";
+  import { getCharacterContext } from "$lib/ts/character/character.svelte";
 
   let {
     selected_upgrade = $bindable(),

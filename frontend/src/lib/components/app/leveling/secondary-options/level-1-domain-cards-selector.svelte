@@ -1,12 +1,12 @@
 <script lang="ts">
-  import type { Card, Character } from "$lib/ts/types";
+  import type { Card, Character } from "$lib/ts/character/types";
   import { cn } from "$lib/utils";
   import { buttonVariants } from "$lib/components/ui/button";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import * as Dialog from "$lib/components/ui/dialog/";
   import DomainCard from "$lib/components/app/cards/full-cards/domain-card.svelte";
   import { DOMAINS } from "$lib/ts/constants/constants";
-  import { getCharacterContext } from "$lib/ts/character.svelte";
+  import { getCharacterContext } from "$lib/ts/character/character.svelte";
 
   const context = getCharacterContext();
   let character = $derived(context.character);

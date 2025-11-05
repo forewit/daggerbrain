@@ -1,6 +1,6 @@
 import { ANCESTRY_CARDS, BLADE_DOMAIN_CARDS, BONE_DOMAIN_CARDS, COMMUNITY_CARDS, SUBCLASS_CARDS, TRANSFORMATION_CARDS, VALOR_DOMAIN_CARDS } from "./cards";
 import { BLANK_LEVEL_UP_CHOICE, BLANK_LEVEL_UP_OPTION, TIER_1_BASE_OPTIONS } from "./rules";
-import type { Domain, Class, Subclass, Card, Character } from "../types";
+import type { Domain, Class, Subclass, Card, Character } from "../character/types";
 import { TIER_1_ARMOR, TIER_1_WEAPONS } from "./equipment";
 
 

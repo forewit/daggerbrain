@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Card } from "$lib/ts/types";
+  import type { Card } from "$lib/ts/character/types";
   import { cn } from "$lib/utils";
   import { buttonVariants } from "$lib/components/ui/button";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";

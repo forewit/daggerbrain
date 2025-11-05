@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { LevelUpOption, LevelUpChoice } from "$lib/ts/types";
+  import type { LevelUpOption, LevelUpChoice } from "$lib/ts/character/types";
   import { ALL_LEVEL_UP_OPTIONS } from "$lib/ts/constants/rules";
   import { cn } from "$lib/utils";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
@@ -9,7 +9,7 @@
   import CheckCheck from "@lucide/svelte/icons/check-check";
   import * as Select from "$lib/components/ui/select/";
   import * as Collapsible from "$lib/components/ui/collapsible/";
-  import { getCharacterContext } from "$lib/ts/character.svelte";
+  import { getCharacterContext } from "$lib/ts/character/character.svelte";
 
   let {
     tier_number,

@@ -1,4 +1,4 @@
-import type { Character } from "$lib/ts/types";
+import type { Character } from "$lib/ts/character/types";
 import { ALL_LEVEL_UP_OPTIONS, BLANK_LEVEL_UP_OPTION } from "$lib/ts/constants/rules";
 
 /**

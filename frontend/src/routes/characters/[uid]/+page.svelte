@@ -2,7 +2,7 @@
   import Dice from "$lib/components/app/dice/dice.svelte";
   import Sheet from "$lib/components/app/sheet/sheet.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
-  import { getCharacterContext } from "$lib/ts/character.svelte.js";
+  import { getCharacterContext } from "$lib/ts/character/character.svelte";
   import { getAppContext } from "$lib/ts/app.svelte";
 
   const context = getCharacterContext();
@@ -25,7 +25,7 @@
       <Button href={!character.primary_class ? "class/" : "traits/"}>Edit Character</Button>
     </div>
   {:else}
-    <Sheet bind:character class="mb-24" />
+    <Sheet class="mb-24" />
     <!-- <Dice
   class="bottom-6 left-6 z-45"
   onRollEnd={(notation, total) => {

@@ -1,4 +1,4 @@
-import type { Character } from './types';
+import type { Character } from './character/types';
 import { getContext, setContext } from 'svelte';
 import { loadCharacters, saveCharacters } from './data';
 import { JUST_JAMES, NEW_CHARACTER } from './constants/constants';

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Card, CardType } from "$lib/ts/types";
+  import type { Card, CardType } from "$lib/ts/character/types";
   import { cn } from "$lib/utils";
   import { onMount } from "svelte";
   import AncestryCard from "./full-cards/ancestry-card.svelte";

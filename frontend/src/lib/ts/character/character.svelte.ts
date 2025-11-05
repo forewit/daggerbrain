@@ -1,18 +1,53 @@
-import { getAppContext } from './app.svelte';
-import { ALL_LEVEL_UP_OPTIONS, BLANK_LEVEL_UP_CHOICE, BLANK_LEVEL_UP_OPTION, TIER_1_BASE_OPTIONS, TIER_2_BASE_OPTIONS, TRAIT_OPTIONS } from './constants/rules';
-import { MODIFIERS } from './constants/modifiers';
-import type { Card, Character, Modifier, LevelUpChoice, LevelUpOption, Traits, Weapon, DamageThresholds } from './types';
+import { getAppContext } from '$lib/ts/app.svelte';
+import { ALL_LEVEL_UP_OPTIONS, BLANK_LEVEL_UP_CHOICE, BLANK_LEVEL_UP_OPTION, TIER_1_BASE_OPTIONS, TIER_2_BASE_OPTIONS, TRAIT_OPTIONS } from '$lib/ts/constants/rules';
+import { MODIFIERS } from '$lib/ts/constants/modifiers';
+import type { Card, Character, Modifier, LevelUpChoice, LevelUpOption, Traits, Weapon, DamageThresholds, Class, Subclass, Armor } from './types';
 import { getContext, setContext } from 'svelte';
-import type { DOMAINS } from './constants/constants';
+import type { DOMAINS } from '$lib/ts/constants/constants';
 
 function createCharacter(uid: string) {
     const app = getAppContext();
     let character: Character | null = $state(null);
 
+    // derived references
+    let ancestry_card: Card<"ancestry"> | null = $derived(null);
+    let community_card: Card<"community"> | null = $derived(null);
+    let transformation_card: Card<"transformation"> | null = $derived(null);
+    let additional_cards: Card<any>[] = $derived([]);
+    let primary_class: Class | null = $derived(null);
+    let primary_subclass: Subclass | null = $derived(null);
+    let secondary_class: Class | null = $derived(null);
+    let secondary_subclass: Subclass | null = $derived(null);
+    let active_armor: Armor | null = $derived(null);
+    let active_weapons: Weapon[] = $derived([]);
+    let level_up_domain_cards: {
+        1: { A: Card<"domain"> | null, B: Card<"domain"> | null },
+        2: { A: Card<"domain"> | null },
+        3: { A: Card<"domain"> | null },
+        4: { A: Card<"domain"> | null },
+        5: { A: Card<"domain"> | null },
+        6: { A: Card<"domain"> | null },
+        7: { A: Card<"domain"> | null },
+        8: { A: Card<"domain"> | null },
+        9: { A: Card<"domain"> | null },
+        10: { A: Card<"domain"> | null },
+    } = $derived({
+        1: { A: null, B: null },
+        2: { A: null },
+        3: { A: null },
+        4: { A: null },
+        5: { A: null },
+        6: { A: null },
+        7: { A: null },
+        8: { A: null },
+        9: { A: null },
+        10: { A: null },
+    });
+
     // derived stats
     let domain_card_vault: Card<"domain">[] = $state([]);
     let traits: Traits = $state({
-        agility: 0,
+        agility: 0, 
         strength: 0,
         finesse: 0,
         instinct: 0,

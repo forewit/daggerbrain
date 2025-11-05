@@ -6,7 +6,7 @@
   import LevelSelect from "$lib/components/app/leveling/level-select.svelte";
   import { cn } from "$lib/utils";
   import Dropdown from "$lib/components/app/leveling/dropdown.svelte";
-  import { getCharacterContext } from "$lib/ts/character.svelte.js";
+  import { getCharacterContext } from "$lib/ts/character/character.svelte";
 
   const context = getCharacterContext();
   let character = $derived(context.character);
@@ -26,7 +26,7 @@
       />
 
       <!-- tier 1 options -->
-      <Tier1Options bind:character />
+      <Tier1Options />
 
       {#if character.level >= 2}
         <Dropdown title="Tier 2" class="bg-accent/10 text-accent border-accent/20">

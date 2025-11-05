@@ -3,7 +3,7 @@
   import * as Select from "$lib/components/ui/select";
   import { buttonVariants } from "$lib/components/ui/button";
   import { cn } from "$lib/utils";
-  import type { Character } from "$lib/ts/types";
+  import type { Character } from "$lib/ts/character/types";
 
   let {
     level = $bindable(),
@@ -13,7 +13,6 @@
 
   let open = $state(false);
   let newLevel = $derived(level);
-
   let value = $state(level.toString());
 </script>
 

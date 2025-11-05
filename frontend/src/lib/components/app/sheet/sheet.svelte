@@ -1,7 +1,7 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
   import Traits from "./traits.svelte";
-  import type { Character, Card } from "$lib/ts/types";
+  import type { Character, Card } from "$lib/ts/character/types";
   import Banner from "../cards/class-banner.svelte";
   import DamageThresholds from "./damage-thresholds.svelte";
   import Armor from "./armor.svelte";
@@ -19,7 +19,7 @@
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import CardCarousel from "../cards/card-carousel.svelte";
   import Loadout from "./loadout.svelte";
-  import { getCharacterContext } from "$lib/ts/character.svelte";
+  import { getCharacterContext } from "$lib/ts/character/character.svelte";
 
   let { class: className = "" }: { class?: string } = $props();
 

@@ -1,5 +1,5 @@
 // src/lib/data.ts
-import type { Character } from "./types"
+import type { Character } from "./character/types"
 
 const CHARACTERS_KEY_PREFIX = "daggerbrain:character:"
 const CHARACTERS_INDEX_KEY = "daggerbrain:characters_index"

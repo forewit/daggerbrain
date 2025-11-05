@@ -4,7 +4,7 @@
   import Button, { buttonVariants } from "$lib/components/ui/button/button.svelte";
   import Label from "$lib/components/ui/label/label.svelte";
   import Switch from "$lib/components/ui/switch/switch.svelte";
-  import type { Card, Character } from "$lib/ts/types";
+  import type { Card, Character } from "$lib/ts/character/types";
   import { cn } from "$lib/utils";
   import Tent from "@lucide/svelte/icons/tent";
   import ArrowUp from "@lucide/svelte/icons/arrow-up";
@@ -13,7 +13,7 @@
   import ChevronDown from "@lucide/svelte/icons/chevron-down";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import ArrowLeftRight from "@lucide/svelte/icons/arrow-left-right";
-  import { getCharacterContext } from "$lib/ts/character.svelte";
+  import { getCharacterContext } from "$lib/ts/character/character.svelte";
 
   let { class: className = "" }: { class?: string } = $props();
 

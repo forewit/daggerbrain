@@ -1,4 +1,4 @@
-import type { Card } from "../types";
+import type { Card } from "../character/types";
 
 export const BONE_DOMAIN_CARDS = {
     untouchable: {

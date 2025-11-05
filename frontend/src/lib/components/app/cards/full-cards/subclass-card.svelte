@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Card, Class } from "$lib/ts/types";
+  import type { Card, Class } from "$lib/ts/character/types";
   import { cn } from "$lib/utils";
   import type { Snippet } from "svelte";
   import ClassBanner from "../class-banner.svelte";

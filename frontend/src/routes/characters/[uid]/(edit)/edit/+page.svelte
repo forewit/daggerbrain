@@ -5,7 +5,7 @@
   import { cn } from "$lib/utils";
   import * as Dialog from "$lib/components/ui/dialog/index";
   import { buttonVariants } from "$lib/components/ui/button";
-  import { getCharacterContext } from "$lib/ts/character.svelte.js";
+  import { getCharacterContext } from "$lib/ts/character/character.svelte";
 
   let { data } = $props();
 

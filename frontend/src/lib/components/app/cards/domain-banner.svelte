@@ -1,6 +1,6 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
-  import type { Class, Domain } from "$lib/ts/types";
+  import type { Class, Domain } from "$lib/ts/character/types";
   import { DOMAINS } from "$lib/ts/constants/constants";
 
   let {

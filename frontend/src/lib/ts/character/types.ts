@@ -1,6 +1,6 @@
-import type { CLASSES, DOMAINS } from "./constants/constants"
-import type { MODIFIERS } from "./constants/modifiers"
-import type { ALL_LEVEL_UP_OPTIONS } from "./constants/rules"
+import type { CLASSES, DOMAINS } from "../constants/constants"
+import type { MODIFIERS } from "../constants/modifiers"
+import type { ALL_LEVEL_UP_OPTIONS } from "../constants/rules"
 
 
 export type Character = {

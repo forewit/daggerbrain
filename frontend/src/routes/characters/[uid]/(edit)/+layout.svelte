@@ -8,7 +8,7 @@
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import { onMount } from "svelte";
   import Input from "$lib/components/ui/input/input.svelte";
-  import { getCharacterContext } from "$lib/ts/character.svelte.js";
+  import { getCharacterContext } from "$lib/ts/character/character.svelte";
   import { goto } from "$app/navigation";
 
   let { data, children } = $props();

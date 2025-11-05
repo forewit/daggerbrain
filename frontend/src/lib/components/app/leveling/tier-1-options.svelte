@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { Character } from "$lib/ts/types";
+  import type { Character } from "$lib/ts/character/types";
   import { cn } from "$lib/utils";
   import Dropdown from "./dropdown.svelte";
   import PrimaryClassSelector from "./secondary-options/primary-class-selector.svelte";
   import PrimarySubclassSelector from "./secondary-options/primary-subclass-selector.svelte";
   import Level1DomainCardsSelector from "./secondary-options/level-1-domain-cards-selector.svelte";
-  import { getCharacterContext } from "$lib/ts/character.svelte";
+  import { getCharacterContext } from "$lib/ts/character/character.svelte";
 
   let { class: className = "" } = $props();
 

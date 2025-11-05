@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getAppContext } from "$lib/ts/app.svelte";
   import { goto } from "$app/navigation";
-  import { setCharacterContext } from "$lib/ts/character.svelte.js";
+  import { setCharacterContext } from "$lib/ts/character/character.svelte";
   import { onDestroy } from "svelte";
 
   let { data, children } = $props();
