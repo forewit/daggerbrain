@@ -20,7 +20,7 @@
     title="Class"
     highlighted={!character.primary_class_id}
     subtitle={character.primary_class_id
-      ? character.descriptors.primary_class_name + ", " + context.primary_class?.source
+      ? character.derived_descriptors.primary_class_name + ", " + context.primary_class?.source
       : ""}
   >
     <PrimaryClassSelector />
@@ -31,7 +31,7 @@
     highlighted={!character.primary_subclass_id}
     disabled={!character.primary_class_id}
     title="Subclass"
-    subtitle={character.descriptors.primary_subclass_name}
+    subtitle={character.derived_descriptors.primary_subclass_name}
   >
     <PrimarySubclassSelector />
   </Dropdown>

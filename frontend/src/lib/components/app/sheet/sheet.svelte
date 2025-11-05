@@ -29,32 +29,17 @@
   let character_cards_expanded = $state(true);
   let character_cards: Card<any>[] = $derived(
     [
-      context.primary_class_mastery_level &&
-        context.primary_class_mastery_level >= 1 &&
-        context.primary_subclass?.foundation_card,
-      context.primary_class_mastery_level &&
-        context.primary_class_mastery_level >= 2 &&
-        context.primary_subclass?.specialization_card,
-      context.primary_class_mastery_level &&
-        context.primary_class_mastery_level >= 3 &&
-        context.primary_subclass?.mastery_card,
+      context.primary_class_mastery_level >= 1 && context.primary_subclass?.foundation_card,
+      context.primary_class_mastery_level >= 2 && context.primary_subclass?.specialization_card,
+      context.primary_class_mastery_level >= 3 && context.primary_subclass?.mastery_card,
+      context.secondary_class_mastery_level >= 1 && context.secondary_subclass?.foundation_card,
+      context.secondary_class_mastery_level >= 2 && context.secondary_subclass?.specialization_card,
+      context.secondary_class_mastery_level >= 3 && context.secondary_subclass?.mastery_card,
       context.ancestry_card,
       context.community_card,
       context.transformation_card,
-      ...(character?.additional_domain_cards || []),
-    ].filter(Boolean) as Card<any>[]
-  );
-
-  let domain_card_loadout_expanded = $state(true);
-  let domain_card_loadout: Card<any>[] = $derived(
-    [
-      // should get the matching cards from the vault based on the indicies in domain card loadout
-      ...(
-        context.domain_card_vault.filter((_, i) =>
-          character?.ephemeral_stats.domain_card_loadout.includes(i)
-        ) || []
-      ).slice(0, context.max_domain_card_loadout),
-    ].filter(Boolean) as Card<any>[]
+      ...context.additional_domain_cards,
+    ].filter(c=>!!c)
   );
 
   let fileInput = $state<HTMLInputElement>();

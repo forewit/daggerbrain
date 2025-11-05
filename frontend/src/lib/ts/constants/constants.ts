@@ -196,20 +196,6 @@ export const JUST_JAMES: Character = {
     uid: "forewit-justjames",
     name: "Just-James",
     image: "/images/portrait-placeholder.png",
-    base_stats: {
-        proficiency: 1,
-        experience_modifier: 2,
-        max_experiences: 2,
-        max_domain_card_loadout: 5,
-        max_hope: 6,
-        max_armor: 0,
-        max_hp: 0,
-        max_stress: 6,
-        max_burden: 2,
-        evasion: 0,
-        primary_class_mastery_level: 0,
-        secondary_class_mastery_level: 0,
-    },
 
     selected_traits: {
         agility: 2,
@@ -220,7 +206,7 @@ export const JUST_JAMES: Character = {
         knowledge: -1,
     },
 
-    descriptors: {
+    derived_descriptors: {
         ancestry_name: "Half-Clank",
         primary_class_name: "Assassin",
         primary_subclass_name: "Executioners Guild",
@@ -246,9 +232,9 @@ export const JUST_JAMES: Character = {
 
     // the void / other
     transformation_card_id: "werewolf",
-    additional_domain_cards: [
-        DOMAINS.valor.cards.bare_bones,
-        DOMAINS.bone.cards.untouchable
+    additional_domain_card_ids: [
+        "bare_bones",
+        "untouchable"
     ],
     additional_modifier_ids: [],
 
@@ -344,20 +330,6 @@ export const NEW_CHARACTER: Character = {
     uid: "new-character",
     name: "New Character",
     image: "/images/portrait-placeholder.png",
-    base_stats: {
-        proficiency: 1,
-        experience_modifier: 2,
-        max_experiences: 2,
-        max_domain_card_loadout: 5,
-        max_hope: 6,
-        max_armor: 0,
-        max_hp: 0,
-        max_stress: 6,
-        max_burden: 2,
-        evasion: 0,
-        primary_class_mastery_level: 0,
-        secondary_class_mastery_level: 0,
-    },
 
     selected_traits: {
         agility: null,
@@ -368,7 +340,7 @@ export const NEW_CHARACTER: Character = {
         knowledge: null,
     },
 
-    descriptors: {
+    derived_descriptors: {
         ancestry_name: "",
         primary_class_name: "",
         primary_subclass_name: "",
@@ -394,7 +366,7 @@ export const NEW_CHARACTER: Character = {
 
     // the void / other
     transformation_card_id: null,
-    additional_domain_cards: [],
+    additional_domain_card_ids: [],
     additional_modifier_ids: [],
 
     // set by the player

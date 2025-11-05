@@ -82,11 +82,11 @@
               <p class="text-lg font-bold truncate mt-1">{character.name}</p>
 
               <p class="mt-1 truncate text-xs text-muted-foreground">
-                {character.descriptors.ancestry_name || "No ancestry"}
+                {character.derived_descriptors.ancestry_name || "No ancestry"}
                 &ensp;•&ensp;
-                {character.descriptors.primary_class_name || "No class"}
+                {character.derived_descriptors.primary_class_name || "No class"}
                 &ensp;•&ensp;
-                {character.descriptors.primary_subclass_name || "No subclass"}
+                {character.derived_descriptors.primary_subclass_name || "No subclass"}
               </p>
             </div>
           </a>

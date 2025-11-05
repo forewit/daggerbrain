@@ -55,7 +55,7 @@
           </Dialog.Trigger>
           <Dialog.Content>
             <Dialog.Header
-              ><Dialog.Title>Suggested Traits: {character.descriptors.primary_class_name}</Dialog.Title
+              ><Dialog.Title>Suggested Traits: {character.derived_descriptors.primary_class_name}</Dialog.Title
               ></Dialog.Header
             >
             <Dialog.Description>

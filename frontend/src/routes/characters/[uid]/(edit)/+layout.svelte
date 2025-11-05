@@ -17,7 +17,7 @@
   const character = $derived(context.character);
 
   const tabs = ["edit", "heritage", "class", "traits", "experiences", "equipment"];
-  let activeTab = $derived(page.url.pathname.split("/").filter(Boolean).pop() || "edit");
+  let activeTab = $derived(page.url.pathname.split("/").filter(t=>!!t).pop() || "edit");
   let fileInput = $state<HTMLInputElement>();
 
   function onImageUploadSuccess(dataUrl: string) {

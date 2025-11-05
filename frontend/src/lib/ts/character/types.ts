@@ -7,31 +7,8 @@ export type Character = {
     uid: string,
     name: string,
     image: string,
-    base_stats: {
-        proficiency: 1
-        experience_modifier: 2
-        max_experiences: 2
-        max_domain_card_loadout: 5
-        max_hope: 6
-        max_armor: 0
-        max_hp: 0
-        max_stress: 6
-        max_burden: 2
-        evasion: 0
-        primary_class_mastery_level: 0
-        secondary_class_mastery_level: 0
-    }
 
     selected_traits: Traits
-
-    // descriptors (used to so that data isn't fetched too often)
-    descriptors: {
-        ancestry_name: string
-        primary_class_name: string
-        primary_subclass_name: string
-        secondary_class_name: string
-        secondary_subclass_name: string
-    }
 
     // heritage
     ancestry_card_id: string | null
@@ -45,13 +22,22 @@ export type Character = {
     secondary_subclass_id: string | null
     secondary_class_domain_id_choice: DomainIds | null
 
+    // descriptors (used to so that data isn't fetched too often)
+    derived_descriptors: {
+        ancestry_name: string
+        primary_class_name: string
+        primary_subclass_name: string
+        secondary_class_name: string
+        secondary_subclass_name: string
+    }
+
     // equipment
     active_armor_id: string | null;
     active_weapon_ids: string[];
 
     // the void / other
     transformation_card_id: string | null,
-    additional_domain_cards: Card<"domain">[],
+    additional_domain_card_ids: string[],
     additional_modifier_ids: (keyof typeof MODIFIERS)[]
 
     // set by the player

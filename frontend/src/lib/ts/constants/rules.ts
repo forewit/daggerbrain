@@ -23,6 +23,20 @@ export const BLANK_LEVEL_UP_CHOICE = {
     selected_subclass_upgrade: null,
 } as const satisfies LevelUpChoice
 
+export const BASE_STATS = {
+    proficiency: 1,
+    experience_modifier: 2,
+    max_experiences: 2,
+    max_domain_card_loadout: 5,
+    max_hope: 6,
+    max_armor: 0,
+    max_hp: 0,
+    max_stress: 6,
+    max_burden: 2,
+    evasion: 0,
+    primary_class_mastery_level: 0,
+    secondary_class_mastery_level: 0,
+} as const
 
 export const TIER_1_BASE_OPTIONS = {
     tier_1_domain_cards: {
