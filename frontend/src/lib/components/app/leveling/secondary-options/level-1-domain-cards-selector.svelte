@@ -6,15 +6,13 @@
   import * as Dialog from "$lib/components/ui/dialog/";
   import DomainCard from "$lib/components/app/cards/full-cards/domain-card.svelte";
   import { DOMAINS } from "$lib/ts/constants/constants";
+  import { getCharacterContext } from "$lib/ts/character.svelte";
 
-  let {
-    character = $bindable(),
-  }: {
-    character: Character;
-  } = $props();
+  const context = getCharacterContext();
+  let character = $derived(context.character);
 
   let available_domain_cards: Card<"domain">[] = $derived.by(() => {
-    if (!character.primary_class) return [];
+    if (!character?.primary_class) return [];
     const primary_domain = character.primary_class.primary_domain;
     const secondary_domain = character.primary_class.secondary_domain;
     const domain_cards = Object.values(
@@ -25,7 +23,7 @@
   });
 
   const dialog_description = $derived.by(() => {
-    if (!character.primary_class) return "";
+    if (!character?.primary_class) return "";
     return `Choose a domain card from the <b>${
       DOMAINS[character.primary_class.primary_domain as keyof typeof DOMAINS].name
     }</b> and <b>${
@@ -34,7 +32,7 @@
   });
 </script>
 
-{#if character.primary_class}
+{#if character?.primary_class}
   <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md">
     <p class="py-1 px-2 text-xs italic text-muted-foreground">
       Choose up to 2 level 1 domain cards from the
@@ -85,7 +83,7 @@
                 )}
                 onclick={() => (character.level_up_domain_cards[1].A = card)}
                 disabled={character.level_up_domain_cards[1].A?.title !== card.title &&
-                  character.derived_domain_card_vault.some((c) => c.title === card.title)}
+                  context.domain_card_vault.some((c) => c.title === card.title)}
               >
                 <DomainCard {card} class="w-full h-full" />
               </Dialog.Close>
@@ -142,7 +140,7 @@
                 )}
                 onclick={() => (character.level_up_domain_cards[1].B = card)}
                 disabled={character.level_up_domain_cards[1].B?.title !== card.title &&
-                  character.derived_domain_card_vault.some((c) => c.title === card.title)}
+                  context.domain_card_vault.some((c) => c.title === card.title)}
               >
                 <DomainCard {card} class="w-full h-full" />
               </Dialog.Close>
@@ -161,4 +159,3 @@
     </div>
   </div>
 {/if}
-

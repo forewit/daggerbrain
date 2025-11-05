@@ -1,32 +1,33 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
+  import { getCharacterContext } from "$lib/ts/character.svelte";
 
-  let {
-    class: className = "",
-    marked_hp = $bindable(),
-    max_hp,
-  }: { class?: string; marked_hp: number; max_hp: number } = $props();
+  let { class: className = "" }: { class?: string } = $props();
+
+  const context = getCharacterContext();
+  let character = $derived(context.character);
 </script>
 
+{#if character}
 <div class={cn("flex items-center gap-4 border-2 rounded-md h-12 px-4", className)}>
   <button
     onclick={() => {
-      marked_hp = 0;
+      character.ephemeral_stats.marked_hp = 0;
     }}
     class="text-sm font-medium">HP</button
   >
   <div class="flex flex-wrap gap-2">
-    {#each Array(max_hp) as _, index}
+    {#each Array(context.max_hp) as _, index}
       <button
         aria-label="hp-slot"
-        class="w-6 h-3 rounded-md border border-muted-foreground {index < marked_hp
+        class="w-6 h-3 rounded-md border border-muted-foreground {index < character.ephemeral_stats.marked_hp
           ? 'bg-muted-foreground'
           : 'bg-transparent'} transition-colors"
         onclick={() => {
-          if (index + 1 === marked_hp) {
-            marked_hp = Math.max(0, marked_hp - 1);
+          if (index + 1 === character.ephemeral_stats.marked_hp) {
+            character.ephemeral_stats.marked_hp = Math.max(0, character.ephemeral_stats.marked_hp - 1);
           } else {
-            marked_hp = index + 1;
+            character.ephemeral_stats.marked_hp = index + 1;
           }
         }}
         type="button"
@@ -34,7 +35,7 @@
     {/each}
   </div>
 
-  {#if max_hp === marked_hp}
+  {#if context.max_hp === character.ephemeral_stats.marked_hp}
     <button
       onclick={() => {
         alert("Death Move");
@@ -45,3 +46,4 @@
     </button>
   {/if}
 </div>
+{/if}

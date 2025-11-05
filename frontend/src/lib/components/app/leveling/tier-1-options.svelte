@@ -5,11 +5,15 @@
   import PrimaryClassSelector from "./secondary-options/primary-class-selector.svelte";
   import PrimarySubclassSelector from "./secondary-options/primary-subclass-selector.svelte";
   import Level1DomainCardsSelector from "./secondary-options/level-1-domain-cards-selector.svelte";
+  import { getCharacterContext } from "$lib/ts/character.svelte";
 
-  let { character = $bindable(), class: className = "" }: { character: Character; class?: string } =
-    $props();
+  let { class: className = "" } = $props();
+
+  const context = getCharacterContext();
+  let character = $derived(context.character);
 </script>
 
+{#if character}
 <div class={cn("flex flex-col gap-4", className)}>
   <!-- Select a Class -->
   <Dropdown
@@ -19,7 +23,7 @@
       ? character.primary_class.name + ", " + character.primary_class.source
       : ""}
   >
-    <PrimaryClassSelector bind:character />
+    <PrimaryClassSelector />
   </Dropdown>
 
   <!-- Select a Subclass -->
@@ -29,7 +33,7 @@
     title="Subclass"
     subtitle={character.primary_subclass?.name}
   >
-    <PrimarySubclassSelector bind:character />
+    <PrimarySubclassSelector />
   </Dropdown>
 
   <!-- Domain Cards -->
@@ -45,6 +49,7 @@
       .filter((title) => title !== undefined)
       .join(", ")}
   >
-    <Level1DomainCardsSelector bind:character />
+    <Level1DomainCardsSelector />
   </Dropdown>
 </div>
+{/if}

@@ -1,13 +1,42 @@
 import { getAppContext } from './app.svelte';
 import { ALL_LEVEL_UP_OPTIONS, BLANK_LEVEL_UP_CHOICE, BLANK_LEVEL_UP_OPTION, TIER_1_BASE_OPTIONS, TIER_2_BASE_OPTIONS, TRAIT_OPTIONS } from './constants/rules';
 import { MODIFIERS } from './constants/modifiers';
-import type { Card, Character, Modifier, LevelUpChoice, LevelUpOption, Traits, Weapon } from './types';
+import type { Card, Character, Modifier, LevelUpChoice, LevelUpOption, Traits, Weapon, DamageThresholds } from './types';
 import { getContext, setContext } from 'svelte';
 import type { DOMAINS } from './constants/constants';
 
 function createCharacter(uid: string) {
     const app = getAppContext();
     let character: Character | null = $state(null);
+
+    // derived stats
+    let domain_card_vault: Card<"domain">[] = $state([]);
+    let traits: Traits = $state({
+        agility: 0,
+        strength: 0,
+        finesse: 0,
+        instinct: 0,
+        presence: 0,
+        knowledge: 0,
+    });
+    let proficiency: number = $state(1);
+    let max_experiences: number = $state(2);
+    let max_domain_card_loadout: number = $state(5);
+    let max_hope: number = $state(6);
+    let max_armor: number = $state(0);
+    let max_hp: number = $state(0);
+    let max_stress: number = $state(6);
+    let max_burden: number = $state(2);
+    let evasion: number = $state(0);
+    let damage_thresholds: DamageThresholds = $state({
+        major: 0,
+        severe: 0,
+    });
+    let primary_class_mastery_level: number = $state(0);
+    let secondary_class_mastery_level: number = $state(0);
+    let experience_modifiers: number[] = $state([2, 2]);
+    let spellcast_trait: keyof Traits | null = $state(null);
+
 
     // ! load character from app context
     $effect(() => {
@@ -17,10 +46,10 @@ function createCharacter(uid: string) {
     // ! keep experiences array length in sync with max_experiences
     $effect(() => {
         if (!character) return;
-        if (character.experiences.length < character.derived_stats.max_experiences) {
+        if (character.experiences.length < max_experiences) {
             console.warn("Experience list is too short. Adding a new one.")
             character.experiences.push("");
-        } else if (character.experiences.length > character.derived_stats.max_experiences) {
+        } else if (character.experiences.length > max_experiences) {
             console.warn("Experience list is too long. Removing the last one.")
             character.experiences.pop();
         }
@@ -390,7 +419,7 @@ function createCharacter(uid: string) {
             return;
         }
 
-        let domain_card_vault: Card<"domain">[] =
+        let new_domain_card_vault: Card<"domain">[] =
             Object.values(character.level_up_domain_cards[1])
                 .filter((card) => card !== null && card.level_requirement <= 1) as Card<"domain">[]
 
@@ -431,11 +460,11 @@ function createCharacter(uid: string) {
             }
 
             // add to vault if it's not already in there
-            if (level_up_domain_cards.A !== null && domain_card_vault.some(card => card.title === level_up_domain_cards.A?.title)) {
+            if (level_up_domain_cards.A !== null && new_domain_card_vault.some(card => card.title === level_up_domain_cards.A?.title)) {
                 console.warn(`Domain card ${level_up_domain_cards.A?.title} is already in the vault`);
                 level_up_domain_cards.A = null;
             } else if (level_up_domain_cards.A !== null) {
-                domain_card_vault.push(level_up_domain_cards.A);
+                new_domain_card_vault.push(level_up_domain_cards.A);
             }
             //***** END level up domain cards *****/
 
@@ -476,32 +505,32 @@ function createCharacter(uid: string) {
             }
 
             // add to vault if it's not already in there
-            if (choice_A.selected_domain_card !== null && domain_card_vault.some(card => card.title === choice_A.selected_domain_card?.title)) {
+            if (choice_A.selected_domain_card !== null && new_domain_card_vault.some(card => card.title === choice_A.selected_domain_card?.title)) {
                 console.warn(`Domain card ${choice_A.selected_domain_card?.title} is already in the vault`);
                 choice_A.selected_domain_card = null;
             } else if (choice_A.selected_domain_card !== null) {
-                domain_card_vault.push(choice_A.selected_domain_card);
+                new_domain_card_vault.push(choice_A.selected_domain_card);
             }
 
-            if (choice_B.selected_domain_card !== null && domain_card_vault.some(card => card.title === choice_B.selected_domain_card?.title)) {
+            if (choice_B.selected_domain_card !== null && new_domain_card_vault.some(card => card.title === choice_B.selected_domain_card?.title)) {
                 console.warn(`Domain card ${choice_B.selected_domain_card?.title} is already in the vault`);
                 choice_B.selected_domain_card = null;
             } else if (choice_B.selected_domain_card !== null) {
-                domain_card_vault.push(choice_B.selected_domain_card);
+                new_domain_card_vault.push(choice_B.selected_domain_card);
             }
             //***** END domain card choices *****/
         }
 
         // * derived domain card vault
-        character.derived_domain_card_vault = domain_card_vault;
+        domain_card_vault = new_domain_card_vault;
     })
 
-    // ! remove invalid indices from the domain card loadout (>max or not in the domain card vault)
+    // ! remove invalid indices from the ephemeral domain card loadout (>max or not in the domain card vault)
     $effect(() => {
         if (!character) return;
-        const max = character.derived_stats.max_domain_card_loadout;
+        const max = max_domain_card_loadout;
         const unique_indices = [...new Set(character.ephemeral_stats.domain_card_loadout)];
-        const valid_indices = unique_indices.filter((i) => i >= 0 && i < max && i < (character?.derived_domain_card_vault.length || 0));
+        const valid_indices = unique_indices.filter((i) => i >= 0 && i < max && i < (domain_card_vault.length || 0));
 
         if (valid_indices.length !== unique_indices.length || valid_indices.length !== character.ephemeral_stats.domain_card_loadout.length) {
             console.warn(`Removing invalid indices from the domain card loadout`);
@@ -571,7 +600,7 @@ function createCharacter(uid: string) {
             }
         }
 
-        character.derived_stats.experience_modifiers = modifiers;
+        experience_modifiers = modifiers;
     })
 
     // * derived modifiers -- used to calculate most stats --
@@ -619,7 +648,7 @@ function createCharacter(uid: string) {
 
         // primary subclass cards (gate by mastery level)
         if (character.primary_subclass) {
-            const primaryMastery = character.derived_stats.primary_class_mastery_level
+            const primaryMastery = primary_class_mastery_level
             push_modifier_ids(character.primary_subclass.foundation_card.features.flatMap(f => f.modifier_ids))
             if (primaryMastery >= 2) {
                 push_modifier_ids(character.primary_subclass.specialization_card.features.flatMap(f => f.modifier_ids))
@@ -637,7 +666,7 @@ function createCharacter(uid: string) {
 
         // secondary subclass cards (gate by mastery level)
         if (character.secondary_subclass) {
-            const secondaryMastery = character.derived_stats.secondary_class_mastery_level
+            const secondaryMastery = secondary_class_mastery_level
             push_modifier_ids(character.secondary_subclass.foundation_card.features.flatMap(f => f.modifier_ids))
             if (secondaryMastery >= 2) {
                 push_modifier_ids(character.secondary_subclass.specialization_card.features.flatMap(f => f.modifier_ids))
@@ -662,7 +691,7 @@ function createCharacter(uid: string) {
         }
 
         // modifiers from the domain card loadout
-        const vault = character.derived_domain_card_vault;
+        const vault = domain_card_vault;
         const loadout = character.ephemeral_stats.domain_card_loadout;
         loadout.forEach(index => {
             const card = vault[index];
@@ -732,7 +761,7 @@ function createCharacter(uid: string) {
                     value = value + modifier.value;
                 }
             } else if (modifier.type === 'derived_from_trait' && target !== 'trait') {
-                const src = Number(character.derived_stats.traits[modifier.trait]);
+                const src = Number(traits[modifier.trait]);
                 const calculated = Math.ceil(src * modifier.multiplier);
                 if (behavior === 'base' || behavior === 'override') {
                     value = calculated;
@@ -770,7 +799,7 @@ function createCharacter(uid: string) {
         }
 
         // start from base + marked trait bonuses
-        let traits = {
+        let new_traits = {
             agility:
                 (base_traits.agility) +
                 (tier_2_marked_traits.agility ? 1 : 0) +
@@ -808,7 +837,7 @@ function createCharacter(uid: string) {
             if (effect.target === 'trait') {
                 const targetTrait = effect.trait
                 if (effect.type === 'flat') {
-                    traits[targetTrait] = traits[targetTrait] + effect.value
+                    new_traits[targetTrait] = new_traits[targetTrait] + effect.value
                 }
                 // ! can't derive a trait from a trait
             }
@@ -819,78 +848,77 @@ function createCharacter(uid: string) {
             if (effect.target === 'trait') {
                 const targetTrait = effect.trait
                 if (effect.type === 'flat') {
-                    traits[targetTrait] = effect.value
+                    new_traits[targetTrait] = effect.value
                 }
                 // ! can't derive a trait from a trait
             }
         }
 
-        character.derived_stats.traits = traits
+        traits = new_traits;
     })
 
     // * derived proficiency
     $effect(() => {
         if (!character) return
-        let prof: number = character.base_stats.proficiency
+        let new_proficiency: number = character.base_stats.proficiency
 
-        prof = apply_modifiers(base_modifiers, 'proficiency', prof, 'base')
+        new_proficiency = apply_modifiers(base_modifiers, 'proficiency', new_proficiency, 'base')
 
         // tier-based increases
-        if (character.level >= 2) prof++
-        if (character.level >= 5) prof++
-        if (character.level >= 8) prof++
+        if (character.level >= 2) new_proficiency++
+        if (character.level >= 5) new_proficiency++
+        if (character.level >= 8) new_proficiency++
 
-        prof = apply_modifiers(bonus_modifiers, 'proficiency', prof, 'bonus')
-        prof = apply_modifiers(override_modifiers, 'proficiency', prof, 'override')
+        new_proficiency = apply_modifiers(bonus_modifiers, 'proficiency', new_proficiency, 'bonus')
+        new_proficiency = apply_modifiers(override_modifiers, 'proficiency', new_proficiency, 'override')
 
-        character.derived_stats.proficiency = prof;
-
+        proficiency = new_proficiency;
     })
 
     // * derived evasion
     $effect(() => {
         if (!character) return
-        let evasion: number = character.base_stats.evasion;
+        let new_evasion: number = character.base_stats.evasion;
 
         // initialize with primary class's starting max hp
         if (character.primary_class) {
-            evasion = character.primary_class.starting_evasion
+            new_evasion = character.primary_class.starting_evasion
         }
 
-        evasion = apply_modifiers(base_modifiers, 'evasion', evasion, 'base')
-        evasion = apply_modifiers(bonus_modifiers, 'evasion', evasion, 'bonus')
-        evasion = apply_modifiers(override_modifiers, 'evasion', evasion, 'override')
+        new_evasion = apply_modifiers(base_modifiers, 'evasion', new_evasion, 'base')
+        new_evasion = apply_modifiers(bonus_modifiers, 'evasion', new_evasion, 'bonus')
+        new_evasion = apply_modifiers(override_modifiers, 'evasion', new_evasion, 'override')
 
-        character.derived_stats.evasion = evasion
+        evasion = new_evasion;
     })
 
     // * derived max_hp
     $effect(() => {
         if (!character) return
-        let max_hp: number = character.base_stats.max_hp;
+        let new_max_hp: number = character.base_stats.max_hp;
 
         // initialize with primary class's starting max hp
         if (character.primary_class) {
-            max_hp = character.primary_class.starting_max_hp
+            new_max_hp = character.primary_class.starting_max_hp
         }
 
-        max_hp = apply_modifiers(base_modifiers, 'max_hp', max_hp, 'base')
-        max_hp = apply_modifiers(bonus_modifiers, 'max_hp', max_hp, 'bonus')
-        max_hp = apply_modifiers(override_modifiers, 'max_hp', max_hp, 'override')
+        new_max_hp = apply_modifiers(base_modifiers, 'max_hp', new_max_hp, 'base')
+        new_max_hp = apply_modifiers(bonus_modifiers, 'max_hp', new_max_hp, 'bonus')
+        new_max_hp = apply_modifiers(override_modifiers, 'max_hp', new_max_hp, 'override')
 
-        character.derived_stats.max_hp = max_hp
+        max_hp = new_max_hp;
     })
 
     // * derived max_stress
     $effect(() => {
         if (!character) return
-        let max_stress: number = character.base_stats.max_stress;
+        let new_max_stress: number = character.base_stats.max_stress;
 
-        max_stress = apply_modifiers(base_modifiers, 'max_stress', max_stress, 'base')
-        max_stress = apply_modifiers(bonus_modifiers, 'max_stress', max_stress, 'bonus')
-        max_stress = apply_modifiers(override_modifiers, 'max_stress', max_stress, 'override')
+        new_max_stress = apply_modifiers(base_modifiers, 'max_stress', new_max_stress, 'base')
+        new_max_stress = apply_modifiers(bonus_modifiers, 'max_stress', new_max_stress, 'bonus')
+        new_max_stress = apply_modifiers(override_modifiers, 'max_stress', new_max_stress, 'override')
 
-        character.derived_stats.max_stress = max_stress
+        max_stress = new_max_stress;
     })
 
     // * derived primary_class_mastery_level and secondary_class_mastery_level
@@ -922,7 +950,7 @@ function createCharacter(uid: string) {
 
         // clamp 0..3 and assign with proper literal type
         const masteryClamped = Math.max(0, Math.min(3, Math.trunc(masteryNum))) as 0 | 1 | 2 | 3
-        character.derived_stats.primary_class_mastery_level = masteryClamped
+        primary_class_mastery_level = masteryClamped
     })
 
     // * derived secondary_class_mastery_level
@@ -953,44 +981,43 @@ function createCharacter(uid: string) {
 
         // clamp 0..3 and assign with proper literal type
         const masteryClamped = Math.max(0, Math.min(2, Math.trunc(masteryNum))) as 0 | 1 | 2 | 3
-        character.derived_stats.secondary_class_mastery_level = masteryClamped
+        secondary_class_mastery_level = masteryClamped
     })
 
     // * derived max_hope
     $effect(() => {
         if (!character) return;
-        let max_hope: number = character.base_stats.max_hope
+        let new_max_hope: number = character.base_stats.max_hope
 
-        max_hope = apply_modifiers(base_modifiers, 'max_hope', max_hope, 'base')
-        max_hope = apply_modifiers(bonus_modifiers, 'max_hope', max_hope, 'bonus')
-        max_hope = apply_modifiers(override_modifiers, 'max_hope', max_hope, 'override')
+        new_max_hope = apply_modifiers(base_modifiers, 'max_hope', new_max_hope, 'base')
+        new_max_hope = apply_modifiers(bonus_modifiers, 'max_hope', new_max_hope, 'bonus')
+        new_max_hope = apply_modifiers(override_modifiers, 'max_hope', new_max_hope, 'override')
 
-        character.derived_stats.max_hope = max_hope
+        max_hope = new_max_hope;
     })
 
     // * derived max_armor
     $effect(() => {
         if (!character) return;
-        let max_armor: number = character.base_stats.max_armor
+        let new_max_armor: number = character.base_stats.max_armor
 
-        max_armor = apply_modifiers(base_modifiers, 'max_armor', max_armor, 'base')
-        max_armor = apply_modifiers(bonus_modifiers, 'max_armor', max_armor, 'bonus')
-        max_armor = apply_modifiers(override_modifiers, 'max_armor', max_armor, 'override')
+        new_max_armor = apply_modifiers(base_modifiers, 'max_armor', new_max_armor, 'base')
+        new_max_armor = apply_modifiers(bonus_modifiers, 'max_armor', new_max_armor, 'bonus')
+        new_max_armor = apply_modifiers(override_modifiers, 'max_armor', new_max_armor, 'override')
 
-        max_armor = Math.min(max_armor, 12)
-        character.derived_stats.max_armor = max_armor
+        max_armor = Math.min(new_max_armor, 12)
     })
 
     // * derived max_burden
     $effect(() => {
         if (!character) return;
-        let max_burden: number = character.base_stats.max_burden
+        let new_max_burden: number = character.base_stats.max_burden
 
-        max_burden = apply_modifiers(base_modifiers, 'max_burden', max_burden, 'base')
-        max_burden = apply_modifiers(bonus_modifiers, 'max_burden', max_burden, 'bonus')
-        max_burden = apply_modifiers(override_modifiers, 'max_burden', max_burden, 'override')
+        new_max_burden = apply_modifiers(base_modifiers, 'max_burden', new_max_burden, 'base')
+        new_max_burden = apply_modifiers(bonus_modifiers, 'max_burden', new_max_burden, 'bonus')
+        new_max_burden = apply_modifiers(override_modifiers, 'max_burden', new_max_burden, 'override')
 
-        character.derived_stats.max_burden = max_burden
+        max_burden = new_max_burden;
     })
 
     // * derived damage_thresholds
@@ -1023,37 +1050,37 @@ function createCharacter(uid: string) {
         thresholds.major = apply_modifiers(override_modifiers, 'major_damage_threshold', thresholds.major, 'override')
         thresholds.severe = apply_modifiers(override_modifiers, 'severe_damage_threshold', thresholds.severe, 'override')
 
-        character.derived_stats.damage_thresholds = thresholds
+        damage_thresholds = thresholds
     })
 
     // * derived max_experiences
     $effect(() => {
         if (!character) return;
-        let max_experiences: number = character.base_stats.max_experiences;
+        let new_max_experiences: number = character.base_stats.max_experiences;
 
-        max_experiences = apply_modifiers(base_modifiers, 'max_experiences', max_experiences, 'base')
+        new_max_experiences = apply_modifiers(base_modifiers, 'max_experiences', new_max_experiences, 'base')
 
         // tier-based increases
-        if (character.level >= 2) max_experiences++
-        if (character.level >= 5) max_experiences++
-        if (character.level >= 8) max_experiences++
+        if (character.level >= 2) new_max_experiences++
+        if (character.level >= 5) new_max_experiences++
+        if (character.level >= 8) new_max_experiences++
 
-        max_experiences = apply_modifiers(bonus_modifiers, 'max_experiences', max_experiences, 'bonus')
-        max_experiences = apply_modifiers(override_modifiers, 'max_experiences', max_experiences, 'override')
+        new_max_experiences = apply_modifiers(bonus_modifiers, 'max_experiences', new_max_experiences, 'bonus')
+        new_max_experiences = apply_modifiers(override_modifiers, 'max_experiences', new_max_experiences, 'override')
 
-        character.derived_stats.max_experiences = max_experiences
+        max_experiences = new_max_experiences;
     })
 
     // * derived max_domain_card_loadout
     $effect(() => {
         if (!character) return;
-        let max_domain_card_loadout: number = character.base_stats.max_domain_card_loadout
+        let new_max_domain_card_loadout: number = character.base_stats.max_domain_card_loadout
 
-        max_domain_card_loadout = apply_modifiers(base_modifiers, 'max_domain_card_loadout', max_domain_card_loadout, 'base')
-        max_domain_card_loadout = apply_modifiers(bonus_modifiers, 'max_domain_card_loadout', max_domain_card_loadout, 'bonus')
-        max_domain_card_loadout = apply_modifiers(override_modifiers, 'max_domain_card_loadout', max_domain_card_loadout, 'override')
+        new_max_domain_card_loadout = apply_modifiers(base_modifiers, 'max_domain_card_loadout', new_max_domain_card_loadout, 'base')
+        new_max_domain_card_loadout = apply_modifiers(bonus_modifiers, 'max_domain_card_loadout', new_max_domain_card_loadout, 'bonus')
+        new_max_domain_card_loadout = apply_modifiers(override_modifiers, 'max_domain_card_loadout', new_max_domain_card_loadout, 'override')
 
-        character.derived_stats.max_domain_card_loadout = max_domain_card_loadout
+        max_domain_card_loadout = new_max_domain_card_loadout;
     })
 
     // --- cleanup ---
@@ -1065,6 +1092,22 @@ function createCharacter(uid: string) {
         get tier_3_marked_traits() { return tier_3_marked_traits },
         get tier_4_marked_traits() { return tier_4_marked_traits },
         get options_used() { return options_used },
+        get domain_card_vault() { return domain_card_vault },
+        get traits() { return traits },
+        get proficiency() { return proficiency },
+        get experience_modifiers() { return experience_modifiers },
+        get max_experiences() { return max_experiences },
+        get max_domain_card_loadout() { return max_domain_card_loadout },
+        get max_hope() { return max_hope },
+        get max_armor() { return max_armor },
+        get max_hp() { return max_hp },
+        get max_stress() { return max_stress },
+        get max_burden() { return max_burden },
+        get evasion() { return evasion },
+        get damage_thresholds() { return damage_thresholds },
+        get primary_class_mastery_level() { return primary_class_mastery_level },
+        get secondary_class_mastery_level() { return secondary_class_mastery_level },
+        get spellcast_trait() { return spellcast_trait },
 
         // read/write
         get character() { return character },

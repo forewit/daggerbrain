@@ -1,11 +1,13 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
-  import type { Character } from "$lib/ts/types";
+  import { getCharacterContext } from "$lib/ts/character.svelte";
 
   let {
     class: className = "",
-    thresholds,
-  }: { class?: string; thresholds: Character["derived_stats"]["damage_thresholds"] } = $props();
+  }: { class?: string; } = $props();
+
+  const context = getCharacterContext();
+  let thresholds = $derived(context.damage_thresholds);
 </script>
 
 <div class={cn("w-[360px] relative text-muted-foreground", className)}>

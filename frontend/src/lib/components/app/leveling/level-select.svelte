@@ -3,8 +3,7 @@
   import * as Select from "$lib/components/ui/select";
   import { buttonVariants } from "$lib/components/ui/button";
   import { cn } from "$lib/utils";
-  import type { LevelUpOption, Character } from "$lib/ts/types";
-  import { BLANK_LEVEL_UP_OPTION } from "$lib/ts/constants/rules";
+  import type { Character } from "$lib/ts/types";
 
   let {
     level = $bindable(),

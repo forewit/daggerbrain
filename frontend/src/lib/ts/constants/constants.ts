@@ -293,40 +293,40 @@ export const JUST_JAMES: Character = {
         10: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
     },
 
-    // will be overwritten and calculated
-    derived_domain_card_vault: [
-        DOMAINS.blade.cards.whirlwind,
-        DOMAINS.blade.cards.not_good_enough,
-        DOMAINS.blade.cards.a_soldiers_bond,
-    ],
-    derived_stats: {
-        // from base stats
-        traits: {
-            agility: 3,
-            strength: 2,
-            finesse: 1,
-            instinct: 0,
-            presence: 0,
-            knowledge: -1,
-        },
-        proficiency: 2,
-        experience_modifiers: [2, 2, 2],
-        max_experiences: 3,
-        max_domain_card_loadout: 5,
-        max_hope: 6,
-        max_armor: 5,
-        max_hp: 5,
-        max_stress: 7,
-        max_burden: 2,
-        evasion: 15,
-        damage_thresholds: {
-            major: 12,
-            severe: 25,
-        },
-        primary_class_mastery_level: 1,
-        secondary_class_mastery_level: 0,
-        spellcast_trait: "agility",
-    },
+    // // will be overwritten and calculated
+    // derived_domain_card_vault: [
+    //     DOMAINS.blade.cards.whirlwind,
+    //     DOMAINS.blade.cards.not_good_enough,
+    //     DOMAINS.blade.cards.a_soldiers_bond,
+    // ],
+    // derived_stats: {
+    //     // from base stats
+    //     traits: {
+    //         agility: 3,
+    //         strength: 2,
+    //         finesse: 1,
+    //         instinct: 0,
+    //         presence: 0,
+    //         knowledge: -1,
+    //     },
+    //     proficiency: 2,
+    //     experience_modifiers: [2, 2, 2],
+    //     max_experiences: 3,
+    //     max_domain_card_loadout: 5,
+    //     max_hope: 6,
+    //     max_armor: 5,
+    //     max_hp: 5,
+    //     max_stress: 7,
+    //     max_burden: 2,
+    //     evasion: 15,
+    //     damage_thresholds: {
+    //         major: 12,
+    //         severe: 25,
+    //     },
+    //     primary_class_mastery_level: 1,
+    //     secondary_class_mastery_level: 0,
+    //     spellcast_trait: "agility",
+    // },
 }
 
 export const NEW_CHARACTER: Character = {
@@ -414,35 +414,5 @@ export const NEW_CHARACTER: Character = {
         9: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
         10: { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE },
     },
-
-    // will be overwritten and calculated
-    derived_domain_card_vault: [],
-    derived_stats: {
-        // from base stats
-        traits: {
-            agility: 0,
-            strength: 0,
-            finesse: 0,
-            instinct: 0,
-            presence: 0,
-            knowledge: 0,
-        },
-        proficiency: 1,
-        experience_modifiers: [2, 2],
-        max_experiences: 2,
-        max_domain_card_loadout: 5,
-        max_hope: 6,
-        max_armor: 0,
-        max_hp: 0,
-        max_stress: 0,
-        max_burden: 2,
-        evasion: 0,
-        damage_thresholds: {
-            major: 0,
-            severe: 0,
-        },
-        primary_class_mastery_level: 0,
-        secondary_class_mastery_level: 0,
-        spellcast_trait: null,
-    },
+    
 }

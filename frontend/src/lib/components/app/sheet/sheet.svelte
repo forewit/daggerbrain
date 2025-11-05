@@ -3,7 +3,7 @@
   import Traits from "./traits.svelte";
   import type { Character, Card } from "$lib/ts/types";
   import Banner from "../cards/class-banner.svelte";
-  import Thresholds from "./thresholds.svelte";
+  import DamageThresholds from "./damage-thresholds.svelte";
   import Armor from "./armor.svelte";
   import Evasion from "./evasion.svelte";
   import Hp from "./hp.svelte";
@@ -19,21 +19,24 @@
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import CardCarousel from "../cards/card-carousel.svelte";
   import Loadout from "./loadout.svelte";
+  import { getCharacterContext } from "$lib/ts/character.svelte";
 
-  let { class: className = "", character = $bindable() }: { class?: string; character: Character } =
-    $props();
+  let { class: className = "" }: { class?: string } = $props();
+
+  const context = getCharacterContext();
+  let character = $derived(context.character);
 
   let character_cards_expanded = $state(true);
   let character_cards: Card<any>[] = $derived(
     [
-      character?.derived_stats.primary_class_mastery_level &&
-        character?.derived_stats.primary_class_mastery_level >= 1 &&
+      context.primary_class_mastery_level &&
+        context.primary_class_mastery_level >= 1 &&
         character?.primary_subclass?.foundation_card,
-      character?.derived_stats.primary_class_mastery_level &&
-        character?.derived_stats.primary_class_mastery_level >= 2 &&
+      context.primary_class_mastery_level &&
+        context.primary_class_mastery_level >= 2 &&
         character?.primary_subclass?.specialization_card,
-      character?.derived_stats.primary_class_mastery_level &&
-        character?.derived_stats.primary_class_mastery_level >= 3 &&
+      context.primary_class_mastery_level &&
+        context.primary_class_mastery_level >= 3 &&
         character?.primary_subclass?.mastery_card,
       character?.ancestry_card,
       character?.community_card,
@@ -47,10 +50,10 @@
     [
       // should get the matching cards from the vault based on the indicies in domain card loadout
       ...(
-        character?.derived_domain_card_vault.filter((_, i) =>
+        context.domain_card_vault.filter((_, i) =>
           character?.ephemeral_stats.domain_card_loadout.includes(i)
         ) || []
-      ).slice(0, character?.derived_stats.max_domain_card_loadout),
+      ).slice(0, context.max_domain_card_loadout),
     ].filter(Boolean) as Card<any>[]
   );
 
@@ -85,22 +88,19 @@
         <div class="grow truncate relative">
           <!-- level class subclass -->
           <div class="flex overflow-hidden items-center mt-4 mb-2.5 truncate max-w-[400px] h-9">
-            <Dialog.Root>
-              <Dialog.Trigger
-                class="border-b border-accent/10 min-w-[72px] relative grid place-items-center text-xs font-medium pl-4 pr-3 rounded-l-full bg-accent/10 hover:bg-accent/20 h-full text-accent overflow-hidden group"
+            <a
+              href={`/characters/${character.uid}/class/`}
+              class="border-b border-accent/10 min-w-[72px] relative grid place-items-center text-xs font-medium pl-4 pr-3 rounded-l-full bg-accent/10 hover:bg-accent/20 h-full text-accent overflow-hidden group"
+            >
+              <span class="transition-transform duration-200 group-hover:-translate-y-[150%]">
+                Level {character.level}
+              </span>
+              <span
+                class="absolute inset-0 grid place-items-center text-xs font-medium transition-transform duration-200 translate-y-full group-hover:translate-y-0"
               >
-                <span class="transition-transform duration-200 group-hover:-translate-y-[150%]">
-                  Level {character.level}
-                </span>
-                <span
-                  class="absolute inset-0 grid place-items-center text-xs font-medium transition-transform duration-200 translate-y-full group-hover:translate-y-0"
-                >
-                  Level up?
-                </span>
-              </Dialog.Trigger>
-              <Dialog.Content>Test</Dialog.Content>
-            </Dialog.Root>
-
+                Level up?
+              </span>
+            </a>
             <Button
               href={`/characters/${character.uid}/class/`}
               class={cn(
@@ -138,7 +138,9 @@
                 {character.ancestry_card?.title || "No ancestry"}&ensp;•&ensp;{character
                   .community_card?.title || "No community"}
               </p>
-              <p class="text-xs text-muted-foreground truncate">Proficiency: {character.derived_stats.proficiency}</p>
+              <p class="text-xs text-muted-foreground truncate">
+                Proficiency: {context.proficiency}
+              </p>
             </div>
           </div>
         </div>
@@ -150,34 +152,27 @@
       </div>
 
       <!-- traits -->
-      <Traits traits={character.derived_stats.traits} class="mx-2 " />
+      <Traits traits={context.traits} class="mx-2 " />
 
       <!-- evasion and armor -->
       <div
         class="grid grid-cols-1 sm:grid-cols-[auto_auto] place-items-center mx-auto gap-x-6 gap-y-2"
       >
         <div class="flex gap-2">
-          <Evasion evasion={character.derived_stats.evasion} />
-          <Armor
-            bind:marked_armor={character.ephemeral_stats.marked_armor}
-            max_armor={character.derived_stats.max_armor}
-          />
+          <Evasion />
+          <Armor />
         </div>
-        <Thresholds thresholds={character.derived_stats.damage_thresholds} class="my-2" />
+        <DamageThresholds class="my-2" />
       </div>
 
       <!-- hp and stress -->
       <div class="mx-2 flex flex-col gap-2">
-        <Hp
-          bind:marked_hp={character.ephemeral_stats.marked_hp}
-          max_hp={character.derived_stats.max_hp}
-          class="justify-center sm:justify-start"
-        />
-        <Stress bind:character class="justify-center sm:justify-start" />
+        <Hp class="justify-center sm:justify-start" />
+        <Stress class="justify-center sm:justify-start" />
       </div>
 
       <!-- hope -->
-      <Hope bind:character />
+      <Hope />
 
       <!-- class features -->
       {#if character.primary_class}
@@ -212,6 +207,6 @@
     </div>
 
     <!-- domain card loadout -->
-    <Loadout bind:character />
+    <Loadout />
   </div>
 {/if}

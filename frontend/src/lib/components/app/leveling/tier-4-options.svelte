@@ -211,14 +211,12 @@
           {:else if choices[key].option_id === "tier_3_subclass_upgrade" || choices[key].option_id === "tier_4_subclass_upgrade"}
             <SecondarySubclassSelector
               bind:selected_upgrade={choices[key].selected_subclass_upgrade}
-              {character}
               option_id={choices[key].option_id}
               options_used={context.options_used}
               {width}
             />
           {:else if choices[key].option_id === "tier_3_multiclass" || choices[key].option_id === "tier_4_multiclass"}
             <SecondaryClassSelector
-              bind:character
               after_remove_secondary_class={() => {
                 if (after_remove_secondary_class) {
                   after_remove_secondary_class();

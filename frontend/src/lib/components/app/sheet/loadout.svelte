@@ -13,18 +13,21 @@
   import ChevronDown from "@lucide/svelte/icons/chevron-down";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import ArrowLeftRight from "@lucide/svelte/icons/arrow-left-right";
+  import { getCharacterContext } from "$lib/ts/character.svelte";
 
-  let { character = $bindable(), class: className = "" }: { character: Character; class?: string } =
-    $props();
+  let { class: className = "" }: { class?: string } = $props();
+
+  const context = getCharacterContext();
+  let character = $derived(context.character);
 
   let loadout: Card<"domain">[] = $derived(
     character?.ephemeral_stats.domain_card_loadout.map(
-      (i) => character.derived_domain_card_vault[i]
+      (i) => context.domain_card_vault[i]
     ) || []
   );
 
   let vault: Card<"domain">[] = $derived(
-    (character?.derived_domain_card_vault || []).filter(
+    (context.domain_card_vault || []).filter(
       (card) => !loadout.some((loadoutCard) => loadoutCard.title === card.title)
     )
   );
@@ -38,7 +41,7 @@
   let expanded = $state(true);
 
   let remainingStress = $derived(
-    character ? character.derived_stats.max_stress - character.ephemeral_stats.marked_stress : 0
+    character ? context.max_stress - character.ephemeral_stats.marked_stress : 0
   );
 </script>
 
@@ -59,7 +62,7 @@
       <div
         class="flex items-center text-sm h-6 px-3 rounded-full font-medium text-muted-foreground border bg-muted"
       >
-        {loadout.length} / {character?.derived_stats.max_domain_card_loadout}
+        {loadout.length} / {context.max_domain_card_loadout}
       </div>
       <Dialog.Root>
         <Dialog.Trigger class={cn(buttonVariants({ size: "sm" }))}>
@@ -91,9 +94,9 @@
                       if (!character) return;
                       if (
                         character.ephemeral_stats.domain_card_loadout.length <
-                        character.derived_stats.max_domain_card_loadout
+                        context.max_domain_card_loadout
                       ) {
-                        const vaultIndex = character.derived_domain_card_vault.findIndex(
+                        const vaultIndex = context.domain_card_vault.findIndex(
                           (card) => card.title === vault[selectedVaultIndex].title
                         );
                         character.ephemeral_stats.domain_card_loadout.push(vaultIndex);
@@ -101,12 +104,12 @@
                     }}
                     class={cn(
                       "absolute -bottom-[2px] left-1/2 -translate-x-1/2 rounded-full",
-                      loadout.length >= character.derived_stats.max_domain_card_loadout &&
+                      loadout.length >= context.max_domain_card_loadout &&
                         "border-destructive border-3 bg-muted hover:bg-muted cursor-default"
                     )}
                     size="sm"
                   >
-                    {#if loadout.length >= character.derived_stats.max_domain_card_loadout}
+                    {#if loadout.length >= context.max_domain_card_loadout}
                       Loadout is full
                     {:else}
                       <ArrowUp class="size-4" />
@@ -121,11 +124,11 @@
                       if (!character) return;
                       if (
                         character.ephemeral_stats.domain_card_loadout.length <
-                          character.derived_stats.max_domain_card_loadout &&
+                          context.max_domain_card_loadout &&
                         selectedVaultCard?.recall_cost <= remainingStress
                       ) {
                         character.ephemeral_stats.marked_stress += selectedVaultCard.recall_cost;
-                        const vaultIndex = character.derived_domain_card_vault.findIndex(
+                        const vaultIndex = context.domain_card_vault.findIndex(
                           (card) => card.title === vault[selectedVaultIndex].title
                         );
                         character.ephemeral_stats.domain_card_loadout.push(vaultIndex);
@@ -134,11 +137,11 @@
                     class={cn(
                       "absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full",
                       (selectedVaultCard?.recall_cost > remainingStress ||
-                        loadout.length >= character.derived_stats.max_domain_card_loadout) &&
+                        loadout.length >= context.max_domain_card_loadout) &&
                         "border-destructive border-3 bg-muted hover:bg-muted cursor-default"
                     )}
                   >
-                    {#if loadout.length >= character.derived_stats.max_domain_card_loadout}
+                    {#if loadout.length >= context.max_domain_card_loadout}
                       Loadout is full
                     {:else if selectedVaultCard?.recall_cost > remainingStress}
                       Not enough stress slots
@@ -155,7 +158,6 @@
             <div class="px-6 flex flex-col justify-center items-center gap-3">
               {#if !restMode}
                 <Stress
-                  {character}
                   class={cn(
                     "bg-muted h-10 rounded-full"
                     // character.ephemeral_stats.marked_stress >= character.derived_stats.max_stress &&

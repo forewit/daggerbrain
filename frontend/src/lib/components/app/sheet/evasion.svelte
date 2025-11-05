@@ -1,9 +1,11 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
-  import type { Character } from "$lib/ts/types";
+  import { getCharacterContext } from "$lib/ts/character.svelte";
+  
+  let { class: className = "" }: { class?: string } = $props();
 
-  let { class: className = "", evasion = $bindable() }: { class?: string; evasion: number } =
-    $props();
+  const context = getCharacterContext();
+  let evasion = $derived(context.evasion);
 </script>
 
 <div class={cn("w-[90px] text-center border-2 rounded-md p-2", className)}>

@@ -4,10 +4,8 @@
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import ChevronDown from "@lucide/svelte/icons/chevron-down";
 
-  let {
-    class: className = "",
-    character_class,
-  }: { class?: string; character_class: Class } = $props();
+  let { class: className = "", character_class }: { class?: string; character_class: Class } =
+    $props();
 
   let expanded = $state(true);
 </script>
@@ -30,15 +28,15 @@
     {character_class.name} Features
   </button>
   {#if expanded}
-  <div class="flex flex-col gap-4">
-  {#each character_class.class_features as feature}
-    <div class="text-sm relative">
-      <p class="font-medium text-[1rem] pb-2">{feature.title}</p>
-      <div class="pl-2 leading-relaxed flex flex-col gap-2">
-        {@html feature.description_html}
-      </div>
+    <div class="flex flex-col gap-4">
+      {#each character_class.class_features as feature}
+        <div class="text-sm relative">
+          <p class="font-medium text-[1rem] pb-2">{feature.title}</p>
+          <div class="pl-2 leading-relaxed flex flex-col gap-2">
+            {@html feature.description_html}
+          </div>
+        </div>
+      {/each}
     </div>
-  {/each}
-</div>
   {/if}
 </div>

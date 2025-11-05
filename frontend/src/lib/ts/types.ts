@@ -81,31 +81,7 @@ export type Character = {
         8: { A: LevelUpChoice, B: LevelUpChoice },
         9: { A: LevelUpChoice, B: LevelUpChoice },
         10: { A: LevelUpChoice, B: LevelUpChoice },
-    }
-
-    // will be overwritten and calculated
-    derived_domain_card_vault: Card<"domain">[],
-    derived_stats: {
-        // from base stats
-        traits: Traits
-        proficiency: number
-        max_experiences: number
-        max_domain_card_loadout: number,
-        max_hope: number,
-        max_armor: number,
-        max_hp: number,
-        max_stress: number,
-        max_burden: number,
-        evasion: number
-        damage_thresholds: {
-            major: number,
-            severe: number
-        }
-        primary_class_mastery_level: 0 | 1 | 2 | 3 // 0 = none, 1 = foundation, 2 = specialization, 3 = mastery
-        secondary_class_mastery_level: 0 | 1 | 2 | 3// 0 = none, 1 = foundation, 2 = specialization, 3 = mastery
-        experience_modifiers: number[] // index matches the experiences array, value is the modifier
-        spellcast_trait: keyof Traits | null
-    }
+    }    
 }
 
 export type Traits = {
@@ -212,15 +188,16 @@ export type LevelUpOption = {
 
 export type Source = "Core" | "The Void 1.0" | "The Void 1.5"
 
+export type DamageThresholds = {
+    major: number,
+    severe: number
+}
 export type Armor = {
     level_requirement: number,
     title: string,
     description_html: string,
     max_armor: number,
-    damage_thresholds: {
-        major: number,
-        severe: number
-    }
+    damage_thresholds: DamageThresholds
     features: Feature[],
 }
 

@@ -1,20 +1,22 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
-  import type { Character } from "$lib/ts/types";
+  import { getCharacterContext } from "$lib/ts/character.svelte";
 
   let {
     class: className = "",
-    character = $bindable(),
     displayOnly = false,
     slotClasses = "",
   }: {
     class?: string;
-    character: Character;
     displayOnly?: boolean;
     slotClasses?: string;
   } = $props();
+
+  const context = getCharacterContext();
+  let character = $derived(context.character);
 </script>
 
+{#if character}
 <div
   class={cn(
     "flex items-center gap-4 border-2 rounded-md h-12 px-4",
@@ -29,7 +31,7 @@
     class="text-sm font-medium">STRESS</button
   >
   <div class="flex flex-wrap gap-2">
-    {#each Array(character.derived_stats.max_stress) as _, index}
+    {#each Array(context.max_stress) as _, index}
       <button
         aria-label="character.stress-slot"
         class={cn(
@@ -54,15 +56,16 @@
     {/each}
   </div>
 
-  {#if character.derived_stats.max_stress === character.ephemeral_stats.marked_stress && !displayOnly}
+  {#if context.max_stress === character.ephemeral_stats.marked_stress && !displayOnly}
     <button
       onclick={() => {
-        if (character.ephemeral_stats.marked_hp < character.derived_stats.max_hp)
+        if (character.ephemeral_stats.marked_hp < context.max_hp)
           character.ephemeral_stats.marked_hp++;
       }}
       class="p-2 text-xs text-nowrap bg-border rounded-md hover:bg-muted-foreground/20 grid place-items-center leading-none"
     >
       Mark HP
-    </button>
-  {/if}
-</div>
+      </button>
+    {/if}
+  </div>
+{/if}
