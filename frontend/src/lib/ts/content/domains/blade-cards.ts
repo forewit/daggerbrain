@@ -2,6 +2,7 @@ import type { Card } from "$lib/ts/character/types";
 
 export const BLADE_DOMAIN_CARDS = {
     get_back_up: {
+        id: "get_back_up",
         card_type: "domain",
         domain_id: "blade",
         artist_name: "Jenny Tan",
@@ -22,6 +23,7 @@ export const BLADE_DOMAIN_CARDS = {
         ],
     },
     whirlwind: {
+        id: "whirlwind",
         card_type: "domain",
         domain_id: "blade",
         artist_name: "Mike Pape",
@@ -42,6 +44,7 @@ export const BLADE_DOMAIN_CARDS = {
         ],
     },
     not_good_enough: {
+        id: "not_good_enough",
         card_type: "domain",
         domain_id: "blade",
         artist_name: "Juan S. Almencion",
@@ -62,6 +65,7 @@ export const BLADE_DOMAIN_CARDS = {
         ],
     },
     reckless: {
+        id: "reckless",
         card_type: "domain",
         domain_id: "blade",
         artist_name: "Jenny Tan",
@@ -82,6 +86,7 @@ export const BLADE_DOMAIN_CARDS = {
         ],
     },
     a_soldiers_bond: {
+        id: "a_soldiers_bond",
         card_type: "domain",
         domain_id: "blade",
         artist_name: "Mila Pesic",
@@ -102,6 +107,7 @@ export const BLADE_DOMAIN_CARDS = {
         ],
     },
     scramble: {
+        id: "scramble",
         card_type: "domain",
         domain_id: "blade",
         artist_name: "Ilya Royz",
@@ -122,6 +128,7 @@ export const BLADE_DOMAIN_CARDS = {
         ],
     },
     versatile_fighter: {
+        id: "versatile_fighter",
         card_type: "domain",
         domain_id: "blade",
         artist_name: "KarrahE",
@@ -142,6 +149,7 @@ export const BLADE_DOMAIN_CARDS = {
         ],
     },
     deadly_focus: {
+        id: "deadly_focus",
         card_type: "domain",
         domain_id: "blade",
         artist_name: "Rafater",
@@ -162,6 +170,7 @@ export const BLADE_DOMAIN_CARDS = {
         ],
     },
     fortified_armor: {
+        id: "fortified_armor",
         card_type: "domain",
         domain_id: "blade",
         artist_name: "Henrik Rosenborg",
@@ -182,32 +191,33 @@ export const BLADE_DOMAIN_CARDS = {
                     target: "major_damage_threshold",
                     type: "flat",
                     value: 2,
-					conditions: [{
-						type: "armor_equipped",
-						value: true
-					}, {
-						type: "level",
-						min_level: 4,
-						max_level: 10
-					}]
+                    conditions: [{
+                        type: "armor_equipped",
+                        value: true
+                    }, {
+                        type: "level",
+                        min_level: 4,
+                        max_level: 10
+                    }]
                 }, {
                     behavior: "bonus",
                     target: "severe_damage_threshold",
                     type: "flat",
                     value: 2,
-					conditions: [{
-						type: "armor_equipped",
-						value: true
-					}, {
-						type: "level",
-						min_level: 4,
-						max_level: 10
-					}]
+                    conditions: [{
+                        type: "armor_equipped",
+                        value: true
+                    }, {
+                        type: "level",
+                        min_level: 4,
+                        max_level: 10
+                    }]
                 }]
             }
         ],
     },
     champions_edge: {
+        id: "champions_edge",
         card_type: "domain",
         domain_id: "blade",
         artist_name: "Samantha B. Lucas",
@@ -233,9 +243,8 @@ export const BLADE_DOMAIN_CARDS = {
             }
         ],
     },
-
-    // TODO: still working on this one. finish before moving on
     vitality: {
+        id: "vitality",
         card_type: "domain",
         domain_id: "blade",
         artist_name: "Juan S. Almencion",
@@ -246,7 +255,20 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 5,
         recall_cost: 0,
         applies_in_vault: true,
-        choices: [],
+        choices: [
+            {
+                id: "vitality_stress",
+                name: "One Stress slot",
+            },
+            {
+                id: "vitality_hit_point",
+                name: "One Hit Point slot",
+            },
+            {
+                id: "vitality_damage_threshold",
+                name: "+2 bonus to your damage thresholds",
+            }
+        ],
         features: [
             {
                 title: "",
@@ -257,6 +279,288 @@ export const BLADE_DOMAIN_CARDS = {
                                         <li>+2 bonus to your damage thresholds</li>
                                     </ul>
                                     <p>Then place this card in your vault permanently.</p>`,
+                modifiers: [
+                    {
+                        behavior: "bonus",
+                        target: "max_stress",
+                        type: "flat",
+                        value: 1,
+                        conditions: [{
+                            type: "domain_card_choice",
+                            domain_card_id: "vitality",
+                            choice_id: "vitality_stress"
+                        }]
+                    },
+                    {
+                        behavior: "bonus",
+                        target: "max_hp",
+                        type: "flat",
+                        value: 1,
+                        conditions: [{
+                            type: "domain_card_choice",
+                            domain_card_id: "vitality",
+                            choice_id: "hit_point"
+                        }]
+                    },
+                    {
+                        behavior: "bonus",
+                        target: "major_damage_threshold",
+                        type: "flat",
+                        value: 2,
+                        conditions: [{
+                            type: "domain_card_choice",
+                            domain_card_id: "vitality",
+                            choice_id: "damage_threshold"
+                        }]
+                    },
+                    {
+                        behavior: "bonus",
+                        target: "severe_damage_threshold",
+                        type: "flat",
+                        value: 2,
+                        conditions: [{
+                            type: "domain_card_choice",
+                            domain_card_id: "vitality",
+                            choice_id: "damage_threshold"
+                        }]
+                    }
+                ]
+            }
+        ],
+    },
+    battle_hardened: {
+        id: "battle_hardened",
+        card_type: "domain",
+        domain_id: "blade",
+        artist_name: "Arturo G. González",
+        image_url: "/images/card/art/domains/blade/battle-hardened.webp",
+        type: "ability",
+        title: "Battle-Hardened",
+        description_html: "",
+        level_requirement: 6,
+        recall_cost: 2,
+        applies_in_vault: false,
+        choices: [],
+        features: [
+            {
+                title: "",
+                description_html: "<p>Once per long rest when you would make a Death Move, you can <b>spend a Hope</b> to clear a Hit Point instead.</p>",
+                modifiers: []
+            }
+        ],
+    },
+    rage_up: {
+        id: "rage_up",
+        card_type: "domain",
+        domain_id: "blade",
+        artist_name: "Ivan Koltovich",
+        image_url: "/images/card/art/domains/blade/rage-up.webp",
+        type: "ability",
+        title: "Rage Up",
+        description_html: "",
+        level_requirement: 6,
+        recall_cost: 1,
+        applies_in_vault: false,
+        choices: [],
+        features: [
+            {
+                title: "",
+                description_html: "<p>Before you make an attack, you can <b>mark a Stress</b> to gain a bonus to your damage roll equal to twice your Strength.</p><p>You can Rage Up twice per attack.</p>",
+                modifiers: []
+            }
+        ],
+    },
+    blade_touched: {
+        id: "blade_touched",
+        card_type: "domain",
+        domain_id: "blade",
+        artist_name: "Simon Pape",
+        image_url: "/images/card/art/domains/blade/blade-touched.webp",
+        type: "ability",
+        title: "Blade-Touched",
+        description_html: "",
+        level_requirement: 7,
+        recall_cost: 1,
+        applies_in_vault: false,
+        choices: [],
+        features: [
+            {
+                title: "",
+                description_html: `<p>When 4 or more of the domain cards in your loadout are from the Blade domain, gain the following benefits:</p>
+                                    <ul class="list-disc list-inside ml-2">
+                                        <li>+2 bonus to your attack rolls</li>
+                                        <li>+4 bonus to your Severe damage threshold</li>
+                                    </ul>`,
+                modifiers: [
+                    {
+                        behavior: "bonus",
+                        target: "attack_roll_bonus",
+                        type: "flat",
+                        value: 2,
+                        conditions: [{
+                            type: "min_loadout_cards_from_domain",
+                            domain_id: "blade",
+                            min_cards: 4
+                        }]
+                    },
+                    {
+                        behavior: "bonus",
+                        target: "severe_damage_threshold",
+                        type: "flat",
+                        value: 4,
+                        conditions: [{
+                            type: "min_loadout_cards_from_domain",
+                            domain_id: "blade",
+                            min_cards: 4
+                        }]
+                    }
+                ]
+            }
+        ],
+    },
+    glancing_blow: {
+        id: "glancing_blow",
+        card_type: "domain",
+        domain_id: "blade",
+        artist_name: "Maxime Minard",
+        image_url: "/images/card/art/domains/blade/glancing-blow.webp",
+        type: "ability",
+        title: "Glancing Blow",
+        description_html: "",
+        level_requirement: 7,
+        recall_cost: 1,
+        applies_in_vault: false,
+        choices: [],
+        features: [
+            {
+                title: "",
+                description_html: "<p>When you fail an attack, you can <b>mark a Stress</b> to deal weapon damage using half your Proficiency.</p>",
+                modifiers: []
+            }
+        ],
+    },
+    battle_cry: {
+        id: "battle_cry",
+        card_type: "domain",
+        domain_id: "blade",
+        artist_name: "Daarken",
+        image_url: "/images/card/art/domains/blade/battle-cry.webp",
+        type: "ability",
+        title: "Battle Cry",
+        description_html: "",
+        level_requirement: 8,
+        recall_cost: 2,
+        applies_in_vault: false,
+        choices: [],
+        features: [
+            {
+                title: "",
+                description_html: "<p>Once per long rest, while you're charging into danger, you can muster a rousing call that inspires your allies. All allies who can hear you each clear a Stress and gain a Hope. Additionally, your allies gain advantage on attack rolls until you or an ally rolls a failure with Fear.</p>",
+                modifiers: []
+            }
+        ],
+    },
+    frenzy: {
+        id: "frenzy",
+        card_type: "domain",
+        domain_id: "blade",
+        artist_name: "Edgar Cardona",
+        image_url: "/images/card/art/domains/blade/frenzy.webp",
+        type: "ability",
+        title: "Frenzy",
+        description_html: "",
+        level_requirement: 8,
+        recall_cost: 3,
+        applies_in_vault: false,
+        choices: [],
+        features: [
+            {
+                title: "",
+                description_html: "<p>Once per long rest, you can go into a <em>Frenzy</em> until there are no more adversaries within sight.</p><p>While <em>Frenzied</em>, you can't use Armor Slots, and you gain a +10 bonus to your damage rolls and a +8 bonus to your Severe damage threshold.</p>",
+                modifiers: []
+            }
+        ],
+    },
+    gore_and_glory: {
+        id: "gore_and_glory",
+        card_type: "domain",
+        domain_id: "blade",
+        artist_name: "Simon Pape",
+        image_url: "/images/card/art/domains/blade/gore-and-glory.webp",
+        type: "ability",
+        title: "Gore and Glory",
+        description_html: "",
+        level_requirement: 9,
+        recall_cost: 2,
+        applies_in_vault: false,
+        choices: [],
+        features: [
+            {
+                title: "",
+                description_html: "<p>When you critically succeed on a weapon attack, gain an additional Hope or clear an additional Stress. Additionally, when you deal enough damage to defeat an enemy, gain a Hope or clear a Stress.</p>",
+                modifiers: []
+            }
+        ],
+    },
+    reapers_strike: {
+        id: "reapers_strike",
+        card_type: "domain",
+        domain_id: "blade",
+        artist_name: "Ilya Royz",
+        image_url: "/images/card/art/domains/blade/reapers-strike.webp",
+        type: "ability",
+        title: "Reaper's Strike",
+        description_html: "",
+        level_requirement: 9,
+        recall_cost: 3,
+        applies_in_vault: false,
+        choices: [],
+        features: [
+            {
+                title: "",
+                description_html: "<p>Once per long rest, <b>spend a Hope</b> to make an attack roll. The GM tells you which targets within range it would succeed against. Choose one of these targets and force them to mark 5 Hit Points.</p>",
+                modifiers: []
+            }
+        ],
+    },
+    battle_monster: {
+        id: "battle_monster",
+        card_type: "domain",
+        domain_id: "blade",
+        artist_name: "Geoffrey Ernault",
+        image_url: "/images/card/art/domains/blade/battle-monster.webp",
+        type: "ability",
+        title: "Battle Monster",
+        description_html: "",
+        level_requirement: 10,
+        recall_cost: 0,
+        applies_in_vault: false,
+        choices: [],
+        features: [
+            {
+                title: "",
+                description_html: "<p>When you make a successful attack against an adversary, you can <b>mark 4 Stress</b> to force the target to mark a number of Hit Points equal to the number of Hit Points you currently have marked instead of rolling for damage.</p>",
+                modifiers: []
+            }
+        ],
+    },
+    onslaught: {
+        id: "onslaught",
+        card_type: "domain",
+        domain_id: "blade",
+        artist_name: "Maciej Wojtala",
+        image_url: "/images/card/art/domains/blade/onslaught.webp",
+        type: "ability",
+        title: "Onslaught",
+        description_html: "",
+        level_requirement: 10,
+        recall_cost: 3,
+        applies_in_vault: false,
+        choices: [],
+        features: [
+            {
+                title: "",
+                description_html: "<p>When you successfully make an attack with your weapon, you never deal damage beneath a target's Major damage threshold (the target always marks a minimum of 2 Hit Points).</p><p>Additionally, when a creature within your weapon's range deals damage to an ally with an attack that doesn't include you, you can <b>mark a Stress</b> to force them to make a Reaction Roll (15). On a failure, the target must mark a Hit Point.</p>",
                 modifiers: []
             }
         ],

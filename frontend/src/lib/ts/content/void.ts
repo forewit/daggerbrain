@@ -2,12 +2,12 @@ import type { Card } from "../character/types"
 
 export const TRANSFORMATION_CARDS = {
     werewolf: {
+        id: "werewolf",
         card_type: "transformation",
         artist_name: "",
         image_url: "/images/wip.avif",
         title: "Werewolf",
         description_html: "Werewolves are creatures who transform into supernatural wolves.",
-        choices: [],
         features: [
             {
                 title: "Wolf Form",

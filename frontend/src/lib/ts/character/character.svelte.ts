@@ -2,7 +2,7 @@ import { getAppContext } from '$lib/ts/app.svelte';
 import { ALL_LEVEL_UP_OPTIONS, BASE_STATS, TRAIT_OPTIONS } from '$lib/ts/character/rules';
 import { getContext, setContext } from 'svelte';
 import { get_ancestry_card, get_armor, get_class, get_community_card, get_domain_card, get_transformation_card, get_weapon } from './helpers';
-import type { Card, Character, Class, DamageThresholds, LevelUpChoice, LevelUpOption, Modifier, Subclass, Traits } from './types';
+import type { Card, Character, Class, Condition, DamageThresholds, LevelUpChoice, LevelUpOption, Modifier, Subclass, Traits } from './types';
 import { BLANK_LEVEL_UP_CHOICE } from './constants';
 
 function createCharacter(uid: string) {
@@ -99,62 +99,36 @@ function createCharacter(uid: string) {
             B: character?.level_up_choices[10].B.option_id ? ALL_LEVEL_UP_OPTIONS[character.level_up_choices[10].B.option_id] : null
         },
     });
-    let additional_domain_cards= $derived(
+    let additional_domain_cards = $derived(
         character?.additional_domain_card_ids.map(id => get_domain_card(id)).filter(c => c !== null) || []
     );
 
 
     // derived stats
     let domain_card_vault: Card<"domain">[] = $state([]);
-    let traits: Traits = $state({
-        agility: 0,
-        strength: 0,
-        finesse: 0,
-        instinct: 0,
-        presence: 0,
-        knowledge: 0,
-    });
-    let proficiency: number = $state(1);
-    let max_experiences: number = $state(2);
-    let max_domain_card_loadout: number = $state(5);
-    let max_hope: number = $state(6);
-    let max_armor: number = $state(0);
-    let max_hp: number = $state(0);
-    let max_stress: number = $state(6);
-    let max_burden: number = $state(2);
-    let evasion: number = $state(0);
-    let damage_thresholds: DamageThresholds = $state({
-        major: 0,
-        severe: 0,
-    });
-    let primary_class_mastery_level: number = $state(0);
-    let secondary_class_mastery_level: number = $state(0);
-    let experience_modifiers: number[] = $state([2, 2]);
-    let spellcast_trait: keyof Traits | null = $state(null);
+    let traits: Traits = $state({ ...BASE_STATS.traits });
+    let proficiency: number = $state(BASE_STATS.proficiency);
+    let max_experiences: number = $state(BASE_STATS.max_experiences);
+    let max_domain_card_loadout: number = $state(BASE_STATS.max_domain_card_loadout);
+    let max_hope: number = $state(BASE_STATS.max_hope);
+    let max_armor: number = $state(BASE_STATS.max_armor);
+    let max_hp: number = $state(BASE_STATS.max_hp);
+    let max_stress: number = $state(BASE_STATS.max_stress);
+    let max_burden: number = $state(BASE_STATS.max_burden);
+    let attack_roll_bonus: number = $state(BASE_STATS.attack_roll_bonus);
+    let evasion: number = $state(BASE_STATS.evasion);
+    let damage_thresholds: DamageThresholds = $state({ ...BASE_STATS.damage_thresholds });
+    let primary_class_mastery_level: number = $state(BASE_STATS.primary_class_mastery_level);
+    let secondary_class_mastery_level: number = $state(BASE_STATS.secondary_class_mastery_level);
+    let spellcast_trait: keyof Traits | null = $state(BASE_STATS.spellcast_trait);
+    let experience_modifiers: number[] = $state(Array.from({ length: BASE_STATS.max_experiences }, () => BASE_STATS.experience_modifier));
+
 
     // ! load character from app context
     $effect(() => {
         character = app.characters.find((c) => c.uid === uid) || null;
     });
-   
 
-    // ! keep experiences array length in sync with max_experiences
-    $effect(() => {
-        if (!character) return;
-        if (character.experiences.length < max_experiences) {
-            console.warn("Experience list is too short. Adding a new one.")
-            character.experiences.push("");
-        } else if (character.experiences.length > max_experiences) {
-            console.warn("Experience list is too long. Removing the last one.")
-            character.experiences.pop();
-        }
-    });
-
-    // ! clear invalid choices (build a list of valid choice ids and remove anything not in the list)
-    // todo: finish
-    $effect(()=>{
-
-    })
 
     // ! clear invalid base traits
     $effect(() => {
@@ -189,7 +163,7 @@ function createCharacter(uid: string) {
     // ! clear level up choices above the current level
     $effect(() => {
         if (!character) return;
-        console.warn("Cleared level_up_choices above level", character.level);
+
         if (character.level < 2) character.level_up_choices[2] = { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE };
         if (character.level < 3) character.level_up_choices[3] = { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE };
         if (character.level < 4) character.level_up_choices[4] = { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE };
@@ -199,6 +173,8 @@ function createCharacter(uid: string) {
         if (character.level < 8) character.level_up_choices[8] = { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE };
         if (character.level < 9) character.level_up_choices[9] = { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE };
         if (character.level < 10) character.level_up_choices[10] = { A: BLANK_LEVEL_UP_CHOICE, B: BLANK_LEVEL_UP_CHOICE };
+
+        console.warn("Cleared level_up_choices above level", character.level);
     })
 
     // ! Clear level up choice if the other choice costs two 
@@ -593,14 +569,15 @@ function createCharacter(uid: string) {
 
 
             //***** domain card choices *****/
-            // clear domain card choices if the level choice is not a domain card choice
-            if (!choice_A.option_id || !["tier_2_domain_card", "tier_3_domain_card", "tier_4_domain_card"].includes(choice_A.option_id)) {
+            // clear domain card choices if the level choice is set and is not a domain card choice
+            // (don't clear if option_id is null, as user might select domain card before selecting tier option)
+            if (choice_A.option_id && !["tier_2_domain_card", "tier_3_domain_card", "tier_4_domain_card"].includes(choice_A.option_id)) {
                 if (choice_A.selected_domain_card_id !== null) {
                     console.warn(`Clearing selected domain card because level choice was changed to ${choice_A.option_id}`)
                     choice_A.selected_domain_card_id = null;
                 }
             }
-            if (!choice_B.option_id || !["tier_2_domain_card", "tier_3_domain_card", "tier_4_domain_card"].includes(choice_B.option_id)) {
+            if (choice_B.option_id && !["tier_2_domain_card", "tier_3_domain_card", "tier_4_domain_card"].includes(choice_B.option_id)) {
                 if (choice_B.selected_domain_card_id !== null) {
                     console.warn(`Clearing selected domain card because level choice was changed to ${choice_B.option_id}`)
                     choice_B.selected_domain_card_id = null;
@@ -647,6 +624,16 @@ function createCharacter(uid: string) {
             //***** END domain card choices *****/
         }
 
+        // ! clear invalid domain card choices 
+        const validChoiceIds = new Set(
+            new_domain_card_vault.flatMap(card => card.choices.map(choice => choice.id))
+        );
+        for (const [domainCardId, choiceId] of Object.entries(character.domain_card_choices)) {
+            if (!validChoiceIds.has(choiceId)) {
+                delete character.domain_card_choices[domainCardId];
+            }
+        }
+
         // * derived domain card vault
         domain_card_vault = new_domain_card_vault;
     })
@@ -683,7 +670,7 @@ function createCharacter(uid: string) {
         for (const id of valid_weapon_ids) {
             const weapon = get_weapon(id);
             if (!weapon) continue;
-            if (total_burden + weapon.burden > 2) continue;
+            if (total_burden + weapon.burden > max_burden) continue;
             if (selected_categories.has(weapon.category)) continue;
 
             selected_categories.add(weapon.category);
@@ -736,13 +723,25 @@ function createCharacter(uid: string) {
         experience_modifiers = modifiers;
     })
 
-    function evaluate_condition(condition: Modifier['conditions'][number]): boolean {
+    function evaluate_condition(condition: Condition): boolean {
         if (!character) return false
         if (condition.type === "level") {
             return character.level >= condition.min_level && character.level <= condition.max_level
         } else if (condition.type === "armor_equipped") {
             const has_armor = character.active_armor_id !== null
             return condition.value === has_armor
+        } else if (condition.type === "domain_card_choice") {
+            return character.domain_card_choices[condition.domain_card_id] === condition.choice_id
+        } else if (condition.type === "min_loadout_cards_from_domain") {
+            // verify that the required number of cards from the domain are in the loadout
+            let count = 0;
+            for (const index of character.ephemeral_stats.domain_card_loadout) {
+                const card = domain_card_vault[index];
+                if (card && card.domain_id === condition.domain_id) {
+                    count++;
+                }
+            }
+            return count >= condition.min_cards;
         }
         return true // unknown condition types default to true
     }
@@ -827,7 +826,7 @@ function createCharacter(uid: string) {
         // modifiers from the vault where applies_in_vault=true or the card index is in the loadout
         const vault = domain_card_vault;
         const loadout = character.ephemeral_stats.domain_card_loadout;
-        vault.forEach(card =>{
+        vault.forEach(card => {
             if (card.applies_in_vault || loadout.includes(vault.indexOf(card))) {
                 card.features.forEach(f => push_modifiers(f.modifiers))
             }
@@ -1048,6 +1047,18 @@ function createCharacter(uid: string) {
         max_hp = new_max_hp;
     })
 
+    // * derive attack roll bonus
+    $effect(() => {
+        if (!character) return
+        let new_attack_roll_bonus: number = BASE_STATS.attack_roll_bonus;
+
+        new_attack_roll_bonus = apply_modifiers(base_modifiers, 'attack_roll_bonus', new_attack_roll_bonus, 'base')
+        new_attack_roll_bonus = apply_modifiers(bonus_modifiers, 'attack_roll_bonus', new_attack_roll_bonus, 'bonus')
+        new_attack_roll_bonus = apply_modifiers(override_modifiers, 'attack_roll_bonus', new_attack_roll_bonus, 'override')
+
+        attack_roll_bonus = new_attack_roll_bonus;
+    })
+
     // * derived max_stress
     $effect(() => {
         if (!character) return
@@ -1207,6 +1218,15 @@ function createCharacter(uid: string) {
         new_max_experiences = apply_modifiers(bonus_modifiers, 'max_experiences', new_max_experiences, 'bonus')
         new_max_experiences = apply_modifiers(override_modifiers, 'max_experiences', new_max_experiences, 'override')
 
+        // ! keep experiences array length in sync with max_experiences
+        if (character.experiences.length < new_max_experiences) {
+            console.warn("Experience list is too short. Adding a new one.")
+            character.experiences.push("");
+        } else if (character.experiences.length > new_max_experiences) {
+            console.warn("Experience list is too long. Removing the last one.")
+            character.experiences.pop();
+        }
+
         max_experiences = new_max_experiences;
     })
 
@@ -1263,6 +1283,7 @@ function createCharacter(uid: string) {
         get primary_class_mastery_level() { return primary_class_mastery_level },
         get secondary_class_mastery_level() { return secondary_class_mastery_level },
         get spellcast_trait() { return spellcast_trait },
+        get attack_roll_bonus() { return attack_roll_bonus },
 
         // read/write
         get character() { return character },

@@ -2,6 +2,7 @@ import type { Card } from "$lib/ts/character/types";
 
 export const BONE_DOMAIN_CARDS = {
     untouchable: {
+        id: "untouchable",
         card_type: "domain",
         domain_id: "bone",
         artist_name: "Henry Peters",

@@ -49,6 +49,15 @@
   );
   let chosen_options = context.level_up_chosen_options[level as keyof typeof context.level_up_chosen_options];
 
+  let level_up_domain_cards = $derived(
+    character?.level_up_domain_card_ids[
+      level as keyof typeof character.level_up_domain_card_ids
+    ] || {
+      A: null,
+      B: null,
+    }
+  );
+
   let select_open = $state(false);
 </script>
 
@@ -64,7 +73,7 @@
       <div class="flex flex-col gap-4" bind:clientWidth={width}>
         <!-- level up domain cards -->
         <DomainCardSelector
-          bind:selected_card_id={choices.A.selected_domain_card_id}
+          bind:selected_card_id={level_up_domain_cards.A}
           available_cards={get_available_domain_cards(context, level, 4, false)}
           previously_chosen_card_ids={previously_chosen_domain_cards}
           description_html="Take an additional domain card of your level or lower from a domain you have access to."

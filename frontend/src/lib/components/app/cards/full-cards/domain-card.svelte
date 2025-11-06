@@ -1,16 +1,20 @@
 <script lang="ts">
-  import type { Card } from "$lib/ts/character/types";
+  import type { Card, Choice } from "$lib/ts/character/types";
   import { cn } from "$lib/utils";
   import type { Snippet } from "svelte";
   import DomainBanner from "../domain-banner.svelte";
   import { DOMAINS } from "$lib/ts/content/domains/domains";
+  import * as Select from "$lib/components/ui/select";
+  import { getCharacterContext } from "$lib/ts/character/character.svelte";
 
   let {
+    bind_choice_select = false,
     card = $bindable(),
     class: className = "",
     variant = "responsive",
     children,
   }: {
+    bind_choice_select?: boolean;
     card: Card<"domain">;
     variant?: "responsive" | "card";
     class?: string;
@@ -18,7 +22,46 @@
   } = $props();
 
   let clientWidth = $state(360);
+
+  const context = getCharacterContext();
+  let character = $derived(context.character);
 </script>
+
+{#snippet choice_select()}
+  {#if character}
+    {@const current_choice = card.choices.find(
+      (choice) => choice.id === character.domain_card_choices[card.id]
+    )}
+    <Select.Root
+      type="single"
+      value={character.domain_card_choices[card.id] || ""}
+      onValueChange={(value) => {
+        if (!character) return;
+        character.domain_card_choices[card.id] = value;
+      }}
+    >
+      <Select.Trigger
+        class="font-medium w-full border-black/30 data-[placeholder]:text-muted bg-white hover:bg-black/10 [&_svg:not([class*='text-'])]:text-muted text-background"
+        highlighted={!character.domain_card_choices[card.id]}
+      >
+        <p class="text-xs">
+          {current_choice?.name || "Select an option"}
+        </p>
+      </Select.Trigger>
+      <Select.Content>
+        <Select.Item value="" class="justify-center hover:cursor-pointer">
+          -- none selected --
+        </Select.Item>
+        <Select.Label>Select an option</Select.Label>
+        {#each card.choices as choice}
+          <Select.Item value={choice.id} class="hover:cursor-pointer">
+            {choice.name}
+          </Select.Item>
+        {/each}
+      </Select.Content>
+    </Select.Root>
+  {/if}
+{/snippet}
 
 {#if variant === "responsive"}
   <div
@@ -77,6 +120,13 @@
           {@html feature.description_html}
         </p>
       {/each}
+
+      <!-- choices -->
+      {#if card.choices.length > 0 && bind_choice_select}
+        {@render choice_select()}
+      {/if}
+
+      <!-- optional children -->
       {@render children?.()}
     </div>
 
@@ -150,7 +200,9 @@
       </div>
 
       <!-- content -->
-      <div class="z-5 flex flex-col shrink-0 gap-[12px] px-[12px] pb-[6px] pt-[16px] -mt-[2px] bg-white">
+      <div
+        class="z-5 flex flex-col shrink-0 gap-[12px] px-[12px] pb-[6px] pt-[16px] -mt-[2px] bg-white"
+      >
         <p class="font-eveleth text-center uppercase text-[20px] text-black leading-none">
           {card.title}
         </p>
@@ -160,6 +212,9 @@
             {@html feature.description_html}
           </div>
         {/each}
+        {#if card.choices.length > 0 && bind_choice_select}
+          {@render choice_select()}
+        {/if}
       </div>
 
       <!-- credits -->

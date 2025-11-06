@@ -2,6 +2,7 @@ import type { Card } from "$lib/ts/character/types";
 
 export const VALOR_DOMAIN_CARDS = {
     bare_bones: {
+        id: "bare_bones",
         card_type: "domain",
         domain_id: "valor",
         artist_name: "Simon Pape",

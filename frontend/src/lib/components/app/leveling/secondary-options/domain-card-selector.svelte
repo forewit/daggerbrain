@@ -65,7 +65,7 @@
             disabled={selected_card_id !== id &&
               previously_chosen_card_ids.some((card_id) => card_id === id)}
           >
-            <DomainCard {card} class="w-full h-full" />
+            <DomainCard {card} class="w-full h-full"/>
           </Dialog.Close>
         {/each}
       </div>
@@ -83,4 +83,8 @@
       </Dialog.Footer>
     </Dialog.Content>
   </Dialog.Root>
+
+  {#if selected_card_id !== null && available_cards[selected_card_id]}
+    <DomainCard card={available_cards[selected_card_id]} bind_choice_select/>
+  {/if}
 </div>

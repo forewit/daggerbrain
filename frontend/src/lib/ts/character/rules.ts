@@ -31,6 +31,14 @@ export const TRAITS = {
 
 
 export const BASE_STATS = {
+    traits: {
+        agility: 0,
+        strength: 0,
+        finesse: 0,
+        instinct: 0,
+        presence: 0,
+        knowledge: 0,
+    },
     proficiency: 1,
     experience_modifier: 2,
     max_experiences: 2,
@@ -41,6 +49,12 @@ export const BASE_STATS = {
     max_stress: 6,
     max_burden: 2,
     evasion: 0,
+    attack_roll_bonus: 0,
+    damage_thresholds: {
+        major: 0,
+        severe: 0,
+    },
+    spellcast_trait: null,
     primary_class_mastery_level: 0,
     secondary_class_mastery_level: 0,
 } as const

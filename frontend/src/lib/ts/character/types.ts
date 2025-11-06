@@ -31,9 +31,6 @@ export type Character = {
         secondary_subclass_name: string
     }
 
-    // choices made by the player (usually related to conditional cards)
-    choices: Record<string, boolean>,
-
     // equipment
     active_armor_id: string | null;
     active_weapon_ids: string[];
@@ -51,6 +48,10 @@ export type Character = {
         marked_armor: number,
         domain_card_loadout: number[], // domain card vault indices
     }
+
+    // choices made by the player in regards to their domain cards
+    // key is the domain card id, value is the choice id
+    domain_card_choices: Record<string, string>,
 
     // level-up choices. levels 2-10
     level: number,
@@ -89,7 +90,7 @@ export type Traits = {
 }
 
 export type Class = {
-    source: Source
+    source_id: keyof typeof SOURCES
     name: string
     image_url: string
     description_html: string
@@ -119,8 +120,13 @@ export type Condition = {
     min_level: number,
     max_level: number
 } | {
-    type: "choice"
+    type: "domain_card_choice"
+    domain_card_id: string
     choice_id: string
+} | {
+    type: "min_loadout_cards_from_domain"
+    domain_id: DomainIds
+    min_cards: number
 }
 
 export type Modifier = ({
@@ -134,7 +140,7 @@ export type Modifier = ({
     type: "flat"
     value: number
 }) & ({
-    target: "evasion" | "max_hp" | "max_stress" | "max_experiences" | "major_damage_threshold" | "severe_damage_threshold" | "primary_class_mastery_level" | "secondary_class_mastery_level" | "max_domain_card_loadout" | "max_hope" | "proficiency" | "max_armor" | "max_burden";
+    target: "evasion" | "max_hp" | "max_stress" | "max_experiences" | "major_damage_threshold" | "severe_damage_threshold" | "primary_class_mastery_level" | "secondary_class_mastery_level" | "max_domain_card_loadout" | "max_hope" | "proficiency" | "max_armor" | "max_burden" | "attack_roll_bonus";
 } | {
     target: "trait"
     trait: keyof Traits
@@ -157,19 +163,20 @@ export type Choice = {
 }
 
 export type Card<T extends CardType> = {
+    id: string
     card_type: T
     image_url: string
     title: string
     description_html: string
     artist_name: string
     features: Feature[]
-    choices: Choice[]
 } & (
         T extends "domain" ? {
             domain_id: DomainIds
             level_requirement: number,
             recall_cost: number,
             type: "ability" | "spell"
+            choices: Choice[]
             applies_in_vault: boolean
         } : T extends "subclass_foundation" ? {
             spellcast_trait: keyof Traits | null
@@ -211,8 +218,6 @@ export type LevelUpOption = {
     costs_two_choices: boolean
     modifiers: Modifier[]
 }
-
-export type Source = keyof typeof SOURCES
 
 export type DamageThresholds = {
     major: number,

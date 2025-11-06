@@ -82,7 +82,7 @@
                 disabled={character.level_up_domain_card_ids[1].A !== id &&
                   context.domain_card_vault.some((c) => c.title === card.title)}
               >
-                <DomainCard {card} class="w-full h-full" />
+                <DomainCard {card} class="w-full h-full" bind_choice_select/>
               </Dialog.Close>
             {/each}
           </div>
@@ -139,7 +139,7 @@
                 disabled={character.level_up_domain_card_ids[1].B !== id &&
                   context.domain_card_vault.some((c) => c.title === card.title)}
               >
-                <DomainCard {card} class="w-full h-full" />
+                <DomainCard {card} class="w-full h-full" bind_choice_select/>
               </Dialog.Close>
             {/each}
           </div>

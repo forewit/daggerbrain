@@ -2,8 +2,12 @@ import type { Domain, Class, Subclass, Card, Character, DomainIds, LevelUpChoice
 
 // todo: include source titles and descriptions
 export const SOURCES = {
-    core: {},
-    void_1_5: {}
+    core: {
+        short_title: "Core",
+    },
+    void_1_5: {
+        short_title: "Void 1.5",
+    }
 }
 
 export const BLANK_LEVEL_UP_CHOICE = {
@@ -52,8 +56,7 @@ export const JUST_JAMES: Character = {
     secondary_subclass_id: null,
     secondary_class_domain_id_choice: null,
 
-    // choices made by the player in regards to their cards
-    choices: {},
+    
 
     // equipment
     active_armor_id: null,
@@ -75,6 +78,9 @@ export const JUST_JAMES: Character = {
         marked_armor: 0,
         domain_card_loadout: [0, 1, 2],
     },
+
+    // choices made by the player in regards to their domain cards
+    domain_card_choices: {},
 
     // level-up choices
     level: 5,
@@ -155,7 +161,7 @@ export const NEW_CHARACTER: Character = {
     secondary_class_domain_id_choice: null,
 
     // choices made by the player in regards to their cards
-    choices: {},
+    domain_card_choices: {},
 
     // equipment
     active_armor_id: null,

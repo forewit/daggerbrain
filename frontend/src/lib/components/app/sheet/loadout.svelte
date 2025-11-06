@@ -60,14 +60,17 @@
         Loadout
       </button>
       <div
-        class="flex items-center text-sm h-6 px-3 rounded-full font-medium text-muted-foreground border bg-muted"
+        class=" h-4.5 px-1.5 bg-accent text-background rounded-full font-bold text-xs grid place-items-center"
       >
         {loadout.length} / {context.max_domain_card_loadout}
       </div>
       <Dialog.Root>
-        <Dialog.Trigger class={cn(buttonVariants({ size: "sm" }))}>
+        <Dialog.Trigger class={cn(buttonVariants({ size: "sm" }), "relative")}>
           <ArrowLeftRight class="size-3" />
           Vault
+          <span class="absolute top-1 right-0 translate-x-1/2 -translate-y-1/2 h-4.5 px-1.5 bg-accent text-background rounded-full font-bold text-xs grid place-items-center">
+            {vault.length}
+          </span>
         </Dialog.Trigger>
         <Dialog.Content class="px-0 flex flex-col min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%]">
           <Dialog.Header class="px-6">

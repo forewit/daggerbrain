@@ -2,6 +2,7 @@ import type { Card, Class } from "$lib/ts/character/types";
 
 export const SUBCLASS_CARDS = {
     executioners_guild_foundation: {
+        id: "executioners_guild_foundation",
         card_type: "subclass_foundation",
         artist_name: "",
         image_url: "/images/wip.avif",
@@ -9,7 +10,6 @@ export const SUBCLASS_CARDS = {
         description_html: "Foundation",
         spellcast_trait: "agility",
         class_name: "assassin",
-        choices: [],
         features: [
             {
                 title: "First Strike",
@@ -24,13 +24,13 @@ export const SUBCLASS_CARDS = {
         ],
     } satisfies Card<"subclass_foundation">,
     executioners_guild_specialization: {
+        id: "executioners_guild_specialization",
         card_type: "subclass_specialization",
         artist_name: "",
         image_url: "/images/wip.avif",
         title: "Executioners Guild",
         description_html: "Specialization",
         class_name: "assassin",
-        choices: [],
         features: [
             {
                 title: "Death Strike",
@@ -45,13 +45,13 @@ export const SUBCLASS_CARDS = {
         ],
     } satisfies Card<"subclass_specialization">,
     executioners_guild_mastery: {
+        id: "executioners_guild_mastery",
         card_type: "subclass_mastery",
         artist_name: "",
         image_url: "/images/wip.avif",
         title: "Executioners Guild",
         description_html: "Mastery",
         class_name: "assassin",
-        choices: [],
         features: [
             {
                 title: "True Strike",
@@ -69,7 +69,7 @@ export const SUBCLASS_CARDS = {
 
 export const CLASSES = {
     assassin: {
-        source: "void_1_5",
+        source_id: "void_1_5",
         starting_evasion: 12,
         starting_max_hp: 5,
         suggested_traits: {

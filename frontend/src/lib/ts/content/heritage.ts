@@ -2,12 +2,12 @@ import type { Card } from "../character/types"
 
 export const ANCESTRY_CARDS = {
     half_clank: {
+        id: "half_clank",
         card_type: "ancestry",
         image_url: "/images/card/art/ancestries/clank.webp",
         title: "Half-Clank",
         description_html: "Half sentient mechanical being, half human.",
         artist_name: "Mat Wilma",
-        choices: [],
         features: [{
             title: "High Stamina",
             description_html: "Gain an additional Stress slot at character creation.",
@@ -27,12 +27,12 @@ export const ANCESTRY_CARDS = {
         }],
     },
     drakona: {
+        id: "drakona",
         card_type: "ancestry",
         image_url: "/images/card/art/ancestries/drakona.webp",
         title: "Drakona",
         description_html: "Drakona resemble wingless dragons in humanoid form and possess a powerful elemental breath.",
         artist_name: "Mat Wilma",
-        choices: [],
         features: [{
             title: "Scales",
             description_html: "Your scales act as natural protection. When you would take Severe damage, you can <b>mark a Stress</b> to mark 1 fewer Hit Points.",
@@ -53,13 +53,13 @@ export const ANCESTRIES = {
 
 export const COMMUNITY_CARDS = {
     warborne: {
+        id: "warborne",
         card_type: "community",
         artist_name: "",
         image_url: "/images/wip.avif",
         title: "Warborne",
         description_html:
             "Being part of a warborne community means you come from a place that is, or was, ravaged by war.",
-        choices: [],
         features: [
             {
                 title: "Brave Face",
