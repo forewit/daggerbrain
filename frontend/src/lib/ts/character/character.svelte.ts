@@ -132,11 +132,11 @@ function createCharacter(uid: string) {
     let experience_modifiers: number[] = $state([2, 2]);
     let spellcast_trait: keyof Traits | null = $state(null);
 
-
     // ! load character from app context
     $effect(() => {
         character = app.characters.find((c) => c.uid === uid) || null;
     });
+   
 
     // ! keep experiences array length in sync with max_experiences
     $effect(() => {
@@ -149,6 +149,12 @@ function createCharacter(uid: string) {
             character.experiences.pop();
         }
     });
+
+    // ! clear invalid choices (build a list of valid choice ids and remove anything not in the list)
+    // todo: finish
+    $effect(()=>{
+
+    })
 
     // ! clear invalid base traits
     $effect(() => {
@@ -817,7 +823,7 @@ function createCharacter(uid: string) {
             push_modifiers(chosen_options.A?.modifiers);
             push_modifiers(chosen_options.B?.modifiers);
         }
-        
+
         // modifiers from the vault where applies_in_vault=true or the card index is in the loadout
         const vault = domain_card_vault;
         const loadout = character.ephemeral_stats.domain_card_loadout;

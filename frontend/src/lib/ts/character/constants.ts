@@ -2,7 +2,7 @@ import type { Domain, Class, Subclass, Card, Character, DomainIds, LevelUpChoice
 
 // todo: include source titles and descriptions
 export const SOURCES = {
-    core: {}, 
+    core: {},
     void_1_5: {}
 }
 
@@ -52,7 +52,7 @@ export const JUST_JAMES: Character = {
     secondary_subclass_id: null,
     secondary_class_domain_id_choice: null,
 
-    // unique choices
+    // choices made by the player in regards to their cards
     choices: {},
 
     // equipment
@@ -154,7 +154,7 @@ export const NEW_CHARACTER: Character = {
     secondary_subclass_id: null,
     secondary_class_domain_id_choice: null,
 
-    // unique choices
+    // choices made by the player in regards to their cards
     choices: {},
 
     // equipment

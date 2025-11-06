@@ -31,8 +31,8 @@ export type Character = {
         secondary_subclass_name: string
     }
 
-    // unique choices are used for specific card conditions
-    choices: Record<string, boolean>
+    // choices made by the player (usually related to conditional cards)
+    choices: Record<string, boolean>,
 
     // equipment
     active_armor_id: string | null;
@@ -141,11 +141,7 @@ export type Modifier = ({
 }))
 
 
-export type Choice = {
-    id: string
-    title: string
-    description_html: string
-}
+
 
 export type Feature = {
     title: string,
@@ -154,6 +150,11 @@ export type Feature = {
 }
 
 export type CardType = "domain" | "ancestry" | "community" | "transformation" | "subclass_foundation" | "subclass_specialization" | "subclass_mastery";
+
+export type Choice = {
+    id: string
+    name: string
+}
 
 export type Card<T extends CardType> = {
     card_type: T
