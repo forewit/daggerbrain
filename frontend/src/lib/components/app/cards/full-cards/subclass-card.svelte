@@ -3,7 +3,8 @@
   import { cn } from "$lib/utils";
   import type { Snippet } from "svelte";
   import ClassBanner from "../class-banner.svelte";
-  import { CLASSES, DOMAINS } from "$lib/ts/constants/constants";
+  import { CLASSES } from "$lib/ts/constants/classes/classes";
+  import { DOMAINS } from "$lib/ts/constants/domains/domains";
 
   let {
     card = $bindable(),

@@ -5,7 +5,7 @@
   import * as Select from "$lib/components/ui/select";
   import { capitalize } from "$lib/utils";
   import { cn } from "$lib/utils";
-  import { TRAIT_OPTIONS } from "$lib/ts/constants/rules.js";
+  import { TRAIT_OPTIONS } from "$lib/ts/character/rules.js";
   import Button, { buttonVariants } from "$lib/components/ui/button/button.svelte";
   import * as Dialog from "$lib/components/ui/dialog";
 

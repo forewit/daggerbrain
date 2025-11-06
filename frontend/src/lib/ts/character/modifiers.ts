@@ -1,4 +1,4 @@
-import type { Modifier } from "../character/types";
+import type { Modifier } from "./types";
 
 export const MODIFIERS = {
     max_hp_plus_1: {

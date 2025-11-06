@@ -3,9 +3,8 @@
   import { cn } from "$lib/utils";
   import * as Select from "$lib/components/ui/select/";
   import {
-    BLANK_LEVEL_UP_CHOICE,
     TIER_2_BASE_OPTIONS,
-  } from "$lib/ts/constants/rules";
+  } from "$lib/ts/character/rules";
   import { getCharacterContext } from "$lib/ts/character/character.svelte";
   import Dropdown from "./dropdown.svelte";
   import {
@@ -17,7 +16,8 @@
   import TraitsSelector from "./secondary-options/traits-selector.svelte";
   import ExperienceSelector from "./secondary-options/experience-selector.svelte";
   import TierOptionsGroup from "./tier-options-group.svelte";
-
+  import { BLANK_LEVEL_UP_CHOICE } from "$lib/ts/character/constants";
+  
   let {
     class: className = "",
     level,

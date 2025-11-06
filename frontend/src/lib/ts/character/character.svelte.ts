@@ -1,11 +1,10 @@
 import { getAppContext } from '$lib/ts/app.svelte';
-import { ALL_LEVEL_UP_OPTIONS, BASE_STATS, BLANK_LEVEL_UP_CHOICE, BLANK_LEVEL_UP_OPTION, TIER_1_BASE_OPTIONS, TIER_2_BASE_OPTIONS, TRAIT_OPTIONS } from '$lib/ts/constants/rules';
-import { MODIFIERS } from '$lib/ts/constants/modifiers';
-import type { Card, Character, Modifier, LevelUpChoice, LevelUpOption, Traits, Weapon, DamageThresholds, Class, Subclass, Armor } from './types';
+import { MODIFIERS } from '$lib/ts/character/modifiers';
+import { ALL_LEVEL_UP_OPTIONS, BASE_STATS, TRAIT_OPTIONS } from '$lib/ts/character/rules';
 import { getContext, setContext } from 'svelte';
-import type { DOMAINS } from '$lib/ts/constants/constants';
-import { ANCESTRY_CARDS } from '../constants/cards';
 import { get_ancestry_card, get_armor, get_class, get_community_card, get_domain_card, get_transformation_card, get_weapon } from './helpers';
+import type { Card, Character, Class, DamageThresholds, LevelUpChoice, LevelUpOption, Modifier, Subclass, Traits } from './types';
+import { BLANK_LEVEL_UP_CHOICE } from './constants';
 
 function createCharacter(uid: string) {
     const app = getAppContext();

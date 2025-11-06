@@ -1,7 +1,7 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
   import type { Class, DomainIds } from "$lib/ts/character/types";
-  import { DOMAINS } from "$lib/ts/constants/constants";
+  import { DOMAINS } from "$lib/ts/constants/domains/domains";
 
   let { class: className = "", character_class }: { class?: string; character_class: Class } =
     $props();

@@ -1,6 +1,6 @@
 import type { getCharacterContext } from "$lib/ts/character/character.svelte";
 import type { Character, Card, Class } from "$lib/ts/character/types";
-import { DOMAINS } from "$lib/ts/constants/constants";
+import { DOMAINS } from "$lib/ts/constants/domains/domains";
 
 /**
  * Calculate previously chosen domain cards up to the given level.

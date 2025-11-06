@@ -1,4 +1,5 @@
-import type { MODIFIERS } from "../constants/modifiers"
+import type { SOURCES } from "./constants"
+import type { MODIFIERS } from "./modifiers"
 
 export type Character = {
     settings: {
@@ -187,7 +188,7 @@ export type LevelUpOption = {
     modifier_ids: (keyof typeof MODIFIERS)[]
 }
 
-export type Source = "Core" | "The Void 1.0" | "The Void 1.5"
+export type Source = keyof typeof SOURCES
 
 export type DamageThresholds = {
     major: number,

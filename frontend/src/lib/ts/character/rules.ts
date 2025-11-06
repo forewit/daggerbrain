@@ -1,27 +1,34 @@
-import type { AllTierOptionIds, LevelUpChoice, LevelUpOption, Tier1OptionIds, Tier2OptionIds, Tier3OptionIds, Tier4OptionIds } from "../character/types"
-
-export const EXPERIENCES = {
-    description_html: `<p>An Experience is a word or phrase used to encapsulate a specific set of skills personality traits or aptitudes your character has acquired over the course of their life When your PC makes a move they can spend a Hope to add a relevant Experience's modifier to an action or reaction roll.</p>
-    <p>You get two Experiences at character creation each with a +2 modifier.</p>`
-} as const
+import type { AllTierOptionIds, LevelUpChoice, LevelUpOption, Tier1OptionIds, Tier2OptionIds, Tier3OptionIds, Tier4OptionIds } from "./types"
 
 export const TRAIT_OPTIONS = [2, 1, 1, 0, 0, -1] as const
 
-export const BLANK_LEVEL_UP_OPTION = {
-    title_html: null,
-    short_title: null,
-    max: 0,
-    costs_two_choices: false,
-    modifier_ids: [],
-} as const satisfies LevelUpOption
+export const TRAITS = {
+    agility: {
+        name: "Agility",
+        examples: ["Sprint", "Leap", "Maneuver"]
+    },
+    strength: {
+        name: "Strength",
+        examples: ["Lift", "Smash", "Grapple"]
+    },
+    finesse: {
+        name: "Finesse",
+        examples: ["Control", "Hide", "Tinker"]
+    },
+    instinct: {
+        name: "Instinct",
+        examples: ["Perceive", "Sense", "Navigate"]
+    },
+    presence: {
+        name: "Presence",
+        examples: ["Charm", "Perform", "Deceive"]
+    },
+    knowledge: {
+        name: "Knowledge",
+        examples: ["Recall", "Analyze", "Comprehend"]
+    }
+} as const
 
-export const BLANK_LEVEL_UP_CHOICE = {
-    option_id: null,
-    marked_traits: { A: null, B: null },
-    selected_experiences: { A: null, B: null },
-    selected_domain_card_id: null,
-    selected_subclass_upgrade: null,
-} as const satisfies LevelUpChoice
 
 export const BASE_STATS = {
     proficiency: 1,

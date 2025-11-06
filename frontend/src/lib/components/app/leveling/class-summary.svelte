@@ -1,6 +1,6 @@
 <script lang="ts">
   import Banner from "$lib/components/app/cards/class-banner.svelte";
-  import { DOMAINS } from "$lib/ts/constants/constants";
+  import { DOMAINS } from "$lib/ts/constants/domains/domains";
   import type { Class, DomainIds } from "$lib/ts/character/types";
   import { cn } from "$lib/utils";
   import type { Snippet } from "svelte";

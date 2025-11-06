@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Traits } from "$lib/ts/character/types";
-  import { TRAITS } from "$lib/ts/constants/constants";
+  import { TRAITS } from "$lib/ts/character/rules";
   import * as Select from "$lib/components/ui/select/";
   import { getCharacterContext } from "$lib/ts/character/character.svelte";
 
