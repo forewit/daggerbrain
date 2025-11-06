@@ -1,6 +1,5 @@
 import type { Domain, Class, Subclass, Card, Character, DomainIds, LevelUpChoice } from "./types";
 
-// todo: include source titles and descriptions
 export const SOURCES = {
     core: {
         short_title: "Core",

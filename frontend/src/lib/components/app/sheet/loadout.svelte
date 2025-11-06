@@ -21,9 +21,7 @@
   let character = $derived(context.character);
 
   let loadout: Card<"domain">[] = $derived(
-    character?.ephemeral_stats.domain_card_loadout.map(
-      (i) => context.domain_card_vault[i]
-    ) || []
+    character?.ephemeral_stats.domain_card_loadout.map((i) => context.domain_card_vault[i]) || []
   );
 
   let vault: Card<"domain">[] = $derived(
@@ -68,18 +66,15 @@
         <Dialog.Trigger class={cn(buttonVariants({ size: "sm" }), "relative")}>
           <ArrowLeftRight class="size-3" />
           Vault
-          <span class="absolute top-1 right-0 translate-x-1/2 -translate-y-1/2 h-4.5 px-1.5 bg-accent text-background rounded-full font-bold text-xs grid place-items-center">
+          <span
+            class="absolute top-1 right-0 translate-x-1/2 -translate-y-1/2 h-4.5 px-1.5 bg-accent text-background rounded-full font-bold text-xs grid place-items-center"
+          >
             {vault.length}
           </span>
         </Dialog.Trigger>
         <Dialog.Content class="px-0 flex flex-col min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%]">
           <Dialog.Header class="px-6">
-            <Dialog.Title>
-              Vault
-              <!-- <span class="ml-1 py-1 px-3 bg-accent/20 rounded-full font-medium text-md">
-                {vault.length}
-              </span> -->
-            </Dialog.Title>
+            <Dialog.Title>Vault</Dialog.Title>
           </Dialog.Header>
           <div class="flex flex-col overflow-y-auto">
             <!-- vault -->

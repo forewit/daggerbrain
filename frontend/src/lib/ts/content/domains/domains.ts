@@ -1,6 +1,12 @@
 import type { DomainIds, Domain } from "$lib/ts/character/types";
+import { ARCANA_DOMAIN_CARDS } from "./arcana-cards";
 import { BLADE_DOMAIN_CARDS } from "./blade-cards";
 import { BONE_DOMAIN_CARDS } from "./bone-cards";
+import { CODEX_DOMAIN_CARDS } from "./codex-cards";
+import { GRACE_DOMAIN_CARDS } from "./grace-cards";
+import { MIDNIGHT_DOMAIN_CARDS } from "./midnight-cards";
+import { SAGE_DOMAIN_CARDS } from "./sage-cards";
+import { SPLENDOR_DOMAIN_CARDS } from "./splendor-cards";
 import { VALOR_DOMAIN_CARDS } from "./valor-cards";
 
 export const DOMAINS = {
@@ -9,7 +15,7 @@ export const DOMAINS = {
         description_html: "",
         color: "#4e345b",
         foreground_color: "#ffffff",
-        cards: {}
+        cards: ARCANA_DOMAIN_CARDS
     },
     blade: {
         name: "Blade",
@@ -40,14 +46,14 @@ export const DOMAINS = {
         description_html: "",
         color: "#24395d",
         foreground_color: "#ffffff",
-        cards: {}
+        cards: CODEX_DOMAIN_CARDS
     },
     grace: {
         name: "Grace",
         description_html: "",
         color: "#8d3965",
         foreground_color: "#ffffff",
-        cards: {}
+        cards: GRACE_DOMAIN_CARDS
     },
     midnight: {
         name: "Midnight",
@@ -59,21 +65,21 @@ export const DOMAINS = {
             domain can be accessed by the <b>Rogue</b> and <b>Sorcerer</b> classes.</p>`,
         color: "#1e201f",
         foreground_color: "#ffffff",
-        cards: {}
+        cards: MIDNIGHT_DOMAIN_CARDS
     },
     sage: {
         name: "Sage",
         description_html: "",
         color: "#244e30",
         foreground_color: "#ffffff",
-        cards: {}
+        cards: SAGE_DOMAIN_CARDS
     },
     splendor: {
         name: "Splendor",
         description_html: "",
         color: "#b8a342",
         foreground_color: "#000000",
-        cards: {}
+        cards: SPLENDOR_DOMAIN_CARDS
     },
     valor: {
         name: "Valor",
