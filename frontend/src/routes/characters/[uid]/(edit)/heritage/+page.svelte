@@ -1,12 +1,7 @@
 <script lang="ts">
-  import Label from "$lib/components/ui/label/label.svelte";
-  import { getAppContext } from "$lib/ts/app.svelte";
   import { cn } from "$lib/utils";
   import * as Dialog from "$lib/components/ui/dialog/index";
   import { buttonVariants } from "$lib/components/ui/button/button.svelte";
-  import ChevronDown from "@lucide/svelte/icons/chevron-down";
-  import ChevronRight from "@lucide/svelte/icons/chevron-right";
-  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import Dropdown from "$lib/components/app/leveling/dropdown.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import HeritageCard from "$lib/components/app/cards/full-cards/ancestry-card.svelte";
@@ -14,8 +9,8 @@
   import CommunityCard from "$lib/components/app/cards/full-cards/community-card.svelte";
   import AncestryCard from "$lib/components/app/cards/full-cards/ancestry-card.svelte";
   import { getCharacterContext } from "$lib/ts/character/character.svelte.js";
-  import { ANCESTRIES, COMMUNITIES } from "$lib/ts/constants/heritage";
-  import { TRANSFORMATIONS } from "$lib/ts/constants/void";
+  import { ANCESTRIES, COMMUNITIES } from "$lib/ts/content/heritage";
+  import { TRANSFORMATIONS } from "$lib/ts/content/void";
   
   let { data } = $props();
 

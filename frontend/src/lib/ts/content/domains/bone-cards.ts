@@ -11,13 +11,25 @@ export const BONE_DOMAIN_CARDS = {
         description_html: "",
         level_requirement: 1,
         recall_cost: 1,
+        applies_in_vault: false,
+        choices: [],
         features: [
             {
                 title: "",
                 description_html: "Gain a bonus to your Evasion equal to half your Agility.",
-                modifier_ids: ["bone_untouchable"]
+                modifiers: [{
+                    behavior: "bonus",
+                    target: "evasion",
+                    type: "derived_from_trait",
+                    trait: "agility",
+                    multiplier: 0.5,
+					conditions: [{
+						type: "level",
+						min_level: 1,
+						max_level: 10
+					}]
+                }]
             }
         ],
-
     }
 } as const satisfies Record<string, Card<"domain">>

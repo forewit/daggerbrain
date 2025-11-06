@@ -52,6 +52,9 @@ export const JUST_JAMES: Character = {
     secondary_subclass_id: null,
     secondary_class_domain_id_choice: null,
 
+    // unique choices
+    choices: {},
+
     // equipment
     active_armor_id: null,
     active_weapon_ids: [],
@@ -62,7 +65,7 @@ export const JUST_JAMES: Character = {
         "bare_bones",
         "untouchable"
     ],
-    additional_modifier_ids: [],
+    additional_modifiers: [],
 
     // set by the player
     ephemeral_stats: {
@@ -151,6 +154,9 @@ export const NEW_CHARACTER: Character = {
     secondary_subclass_id: null,
     secondary_class_domain_id_choice: null,
 
+    // unique choices
+    choices: {},
+
     // equipment
     active_armor_id: null,
     active_weapon_ids: [],
@@ -158,7 +164,7 @@ export const NEW_CHARACTER: Character = {
     // the void / other
     transformation_card_id: null,
     additional_domain_card_ids: [],
-    additional_modifier_ids: [],
+    additional_modifiers: [],
 
     // set by the player
     ephemeral_stats: {

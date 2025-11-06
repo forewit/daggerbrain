@@ -1,9 +1,9 @@
 
-import { CLASSES } from "../constants/classes/classes";
-import { DOMAINS } from "../constants/domains/domains";
-import { ARMOR, WEAPONS } from "../constants/equipment";
-import { ANCESTRY_CARDS, COMMUNITY_CARDS } from "../constants/heritage";
-import { TRANSFORMATION_CARDS } from "../constants/void";
+import { CLASSES } from "../content/classes/classes";
+import { DOMAINS } from "../content/domains/domains";
+import { ARMOR, WEAPONS } from "../content/equipment";
+import { ANCESTRY_CARDS, COMMUNITY_CARDS } from "../content/heritage";
+import { TRANSFORMATION_CARDS } from "../content/void";
 import type { Armor, Card, Class, Weapon } from "./types";
 
 

@@ -7,16 +7,23 @@ export const ANCESTRY_CARDS = {
         title: "Half-Clank",
         description_html: "Half sentient mechanical being, half human.",
         artist_name: "Mat Wilma",
+        choices: [],
         features: [{
             title: "High Stamina",
             description_html: "Gain an additional Stress slot at character creation.",
-            modifier_ids: ["max_stress_plus_1"]
+            modifiers: [{
+                behavior: "bonus",
+                target: "max_stress",
+                type: "flat",
+                value: 1,
+                conditions: []
+            }]
         },
         {
             title: "Efficient",
             description_html:
                 "When you take a short rest, you can choose a long rest move instead of a short rest move.",
-            modifier_ids: []
+            modifiers: []
         }],
     },
     drakona: {
@@ -25,15 +32,16 @@ export const ANCESTRY_CARDS = {
         title: "Drakona",
         description_html: "Drakona resemble wingless dragons in humanoid form and possess a powerful elemental breath.",
         artist_name: "Mat Wilma",
+        choices: [],
         features: [{
             title: "Scales",
             description_html: "Your scales act as natural protection. When you would take Severe damage, you can <b>mark a Stress</b> to mark 1 fewer Hit Points.",
-            modifier_ids: []
+            modifiers: []
         },
         {
             title: "Elemental Breath",
             description_html: "Choose an element for your breath (such as electricity, fire, or ice). You can use this breath against a target or group of targets within Very Close range, treating it as an Instinct weapon that deals <b>d8</b> magic damage using your Proficiency.",
-            modifier_ids: []
+            modifiers: []
         }],
     },
 } as const satisfies Record<string, Card<"ancestry">>
@@ -51,12 +59,13 @@ export const COMMUNITY_CARDS = {
         title: "Warborne",
         description_html:
             "Being part of a warborne community means you come from a place that is, or was, ravaged by war.",
+        choices: [],
         features: [
             {
                 title: "Brave Face",
                 description_html:
                     "Once per session, when an attack would cause you to <b>mark a stress</b>, you can <b>spend a hope</b> instead.",
-                modifier_ids: []
+                modifiers: []
             },
         ],
     }

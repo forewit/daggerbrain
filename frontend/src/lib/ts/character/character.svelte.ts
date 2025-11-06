@@ -1,5 +1,4 @@
 import { getAppContext } from '$lib/ts/app.svelte';
-import { MODIFIERS } from '$lib/ts/character/modifiers';
 import { ALL_LEVEL_UP_OPTIONS, BASE_STATS, TRAIT_OPTIONS } from '$lib/ts/character/rules';
 import { getContext, setContext } from 'svelte';
 import { get_ancestry_card, get_armor, get_class, get_community_card, get_domain_card, get_transformation_card, get_weapon } from './helpers';
@@ -731,6 +730,17 @@ function createCharacter(uid: string) {
         experience_modifiers = modifiers;
     })
 
+    function evaluate_condition(condition: Modifier['conditions'][number]): boolean {
+        if (!character) return false
+        if (condition.type === "level") {
+            return character.level >= condition.min_level && character.level <= condition.max_level
+        } else if (condition.type === "armor_equipped") {
+            const has_armor = character.active_armor_id !== null
+            return condition.value === has_armor
+        }
+        return true // unknown condition types default to true
+    }
+
     // * derived modifiers -- used to calculate most stats --
     let base_modifiers: Modifier[] = $state([])
     let bonus_modifiers: Modifier[] = $state([])
@@ -740,67 +750,63 @@ function createCharacter(uid: string) {
 
         let all_modifiers: Modifier[] = []
 
-        const level = character.level
-
-        function push_modifier_ids(modifier_ids: (keyof typeof MODIFIERS)[] | undefined) {
-            if (!modifier_ids || modifier_ids.length === 0) return
-            for (const id of modifier_ids) {
-                const effect = MODIFIERS[id]
-                if (!effect) continue
-                const withinMin = effect.min_level === null || level >= effect.min_level
-                const withinMax = effect.max_level === null || level <= effect.max_level
-                if (withinMin && withinMax) all_modifiers.push(effect)
+        function push_modifiers(modifiers: Modifier[] | undefined) {
+            if (!modifiers || modifiers.length === 0) return
+            for (const modifier of modifiers) {
+                // Check all conditions - all must pass (AND logic)
+                const conditions_met = modifier.conditions.every(condition => evaluate_condition(condition))
+                if (conditions_met) all_modifiers.push(modifier)
             }
         }
 
         // ancestry card
         if (ancestry_card) {
-            ancestry_card.features.forEach(f => push_modifier_ids(f.modifier_ids))
+            ancestry_card.features.forEach(f => push_modifiers(f.modifiers))
         }
 
         // community card
         if (community_card) {
-            community_card.features.forEach(f => push_modifier_ids(f.modifier_ids))
+            community_card.features.forEach(f => push_modifiers(f.modifiers))
         }
 
         // transformation card
         if (transformation_card) {
-            transformation_card.features.forEach(f => push_modifier_ids(f.modifier_ids))
+            transformation_card.features.forEach(f => push_modifiers(f.modifiers))
         }
 
         // primary class
         if (primary_class) {
-            push_modifier_ids(primary_class.hope_feature.modifier_ids)
-            primary_class.class_features.forEach(f => push_modifier_ids(f.modifier_ids))
+            push_modifiers(primary_class.hope_feature.modifiers)
+            primary_class.class_features.forEach(f => push_modifiers(f.modifiers))
         }
 
         // primary subclass cards (gate by mastery level)
         if (primary_subclass) {
             const primaryMastery = primary_class_mastery_level
-            push_modifier_ids(primary_subclass.foundation_card.features.flatMap(f => f.modifier_ids))
+            push_modifiers(primary_subclass.foundation_card.features.flatMap(f => f.modifiers))
             if (primaryMastery >= 2) {
-                push_modifier_ids(primary_subclass.specialization_card.features.flatMap(f => f.modifier_ids))
+                push_modifiers(primary_subclass.specialization_card.features.flatMap(f => f.modifiers))
             }
             if (primaryMastery >= 3) {
-                push_modifier_ids(primary_subclass.mastery_card.features.flatMap(f => f.modifier_ids))
+                push_modifiers(primary_subclass.mastery_card.features.flatMap(f => f.modifiers))
             }
         }
 
         // secondary class
         if (secondary_class) {
             // no hope feature for secondary class
-            secondary_class.class_features.forEach(f => push_modifier_ids(f.modifier_ids))
+            secondary_class.class_features.forEach(f => push_modifiers(f.modifiers))
         }
 
         // secondary subclass cards (gate by mastery level)
         if (secondary_subclass) {
             const secondaryMastery = secondary_class_mastery_level
-            push_modifier_ids(secondary_subclass.foundation_card.features.flatMap(f => f.modifier_ids))
+            push_modifiers(secondary_subclass.foundation_card.features.flatMap(f => f.modifiers))
             if (secondaryMastery >= 2) {
-                push_modifier_ids(secondary_subclass.specialization_card.features.flatMap(f => f.modifier_ids))
+                push_modifiers(secondary_subclass.specialization_card.features.flatMap(f => f.modifiers))
             }
             if (secondaryMastery >= 3) {
-                push_modifier_ids(secondary_subclass.mastery_card.features.flatMap(f => f.modifier_ids))
+                push_modifiers(secondary_subclass.mastery_card.features.flatMap(f => f.modifiers))
             }
         }
 
@@ -808,38 +814,37 @@ function createCharacter(uid: string) {
         for (let i = 2; i <= character.level; i++) {
             const chosen_options = level_up_chosen_options[i as keyof typeof level_up_chosen_options];
             if (!chosen_options) continue;
-            push_modifier_ids(chosen_options.A?.modifier_ids);
-            push_modifier_ids(chosen_options.B?.modifier_ids);
+            push_modifiers(chosen_options.A?.modifiers);
+            push_modifiers(chosen_options.B?.modifiers);
         }
-
-        // modifiers from the domain card loadout
+        
+        // modifiers from the vault where applies_in_vault=true or the card index is in the loadout
         const vault = domain_card_vault;
         const loadout = character.ephemeral_stats.domain_card_loadout;
-        loadout.forEach(index => {
-            const card = vault[index];
-            if (card) {
-                card.features.forEach(f => push_modifier_ids(f.modifier_ids))
+        vault.forEach(card =>{
+            if (card.applies_in_vault || loadout.includes(vault.indexOf(card))) {
+                card.features.forEach(f => push_modifiers(f.modifiers))
             }
         })
 
         // modifiers from active armor
         if (active_armor) {
-            active_armor.features.forEach(f => push_modifier_ids(f.modifier_ids))
+            active_armor.features.forEach(f => push_modifiers(f.modifiers))
         }
 
         // modifiers from active weapons
         active_weapons.forEach(weapon => {
-            weapon.features.forEach(f => push_modifier_ids(f.modifier_ids))
+            weapon.features.forEach(f => push_modifiers(f.modifiers))
         })
 
 
         // additional cards
         additional_domain_cards.forEach(card => {
-            card.features.forEach(f => push_modifier_ids(f.modifier_ids))
+            card.features.forEach(f => push_modifiers(f.modifiers))
         })
 
-        // additional modifier ids
-        push_modifier_ids(character.additional_modifier_ids)
+        // additional modifiers
+        push_modifiers(character.additional_modifiers)
 
 
 
@@ -873,6 +878,12 @@ function createCharacter(uid: string) {
 
         for (const modifier of modifiers) {
             if (modifier.target !== target || ('behavior' in modifier && modifier.behavior !== behavior)) {
+                continue;
+            }
+
+            // Check all conditions - all must pass (AND logic)
+            const conditions_met = modifier.conditions.every(condition => evaluate_condition(condition))
+            if (!conditions_met) {
                 continue;
             }
 

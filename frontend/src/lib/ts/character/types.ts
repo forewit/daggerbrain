@@ -1,5 +1,4 @@
 import type { SOURCES } from "./constants"
-import type { MODIFIERS } from "./modifiers"
 
 export type Character = {
     settings: {
@@ -32,6 +31,9 @@ export type Character = {
         secondary_subclass_name: string
     }
 
+    // unique choices are used for specific card conditions
+    choices: Record<string, boolean>
+
     // equipment
     active_armor_id: string | null;
     active_weapon_ids: string[];
@@ -39,7 +41,7 @@ export type Character = {
     // the void / other
     transformation_card_id: string | null,
     additional_domain_card_ids: string[],
-    additional_modifier_ids: (keyof typeof MODIFIERS)[]
+    additional_modifiers: Modifier[]
 
     // set by the player
     ephemeral_stats: {
@@ -109,27 +111,46 @@ export type Subclass = {
     mastery_card: Card<"subclass_mastery">
 }
 
+export type Condition = {
+    type: "armor_equipped"
+    value: boolean
+} | {
+    type: "level"
+    min_level: number,
+    max_level: number
+} | {
+    type: "choice"
+    choice_id: string
+}
+
 export type Modifier = ({
     behavior: "bonus" | "base" | "override"
-    min_level: number | null;
-    max_level: number | null;
-    target: "evasion" | "max_hp" | "max_stress" | "max_experiences" | "major_damage_threshold" | "severe_damage_threshold" | "primary_class_mastery_level" | "secondary_class_mastery_level" | "max_domain_card_loadout" | "max_hope" | "proficiency" | "max_armor" | "max_burden"
-} | {
-    target: "trait"
-    trait: keyof Traits
-}) & ({
+    conditions: Condition[];
+} & ({
     type: "derived_from_trait"
     trait: keyof Traits
     multiplier: number
 } | {
     type: "flat"
     value: number
-})
+}) & ({
+    target: "evasion" | "max_hp" | "max_stress" | "max_experiences" | "major_damage_threshold" | "severe_damage_threshold" | "primary_class_mastery_level" | "secondary_class_mastery_level" | "max_domain_card_loadout" | "max_hope" | "proficiency" | "max_armor" | "max_burden";
+} | {
+    target: "trait"
+    trait: keyof Traits
+}))
+
+
+export type Choice = {
+    id: string
+    title: string
+    description_html: string
+}
 
 export type Feature = {
     title: string,
     description_html: string,
-    modifier_ids: (keyof typeof MODIFIERS)[]
+    modifiers: Modifier[]
 }
 
 export type CardType = "domain" | "ancestry" | "community" | "transformation" | "subclass_foundation" | "subclass_specialization" | "subclass_mastery";
@@ -141,12 +162,14 @@ export type Card<T extends CardType> = {
     description_html: string
     artist_name: string
     features: Feature[]
+    choices: Choice[]
 } & (
         T extends "domain" ? {
             domain_id: DomainIds
             level_requirement: number,
             recall_cost: number,
             type: "ability" | "spell"
+            applies_in_vault: boolean
         } : T extends "subclass_foundation" ? {
             spellcast_trait: keyof Traits | null
             class_name: string
@@ -185,7 +208,7 @@ export type LevelUpOption = {
     short_title: string | null
     max: number
     costs_two_choices: boolean
-    modifier_ids: (keyof typeof MODIFIERS)[]
+    modifiers: Modifier[]
 }
 
 export type Source = keyof typeof SOURCES

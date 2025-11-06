@@ -9,16 +9,17 @@ export const SUBCLASS_CARDS = {
         description_html: "Foundation",
         spellcast_trait: "agility",
         class_name: "assassin",
+        choices: [],
         features: [
             {
                 title: "First Strike",
                 description_html: "The first time in a scene you succeed on an attack roll, double the damage of the attack.",
-                modifier_ids: []
+                modifiers: []
             },
             {
                 title: "Ambush",
                 description_html: 'Your "Marked for Death" feature uses <b>d6s</b> instead of <b>d4s</b>.',
-                modifier_ids: []
+                modifiers: []
             },
         ],
     } satisfies Card<"subclass_foundation">,
@@ -29,16 +30,17 @@ export const SUBCLASS_CARDS = {
         title: "Executioners Guild",
         description_html: "Specialization",
         class_name: "assassin",
+        choices: [],
         features: [
             {
                 title: "Death Strike",
                 description_html: "When you deal Severe damage to a creature, you can <b>mark a stress</b> to make them mark an additional Hit Point.",
-                modifier_ids: []
+                modifiers: []
             },
             {
                 title: "Scorpion's Poise",
                 description_html: "You gain a <b>+2</b> bonus to your Evasion against any attacks made by a creature <i>Marked for Death</i>.",
-                modifier_ids: []
+                modifiers: []
             }
         ],
     } satisfies Card<"subclass_specialization">,
@@ -49,16 +51,17 @@ export const SUBCLASS_CARDS = {
         title: "Executioners Guild",
         description_html: "Mastery",
         class_name: "assassin",
+        choices: [],
         features: [
             {
                 title: "True Strike",
                 description_html: "Once per long rest, when you fail an attack roll, you can <b>spend a hope</b> to make it a success instead.",
-                modifier_ids: []
+                modifiers: []
             },
             {
                 title: "Backstab",
                 description_html: 'Your "Marked for Death" feature uses <b>d8s</b> instead of <b>d6s</b>.',
-                modifier_ids: []
+                modifiers: []
             }
         ],
     } satisfies Card<"subclass_mastery">,
@@ -83,7 +86,7 @@ export const CLASSES = {
         hope_feature: {
             title: "Grim Resolve",
             description_html: "<p><b>Spend 3 Hope</b> to clear 2 Stress.</p>",
-            modifier_ids: []
+            modifiers: []
         },
         primary_domain_id: "blade",
         secondary_domain_id: "midnight",
@@ -98,14 +101,14 @@ export const CLASSES = {
               remove the condition except by defeating the target. The GM can spend a number of Fear equal 
               to your Proficiency to remove the <i>Marked for Death</i> condition. Otherwise, it ends
               automatically when you take a rest.</p>`,
-                modifier_ids: []
+                modifiers: []
             },
             {
                 title: "Get In & Get Out",
                 description_html: `<p><b>Spend a Hope</b> to ask the GM for either a quick or inconspicuous way 
               into or out of a building or structure you can see. The next roll you make that capitalizes 
               on this information has advantage.</p>`,
-                modifier_ids: []
+                modifiers: []
             },
         ],
         subclasses: {

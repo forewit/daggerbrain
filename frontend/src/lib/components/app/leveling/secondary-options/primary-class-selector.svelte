@@ -2,7 +2,7 @@
   import type { Character } from "$lib/ts/character/types";
   import { Button, buttonVariants } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog/";
-  import { CLASSES } from "$lib/ts/constants/classes/classes";
+  import { CLASSES } from "$lib/ts/content/classes/classes";
   import ClassSummary from "../class-summary.svelte";
   import { getCharacterContext } from "$lib/ts/character/character.svelte";
 

@@ -5,7 +5,7 @@
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import * as Dialog from "$lib/components/ui/dialog/";
   import DomainCard from "$lib/components/app/cards/full-cards/domain-card.svelte";
-  import { DOMAINS } from "$lib/ts/constants/domains/domains";
+  import { DOMAINS } from "$lib/ts/content/domains/domains";
   import { getCharacterContext } from "$lib/ts/character/character.svelte";
   import { get_available_domain_cards } from "../domain-card-utils";
 
