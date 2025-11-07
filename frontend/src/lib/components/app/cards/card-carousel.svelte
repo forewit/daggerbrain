@@ -13,13 +13,17 @@
     cards = $bindable(),
     cardWidth = $bindable(240),
     selectedIndex = $bindable(0),
+    disabled_indices = new Set<number>(),
+    highlighted_indices = new Set<number>(),
     emptyMessage = "",
   }: {
     class?: string;
     cards: Card<CardType>[];
     cardWidth?: number;
     selectedIndex?: number;
-    emptyMessage?:string;
+    disabled_indices?: Set<number>;
+    highlighted_indices?: Set<number>;
+    emptyMessage?: string;
   } = $props();
 
   let scrollContainer: HTMLDivElement;
@@ -61,11 +65,12 @@
 
   {#each cards as card, index (card.title)}
     <button
-      style="width: {cardWidth}px;"
       class={cn(
         "rounded-xl snap-center scale-95 relative transition-scale duration-200",
-        selectedIndex === index && "scale-100"
+        selectedIndex === index && "scale-100",
+        disabled_indices.has(index) && "opacity-50"
       )}
+      style="width: {cardWidth}px;"
       onclick={(e) => {
         let el = e.currentTarget as HTMLButtonElement;
         el.scrollIntoView({
@@ -75,6 +80,14 @@
         });
       }}
     >
+      <span
+        class="absolute inset-0 rounded-2xl"
+        style={cn(
+          `width: ${cardWidth}px;`,
+          highlighted_indices.has(index) &&
+            "outline-offset: 2px; outline-width: 4px; outline-color: var(--primary); outline-style: solid;"
+        )}
+      ></span>
       {#if card.card_type === "domain"}
         <DomainCard card={card as Card<"domain">} variant="card" />
       {:else if card.card_type === "ancestry"}
@@ -99,8 +112,8 @@
       class="rounded-2xl snap-center relative border-4 border-dotted border-muted flex items-center justify-center"
       style="width: {cardWidth}px; height: {(cardWidth * 503) / 360}px;"
     >
-    <p class="text-center font-eveleth text-lg text-muted">{emptyMessage}</p>
-  </div>
+      <p class="text-center font-eveleth text-lg text-muted">{emptyMessage}</p>
+    </div>
   {/if}
 
   <div

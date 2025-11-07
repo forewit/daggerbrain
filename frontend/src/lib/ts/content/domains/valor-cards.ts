@@ -14,6 +14,7 @@ export const VALOR_DOMAIN_CARDS = {
         recall_cost: 0,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",

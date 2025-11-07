@@ -634,6 +634,13 @@ function createCharacter(uid: string) {
             }
         }
 
+        // ! clear invalid domain card tokens
+        for (const [domainCardId, tokenCount] of Object.entries(character.domain_card_tokens)) {
+            if (!new_domain_card_vault.some(card => card.id === domainCardId)) {
+                delete character.domain_card_tokens[domainCardId];
+            }
+        }
+
         // * derived domain card vault
         domain_card_vault = new_domain_card_vault;
     })

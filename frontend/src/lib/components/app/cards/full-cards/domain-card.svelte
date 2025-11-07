@@ -9,12 +9,14 @@
 
   let {
     bind_choice_select = false,
+    bind_token_count = false,
     card = $bindable(),
     class: className = "",
     variant = "responsive",
     children,
   }: {
     bind_choice_select?: boolean;
+    bind_token_count?: boolean;
     card: Card<"domain">;
     variant?: "responsive" | "card";
     class?: string;
@@ -27,8 +29,70 @@
   let character = $derived(context.character);
 </script>
 
+{#snippet token_count()}
+  {#if character && bind_token_count && card.tokens}
+    {@const current_count = character.domain_card_tokens[card.id] || 0}
+    <div class="flex items-center gap-2 justify-center">
+      <!-- Minus Button -->
+      <button
+        type="button"
+        onclick={() => {
+          if (!character) return;
+          const current = character.domain_card_tokens[card.id] || 0;
+          character.domain_card_tokens[card.id] = Math.max(0, current - 1);
+        }}
+        disabled={current_count === 0}
+        class="flex items-center justify-center size-7 rounded-full bg-red-500 hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold text-lg transition-colors shadow-md"
+        aria-label="Decrease token count"
+      >
+        −
+      </button>
+
+      <!-- Coin Stack -->
+      <div class="relative flex items-center justify-center">
+        <!-- Stack of coins (background coins) -->
+        <div class="relative w-12 h-12">
+          <!-- Bottom coin -->
+          <div
+            class="absolute inset-0 rounded-full bg-gradient-to-b from-yellow-400 to-yellow-600 border-2 border-yellow-700"
+            style="transform: translate(2px, 4px);"
+          ></div>
+          <!-- Middle coin -->
+          <div
+            class="absolute inset-0 rounded-full bg-gradient-to-b from-yellow-400 to-yellow-600 border-2 border-yellow-700"
+            style="transform: translate(1px, 2px);"
+          ></div>
+          <!-- Top coin with number -->
+          <div
+            class="absolute inset-0 rounded-full bg-gradient-to-b from-yellow-300 to-yellow-500 border-2 border-yellow-700 flex items-center justify-center shadow-lg"
+          >
+            <span class="text-sm font-bold text-yellow-900 drop-shadow-sm">
+              {current_count}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plus Button -->
+      <button
+        type="button"
+        onclick={() => {
+          if (!character) return;
+          const current = character.domain_card_tokens[card.id] || 0;
+          character.domain_card_tokens[card.id] = Math.min(99, current + 1);
+        }}
+        disabled={current_count === 99}
+        class="flex items-center justify-center size-7 rounded-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold text-lg transition-colors shadow-md"
+        aria-label="Increase token count"
+      >
+        +
+      </button>
+    </div>
+  {/if}
+{/snippet}
+
 {#snippet choice_select()}
-  {#if character}
+  {#if character && card.choices.length > 0 && bind_choice_select}
     {@const current_choice = card.choices.find(
       (choice) => choice.id === character.domain_card_choices[card.id]
     )}
@@ -122,9 +186,10 @@
       {/each}
 
       <!-- choices -->
-      {#if card.choices.length > 0 && bind_choice_select}
-        {@render choice_select()}
-      {/if}
+      {@render choice_select()}
+
+      <!-- token count -->
+      {@render token_count()}
 
       <!-- optional children -->
       {@render children?.()}
@@ -212,9 +277,9 @@
             {@html feature.description_html}
           </div>
         {/each}
-        {#if card.choices.length > 0 && bind_choice_select}
-          {@render choice_select()}
-        {/if}
+
+        {@render choice_select()}
+        {@render token_count()}
       </div>
 
       <!-- credits -->

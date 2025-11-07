@@ -2,10 +2,7 @@
   import type { LevelUpOption, Character } from "$lib/ts/character/types";
   import { cn } from "$lib/utils";
   import * as Select from "$lib/components/ui/select/";
-  import {
-    TIER_2_BASE_OPTIONS,
-    TIER_3_BASE_OPTIONS,
-  } from "$lib/ts/character/rules";
+  import { TIER_2_BASE_OPTIONS, TIER_3_BASE_OPTIONS } from "$lib/ts/character/rules";
   import { getCharacterContext } from "$lib/ts/character/character.svelte";
   import Dropdown from "./dropdown.svelte";
   import {
@@ -56,7 +53,10 @@
       B: BLANK_LEVEL_UP_CHOICE,
     }
   );
-  let chosen_options = context.level_up_chosen_options[level as keyof typeof context.level_up_chosen_options];
+  let chosen_options = $derived(
+    context.level_up_chosen_options[level as keyof typeof context.level_up_chosen_options]
+  );
+  
   let level_up_domain_cards = $derived(
     character?.level_up_domain_card_ids[
       level as keyof typeof character.level_up_domain_card_ids
@@ -75,18 +75,22 @@
       title="Level {level}"
       {highlighted}
       subtitle={[chosen_options.A?.short_title, chosen_options.B?.short_title]
-        .filter((title) => title !== null)
+        .filter((title) => title)
         .join(", ")}
     >
       <div class="flex flex-col gap-4" bind:clientWidth={width}>
         <!-- level up domain cards -->
-        <DomainCardSelector
-          bind:selected_card_id={level_up_domain_cards.A}
-          available_cards={get_available_domain_cards(context, level, 7, true)}
-          previously_chosen_card_ids={previously_chosen_domain_cards}
-          description_html="Take an additional domain card of your level or lower from a domain you have access to."
-        />
-
+        <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md">
+          <p class="py-1 px-2 text-xs italic text-muted-foreground">
+            Take an additional domain card of your level or lower from a domain you have access to.
+          </p>
+          <DomainCardSelector
+            bind:selected_card_id={level_up_domain_cards.A}
+            available_cards={get_available_domain_cards(context, level, 7, true)}
+            previously_chosen_card_ids={previously_chosen_domain_cards}
+            description_html="Take an additional domain card of your level or lower from a domain you have access to."
+          />
+        </div>
         <!-- level up choices select -->
         <Select.Root
           type="single"
@@ -125,15 +129,14 @@
                 class="justify-center font-bold text-destructive hover:cursor-pointer hover:bg-muted disabled:opacity-50 disabled:pointer-events-none disabled:cursor-default flex w-full select-none items-center gap-2 rounded-sm py-1.5 px-2 text-sm"
                 onclick={() => {
                   if (
-                    choices.A.option_id === "tier_3_multiclass" ||
-                    choices.A.option_id === "tier_4_multiclass"
+                    (choices.A.option_id === "tier_3_multiclass" ||
+                      choices.A.option_id === "tier_4_multiclass") &&
+                    character.secondary_class_id !== null
                   ) {
                     after_remove_secondary_class = () => {
                       choices.A = BLANK_LEVEL_UP_CHOICE;
                       choices.B = BLANK_LEVEL_UP_CHOICE;
                     };
-                    // This will be handled by MulticlassSelector component
-                    // For now, we'll need to expose this callback
                   } else {
                     choices.A = BLANK_LEVEL_UP_CHOICE;
                     choices.B = BLANK_LEVEL_UP_CHOICE;
@@ -178,12 +181,17 @@
             />
           {:else if choices[key].option_id === "tier_2_domain_card" || choices[key].option_id === "tier_3_domain_card"}
             {@const max_level = choices[key].option_id === "tier_2_domain_card" ? 4 : 7}
-            <DomainCardSelector
-              bind:selected_card_id={choices[key].selected_domain_card_id}
-              available_cards={get_available_domain_cards(context, level, max_level, true)}
-              previously_chosen_card_ids={previously_chosen_domain_cards}
-              description_html={chosen_options[key]?.title_html || ""}
-            />
+            <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md">
+              <p class="py-1 px-2 text-xs italic text-muted-foreground">
+                {@html chosen_options[key]?.title_html || ""}
+              </p>
+              <DomainCardSelector
+                bind:selected_card_id={choices[key].selected_domain_card_id}
+                available_cards={get_available_domain_cards(context, level, max_level, true)}
+                previously_chosen_card_ids={previously_chosen_domain_cards}
+                description_html={chosen_options[key]?.title_html || ""}
+              />
+            </div>
           {:else if choices[key].option_id === "tier_3_subclass_upgrade"}
             <SecondarySubclassSelector
               bind:selected_upgrade={choices[key].selected_subclass_upgrade}

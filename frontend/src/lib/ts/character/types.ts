@@ -53,6 +53,10 @@ export type Character = {
     // key is the domain card id, value is the choice id
     domain_card_choices: Record<string, string>,
 
+    // tokens used by domain cards
+    // key is the domain card id, value is the number of tokens used
+    domain_card_tokens: Record<string, number>,
+
     // level-up choices. levels 2-10
     level: number,
     level_up_domain_card_ids: {
@@ -177,6 +181,7 @@ export type Card<T extends CardType> = {
             recall_cost: number,
             type: "ability" | "spell"
             choices: Choice[]
+            tokens: boolean
             applies_in_vault: boolean
         } : T extends "subclass_foundation" ? {
             spellcast_trait: keyof Traits | null

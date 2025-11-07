@@ -14,6 +14,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -35,6 +36,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 0,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -56,6 +58,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -77,6 +80,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -98,6 +102,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -119,6 +124,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -140,6 +146,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -161,6 +168,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 2,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -182,6 +190,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 0,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -229,6 +238,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -269,6 +279,7 @@ export const BLADE_DOMAIN_CARDS = {
                 name: "+2 bonus to your damage thresholds",
             }
         ],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -341,6 +352,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 2,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -362,6 +374,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -383,6 +396,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -431,6 +445,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -452,6 +467,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 2,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -473,6 +489,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 3,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -494,6 +511,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 2,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -515,6 +533,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 3,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -536,6 +555,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 0,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",
@@ -557,6 +577,7 @@ export const BLADE_DOMAIN_CARDS = {
         recall_cost: 3,
         applies_in_vault: false,
         choices: [],
+        tokens: false,
         features: [
             {
                 title: "",

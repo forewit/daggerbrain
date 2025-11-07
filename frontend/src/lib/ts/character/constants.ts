@@ -81,6 +81,9 @@ export const JUST_JAMES: Character = {
     // choices made by the player in regards to their domain cards
     domain_card_choices: {},
 
+    // tokens used by domain cards
+    domain_card_tokens: {},
+
     // level-up choices
     level: 5,
     level_up_domain_card_ids: {
@@ -161,6 +164,9 @@ export const NEW_CHARACTER: Character = {
 
     // choices made by the player in regards to their cards
     domain_card_choices: {},
+
+    // tokens used by domain cards
+    domain_card_tokens: {},
 
     // equipment
     active_armor_id: null,

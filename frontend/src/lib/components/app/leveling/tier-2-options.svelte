@@ -2,9 +2,7 @@
   import type { LevelUpOption, Character } from "$lib/ts/character/types";
   import { cn } from "$lib/utils";
   import * as Select from "$lib/components/ui/select/";
-  import {
-    TIER_2_BASE_OPTIONS,
-  } from "$lib/ts/character/rules";
+  import { TIER_2_BASE_OPTIONS } from "$lib/ts/character/rules";
   import { getCharacterContext } from "$lib/ts/character/character.svelte";
   import Dropdown from "./dropdown.svelte";
   import {
@@ -17,7 +15,7 @@
   import ExperienceSelector from "./secondary-options/experience-selector.svelte";
   import TierOptionsGroup from "./tier-options-group.svelte";
   import { BLANK_LEVEL_UP_CHOICE } from "$lib/ts/character/constants";
-  
+
   let {
     class: className = "",
     level,
@@ -29,15 +27,11 @@
   const context = getCharacterContext();
   let character = $derived(context.character);
 
-  let previously_chosen_domain_cards = $derived.by(() => {
+  let previously_chosen_domain_card_ids = $derived.by(() => {
     return get_previously_chosen_domain_card_ids(context, level, ["tier_2_domain_card"]);
   });
 
   let width: number = $state(300);
-
-  let highlighted = $derived.by(() => {
-    return calculate_highlighted(context, level, ["tier_2"]);
-  });
 
   let tier_2_options_open = $state(true);
 
@@ -47,7 +41,9 @@
       B: BLANK_LEVEL_UP_CHOICE,
     }
   );
-  let chosen_options = context.level_up_chosen_options[level as keyof typeof context.level_up_chosen_options];
+  let chosen_options = $derived(
+    context.level_up_chosen_options[level as keyof typeof context.level_up_chosen_options]
+  );
 
   let level_up_domain_cards = $derived(
     character?.level_up_domain_card_ids[
@@ -65,19 +61,25 @@
   <div class={cn(className)}>
     <Dropdown
       title="Level {level}"
-      {highlighted}
+      highlighted={calculate_highlighted(context, level, ["tier_2"])}
       subtitle={[chosen_options.A?.short_title, chosen_options.B?.short_title]
         .filter((title) => title)
         .join(", ")}
     >
       <div class="flex flex-col gap-4" bind:clientWidth={width}>
         <!-- level up domain cards -->
-        <DomainCardSelector
-          bind:selected_card_id={level_up_domain_cards.A}
-          available_cards={get_available_domain_cards(context, level, 4, false)}
-          previously_chosen_card_ids={previously_chosen_domain_cards}
-          description_html="Take an additional domain card of your level or lower from a domain you have access to."
-        />
+        <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md">
+          <p class="py-1 px-2 text-xs italic text-muted-foreground">
+            Take an additional domain card of your level or lower from a domain you have access to.
+          </p>
+
+          <DomainCardSelector
+            bind:selected_card_id={level_up_domain_cards.A}
+            available_cards={get_available_domain_cards(context, level, 4, false)}
+            previously_chosen_card_ids={previously_chosen_domain_card_ids}
+            description_html="Take an additional domain card of your level or lower from a domain you have access to."
+          />
+        </div>
 
         <!-- level up choices -->
         <Select.Root
@@ -139,12 +141,17 @@
               {width}
             />
           {:else if choices[key].option_id === "tier_2_domain_card"}
-            <DomainCardSelector
-              bind:selected_card_id={choices[key].selected_domain_card_id}
-              available_cards={get_available_domain_cards(context, level, 4, false)}
-              previously_chosen_card_ids={previously_chosen_domain_cards}
-              description_html={chosen_options[key]?.title_html || ""}
-            />
+            <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md">
+              <p class="py-1 px-2 text-xs italic text-muted-foreground">
+                {@html chosen_options[key]?.title_html || ""}
+              </p>
+              <DomainCardSelector
+                bind:selected_card_id={choices[key].selected_domain_card_id}
+                available_cards={get_available_domain_cards(context, level, 4, false)}
+                previously_chosen_card_ids={previously_chosen_domain_card_ids}
+                description_html={chosen_options[key]?.title_html || ""}
+              />
+            </div>
           {/if}
         {/each}
       </div>

@@ -1,12 +1,13 @@
 <script lang="ts">
-  import type { Character } from "$lib/ts/character/types";
   import { cn } from "$lib/utils";
   import Dropdown from "./dropdown.svelte";
   import PrimaryClassSelector from "./secondary-options/primary-class-selector.svelte";
   import PrimarySubclassSelector from "./secondary-options/primary-subclass-selector.svelte";
-  import Level1DomainCardsSelector from "./secondary-options/level-1-domain-cards-selector.svelte";
   import { getCharacterContext } from "$lib/ts/character/character.svelte";
   import { SOURCES } from "$lib/ts/character/constants";
+  import { DOMAINS } from "$lib/ts/content/domains/domains";
+  import DomainCardSelector from "./secondary-options/domain-card-selector.svelte";
+  import { get_available_domain_cards, get_previously_chosen_domain_card_ids } from "./domain-card-utils";
 
   let { class: className = "" } = $props();
 
@@ -52,7 +53,31 @@
         .filter((title) => title !== undefined)
         .join(", ")}
     >
-      <Level1DomainCardsSelector />
+      {#if context.primary_class !== null}
+        {@const description_html = `<p>Choose up to 2 level 1 domain cards from the
+            <b>${DOMAINS[context.primary_class.primary_domain_id].name}</b>
+            and
+            <b>${DOMAINS[context.primary_class.secondary_domain_id].name}</b>
+            domains.</p>`}
+        <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md">
+          <p class="py-1 px-2 text-xs italic text-muted-foreground">
+            {@html description_html}
+          </p>
+          <DomainCardSelector
+            bind:selected_card_id={character.level_up_domain_card_ids[1].A}
+            available_cards={get_available_domain_cards(context, 1, 1, false)}
+            previously_chosen_card_ids={get_previously_chosen_domain_card_ids(context, 1, [])}
+            {description_html}
+          />
+
+          <DomainCardSelector
+            bind:selected_card_id={character.level_up_domain_card_ids[1].B}
+            available_cards={get_available_domain_cards(context, 1, 1, false)}
+            previously_chosen_card_ids={get_previously_chosen_domain_card_ids(context, 1, [])}
+            {description_html}
+          />
+        </div>
+      {/if}
     </Dropdown>
   </div>
 {/if}

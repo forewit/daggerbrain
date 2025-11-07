@@ -16,7 +16,7 @@
     open = $bindable(),
     choices = $bindable(),
     chosen_options,
-    on_close = ()=>{}
+    on_close = () => {},
   }: {
     tier_number: number;
     options: Partial<Record<AllTierOptionIds, LevelUpOption>>;
@@ -68,7 +68,11 @@
       choices.B.option_id = option_id;
     }
     // if both choices are !== null then call on_close
-    if (choices.A.option_id !== null && choices.B.option_id !== null) {
+    if (
+      (choices.A.option_id !== null && choices.B.option_id !== null) ||
+      chosen_options.A?.costs_two_choices ||
+      chosen_options.B?.costs_two_choices
+    ) {
       on_close();
     }
   }

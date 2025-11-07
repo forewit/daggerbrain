@@ -5,6 +5,8 @@
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import * as Dialog from "$lib/components/ui/dialog/";
   import DomainCard from "$lib/components/app/cards/full-cards/domain-card.svelte";
+  import CardCarousel from "$lib/components/app/cards/card-carousel.svelte";
+  import Button from "$lib/components/ui/button/button.svelte";
 
   let {
     selected_card_id = $bindable(),
@@ -19,13 +21,45 @@
     description_html: string;
     title?: string;
   } = $props();
+
+  let cardsArray = $derived(
+    Object.entries(available_cards)
+      .map(([id, card]) => ({ id, card }))
+      .sort((a, b) => {
+        // Sort by level requirement first
+        if (a.card.level_requirement !== b.card.level_requirement) {
+          return a.card.level_requirement - b.card.level_requirement;
+        }
+        // Then sort by domain name
+        return a.card.domain_id.localeCompare(b.card.domain_id);
+      })
+  );
+
+  let disabled_indices = $derived(
+    new Set(
+      cardsArray
+        .map((item, index) =>
+          previously_chosen_card_ids.includes(item.id) && item.id !== selected_card_id ? index : -1
+        )
+        .filter((index) => index !== -1)
+    )
+  );
+
+  let highlighted_indices = $derived(
+    new Set([cardsArray.findIndex(({ id }) => id === selected_card_id)])
+  );
+
+  let selectedIndex = $state(0);
+  let selectedCard = $derived(cardsArray[selectedIndex]);
+  let isSelectedCardDisabled = $derived(
+    selectedCard ? previously_chosen_card_ids.includes(selectedCard.id) : false
+  );
+
+  let dialog_open = $state(false);
 </script>
 
-<div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md">
-  <p class="py-1 px-2 text-xs italic text-muted-foreground">
-    {@html description_html}
-  </p>
-  <Dialog.Root>
+<div class="flex flex-col gap-2">
+  <Dialog.Root bind:open={dialog_open}>
     <Dialog.Trigger
       class={cn(
         buttonVariants({ variant: "outline" }),
@@ -52,22 +86,43 @@
           {@html description_html}
         </p>
       </Dialog.Description>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto p-2">
-        {#each Object.entries(available_cards) as [id, card]}
-          <Dialog.Close
-            class={cn(
-              "w-full rounded-xl outline-offset-3 outline-primary hover:outline-4 hover:cursor-pointer disabled:pointer-events-none disabled:opacity-50 disabled:cursor-default",
-              selected_card_id === id && "outline-4"
-            )}
+      <div class="relative">
+        <CardCarousel
+          cards={cardsArray.map(({ card }) => card)}
+          bind:selectedIndex
+          {disabled_indices}
+          {highlighted_indices}
+          emptyMessage="No cards available"
+        />
+        {#if cardsArray.length > 0}
+          <Button
+            size="sm"
             onclick={() => {
-              selected_card_id = id;
+              if (highlighted_indices.has(selectedIndex)) {
+                dialog_open = false;
+                selected_card_id = null;
+              } else if (!isSelectedCardDisabled) {
+                dialog_open = false;
+                selected_card_id = selectedCard.id;
+              }
             }}
-            disabled={selected_card_id !== id &&
-              previously_chosen_card_ids.some((card_id) => card_id === id)}
+            hidden={highlighted_indices.has(selectedIndex)}
+            class={cn(
+              "absolute -bottom-[2px] left-1/2 -translate-x-1/2 rounded-full",
+              isSelectedCardDisabled &&
+                !highlighted_indices.has(selectedIndex) &&
+                "border-destructive border-3 bg-muted hover:bg-muted cursor-default"
+            )}
           >
-            <DomainCard {card} class="w-full h-full"/>
-          </Dialog.Close>
-        {/each}
+            {#if highlighted_indices.has(selectedIndex)}
+              Deselect
+            {:else if isSelectedCardDisabled}
+              Already in vault
+            {:else}
+              Select card
+            {/if}
+          </Button>
+        {/if}
       </div>
       <Dialog.Footer>
         {#if selected_card_id === null}
@@ -85,6 +140,8 @@
   </Dialog.Root>
 
   {#if selected_card_id !== null && available_cards[selected_card_id]}
-    <DomainCard card={available_cards[selected_card_id]} bind_choice_select/>
+    <div class="px-2">
+      <DomainCard card={available_cards[selected_card_id]} bind_choice_select bind_token_count />
+    </div>
   {/if}
 </div>
