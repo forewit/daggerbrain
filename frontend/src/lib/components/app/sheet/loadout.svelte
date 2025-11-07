@@ -95,7 +95,7 @@
                         context.max_domain_card_loadout
                       ) {
                         const vaultIndex = context.domain_card_vault.findIndex(
-                          (card) => card.title === vault[selectedVaultIndex].title
+                          (card) => card.id === vault[selectedVaultIndex].id
                         );
                         character.ephemeral_stats.domain_card_loadout.push(vaultIndex);
                       }
@@ -127,7 +127,7 @@
                       ) {
                         character.ephemeral_stats.marked_stress += selectedVaultCard.recall_cost;
                         const vaultIndex = context.domain_card_vault.findIndex(
-                          (card) => card.title === vault[selectedVaultIndex].title
+                          (card) => card.id === vault[selectedVaultIndex].id
                         );
                         character.ephemeral_stats.domain_card_loadout.push(vaultIndex);
                       }

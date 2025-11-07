@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Card, CardType } from "$lib/ts/character/types";
   import { cn } from "$lib/utils";
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import AncestryCard from "./full-cards/ancestry-card.svelte";
   import CommunityCard from "./full-cards/community-card.svelte";
   import DomainCard from "./full-cards/domain-card.svelte";
@@ -16,6 +16,7 @@
     disabled_indices = new Set<number>(),
     highlighted_indices = new Set<number>(),
     emptyMessage = "",
+    scroll_to_index = -1,
   }: {
     class?: string;
     cards: Card<CardType>[];
@@ -24,6 +25,7 @@
     disabled_indices?: Set<number>;
     highlighted_indices?: Set<number>;
     emptyMessage?: string;
+    scroll_to_index?: number;
   } = $props();
 
   let scrollContainer: HTMLDivElement;
@@ -39,7 +41,7 @@
 
   onMount(() => {
     if (scrollContainer) {
-      scrollContainer.scrollLeft = cardWidth;
+      //scrollContainer.scrollLeft = cardWidth;
       scrollContainer.addEventListener("scroll", handleScroll);
     }
 
@@ -47,6 +49,7 @@
       scrollContainer.removeEventListener("scroll", handleScroll);
     };
   });
+
 </script>
 
 <div
@@ -63,7 +66,7 @@
     style="width: {(containerWidth - cardWidth) / 2}px;"
   ></div>
 
-  {#each cards as card, index (card.title)}
+  {#each cards as card, index (card.id)}
     <button
       class={cn(
         "rounded-xl snap-center scale-95 relative transition-scale duration-200",

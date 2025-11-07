@@ -50,6 +50,7 @@ export const BASE_STATS = {
     max_burden: 2,
     evasion: 0,
     attack_roll_bonus: 0,
+    spellcast_roll_bonus: 0,
     damage_thresholds: {
         major: 0,
         severe: 0,

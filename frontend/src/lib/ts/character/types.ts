@@ -144,7 +144,7 @@ export type Modifier = ({
     type: "flat"
     value: number
 }) & ({
-    target: "evasion" | "max_hp" | "max_stress" | "max_experiences" | "major_damage_threshold" | "severe_damage_threshold" | "primary_class_mastery_level" | "secondary_class_mastery_level" | "max_domain_card_loadout" | "max_hope" | "proficiency" | "max_armor" | "max_burden" | "attack_roll_bonus";
+    target: "evasion" | "max_hp" | "max_stress" | "max_experiences" | "major_damage_threshold" | "severe_damage_threshold" | "primary_class_mastery_level" | "secondary_class_mastery_level" | "max_domain_card_loadout" | "max_hope" | "proficiency" | "max_armor" | "max_burden" | "attack_roll_bonus" | "spellcast_roll_bonus";
 } | {
     target: "trait"
     trait: keyof Traits
@@ -179,7 +179,7 @@ export type Card<T extends CardType> = {
             domain_id: DomainIds
             level_requirement: number,
             recall_cost: number,
-            type: "ability" | "spell"
+            type: "ability" | "spell" | "grimoire"
             choices: Choice[]
             tokens: boolean
             applies_in_vault: boolean

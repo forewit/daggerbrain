@@ -116,6 +116,7 @@ function createCharacter(uid: string) {
     let max_stress: number = $state(BASE_STATS.max_stress);
     let max_burden: number = $state(BASE_STATS.max_burden);
     let attack_roll_bonus: number = $state(BASE_STATS.attack_roll_bonus);
+    let spellcast_roll_bonus: number = $state(BASE_STATS.spellcast_roll_bonus);
     let evasion: number = $state(BASE_STATS.evasion);
     let damage_thresholds: DamageThresholds = $state({ ...BASE_STATS.damage_thresholds });
     let primary_class_mastery_level: number = $state(BASE_STATS.primary_class_mastery_level);
@@ -1066,6 +1067,18 @@ function createCharacter(uid: string) {
         attack_roll_bonus = new_attack_roll_bonus;
     })
 
+    // * derive spellcast roll bonus
+    $effect(() => {
+        if (!character) return
+        let new_spellcast_roll_bonus: number = BASE_STATS.spellcast_roll_bonus;
+
+        new_spellcast_roll_bonus = apply_modifiers(base_modifiers, 'attack_roll_bonus', new_spellcast_roll_bonus, 'base')
+        new_spellcast_roll_bonus = apply_modifiers(bonus_modifiers, 'attack_roll_bonus', new_spellcast_roll_bonus, 'bonus')
+        new_spellcast_roll_bonus = apply_modifiers(override_modifiers, 'attack_roll_bonus', new_spellcast_roll_bonus, 'override')
+
+        spellcast_roll_bonus = new_spellcast_roll_bonus;
+    })
+
     // * derived max_stress
     $effect(() => {
         if (!character) return
@@ -1291,6 +1304,7 @@ function createCharacter(uid: string) {
         get secondary_class_mastery_level() { return secondary_class_mastery_level },
         get spellcast_trait() { return spellcast_trait },
         get attack_roll_bonus() { return attack_roll_bonus },
+        get spellcast_roll_bonus() { return spellcast_roll_bonus },
 
         // read/write
         get character() { return character },

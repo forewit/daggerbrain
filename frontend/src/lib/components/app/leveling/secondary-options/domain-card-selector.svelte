@@ -7,6 +7,7 @@
   import DomainCard from "$lib/components/app/cards/full-cards/domain-card.svelte";
   import CardCarousel from "$lib/components/app/cards/card-carousel.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
+  import CircleMinus from "@lucide/svelte/icons/circle-minus";
 
   let {
     selected_card_id = $bindable(),
@@ -59,86 +60,94 @@
 </script>
 
 <div class="flex flex-col gap-2">
-  <Dialog.Root bind:open={dialog_open}>
-    <Dialog.Trigger
-      class={cn(
-        buttonVariants({ variant: "outline" }),
-        "w-full truncate flex items-center justify-between bg-card/50 hover:bg-card/70",
-        selected_card_id === null && "text-muted-foreground hover:text-muted-foreground"
-      )}
-      style={cn(
-        selected_card_id === null &&
-          "outline-offset: 2px; outline-width: 2px; outline-color: var(--primary); outline-style: solid;"
-      )}
-    >
-      <p class="truncate">
-        {selected_card_id ? available_cards[selected_card_id]?.title : "Select a domain card"}
-      </p>
-      <ChevronRight class="size-4 opacity-50" />
-    </Dialog.Trigger>
-
-    <Dialog.Content class="flex flex-col gap-4 min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%]">
-      <Dialog.Header>
-        <Dialog.Title>{title}</Dialog.Title>
-      </Dialog.Header>
-      <Dialog.Description>
-        <p class="text-xs italic text-muted-foreground">
-          {@html description_html}
+  <div class="flex items-center w-full">
+    <Dialog.Root bind:open={dialog_open}>
+      <Dialog.Trigger
+        class={cn(
+          buttonVariants({ variant: "outline" }),
+          "grow truncate flex items-center justify-between bg-card/50 hover:bg-card/70",
+          selected_card_id === null && "text-muted-foreground hover:text-muted-foreground"
+        )}
+        style={cn(
+          selected_card_id === null &&
+            "outline-offset: 2px; outline-width: 2px; outline-color: var(--primary); outline-style: solid;"
+        )}
+      >
+        <p class="truncate">
+          {selected_card_id ? available_cards[selected_card_id]?.title : "Select a domain card"}
         </p>
-      </Dialog.Description>
-      <div class="relative">
-        <CardCarousel
-          cards={cardsArray.map(({ card }) => card)}
-          bind:selectedIndex
-          {disabled_indices}
-          {highlighted_indices}
-          emptyMessage="No cards available"
-        />
-        {#if cardsArray.length > 0}
-          <Button
-            size="sm"
-            onclick={() => {
-              if (highlighted_indices.has(selectedIndex)) {
-                dialog_open = false;
-                selected_card_id = null;
-              } else if (!isSelectedCardDisabled) {
-                dialog_open = false;
-                selected_card_id = selectedCard.id;
-              }
-            }}
-            hidden={highlighted_indices.has(selectedIndex)}
-            class={cn(
-              "absolute -bottom-[2px] left-1/2 -translate-x-1/2 rounded-full",
-              isSelectedCardDisabled &&
-                !highlighted_indices.has(selectedIndex) &&
-                "border-destructive border-3 bg-muted hover:bg-muted cursor-default"
-            )}
-          >
-            {#if highlighted_indices.has(selectedIndex)}
-              Deselect
-            {:else if isSelectedCardDisabled}
-              Already in vault
-            {:else}
-              Select card
-            {/if}
-          </Button>
-        {/if}
-      </div>
-      <Dialog.Footer>
-        {#if selected_card_id === null}
-          <Dialog.Close class={cn(buttonVariants({ variant: "link" }))}>Cancel</Dialog.Close>
-        {:else}
+        <ChevronRight class="size-4 opacity-50" />
+      </Dialog.Trigger>
+
+      <Dialog.Content class="flex flex-col gap-4 min-w-[calc(100%-1rem)] md:min-w-3xl max-h-[90%]">
+        <Dialog.Header>
+          <Dialog.Title>{title}</Dialog.Title>
+        </Dialog.Header>
+        <Dialog.Description>
+          <p class="text-xs italic text-muted-foreground">
+            {@html description_html}
+          </p>
+        </Dialog.Description>
+        <div class="relative overflow-y-auto">
+          <CardCarousel
+            cards={cardsArray.map(({ card }) => card)}
+            bind:selectedIndex
+            {disabled_indices}
+            {highlighted_indices}
+            emptyMessage="No Domain Cards"
+            scroll_to_index={cardsArray.findIndex(({ id }) => id === selected_card_id)}
+          />
+          {#if cardsArray.length > 0}
+            <Button
+              size="sm"
+              onclick={() => {
+                if (highlighted_indices.has(selectedIndex)) {
+                  dialog_open = false;
+                  selected_card_id = null;
+                } else if (!isSelectedCardDisabled) {
+                  dialog_open = false;
+                  selected_card_id = selectedCard.id;
+                }
+              }}
+              hidden={highlighted_indices.has(selectedIndex)}
+              class={cn(
+                "absolute -bottom-[2px] left-1/2 -translate-x-1/2 rounded-full",
+                isSelectedCardDisabled &&
+                  "border-destructive border-3 bg-muted hover:bg-muted cursor-default"
+              )}
+            >
+              {#if isSelectedCardDisabled}
+                Already in vault
+              {:else}
+                Select card
+              {/if}
+            </Button>
+          {/if}
+        </div>
+        <Dialog.Footer>
+          <!-- {#if selected_card_id !== null}
           <Dialog.Close
             class={cn(buttonVariants({ variant: "link" }), "text-destructive")}
             onclick={() => (selected_card_id = null)}
           >
             Clear selection
           </Dialog.Close>
-        {/if}
-      </Dialog.Footer>
-    </Dialog.Content>
-  </Dialog.Root>
-
+        {/if} -->
+          <Dialog.Close class={cn(buttonVariants({ variant: "link" }))}>Close</Dialog.Close>
+        </Dialog.Footer>
+      </Dialog.Content>
+    </Dialog.Root>
+    {#if selected_card_id !== null}
+      <Button
+        size="icon"
+        variant="link"
+        class="text-destructive"
+        onclick={() => (selected_card_id = null)}
+      >
+        <CircleMinus class="size-4" />
+      </Button>
+    {/if}
+  </div>
   {#if selected_card_id !== null && available_cards[selected_card_id]}
     <div class="px-2">
       <DomainCard card={available_cards[selected_card_id]} bind_choice_select bind_token_count />
