@@ -174,11 +174,19 @@
               {width}
             />
           {:else if choices[key].option_id === "tier_2_experience_bonus" || choices[key].option_id === "tier_3_experience_bonus"}
-            <ExperienceSelector
-              bind:selected_experiences={choices[key].selected_experiences}
-              experiences={character.experiences}
-              {width}
-            />
+            <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md">
+              <p class="py-1 px-2 text-xs italic font-medium text-muted-foreground">
+                Choose 2 Experiences.
+              </p>
+              <div class="flex gap-2.5">
+                <ExperienceSelector
+                  bind:selected_experiences={choices[key].selected_experiences}
+                  max={2}
+                  experiences={character.experiences}
+                  {width}
+                />
+              </div>
+            </div>
           {:else if choices[key].option_id === "tier_2_domain_card" || choices[key].option_id === "tier_3_domain_card"}
             {@const max_level = choices[key].option_id === "tier_2_domain_card" ? 4 : 7}
             <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md">

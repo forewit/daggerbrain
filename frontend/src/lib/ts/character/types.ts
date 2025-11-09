@@ -49,12 +49,11 @@ export type Character = {
         domain_card_loadout: number[], // domain card vault indices
     }
 
-    // choices made by the player in regards to their domain cards
-    // key is the domain card id, value is the choice id
-    domain_card_choices: Record<string, string>,
 
-    // tokens used by domain cards
-    // key is the domain card id, value is the number of tokens used
+    // choices made by the player in regards to their domain cards
+    // key is the domain card id
+    domain_card_experience_selections: Record<string, number[]>
+    domain_card_choices: Record<string, string>,
     domain_card_tokens: Record<string, number>,
 
     // level-up choices. levels 2-10
@@ -148,10 +147,10 @@ export type Modifier = ({
 } | {
     target: "trait"
     trait: keyof Traits
+} | {
+    target: "experiences_from_domain_card_selection"
+    domain_card_id: string
 }))
-
-
-
 
 export type Feature = {
     title: string,
@@ -161,10 +160,16 @@ export type Feature = {
 
 export type CardType = "domain" | "ancestry" | "community" | "transformation" | "subclass_foundation" | "subclass_specialization" | "subclass_mastery";
 
-export type Choice = {
-    id: string
-    name: string
-}
+
+export type DomainCardChoice = {
+    id: string,
+    name: string,
+} & ({
+    type: "arbitrary"
+} | {
+    type: "experience"
+    max: number
+})
 
 export type Card<T extends CardType> = {
     id: string
@@ -180,16 +185,16 @@ export type Card<T extends CardType> = {
             level_requirement: number,
             recall_cost: number,
             type: "ability" | "spell" | "grimoire"
-            choices: Choice[]
+            choices: DomainCardChoice[]
             tokens: boolean
             applies_in_vault: boolean
         } : T extends "subclass_foundation" ? {
             spellcast_trait: keyof Traits | null
-            class_name: string
+            class_id: string
         } : T extends "subclass_specialization" ? {
-            class_name: string
+            class_id: string
         } : T extends "subclass_mastery" ? {
-            class_name: string
+            class_id: string
         } : {}
     )
 
@@ -212,7 +217,7 @@ export type AllTierOptionIds = Tier1OptionIds | Tier2OptionIds | Tier3OptionIds 
 export type LevelUpChoice = {
     option_id: AllTierOptionIds | null
     marked_traits: { A: keyof Traits | null, B: keyof Traits | null }
-    selected_experiences: { A: number | null, B: number | null }
+    selected_experiences: number[]
     selected_domain_card_id: string | null,
     selected_subclass_upgrade: "primary" | "secondary" | null,
 }

@@ -24,7 +24,7 @@
     <div class="m-4 flex flex-col gap-4">
       <Dropdown
         title="Experiences"
-        subtitle={character.experiences.filter((experience) => experience !== "").join(", ")}
+        subtitle={character.experiences.filter((experience) => experience.trim()).join(", ")}
       >
         <div class="text-sm italic flex flex-col gap-2">
           <p>

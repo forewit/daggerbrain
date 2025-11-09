@@ -43,10 +43,8 @@ export function calculate_highlighted(
 
     // Check experience_bonus option
     tier_checks.push(
-      (choices.A.option_id === experience_bonus_option &&
-        (choices.A.selected_experiences.A === null || choices.A.selected_experiences.B === null)) ||
-      (choices.B.option_id === experience_bonus_option &&
-        (choices.B.selected_experiences.A === null || choices.B.selected_experiences.B === null))
+      (choices.A.option_id === experience_bonus_option && choices.A.selected_experiences.length < 2) ||
+      (choices.B.option_id === experience_bonus_option && choices.B.selected_experiences.length < 2)
     );
 
     // Check subclass_upgrade option (only for tier_3 and tier_4)

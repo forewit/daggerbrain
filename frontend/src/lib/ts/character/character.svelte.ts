@@ -411,28 +411,36 @@ function createCharacter(uid: string) {
 
             // clear selected experiences if the level choice is not an experience bonus choice
             if (!choice_A.option_id || !["tier_2_experience_bonus", "tier_3_experience_bonus", "tier_4_experience_bonus"].includes(choice_A.option_id)) {
-                if (choice_A.selected_experiences.A !== null || choice_A.selected_experiences.B !== null) {
+                if (choice_A.selected_experiences.length > 0) {
                     console.warn(`Clearing selected experiences because level choice was changed to ${choice_A.option_id}`)
-                    choice_A.selected_experiences.A = null;
-                    choice_A.selected_experiences.B = null;
+                    choice_A.selected_experiences = []
                 }
             }
             if (!choice_B.option_id || !["tier_2_experience_bonus", "tier_3_experience_bonus", "tier_4_experience_bonus"].includes(choice_B.option_id)) {
-                if (choice_B.selected_experiences.A !== null || choice_B.selected_experiences.B !== null) {
+                if (choice_B.selected_experiences.length > 0) {
                     console.warn(`Clearing selected experiences because level choice was changed to ${choice_B.option_id}`)
-                    choice_B.selected_experiences.A = null;
-                    choice_B.selected_experiences.B = null;
+                    choice_B.selected_experiences = []
                 }
             }
 
-            // clear conflicting selected experiences
-            if (choice_A.selected_experiences.A !== null && choice_A.selected_experiences.B !== null && choice_A.selected_experiences.A === choice_A.selected_experiences.B) {
-                console.warn(`Experience ${choice_A.selected_experiences.A} is already used in another option`);
-                choice_A.selected_experiences.B = null;
+            // clear anything above 2 selected experiences
+            if (choice_A.selected_experiences.length > 2) {
+                console.warn("Selected Experiences length was greater than 2, removing extra selections.")
+                choice_A.selected_experiences = choice_A.selected_experiences.slice(0, 1)
             }
-            if (choice_B.selected_experiences.A !== null && choice_B.selected_experiences.B !== null && choice_B.selected_experiences.A === choice_B.selected_experiences.B) {
-                console.warn(`Experience ${choice_B.selected_experiences.A} is already used in another option`);
-                choice_B.selected_experiences.B = null;
+            if (choice_B.selected_experiences.length > 2) {
+                console.warn("Selected Experiences length was greater than 2, removing extra selections.")
+                choice_B.selected_experiences = choice_B.selected_experiences.slice(0, 1)
+            }
+
+            // clear conflicting selected experiences
+            if (choice_A.selected_experiences.length === 2 && choice_A.selected_experiences[0] === choice_A.selected_experiences[1]) {
+                console.warn(`Experience ${choice_A.selected_experiences[0]} is already used in another option`);
+                choice_A.selected_experiences.pop()
+            }
+            if (choice_B.selected_experiences.length === 2 && choice_B.selected_experiences[0] === choice_B.selected_experiences[1]) {
+                console.warn(`Experience ${choice_B.selected_experiences[0]} is already used in another option`);
+                choice_B.selected_experiences.pop()
             }
         }
     })
@@ -625,7 +633,7 @@ function createCharacter(uid: string) {
             //***** END domain card choices *****/
         }
 
-        // ! clear invalid domain card choices 
+        // ! clear invalid domain_card_choices
         const validChoiceIds = new Set(
             new_domain_card_vault.flatMap(card => card.choices.map(choice => choice.id))
         );
@@ -635,10 +643,17 @@ function createCharacter(uid: string) {
             }
         }
 
-        // ! clear invalid domain card tokens
-        for (const [domainCardId, tokenCount] of Object.entries(character.domain_card_tokens)) {
+        // ! clear invalid domain_card_tokens
+        for (const domainCardId of Object.keys(character.domain_card_tokens)) {
             if (!new_domain_card_vault.some(card => card.id === domainCardId)) {
                 delete character.domain_card_tokens[domainCardId];
+            }
+        }
+
+        // ! clear invalid domain_card_experience_selections
+        for (const domainCardId of Object.keys(character.domain_card_experience_selections)) {
+            if (!new_domain_card_vault.some(card => card.id === domainCardId)) {
+                delete character.domain_card_experience_selections[domainCardId];
             }
         }
 
@@ -703,33 +718,7 @@ function createCharacter(uid: string) {
 
     })
 
-    // * derived experience_modifiers (can't be done with modifiers)
-    $effect(() => {
-        if (!character) return;
-        const count = character.experiences.length;
-        const base = BASE_STATS.experience_modifier;
-        const modifiers: number[] = Array(count).fill(base);
 
-        // apply level-up experience bonus selections across levels up to current level
-        for (let i = 2; i <= character.level; i++) {
-            const levelChoices = character.level_up_choices[i as keyof typeof character.level_up_choices];
-            if (!levelChoices) continue;
-
-            const choices = [levelChoices.A, levelChoices.B];
-            for (const choice of choices) {
-                if (!choice || !choice.option_id) continue;
-                if (!["tier_2_experience_bonus", "tier_3_experience_bonus", "tier_4_experience_bonus"].includes(choice.option_id)) continue;
-
-                const a = choice.selected_experiences.A;
-                const b = choice.selected_experiences.B;
-
-                if (a !== null && a >= 0 && a < count) modifiers[a] = modifiers[a] + 1;
-                if (b !== null && b >= 0 && b < count) modifiers[b] = modifiers[b] + 1;
-            }
-        }
-
-        experience_modifiers = modifiers;
-    })
 
     function evaluate_condition(condition: Condition): boolean {
         if (!character) return false
@@ -934,11 +923,11 @@ function createCharacter(uid: string) {
         ) return
 
         // apply base effects targeting traits (set base values)
-        for (const effect of base_modifiers) {
-            if (effect.target === 'trait') {
-                const targetTrait = effect.trait
-                if (effect.type === 'flat') {
-                    base_traits[targetTrait] = effect.value
+        for (const modifier of base_modifiers) {
+            if (modifier.target === 'trait') {
+                const targetTrait = modifier.trait
+                if (modifier.type === 'flat') {
+                    base_traits[targetTrait] = modifier.value
                 }
                 // ! can't derive a trait from a trait
             }
@@ -979,28 +968,108 @@ function createCharacter(uid: string) {
         }
 
         // apply bonus effects targeting traits (additive or derived)
-        for (const effect of bonus_modifiers) {
-            if (effect.target === 'trait') {
-                const targetTrait = effect.trait
-                if (effect.type === 'flat') {
-                    new_traits[targetTrait] = new_traits[targetTrait] + effect.value
+        for (const modifier of bonus_modifiers) {
+            if (modifier.target === 'trait') {
+                const targetTrait = modifier.trait
+                if (modifier.type === 'flat') {
+                    new_traits[targetTrait] = new_traits[targetTrait] + modifier.value
                 }
                 // ! can't derive a trait from a trait
             }
         }
 
         // apply override effects targeting traits (set final values)
-        for (const effect of override_modifiers) {
-            if (effect.target === 'trait') {
-                const targetTrait = effect.trait
-                if (effect.type === 'flat') {
-                    new_traits[targetTrait] = effect.value
+        for (const modifier of override_modifiers) {
+            if (modifier.target === 'trait') {
+                const targetTrait = modifier.trait
+                if (modifier.type === 'flat') {
+                    new_traits[targetTrait] = modifier.value
                 }
                 // ! can't derive a trait from a trait
             }
         }
 
         traits = new_traits;
+    })
+
+
+    // * derived experience_modifiers
+    $effect(() => {
+        if (!character) return;
+        const count = character.experiences.length;
+        const base = BASE_STATS.experience_modifier;
+        const new_experience_modifiers: number[] = Array(count).fill(base);
+
+        // apply base modifiers
+        for (const modifier of base_modifiers) {
+            if (modifier.target === "experiences_from_domain_card_selection") {
+                const experience_indices = character.domain_card_experience_selections[modifier.domain_card_id]
+                if (!experience_indices || experience_indices.length === 0) continue;
+
+                for (const i of experience_indices) {
+                    if (i === null || i < 0 || i > count) continue;
+                    if (modifier.type === 'flat') {
+                        new_experience_modifiers[i] = modifier.value;
+                    } else if (modifier.type === "derived_from_trait") {
+                        new_experience_modifiers[i] = Math.ceil(Number(traits[modifier.trait]) * modifier.multiplier);
+                    }
+                }
+            }
+        }
+
+        // apply level-up experience bonus selections across levels up to current level
+        for (let i = 2; i <= character.level; i++) {
+            const levelChoices = character.level_up_choices[i as keyof typeof character.level_up_choices];
+            if (!levelChoices) continue;
+
+            const choices = [levelChoices.A, levelChoices.B];
+            for (const choice of choices) {
+                if (!choice || !choice.option_id) continue;
+                if (!["tier_2_experience_bonus", "tier_3_experience_bonus", "tier_4_experience_bonus"].includes(choice.option_id)) continue;
+
+                const index_a = choice.selected_experiences[0];
+                const index_b = choice.selected_experiences[1];
+
+                if (index_a !== null && index_a >= 0 && index_a < count) new_experience_modifiers[index_a] = new_experience_modifiers[index_a] + 1;
+                if (index_b !== null && index_b >= 0 && index_b < count) new_experience_modifiers[index_b] = new_experience_modifiers[index_b] + 1;
+            }
+        }
+
+        // apply bonus modifiers
+        for (const modifier of bonus_modifiers) {
+            if (modifier.target === "experiences_from_domain_card_selection") {
+                const experience_indices = character.domain_card_experience_selections[modifier.domain_card_id]
+                if (!experience_indices || experience_indices.length === 0) continue;
+
+                for (const i of experience_indices) {
+                    if (i === null || i < 0 || i > count) continue;
+                    if (modifier.type === 'flat') {
+                        new_experience_modifiers[i] = new_experience_modifiers[i] + modifier.value;
+                    } else if (modifier.type === "derived_from_trait") {
+                        new_experience_modifiers[i] = new_experience_modifiers[i] + Math.ceil(Number(traits[modifier.trait]) * modifier.multiplier);
+                    }
+                }
+            }
+        }
+
+        // apply override modifiers
+        for (const modifier of override_modifiers) {
+            if (modifier.target === "experiences_from_domain_card_selection") {
+                const experience_indices = character.domain_card_experience_selections[modifier.domain_card_id]
+                if (!experience_indices || experience_indices.length === 0) continue;
+
+                for (const i of experience_indices) {
+                    if (i === null || i < 0 || i > count) continue;
+                    if (modifier.type === 'flat') {
+                        new_experience_modifiers[i] = modifier.value;
+                    } else if (modifier.type === "derived_from_trait") {
+                        new_experience_modifiers[i] = Math.ceil(Number(traits[modifier.trait]) * modifier.multiplier);
+                    }
+                }
+            }
+        }
+
+        experience_modifiers = new_experience_modifiers;
     })
 
     // * derived proficiency

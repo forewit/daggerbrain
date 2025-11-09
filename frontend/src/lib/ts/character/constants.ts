@@ -12,7 +12,7 @@ export const SOURCES = {
 export const BLANK_LEVEL_UP_CHOICE = {
     option_id: null,
     marked_traits: { A: null, B: null },
-    selected_experiences: { A: null, B: null },
+    selected_experiences: [],
     selected_domain_card_id: null,
     selected_subclass_upgrade: null,
 } as const satisfies LevelUpChoice
@@ -80,6 +80,7 @@ export const JUST_JAMES: Character = {
 
     // choices made by the player in regards to their domain cards
     domain_card_choices: {},
+    domain_card_experience_selections: {},
 
     // tokens used by domain cards
     domain_card_tokens: {},
@@ -103,13 +104,13 @@ export const JUST_JAMES: Character = {
             A: {
                 option_id: "tier_2_traits",
                 marked_traits: { A: "agility", B: "strength" },
-                selected_experiences: { A: null, B: null },
+                selected_experiences: [],
                 selected_domain_card_id: null,
                 selected_subclass_upgrade: null,
             }, B: {
                 option_id: "tier_2_evasion",
                 marked_traits: { A: null, B: null },
-                selected_experiences: { A: null, B: null },
+                selected_experiences: [],
                 selected_domain_card_id: null,
                 selected_subclass_upgrade: null,
             }
@@ -164,6 +165,7 @@ export const NEW_CHARACTER: Character = {
 
     // choices made by the player in regards to their cards
     domain_card_choices: {},
+    domain_card_experience_selections: {},
 
     // tokens used by domain cards
     domain_card_tokens: {},

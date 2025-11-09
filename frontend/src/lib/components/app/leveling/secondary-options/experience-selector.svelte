@@ -1,96 +1,78 @@
 <script lang="ts">
   import * as Select from "$lib/components/ui/select/";
+  import { cn } from "$lib/utils";
 
   let {
     selected_experiences = $bindable(),
+    max = 2,
     experiences,
     width,
+    class: className = "",
   }: {
-    selected_experiences: { A: number | null; B: number | null };
+    selected_experiences: number[];
+    max: number;
     experiences: string[];
     width: number;
+    class?: string;
   } = $props();
+
+  let open = $state(false);
 </script>
 
-<div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md">
-  <p class="py-1 px-2 text-xs italic font-medium text-muted-foreground">
-    Choose 2 Experiences.
-  </p>
-  <div class="flex gap-2.5">
-    <Select.Root
-      type="single"
-      value={selected_experiences.A === null
-        ? ""
-        : selected_experiences.A.toString()}
-      onValueChange={(value) => {
-        selected_experiences.A = value !== "" ? parseInt(value) : null;
-      }}
-    >
-      <Select.Trigger
-        highlighted={selected_experiences.A === null}
-        class="w-full truncate"
+<Select.Root
+  type="multiple"
+  bind:open
+  value={selected_experiences.map((i) => i.toString())}
+  onValueChange={(value) => {
+    selected_experiences = value.filter((value) => value).map((value) => parseInt(value));
+    if (selected_experiences.length >= max) open = false;
+  }}
+>
+  <Select.Trigger
+    highlighted={selected_experiences.length < max}
+    class={cn("w-full truncate", className)}
+  >
+    <p class="truncate">
+      {#if max === 1}
+        {#if selected_experiences.length === 0}
+          Select 1 Experience
+        {:else}
+          {experiences[0].trim() || "Unnamed Experience"}
+        {/if}
+      {:else if selected_experiences.length === 0}
+        Select {max} Experiences
+      {:else}
+        {selected_experiences.map((i) => experiences[i].trim() || "Unnamed Experience").join(", ")}
+        {#if selected_experiences.length < max}
+          , (Choose {max - selected_experiences.length} more)
+        {/if}
+      {/if}
+    </p>
+  </Select.Trigger>
+  <Select.Content class="rounded-md" align="start">
+    <div style="max-width: {width}px;" class="p-2">
+      <Select.Item
+        value=""
+        disabled={selected_experiences.length === 0}
+        onclick={() => {
+          selected_experiences = [];
+          open = true;
+        }}
+        class="text-destructive font-bold justify-center hover:cursor-pointer"
       >
-        <p class="truncate">
-          {selected_experiences.A !== null
-            ? experiences[selected_experiences.A].trim() ||
-              "Unnamed Experience"
-            : "Select an Experience"}
-        </p>
-      </Select.Trigger>
-      <Select.Content class="rounded-md" align="start">
-        <div style="max-width: {width}px;" class="p-2">
-          <Select.Item value="" class="justify-center hover:cursor-pointer text-sm">
-            -- none selected --
-          </Select.Item>
-          <Select.Label>Experiences</Select.Label>
-          {#each experiences as experience, j}
-            <Select.Item
-              disabled={selected_experiences.B === j || selected_experiences.A === j}
-              class="hover:cursor-pointer"
-              value={j.toString()}
-              >{experience.trim() || "Unnamed Experience"}</Select.Item
-            >
-          {/each}
-        </div>
-      </Select.Content>
-    </Select.Root>
-    <Select.Root
-      type="single"
-      value={selected_experiences.B === null
-        ? ""
-        : selected_experiences.B.toString()}
-      onValueChange={(value) => {
-        selected_experiences.B = value !== "" ? parseInt(value) : null;
-      }}
-    >
-      <Select.Trigger
-        highlighted={selected_experiences.B === null}
-        class="w-full truncate"
-      >
-        <p class="truncate">
-          {selected_experiences.B !== null
-            ? experiences[selected_experiences.B].trim() ||
-              "Unnamed Experience"
-            : "Select an Experience"}
-        </p>
-      </Select.Trigger>
-      <Select.Content class="rounded-md" align="end">
-        <div style="max-width: {width}px;" class="p-2">
-          <Select.Item value="" class="justify-center hover:cursor-pointer text-sm">
-            -- none selected --
-          </Select.Item>
-          <Select.Label>Experiences</Select.Label>
-          {#each experiences as experience, j}
-            <Select.Item
-              disabled={selected_experiences.A === j || selected_experiences.B === j}
-              class="hover:cursor-pointer"
-              value={j.toString()}
-              >{experience.trim() || "Unnamed Experience"}</Select.Item
-            >
-          {/each}
-        </div>
-      </Select.Content>
-    </Select.Root>
-  </div>
-</div>
+        -- Clear selection --
+      </Select.Item>
 
+      <Select.Label>Select {max} {max === 1 ? "Experience" : "Experiences"}</Select.Label>
+      {#each experiences as experience, j}
+        <Select.Item
+          disabled={selected_experiences.some((i) => i === j) || selected_experiences.length >= max}
+          class="hover:cursor-pointer"
+          value={j.toString()}
+        >
+          {experience.trim() || "Unnamed Experience"}
+        </Select.Item>
+      {/each}
+    </div>
+  </Select.Content>
+</Select.Root>

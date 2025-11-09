@@ -5,9 +5,9 @@ export const GRACE_DOMAIN_CARDS = {
     deft_deceiver: {
         id: "deft_deceiver",
         card_type: "domain",
-        domain_id: "codex",
+        domain_id: "grace",
         artist_name: "Simon Pape",
-        image_url: "/images/card/art/domains/codex/deft-deceiver.webp",
+        image_url: "/images/card/art/domains/grace/deft-deceiver.webp",
         type: "ability",
         title: "Deft Deceiver",
         description_html: "",
@@ -28,9 +28,9 @@ export const GRACE_DOMAIN_CARDS = {
     enrapture: {
         id: "enrapture",
         card_type: "domain",
-        domain_id: "codex",
+        domain_id: "grace",
         artist_name: "Letícia Freitas",
-        image_url: "/images/card/art/domains/codex/enrapture.webp",
+        image_url: "/images/card/art/domains/grace/enrapture.webp",
         type: "spell",
         title: "Enrapture",
         description_html: "",
@@ -52,9 +52,9 @@ export const GRACE_DOMAIN_CARDS = {
     inspirational_words: {
         id: "inspirational_words",
         card_type: "domain",
-        domain_id: "codex",
+        domain_id: "grace",
         artist_name: "Mat Wilma",
-        image_url: "/images/card/art/domains/codex/inspirational-words.webp",
+        image_url: "/images/card/art/domains/grace/inspirational-words.webp",
         type: "ability",
         title: "Inspirational Words",
         description_html: "",
@@ -81,9 +81,9 @@ export const GRACE_DOMAIN_CARDS = {
     tell_no_lies: {
         id: "tell_no_lies",
         card_type: "domain",
-        domain_id: "codex",
+        domain_id: "grace",
         artist_name: "Arturo G. González",
-        image_url: "/images/card/art/domains/codex/tell-no-lies.webp",
+        image_url: "/images/card/art/domains/grace/tell-no-lies.webp",
         type: "spell",
         title: "Tell No Lies",
         description_html: "",
@@ -104,9 +104,9 @@ export const GRACE_DOMAIN_CARDS = {
     troublemaker: {
         id: "troublemaker",
         card_type: "domain",
-        domain_id: "codex",
+        domain_id: "grace",
         artist_name: "Anthony Jones",
-        image_url: "/images/card/art/domains/codex/troublemaker.webp",
+        image_url: "/images/card/art/domains/grace/troublemaker.webp",
         type: "ability",
         title: "Troublemaker",
         description_html: "",
@@ -127,9 +127,9 @@ export const GRACE_DOMAIN_CARDS = {
     hypnotic_shimmer: {
         id: "hypnotic_shimmer",
         card_type: "domain",
-        domain_id: "codex",
+        domain_id: "grace",
         artist_name: "Edgar Cardona",
-        image_url: "/images/card/art/domains/codex/hypnotic-shimmer.webp",
+        image_url: "/images/card/art/domains/grace/hypnotic-shimmer.webp",
         type: "spell",
         title: "Hypnotic Shimmer",
         description_html: "",
@@ -151,9 +151,9 @@ export const GRACE_DOMAIN_CARDS = {
     soothing_speech: {
         id: "soothing_speech",
         card_type: "domain",
-        domain_id: "codex",
+        domain_id: "grace",
         artist_name: "Anthony Jones",
-        image_url: "/images/card/art/domains/codex/soothing-speech.webp",
+        image_url: "/images/card/art/domains/grace/soothing-speech.webp",
         type: "ability",
         title: "Soothing Speech",
         description_html: "",
@@ -174,9 +174,9 @@ export const GRACE_DOMAIN_CARDS = {
     through_your_eyes: {
         id: "through_your_eyes",
         card_type: "domain",
-        domain_id: "codex",
+        domain_id: "grace",
         artist_name: "Edgar Cardona",
-        image_url: "/images/card/art/domains/codex/through-your-eyes.webp",
+        image_url: "/images/card/art/domains/grace/through-your-eyes.webp",
         type: "spell",
         title: "Through Your Eyes",
         description_html: "",
@@ -197,9 +197,9 @@ export const GRACE_DOMAIN_CARDS = {
     thought_delver: {
         id: "thought_delver",
         card_type: "domain",
-        domain_id: "codex",
+        domain_id: "grace",
         artist_name: "Cybercatbug",
-        image_url: "/images/card/art/domains/codex/thought-delver.webp",
+        image_url: "/images/card/art/domains/grace/thought-delver.webp",
         type: "spell",
         title: "Thought Delver",
         description_html: "",
@@ -221,9 +221,9 @@ export const GRACE_DOMAIN_CARDS = {
     words_of_discord: {
         id: "words_of_discord",
         card_type: "domain",
-        domain_id: "codex",
+        domain_id: "grace",
         artist_name: "Anthony Jones",
-        image_url: "/images/card/art/domains/codex/words-of-discord.webp",
+        image_url: "/images/card/art/domains/grace/words-of-discord.webp",
         type: "spell",
         title: "Words of Discord",
         description_html: "",
@@ -245,9 +245,9 @@ export const GRACE_DOMAIN_CARDS = {
     share_the_burden: {
         id: "share_the_burden",
         card_type: "domain",
-        domain_id: "codex",
+        domain_id: "grace",
         artist_name: "Eliot Baum",
-        image_url: "/images/card/art/domains/codex/share-the-burden.webp",
+        image_url: "/images/card/art/domains/grace/share-the-burden.webp",
         type: "spell",
         title: "Share the Burden",
         description_html: "",
@@ -268,9 +268,9 @@ export const GRACE_DOMAIN_CARDS = {
     never_upstaged: {
         id: "never_upstaged",
         card_type: "domain",
-        domain_id: "codex",
+        domain_id: "grace",
         artist_name: "Andrea T Montalto",
-        image_url: "/images/card/art/domains/codex/never-upstaged.webp",
+        image_url: "/images/card/art/domains/grace/never-upstaged.webp",
         type: "ability",
         title: "Never Upstaged",
         description_html: "",
@@ -291,9 +291,9 @@ export const GRACE_DOMAIN_CARDS = {
     endless_charisma: {
         id: "endless_charisma",
         card_type: "domain",
-        domain_id: "codex",
+        domain_id: "grace",
         artist_name: "Samantha B. Lucas",
-        image_url: "/images/card/art/domains/codex/endless-charisma.webp",
+        image_url: "/images/card/art/domains/grace/endless-charisma.webp",
         type: "ability",
         title: "Endless Charisma",
         description_html: "",
@@ -341,9 +341,9 @@ export const GRACE_DOMAIN_CARDS = {
     astral_projection: {
         id: "astral_projection",
         card_type: "domain",
-        domain_id: "codex",
+        domain_id: "grace",
         artist_name: "Dominik Mayer",
-        image_url: "/images/card/art/domains/codex/astral-projection.webp",
+        image_url: "/images/card/art/domains/grace/astral-projection.webp",
         type: "spell",
         title: "Astral Projection",
         description_html: "",
@@ -365,9 +365,9 @@ export const GRACE_DOMAIN_CARDS = {
     mass_enrapture: {
         id: "mass_enrapture",
         card_type: "domain",
-        domain_id: "codex",
+        domain_id: "grace",
         artist_name: "Daarken",
-        image_url: "/images/card/art/domains/codex/mass-enrapture.webp",
+        image_url: "/images/card/art/domains/grace/mass-enrapture.webp",
         type: "spell",
         title: "Mass Enrapture",
         description_html: "",
@@ -389,9 +389,9 @@ export const GRACE_DOMAIN_CARDS = {
     copycat: {
         id: "copycat",
         card_type: "domain",
-        domain_id: "codex",
+        domain_id: "grace",
         artist_name: "Cybercatbug",
-        image_url: "/images/card/art/domains/codex/copycat.webp",
+        image_url: "/images/card/art/domains/grace/copycat.webp",
         type: "spell",
         title: "Copycat",
         description_html: "",
@@ -413,32 +413,74 @@ export const GRACE_DOMAIN_CARDS = {
     master_of_the_craft: {
         id: "master_of_the_craft",
         card_type: "domain",
-        domain_id: "codex",
+        domain_id: "grace",
         artist_name: "Anthony Jones",
-        image_url: "/images/card/art/domains/codex/master-of-the-craft.webp",
+        image_url: "/images/card/art/domains/grace/master-of-the-craft.webp",
         type: "ability",
         title: "Master of the Craft",
         description_html: "",
         level_requirement: 9,
         recall_cost: 0,
         applies_in_vault: true,
-        choices: [],
+        choices: [
+            {
+                id: "plus_2_to_two_experiences",
+                name: "+2 to two experiences",
+                type: "experience",
+                max: 2
+            },
+            {
+                id: "plus_3_to_one_experience",
+                name: "+3 to one experience",
+                type: "experience",
+                max: 1
+            }
+        ],
         tokens: false,
         features: [
             {
                 title: "",
                 description_html:
                     `<p>Gain a permanent +2 bonus to two of your Experiences or a permanent +3 bonus to one of your Experiences. Then place this card in your vault permanently.</p>`,
-                modifiers: []
+                modifiers: [
+                    {
+                        behavior: "bonus",
+                        conditions: [
+                            {
+                                type: "domain_card_choice",
+                                domain_card_id: "master_of_the_craft",
+                                choice_id:"plus_2_to_two_experiences",
+                            }
+                        ],
+                        type: "flat",
+                        value: 2,
+                        target: "experiences_from_domain_card_selection",
+                        domain_card_id: "master_of_the_craft"
+                    },
+                    {
+                        behavior: "bonus",
+                        conditions: [
+                            {
+                                type: "domain_card_choice",
+                                domain_card_id: "master_of_the_craft",
+                                choice_id:"plus_3_to_one_experience",
+                            }
+                        ],
+                        type: "flat",
+                        value: 3,
+                        target: "experiences_from_domain_card_selection",
+                        domain_card_id: "master_of_the_craft"
+                    }
+                ]
             }
         ],
     },
     encore: {
         id: "encore",
         card_type: "domain",
-        domain_id: "codex",
+        domain_id: "grace",
         artist_name: "Mat Wilma",
-        image_url: "/images/card/art/domains/codex/encore.webp",
+        image_url: "/images/card/art/domains/grace/encore.webp",
         type: "spell",
         title: "Encore",
         description_html: "",
@@ -461,9 +503,9 @@ export const GRACE_DOMAIN_CARDS = {
     notorious: {
         id: "notorious",
         card_type: "domain",
-        domain_id: "codex",
+        domain_id: "grace",
         artist_name: "Arturo G. González",
-        image_url: "/images/card/art/domains/codex/notorious.webp",
+        image_url: "/images/card/art/domains/grace/notorious.webp",
         type: "ability",
         title: "Notorious",
         description_html: "",

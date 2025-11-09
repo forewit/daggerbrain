@@ -1,11 +1,12 @@
 <script lang="ts">
-  import type { Card, Choice } from "$lib/ts/character/types";
+  import type { Card } from "$lib/ts/character/types";
   import { cn } from "$lib/utils";
   import type { Snippet } from "svelte";
   import DomainBanner from "../domain-banner.svelte";
   import { DOMAINS } from "$lib/ts/content/domains/domains";
   import * as Select from "$lib/components/ui/select";
   import { getCharacterContext } from "$lib/ts/character/character.svelte";
+  import ExperienceSelector from "../../leveling/secondary-options/experience-selector.svelte";
 
   let {
     bind_choice_select = false,
@@ -27,6 +28,7 @@
 
   const context = getCharacterContext();
   let character = $derived(context.character);
+  let width = $state(300);
 </script>
 
 {#snippet token_count()}
@@ -102,6 +104,9 @@
       onValueChange={(value) => {
         if (!character) return;
         character.domain_card_choices[card.id] = value;
+        if (current_choice?.type === "experience") {
+          character.domain_card_experience_selections[card.id] = [];
+        }
       }}
     >
       <Select.Trigger
@@ -124,6 +129,15 @@
         {/each}
       </Select.Content>
     </Select.Root>
+    {#if current_choice?.type === "experience"}
+      <ExperienceSelector
+        class="font-medium w-full border-black/30 data-[placeholder]:text-muted bg-white hover:bg-black/10 [&_svg:not([class*='text-'])]:text-muted text-background"
+        bind:selected_experiences={character.domain_card_experience_selections[card.id]}
+        max={current_choice.max}
+        experiences={character.experiences}
+        {width}
+      />
+    {/if}
   {/if}
 {/snippet}
 
@@ -166,7 +180,7 @@
     </div>
 
     <!-- content -->
-    <div class="flex-2 flex flex-col gap-2 px-3 py-2">
+    <div class="flex-2 flex flex-col gap-2 px-3 py-2" bind:clientWidth={width}>
       <!-- title and community label -->
       <div class="relative flex flex-row-reverse flex-wrap gap-2 justify-between">
         <div class="mr-auto shadow-md px-2 py-1 bg-accent rounded h-min">

@@ -269,14 +269,17 @@ export const BLADE_DOMAIN_CARDS = {
             {
                 id: "vitality_stress",
                 name: "One Stress slot",
+                type: "arbitrary"
             },
             {
                 id: "vitality_hit_point",
                 name: "One Hit Point slot",
+                type:"arbitrary"
             },
             {
                 id: "vitality_damage_threshold",
                 name: "+2 bonus to your damage thresholds",
+                type:"arbitrary"
             }
         ],
         tokens: false,

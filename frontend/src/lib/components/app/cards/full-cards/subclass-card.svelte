@@ -22,7 +22,7 @@
 
   let clientWidth = $state(360);
 
-  const character_class = CLASSES[card.class_name as keyof typeof CLASSES];
+  const character_class = CLASSES[card.class_id as keyof typeof CLASSES];
 </script>
 
 {#if variant === "responsive"}
