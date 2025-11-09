@@ -14,6 +14,7 @@ export const GRACE_DOMAIN_CARDS = {
         level_requirement: 1,
         recall_cost: 0,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -37,6 +38,7 @@ export const GRACE_DOMAIN_CARDS = {
         level_requirement: 1,
         recall_cost: 0,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -61,6 +63,7 @@ export const GRACE_DOMAIN_CARDS = {
         level_requirement: 1,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: true,
         features: [
@@ -90,6 +93,7 @@ export const GRACE_DOMAIN_CARDS = {
         level_requirement: 2,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -113,6 +117,7 @@ export const GRACE_DOMAIN_CARDS = {
         level_requirement: 2,
         recall_cost: 2,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -136,6 +141,7 @@ export const GRACE_DOMAIN_CARDS = {
         level_requirement: 3,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -160,6 +166,7 @@ export const GRACE_DOMAIN_CARDS = {
         level_requirement: 4,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -183,6 +190,7 @@ export const GRACE_DOMAIN_CARDS = {
         level_requirement: 4,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -206,6 +214,7 @@ export const GRACE_DOMAIN_CARDS = {
         level_requirement: 5,
         recall_cost: 2,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -230,6 +239,7 @@ export const GRACE_DOMAIN_CARDS = {
         level_requirement: 5,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -254,6 +264,7 @@ export const GRACE_DOMAIN_CARDS = {
         level_requirement: 6,
         recall_cost: 0,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -277,6 +288,7 @@ export const GRACE_DOMAIN_CARDS = {
         level_requirement: 6,
         recall_cost: 2,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: true,
         features: [
@@ -300,6 +312,7 @@ export const GRACE_DOMAIN_CARDS = {
         level_requirement: 7,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -323,6 +336,7 @@ export const GRACE_DOMAIN_CARDS = {
         level_requirement: 7,
         recall_cost: 2,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -350,6 +364,7 @@ export const GRACE_DOMAIN_CARDS = {
         level_requirement: 8,
         recall_cost: 0,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -374,6 +389,7 @@ export const GRACE_DOMAIN_CARDS = {
         level_requirement: 8,
         recall_cost: 3,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -398,6 +414,7 @@ export const GRACE_DOMAIN_CARDS = {
         level_requirement: 9,
         recall_cost: 3,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -409,7 +426,6 @@ export const GRACE_DOMAIN_CARDS = {
             }
         ],
     },
-    // todo: figure out how to make modifiers for this card...
     master_of_the_craft: {
         id: "master_of_the_craft",
         card_type: "domain",
@@ -422,6 +438,7 @@ export const GRACE_DOMAIN_CARDS = {
         level_requirement: 9,
         recall_cost: 0,
         applies_in_vault: true,
+        forced_in_loadout: false,
         choices: [
             {
                 id: "plus_2_to_two_experiences",
@@ -487,6 +504,7 @@ export const GRACE_DOMAIN_CARDS = {
         level_requirement: 10,
         recall_cost: 1,
         applies_in_vault: true,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -514,6 +532,7 @@ export const GRACE_DOMAIN_CARDS = {
         applies_in_vault: true,
         choices: [],
         tokens: false,
+        forced_in_loadout: true,
         features: [
             {
                 title: "",
@@ -521,7 +540,15 @@ export const GRACE_DOMAIN_CARDS = {
                     `<p>People know who you are and what you've done, and they treat you differently because of it. When you leverage your notoriety to get what you want, you can <b>mark a Stress</b> before you roll to gain a +10 bonus to the result.</p>
                      <p>Your food and drinks are always free wherever you go, and everything else you buy is reduced in price by one bag of gold (to a minimum of one handful).</p>
                      <p>This card doesn't count against your loadout's domain card maximum of 5 and can't be placed in your vault.</p>`,
-                modifiers: []
+                modifiers: [
+                    {
+                        behavior: "bonus",
+                        type: "flat",
+                        value: 1,
+                        target: "max_domain_card_loadout",
+                        conditions: []
+                    }
+                ]
             }
         ],
     }

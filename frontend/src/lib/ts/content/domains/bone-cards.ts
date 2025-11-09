@@ -13,6 +13,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 1,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -46,6 +47,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 1,
         recall_cost: 0,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -68,6 +70,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 1,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -90,6 +93,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 2,
         recall_cost: 2,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -112,6 +116,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 2,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: true,
         features: [
@@ -140,6 +145,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 3,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -162,6 +168,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 3,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -184,6 +191,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 4,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -206,6 +214,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 4,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -228,6 +237,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 5,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -257,6 +267,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 5,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -279,6 +290,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 6,
         recall_cost: 0,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -301,6 +313,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 6,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -323,6 +336,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 7,
         recall_cost: 2,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -362,6 +376,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 7,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -384,6 +399,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 8,
         recall_cost: 3,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -406,6 +422,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 8,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -428,6 +445,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 9,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -450,6 +468,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 9,
         recall_cost: 3,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -472,6 +491,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 10,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -494,6 +514,7 @@ export const BONE_DOMAIN_CARDS = {
         level_requirement: 10,
         recall_cost: 2,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [

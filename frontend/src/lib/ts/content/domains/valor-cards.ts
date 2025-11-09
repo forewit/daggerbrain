@@ -13,6 +13,7 @@ export const VALOR_DOMAIN_CARDS = {
         level_requirement: 1,
         recall_cost: 0,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [

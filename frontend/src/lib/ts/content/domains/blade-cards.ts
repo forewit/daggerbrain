@@ -13,6 +13,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 1,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -35,6 +36,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 1,
         recall_cost: 0,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -57,6 +59,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 1,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -79,6 +82,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 2,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -101,6 +105,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 2,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -123,6 +128,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 3,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -145,6 +151,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 3,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -167,6 +174,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 4,
         recall_cost: 2,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -189,6 +197,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 4,
         recall_cost: 0,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -237,6 +246,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 5,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -253,6 +263,7 @@ export const BLADE_DOMAIN_CARDS = {
             }
         ],
     },
+    // todo: add force_in_vault
     vitality: {
         id: "vitality",
         card_type: "domain",
@@ -265,6 +276,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 5,
         recall_cost: 0,
         applies_in_vault: true,
+        forced_in_loadout: false,
         choices: [
             {
                 id: "vitality_stress",
@@ -274,12 +286,12 @@ export const BLADE_DOMAIN_CARDS = {
             {
                 id: "vitality_hit_point",
                 name: "One Hit Point slot",
-                type:"arbitrary"
+                type: "arbitrary"
             },
             {
                 id: "vitality_damage_threshold",
                 name: "+2 bonus to your damage thresholds",
-                type:"arbitrary"
+                type: "arbitrary"
             }
         ],
         tokens: false,
@@ -354,6 +366,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 6,
         recall_cost: 2,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -376,6 +389,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 6,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -398,6 +412,8 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 7,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
+
         choices: [],
         tokens: false,
         features: [
@@ -447,6 +463,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 7,
         recall_cost: 1,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -469,6 +486,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 8,
         recall_cost: 2,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -491,6 +509,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 8,
         recall_cost: 3,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -513,6 +532,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 9,
         recall_cost: 2,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -535,6 +555,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 9,
         recall_cost: 3,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -557,6 +578,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 10,
         recall_cost: 0,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [
@@ -579,6 +601,7 @@ export const BLADE_DOMAIN_CARDS = {
         level_requirement: 10,
         recall_cost: 3,
         applies_in_vault: false,
+        forced_in_loadout: false,
         choices: [],
         tokens: false,
         features: [

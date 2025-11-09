@@ -188,6 +188,7 @@ export type Card<T extends CardType> = {
             choices: DomainCardChoice[]
             tokens: boolean
             applies_in_vault: boolean
+            forced_in_loadout: boolean
         } : T extends "subclass_foundation" ? {
             spellcast_trait: keyof Traits | null
             class_id: string
