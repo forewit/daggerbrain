@@ -14,6 +14,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 0,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -37,6 +38,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -60,6 +62,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 0,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: true,
         features: [
@@ -83,6 +86,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -106,6 +110,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 0,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -129,6 +134,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -152,6 +158,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -175,6 +182,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -198,6 +206,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 0,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -221,6 +230,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -244,6 +254,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 2,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -267,6 +278,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 0,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -296,6 +308,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 0,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -319,6 +332,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 2,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -346,6 +360,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -369,6 +384,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 2,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -392,6 +408,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: true,
         features: [
@@ -415,6 +432,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 2,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -438,6 +456,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: true,
         features: [
@@ -461,6 +480,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 2,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -484,6 +504,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         forced_in_loadout: false,
+forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [

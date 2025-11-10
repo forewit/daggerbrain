@@ -212,7 +212,7 @@ export const CLASSES = {
             description_html: "<p><b>Spend 3 Hope</b> when you succeed on an attack to temporarily Stagger your target and force them to mark a Stress. While Staggered, they have disadvantage on attack rolls.</p>",
             modifiers: []
         },
-        primary_domain_id: "bone",
+        primary_domain_id: "blade",
         secondary_domain_id: "grace",
         class_features: [
             {

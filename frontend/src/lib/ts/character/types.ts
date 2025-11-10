@@ -46,7 +46,7 @@ export type Character = {
         marked_stress: number,
         marked_hope: number,
         marked_armor: number,
-        domain_card_loadout: number[], // domain card vault indices
+        loadout_domain_card_ids: string[],
     }
 
 
@@ -189,6 +189,7 @@ export type Card<T extends CardType> = {
             tokens: boolean
             applies_in_vault: boolean
             forced_in_loadout: boolean
+            forced_in_vault: boolean
         } : T extends "subclass_foundation" ? {
             spellcast_trait: keyof Traits | null
             class_id: string

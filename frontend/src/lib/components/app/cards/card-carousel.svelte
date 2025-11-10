@@ -39,6 +39,8 @@
     selectedIndex = Math.max(Math.min(i, cards.length - 1), 0);
   }
 
+  
+
   onMount(() => {
     if (scrollContainer) {
       //scrollContainer.scrollLeft = cardWidth;

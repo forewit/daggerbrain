@@ -106,6 +106,7 @@ function createCharacter(uid: string) {
 
     // derived stats
     let domain_card_vault: Card<"domain">[] = $state([]);
+    let domain_card_loadout: Card<"domain">[] = $state([]);
     let traits: Traits = $state({ ...BASE_STATS.traits });
     let proficiency: number = $state(BASE_STATS.proficiency);
     let max_experiences: number = $state(BASE_STATS.max_experiences);
@@ -633,6 +634,7 @@ function createCharacter(uid: string) {
             //***** END domain card choices *****/
         }
 
+
         // ! clear invalid domain_card_choices
         const validChoiceIds = new Set(
             new_domain_card_vault.flatMap(card => card.choices.map(choice => choice.id))
@@ -661,18 +663,67 @@ function createCharacter(uid: string) {
         domain_card_vault = new_domain_card_vault;
     })
 
-    // ! remove invalid indices from the ephemeral domain card loadout (>max or not in the domain card vault)
+
+    // ! apply "force_in_vault" and "force_in_loadout" domain card properties
+    $effect(() => {
+        if (!character) return
+
+    })
+
+    // ! remove invalid indices from the ephemeral domain card loadout (>max or not in the domain card vault index range)
+    // * derive domain_card_loadout
     $effect(() => {
         if (!character) return;
-        const max = max_domain_card_loadout;
-        const unique_indices = [...new Set(character.ephemeral_stats.domain_card_loadout)];
-        const valid_indices = unique_indices.filter((i) => i >= 0 && i < max && i < (domain_card_vault.length || 0));
 
-        if (valid_indices.length !== unique_indices.length || valid_indices.length !== character.ephemeral_stats.domain_card_loadout.length) {
-            console.warn(`Removing invalid indices from the domain card loadout`);
-            character.ephemeral_stats.domain_card_loadout = valid_indices;
+        // checks for uniqueness while maintaining order
+        function unique<T>(arr: T[]): T[] {
+            const seen = new Set<T>();
+            return arr.filter(item => {
+                if (seen.has(item)) return false;
+                seen.add(item);
+                return true;
+            });
+        }
+
+        // filter out ids not in the vault and not forced in vault
+        let new_loadout_domain_card_ids = unique(character.ephemeral_stats.loadout_domain_card_ids)
+            .filter(id => domain_card_vault.some(card => card.id === id && !card.forced_in_vault))
+
+        // check if any cards are forced in the loadout
+        const ids_forced_in_loadout = domain_card_vault.filter(card => card.forced_in_loadout).map(card => card.id)
+
+
+        // add any missing cards that were forced in the loadout
+        for (const id of ids_forced_in_loadout) {
+            if (!new_loadout_domain_card_ids.includes(id)) {
+                console.warn(`Card with forced_in_loadout was missing. Adding to loadout:`, ids_forced_in_loadout)
+                new_loadout_domain_card_ids.unshift(...ids_forced_in_loadout)
+            }
+        }
+
+        if (new_loadout_domain_card_ids.length > max_domain_card_loadout) {
+            console.warn(`Loadout exceeded the max. Removing extra cards`)
+            new_loadout_domain_card_ids = new_loadout_domain_card_ids.slice(0, max_domain_card_loadout);
+        }
+
+        domain_card_loadout = new_loadout_domain_card_ids
+            .map(id => domain_card_vault.find(card => card.id === id))
+            .filter(id => !!id)
+
+        function equivilant(a: string[], b: string[]): boolean {
+            if (a.length === 0 && b.length === 0) return true
+            if (a.length !== b.length) return false;
+            const sortedA = [...a].sort();
+            const sortedB = [...b].sort();
+            return sortedA.every((v, i) => v === sortedB[i]);
+        }
+
+        if (!equivilant(new_loadout_domain_card_ids, character.ephemeral_stats.loadout_domain_card_ids)) {
+            character.ephemeral_stats.loadout_domain_card_ids = new_loadout_domain_card_ids
         }
     })
+
+
 
     // ! clear invalid active weapons
     $effect(() => {
@@ -719,7 +770,7 @@ function createCharacter(uid: string) {
     })
 
 
-
+    // helper function to check if conditionsa are met
     function evaluate_condition(condition: Condition): boolean {
         if (!character) return false
         if (condition.type === "level") {
@@ -732,9 +783,8 @@ function createCharacter(uid: string) {
         } else if (condition.type === "min_loadout_cards_from_domain") {
             // verify that the required number of cards from the domain are in the loadout
             let count = 0;
-            for (const index of character.ephemeral_stats.domain_card_loadout) {
-                const card = domain_card_vault[index];
-                if (card && card.domain_id === condition.domain_id) {
+            for (const card of domain_card_loadout) {
+                if (card.domain_id === condition.domain_id) {
                     count++;
                 }
             }
@@ -822,9 +872,9 @@ function createCharacter(uid: string) {
 
         // modifiers from the vault where applies_in_vault=true or the card index is in the loadout
         const vault = domain_card_vault;
-        const loadout = character.ephemeral_stats.domain_card_loadout;
-        vault.forEach(card => {
-            if (card.applies_in_vault || loadout.includes(vault.indexOf(card))) {
+        const loadout_card_ids = character.ephemeral_stats.loadout_domain_card_ids;
+        vault.forEach((card, i) => {
+            if (card.applies_in_vault || loadout_card_ids.includes(card.id)) {
                 card.features.forEach(f => push_modifiers(f.modifiers))
             }
         })
@@ -857,8 +907,6 @@ function createCharacter(uid: string) {
 
         console.warn("Updated modifier list...")
     })
-
-    // * do NOT derive secondary class and subclass from level up choices. 
 
     /**
      * Applies modifiers of a specific behavior type to a stat value
@@ -991,7 +1039,6 @@ function createCharacter(uid: string) {
 
         traits = new_traits;
     })
-
 
     // * derived experience_modifiers
     $effect(() => {
@@ -1357,6 +1404,7 @@ function createCharacter(uid: string) {
 
         // derived stats
         get domain_card_vault() { return domain_card_vault },
+        get domain_card_loadout() { return domain_card_loadout },
         get traits() { return traits },
         get proficiency() { return proficiency },
         get experience_modifiers() { return experience_modifiers },

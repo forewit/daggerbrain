@@ -20,13 +20,9 @@
   const context = getCharacterContext();
   let character = $derived(context.character);
 
-  let loadout: Card<"domain">[] = $derived(
-    character?.ephemeral_stats.domain_card_loadout.map((i) => context.domain_card_vault[i]) || []
-  );
-
   let vault: Card<"domain">[] = $derived(
     (context.domain_card_vault || []).filter(
-      (card) => !loadout.some((loadoutCard) => loadoutCard.title === card.title)
+      (card) => !context.domain_card_loadout.some((loadoutCard) => loadoutCard.id === card.id)
     )
   );
 
@@ -60,7 +56,7 @@
       <div
         class=" h-4.5 px-1.5 bg-accent text-background rounded-full font-bold text-xs grid place-items-center"
       >
-        {loadout.length} / {context.max_domain_card_loadout}
+        {context.domain_card_loadout.length} / {context.max_domain_card_loadout}
       </div>
       <Dialog.Root>
         <Dialog.Trigger class={cn(buttonVariants({ size: "sm" }), "relative")}>
@@ -87,27 +83,26 @@
               {#if vault.length > 0}
                 {#if restMode}
                   <Button
-                    hidden={vault.length === 0}
+                    hidden={vault.length === 0 || selectedVaultCard.forced_in_vault}
                     onclick={() => {
                       if (!character) return;
                       if (
-                        character.ephemeral_stats.domain_card_loadout.length <
+                        character.ephemeral_stats.loadout_domain_card_ids.length <
                         context.max_domain_card_loadout
                       ) {
-                        const vaultIndex = context.domain_card_vault.findIndex(
-                          (card) => card.id === vault[selectedVaultIndex].id
+                        character.ephemeral_stats.loadout_domain_card_ids.push(
+                          selectedVaultCard.id
                         );
-                        character.ephemeral_stats.domain_card_loadout.push(vaultIndex);
                       }
                     }}
                     class={cn(
                       "absolute -bottom-[2px] left-1/2 -translate-x-1/2 rounded-full",
-                      loadout.length >= context.max_domain_card_loadout &&
+                      context.domain_card_loadout.length >= context.max_domain_card_loadout &&
                         "border-destructive border-3 bg-muted hover:bg-muted cursor-default"
                     )}
                     size="sm"
                   >
-                    {#if loadout.length >= context.max_domain_card_loadout}
+                    {#if context.domain_card_loadout.length >= context.max_domain_card_loadout}
                       Loadout is full
                     {:else}
                       <ArrowUp class="size-4" />
@@ -116,30 +111,29 @@
                   </Button>
                 {:else}
                   <Button
-                    hidden={vault.length === 0}
+                    hidden={vault.length === 0 || selectedVaultCard.forced_in_vault}
                     size="sm"
                     onclick={() => {
                       if (!character) return;
                       if (
-                        character.ephemeral_stats.domain_card_loadout.length <
+                        character.ephemeral_stats.loadout_domain_card_ids.length <
                           context.max_domain_card_loadout &&
                         selectedVaultCard?.recall_cost <= remainingStress
                       ) {
                         character.ephemeral_stats.marked_stress += selectedVaultCard.recall_cost;
-                        const vaultIndex = context.domain_card_vault.findIndex(
-                          (card) => card.id === vault[selectedVaultIndex].id
+                        character.ephemeral_stats.loadout_domain_card_ids.push(
+                          selectedVaultCard.id
                         );
-                        character.ephemeral_stats.domain_card_loadout.push(vaultIndex);
                       }
                     }}
                     class={cn(
                       "absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full",
                       (selectedVaultCard?.recall_cost > remainingStress ||
-                        loadout.length >= context.max_domain_card_loadout) &&
+                        context.domain_card_loadout.length >= context.max_domain_card_loadout) &&
                         "border-destructive border-3 bg-muted hover:bg-muted cursor-default"
                     )}
                   >
-                    {#if loadout.length >= context.max_domain_card_loadout}
+                    {#if context.domain_card_loadout.length >= context.max_domain_card_loadout}
                       Loadout is full
                     {:else if selectedVaultCard?.recall_cost > remainingStress}
                       Not enough stress slots
@@ -188,15 +182,18 @@
     {#if expanded}
       <div class="relative">
         <CardCarousel
-          cards={loadout}
+          cards={context.domain_card_loadout}
           bind:selectedIndex={selectedLoadoutIndex}
           emptyMessage="Loadout Empty"
         />
         <Button
-          hidden={loadout.length === 0}
+          hidden={context.domain_card_loadout.length === 0 ||
+            (context.domain_card_loadout[selectedLoadoutIndex] && context.domain_card_loadout[selectedLoadoutIndex].forced_in_loadout)}
           size="sm"
           onclick={() => {
-            character.ephemeral_stats.domain_card_loadout.splice(selectedLoadoutIndex, 1);
+            const selected_id = context.domain_card_loadout[selectedLoadoutIndex].id;
+            character.ephemeral_stats.loadout_domain_card_ids =
+              character.ephemeral_stats.loadout_domain_card_ids.filter((id) => id !== selected_id);
           }}
           class="absolute -bottom-[2px] left-1/2 -translate-x-1/2 rounded-full"
         >

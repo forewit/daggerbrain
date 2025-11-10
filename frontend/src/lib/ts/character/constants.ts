@@ -75,7 +75,7 @@ export const JUST_JAMES: Character = {
         marked_stress: 0,
         marked_hope: 0,
         marked_armor: 0,
-        domain_card_loadout: [0, 1, 2],
+        loadout_domain_card_ids: ["whirlwind", "not_good_enough", "a_soldiers_bond"],
     },
 
     // choices made by the player in regards to their domain cards
@@ -185,7 +185,7 @@ export const NEW_CHARACTER: Character = {
         marked_stress: 0,
         marked_hope: 0,
         marked_armor: 0,
-        domain_card_loadout: [],
+        loadout_domain_card_ids: [],
     },
 
     // level-up choices

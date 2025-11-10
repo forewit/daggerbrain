@@ -14,6 +14,7 @@ export const VALOR_DOMAIN_CARDS = {
         recall_cost: 0,
         applies_in_vault: false,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -33,17 +34,17 @@ export const VALOR_DOMAIN_CARDS = {
                         type: "derived_from_trait",
                         trait: "strength",
                         multiplier: 1,
-					conditions: [{
+                        conditions: [{
                             type: "level",
                             min_level: 1,
-						max_level: 1
+                            max_level: 1
                         }, {
                             type: "armor_equipped",
-						value: false
-					}, {
-						type: "level",
-						min_level: 1,
-						max_level: 10
+                            value: false
+                        }, {
+                            type: "level",
+                            min_level: 1,
+                            max_level: 10
                         }]
                     },
                     {
@@ -51,17 +52,17 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "max_armor",
                         type: "flat",
                         value: 3,
-					conditions: [{
+                        conditions: [{
                             type: "level",
                             min_level: 1,
-						max_level: 1
+                            max_level: 1
                         }, {
                             type: "armor_equipped",
-						value: false
-					}, {
-						type: "level",
-						min_level: 1,
-						max_level: 10
+                            value: false
+                        }, {
+                            type: "level",
+                            min_level: 1,
+                            max_level: 10
                         }]
                     },
                     {
@@ -69,17 +70,17 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "major_damage_threshold",
                         type: "flat",
                         value: 9,
-					conditions: [{
+                        conditions: [{
                             type: "level",
                             min_level: 1,
-						max_level: 1
+                            max_level: 1
                         }, {
                             type: "armor_equipped",
-						value: false
-					}, {
-						type: "level",
-						min_level: 1,
-						max_level: 10
+                            value: false
+                        }, {
+                            type: "level",
+                            min_level: 1,
+                            max_level: 10
                         }]
                     },
                     {
@@ -87,17 +88,17 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "severe_damage_threshold",
                         type: "flat",
                         value: 19,
-					conditions: [{
+                        conditions: [{
                             type: "level",
                             min_level: 1,
-						max_level: 1
+                            max_level: 1
                         }, {
                             type: "armor_equipped",
-						value: false
-					}, {
-						type: "level",
-						min_level: 1,
-						max_level: 10
+                            value: false
+                        }, {
+                            type: "level",
+                            min_level: 1,
+                            max_level: 10
                         }]
                     },
                     {
@@ -106,17 +107,17 @@ export const VALOR_DOMAIN_CARDS = {
                         type: "derived_from_trait",
                         trait: "strength",
                         multiplier: 1,
-					conditions: [{
+                        conditions: [{
                             type: "level",
                             min_level: 2,
-						max_level: 4
+                            max_level: 4
                         }, {
                             type: "armor_equipped",
-						value: false
-					}, {
-						type: "level",
-						min_level: 1,
-						max_level: 10
+                            value: false
+                        }, {
+                            type: "level",
+                            min_level: 1,
+                            max_level: 10
                         }]
                     },
                     {
@@ -124,17 +125,17 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "max_armor",
                         type: "flat",
                         value: 3,
-					conditions: [{
+                        conditions: [{
                             type: "level",
                             min_level: 2,
-						max_level: 4
+                            max_level: 4
                         }, {
                             type: "armor_equipped",
-						value: false
-					}, {
-						type: "level",
-						min_level: 1,
-						max_level: 10
+                            value: false
+                        }, {
+                            type: "level",
+                            min_level: 1,
+                            max_level: 10
                         }]
                     },
                     {
@@ -142,17 +143,17 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "major_damage_threshold",
                         type: "flat",
                         value: 11,
-					conditions: [{
+                        conditions: [{
                             type: "level",
                             min_level: 2,
-						max_level: 4
+                            max_level: 4
                         }, {
                             type: "armor_equipped",
-						value: false
-					}, {
-						type: "level",
-						min_level: 1,
-						max_level: 10
+                            value: false
+                        }, {
+                            type: "level",
+                            min_level: 1,
+                            max_level: 10
                         }]
                     },
                     {
@@ -160,17 +161,17 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "severe_damage_threshold",
                         type: "flat",
                         value: 24,
-					conditions: [{
+                        conditions: [{
                             type: "level",
                             min_level: 2,
-						max_level: 4
+                            max_level: 4
                         }, {
                             type: "armor_equipped",
-						value: false
-					}, {
-						type: "level",
-						min_level: 1,
-						max_level: 10
+                            value: false
+                        }, {
+                            type: "level",
+                            min_level: 1,
+                            max_level: 10
                         }]
                     },
                     {
@@ -179,17 +180,17 @@ export const VALOR_DOMAIN_CARDS = {
                         type: "derived_from_trait",
                         trait: "strength",
                         multiplier: 1,
-					conditions: [{
+                        conditions: [{
                             type: "level",
                             min_level: 5,
-						max_level: 7
+                            max_level: 7
                         }, {
                             type: "armor_equipped",
-						value: false
-					}, {
-						type: "level",
-						min_level: 1,
-						max_level: 10
+                            value: false
+                        }, {
+                            type: "level",
+                            min_level: 1,
+                            max_level: 10
                         }]
                     },
                     {
@@ -197,17 +198,17 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "max_armor",
                         type: "flat",
                         value: 3,
-					conditions: [{
+                        conditions: [{
                             type: "level",
                             min_level: 5,
-						max_level: 7
+                            max_level: 7
                         }, {
                             type: "armor_equipped",
-						value: false
-					}, {
-						type: "level",
-						min_level: 1,
-						max_level: 10
+                            value: false
+                        }, {
+                            type: "level",
+                            min_level: 1,
+                            max_level: 10
                         }]
                     },
                     {
@@ -215,17 +216,17 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "major_damage_threshold",
                         type: "flat",
                         value: 13,
-					conditions: [{
+                        conditions: [{
                             type: "level",
                             min_level: 5,
-						max_level: 7
+                            max_level: 7
                         }, {
                             type: "armor_equipped",
-						value: false
-					}, {
-						type: "level",
-						min_level: 1,
-						max_level: 10
+                            value: false
+                        }, {
+                            type: "level",
+                            min_level: 1,
+                            max_level: 10
                         }]
                     },
                     {
@@ -233,17 +234,17 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "severe_damage_threshold",
                         type: "flat",
                         value: 31,
-					conditions: [{
+                        conditions: [{
                             type: "level",
                             min_level: 5,
-						max_level: 7
+                            max_level: 7
                         }, {
                             type: "armor_equipped",
-						value: false
-					}, {
-						type: "level",
-						min_level: 1,
-						max_level: 10
+                            value: false
+                        }, {
+                            type: "level",
+                            min_level: 1,
+                            max_level: 10
                         }]
                     },
                     {
@@ -252,17 +253,17 @@ export const VALOR_DOMAIN_CARDS = {
                         type: "derived_from_trait",
                         trait: "strength",
                         multiplier: 1,
-					conditions: [{
+                        conditions: [{
                             type: "level",
                             min_level: 8,
-						max_level: 10
+                            max_level: 10
                         }, {
                             type: "armor_equipped",
-						value: false
-					}, {
-						type: "level",
-						min_level: 1,
-						max_level: 10
+                            value: false
+                        }, {
+                            type: "level",
+                            min_level: 1,
+                            max_level: 10
                         }]
                     },
                     {
@@ -270,17 +271,17 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "max_armor",
                         type: "flat",
                         value: 3,
-					conditions: [{
+                        conditions: [{
                             type: "level",
                             min_level: 8,
-						max_level: 10
+                            max_level: 10
                         }, {
                             type: "armor_equipped",
-						value: false
-					}, {
-						type: "level",
-						min_level: 1,
-						max_level: 10
+                            value: false
+                        }, {
+                            type: "level",
+                            min_level: 1,
+                            max_level: 10
                         }]
                     },
                     {
@@ -288,17 +289,17 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "major_damage_threshold",
                         type: "flat",
                         value: 15,
-					conditions: [{
+                        conditions: [{
                             type: "level",
                             min_level: 8,
-						max_level: 10
+                            max_level: 10
                         }, {
                             type: "armor_equipped",
-						value: false
-					}, {
-						type: "level",
-						min_level: 1,
-						max_level: 10
+                            value: false
+                        }, {
+                            type: "level",
+                            min_level: 1,
+                            max_level: 10
                         }]
                     },
                     {
@@ -306,17 +307,17 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "severe_damage_threshold",
                         type: "flat",
                         value: 38,
-					conditions: [{
+                        conditions: [{
                             type: "level",
                             min_level: 8,
-						max_level: 10
+                            max_level: 10
                         }, {
                             type: "armor_equipped",
-						value: false
-					}, {
-						type: "level",
-						min_level: 1,
-						max_level: 10
+                            value: false
+                        }, {
+                            type: "level",
+                            min_level: 1,
+                            max_level: 10
                         }]
                     }
                 ]

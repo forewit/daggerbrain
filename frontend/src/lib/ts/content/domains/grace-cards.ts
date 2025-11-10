@@ -15,6 +15,7 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 0,
         applies_in_vault: false,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -39,6 +40,7 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 0,
         applies_in_vault: false,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -64,6 +66,7 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [],
         tokens: true,
         features: [
@@ -94,6 +97,7 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -118,6 +122,7 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 2,
         applies_in_vault: false,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -142,6 +147,7 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -167,6 +173,7 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -191,6 +198,7 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -215,6 +223,7 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 2,
         applies_in_vault: false,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -240,6 +249,7 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -265,6 +275,7 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 0,
         applies_in_vault: false,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -289,6 +300,7 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 2,
         applies_in_vault: false,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [],
         tokens: true,
         features: [
@@ -313,6 +325,7 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: false,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -337,6 +350,7 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 2,
         applies_in_vault: false,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -365,6 +379,7 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 0,
         applies_in_vault: false,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -390,6 +405,7 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 3,
         applies_in_vault: false,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -415,6 +431,7 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 3,
         applies_in_vault: false,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -439,6 +456,7 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 0,
         applies_in_vault: true,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [
             {
                 id: "plus_2_to_two_experiences",
@@ -466,7 +484,7 @@ export const GRACE_DOMAIN_CARDS = {
                             {
                                 type: "domain_card_choice",
                                 domain_card_id: "master_of_the_craft",
-                                choice_id:"plus_2_to_two_experiences",
+                                choice_id: "plus_2_to_two_experiences",
                             }
                         ],
                         type: "flat",
@@ -480,7 +498,7 @@ export const GRACE_DOMAIN_CARDS = {
                             {
                                 type: "domain_card_choice",
                                 domain_card_id: "master_of_the_craft",
-                                choice_id:"plus_3_to_one_experience",
+                                choice_id: "plus_3_to_one_experience",
                             }
                         ],
                         type: "flat",
@@ -505,6 +523,7 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 1,
         applies_in_vault: true,
         forced_in_loadout: false,
+        forced_in_vault: false,
         choices: [],
         tokens: false,
         features: [
@@ -529,10 +548,11 @@ export const GRACE_DOMAIN_CARDS = {
         description_html: "",
         level_requirement: 10,
         recall_cost: 0,
-        applies_in_vault: true,
+        applies_in_vault: false,
         choices: [],
         tokens: false,
         forced_in_loadout: true,
+        forced_in_vault: false,
         features: [
             {
                 title: "",

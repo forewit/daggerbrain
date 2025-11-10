@@ -1,0 +1,203 @@
+{
+  "settings": { "void_enabled": false },
+  "uid": "9cbf3986-93ab-4598-8001-e63ba8c27f1d",
+  "name": "New Character",
+  "image": "/images/portrait-placeholder.png",
+  "selected_traits": {
+    "agility": null,
+    "strength": null,
+    "finesse": null,
+    "instinct": null,
+    "presence": null,
+    "knowledge": null
+  },
+  "derived_descriptors": {
+    "ancestry_name": "",
+    "primary_class_name": "Brawler",
+    "primary_subclass_name": "",
+    "secondary_class_name": "",
+    "secondary_subclass_name": ""
+  },
+  "ancestry_card_id": null,
+  "community_card_id": null,
+  "experiences": ["", "", "", "", ""],
+  "primary_class_id": "brawler",
+  "primary_subclass_id": null,
+  "secondary_class_id": null,
+  "secondary_subclass_id": null,
+  "secondary_class_domain_id_choice": null,
+  "domain_card_choices": {},
+  "domain_card_experience_selections": {},
+  "domain_card_tokens": {},
+  "active_armor_id": null,
+  "active_weapon_ids": [],
+  "transformation_card_id": null,
+  "additional_domain_card_ids": [],
+  "additional_modifiers": [],
+  "ephemeral_stats": {
+    "marked_hp": 0,
+    "marked_stress": 0,
+    "marked_hope": 0,
+    "marked_armor": 0,
+    "loadout_domain_card_ids": []
+  },
+  "level": 10,
+  "level_up_domain_card_ids": {
+    "1": { "A": null, "B": null },
+    "2": { "A": null },
+    "3": { "A": null },
+    "4": { "A": null },
+    "5": { "A": null },
+    "6": { "A": null },
+    "7": { "A": null },
+    "8": { "A": null },
+    "9": { "A": null },
+    "10": { "A": "notorious" }
+  },
+  "level_up_choices": {
+    "2": {
+      "A": {
+        "option_id": null,
+        "marked_traits": { "A": null, "B": null },
+        "selected_experiences": [],
+        "selected_domain_card_id": null,
+        "selected_subclass_upgrade": null
+      },
+      "B": {
+        "option_id": null,
+        "marked_traits": { "A": null, "B": null },
+        "selected_experiences": [],
+        "selected_domain_card_id": null,
+        "selected_subclass_upgrade": null
+      }
+    },
+    "3": {
+      "A": {
+        "option_id": null,
+        "marked_traits": { "A": null, "B": null },
+        "selected_experiences": [],
+        "selected_domain_card_id": null,
+        "selected_subclass_upgrade": null
+      },
+      "B": {
+        "option_id": null,
+        "marked_traits": { "A": null, "B": null },
+        "selected_experiences": [],
+        "selected_domain_card_id": null,
+        "selected_subclass_upgrade": null
+      }
+    },
+    "4": {
+      "A": {
+        "option_id": null,
+        "marked_traits": { "A": null, "B": null },
+        "selected_experiences": [],
+        "selected_domain_card_id": null,
+        "selected_subclass_upgrade": null
+      },
+      "B": {
+        "option_id": null,
+        "marked_traits": { "A": null, "B": null },
+        "selected_experiences": [],
+        "selected_domain_card_id": null,
+        "selected_subclass_upgrade": null
+      }
+    },
+    "5": {
+      "A": {
+        "option_id": null,
+        "marked_traits": { "A": null, "B": null },
+        "selected_experiences": [],
+        "selected_domain_card_id": null,
+        "selected_subclass_upgrade": null
+      },
+      "B": {
+        "option_id": null,
+        "marked_traits": { "A": null, "B": null },
+        "selected_experiences": [],
+        "selected_domain_card_id": null,
+        "selected_subclass_upgrade": null
+      }
+    },
+    "6": {
+      "A": {
+        "option_id": null,
+        "marked_traits": { "A": null, "B": null },
+        "selected_experiences": [],
+        "selected_domain_card_id": null,
+        "selected_subclass_upgrade": null
+      },
+      "B": {
+        "option_id": null,
+        "marked_traits": { "A": null, "B": null },
+        "selected_experiences": [],
+        "selected_domain_card_id": null,
+        "selected_subclass_upgrade": null
+      }
+    },
+    "7": {
+      "A": {
+        "option_id": null,
+        "marked_traits": { "A": null, "B": null },
+        "selected_experiences": [],
+        "selected_domain_card_id": null,
+        "selected_subclass_upgrade": null
+      },
+      "B": {
+        "option_id": null,
+        "marked_traits": { "A": null, "B": null },
+        "selected_experiences": [],
+        "selected_domain_card_id": null,
+        "selected_subclass_upgrade": null
+      }
+    },
+    "8": {
+      "A": {
+        "option_id": null,
+        "marked_traits": { "A": null, "B": null },
+        "selected_experiences": [],
+        "selected_domain_card_id": null,
+        "selected_subclass_upgrade": null
+      },
+      "B": {
+        "option_id": null,
+        "marked_traits": { "A": null, "B": null },
+        "selected_experiences": [],
+        "selected_domain_card_id": null,
+        "selected_subclass_upgrade": null
+      }
+    },
+    "9": {
+      "A": {
+        "option_id": null,
+        "marked_traits": { "A": null, "B": null },
+        "selected_experiences": [],
+        "selected_domain_card_id": null,
+        "selected_subclass_upgrade": null
+      },
+      "B": {
+        "option_id": null,
+        "marked_traits": { "A": null, "B": null },
+        "selected_experiences": [],
+        "selected_domain_card_id": null,
+        "selected_subclass_upgrade": null
+      }
+    },
+    "10": {
+      "A": {
+        "option_id": null,
+        "marked_traits": { "A": null, "B": null },
+        "selected_experiences": [],
+        "selected_domain_card_id": null,
+        "selected_subclass_upgrade": null
+      },
+      "B": {
+        "option_id": null,
+        "marked_traits": { "A": null, "B": null },
+        "selected_experiences": [],
+        "selected_domain_card_id": null,
+        "selected_subclass_upgrade": null
+      }
+    }
+  }
+}
