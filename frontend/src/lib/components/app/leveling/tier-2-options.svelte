@@ -15,6 +15,7 @@
   import ExperienceSelector from "./secondary-options/experience-selector.svelte";
   import TierOptionsGroup from "./tier-options-group.svelte";
   import { BLANK_LEVEL_UP_CHOICE } from "$lib/ts/character/constants";
+  import ChoiceSelector from "./secondary-options/choice-selector.svelte";
 
   let {
     class: className = "",
