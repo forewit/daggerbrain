@@ -16,27 +16,28 @@ function safeParse<T>(raw: string | null, fallback: T): T {
 
 // --- characters ---
 export function loadCharacters(fallback: Character[]): Character[] {
-    const indexRaw = localStorage.getItem(CHARACTERS_INDEX_KEY)
-    if (indexRaw === null) {
-        // No characters saved yet, save the fallback and return it
-        saveCharacters(fallback)
-        return fallback
-    }
+    return []
+    // const indexRaw = localStorage.getItem(CHARACTERS_INDEX_KEY)
+    // if (indexRaw === null) {
+    //     // No characters saved yet, save the fallback and return it
+    //     saveCharacters(fallback)
+    //     return fallback
+    // }
 
-    const characterUids = safeParse<string[]>(indexRaw, [])
-    const characters: Character[] = []
+    // const characterUids = safeParse<string[]>(indexRaw, [])
+    // const characters: Character[] = []
     
-    for (const uid of characterUids) {
-        const characterRaw = localStorage.getItem(`${CHARACTERS_KEY_PREFIX}${uid}`)
-        if (characterRaw) {
-            const character = safeParse<Character | null>(characterRaw, null)
-            if (character) {
-                characters.push(character)
-            }
-        }
-    }
+    // for (const uid of characterUids) {
+    //     const characterRaw = localStorage.getItem(`${CHARACTERS_KEY_PREFIX}${uid}`)
+    //     if (characterRaw) {
+    //         const character = safeParse<Character | null>(characterRaw, null)
+    //         if (character) {
+    //             characters.push(character)
+    //         }
+    //     }
+    // }
 
-    return characters
+    // return characters
 }
 
 export function saveCharacters(state: Character[]): void {

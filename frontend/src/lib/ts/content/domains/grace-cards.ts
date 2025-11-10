@@ -456,19 +456,44 @@ export const GRACE_DOMAIN_CARDS = {
         recall_cost: 0,
         applies_in_vault: true,
         forced_in_loadout: false,
-        forced_in_vault: false,
+        forced_in_vault: true,
         choices: [
             {
-                id: "plus_2_to_two_experiences",
-                name: "+2 to two experiences",
-                type: "experience",
-                max: 2
+                choice_id: "choose_one_option",
+                type: "arbitrary",
+                max: 1,
+                conditional_choice: null,
+                options: [
+                    {
+                        selection_id: "plus_2_to_two_experiences",
+                        title: "+2 bonus to two Experiences",
+                        short_title: "+2 to 2 Experiences"
+                    },
+                    {
+                        selection_id: "plus_3_to_one_experience",
+                        title: "+3 bonus to one Experience",
+                        short_title: "+3 to 1 Experience"
+                    }
+                ]
+
             },
             {
-                id: "plus_3_to_one_experience",
-                name: "+3 to one experience",
+                choice_id: "choose_two_experiences",
                 type: "experience",
-                max: 1
+                max: 2,
+                conditional_choice: {
+                    choice_id: "choose_one_option",
+                    selection_id: "plus_2_to_two_experiences"
+                }
+            },
+            {
+                choice_id: "choose_one_experience",
+                type: "experience",
+                max: 1,
+                conditional_choice: {
+                    choice_id: "choose_one_option",
+                    selection_id: "plus_3_to_one_experience"
+                }
             }
         ],
         tokens: false,
@@ -482,30 +507,34 @@ export const GRACE_DOMAIN_CARDS = {
                         behavior: "bonus",
                         conditions: [
                             {
-                                type: "domain_card_choice",
+                                type:"domain_card_choice",
                                 domain_card_id: "master_of_the_craft",
-                                choice_id: "plus_2_to_two_experiences",
+                                choice_id: "choose_one_option",
+                                selection_id: "plus_2_to_two_experiences"
                             }
                         ],
                         type: "flat",
                         value: 2,
-                        target: "experiences_from_domain_card_selection",
-                        domain_card_id: "master_of_the_craft"
+                        target: "experience_from_selection",
+                        domain_card_id: "master_of_the_craft",
+                        choice_id: "choose_two_experiences"
                     },
                     {
                         behavior: "bonus",
                         conditions: [
                             {
-                                type: "domain_card_choice",
+                                type:"domain_card_choice",
                                 domain_card_id: "master_of_the_craft",
-                                choice_id: "plus_3_to_one_experience",
+                                choice_id: "choose_one_option",
+                                selection_id: "plus_3_to_one_experience"
                             }
                         ],
                         type: "flat",
                         value: 3,
-                        target: "experiences_from_domain_card_selection",
-                        domain_card_id: "master_of_the_craft"
-                    }
+                        target: "experience_from_selection",
+                        domain_card_id: "master_of_the_craft",
+                        choice_id: "choose_one_experience"
+                    },
                 ]
             }
         ],
@@ -536,7 +565,6 @@ export const GRACE_DOMAIN_CARDS = {
             }
         ],
     },
-    // todo: add a way to force this in your loadout
     notorious: {
         id: "notorious",
         card_type: "domain",

@@ -1,15 +1,15 @@
 {
   "settings": { "void_enabled": false },
-  "uid": "9cbf3986-93ab-4598-8001-e63ba8c27f1d",
+  "uid": "1d6ffe1a-c39a-4382-8da0-30cec6da49ed",
   "name": "New Character",
   "image": "/images/portrait-placeholder.png",
   "selected_traits": {
-    "agility": null,
-    "strength": null,
-    "finesse": null,
-    "instinct": null,
-    "presence": null,
-    "knowledge": null
+    "agility": 1,
+    "strength": 1,
+    "finesse": 0,
+    "instinct": 2,
+    "presence": 0,
+    "knowledge": -1
   },
   "derived_descriptors": {
     "ancestry_name": "",
@@ -20,7 +20,7 @@
   },
   "ancestry_card_id": null,
   "community_card_id": null,
-  "experiences": ["", "", "", "", ""],
+  "experiences": ["", "", "", ""],
   "primary_class_id": "brawler",
   "primary_subclass_id": null,
   "secondary_class_id": null,
@@ -28,6 +28,12 @@
   "secondary_class_domain_id_choice": null,
   "domain_card_choices": {},
   "domain_card_experience_selections": {},
+  "domain_card_arbitrary_selections": {
+    "vitality": {
+      "choose_one": ["stress_slot", "hp_slot"],
+      "choose_two": ["stress_slot", "hp_slot"]
+    }
+  },
   "domain_card_tokens": {},
   "active_armor_id": null,
   "active_weapon_ids": [],
@@ -41,18 +47,18 @@
     "marked_armor": 0,
     "loadout_domain_card_ids": []
   },
-  "level": 10,
+  "level": 5,
   "level_up_domain_card_ids": {
     "1": { "A": null, "B": null },
     "2": { "A": null },
     "3": { "A": null },
     "4": { "A": null },
-    "5": { "A": null },
+    "5": { "A": "vitality" },
     "6": { "A": null },
     "7": { "A": null },
     "8": { "A": null },
     "9": { "A": null },
-    "10": { "A": "notorious" }
+    "10": { "A": null }
   },
   "level_up_choices": {
     "2": {

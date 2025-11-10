@@ -49,11 +49,11 @@ export type Character = {
         loadout_domain_card_ids: string[],
     }
 
+    // key is a domain card id or class id
+    // key: {choice_id, selection_ids[]}
+    domain_card_choices: Record<string, Record<string, string[]>>,
 
-    // choices made by the player in regards to their domain cards
-    // key is the domain card id
-    domain_card_experience_selections: Record<string, number[]>
-    domain_card_choices: Record<string, string>,
+
     domain_card_tokens: Record<string, number>,
 
     // level-up choices. levels 2-10
@@ -126,6 +126,7 @@ export type Condition = {
     type: "domain_card_choice"
     domain_card_id: string
     choice_id: string
+    selection_id: string
 } | {
     type: "min_loadout_cards_from_domain"
     domain_id: DomainIds
@@ -148,8 +149,9 @@ export type Modifier = ({
     target: "trait"
     trait: keyof Traits
 } | {
-    target: "experiences_from_domain_card_selection"
+    target: "experience_from_selection"
     domain_card_id: string
+    choice_id: string
 }))
 
 export type Feature = {
@@ -162,10 +164,12 @@ export type CardType = "domain" | "ancestry" | "community" | "transformation" | 
 
 
 export type DomainCardChoice = {
-    id: string,
-    name: string,
+    choice_id: string,
+    conditional_choice: { choice_id: string, selection_id: string } | null
 } & ({
     type: "arbitrary"
+    max: number,
+    options: { selection_id: string, title: string, short_title: string }[]
 } | {
     type: "experience"
     max: number

@@ -634,17 +634,6 @@ function createCharacter(uid: string) {
             //***** END domain card choices *****/
         }
 
-
-        // ! clear invalid domain_card_choices
-        const validChoiceIds = new Set(
-            new_domain_card_vault.flatMap(card => card.choices.map(choice => choice.id))
-        );
-        for (const [domainCardId, choiceId] of Object.entries(character.domain_card_choices)) {
-            if (!validChoiceIds.has(choiceId)) {
-                delete character.domain_card_choices[domainCardId];
-            }
-        }
-
         // ! clear invalid domain_card_tokens
         for (const domainCardId of Object.keys(character.domain_card_tokens)) {
             if (!new_domain_card_vault.some(card => card.id === domainCardId)) {
@@ -652,23 +641,68 @@ function createCharacter(uid: string) {
             }
         }
 
-        // ! clear invalid domain_card_experience_selections
-        for (const domainCardId of Object.keys(character.domain_card_experience_selections)) {
-            if (!new_domain_card_vault.some(card => card.id === domainCardId)) {
-                delete character.domain_card_experience_selections[domainCardId];
+
+        // ! clear invalid domain_card_choices
+        let new_domain_card_choices: typeof character.domain_card_choices = JSON.parse(JSON.stringify(character.domain_card_choices))
+
+        // initialize choices 
+        for (const card of new_domain_card_vault) {
+            if (!new_domain_card_choices[card.id]) {
+                console.warn(`Creating arbitrary_choice slot for ${card.id}`)
+                new_domain_card_choices[card.id] = Object.fromEntries(card.choices.map(choice => [choice.choice_id, []]))
             }
         }
+
+        // clear invalid choices
+        const valid_keys = new_domain_card_vault.map(card => card.id)
+        for (const domain_card_id of Object.keys(new_domain_card_choices)) {
+            if (!valid_keys.includes(domain_card_id)) delete new_domain_card_choices[domain_card_id]
+        }
+
+        function deepEqualRecords(
+            a: Record<string, Record<string, string[]>>,
+            b: Record<string, Record<string, string[]>>
+        ): boolean {
+            const aKeys = Object.keys(a);
+            const bKeys = Object.keys(b);
+            if (aKeys.length !== bKeys.length) return false;
+
+            for (const key of aKeys) {
+                if (!b.hasOwnProperty(key)) return false;
+
+                const aInner = a[key];
+                const bInner = b[key];
+                const aInnerKeys = Object.keys(aInner);
+                const bInnerKeys = Object.keys(bInner);
+                if (aInnerKeys.length !== bInnerKeys.length) return false;
+
+                for (const subKey of aInnerKeys) {
+                    if (!bInner.hasOwnProperty(subKey)) return false;
+
+                    const aValues = [...aInner[subKey]].sort();
+                    const bValues = [...bInner[subKey]].sort();
+
+                    if (aValues.length !== bValues.length) return false;
+                    for (let i = 0; i < aValues.length; i++) {
+                        if (aValues[i] !== bValues[i]) return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        if (!deepEqualRecords(character.domain_card_choices, new_domain_card_choices)) {
+            console.warn("domain_card_choices updated")
+            character.domain_card_choices = new_domain_card_choices
+        }
+
+
 
         // * derived domain card vault
         domain_card_vault = new_domain_card_vault;
     })
 
-
-    // ! apply "force_in_vault" and "force_in_loadout" domain card properties
-    $effect(() => {
-        if (!character) return
-
-    })
 
     // ! remove invalid indices from the ephemeral domain card loadout (>max or not in the domain card vault index range)
     // * derive domain_card_loadout
@@ -691,7 +725,6 @@ function createCharacter(uid: string) {
 
         // check if any cards are forced in the loadout
         const ids_forced_in_loadout = domain_card_vault.filter(card => card.forced_in_loadout).map(card => card.id)
-
 
         // add any missing cards that were forced in the loadout
         for (const id of ids_forced_in_loadout) {
@@ -722,7 +755,6 @@ function createCharacter(uid: string) {
             character.ephemeral_stats.loadout_domain_card_ids = new_loadout_domain_card_ids
         }
     })
-
 
 
     // ! clear invalid active weapons
@@ -779,7 +811,12 @@ function createCharacter(uid: string) {
             const has_armor = character.active_armor_id !== null
             return condition.value === has_armor
         } else if (condition.type === "domain_card_choice") {
-            return character.domain_card_choices[condition.domain_card_id] === condition.choice_id
+
+            if (!character.domain_card_choices[condition.domain_card_id] || !character.domain_card_choices[condition.domain_card_id][condition.choice_id]) {
+                return false
+            } else {
+                return character.domain_card_choices[condition.domain_card_id][condition.choice_id].includes(condition.selection_id)
+            }
         } else if (condition.type === "min_loadout_cards_from_domain") {
             // verify that the required number of cards from the domain are in the loadout
             let count = 0;
@@ -1049,8 +1086,9 @@ function createCharacter(uid: string) {
 
         // apply base modifiers
         for (const modifier of base_modifiers) {
-            if (modifier.target === "experiences_from_domain_card_selection") {
-                const experience_indices = character.domain_card_experience_selections[modifier.domain_card_id]
+            if (modifier.target === "experience_from_selection") {
+                const experience_indices: number[] = character.domain_card_choices[modifier.domain_card_id][modifier.choice_id].map(str => parseInt(str))
+
                 if (!experience_indices || experience_indices.length === 0) continue;
 
                 for (const i of experience_indices) {
@@ -1084,16 +1122,17 @@ function createCharacter(uid: string) {
 
         // apply bonus modifiers
         for (const modifier of bonus_modifiers) {
-            if (modifier.target === "experiences_from_domain_card_selection") {
-                const experience_indices = character.domain_card_experience_selections[modifier.domain_card_id]
+            if (modifier.target === "experience_from_selection") {
+                const experience_indices: number[] = character.domain_card_choices[modifier.domain_card_id][modifier.choice_id].map(str => parseInt(str))
+
                 if (!experience_indices || experience_indices.length === 0) continue;
 
                 for (const i of experience_indices) {
                     if (i === null || i < 0 || i > count) continue;
                     if (modifier.type === 'flat') {
-                        new_experience_modifiers[i] = new_experience_modifiers[i] + modifier.value;
+                        new_experience_modifiers[i] += modifier.value;
                     } else if (modifier.type === "derived_from_trait") {
-                        new_experience_modifiers[i] = new_experience_modifiers[i] + Math.ceil(Number(traits[modifier.trait]) * modifier.multiplier);
+                        new_experience_modifiers[i] += Math.ceil(Number(traits[modifier.trait]) * modifier.multiplier);
                     }
                 }
             }
@@ -1101,8 +1140,9 @@ function createCharacter(uid: string) {
 
         // apply override modifiers
         for (const modifier of override_modifiers) {
-            if (modifier.target === "experiences_from_domain_card_selection") {
-                const experience_indices = character.domain_card_experience_selections[modifier.domain_card_id]
+            if (modifier.target === "experience_from_selection") {
+                const experience_indices: number[] = character.domain_card_choices[modifier.domain_card_id][modifier.choice_id].map(str => parseInt(str))
+
                 if (!experience_indices || experience_indices.length === 0) continue;
 
                 for (const i of experience_indices) {

@@ -55,7 +55,7 @@ export const JUST_JAMES: Character = {
     secondary_subclass_id: null,
     secondary_class_domain_id_choice: null,
 
-    
+
 
     // equipment
     active_armor_id: null,
@@ -78,11 +78,8 @@ export const JUST_JAMES: Character = {
         loadout_domain_card_ids: ["whirlwind", "not_good_enough", "a_soldiers_bond"],
     },
 
-    // choices made by the player in regards to their domain cards
     domain_card_choices: {},
-    domain_card_experience_selections: {},
 
-    // tokens used by domain cards
     domain_card_tokens: {},
 
     // level-up choices
@@ -163,11 +160,8 @@ export const NEW_CHARACTER: Character = {
     secondary_subclass_id: null,
     secondary_class_domain_id_choice: null,
 
-    // choices made by the player in regards to their cards
     domain_card_choices: {},
-    domain_card_experience_selections: {},
 
-    // tokens used by domain cards
     domain_card_tokens: {},
 
     // equipment

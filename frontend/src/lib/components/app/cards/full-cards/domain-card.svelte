@@ -1,12 +1,11 @@
 <script lang="ts">
-  import type { Card } from "$lib/ts/character/types";
+  import type { Card, DomainCardChoice } from "$lib/ts/character/types";
   import { cn } from "$lib/utils";
   import type { Snippet } from "svelte";
   import DomainBanner from "../domain-banner.svelte";
   import { DOMAINS } from "$lib/ts/content/domains/domains";
-  import * as Select from "$lib/components/ui/select";
   import { getCharacterContext } from "$lib/ts/character/character.svelte";
-  import ExperienceSelector from "../../leveling/secondary-options/experience-selector.svelte";
+  import ChoiceSelector from "$lib/components/app/leveling/secondary-options/choice-selector.svelte";
 
   let {
     bind_choice_select = false,
@@ -93,50 +92,41 @@
   {/if}
 {/snippet}
 
-{#snippet choice_select()}
+{#snippet choice_select(choice: DomainCardChoice)}
   {#if character && card.choices.length > 0 && bind_choice_select}
-    {@const current_choice = card.choices.find(
-      (choice) => choice.id === character.domain_card_choices[card.id]
-    )}
-    <Select.Root
-      type="single"
-      value={character.domain_card_choices[card.id] || ""}
-      onValueChange={(value) => {
-        if (!character) return;
-        character.domain_card_choices[card.id] = value;
-        if (current_choice?.type === "experience") {
-          character.domain_card_experience_selections[card.id] = [];
-        }
-      }}
-    >
-      <Select.Trigger
-        class="font-medium w-full border-black/30 data-[placeholder]:text-muted bg-white hover:bg-black/10 [&_svg:not([class*='text-'])]:text-muted text-background"
-        highlighted={!character.domain_card_choices[card.id]}
-      >
-        <p class="text-xs">
-          {current_choice?.name || "Select an option"}
-        </p>
-      </Select.Trigger>
-      <Select.Content>
-        <Select.Item value="" class="justify-center hover:cursor-pointer">
-          -- none selected --
-        </Select.Item>
-        <Select.Label>Select an option</Select.Label>
-        {#each card.choices as choice}
-          <Select.Item value={choice.id} class="hover:cursor-pointer">
-            {choice.name}
-          </Select.Item>
-        {/each}
-      </Select.Content>
-    </Select.Root>
-    {#if current_choice?.type === "experience"}
-      <ExperienceSelector
-        class="font-medium w-full border-black/30 data-[placeholder]:text-muted bg-white hover:bg-black/10 [&_svg:not([class*='text-'])]:text-muted text-background"
-        bind:selected_experiences={character.domain_card_experience_selections[card.id]}
-        max={current_choice.max}
-        experiences={character.experiences}
-        {width}
-      />
+    {@const conditional_choice_id = choice.conditional_choice?.choice_id || null}
+    {@const conditional_selection_id = choice.conditional_choice?.selection_id || null}
+
+    {#if character.domain_card_choices[card.id] && character.domain_card_choices[card.id][choice.choice_id]}
+      {#if choice.conditional_choice === null || (conditional_choice_id && conditional_selection_id && character.domain_card_choices[card.id][conditional_choice_id] && character.domain_card_choices[card.id][conditional_choice_id].includes(conditional_selection_id))}
+        {#if choice.type === "arbitrary"}
+          <ChoiceSelector
+            class="font-medium w-full border-black/30 data-[placeholder]:text-muted bg-white hover:bg-black/10 [&_svg:not([class*='text-'])]:text-muted text-background"
+            bind:selected_ids={character.domain_card_choices[card.id][choice.choice_id]}
+            max={choice.max}
+            options={choice.options}
+            {width}
+          />
+        {:else if choice.type === "experience"}
+          <ChoiceSelector
+            class="font-medium w-full border-black/30 data-[placeholder]:text-muted bg-white hover:bg-black/10 [&_svg:not([class*='text-'])]:text-muted text-background"
+            bind:selected_ids={character.domain_card_choices[card.id][choice.choice_id]}
+            max={choice.max}
+            options={character.experiences.map((exp, i) => {
+              return {
+                selection_id: i.toString(),
+                title: exp,
+                short_title: exp,
+              };
+            })}
+            term="Experience"
+            term_plural="Experiences"
+            {width}
+          />
+        {/if}
+      {:else}
+        <!-- conditional choice not met -->
+      {/if}
     {/if}
   {/if}
 {/snippet}
@@ -200,7 +190,9 @@
       {/each}
 
       <!-- choices -->
-      {@render choice_select()}
+      {#each card.choices as choice}
+        {@render choice_select(choice)}
+      {/each}
 
       <!-- token count -->
       {@render token_count()}
@@ -292,7 +284,9 @@
           </div>
         {/each}
 
-        {@render choice_select()}
+        {#each card.choices as choice}
+          {@render choice_select(choice)}
+        {/each}
         {@render token_count()}
       </div>
 

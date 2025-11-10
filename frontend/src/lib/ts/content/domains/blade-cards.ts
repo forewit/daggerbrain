@@ -273,7 +273,6 @@ export const BLADE_DOMAIN_CARDS = {
             }
         ],
     },
-    // todo: add force_in_vault
     vitality: {
         id: "vitality",
         card_type: "domain",
@@ -288,23 +287,27 @@ export const BLADE_DOMAIN_CARDS = {
         applies_in_vault: true,
         forced_in_loadout: false,
         forced_in_vault: true,
-        // todo: allow multiple to be selected
         choices: [
             {
-                id: "vitality_stress",
-                name: "One Stress slot",
-                type: "arbitrary"
+                choice_id: "choose_two",
+                type: "arbitrary",
+                max: 2,
+                conditional_choice: null,
+                options: [
+                    {
+                        selection_id: "stress_slot",
+                        title: "+1 Stress slot",
+                        short_title: "+1 Stress"
+                    }, {
+                        selection_id: "hp_slot",
+                        title: "+1 Hit Point slot",
+                        short_title: "+1 HP"
+                    }, {
+                        selection_id: "damage_thresholds",
+                        title: "+2 bonus to your damage thresholds",
+                        short_title: "+2 to thresholds"
+                    }]
             },
-            {
-                id: "vitality_hit_point",
-                name: "One Hit Point slot",
-                type: "arbitrary"
-            },
-            {
-                id: "vitality_damage_threshold",
-                name: "+2 bonus to your damage thresholds",
-                type: "arbitrary"
-            }
         ],
         tokens: false,
         features: [
@@ -326,7 +329,8 @@ export const BLADE_DOMAIN_CARDS = {
                         conditions: [{
                             type: "domain_card_choice",
                             domain_card_id: "vitality",
-                            choice_id: "vitality_stress"
+                            choice_id: "choose_two",
+                            selection_id: "stress_slot"
                         }]
                     },
                     {
@@ -337,7 +341,8 @@ export const BLADE_DOMAIN_CARDS = {
                         conditions: [{
                             type: "domain_card_choice",
                             domain_card_id: "vitality",
-                            choice_id: "vitality_hit_point"
+                            choice_id: "choose_two",
+                            selection_id: "hp_slot"
                         }]
                     },
                     {
@@ -348,7 +353,8 @@ export const BLADE_DOMAIN_CARDS = {
                         conditions: [{
                             type: "domain_card_choice",
                             domain_card_id: "vitality",
-                            choice_id: "damage_threshold"
+                            choice_id: "choose_two",
+                            selection_id: "damage_thresholds"
                         }]
                     },
                     {
@@ -359,7 +365,8 @@ export const BLADE_DOMAIN_CARDS = {
                         conditions: [{
                             type: "domain_card_choice",
                             domain_card_id: "vitality",
-                            choice_id: "damage_threshold"
+                            choice_id: "choose_two",
+                            selection_id: "damage_thresholds"
                         }]
                     }
                 ]
