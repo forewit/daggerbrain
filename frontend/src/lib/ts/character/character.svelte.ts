@@ -988,6 +988,13 @@ function createCharacter(uid: string) {
                 } else if (behavior === 'bonus') {
                     value = value + calculated;
                 }
+            } else if (modifier.type === "derived_from_proficiency" && target !== 'proficiency') {
+                const calculated = Math.ceil(proficiency * modifier.multiplier)
+                if (behavior === 'base' || behavior === 'override') {
+                    value = calculated
+                } else if (behavior === 'bonus'){
+                    value = value + calculated
+                }
             }
         }
 
@@ -1013,6 +1020,8 @@ function createCharacter(uid: string) {
                 const targetTrait = modifier.trait
                 if (modifier.type === 'flat') {
                     base_traits[targetTrait] = modifier.value
+                } else if (modifier.type === "derived_from_proficiency") {
+                    base_traits[targetTrait] = Math.ceil(proficiency * modifier.multiplier)
                 }
                 // ! can't derive a trait from a trait
             }
@@ -1058,6 +1067,8 @@ function createCharacter(uid: string) {
                 const targetTrait = modifier.trait
                 if (modifier.type === 'flat') {
                     new_traits[targetTrait] = new_traits[targetTrait] + modifier.value
+                } else if (modifier.type === "derived_from_proficiency") {
+                    new_traits[targetTrait] += Math.ceil(proficiency * modifier.multiplier)
                 }
                 // ! can't derive a trait from a trait
             }
@@ -1069,6 +1080,8 @@ function createCharacter(uid: string) {
                 const targetTrait = modifier.trait
                 if (modifier.type === 'flat') {
                     new_traits[targetTrait] = modifier.value
+                } else if (modifier.type === "derived_from_proficiency") {
+                    new_traits[targetTrait] = Math.ceil(proficiency * modifier.multiplier)
                 }
                 // ! can't derive a trait from a trait
             }
@@ -1097,6 +1110,8 @@ function createCharacter(uid: string) {
                         new_experience_modifiers[i] = modifier.value;
                     } else if (modifier.type === "derived_from_trait") {
                         new_experience_modifiers[i] = Math.ceil(Number(traits[modifier.trait]) * modifier.multiplier);
+                    }  else if (modifier.type === "derived_from_proficiency") {
+                        new_experience_modifiers[i] = Math.ceil(proficiency * modifier.multiplier)
                     }
                 }
             }
@@ -1133,6 +1148,8 @@ function createCharacter(uid: string) {
                         new_experience_modifiers[i] += modifier.value;
                     } else if (modifier.type === "derived_from_trait") {
                         new_experience_modifiers[i] += Math.ceil(Number(traits[modifier.trait]) * modifier.multiplier);
+                    } else if (modifier.type === "derived_from_proficiency") {
+                        new_experience_modifiers[i] += Math.ceil(proficiency * modifier.multiplier)
                     }
                 }
             }
@@ -1151,6 +1168,8 @@ function createCharacter(uid: string) {
                         new_experience_modifiers[i] = modifier.value;
                     } else if (modifier.type === "derived_from_trait") {
                         new_experience_modifiers[i] = Math.ceil(Number(traits[modifier.trait]) * modifier.multiplier);
+                    } else if (modifier.type === "derived_from_proficiency") {
+                        new_experience_modifiers[i] = Math.ceil(proficiency * modifier.multiplier)
                     }
                 }
             }

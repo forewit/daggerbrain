@@ -184,9 +184,9 @@
 
       <!-- features -->
       {#each card.features as feature}
-        <p class="text-xs">
+        <div class="text-xs flex flex-col gap-2">
           {@html feature.description_html}
-        </p>
+        </div>
       {/each}
 
       <!-- choices -->

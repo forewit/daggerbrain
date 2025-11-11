@@ -143,6 +143,9 @@ export type Modifier = ({
 } | {
     type: "flat"
     value: number
+} | {
+    type: "derived_from_proficiency"
+    multiplier: number
 }) & ({
     target: "evasion" | "max_hp" | "max_stress" | "max_experiences" | "major_damage_threshold" | "severe_damage_threshold" | "primary_class_mastery_level" | "secondary_class_mastery_level" | "max_domain_card_loadout" | "max_hope" | "proficiency" | "max_armor" | "max_burden" | "attack_roll_bonus" | "spellcast_roll_bonus";
 } | {
