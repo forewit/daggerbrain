@@ -19,9 +19,10 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: "<p>When you take Severe damage, you can <b>mark a Stress</b> to reduce the severity by one threshold.</p>",
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -43,9 +44,10 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: "<p>When you make a successful attack agains a target within Very Close range, you can <b>spend a Hope</b> to use the attack against all other targets within Very Close range.</p>",
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -67,9 +69,10 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: "<p>When you roll your damage dice, you can reroll any 1s or 2s.</p>",
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -91,9 +94,10 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: "<p><b>Mark a Stress</b> to gain advantage on an attack.</p>",
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -115,9 +119,10 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: "Once per long rest, when you compliment someone or ask them about something they're good at, you can both gain 3 Hope.",
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -139,9 +144,10 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: "<p>Once per rest, when a creature within Melee range would deal damage to you, you can avoid the attack and safely move out of Melee range of the enemy.</p>",
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -163,9 +169,10 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: "<p>You can use a different character trait for an equipped weapon, rather than the trait the weapon calls for. When you deal damage, you can <b>mark a Stress</b> to use the maximum result of one of your damage dice instead of rolling it.</p>",
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -187,9 +194,10 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: "<p>Once per rest, you can apply all your focus toward a target of your choice. Until you attack another creature, you defeat the target, or the battle ends, gain a +1 bonus to your Proficiency.</p>",
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -211,14 +219,15 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: "<p>While you are wearing armor, gain a +2 bonus to your damage thresholds.</p>",
-                modifiers: [{
+                character_modifiers: [{
                     behavior: "bonus",
                     target: "major_damage_threshold",
                     type: "flat",
                     value: 2,
-                    conditions: [{
+                    character_conditions: [{
                         type: "armor_equipped",
                         value: true
                     }, {
@@ -231,7 +240,7 @@ export const BLADE_DOMAIN_CARDS = {
                     target: "severe_damage_threshold",
                     type: "flat",
                     value: 2,
-                    conditions: [{
+                    character_conditions: [{
                         type: "armor_equipped",
                         value: true
                     }, {
@@ -261,6 +270,7 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: `<p>When you critically succeed on an attack, you can <b>spend up to 3 Hope</b> and choose one of the following options for each Hope spent:</p>
                                     <ul class="list-disc list-inside ml-2">
@@ -269,7 +279,7 @@ export const BLADE_DOMAIN_CARDS = {
                                         <li>The target must mark an additional Hit Point.</li>
                                     </ul>
                                     <p>You can't choose the same option more than once.</p>`,
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -312,6 +322,7 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: `<p>When you choose this card, permanently gain two of the following benefits:</p>
                                     <ul class="list-disc list-inside ml-2">
@@ -320,13 +331,13 @@ export const BLADE_DOMAIN_CARDS = {
                                         <li>+2 bonus to your damage thresholds</li>
                                     </ul>
                                     <p>Then place this card in your vault permanently.</p>`,
-                modifiers: [
+                character_modifiers: [
                     {
                         behavior: "bonus",
                         target: "max_stress",
                         type: "flat",
                         value: 1,
-                        conditions: [{
+                        character_conditions: [{
                             type: "domain_card_choice",
                             domain_card_id: "vitality",
                             choice_id: "choose_two",
@@ -338,7 +349,7 @@ export const BLADE_DOMAIN_CARDS = {
                         target: "max_hp",
                         type: "flat",
                         value: 1,
-                        conditions: [{
+                        character_conditions: [{
                             type: "domain_card_choice",
                             domain_card_id: "vitality",
                             choice_id: "choose_two",
@@ -350,7 +361,7 @@ export const BLADE_DOMAIN_CARDS = {
                         target: "major_damage_threshold",
                         type: "flat",
                         value: 2,
-                        conditions: [{
+                        character_conditions: [{
                             type: "domain_card_choice",
                             domain_card_id: "vitality",
                             choice_id: "choose_two",
@@ -362,7 +373,7 @@ export const BLADE_DOMAIN_CARDS = {
                         target: "severe_damage_threshold",
                         type: "flat",
                         value: 2,
-                        conditions: [{
+                        character_conditions: [{
                             type: "domain_card_choice",
                             domain_card_id: "vitality",
                             choice_id: "choose_two",
@@ -391,9 +402,10 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: "<p>Once per long rest when you would make a Death Move, you can <b>spend a Hope</b> to clear a Hit Point instead.</p>",
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -415,9 +427,10 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: "<p>Before you make an attack, you can <b>mark a Stress</b> to gain a bonus to your damage roll equal to twice your Strength.</p><p>You can Rage Up twice per attack.</p>",
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -440,19 +453,20 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: `<p>When 4 or more of the domain cards in your loadout are from the Blade domain, gain the following benefits:</p>
                                     <ul class="list-disc list-inside ml-2">
                                         <li>+2 bonus to your attack rolls</li>
                                         <li>+4 bonus to your Severe damage threshold</li>
                                     </ul>`,
-                modifiers: [
+                character_modifiers: [
                     {
                         behavior: "bonus",
                         target: "attack_roll_bonus",
                         type: "flat",
                         value: 2,
-                        conditions: [{
+                        character_conditions: [{
                             type: "min_loadout_cards_from_domain",
                             domain_id: "blade",
                             min_cards: 4
@@ -463,7 +477,7 @@ export const BLADE_DOMAIN_CARDS = {
                         target: "severe_damage_threshold",
                         type: "flat",
                         value: 4,
-                        conditions: [{
+                        character_conditions: [{
                             type: "min_loadout_cards_from_domain",
                             domain_id: "blade",
                             min_cards: 4
@@ -491,9 +505,10 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: "<p>When you fail an attack, you can <b>mark a Stress</b> to deal weapon damage using half your Proficiency.</p>",
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -515,9 +530,10 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: "<p>Once per long rest, while you're charging into danger, you can muster a rousing call that inspires your allies. All allies who can hear you each clear a Stress and gain a Hope. Additionally, your allies gain advantage on attack rolls until you or an ally rolls a failure with Fear.</p>",
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -539,9 +555,10 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: "<p>Once per long rest, you can go into a <em>Frenzy</em> until there are no more adversaries within sight.</p><p>While <em>Frenzied</em>, you can't use Armor Slots, and you gain a +10 bonus to your damage rolls and a +8 bonus to your Severe damage threshold.</p>",
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -563,9 +580,10 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: "<p>When you critically succeed on a weapon attack, gain an additional Hope or clear an additional Stress. Additionally, when you deal enough damage to defeat an enemy, gain a Hope or clear a Stress.</p>",
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -587,9 +605,10 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: "<p>Once per long rest, <b>spend a Hope</b> to make an attack roll. The GM tells you which targets within range it would succeed against. Choose one of these targets and force them to mark 5 Hit Points.</p>",
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -611,9 +630,10 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: "<p>When you make a successful attack against an adversary, you can <b>mark 4 Stress</b> to force the target to mark a number of Hit Points equal to the number of Hit Points you currently have marked instead of rolling for damage.</p>",
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -635,9 +655,10 @@ export const BLADE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: "<p>When you successfully make an attack with your weapon, you never deal damage beneath a target's Major damage threshold (the target always marks a minimum of 2 Hit Points).</p><p>Additionally, when a creature within your weapon's range deals damage to an ally with an attack that doesn't include you, you can <b>mark a Stress</b> to force them to make a Reaction Roll (15). On a failure, the target must mark a Hit Point.</p>",
-                modifiers: []
+                character_modifiers: []
             }
         ],
     }

@@ -19,6 +19,7 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html: `<p>When you choose not to equip armor, you have a base Armor Score of 3 + your Strength and use the following as your base damage thresholds:</p>
                                     <ul class="list-disc list-inside ml-2">
@@ -27,14 +28,14 @@ export const VALOR_DOMAIN_CARDS = {
                                         <li><b><em>Tier 3:</em></b> 13/31</li>
                                         <li><b><em>Tier 4:</em></b> 15/38</li>
                                     </ul>`,
-                modifiers: [
+                character_modifiers: [
                     {
                         behavior: "base",
                         target: "max_armor",
                         type: "derived_from_trait",
                         trait: "strength",
                         multiplier: 1,
-                        conditions: [{
+                        character_conditions: [{
                             type: "level",
                             min_level: 1,
                             max_level: 1
@@ -52,7 +53,7 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "max_armor",
                         type: "flat",
                         value: 3,
-                        conditions: [{
+                        character_conditions: [{
                             type: "level",
                             min_level: 1,
                             max_level: 1
@@ -70,7 +71,7 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "major_damage_threshold",
                         type: "flat",
                         value: 9,
-                        conditions: [{
+                        character_conditions: [{
                             type: "level",
                             min_level: 1,
                             max_level: 1
@@ -88,7 +89,7 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "severe_damage_threshold",
                         type: "flat",
                         value: 19,
-                        conditions: [{
+                        character_conditions: [{
                             type: "level",
                             min_level: 1,
                             max_level: 1
@@ -107,7 +108,7 @@ export const VALOR_DOMAIN_CARDS = {
                         type: "derived_from_trait",
                         trait: "strength",
                         multiplier: 1,
-                        conditions: [{
+                        character_conditions: [{
                             type: "level",
                             min_level: 2,
                             max_level: 4
@@ -125,7 +126,7 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "max_armor",
                         type: "flat",
                         value: 3,
-                        conditions: [{
+                        character_conditions: [{
                             type: "level",
                             min_level: 2,
                             max_level: 4
@@ -143,7 +144,7 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "major_damage_threshold",
                         type: "flat",
                         value: 11,
-                        conditions: [{
+                        character_conditions: [{
                             type: "level",
                             min_level: 2,
                             max_level: 4
@@ -161,7 +162,7 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "severe_damage_threshold",
                         type: "flat",
                         value: 24,
-                        conditions: [{
+                        character_conditions: [{
                             type: "level",
                             min_level: 2,
                             max_level: 4
@@ -180,7 +181,7 @@ export const VALOR_DOMAIN_CARDS = {
                         type: "derived_from_trait",
                         trait: "strength",
                         multiplier: 1,
-                        conditions: [{
+                        character_conditions: [{
                             type: "level",
                             min_level: 5,
                             max_level: 7
@@ -198,7 +199,7 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "max_armor",
                         type: "flat",
                         value: 3,
-                        conditions: [{
+                        character_conditions: [{
                             type: "level",
                             min_level: 5,
                             max_level: 7
@@ -216,7 +217,7 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "major_damage_threshold",
                         type: "flat",
                         value: 13,
-                        conditions: [{
+                        character_conditions: [{
                             type: "level",
                             min_level: 5,
                             max_level: 7
@@ -234,7 +235,7 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "severe_damage_threshold",
                         type: "flat",
                         value: 31,
-                        conditions: [{
+                        character_conditions: [{
                             type: "level",
                             min_level: 5,
                             max_level: 7
@@ -253,7 +254,7 @@ export const VALOR_DOMAIN_CARDS = {
                         type: "derived_from_trait",
                         trait: "strength",
                         multiplier: 1,
-                        conditions: [{
+                        character_conditions: [{
                             type: "level",
                             min_level: 8,
                             max_level: 10
@@ -271,7 +272,7 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "max_armor",
                         type: "flat",
                         value: 3,
-                        conditions: [{
+                        character_conditions: [{
                             type: "level",
                             min_level: 8,
                             max_level: 10
@@ -289,7 +290,7 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "major_damage_threshold",
                         type: "flat",
                         value: 15,
-                        conditions: [{
+                        character_conditions: [{
                             type: "level",
                             min_level: 8,
                             max_level: 10
@@ -307,7 +308,7 @@ export const VALOR_DOMAIN_CARDS = {
                         target: "severe_damage_threshold",
                         type: "flat",
                         value: 38,
-                        conditions: [{
+                        character_conditions: [{
                             type: "level",
                             min_level: 8,
                             max_level: 10
@@ -343,11 +344,12 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make an attack with your primary weapon against a target within Melee range. On a success, you deal damage and knock them back to Close range.</p>
                      <p>On a success with Hope, add a <b>d6</b> to your damage roll. Additionally, you can <b>spend a Hope</b> to make them temporarily <em>Vulnerable</em>.</p>`,
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -370,11 +372,12 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When an ally within Very Close range would take damage, you can <b>mark a Stress</b> to stand in the way and make yourself the target of the attack instead.</p>
                      <p>When you take damage from this attack, you can mark any number of Armor Slots.</p>`,
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -397,10 +400,11 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p>You use the full force of your body in a fight. On a successful attack using a weapon with a Melee range, gain a bonus to your damage roll equal to your <b>Strength</b>.</p>`,
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -423,11 +427,12 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When you make a <b>Presence Roll</b>, you can <b>spend a Hope</b> to add your <b>Strength</b> to the roll.</p>
                      <p>Additionally, once per rest when you would gain a condition, you can describe how your bold presence aids you in the situation and avoid gaining the condition.</p>`,
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -449,10 +454,11 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Once per rest, when you <b>critically succeed</b> on an attack, all allies within Very Close range can <b>clear a Stress</b> or <b>gain a Hope</b>.</p>`,
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -475,10 +481,11 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Once per long rest, when you console or inspire an ally who failed an action roll, you can both <b>clear 2 Stress</b>.</p>`,
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -501,6 +508,7 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Describe how you taunt a target within Close range, then make a <b>Presence Roll</b> against them. On a success:</p>
@@ -508,7 +516,7 @@ export const VALOR_DOMAIN_CARDS = {
                         <li>The target must <b>mark a Stress</b>.</li>
                         <li>The next time the GM spotlights them, they must target you with an attack, which they make with <b>disadvantage</b>.</li>
                      </ul>`,
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -531,10 +539,11 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When an ally within Close range fails a roll, you can <b>spend 2 Hope</b> to allow them to reroll either their Hope or Fear Die.</p>`,
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -557,16 +566,17 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p>While you're wearing armor, gain a +1 bonus to your Armor Score.</p>
                      <p>During a rest, when you choose to repair your armor as a downtime move, your allies also <b>clear an Armor Slot</b>.</p>`,
-                modifiers: [{
+                character_modifiers: [{
                     behavior: "bonus",
                     type: "flat",
                     value: 1,
                     target: "max_armor",
-                    conditions: [{
+                    character_conditions: [{
                         type: "armor_equipped",
                         value: true
                     }]
@@ -593,10 +603,11 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Once per rest, when you <b>critically succeed</b> on an attack, you and all allies who can see or hear you can <b>clear a Hit Point</b> or <b>1d4 Stress</b>.</p>`,
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -618,10 +629,11 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When you <b>fail an action roll</b>, your next action roll has <b>advantage</b>.</p>`,
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -644,13 +656,14 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Gain a bonus to your Severe threshold equal to your Proficiency.</p>
                      <p>When you mark 1 or more Hit Points from an attack, clear a Stress.</p>`,
-                modifiers: [{
+                character_modifiers: [{
                     behavior: "bonus",
-                    conditions: [],
+                    character_conditions: [],
                     type: "derived_from_proficiency",
                     multiplier: 1,
                     target: "severe_damage_threshold"
@@ -676,11 +689,12 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When you would take damage, you can <b>mark a Stress</b> to reduce the severity of the damage by one threshold.
                      When you do, roll a <b>d6</b>. On a result of 3 or lower, place this card in your vault.</p>`,
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
@@ -703,6 +717,7 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When 4 or more of the domain cards in your loadout are from the Valor domain, gain the following benefits:</p>
@@ -710,9 +725,9 @@ export const VALOR_DOMAIN_CARDS = {
                         <li>+1 bonus to your Armor Score</li>
                         <li>When you mark 1 or more Hit Points without marking an Armor Slot, clear an Armor Slot.</li>
                      </ul>`,
-                modifiers: [{
+                character_modifiers: [{
                     behavior: "bonus",
-                    conditions: [{
+                    character_conditions: [{
                         type: "min_loadout_cards_from_domain",
                         domain_id: "valor",
                         min_cards: 4
@@ -742,14 +757,15 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Once per long rest, <b>mark 3 Stress</b> to push your body to its limits. Gain a <b>+2 bonus</b> to all of your character traits until your next rest.</p>`,
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
-    
+
     ground_pound: {
         id: "ground_pound",
         card_type: "domain",
@@ -768,6 +784,7 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b>Spend 2 Hope</b> to strike the ground where you stand and make a <b>Strength Roll</b> against all targets within Very Close range.</p>
@@ -776,11 +793,11 @@ export const VALOR_DOMAIN_CARDS = {
                         <li>Targets who fail take <b>4d10+8</b> damage.</li>
                         <li>Targets who succeed take half damage.</li>
                      </ul>`,
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
-    
+
     hold_the_line: {
         id: "hold_the_line",
         card_type: "domain",
@@ -799,15 +816,16 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Describe the defensive stance you take and <b>spend a Hope</b>. If an adversary moves within Very Close range, they're pulled into Melee range and <em>Restrained</em>.</p>
                      <p>This condition lasts until you move or fail a roll with Fear, or the GM spends 2 Fear on their turn to clear it.</p>`,
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
-    
+
     lead_by_example: {
         id: "lead_by_example",
         card_type: "domain",
@@ -826,15 +844,16 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When you deal damage to an adversary, you can <b>mark a Stress</b> and describe how you encourage your allies.</p>
                      <p>The next PC to make an attack against that adversary can <b>clear a Stress</b> or <b>gain a Hope</b>.</p>`,
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
-    
+
     unbreakable: {
         id: "unbreakable",
         card_type: "domain",
@@ -853,14 +872,15 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When you <b>mark your last Hit Point</b>, instead of making a death move, you can roll a <b>d6</b> and <b>clear a number of Hit Points equal to the result</b>. Then place this card in your vault.</p>`,
-                modifiers: []
+                character_modifiers: []
             }
         ],
     },
-    
+
     unyielding_armor: {
         id: "unyielding_armor",
         card_type: "domain",
@@ -879,10 +899,11 @@ export const VALOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
+                attack_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When you would mark an Armor Slot, roll a number of <b>d6s</b> equal to your Proficiency. If any roll a 6, reduce the severity by one threshold without marking an Armor Slot.</p>`,
-                modifiers: []
+                character_modifiers: []
             }
         ],
     }

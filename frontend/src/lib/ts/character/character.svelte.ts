@@ -2,7 +2,7 @@ import { getAppContext } from '$lib/ts/app.svelte';
 import { ALL_LEVEL_UP_OPTIONS, BASE_STATS, TRAIT_OPTIONS } from '$lib/ts/character/rules';
 import { getContext, setContext } from 'svelte';
 import { get_ancestry_card, get_armor, get_class, get_community_card, get_domain_card, get_transformation_card, get_weapon } from './helpers';
-import type { Card, Character, Class, Condition, DamageThresholds, LevelUpChoice, LevelUpOption, Modifier, Subclass, Traits } from './types';
+import type { Card, Character, Class, CharacterCondition, DamageThresholds, LevelUpChoice, LevelUpOption, CharacterModifier, Subclass, Traits } from './types';
 import { BLANK_LEVEL_UP_CHOICE } from './constants';
 
 function createCharacter(uid: string) {
@@ -116,14 +116,14 @@ function createCharacter(uid: string) {
     let max_hp: number = $state(BASE_STATS.max_hp);
     let max_stress: number = $state(BASE_STATS.max_stress);
     let max_burden: number = $state(BASE_STATS.max_burden);
-    let attack_roll_bonus: number = $state(BASE_STATS.attack_roll_bonus);
-    let spellcast_roll_bonus: number = $state(BASE_STATS.spellcast_roll_bonus);
     let evasion: number = $state(BASE_STATS.evasion);
     let damage_thresholds: DamageThresholds = $state({ ...BASE_STATS.damage_thresholds });
     let primary_class_mastery_level: number = $state(BASE_STATS.primary_class_mastery_level);
     let secondary_class_mastery_level: number = $state(BASE_STATS.secondary_class_mastery_level);
     let spellcast_trait: keyof Traits | null = $state(BASE_STATS.spellcast_trait);
     let experience_modifiers: number[] = $state(Array.from({ length: BASE_STATS.max_experiences }, () => BASE_STATS.experience_modifier));
+    let attack_roll_bonus: number = $state(BASE_STATS.attack_roll_bonus);
+    let spellcast_roll_bonus: number = $state(BASE_STATS.spellcast_roll_bonus);
 
 
     // ! load character from app context
@@ -803,7 +803,7 @@ function createCharacter(uid: string) {
 
 
     // helper function to check if conditionsa are met
-    function evaluate_condition(condition: Condition): boolean {
+    function evaluate_condition(condition: CharacterCondition): boolean {
         if (!character) return false
         if (condition.type === "level") {
             return character.level >= condition.min_level && character.level <= condition.max_level
@@ -831,71 +831,71 @@ function createCharacter(uid: string) {
     }
 
     // * derived modifiers -- used to calculate most stats --
-    let base_modifiers: Modifier[] = $state([])
-    let bonus_modifiers: Modifier[] = $state([])
-    let override_modifiers: Modifier[] = $state([])
+    let base_modifiers: CharacterModifier[] = $state([])
+    let bonus_modifiers: CharacterModifier[] = $state([])
+    let override_modifiers: CharacterModifier[] = $state([])
     $effect(() => {
         if (!character) return
 
-        let all_modifiers: Modifier[] = []
+        let all_modifiers: CharacterModifier[] = []
 
-        function push_modifiers(modifiers: Modifier[] | undefined) {
+        function push_modifiers(modifiers: CharacterModifier[] | undefined) {
             if (!modifiers || modifiers.length === 0) return
             for (const modifier of modifiers) {
                 // Check all conditions - all must pass (AND logic)
-                const conditions_met = modifier.conditions.every(condition => evaluate_condition(condition))
+                const conditions_met = modifier.character_conditions.every(condition => evaluate_condition(condition))
                 if (conditions_met) all_modifiers.push(modifier)
             }
         }
 
         // ancestry card
         if (ancestry_card) {
-            ancestry_card.features.forEach(f => push_modifiers(f.modifiers))
+            ancestry_card.features.forEach(f => push_modifiers(f.character_modifiers))
         }
 
         // community card
         if (community_card) {
-            community_card.features.forEach(f => push_modifiers(f.modifiers))
+            community_card.features.forEach(f => push_modifiers(f.character_modifiers))
         }
 
         // transformation card
         if (transformation_card) {
-            transformation_card.features.forEach(f => push_modifiers(f.modifiers))
+            transformation_card.features.forEach(f => push_modifiers(f.character_modifiers))
         }
 
         // primary class
         if (primary_class) {
-            push_modifiers(primary_class.hope_feature.modifiers)
-            primary_class.class_features.forEach(f => push_modifiers(f.modifiers))
+            push_modifiers(primary_class.hope_feature.character_modifiers)
+            primary_class.class_features.forEach(f => push_modifiers(f.character_modifiers))
         }
 
         // primary subclass cards (gate by mastery level)
         if (primary_subclass) {
             const primaryMastery = primary_class_mastery_level
-            push_modifiers(primary_subclass.foundation_card.features.flatMap(f => f.modifiers))
+            push_modifiers(primary_subclass.foundation_card.features.flatMap(f => f.character_modifiers))
             if (primaryMastery >= 2) {
-                push_modifiers(primary_subclass.specialization_card.features.flatMap(f => f.modifiers))
+                push_modifiers(primary_subclass.specialization_card.features.flatMap(f => f.character_modifiers))
             }
             if (primaryMastery >= 3) {
-                push_modifiers(primary_subclass.mastery_card.features.flatMap(f => f.modifiers))
+                push_modifiers(primary_subclass.mastery_card.features.flatMap(f => f.character_modifiers))
             }
         }
 
         // secondary class
         if (secondary_class) {
             // no hope feature for secondary class
-            secondary_class.class_features.forEach(f => push_modifiers(f.modifiers))
+            secondary_class.class_features.forEach(f => push_modifiers(f.character_modifiers))
         }
 
         // secondary subclass cards (gate by mastery level)
         if (secondary_subclass) {
             const secondaryMastery = secondary_class_mastery_level
-            push_modifiers(secondary_subclass.foundation_card.features.flatMap(f => f.modifiers))
+            push_modifiers(secondary_subclass.foundation_card.features.flatMap(f => f.character_modifiers))
             if (secondaryMastery >= 2) {
-                push_modifiers(secondary_subclass.specialization_card.features.flatMap(f => f.modifiers))
+                push_modifiers(secondary_subclass.specialization_card.features.flatMap(f => f.character_modifiers))
             }
             if (secondaryMastery >= 3) {
-                push_modifiers(secondary_subclass.mastery_card.features.flatMap(f => f.modifiers))
+                push_modifiers(secondary_subclass.mastery_card.features.flatMap(f => f.character_modifiers))
             }
         }
 
@@ -903,8 +903,8 @@ function createCharacter(uid: string) {
         for (let i = 2; i <= character.level; i++) {
             const chosen_options = level_up_chosen_options[i as keyof typeof level_up_chosen_options];
             if (!chosen_options) continue;
-            push_modifiers(chosen_options.A?.modifiers);
-            push_modifiers(chosen_options.B?.modifiers);
+            push_modifiers(chosen_options.A?.character_modifiers);
+            push_modifiers(chosen_options.B?.character_modifiers);
         }
 
         // modifiers from the vault where applies_in_vault=true or the card index is in the loadout
@@ -912,35 +912,35 @@ function createCharacter(uid: string) {
         const loadout_card_ids = character.ephemeral_stats.loadout_domain_card_ids;
         vault.forEach((card, i) => {
             if (card.applies_in_vault || loadout_card_ids.includes(card.id)) {
-                card.features.forEach(f => push_modifiers(f.modifiers))
+                card.features.forEach(f => push_modifiers(f.character_modifiers))
             }
         })
 
         // modifiers from active armor
         if (active_armor) {
-            active_armor.features.forEach(f => push_modifiers(f.modifiers))
+            active_armor.features.forEach(f => push_modifiers(f.character_modifiers))
         }
 
         // modifiers from active weapons
         active_weapons.forEach(weapon => {
-            weapon.features.forEach(f => push_modifiers(f.modifiers))
+            weapon.features.forEach(f => push_modifiers(f.character_modifiers))
         })
 
 
         // additional cards
         additional_domain_cards.forEach(card => {
-            card.features.forEach(f => push_modifiers(f.modifiers))
+            card.features.forEach(f => push_modifiers(f.character_modifiers))
         })
 
         // additional modifiers
-        push_modifiers(character.additional_modifiers)
+        push_modifiers(character.additional_character_modifiers)
 
 
 
         // categorize by behavior
-        base_modifiers = all_modifiers.filter((e) => 'behavior' in e && e.behavior === 'base') as Modifier[]
-        bonus_modifiers = all_modifiers.filter((e) => 'behavior' in e && e.behavior === 'bonus') as Modifier[]
-        override_modifiers = all_modifiers.filter((e) => 'behavior' in e && e.behavior === 'override') as Modifier[]
+        base_modifiers = all_modifiers.filter((e) => 'behavior' in e && e.behavior === 'base') as CharacterModifier[]
+        bonus_modifiers = all_modifiers.filter((e) => 'behavior' in e && e.behavior === 'bonus') as CharacterModifier[]
+        override_modifiers = all_modifiers.filter((e) => 'behavior' in e && e.behavior === 'override') as CharacterModifier[]
 
         console.warn("Updated modifier list...")
     })
@@ -954,8 +954,8 @@ function createCharacter(uid: string) {
      * @returns The modified value after applying modifiers
      */
     function apply_modifiers(
-        modifiers: Modifier[],
-        target: Modifier['target'],
+        modifiers: CharacterModifier[],
+        target: CharacterModifier['target'],
         currentValue: number,
         behavior: 'base' | 'bonus' | 'override'
     ): number {
@@ -969,7 +969,7 @@ function createCharacter(uid: string) {
             }
 
             // Check all conditions - all must pass (AND logic)
-            const conditions_met = modifier.conditions.every(condition => evaluate_condition(condition))
+            const conditions_met = modifier.character_conditions.every(condition => evaluate_condition(condition))
             if (!conditions_met) {
                 continue;
             }
@@ -1266,9 +1266,9 @@ function createCharacter(uid: string) {
         if (!character) return
         let new_spellcast_roll_bonus: number = BASE_STATS.spellcast_roll_bonus;
 
-        new_spellcast_roll_bonus = apply_modifiers(base_modifiers, 'attack_roll_bonus', new_spellcast_roll_bonus, 'base')
-        new_spellcast_roll_bonus = apply_modifiers(bonus_modifiers, 'attack_roll_bonus', new_spellcast_roll_bonus, 'bonus')
-        new_spellcast_roll_bonus = apply_modifiers(override_modifiers, 'attack_roll_bonus', new_spellcast_roll_bonus, 'override')
+        new_spellcast_roll_bonus = apply_modifiers(base_modifiers, 'spellcast_roll_bonus', new_spellcast_roll_bonus, 'base')
+        new_spellcast_roll_bonus = apply_modifiers(bonus_modifiers, 'spellcast_roll_bonus', new_spellcast_roll_bonus, 'bonus')
+        new_spellcast_roll_bonus = apply_modifiers(override_modifiers, 'spellcast_roll_bonus', new_spellcast_roll_bonus, 'override')
 
         spellcast_roll_bonus = new_spellcast_roll_bonus;
     })

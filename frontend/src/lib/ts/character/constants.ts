@@ -67,7 +67,7 @@ export const JUST_JAMES: Character = {
         "bare_bones",
         "untouchable"
     ],
-    additional_modifiers: [],
+    additional_character_modifiers: [],
 
     // set by the player
     ephemeral_stats: {
@@ -171,7 +171,7 @@ export const NEW_CHARACTER: Character = {
     // the void / other
     transformation_card_id: null,
     additional_domain_card_ids: [],
-    additional_modifiers: [],
+    additional_character_modifiers: [],
 
     // set by the player
     ephemeral_stats: {

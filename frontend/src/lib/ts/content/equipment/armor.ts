@@ -3,6 +3,7 @@ import type { Armor } from "../../character/types";
 
 export const TIER_1_ARMOR = {
     gambeson_armor: {
+        id: "gambeson_armor",
         title: "Gambeson Armor",
         description_html: "",
         level_requirement: 1,
@@ -12,11 +13,12 @@ export const TIER_1_ARMOR = {
             severe: 11
         },
         features: [{
+            attack_modifiers: [],
             title: "Flexible",
             description_html: "<p>+1 to Evasion</p>",
-            modifiers: [{
+            character_modifiers: [{
                 behavior: "bonus",
-                conditions: [],
+                character_conditions: [],
                 type: "flat",
                 value: 1,
                 target: "evasion"
@@ -24,6 +26,7 @@ export const TIER_1_ARMOR = {
         }]
     },
     leather_armor: {
+        id: "leather_armor",
         title: "Leather Armor",
         description_html: "",
         level_requirement: 1,
@@ -35,6 +38,7 @@ export const TIER_1_ARMOR = {
         features: []
     },
     chainmail_armor: {
+        id: "chainmail_armor",
         title: "Chainmail Armor",
         description_html: "",
         level_requirement: 1,
@@ -44,11 +48,12 @@ export const TIER_1_ARMOR = {
             severe: 15
         },
         features: [{
+            attack_modifiers: [],
             title: "Heavy",
             description_html: "<p>−1 to Evasion</p>",
-            modifiers: [{
+            character_modifiers: [{
                 behavior: "bonus",
-                conditions: [],
+                character_conditions: [],
                 type: "flat",
                 value: -1,
                 target: "evasion"
@@ -56,6 +61,7 @@ export const TIER_1_ARMOR = {
         }]
     },
     full_plate_armor: {
+        id: "full_plate_armor",
         title: "Full Plate Armor",
         description_html: "",
         level_requirement: 1,
@@ -65,19 +71,20 @@ export const TIER_1_ARMOR = {
             severe: 17
         },
         features: [{
+            attack_modifiers: [],
             title: "Very Heavy",
             description_html: "<p>−2 to Evasion; −1 to Agility</p>",
-            modifiers: [
+            character_modifiers: [
                 {
                     behavior: "bonus",
-                    conditions: [],
+                    character_conditions: [],
                     type: "flat",
                     value: -2,
                     target: "evasion"
                 },
                 {
                     behavior: "bonus",
-                    conditions: [],
+                    character_conditions: [],
                     type: "flat",
                     value: -1,
                     target: "trait",
@@ -90,6 +97,7 @@ export const TIER_1_ARMOR = {
 
 export const TIER_2_ARMOR = {
     improved_gambeson_armor: {
+        id: "improved_gambeson_armor",
         title: "Improved Gambeson Armor",
         description_html: "",
         level_requirement: 2,
@@ -99,11 +107,12 @@ export const TIER_2_ARMOR = {
             severe: 16
         },
         features: [{
+            attack_modifiers: [],
             title: "Flexible",
             description_html: "<p>+1 to Evasion</p>",
-            modifiers: [{
+            character_modifiers: [{
                 behavior: "bonus",
-                conditions: [],
+                character_conditions: [],
                 type: "flat",
                 value: 1,
                 target: "evasion"
@@ -111,6 +120,7 @@ export const TIER_2_ARMOR = {
         }]
     },
     improved_leather_armor: {
+        id: "improved_leather_armor",
         title: "Improved Leather Armor",
         description_html: "",
         level_requirement: 2,
@@ -122,6 +132,7 @@ export const TIER_2_ARMOR = {
         features: []
     },
     improved_chainmail_armor: {
+        id: "improved_chainmail_armor",
         title: "Improved Chainmail Armor",
         description_html: "",
         level_requirement: 2,
@@ -131,11 +142,12 @@ export const TIER_2_ARMOR = {
             severe: 24
         },
         features: [{
+            attack_modifiers: [],
             title: "Heavy",
             description_html: "<p>−1 to Evasion</p>",
-            modifiers: [{
+            character_modifiers: [{
                 behavior: "bonus",
-                conditions: [],
+                character_conditions: [],
                 type: "flat",
                 value: -1,
                 target: "evasion"
@@ -143,6 +155,7 @@ export const TIER_2_ARMOR = {
         }]
     },
     improved_full_plate_armor: {
+        id: "improved_full_plate_armor",
         title: "Improved Full Plate Armor",
         description_html: "",
         level_requirement: 2,
@@ -152,19 +165,20 @@ export const TIER_2_ARMOR = {
             severe: 28
         },
         features: [{
+            attack_modifiers: [],
             title: "Very Heavy",
             description_html: "<p>−2 to Evasion; −1 to Agility</p>",
-            modifiers: [
+            character_modifiers: [
                 {
                     behavior: "bonus",
-                    conditions: [],
+                    character_conditions: [],
                     type: "flat",
                     value: -2,
                     target: "evasion"
                 },
                 {
                     behavior: "bonus",
-                    conditions: [],
+                    character_conditions: [],
                     type: "flat",
                     value: -1,
                     target: "trait",
@@ -174,6 +188,7 @@ export const TIER_2_ARMOR = {
         }]
     },
     elundrian_chain_armor: {
+        id: "elundrian_chain_armor",
         title: "Elundrian Chain Armor",
         description_html: "",
         level_requirement: 2,
@@ -183,12 +198,14 @@ export const TIER_2_ARMOR = {
             severe: 21
         },
         features: [{
+            attack_modifiers: [],
             title: "Warded",
             description_html: "<p>You reduce incoming magic damage by your Armor Score before applying it to your damage thresholds.</p>",
-            modifiers: []
+            character_modifiers: []
         }]
     },
     harrowbone_armor: {
+        id: "harrowbone_armor",
         title: "Harrowbone Armor",
         description_html: "",
         level_requirement: 2,
@@ -198,12 +215,14 @@ export const TIER_2_ARMOR = {
             severe: 21
         },
         features: [{
+            attack_modifiers: [],
             title: "Resilient",
             description_html: "<p>Before you mark your last Armor Slot, roll a d6. On a result of 6, reduce the severity by one threshold without marking an Armor Slot.</p>",
-            modifiers: []
+            character_modifiers: []
         }]
     },
     irontree_breastplate_armor: {
+        id: "irontree_breastplate_armor",
         title: "Irontree Breastplate Armor",
         description_html: "",
         level_requirement: 2,
@@ -213,12 +232,14 @@ export const TIER_2_ARMOR = {
             severe: 20
         },
         features: [{
+            attack_modifiers: [],
             title: "Reinforced",
             description_html: "<p>When you mark your last Armor Slot, increase your damage thresholds by +2 until you clear at least 1 Armor Slot.</p>",
-            modifiers: []
+            character_modifiers: []
         }]
     },
     runetan_floating_armor: {
+        id: "runetan_floating_armor",
         title: "Runetan Floating Armor",
         description_html: "",
         level_requirement: 2,
@@ -228,12 +249,14 @@ export const TIER_2_ARMOR = {
             severe: 20
         },
         features: [{
+            attack_modifiers: [],
             title: "Shifting",
             description_html: "<p>When you are targeted for an attack, you can mark an Armor Slot to give the attack roll against you disadvantage.</p>",
-            modifiers: []
+            character_modifiers: []
         }]
     },
     tyris_soft_armor: {
+        id: "tyris_soft_armor",
         title: "Tyris Soft Armor",
         description_html: "",
         level_requirement: 2,
@@ -243,11 +266,12 @@ export const TIER_2_ARMOR = {
             severe: 18
         },
         features: [{
+            attack_modifiers: [],
             title: "Quiet",
             description_html: "<p>You gain a +2 bonus to rolls you make to move silently.</p>",
-            modifiers: [{
+            character_modifiers: [{
                 behavior: "bonus",
-                conditions: [],
+                character_conditions: [],
                 type: "flat",
                 value: 2,
                 target: "spellcast_roll_bonus" // representing stealth/silence rolls
@@ -255,6 +279,7 @@ export const TIER_2_ARMOR = {
         }]
     },
     rosewild_armor: {
+        id: "rosewild_armor",
         title: "Rosewild Armor",
         description_html: "",
         level_requirement: 2,
@@ -264,15 +289,17 @@ export const TIER_2_ARMOR = {
             severe: 23
         },
         features: [{
+            attack_modifiers: [],
             title: "Hopeful",
             description_html: "<p>When you would spend a Hope, you can mark an Armor Slot instead.</p>",
-            modifiers: []
+            character_modifiers: []
         }]
     }
 } as const satisfies Record<string, Armor>;
 
 export const TIER_3_ARMOR = {
     advanced_gambeson_armor: {
+        id: "advanced_gambeson_armor",
         title: "Advanced Gambeson Armor",
         description_html: "",
         level_requirement: 5,
@@ -282,11 +309,12 @@ export const TIER_3_ARMOR = {
             severe: 23
         },
         features: [{
+            attack_modifiers: [],
             title: "Flexible",
             description_html: "<p>+1 to Evasion</p>",
-            modifiers: [{
+            character_modifiers: [{
                 behavior: "bonus",
-                conditions: [],
+                character_conditions: [],
                 type: "flat",
                 value: 1,
                 target: "evasion"
@@ -294,6 +322,7 @@ export const TIER_3_ARMOR = {
         }]
     },
     advanced_leather_armor: {
+        id: "advanced_leather_armor",
         title: "Advanced Leather Armor",
         description_html: "",
         level_requirement: 5,
@@ -305,6 +334,7 @@ export const TIER_3_ARMOR = {
         features: []
     },
     advanced_chainmail_armor: {
+        id: "advanced_chainmail_armor",
         title: "Advanced Chainmail Armor",
         description_html: "",
         level_requirement: 5,
@@ -314,11 +344,12 @@ export const TIER_3_ARMOR = {
             severe: 31
         },
         features: [{
+            attack_modifiers: [],
             title: "Heavy",
             description_html: "<p>−1 to Evasion</p>",
-            modifiers: [{
+            character_modifiers: [{
                 behavior: "bonus",
-                conditions: [],
+                character_conditions: [],
                 type: "flat",
                 value: -1,
                 target: "evasion"
@@ -326,6 +357,7 @@ export const TIER_3_ARMOR = {
         }]
     },
     advanced_full_plate_armor: {
+        id: "advanced_full_plate_armor",
         title: "Advanced Full Plate Armor",
         description_html: "",
         level_requirement: 5,
@@ -335,19 +367,20 @@ export const TIER_3_ARMOR = {
             severe: 35
         },
         features: [{
+            attack_modifiers: [],
             title: "Very Heavy",
             description_html: "<p>−2 to Evasion; −1 to Agility</p>",
-            modifiers: [
+            character_modifiers: [
                 {
                     behavior: "bonus",
-                    conditions: [],
+                    character_conditions: [],
                     type: "flat",
                     value: -2,
                     target: "evasion"
                 },
                 {
                     behavior: "bonus",
-                    conditions: [],
+                    character_conditions: [],
                     type: "flat",
                     value: -1,
                     target: "trait",
@@ -357,6 +390,7 @@ export const TIER_3_ARMOR = {
         }]
     },
     bellamoi_fine_armor: {
+        id: "bellamoi_fine_armor",
         title: "Bellamoi Fine Armor",
         description_html: "",
         level_requirement: 5,
@@ -366,11 +400,12 @@ export const TIER_3_ARMOR = {
             severe: 27
         },
         features: [{
+            attack_modifiers: [],
             title: "Gilded",
             description_html: "<p>+1 to Presence</p>",
-            modifiers: [{
+            character_modifiers: [{
                 behavior: "bonus",
-                conditions: [],
+                character_conditions: [],
                 type: "flat",
                 value: 1,
                 target: "trait",
@@ -379,6 +414,7 @@ export const TIER_3_ARMOR = {
         }]
     },
     dragonscale_armor: {
+        id: "dragonscale_armor",
         title: "Dragonscale Armor",
         description_html: "",
         level_requirement: 5,
@@ -388,12 +424,14 @@ export const TIER_3_ARMOR = {
             severe: 27
         },
         features: [{
+            attack_modifiers: [],
             title: "Impenetrable",
             description_html: "<p>Once per short rest, when you would mark your last Hit Point, you can instead mark a Stress.</p>",
-            modifiers: []
+            character_modifiers: []
         }]
     },
     spiked_plate_armor: {
+        id: "spiked_plate_armor",
         title: "Spiked Plate Armor",
         description_html: "",
         level_requirement: 5,
@@ -403,12 +441,14 @@ export const TIER_3_ARMOR = {
             severe: 25
         },
         features: [{
+            attack_modifiers: [],
             title: "Sharp",
             description_html: "<p>On a successful attack against a target within Melee range, add a d4 to the damage roll.</p>",
-            modifiers: []
+            character_modifiers: []
         }]
     },
     bladefare_armor: {
+        id: "bladefare_armor",
         title: "Bladefare Armor",
         description_html: "",
         level_requirement: 5,
@@ -418,12 +458,14 @@ export const TIER_3_ARMOR = {
             severe: 39
         },
         features: [{
+            attack_modifiers: [],
             title: "Physical",
             description_html: "<p>You can’t mark an Armor Slot to reduce magic damage.</p>",
-            modifiers: []
+            character_modifiers: []
         }]
     },
     monetts_cloak: {
+        id: "monetts_cloak",
         title: "Monett’s Cloak",
         description_html: "",
         level_requirement: 5,
@@ -433,12 +475,14 @@ export const TIER_3_ARMOR = {
             severe: 39
         },
         features: [{
+            attack_modifiers: [],
             title: "Magic",
             description_html: "<p>You can’t mark an Armor Slot to reduce physical damage.</p>",
-            modifiers: []
+            character_modifiers: []
         }]
     },
     runes_of_fortification: {
+        id: "runes_of_fortification",
         title: "Runes of Fortification",
         description_html: "",
         level_requirement: 5,
@@ -448,15 +492,17 @@ export const TIER_3_ARMOR = {
             severe: 43
         },
         features: [{
+            attack_modifiers: [],
             title: "Painful",
             description_html: "<p>Each time you mark an Armor Slot, you must mark a Stress.</p>",
-            modifiers: []
+            character_modifiers: []
         }]
     }
 } as const satisfies Record<string, Armor>;
 
 export const TIER_4_ARMOR = {
     legendary_gambeson_armor: {
+        id: "legendary_gambeson_armor",
         title: "Legendary Gambeson Armor",
         description_html: "",
         level_requirement: 8,
@@ -466,11 +512,12 @@ export const TIER_4_ARMOR = {
             severe: 32
         },
         features: [{
+            attack_modifiers: [],
             title: "Flexible",
             description_html: "<p>+1 to Evasion</p>",
-            modifiers: [{
+            character_modifiers: [{
                 behavior: "bonus",
-                conditions: [],
+                character_conditions: [],
                 type: "flat",
                 value: 1,
                 target: "evasion"
@@ -478,6 +525,7 @@ export const TIER_4_ARMOR = {
         }]
     },
     legendary_leather_armor: {
+        id: "legendary_leather_armor",
         title: "Legendary Leather Armor",
         description_html: "",
         level_requirement: 8,
@@ -489,6 +537,7 @@ export const TIER_4_ARMOR = {
         features: []
     },
     legendary_chainmail_armor: {
+        id: "legendary_chainmail_armor",
         title: "Legendary Chainmail Armor",
         description_html: "",
         level_requirement: 8,
@@ -498,11 +547,12 @@ export const TIER_4_ARMOR = {
             severe: 40
         },
         features: [{
+            attack_modifiers: [],
             title: "Heavy",
             description_html: "<p>−1 to Evasion</p>",
-            modifiers: [{
+            character_modifiers: [{
                 behavior: "bonus",
-                conditions: [],
+                character_conditions: [],
                 type: "flat",
                 value: -1,
                 target: "evasion"
@@ -510,6 +560,7 @@ export const TIER_4_ARMOR = {
         }]
     },
     legendary_full_plate_armor: {
+        id: "legendary_full_plate_armor",
         title: "Legendary Full Plate Armor",
         description_html: "",
         level_requirement: 8,
@@ -519,19 +570,20 @@ export const TIER_4_ARMOR = {
             severe: 44
         },
         features: [{
+            attack_modifiers: [],
             title: "Very Heavy",
             description_html: "<p>−2 to Evasion; −1 to Agility</p>",
-            modifiers: [
+            character_modifiers: [
                 {
                     behavior: "bonus",
-                    conditions: [],
+                    character_conditions: [],
                     type: "flat",
                     value: -2,
                     target: "evasion"
                 },
                 {
                     behavior: "bonus",
-                    conditions: [],
+                    character_conditions: [],
                     type: "flat",
                     value: -1,
                     target: "trait",
@@ -541,6 +593,7 @@ export const TIER_4_ARMOR = {
         }]
     },
     dunamis_silkchain: {
+        id: "dunamis_silkchain",
         title: "Dunamis Silkchain",
         description_html: "",
         level_requirement: 8,
@@ -550,12 +603,14 @@ export const TIER_4_ARMOR = {
             severe: 36
         },
         features: [{
+            attack_modifiers: [],
             title: "Timeslowing",
             description_html: "<p>Mark an Armor Slot to roll a d4 and add its result as a bonus to your Evasion against an incoming attack.</p>",
-            modifiers: []
+            character_modifiers: []
         }]
     },
     channeling_armor: {
+        id: "channeling_armor",
         title: "Channeling Armor",
         description_html: "",
         level_requirement: 8,
@@ -565,11 +620,12 @@ export const TIER_4_ARMOR = {
             severe: 36
         },
         features: [{
+            attack_modifiers: [],
             title: "Channeling",
             description_html: "<p>+1 to Spellcast Rolls</p>",
-            modifiers: [{
+            character_modifiers: [{
                 behavior: "bonus",
-                conditions: [],
+                character_conditions: [],
                 type: "flat",
                 value: 1,
                 target: "spellcast_roll_bonus"
@@ -577,6 +633,7 @@ export const TIER_4_ARMOR = {
         }]
     },
     emberwoven_armor: {
+        id: "emberwoven_armor",
         title: "Emberwoven Armor",
         description_html: "",
         level_requirement: 8,
@@ -586,12 +643,14 @@ export const TIER_4_ARMOR = {
             severe: 36
         },
         features: [{
+            attack_modifiers: [],
             title: "Burning",
             description_html: "<p>When an adversary attacks you within Melee range, they mark a Stress.</p>",
-            modifiers: []
+            character_modifiers: []
         }]
     },
     full_fortified_armor: {
+        id: "full_fortified_armor",
         title: "Full Fortified Armor",
         description_html: "",
         level_requirement: 8,
@@ -601,12 +660,14 @@ export const TIER_4_ARMOR = {
             severe: 40
         },
         features: [{
+            attack_modifiers: [],
             title: "Fortified",
             description_html: "<p>When you mark an Armor Slot, you reduce the severity of an attack by two thresholds instead of one.</p>",
-            modifiers: []
+            character_modifiers: []
         }]
     },
     veritas_opal_armor: {
+        id: "veritas_opal_armor",
         title: "Veritas Opal Armor",
         description_html: "",
         level_requirement: 8,
@@ -616,12 +677,14 @@ export const TIER_4_ARMOR = {
             severe: 36
         },
         features: [{
+            attack_modifiers: [],
             title: "Truthseeking",
             description_html: "<p>This armor glows when another creature within Close range tells a lie.</p>",
-            modifiers: []
+            character_modifiers: []
         }]
     },
     savior_chainmail: {
+        id: "savior_chainmail",
         title: "Savior Chainmail",
         description_html: "",
         level_requirement: 8,
@@ -631,19 +694,20 @@ export const TIER_4_ARMOR = {
             severe: 48
         },
         features: [{
+            attack_modifiers: [],
             title: "Difficult",
             description_html: "<p>−1 to all character traits and Evasion</p>",
-            modifiers: [
+            character_modifiers: [
                 {
                     behavior: "bonus",
-                    conditions: [],
+                    character_conditions: [],
                     type: "flat",
                     value: -1,
                     target: "evasion"
                 },
                 {
                     behavior: "bonus",
-                    conditions: [],
+                    character_conditions: [],
                     type: "flat",
                     value: -1,
                     target: "trait",
@@ -651,7 +715,7 @@ export const TIER_4_ARMOR = {
                 },
                 {
                     behavior: "bonus",
-                    conditions: [],
+                    character_conditions: [],
                     type: "flat",
                     value: -1,
                     target: "trait",
@@ -659,7 +723,7 @@ export const TIER_4_ARMOR = {
                 },
                 {
                     behavior: "bonus",
-                    conditions: [],
+                    character_conditions: [],
                     type: "flat",
                     value: -1,
                     target: "trait",
@@ -667,7 +731,7 @@ export const TIER_4_ARMOR = {
                 },
                 {
                     behavior: "bonus",
-                    conditions: [],
+                    character_conditions: [],
                     type: "flat",
                     value: -1,
                     target: "trait",
@@ -675,7 +739,7 @@ export const TIER_4_ARMOR = {
                 },
                 {
                     behavior: "bonus",
-                    conditions: [],
+                    character_conditions: [],
                     type: "flat",
                     value: -1,
                     target: "trait",
@@ -683,7 +747,7 @@ export const TIER_4_ARMOR = {
                 },
                 {
                     behavior: "bonus",
-                    conditions: [],
+                    character_conditions: [],
                     type: "flat",
                     value: -1,
                     target: "trait",

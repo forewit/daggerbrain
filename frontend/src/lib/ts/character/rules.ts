@@ -66,7 +66,7 @@ export const TIER_1_BASE_OPTIONS = {
         short_title: "Starting Domain Cards",
         max: 1,
         costs_two_choices: false,
-        modifiers: []
+        character_modifiers: []
     }
 } as const satisfies Record<Tier1OptionIds, LevelUpOption>
 
@@ -76,19 +76,19 @@ export const TIER_2_BASE_OPTIONS = {
         short_title: "+1 to 2 Traits",
         max: 3,
         costs_two_choices: false,
-        modifiers: []
+        character_modifiers: []
     },
     tier_2_max_hp: {
         title_html: "<p>Permanently gain 1 Hit Point slot.</p>",
         short_title: "+1 HP Slot",
         max: 2,
         costs_two_choices: false,
-        modifiers: [{
+        character_modifiers: [{
             behavior: "bonus",
             target: "max_hp",
             type: "flat",
             value: 1,
-            conditions: []
+            character_conditions: []
         }]
     },
     tier_2_max_stress: {
@@ -96,12 +96,12 @@ export const TIER_2_BASE_OPTIONS = {
         short_title: "+1 Stress Slot",
         max: 2,
         costs_two_choices: false,
-        modifiers: [{
+        character_modifiers: [{
             behavior: "bonus",
             target: "max_stress",
             type: "flat",
             value: 1,
-            conditions: []
+            character_conditions: []
         }]
     },
     tier_2_experience_bonus: {
@@ -109,26 +109,26 @@ export const TIER_2_BASE_OPTIONS = {
         short_title: "+1 to 2 Experiences",
         max: 1,
         costs_two_choices: false,
-        modifiers: []
+        character_modifiers: []
     },
     tier_2_domain_card: {
         title_html: "<p>Choose an additional domain card of your level or lower from a domain you have access to (up to level 4).</p>",
         short_title: "+1 Domain Card",
         max: 1,
         costs_two_choices: false,
-        modifiers: []
+        character_modifiers: []
     },
     tier_2_evasion: {
         title_html: "<p>Permanently gain a +1 bonus to your Evasion.</p>",
         short_title: "+1 Evasion",
         max: 1,
         costs_two_choices: false,
-        modifiers: [{
+        character_modifiers: [{
             behavior: "bonus",
             target: "evasion",
             type: "flat",
             value: 1,
-            conditions: []
+            character_conditions: []
         }]
     }
 } as const satisfies Record<Tier2OptionIds, LevelUpOption>
@@ -139,19 +139,19 @@ export const TIER_3_BASE_OPTIONS = {
         short_title: "+1 to 2 Traits",
         max: 3,
         costs_two_choices: false,
-        modifiers: []
+        character_modifiers: []
     },
     tier_3_max_hp: {
         title_html: "<p>Permanently gain 1 Hit Point slot.</p>",
         short_title: "+1 HP Slot",
         max: 2,
         costs_two_choices: false,
-        modifiers: [{
+        character_modifiers: [{
             behavior: "bonus",
             target: "max_hp",
             type: "flat",
             value: 1,
-            conditions: []
+            character_conditions: []
         }]
     },
     tier_3_max_stress: {
@@ -159,12 +159,12 @@ export const TIER_3_BASE_OPTIONS = {
         short_title: "+1 Stress Slot",
         max: 2,
         costs_two_choices: false,
-        modifiers: [{
+        character_modifiers: [{
             behavior: "bonus",
             target: "max_stress",
             type: "flat",
             value: 1,
-            conditions: []
+            character_conditions: []
         }]
     },
     tier_3_experience_bonus: {
@@ -172,26 +172,26 @@ export const TIER_3_BASE_OPTIONS = {
         short_title: "+1 to 2 Experiences",
         max: 1,
         costs_two_choices: false,
-        modifiers: []
+        character_modifiers: []
     },
     tier_3_domain_card: {
         title_html: "<p>Choose an additional domain card of your level or lower from a domain you have access to (up to level 7).</p>",
         short_title: "+1 Domain Card",
         max: 1,
         costs_two_choices: false,
-        modifiers: []
+        character_modifiers: []
     },
     tier_3_evasion: {
         title_html: "<p>Permanently gain a +1 bonus to your Evasion.</p>",
         short_title: "+1 Evasion",
         max: 1,
         costs_two_choices: false,
-        modifiers: [{
+        character_modifiers: [{
             behavior: "bonus",
             target: "evasion",
             type: "flat",
             value: 1,
-            conditions: []
+            character_conditions: []
         }]
     },
     tier_3_subclass_upgrade: {
@@ -199,19 +199,19 @@ export const TIER_3_BASE_OPTIONS = {
         short_title: "Upgrade Subclass",
         max: 1,
         costs_two_choices: false,
-        modifiers: []
+        character_modifiers: []
     },
     tier_3_proficiency: {
         title_html: "<p>Increase your Proficiency by +1.</p>",
         short_title: "+1 Proficiency",
         max: 1,
         costs_two_choices: true,
-        modifiers: [{
+        character_modifiers: [{
             behavior: "bonus",
             target: "proficiency",
             type: "flat",
             value: 1,
-            conditions: []
+            character_conditions: []
         }]
     },
     tier_3_multiclass: {
@@ -219,7 +219,7 @@ export const TIER_3_BASE_OPTIONS = {
         short_title: "Multiclass",
         max: 1,
         costs_two_choices: true,
-        modifiers: []
+        character_modifiers: []
     }
 } as const satisfies Record<Tier3OptionIds, LevelUpOption>
 
@@ -229,19 +229,19 @@ export const TIER_4_BASE_OPTIONS = {
         short_title: "+1 to 2 Traits",
         max: 3,
         costs_two_choices: false,
-        modifiers: []
+        character_modifiers: []
     },
     tier_4_max_hp: {
         title_html: "<p>Permanently gain 1 Hit Point slot.</p>",
         short_title: "+1 HP Slot",
         max: 2,
         costs_two_choices: false,
-        modifiers: [{
+        character_modifiers: [{
             behavior: "bonus",
             target: "max_hp",
             type: "flat",
             value: 1,
-            conditions: []
+            character_conditions: []
         }]
     },
     tier_4_max_stress: {
@@ -249,12 +249,12 @@ export const TIER_4_BASE_OPTIONS = {
         short_title: "+1 Stress Slot",
         max: 2,
         costs_two_choices: false,
-        modifiers: [{
+        character_modifiers: [{
             behavior: "bonus",
             target: "max_stress",
             type: "flat",
             value: 1,
-            conditions: []
+            character_conditions: []
         }]
     },
     tier_4_experience_bonus: {
@@ -262,26 +262,26 @@ export const TIER_4_BASE_OPTIONS = {
         short_title: "+1 to 2 Experiences",
         max: 1,
         costs_two_choices: false,
-        modifiers: []
+        character_modifiers: []
     },
     tier_4_domain_card: {
         title_html: "<p>Choose an additional domain card of your level or lower from a domain you have access to.</p>",
         short_title: "+1 Domain Card",
         max: 1,
         costs_two_choices: false,
-        modifiers: []
+        character_modifiers: []
     },
     tier_4_evasion: {
         title_html: "<p>Permanently gain a +1 bonus to your Evasion.</p>",
         short_title: "+1 Evasion",
         max: 1,
         costs_two_choices: false,
-        modifiers: [{
+        character_modifiers: [{
             behavior: "bonus",
             target: "evasion",
             type: "flat",
             value: 1,
-            conditions: []
+            character_conditions: []
         }]
     },
     tier_4_subclass_upgrade: {
@@ -289,19 +289,19 @@ export const TIER_4_BASE_OPTIONS = {
         short_title: "Upgrade Subclass",
         max: 1,
         costs_two_choices: false,
-        modifiers: []
+        character_modifiers: []
     },
     tier_4_proficiency: {
         title_html: "<p>Increase your Proficiency by +1.</p>",
         short_title: "+1 Proficiency",
         max: 1,
         costs_two_choices: true,
-        modifiers: [{
+        character_modifiers: [{
             behavior: "bonus",
             target: "proficiency",
             type: "flat",
             value: 1,
-            conditions: []
+            character_conditions: []
         }]
     },
     tier_4_multiclass: {
@@ -309,7 +309,7 @@ export const TIER_4_BASE_OPTIONS = {
         short_title: "Multiclass",
         max: 1,
         costs_two_choices: true,
-        modifiers: []
+        character_modifiers: []
     }
 } as const satisfies Record<Tier4OptionIds, LevelUpOption>
 

@@ -33,12 +33,13 @@ export type Character = {
 
     // equipment
     active_armor_id: string | null;
+    // todo: change to primary_weapon_id: string and secondary_weapon_id: string
     active_weapon_ids: string[];
 
     // the void / other
     transformation_card_id: string | null,
     additional_domain_card_ids: string[],
-    additional_modifiers: Modifier[]
+    additional_character_modifiers: CharacterModifier[]
 
     // set by the player
     ephemeral_stats: {
@@ -115,7 +116,7 @@ export type Subclass = {
     mastery_card: Card<"subclass_mastery">
 }
 
-export type Condition = {
+export type CharacterCondition = {
     type: "armor_equipped"
     value: boolean
 } | {
@@ -133,9 +134,9 @@ export type Condition = {
     min_cards: number
 }
 
-export type Modifier = ({
+export type CharacterModifier = ({
     behavior: "bonus" | "base" | "override"
-    conditions: Condition[];
+    character_conditions: CharacterCondition[];
 } & ({
     type: "derived_from_trait"
     trait: keyof Traits
@@ -160,10 +161,28 @@ export type Modifier = ({
     choice_id: string
 }))
 
+// todo: finish and figure out how to apply properly
+// todo: will need to derive weapon damage and damage type for primary and secondary weapon
+export type AttackModifier = {
+    behaviour: "bonus" | "base" | "override"
+    character_conditions: CharacterCondition[]
+
+} & ({
+    type: "damage"    
+} | {
+    type: "change_damage_type"
+}) & ({
+    target: "primary_weapon_attack" | "secondary_weapon_attack" | "all"
+} | {
+    target: "specific_weapon"
+    weapon_id: string
+})
+
 export type Feature = {
     title: string,
     description_html: string,
-    modifiers: Modifier[]
+    character_modifiers: CharacterModifier[]
+    attack_modifiers: AttackModifier[]
 }
 
 export type CardType = "domain" | "ancestry" | "community" | "transformation" | "subclass_foundation" | "subclass_specialization" | "subclass_mastery";
@@ -238,7 +257,7 @@ export type LevelUpOption = {
     short_title: string | null
     max: number
     costs_two_choices: boolean
-    modifiers: Modifier[]
+    character_modifiers: CharacterModifier[]
 }
 
 export type DamageThresholds = {
@@ -246,6 +265,7 @@ export type DamageThresholds = {
     severe: number
 }
 export type Armor = {
+    id: string,
     level_requirement: number,
     title: string,
     description_html: string,
@@ -256,7 +276,10 @@ export type Armor = {
 
 export type Range = "Melee" | "Very Close" | "Close" | "Far" | "Very Far";
 
+
+
 export type Weapon = {
+    id: string,
     title: string,
     description_html: string,
     level_requirement: number, // tier 1: 1, tier 2: 2-4, tier 3: 5-7, tier 4: 8-10
