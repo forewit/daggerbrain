@@ -992,7 +992,14 @@ function createCharacter(uid: string) {
                 const calculated = Math.ceil(proficiency * modifier.multiplier)
                 if (behavior === 'base' || behavior === 'override') {
                     value = calculated
-                } else if (behavior === 'bonus'){
+                } else if (behavior === 'bonus') {
+                    value = value + calculated
+                }
+            } else if (modifier.type === "derived_from_level") {
+                const calculated = Math.ceil(character.level * modifier.multiplier)
+                if (behavior === 'base' || behavior === 'override') {
+                    value = calculated
+                } else if (behavior === 'bonus') {
                     value = value + calculated
                 }
             }
@@ -1022,6 +1029,8 @@ function createCharacter(uid: string) {
                     base_traits[targetTrait] = modifier.value
                 } else if (modifier.type === "derived_from_proficiency") {
                     base_traits[targetTrait] = Math.ceil(proficiency * modifier.multiplier)
+                } else if (modifier.type === "derived_from_level") {
+                    base_traits[targetTrait] = Math.ceil(character.level * modifier.multiplier)
                 }
                 // ! can't derive a trait from a trait
             }
@@ -1069,6 +1078,8 @@ function createCharacter(uid: string) {
                     new_traits[targetTrait] = new_traits[targetTrait] + modifier.value
                 } else if (modifier.type === "derived_from_proficiency") {
                     new_traits[targetTrait] += Math.ceil(proficiency * modifier.multiplier)
+                } else if (modifier.type === "derived_from_level") {
+                    new_traits[targetTrait] += Math.ceil(character.level * modifier.multiplier)
                 }
                 // ! can't derive a trait from a trait
             }
@@ -1082,6 +1093,8 @@ function createCharacter(uid: string) {
                     new_traits[targetTrait] = modifier.value
                 } else if (modifier.type === "derived_from_proficiency") {
                     new_traits[targetTrait] = Math.ceil(proficiency * modifier.multiplier)
+                } else if (modifier.type === "derived_from_level") {
+                    new_traits[targetTrait] = Math.ceil(character.level * modifier.multiplier)
                 }
                 // ! can't derive a trait from a trait
             }
@@ -1110,8 +1123,10 @@ function createCharacter(uid: string) {
                         new_experience_modifiers[i] = modifier.value;
                     } else if (modifier.type === "derived_from_trait") {
                         new_experience_modifiers[i] = Math.ceil(Number(traits[modifier.trait]) * modifier.multiplier);
-                    }  else if (modifier.type === "derived_from_proficiency") {
+                    } else if (modifier.type === "derived_from_proficiency") {
                         new_experience_modifiers[i] = Math.ceil(proficiency * modifier.multiplier)
+                    } else if (modifier.type === "derived_from_level") {
+                        new_experience_modifiers[i] = Math.ceil(character.level * modifier.multiplier)
                     }
                 }
             }
@@ -1150,6 +1165,8 @@ function createCharacter(uid: string) {
                         new_experience_modifiers[i] += Math.ceil(Number(traits[modifier.trait]) * modifier.multiplier);
                     } else if (modifier.type === "derived_from_proficiency") {
                         new_experience_modifiers[i] += Math.ceil(proficiency * modifier.multiplier)
+                    } else if (modifier.type === "derived_from_level") {
+                        new_experience_modifiers[i] += Math.ceil(character.level * modifier.multiplier)
                     }
                 }
             }
@@ -1170,6 +1187,8 @@ function createCharacter(uid: string) {
                         new_experience_modifiers[i] = Math.ceil(Number(traits[modifier.trait]) * modifier.multiplier);
                     } else if (modifier.type === "derived_from_proficiency") {
                         new_experience_modifiers[i] = Math.ceil(proficiency * modifier.multiplier)
+                    } else if (modifier.type === "derived_from_level") {
+                        new_experience_modifiers[i] = Math.ceil(character.level * modifier.multiplier)
                     }
                 }
             }

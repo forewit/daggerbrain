@@ -1,7 +1,8 @@
 
 import { CLASSES } from "../content/classes/classes";
 import { DOMAINS } from "../content/domains/domains";
-import { ARMOR, WEAPONS } from "../content/equipment";
+import { WEAPONS } from "../content/equipment/primary-weapons";
+import { ARMOR } from "../content/equipment/armor";
 import { ANCESTRY_CARDS, COMMUNITY_CARDS } from "../content/heritage";
 import { TRANSFORMATION_CARDS } from "../content/void";
 import type { Armor, Card, Class, Weapon } from "./types";
