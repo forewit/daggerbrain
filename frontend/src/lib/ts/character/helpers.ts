@@ -1,8 +1,8 @@
 
 import { CLASSES } from "../content/classes/classes";
 import { DOMAINS } from "../content/domains/domains";
-import { WEAPONS } from "../content/equipment/primary-weapons";
-import { ARMOR } from "../content/equipment/armor";
+import { PRIMARY_WEAPONS } from "../content/equipment/equipment";
+import { ARMOR } from "../content/equipment/equipment";
 import { ANCESTRY_CARDS, COMMUNITY_CARDS } from "../content/heritage";
 import { TRANSFORMATION_CARDS } from "../content/void";
 import type { Armor, Card, Class, Weapon } from "./types";
@@ -34,7 +34,7 @@ export function get_armor(armor_id: string | null | undefined): Armor | null {
 
 export function get_weapon(weapon_id: string | null | undefined): Weapon | null {
     if (!weapon_id) return null;
-    return WEAPONS[weapon_id as keyof typeof WEAPONS] || null;
+    return PRIMARY_WEAPONS[weapon_id as keyof typeof PRIMARY_WEAPONS] || null;
 }
 
 export function get_domain_card(domain_card_id: string | null | undefined): Card<"domain"> | null {

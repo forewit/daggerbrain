@@ -1,7 +1,7 @@
 import type { Weapon } from "../../character/types";
 
 
-export const TIER_1_WEAPONS = {
+export const TIER_1_PRIMARY_WEAPONS = {
     broadsword: {
         title: "Broadsword",
         description_html: "",
@@ -362,7 +362,7 @@ export const TIER_1_WEAPONS = {
     }
 } as const satisfies Record<string, Weapon>;
 
-export const TIER_2_WEAPONS = {
+export const TIER_2_PRIMARY_WEAPONS = {
     improved_broadsword: {
         title: "Improved Broadsword",
         description_html: "",
@@ -1042,7 +1042,7 @@ export const TIER_2_WEAPONS = {
 } as const satisfies Record<string, Weapon>;
 
 
-export const TIER_3_WEAPONS = {
+export const TIER_3_PRIMARY_WEAPONS = {
     advanced_broadsword: {
         title: "Advanced Broadsword",
         description_html: "<p>+1 to attack rolls</p>",
@@ -1740,7 +1740,7 @@ export const TIER_3_WEAPONS = {
     }
 } as const satisfies Record<string, Weapon>;
 
-export const TIER_4_WEAPONS = {
+export const TIER_4_PRIMARY_WEAPONS = {
 
     legendary_broadsword: {
         title: "Legendary Broadsword",
@@ -2425,4 +2425,3 @@ export const TIER_4_WEAPONS = {
     }
 } as const satisfies Record<string, Weapon>;
 
-export const WEAPONS = { ...TIER_1_WEAPONS, ...TIER_2_WEAPONS, ...TIER_3_WEAPONS, ...TIER_4_WEAPONS }
