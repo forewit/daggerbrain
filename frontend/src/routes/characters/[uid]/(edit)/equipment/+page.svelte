@@ -7,6 +7,7 @@
   import Shield from "@lucide/svelte/icons/shield";
   import Hand from "@lucide/svelte/icons/hand";
   import { getCharacterContext } from "$lib/ts/character/character.svelte.js";
+  import Inventory from "$lib/components/app/inventory/inventory.svelte";
 
   let { data } = $props();
 
@@ -68,103 +69,108 @@
                 You can only equip one primary and one secondary weapon. Maximum burden is 2 hands.
               </p>
 
-              {#if context.primary_weapon !== null}
-                <div class="flex gap-2 items-center flex-wrap justify-end">
-                  <div
-                    class="relative bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center justify-end gap-3 grow"
-                  >
-                    <div class="grow flex flex-col">
-                      <p class="text-sm">{context.primary_weapon.title}</p>
-                      <p class="text-xs text-muted-foreground italic">
-                        {context.primary_weapon.category}
-                      </p>
+              <div class="flex flex-col gap-2">
+                {#if context.primary_weapon !== null}
+                  <div class="flex gap-2 items-center flex-wrap justify-end">
+                    <div
+                      class="relative bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center justify-end gap-3 grow"
+                    >
+                      <div class="grow flex flex-col">
+                        <p class="text-sm">{context.primary_weapon.title}</p>
+                        <p class="text-xs text-muted-foreground italic">
+                          {context.primary_weapon.category}
+                        </p>
+                      </div>
+
+                      <div class="flex flex-wrap items-center gap-1 justify-end">
+                        <div
+                          class="text-xs flex items-center gap-1 bg-primary-muted rounded-full px-2 py-1"
+                        >
+                          {context.primary_weapon.burden}<Hand class="size-3.5" />
+                        </div>
+                        <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
+                          {context.primary_weapon.damage_dice}
+                          !!damage_type selector!!
+                        </div>
+                        <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
+                          !!trait selector!!
+                        </div>
+                        <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
+                          {context.primary_weapon.range}
+                        </div>
+                      </div>
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-1 justify-end">
-                      <div
-                        class="text-xs flex items-center gap-1 bg-primary-muted rounded-full px-2 py-1"
-                      >
-                        {context.primary_weapon.burden}<Hand class="size-3.5" />
-                      </div>
-                      <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
-                        {context.primary_weapon.damage_dice}
-                        !!damage_type selector!!
-                      </div>
-                      <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
-                        !!trait selector!!
-                      </div>
-                      <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
-                        {context.primary_weapon.range}
-                      </div>
-                    </div>
+                    <Button
+                      variant="link"
+                      class="text-destructive"
+                      onclick={() => {
+                        character.primary_weapon_id = null;
+                      }}>Unequip</Button
+                    >
                   </div>
-
-                  <Button
-                    variant="link"
-                    class="text-destructive"
-                    onclick={() => {
-                      character.primary_weapon_id = null;
-                    }}>Unequip</Button
-                  >
-                </div>
-              {:else}
-                <div
-                  class="bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center gap-3 grow truncate"
-                >
-                  <p class="text-sm text-muted-foreground">No Primary Weapon</p>
-                </div>
-              {/if}
-              {#if context.secondary_weapon !== null}
-                <div class="flex gap-2 items-center flex-wrap justify-end">
+                {:else}
                   <div
-                    class="relative bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center justify-end gap-3 grow"
+                    class="bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center gap-3 grow truncate"
                   >
-                    <div class="grow flex flex-col">
-                      <p class="text-sm">{context.secondary_weapon.title}</p>
-                      <p class="text-xs text-muted-foreground italic">
-                        {context.secondary_weapon.category}
-                      </p>
-                    </div>
-
-                    <div class="flex flex-wrap items-center gap-1 justify-end">
-                      <div
-                        class="text-xs flex items-center gap-1 bg-primary-muted rounded-full px-2 py-1"
-                      >
-                        {context.secondary_weapon.burden}<Hand class="size-3.5" />
-                      </div>
-                      <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
-                        {context.secondary_weapon.damage_dice}
-                        <!-- {context.secondary_weapon.damage_type} -->
-                         !!damage_type selector!!
-                      </div>
-                      <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
-                        <!-- {capitalize(context.secondary_weapon.trait)} -->
-                         !!trait selector!!
-                      </div>
-                      <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
-                        {context.secondary_weapon.range}
-                      </div>
-                    </div>
+                    <p class="text-sm text-muted-foreground">No Primary Weapon</p>
                   </div>
+                {/if}
+                {#if context.secondary_weapon !== null}
+                  <div class="flex gap-2 items-center flex-wrap justify-end">
+                    <div
+                      class="relative bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center justify-end gap-3 grow"
+                    >
+                      <div class="grow flex flex-col">
+                        <p class="text-sm">{context.secondary_weapon.title}</p>
+                        <p class="text-xs text-muted-foreground italic">
+                          {context.secondary_weapon.category}
+                        </p>
+                      </div>
 
-                  <Button
-                    variant="link"
-                    class="text-destructive"
-                    onclick={() => {
-                      character.secondary_weapon_id = null;
-                    }}>Unequip</Button
+                      <div class="flex flex-wrap items-center gap-1 justify-end">
+                        <div
+                          class="text-xs flex items-center gap-1 bg-primary-muted rounded-full px-2 py-1"
+                        >
+                          {context.secondary_weapon.burden}<Hand class="size-3.5" />
+                        </div>
+                        <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
+                          {context.secondary_weapon.damage_dice}
+                          <!-- {context.secondary_weapon.damage_type} -->
+                          !!damage_type selector!!
+                        </div>
+                        <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
+                          <!-- {capitalize(context.secondary_weapon.trait)} -->
+                          !!trait selector!!
+                        </div>
+                        <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
+                          {context.secondary_weapon.range}
+                        </div>
+                      </div>
+                    </div>
+
+                    <Button
+                      variant="link"
+                      class="text-destructive"
+                      onclick={() => {
+                        character.secondary_weapon_id = null;
+                      }}>Unequip</Button
+                    >
+                  </div>
+                {:else}
+                  <div
+                    class="bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center gap-3 grow truncate"
                   >
-                </div>
-              {:else}
-                <div
-                  class="bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center gap-3 grow truncate"
-                >
-                  <p class="text-sm text-muted-foreground">No Secondary Weapon</p>
-                </div>
-              {/if}
+                    <p class="text-sm text-muted-foreground">No Secondary Weapon</p>
+                  </div>
+                {/if}
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- Inventory -->
+        <Inventory />
       </Dropdown>
     </div>
   </div>
