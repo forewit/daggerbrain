@@ -4,7 +4,7 @@
   import type { Character, Card } from "$lib/ts/character/types";
   import Banner from "../cards/class-banner.svelte";
   import DamageThresholds from "./damage-thresholds.svelte";
-  import Armor from "./armor.svelte";
+  import ArmorSlots from "./armor-slots.svelte";
   import Evasion from "./evasion.svelte";
   import Hp from "./hp.svelte";
   import Stress from "./stress.svelte";
@@ -147,7 +147,7 @@
       >
         <div class="flex gap-2">
           <Evasion />
-          <Armor />
+          <ArmorSlots />
         </div>
         <DamageThresholds class="my-2" />
       </div>

@@ -35,11 +35,15 @@ export type Character = {
     armor_id: string | null;
     primary_weapon_id: string | null;
     secondary_weapon_id: string | null;
+    primary_weapon_chocies: WeaponChoices
+    secondary_weapon_chocies: WeaponChoices
+    unarmed_attack_chocies: WeaponChoices
 
     // the void / other
     transformation_card_id: string | null,
     additional_domain_card_ids: string[],
     additional_character_modifiers: CharacterModifier[]
+    additional_weapon_modifiers: WeaponModifier[]
 
     // set by the player
     ephemeral_stats: {
@@ -50,11 +54,9 @@ export type Character = {
         loadout_domain_card_ids: string[],
     }
 
-    // key is a domain card id or class id
-    // key: {choice_id, selection_ids[]}
+    // structure: {domain_card_id: {choice_id, selection_ids[]}}
     domain_card_choices: Record<string, Record<string, string[]>>,
-
-
+    // structure: {domain_card_id: token_count}
     domain_card_tokens: Record<string, number>,
 
     // level-up choices. levels 2-10
@@ -82,6 +84,11 @@ export type Character = {
         9: { A: LevelUpChoice, B: LevelUpChoice },
         10: { A: LevelUpChoice, B: LevelUpChoice },
     }
+}
+
+export type WeaponChoices = {
+    trait: keyof Traits | null
+    damage_type: DamageType | null
 }
 
 export type Traits = {
@@ -132,6 +139,9 @@ export type CharacterCondition = {
     type: "min_loadout_cards_from_domain"
     domain_id: DomainIds
     min_cards: number
+} | {
+    type: "primary_weapon_equiped" | "secondary_weapon_equiped"
+    weapon_id: string | null
 }
 
 export type CharacterModifier = ({
@@ -169,15 +179,20 @@ export type WeaponModifier = {
     target_stat: "attack_roll"
     value: number
 } | {
-    target_stat: "damage"
-    numeric: number
+    target_stat: "damage_bonus"
+    value: number
+} | {
+    target_stat: "damage_dice"
     dice: string
 } | {
     target_stat: "damage_type"
-    damage_type: "phy" | "mag"
+    damage_type: DamageType
 } | {
     target_stat: "range"
     range: Range
+} | {
+    target_stat: "trait"
+    trait: keyof Traits
 })
 
 export type Feature = {
@@ -276,19 +291,20 @@ export type Armor = {
 }
 
 export type Range = "Melee" | "Very Close" | "Close" | "Far" | "Very Far";
-
-
+export type DamageType = "phy" | "mag"
 
 export type Weapon = {
     id: string,
     title: string,
     description_html: string,
     level_requirement: number, // tier 1: 1, tier 2: 2-4, tier 3: 5-7, tier 4: 8-10
-    category: "Primary" | "Secondary";
-    trait: keyof Traits;
+    category: "Primary" | "Secondary" | "Unarmed";
+    available_traits: (keyof Traits)[]
     range: Range;
     features: Feature[];
-    damage: string;
-    damage_type: "phy" | "mag";
-    burden: 1 | 2 // represents number of hands required to wield
+    attack_roll_bonus: number;
+    damage_bonus: number;
+    damage_dice: string;
+    available_damage_types: DamageType[]
+    burden: 0 | 1 | 2 // represents number of hands required to wield
 }

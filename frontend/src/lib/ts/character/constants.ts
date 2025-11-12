@@ -18,7 +18,6 @@ export const BLANK_LEVEL_UP_CHOICE = {
 } as const satisfies LevelUpChoice
 
 export const JUST_JAMES: Character = {
-
     settings: {
         void_enabled: true,
     },
@@ -61,6 +60,18 @@ export const JUST_JAMES: Character = {
     armor_id: null,
     primary_weapon_id: null,
     secondary_weapon_id: null,
+    primary_weapon_chocies: {
+        trait: null,
+        damage_type: null
+    },
+    secondary_weapon_chocies: {
+        trait: null,
+        damage_type: null
+    },
+    unarmed_attack_chocies: {
+        trait: null,
+        damage_type: null
+    },
 
     // the void / other
     transformation_card_id: "werewolf",
@@ -69,6 +80,7 @@ export const JUST_JAMES: Character = {
         "untouchable"
     ],
     additional_character_modifiers: [],
+    additional_weapon_modifiers: [],
 
     // set by the player
     ephemeral_stats: {
@@ -169,11 +181,24 @@ export const NEW_CHARACTER: Character = {
     armor_id: null,
     primary_weapon_id: null,
     secondary_weapon_id: null,
+    primary_weapon_chocies: {
+        trait: null,
+        damage_type: null
+    },
+    secondary_weapon_chocies: {
+        trait: null,
+        damage_type: null
+    },
+    unarmed_attack_chocies: {
+        trait: null,
+        damage_type: null
+    },
 
     // the void / other
     transformation_card_id: null,
     additional_domain_card_ids: [],
     additional_character_modifiers: [],
+    additional_weapon_modifiers: [],
 
     // set by the player
     ephemeral_stats: {

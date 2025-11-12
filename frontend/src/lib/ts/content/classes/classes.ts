@@ -84,9 +84,14 @@ export const SUBCLASS_CARDS = {
             {
                 title: "Powerhouse",
                 description_html: `<p>Increase the <b>d8</b> damage dice for your unarmed attack to <b>d10s</b>. Additionally, you can mark a Stress to target two creatures within Melee range with a single attack roll.</p>`,
-                // todo: figure out how to add this as a modifier (maybe add an "unarmed strike" as a default weapon)
                 character_modifiers: [],
-                weapon_modifiers: [],
+                weapon_modifiers: [{
+                    behaviour: "base",
+                    target_weapon: "unarmed",
+                    character_conditions: [],
+                    target_stat: "damage_dice",
+                    dice: "1d10"
+                }],
             },
             {
                 title: "Overwhelm",
@@ -238,9 +243,56 @@ export const CLASSES = {
                         <li>You gain a +1 bonus to Evasion</li>
                         <li>Your unarmed strikes are considered a Melee weapon, use the trait of your choice, and deal <b>d8+d6</b> phy damage using your Proficiency.</li>
                      </ul>`,
-                // todo: add modifiers
-                character_modifiers: [],
-                weapon_modifiers: [],
+                character_modifiers: [{
+                    behaviour: "bonus",
+                    character_conditions: [{
+                        type: "primary_weapon_equiped",
+                        weapon_id: null
+                    }, {
+                        type: "secondary_weapon_equiped",
+                        weapon_id: null
+                    }],
+                    type: "flat",
+                    value: 1,
+                    target: "evasion"
+                }],
+                weapon_modifiers: [{
+                    behaviour: "base",
+                    character_conditions: [{
+                        type: "primary_weapon_equiped",
+                        weapon_id: null
+                    }, {
+                        type: "secondary_weapon_equiped",
+                        weapon_id: null
+                    }],
+                    target_weapon: "unarmed",
+                    target_stat: "range",
+                    range: "Melee"
+                },{
+                    behaviour: "base",
+                    character_conditions: [{
+                        type: "primary_weapon_equiped",
+                        weapon_id: null
+                    }, {
+                        type: "secondary_weapon_equiped",
+                        weapon_id: null
+                    }],
+                    target_weapon: "unarmed",
+                    target_stat: "damage_dice",
+                    dice: "1d8+1d6"
+                },{
+                    behaviour: "base",
+                    character_conditions: [{
+                        type: "primary_weapon_equiped",
+                        weapon_id: null
+                    }, {
+                        type: "secondary_weapon_equiped",
+                        weapon_id: null
+                    }],
+                    target_weapon: "unarmed",
+                    target_stat: "damage_type",
+                    damage_type: "phy"
+                }],
             },
             {
                 title: "Combo Strikes",

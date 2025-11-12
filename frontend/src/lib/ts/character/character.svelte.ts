@@ -2,7 +2,7 @@ import { getAppContext } from '$lib/ts/app.svelte';
 import { ALL_LEVEL_UP_OPTIONS, BASE_STATS, TRAIT_OPTIONS } from '$lib/ts/character/rules';
 import { getContext, setContext } from 'svelte';
 import { get_ancestry_card, get_armor, get_class, get_community_card, get_domain_card, get_transformation_card, get_weapon } from './helpers';
-import type { Card, Character, Class, CharacterCondition, DamageThresholds, LevelUpChoice, LevelUpOption, CharacterModifier, Subclass, Traits } from './types';
+import type { Card, Character, Class, CharacterCondition, DamageThresholds, LevelUpChoice, LevelUpOption, CharacterModifier, Subclass, Traits, Weapon, WeaponModifier, WeaponChoices } from './types';
 import { BLANK_LEVEL_UP_CHOICE } from './constants';
 
 function createCharacter(uid: string) {
@@ -25,9 +25,6 @@ function createCharacter(uid: string) {
         if (!secondary_class || !character?.secondary_subclass_id) return null;
         return secondary_class.subclasses[character.secondary_subclass_id]
     })
-    let armor = $derived(get_armor(character?.armor_id));
-    let primary_weapon = $derived(get_weapon(character?.primary_weapon_id));
-    let secondary_weapon = $derived(get_weapon(character?.secondary_weapon_id))
     let level_up_domain_cards: {
         1: { A: Card<"domain"> | null, B: Card<"domain"> | null },
         2: { A: Card<"domain"> | null },
@@ -104,6 +101,11 @@ function createCharacter(uid: string) {
         character?.additional_domain_card_ids.map(id => get_domain_card(id)).filter(c => c !== null) || []
     );
 
+    // derived equipment
+    let primary_weapon: Weapon | null = $state(null);
+    let secondary_weapon: Weapon | null = $state(null);
+    let unarmed_attack: Weapon | null = $state(null);
+    let armor = $derived(get_armor(character?.armor_id));
 
     // derived character stats
     let domain_card_vault: Card<"domain">[] = $state([]);
@@ -122,11 +124,9 @@ function createCharacter(uid: string) {
     let primary_class_mastery_level: number = $state(BASE_STATS.primary_class_mastery_level);
     let secondary_class_mastery_level: number = $state(BASE_STATS.secondary_class_mastery_level);
     let experience_modifiers: number[] = $state(Array.from({ length: BASE_STATS.max_experiences }, () => BASE_STATS.experience_modifier));
-   
     let spellcast_trait: keyof Traits | null = $state(BASE_STATS.spellcast_trait);
     let spellcast_roll_bonus: number = $state(BASE_STATS.spellcast_roll_bonus);
 
-    // derived weapon stats
 
 
     // ! load character from app context
@@ -760,6 +760,222 @@ function createCharacter(uid: string) {
     })
 
 
+    // * derive weapons and apply weapon modifiers
+    $effect(() => {
+        if (!character) return
+        let new_primary_weapon = get_weapon(character.primary_weapon_id)
+        let new_secondary_weapon = get_weapon(character.secondary_weapon_id)
+        let new_unarmed_attack = BASE_STATS.unarmed_attack
+
+        // apply base weapon modifiers
+        for (const modifier of base_weapon_modifiers) {
+            // Check all conditions
+            const conditions_met = modifier.character_conditions.every(condition => evaluate_character_condition(condition))
+            if (!conditions_met) continue;
+
+            const for_primary = new_primary_weapon && (modifier.target_weapon === "all" || modifier.target_weapon === "primary");
+            const for_secondary = new_secondary_weapon && (modifier.target_weapon === "all" || modifier.target_weapon === "secondary");
+            const for_unarmed = new_unarmed_attack && (modifier.target_weapon === "all" || modifier.target_weapon === "unarmed");
+
+            if (modifier.target_stat === "attack_roll") {
+                if (for_primary) new_primary_weapon.attack_roll_bonus = modifier.value
+                if (for_secondary) new_secondary_weapon.attack_roll_bonus = modifier.value
+                if (for_unarmed) new_unarmed_attack.attack_roll_bonus = modifier.value
+            }
+            else if (modifier.target_stat === "damage_bonus") {
+                if (for_primary) new_primary_weapon.damage_bonus = modifier.value
+                if (for_secondary) new_secondary_weapon.damage_bonus = modifier.value
+                if (for_unarmed) new_unarmed_attack.damage_bonus = modifier.value
+            }
+            else if (modifier.target_stat === "damage_dice") {
+                if (for_primary) new_primary_weapon.damage_dice = modifier.dice
+                if (for_secondary) new_secondary_weapon.damage_dice = modifier.dice
+                if (for_unarmed) new_unarmed_attack.damage_dice = modifier.dice
+            }
+            else if (modifier.target_stat === "damage_type") {
+                if (for_primary)
+                    new_primary_weapon.available_damage_types = [modifier.damage_type]
+                if (for_secondary)
+                    new_secondary_weapon.available_damage_types = [modifier.damage_type]
+                if (for_unarmed)
+                    new_unarmed_attack.available_damage_types = [modifier.damage_type]
+            }
+            else if (modifier.target_stat === "range") {
+                if (for_primary) new_primary_weapon.range = modifier.range
+                if (for_secondary) new_secondary_weapon.range = modifier.range
+                if (for_unarmed) new_unarmed_attack.range = modifier.range
+            }
+            else if (modifier.target_stat === "trait") {
+                if (for_primary)
+                    new_primary_weapon.available_traits = [modifier.trait]
+                if (for_secondary)
+                    new_secondary_weapon.available_traits = [modifier.trait]
+                if (for_unarmed)
+                    new_unarmed_attack.available_traits = [modifier.trait]
+            }
+        }
+
+        // apply bonus weapon modifiers
+        for (const modifier of bonus_weapon_modifiers) {
+            // Check all conditions
+            const conditions_met = modifier.character_conditions.every(condition => evaluate_character_condition(condition))
+            if (!conditions_met) continue;
+
+            const for_primary = new_primary_weapon && (modifier.target_weapon === "all" || modifier.target_weapon === "primary");
+            const for_secondary = new_secondary_weapon && (modifier.target_weapon === "all" || modifier.target_weapon === "secondary");
+            const for_unarmed = new_unarmed_attack && (modifier.target_weapon === "all" || modifier.target_weapon === "unarmed");
+
+            if (modifier.target_stat === "attack_roll") {
+                if (for_primary) new_primary_weapon.attack_roll_bonus += modifier.value
+                if (for_secondary) new_secondary_weapon.attack_roll_bonus += modifier.value
+                if (for_unarmed) new_unarmed_attack.attack_roll_bonus += modifier.value
+            }
+            else if (modifier.target_stat === "damage_bonus") {
+                if (for_primary) new_primary_weapon.damage_bonus += modifier.value
+                if (for_secondary) new_secondary_weapon.damage_bonus += modifier.value
+                if (for_unarmed) new_unarmed_attack.damage_bonus += modifier.value
+            }
+            else if (modifier.target_stat === "damage_dice") {
+                if (for_primary) new_primary_weapon.damage_dice += "+" + modifier.dice
+                if (for_secondary) new_secondary_weapon.damage_dice += "+" + modifier.dice
+                if (for_unarmed) new_unarmed_attack.damage_dice += "+" + modifier.dice
+            }
+            else if (modifier.target_stat === "damage_type") {
+                if (for_primary && !new_primary_weapon.available_damage_types.includes(modifier.damage_type))
+                    new_primary_weapon.available_damage_types.push(modifier.damage_type)
+                if (for_secondary && !new_secondary_weapon.available_damage_types.includes(modifier.damage_type))
+                    new_secondary_weapon.available_damage_types.push(modifier.damage_type)
+                if (for_unarmed && !new_unarmed_attack.available_damage_types.includes(modifier.damage_type))
+                    new_unarmed_attack.available_damage_types.push(modifier.damage_type)
+            }
+            else if (modifier.target_stat === "range") {
+                if (for_primary) new_primary_weapon.range = modifier.range
+                if (for_secondary) new_secondary_weapon.range = modifier.range
+                if (for_unarmed) new_unarmed_attack.range = modifier.range
+            }
+            else if (modifier.target_stat === "trait") {
+                if (for_primary && !new_primary_weapon.available_traits.includes(modifier.trait))
+                    new_primary_weapon.available_traits.push(modifier.trait)
+                if (for_secondary && !new_secondary_weapon.available_traits.includes(modifier.trait))
+                    new_secondary_weapon.available_traits.push(modifier.trait)
+                if (for_unarmed && !new_unarmed_attack.available_traits.includes(modifier.trait))
+                    new_unarmed_attack.available_traits.push(modifier.trait)
+            }
+        }
+
+        // apply override weapon modifiers
+        for (const modifier of override_weapon_modifiers) {
+            // Check all conditions
+            const conditions_met = modifier.character_conditions.every(condition => evaluate_character_condition(condition))
+            if (!conditions_met) continue;
+
+            const for_primary = new_primary_weapon && (modifier.target_weapon === "all" || modifier.target_weapon === "primary");
+            const for_secondary = new_secondary_weapon && (modifier.target_weapon === "all" || modifier.target_weapon === "secondary");
+            const for_unarmed = new_unarmed_attack && (modifier.target_weapon === "all" || modifier.target_weapon === "unarmed");
+
+            if (modifier.target_stat === "attack_roll") {
+                if (for_primary) new_primary_weapon.attack_roll_bonus = modifier.value
+                if (for_secondary) new_secondary_weapon.attack_roll_bonus = modifier.value
+                if (for_unarmed) new_unarmed_attack.attack_roll_bonus = modifier.value
+            }
+            else if (modifier.target_stat === "damage_bonus") {
+                if (for_primary) new_primary_weapon.damage_bonus = modifier.value
+                if (for_secondary) new_secondary_weapon.damage_bonus = modifier.value
+                if (for_unarmed) new_unarmed_attack.damage_bonus = modifier.value
+            }
+            else if (modifier.target_stat === "damage_dice") {
+                if (for_primary) new_primary_weapon.damage_dice = modifier.dice
+                if (for_secondary) new_secondary_weapon.damage_dice = modifier.dice
+                if (for_unarmed) new_unarmed_attack.damage_dice = modifier.dice
+            }
+            else if (modifier.target_stat === "damage_type") {
+                if (for_primary)
+                    new_primary_weapon.available_damage_types = [modifier.damage_type]
+                if (for_secondary)
+                    new_secondary_weapon.available_damage_types = [modifier.damage_type]
+                if (for_unarmed)
+                    new_unarmed_attack.available_damage_types = [modifier.damage_type]
+            }
+            else if (modifier.target_stat === "range") {
+                if (for_primary) new_primary_weapon.range = modifier.range
+                if (for_secondary) new_secondary_weapon.range = modifier.range
+                if (for_unarmed) new_unarmed_attack.range = modifier.range
+            }
+            else if (modifier.target_stat === "trait") {
+                if (for_primary)
+                    new_primary_weapon.available_traits = [modifier.trait]
+                if (for_secondary)
+                    new_secondary_weapon.available_traits = [modifier.trait]
+                if (for_unarmed)
+                    new_unarmed_attack.available_traits = [modifier.trait]
+            }
+        }
+        // ! clear invalid weapon choices
+        let new_primary_weapon_choices = character.primary_weapon_chocies
+        let new_secondary_weapon_choices = character.secondary_weapon_chocies
+        let new_unarmed_attack_choices = character.unarmed_attack_chocies
+
+        if (new_primary_weapon === null) {
+            new_primary_weapon_choices = { trait: null, damage_type: null, }
+        } else {
+            if (new_primary_weapon_choices.trait !== null && !new_primary_weapon.available_traits.includes(new_primary_weapon_choices.trait)) {
+                new_primary_weapon_choices.trait = null
+            }
+            if (new_primary_weapon_choices.damage_type !== null && !new_primary_weapon.available_damage_types.includes(new_primary_weapon_choices.damage_type)) {
+                new_primary_weapon_choices.damage_type = null
+            }
+        }
+
+        if (new_secondary_weapon === null) {
+            new_secondary_weapon_choices = { trait: null, damage_type: null, }
+        } else {
+            if (new_secondary_weapon_choices.trait !== null && !new_secondary_weapon.available_traits.includes(new_secondary_weapon_choices.trait)) {
+                new_secondary_weapon_choices.trait = null
+            }
+            if (new_secondary_weapon_choices.damage_type !== null && !new_secondary_weapon.available_damage_types.includes(new_secondary_weapon_choices.damage_type)) {
+                new_secondary_weapon_choices.damage_type = null
+            }
+        }
+
+        if (new_unarmed_attack === null) {
+            new_unarmed_attack_choices = { trait: null, damage_type: null, }
+        } else {
+            if (new_unarmed_attack_choices.trait !== null && !new_unarmed_attack.available_traits.includes(new_unarmed_attack_choices.trait)) {
+                new_unarmed_attack_choices.trait = null
+            }
+            if (new_unarmed_attack_choices.damage_type !== null && !new_unarmed_attack.available_damage_types.includes(new_unarmed_attack_choices.damage_type)) {
+                new_unarmed_attack_choices.damage_type = null
+            }
+        }
+
+        function equivalent(a: WeaponChoices, b: WeaponChoices) {
+            return a.trait === b.trait && a.damage_type === b.damage_type;
+        }
+
+
+        // update values
+        if (!equivalent(new_primary_weapon_choices, character.primary_weapon_chocies)) {
+            character.primary_weapon_chocies = new_primary_weapon_choices
+        }
+        if (!equivalent(new_secondary_weapon_choices, character.secondary_weapon_chocies)) {
+            character.secondary_weapon_chocies = new_secondary_weapon_choices
+        }
+        if (!equivalent(new_unarmed_attack_choices, character.unarmed_attack_chocies)) {
+            character.unarmed_attack_chocies = new_unarmed_attack_choices
+        }
+
+        primary_weapon = new_primary_weapon;
+        secondary_weapon = new_secondary_weapon;
+        unarmed_attack = new_unarmed_attack;
+    })
+
+    $effect(() => {
+        if (!character) return
+
+
+
+    })
+
     // ! clear invalid  weapons
     $effect(() => {
         if (!character) return;
@@ -780,8 +996,8 @@ function createCharacter(uid: string) {
             if (secondary_weapon.level_requirement <= character.level &&
                 secondary_weapon.category === "Secondary" &&
                 total_burden <= max_burden) {
-                    return
-                }
+                return
+            }
 
             console.warn(`Removing invalid secondary weapon ${secondary_weapon.id}`)
             character.secondary_weapon_id = null;
@@ -801,22 +1017,24 @@ function createCharacter(uid: string) {
 
 
     // helper function to check if conditionsa are met
-    function evaluate_condition(condition: CharacterCondition): boolean {
+    function evaluate_character_condition(condition: CharacterCondition): boolean {
         if (!character) return false
         if (condition.type === "level") {
             return character.level >= condition.min_level && character.level <= condition.max_level
         } else if (condition.type === "armor_equipped") {
             const has_armor = character.armor_id !== null
             return condition.value === has_armor
+        } else if (condition.type === "primary_weapon_equiped") {
+            return condition.weapon_id === character.primary_weapon_id
+        } else if (condition.type === "secondary_weapon_equiped") {
+            return condition.weapon_id === character.secondary_weapon_id
         } else if (condition.type === "domain_card_choice") {
-
             if (!character.domain_card_choices[condition.domain_card_id] || !character.domain_card_choices[condition.domain_card_id][condition.choice_id]) {
                 return false
             } else {
                 return character.domain_card_choices[condition.domain_card_id][condition.choice_id].includes(condition.selection_id)
             }
         } else if (condition.type === "min_loadout_cards_from_domain") {
-            // verify that the required number of cards from the domain are in the loadout
             let count = 0;
             for (const card of domain_card_loadout) {
                 if (card.domain_id === condition.domain_id) {
@@ -829,80 +1047,114 @@ function createCharacter(uid: string) {
     }
 
     // * derived modifiers -- used to calculate most stats --
-    let base_modifiers: CharacterModifier[] = $state([])
-    let bonus_modifiers: CharacterModifier[] = $state([])
-    let override_modifiers: CharacterModifier[] = $state([])
+    let base_character_modifiers: CharacterModifier[] = $state([])
+    let bonus_character_modifiers: CharacterModifier[] = $state([])
+    let override_character_modifiers: CharacterModifier[] = $state([])
+    let base_weapon_modifiers: WeaponModifier[] = $state([])
+    let bonus_weapon_modifiers: WeaponModifier[] = $state([])
+    let override_weapon_modifiers: WeaponModifier[] = $state([])
     $effect(() => {
         if (!character) return
 
-        let all_modifiers: CharacterModifier[] = []
-
-        function push_modifiers(modifiers: CharacterModifier[] | undefined) {
+        let all_character_modifiers: CharacterModifier[] = []
+        function push_character_modifiers(modifiers: CharacterModifier[] | undefined) {
             if (!modifiers || modifiers.length === 0) return
             for (const modifier of modifiers) {
-                // Check all conditions - all must pass (AND logic)
-                const conditions_met = modifier.character_conditions.every(condition => evaluate_condition(condition))
-                if (conditions_met) all_modifiers.push(modifier)
+                const conditions_met = modifier.character_conditions.every(condition => evaluate_character_condition(condition))
+                if (conditions_met) all_character_modifiers.push(modifier)
+            }
+        }
+
+        let all_weapon_modifiers: WeaponModifier[] = []
+        function push_weapon_modifiers(modifiers: WeaponModifier[] | undefined) {
+            if (!modifiers || modifiers.length === 0) return
+            for (const modifier of modifiers) {
+                const conditions_met = modifier.character_conditions.every(condition => evaluate_character_condition(condition))
+                if (conditions_met) all_weapon_modifiers.push(modifier)
             }
         }
 
         // ancestry card
         if (ancestry_card) {
-            ancestry_card.features.forEach(f => push_modifiers(f.character_modifiers))
+            ancestry_card.features.forEach(f => {
+                push_character_modifiers(f.character_modifiers)
+                push_weapon_modifiers(f.weapon_modifiers)
+            })
         }
 
         // community card
         if (community_card) {
-            community_card.features.forEach(f => push_modifiers(f.character_modifiers))
+            community_card.features.forEach(f => {
+                push_character_modifiers(f.character_modifiers)
+                push_weapon_modifiers(f.weapon_modifiers)
+            })
         }
 
         // transformation card
         if (transformation_card) {
-            transformation_card.features.forEach(f => push_modifiers(f.character_modifiers))
+            transformation_card.features.forEach(f => {
+                push_character_modifiers(f.character_modifiers)
+                push_weapon_modifiers(f.weapon_modifiers)
+            })
         }
 
         // primary class
         if (primary_class) {
-            push_modifiers(primary_class.hope_feature.character_modifiers)
-            primary_class.class_features.forEach(f => push_modifiers(f.character_modifiers))
+            push_character_modifiers(primary_class.hope_feature.character_modifiers)
+            push_weapon_modifiers(primary_class.hope_feature.weapon_modifiers)
+
+            primary_class.class_features.forEach(f => {
+                push_character_modifiers(f.character_modifiers)
+                push_weapon_modifiers(f.weapon_modifiers)
+            })
         }
 
         // primary subclass cards (gate by mastery level)
         if (primary_subclass) {
             const primaryMastery = primary_class_mastery_level
-            push_modifiers(primary_subclass.foundation_card.features.flatMap(f => f.character_modifiers))
+            push_character_modifiers(primary_subclass.foundation_card.features.flatMap(f => f.character_modifiers))
+            push_weapon_modifiers(primary_subclass.foundation_card.features.flatMap(f => f.weapon_modifiers))
             if (primaryMastery >= 2) {
-                push_modifiers(primary_subclass.specialization_card.features.flatMap(f => f.character_modifiers))
+                push_character_modifiers(primary_subclass.specialization_card.features.flatMap(f => f.character_modifiers))
+                push_weapon_modifiers(primary_subclass.specialization_card.features.flatMap(f => f.weapon_modifiers))
             }
             if (primaryMastery >= 3) {
-                push_modifiers(primary_subclass.mastery_card.features.flatMap(f => f.character_modifiers))
+                push_character_modifiers(primary_subclass.mastery_card.features.flatMap(f => f.character_modifiers))
+                push_weapon_modifiers(primary_subclass.mastery_card.features.flatMap(f => f.weapon_modifiers))
             }
         }
 
         // secondary class
         if (secondary_class) {
             // no hope feature for secondary class
-            secondary_class.class_features.forEach(f => push_modifiers(f.character_modifiers))
+            secondary_class.class_features.forEach(f => {
+                push_character_modifiers(f.character_modifiers)
+                push_weapon_modifiers(f.weapon_modifiers)
+            })
         }
 
         // secondary subclass cards (gate by mastery level)
         if (secondary_subclass) {
             const secondaryMastery = secondary_class_mastery_level
-            push_modifiers(secondary_subclass.foundation_card.features.flatMap(f => f.character_modifiers))
+            push_character_modifiers(secondary_subclass.foundation_card.features.flatMap(f => f.character_modifiers))
+            push_weapon_modifiers(secondary_subclass.foundation_card.features.flatMap(f => f.weapon_modifiers))
+
             if (secondaryMastery >= 2) {
-                push_modifiers(secondary_subclass.specialization_card.features.flatMap(f => f.character_modifiers))
+                push_character_modifiers(secondary_subclass.specialization_card.features.flatMap(f => f.character_modifiers))
+                push_weapon_modifiers(secondary_subclass.specialization_card.features.flatMap(f => f.weapon_modifiers))
             }
             if (secondaryMastery >= 3) {
-                push_modifiers(secondary_subclass.mastery_card.features.flatMap(f => f.character_modifiers))
+                push_character_modifiers(secondary_subclass.mastery_card.features.flatMap(f => f.character_modifiers))
+                push_weapon_modifiers(secondary_subclass.mastery_card.features.flatMap(f => f.weapon_modifiers))
             }
         }
 
-        // modifiers from chosen level up options
+        // character_modifiers from chosen level up options
         for (let i = 2; i <= character.level; i++) {
             const chosen_options = level_up_chosen_options[i as keyof typeof level_up_chosen_options];
             if (!chosen_options) continue;
-            push_modifiers(chosen_options.A?.character_modifiers);
-            push_modifiers(chosen_options.B?.character_modifiers);
+            push_character_modifiers(chosen_options.A?.character_modifiers);
+            push_character_modifiers(chosen_options.B?.character_modifiers);
         }
 
         // modifiers from the vault where applies_in_vault=true or the card index is in the loadout
@@ -910,36 +1162,54 @@ function createCharacter(uid: string) {
         const loadout_card_ids = character.ephemeral_stats.loadout_domain_card_ids;
         vault.forEach((card, i) => {
             if (card.applies_in_vault || loadout_card_ids.includes(card.id)) {
-                card.features.forEach(f => push_modifiers(f.character_modifiers))
+                card.features.forEach(f => {
+                    push_character_modifiers(f.character_modifiers)
+                    push_weapon_modifiers(f.weapon_modifiers)
+                })
             }
         })
 
         // modifiers from active armor & weapons
         if (armor) {
-            armor.features.forEach(f => push_modifiers(f.character_modifiers))
+            armor.features.forEach(f => {
+                push_character_modifiers(f.character_modifiers)
+                push_weapon_modifiers(f.weapon_modifiers)
+            })
         }
         if (primary_weapon) {
-            primary_weapon.features.forEach(f => push_modifiers(f.character_modifiers))
+            primary_weapon.features.forEach(f => {
+                push_character_modifiers(f.character_modifiers)
+                push_weapon_modifiers(f.weapon_modifiers)
+            })
         }
         if (secondary_weapon) {
-            secondary_weapon.features.forEach(f => push_modifiers(f.character_modifiers))
+            secondary_weapon.features.forEach(f => {
+                push_character_modifiers(f.character_modifiers)
+                push_weapon_modifiers(f.weapon_modifiers)
+            })
         }
-
 
         // additional cards
         additional_domain_cards.forEach(card => {
-            card.features.forEach(f => push_modifiers(f.character_modifiers))
+            card.features.forEach(f => {
+                push_character_modifiers(f.character_modifiers)
+                push_weapon_modifiers(f.weapon_modifiers)
+            })
         })
 
         // additional modifiers
-        push_modifiers(character.additional_character_modifiers)
-
+        push_character_modifiers(character.additional_character_modifiers)
+        push_weapon_modifiers(character.additional_weapon_modifiers)
 
 
         // categorize by behavior
-        base_modifiers = all_modifiers.filter((e) => 'behavior' in e && e.behaviour === 'base') as CharacterModifier[]
-        bonus_modifiers = all_modifiers.filter((e) => 'behavior' in e && e.behaviour === 'bonus') as CharacterModifier[]
-        override_modifiers = all_modifiers.filter((e) => 'behavior' in e && e.behaviour === 'override') as CharacterModifier[]
+        base_character_modifiers = all_character_modifiers.filter((e) => 'behavior' in e && e.behaviour === 'base')
+        bonus_character_modifiers = all_character_modifiers.filter((e) => 'behavior' in e && e.behaviour === 'bonus')
+        override_character_modifiers = all_character_modifiers.filter((e) => 'behavior' in e && e.behaviour === 'override')
+
+        base_weapon_modifiers = all_weapon_modifiers.filter((e) => 'behavior' in e && e.behaviour === 'base')
+        bonus_weapon_modifiers = all_weapon_modifiers.filter((e) => 'behavior' in e && e.behaviour === 'bonus')
+        override_weapon_modifiers = all_weapon_modifiers.filter((e) => 'behavior' in e && e.behaviour === 'override')
 
         console.warn("Updated modifier list...")
     })
@@ -968,7 +1238,7 @@ function createCharacter(uid: string) {
             }
 
             // Check all conditions - all must pass (AND logic)
-            const conditions_met = modifier.character_conditions.every(condition => evaluate_condition(condition))
+            const conditions_met = modifier.character_conditions.every(condition => evaluate_character_condition(condition))
             if (!conditions_met) {
                 continue;
             }
@@ -1021,7 +1291,11 @@ function createCharacter(uid: string) {
         ) return
 
         // apply base effects targeting traits (set base values)
-        for (const modifier of base_modifiers) {
+        for (const modifier of base_character_modifiers) {
+            // Check all conditions 
+            const conditions_met = modifier.character_conditions.every(condition => evaluate_character_condition(condition))
+            if (!conditions_met) continue;
+
             if (modifier.target === 'trait') {
                 const targetTrait = modifier.trait
                 if (modifier.type === 'flat') {
@@ -1031,7 +1305,6 @@ function createCharacter(uid: string) {
                 } else if (modifier.type === "derived_from_level") {
                     base_traits[targetTrait] = Math.ceil(character.level * modifier.multiplier)
                 }
-                // ! can't derive a trait from a trait
             }
         }
 
@@ -1070,7 +1343,11 @@ function createCharacter(uid: string) {
         }
 
         // apply bonus effects targeting traits (additive or derived)
-        for (const modifier of bonus_modifiers) {
+        for (const modifier of bonus_character_modifiers) {
+            // Check all conditions
+            const conditions_met = modifier.character_conditions.every(condition => evaluate_character_condition(condition))
+            if (!conditions_met) continue;
+
             if (modifier.target === 'trait') {
                 const targetTrait = modifier.trait
                 if (modifier.type === 'flat') {
@@ -1080,12 +1357,15 @@ function createCharacter(uid: string) {
                 } else if (modifier.type === "derived_from_level") {
                     new_traits[targetTrait] += Math.ceil(character.level * modifier.multiplier)
                 }
-                // ! can't derive a trait from a trait
             }
         }
 
         // apply override effects targeting traits (set final values)
-        for (const modifier of override_modifiers) {
+        for (const modifier of override_character_modifiers) {
+            // Check all conditions
+            const conditions_met = modifier.character_conditions.every(condition => evaluate_character_condition(condition))
+            if (!conditions_met) continue;
+
             if (modifier.target === 'trait') {
                 const targetTrait = modifier.trait
                 if (modifier.type === 'flat') {
@@ -1095,7 +1375,6 @@ function createCharacter(uid: string) {
                 } else if (modifier.type === "derived_from_level") {
                     new_traits[targetTrait] = Math.ceil(character.level * modifier.multiplier)
                 }
-                // ! can't derive a trait from a trait
             }
         }
 
@@ -1110,7 +1389,11 @@ function createCharacter(uid: string) {
         const new_experience_modifiers: number[] = Array(count).fill(base);
 
         // apply base modifiers
-        for (const modifier of base_modifiers) {
+        for (const modifier of base_character_modifiers) {
+            // Check all conditions
+            const conditions_met = modifier.character_conditions.every(condition => evaluate_character_condition(condition))
+            if (!conditions_met) continue;
+
             if (modifier.target === "experience_from_selection") {
                 const experience_indices: number[] = character.domain_card_choices[modifier.domain_card_id][modifier.choice_id].map(str => parseInt(str))
 
@@ -1150,7 +1433,11 @@ function createCharacter(uid: string) {
         }
 
         // apply bonus modifiers
-        for (const modifier of bonus_modifiers) {
+        for (const modifier of bonus_character_modifiers) {
+            // Check all conditions
+            const conditions_met = modifier.character_conditions.every(condition => evaluate_character_condition(condition))
+            if (!conditions_met) continue;
+
             if (modifier.target === "experience_from_selection") {
                 const experience_indices: number[] = character.domain_card_choices[modifier.domain_card_id][modifier.choice_id].map(str => parseInt(str))
 
@@ -1172,7 +1459,11 @@ function createCharacter(uid: string) {
         }
 
         // apply override modifiers
-        for (const modifier of override_modifiers) {
+        for (const modifier of override_character_modifiers) {
+            // Check all conditions
+            const conditions_met = modifier.character_conditions.every(condition => evaluate_character_condition(condition))
+            if (!conditions_met) continue;
+
             if (modifier.target === "experience_from_selection") {
                 const experience_indices: number[] = character.domain_card_choices[modifier.domain_card_id][modifier.choice_id].map(str => parseInt(str))
 
@@ -1201,15 +1492,15 @@ function createCharacter(uid: string) {
         if (!character) return
         let new_proficiency: number = BASE_STATS.proficiency
 
-        new_proficiency = apply_modifiers(base_modifiers, 'proficiency', new_proficiency, 'base')
+        new_proficiency = apply_modifiers(base_character_modifiers, 'proficiency', new_proficiency, 'base')
 
         // tier-based increases
         if (character.level >= 2) new_proficiency++
         if (character.level >= 5) new_proficiency++
         if (character.level >= 8) new_proficiency++
 
-        new_proficiency = apply_modifiers(bonus_modifiers, 'proficiency', new_proficiency, 'bonus')
-        new_proficiency = apply_modifiers(override_modifiers, 'proficiency', new_proficiency, 'override')
+        new_proficiency = apply_modifiers(bonus_character_modifiers, 'proficiency', new_proficiency, 'bonus')
+        new_proficiency = apply_modifiers(override_character_modifiers, 'proficiency', new_proficiency, 'override')
 
         proficiency = new_proficiency;
     })
@@ -1224,9 +1515,9 @@ function createCharacter(uid: string) {
             new_evasion = primary_class.starting_evasion
         }
 
-        new_evasion = apply_modifiers(base_modifiers, 'evasion', new_evasion, 'base')
-        new_evasion = apply_modifiers(bonus_modifiers, 'evasion', new_evasion, 'bonus')
-        new_evasion = apply_modifiers(override_modifiers, 'evasion', new_evasion, 'override')
+        new_evasion = apply_modifiers(base_character_modifiers, 'evasion', new_evasion, 'base')
+        new_evasion = apply_modifiers(bonus_character_modifiers, 'evasion', new_evasion, 'bonus')
+        new_evasion = apply_modifiers(override_character_modifiers, 'evasion', new_evasion, 'override')
 
         evasion = new_evasion;
     })
@@ -1241,9 +1532,9 @@ function createCharacter(uid: string) {
             new_max_hp = primary_class.starting_max_hp
         }
 
-        new_max_hp = apply_modifiers(base_modifiers, 'max_hp', new_max_hp, 'base')
-        new_max_hp = apply_modifiers(bonus_modifiers, 'max_hp', new_max_hp, 'bonus')
-        new_max_hp = apply_modifiers(override_modifiers, 'max_hp', new_max_hp, 'override')
+        new_max_hp = apply_modifiers(base_character_modifiers, 'max_hp', new_max_hp, 'base')
+        new_max_hp = apply_modifiers(bonus_character_modifiers, 'max_hp', new_max_hp, 'bonus')
+        new_max_hp = apply_modifiers(override_character_modifiers, 'max_hp', new_max_hp, 'override')
 
         max_hp = new_max_hp;
     })
@@ -1253,9 +1544,9 @@ function createCharacter(uid: string) {
         if (!character) return
         let new_spellcast_roll_bonus: number = BASE_STATS.spellcast_roll_bonus;
 
-        new_spellcast_roll_bonus = apply_modifiers(base_modifiers, 'spellcast_roll_bonus', new_spellcast_roll_bonus, 'base')
-        new_spellcast_roll_bonus = apply_modifiers(bonus_modifiers, 'spellcast_roll_bonus', new_spellcast_roll_bonus, 'bonus')
-        new_spellcast_roll_bonus = apply_modifiers(override_modifiers, 'spellcast_roll_bonus', new_spellcast_roll_bonus, 'override')
+        new_spellcast_roll_bonus = apply_modifiers(base_character_modifiers, 'spellcast_roll_bonus', new_spellcast_roll_bonus, 'base')
+        new_spellcast_roll_bonus = apply_modifiers(bonus_character_modifiers, 'spellcast_roll_bonus', new_spellcast_roll_bonus, 'bonus')
+        new_spellcast_roll_bonus = apply_modifiers(override_character_modifiers, 'spellcast_roll_bonus', new_spellcast_roll_bonus, 'override')
 
         spellcast_roll_bonus = new_spellcast_roll_bonus;
     })
@@ -1265,9 +1556,9 @@ function createCharacter(uid: string) {
         if (!character) return
         let new_max_stress: number = BASE_STATS.max_stress;
 
-        new_max_stress = apply_modifiers(base_modifiers, 'max_stress', new_max_stress, 'base')
-        new_max_stress = apply_modifiers(bonus_modifiers, 'max_stress', new_max_stress, 'bonus')
-        new_max_stress = apply_modifiers(override_modifiers, 'max_stress', new_max_stress, 'override')
+        new_max_stress = apply_modifiers(base_character_modifiers, 'max_stress', new_max_stress, 'base')
+        new_max_stress = apply_modifiers(bonus_character_modifiers, 'max_stress', new_max_stress, 'bonus')
+        new_max_stress = apply_modifiers(override_character_modifiers, 'max_stress', new_max_stress, 'override')
 
         max_stress = new_max_stress;
     })
@@ -1280,7 +1571,7 @@ function createCharacter(uid: string) {
         // having a primary class guarantees at least foundation (1)
         if (character.primary_class_id) masteryNum = Math.max(masteryNum, 1);
 
-        masteryNum = apply_modifiers(base_modifiers, 'primary_class_mastery_level', masteryNum, 'base')
+        masteryNum = apply_modifiers(base_character_modifiers, 'primary_class_mastery_level', masteryNum, 'base')
 
         for (let i = 2; i <= character.level; i++) {
             const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
@@ -1296,8 +1587,8 @@ function createCharacter(uid: string) {
             }
         }
 
-        masteryNum = apply_modifiers(bonus_modifiers, 'primary_class_mastery_level', masteryNum, 'bonus')
-        masteryNum = apply_modifiers(override_modifiers, 'primary_class_mastery_level', masteryNum, 'override')
+        masteryNum = apply_modifiers(bonus_character_modifiers, 'primary_class_mastery_level', masteryNum, 'bonus')
+        masteryNum = apply_modifiers(override_character_modifiers, 'primary_class_mastery_level', masteryNum, 'override')
 
         // clamp 0..3 and assign with proper literal type
         const masteryClamped = Math.max(0, Math.min(3, Math.trunc(masteryNum))) as 0 | 1 | 2 | 3
@@ -1312,7 +1603,7 @@ function createCharacter(uid: string) {
         // having a secondary class guarantees at least foundation (1)
         if (character.secondary_class_id) masteryNum = Math.max(masteryNum, 1);
 
-        masteryNum = apply_modifiers(base_modifiers, 'secondary_class_mastery_level', masteryNum, 'base')
+        masteryNum = apply_modifiers(base_character_modifiers, 'secondary_class_mastery_level', masteryNum, 'base')
 
         for (let i = 2; i <= character.level; i++) {
             const level_choices = character.level_up_choices[i as keyof typeof character.level_up_choices];
@@ -1327,8 +1618,8 @@ function createCharacter(uid: string) {
             }
         }
 
-        masteryNum = apply_modifiers(bonus_modifiers, 'secondary_class_mastery_level', masteryNum, 'bonus')
-        masteryNum = apply_modifiers(override_modifiers, 'secondary_class_mastery_level', masteryNum, 'override')
+        masteryNum = apply_modifiers(bonus_character_modifiers, 'secondary_class_mastery_level', masteryNum, 'bonus')
+        masteryNum = apply_modifiers(override_character_modifiers, 'secondary_class_mastery_level', masteryNum, 'override')
 
         // clamp 0..3 and assign with proper literal type
         const masteryClamped = Math.max(0, Math.min(2, Math.trunc(masteryNum))) as 0 | 1 | 2 | 3
@@ -1340,9 +1631,9 @@ function createCharacter(uid: string) {
         if (!character) return;
         let new_max_hope: number = BASE_STATS.max_hope
 
-        new_max_hope = apply_modifiers(base_modifiers, 'max_hope', new_max_hope, 'base')
-        new_max_hope = apply_modifiers(bonus_modifiers, 'max_hope', new_max_hope, 'bonus')
-        new_max_hope = apply_modifiers(override_modifiers, 'max_hope', new_max_hope, 'override')
+        new_max_hope = apply_modifiers(base_character_modifiers, 'max_hope', new_max_hope, 'base')
+        new_max_hope = apply_modifiers(bonus_character_modifiers, 'max_hope', new_max_hope, 'bonus')
+        new_max_hope = apply_modifiers(override_character_modifiers, 'max_hope', new_max_hope, 'override')
 
         max_hope = new_max_hope;
     })
@@ -1352,9 +1643,9 @@ function createCharacter(uid: string) {
         if (!character) return;
         let new_max_armor: number = BASE_STATS.max_armor
 
-        new_max_armor = apply_modifiers(base_modifiers, 'max_armor', new_max_armor, 'base')
-        new_max_armor = apply_modifiers(bonus_modifiers, 'max_armor', new_max_armor, 'bonus')
-        new_max_armor = apply_modifiers(override_modifiers, 'max_armor', new_max_armor, 'override')
+        new_max_armor = apply_modifiers(base_character_modifiers, 'max_armor', new_max_armor, 'base')
+        new_max_armor = apply_modifiers(bonus_character_modifiers, 'max_armor', new_max_armor, 'bonus')
+        new_max_armor = apply_modifiers(override_character_modifiers, 'max_armor', new_max_armor, 'override')
 
         max_armor = Math.min(new_max_armor, 12)
     })
@@ -1364,9 +1655,9 @@ function createCharacter(uid: string) {
         if (!character) return;
         let new_max_burden: number = BASE_STATS.max_burden
 
-        new_max_burden = apply_modifiers(base_modifiers, 'max_burden', new_max_burden, 'base')
-        new_max_burden = apply_modifiers(bonus_modifiers, 'max_burden', new_max_burden, 'bonus')
-        new_max_burden = apply_modifiers(override_modifiers, 'max_burden', new_max_burden, 'override')
+        new_max_burden = apply_modifiers(base_character_modifiers, 'max_burden', new_max_burden, 'base')
+        new_max_burden = apply_modifiers(bonus_character_modifiers, 'max_burden', new_max_burden, 'bonus')
+        new_max_burden = apply_modifiers(override_character_modifiers, 'max_burden', new_max_burden, 'override')
 
         max_burden = new_max_burden;
     })
@@ -1386,8 +1677,8 @@ function createCharacter(uid: string) {
             thresholds.severe = armor.damage_thresholds.severe
         }
 
-        thresholds.major = apply_modifiers(base_modifiers, 'major_damage_threshold', thresholds.major, 'base')
-        thresholds.severe = apply_modifiers(base_modifiers, 'severe_damage_threshold', thresholds.severe, 'base')
+        thresholds.major = apply_modifiers(base_character_modifiers, 'major_damage_threshold', thresholds.major, 'base')
+        thresholds.severe = apply_modifiers(base_character_modifiers, 'severe_damage_threshold', thresholds.severe, 'base')
 
         // level-based bump
         if (thresholds.major !== character.level && thresholds.severe !== character.level * 2) {
@@ -1395,11 +1686,11 @@ function createCharacter(uid: string) {
             thresholds.severe += character.level;
         }
 
-        thresholds.major = apply_modifiers(bonus_modifiers, 'major_damage_threshold', thresholds.major, 'bonus')
-        thresholds.severe = apply_modifiers(bonus_modifiers, 'severe_damage_threshold', thresholds.severe, 'bonus')
+        thresholds.major = apply_modifiers(bonus_character_modifiers, 'major_damage_threshold', thresholds.major, 'bonus')
+        thresholds.severe = apply_modifiers(bonus_character_modifiers, 'severe_damage_threshold', thresholds.severe, 'bonus')
 
-        thresholds.major = apply_modifiers(override_modifiers, 'major_damage_threshold', thresholds.major, 'override')
-        thresholds.severe = apply_modifiers(override_modifiers, 'severe_damage_threshold', thresholds.severe, 'override')
+        thresholds.major = apply_modifiers(override_character_modifiers, 'major_damage_threshold', thresholds.major, 'override')
+        thresholds.severe = apply_modifiers(override_character_modifiers, 'severe_damage_threshold', thresholds.severe, 'override')
 
         damage_thresholds = thresholds
     })
@@ -1409,15 +1700,15 @@ function createCharacter(uid: string) {
         if (!character) return;
         let new_max_experiences: number = BASE_STATS.max_experiences;
 
-        new_max_experiences = apply_modifiers(base_modifiers, 'max_experiences', new_max_experiences, 'base')
+        new_max_experiences = apply_modifiers(base_character_modifiers, 'max_experiences', new_max_experiences, 'base')
 
         // tier-based increases
         if (character.level >= 2) new_max_experiences++
         if (character.level >= 5) new_max_experiences++
         if (character.level >= 8) new_max_experiences++
 
-        new_max_experiences = apply_modifiers(bonus_modifiers, 'max_experiences', new_max_experiences, 'bonus')
-        new_max_experiences = apply_modifiers(override_modifiers, 'max_experiences', new_max_experiences, 'override')
+        new_max_experiences = apply_modifiers(bonus_character_modifiers, 'max_experiences', new_max_experiences, 'bonus')
+        new_max_experiences = apply_modifiers(override_character_modifiers, 'max_experiences', new_max_experiences, 'override')
 
         // ! keep experiences array length in sync with max_experiences
         if (character.experiences.length < new_max_experiences) {
@@ -1436,9 +1727,9 @@ function createCharacter(uid: string) {
         if (!character) return;
         let new_max_domain_card_loadout: number = BASE_STATS.max_domain_card_loadout
 
-        new_max_domain_card_loadout = apply_modifiers(base_modifiers, 'max_domain_card_loadout', new_max_domain_card_loadout, 'base')
-        new_max_domain_card_loadout = apply_modifiers(bonus_modifiers, 'max_domain_card_loadout', new_max_domain_card_loadout, 'bonus')
-        new_max_domain_card_loadout = apply_modifiers(override_modifiers, 'max_domain_card_loadout', new_max_domain_card_loadout, 'override')
+        new_max_domain_card_loadout = apply_modifiers(base_character_modifiers, 'max_domain_card_loadout', new_max_domain_card_loadout, 'base')
+        new_max_domain_card_loadout = apply_modifiers(bonus_character_modifiers, 'max_domain_card_loadout', new_max_domain_card_loadout, 'bonus')
+        new_max_domain_card_loadout = apply_modifiers(override_character_modifiers, 'max_domain_card_loadout', new_max_domain_card_loadout, 'override')
 
         max_domain_card_loadout = new_max_domain_card_loadout;
     })
@@ -1461,12 +1752,15 @@ function createCharacter(uid: string) {
         get primary_subclass() { return primary_subclass },
         get secondary_class() { return secondary_class },
         get secondary_subclass() { return secondary_subclass },
-        get armor() { return armor },
-        get primary_weapon() { return primary_weapon },
-        get secondary_weapon() { return secondary_weapon },
         get level_up_domain_cards() { return level_up_domain_cards },
         get level_up_chosen_options() { return level_up_chosen_options },
         get additional_domain_cards() { return additional_domain_cards },
+
+        // derived equipment
+        get armor() { return armor },
+        get primary_weapon() { return primary_weapon },
+        get secondary_weapon() { return secondary_weapon },
+        get unarmed_attack() { return unarmed_attack },
 
         // derived stats
         get domain_card_vault() { return domain_card_vault },

@@ -1,4 +1,4 @@
-import type { AllTierOptionIds, LevelUpChoice, LevelUpOption, Tier1OptionIds, Tier2OptionIds, Tier3OptionIds, Tier4OptionIds } from "./types"
+import type { AllTierOptionIds, LevelUpChoice, LevelUpOption, Tier1OptionIds, Tier2OptionIds, Tier3OptionIds, Tier4OptionIds, Weapon } from "./types"
 
 export const TRAIT_OPTIONS = [2, 1, 1, 0, 0, -1] as const
 
@@ -30,6 +30,22 @@ export const TRAITS = {
 } as const
 
 
+export const BASE_UNARMED_ATTACK: Weapon = {
+    id: "unarmed_attack",
+    title: "Unarmed Attack",
+    description_html: "",
+    category: "Unarmed",
+    level_requirement: 1,
+    available_traits: ["strength"],
+    range: "Melee",
+    features: [],
+    attack_roll_bonus: 0,
+    damage_dice: "1d4",
+    damage_bonus: 0,
+    available_damage_types: ["phy"],
+    burden: 0,
+}
+
 export const BASE_STATS = {
     traits: {
         agility: 0,
@@ -49,7 +65,6 @@ export const BASE_STATS = {
     max_stress: 6,
     max_burden: 2,
     evasion: 0,
-    attack_roll_bonus: 0,
     spellcast_roll_bonus: 0,
     damage_thresholds: {
         major: 0,
@@ -58,6 +73,7 @@ export const BASE_STATS = {
     spellcast_trait: null,
     primary_class_mastery_level: 0,
     secondary_class_mastery_level: 0,
+    unarmed_attack: BASE_UNARMED_ATTACK
 } as const
 
 export const TIER_1_BASE_OPTIONS = {

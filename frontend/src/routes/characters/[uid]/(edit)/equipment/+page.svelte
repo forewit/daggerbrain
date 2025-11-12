@@ -87,11 +87,11 @@
                         {context.primary_weapon.burden}<Hand class="size-3.5" />
                       </div>
                       <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
-                        {context.primary_weapon.damage}
-                        {context.primary_weapon.damage_type}
+                        {context.primary_weapon.damage_dice}
+                        !!damage_type selector!!
                       </div>
                       <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
-                        {capitalize(context.primary_weapon.trait)}
+                        !!trait selector!!
                       </div>
                       <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
                         {context.primary_weapon.range}
@@ -133,11 +133,13 @@
                         {context.secondary_weapon.burden}<Hand class="size-3.5" />
                       </div>
                       <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
-                        {context.secondary_weapon.damage}
-                        {context.secondary_weapon.damage_type}
+                        {context.secondary_weapon.damage_dice}
+                        <!-- {context.secondary_weapon.damage_type} -->
+                         !!damage_type selector!!
                       </div>
                       <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
-                        {capitalize(context.secondary_weapon.trait)}
+                        <!-- {capitalize(context.secondary_weapon.trait)} -->
+                         !!trait selector!!
                       </div>
                       <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
                         {context.secondary_weapon.range}
