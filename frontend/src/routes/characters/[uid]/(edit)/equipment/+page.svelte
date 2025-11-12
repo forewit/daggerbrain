@@ -170,7 +170,9 @@
         </div>
 
         <!-- Inventory -->
-        <Inventory />
+        <div class="p-2 mt-4">
+          <Inventory />
+        </div>
       </Dropdown>
     </div>
   </div>

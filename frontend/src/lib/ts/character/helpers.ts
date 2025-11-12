@@ -1,7 +1,7 @@
 
 import { CLASSES } from "../content/classes/classes";
 import { DOMAINS } from "../content/domains/domains";
-import { PRIMARY_WEAPONS } from "../content/equipment/equipment";
+import { PRIMARY_WEAPONS, SECONDARY_WEAPONS } from "../content/equipment/equipment";
 import { ARMOR } from "../content/equipment/equipment";
 import { ANCESTRY_CARDS, COMMUNITY_CARDS } from "../content/heritage";
 import { TRANSFORMATION_CARDS } from "../content/void";
@@ -45,4 +45,20 @@ export function get_domain_card(domain_card_id: string | null | undefined): Card
         if (card) return card;
     }
     return null;
+}
+
+export function get_all_primary_weapons(): Weapon[] {
+    return Object.values(PRIMARY_WEAPONS);
+}
+
+export function get_all_secondary_weapons(): Weapon[] {
+    return Object.values(SECONDARY_WEAPONS);
+}
+
+export function get_all_weapons(): Weapon[] {
+    return [...get_all_primary_weapons(), ...get_all_secondary_weapons()];
+}
+
+export function get_all_armor(): Armor[] {
+    return Object.values(ARMOR);
 }
