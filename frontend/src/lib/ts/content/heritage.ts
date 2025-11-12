@@ -9,11 +9,11 @@ export const ANCESTRY_CARDS = {
         description_html: "Half sentient mechanical being, half human.",
         artist_name: "Mat Wilma",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "High Stamina",
             description_html: "Gain an additional Stress slot at character creation.",
             character_modifiers: [{
-                behavior: "bonus",
+                behaviour: "bonus",
                 target: "max_stress",
                 type: "flat",
                 value: 1,
@@ -25,7 +25,7 @@ export const ANCESTRY_CARDS = {
             description_html:
                 "When you take a short rest, you can choose a long rest move instead of a short rest move.",
             character_modifiers: [],
-            attack_modifiers: [],
+            weapon_modifiers: [],
         }],
     },
     drakona: {
@@ -39,13 +39,13 @@ export const ANCESTRY_CARDS = {
             title: "Scales",
             description_html: "Your scales act as natural protection. When you would take Severe damage, you can <b>mark a Stress</b> to mark 1 fewer Hit Points.",
             character_modifiers: [],
-            attack_modifiers: [],
+            weapon_modifiers: [],
         },
         {
             title: "Elemental Breath",
             description_html: "Choose an element for your breath (such as electricity, fire, or ice). You can use this breath against a target or group of targets within Very Close range, treating it as an Instinct weapon that deals <b>d8</b> magic damage using your Proficiency.",
             character_modifiers: [],
-            attack_modifiers: [],
+            weapon_modifiers: [],
         }],
     },
 } as const satisfies Record<string, Card<"ancestry">>
@@ -70,7 +70,7 @@ export const COMMUNITY_CARDS = {
                 description_html:
                     "Once per session, when an attack would cause you to <b>mark a stress</b>, you can <b>spend a hope</b> instead.",
                 character_modifiers: [],
-                attack_modifiers: [],
+                weapon_modifiers: [],
             },
         ],
     }

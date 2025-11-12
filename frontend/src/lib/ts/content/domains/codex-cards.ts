@@ -19,7 +19,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b><em>Power Push:</em></b> Make a <b>Spellcast Roll</b> against a target within Melee range. On a success, they're knocked back to Far range and take <b>d10+2</b> magic damage using your Proficiency.</p>
@@ -47,7 +47,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b><em>Slumber:</em></b> Make a <b>Spellcast Roll</b> against a target within Very Close range. On a success, they're <em>Asleep</em> until they take damage or the GM spends a Fear on their turn to clear this condition.</p>
@@ -75,7 +75,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b><em>Wild Flame:</em></b> Make a <b>Spellcast Roll</b> against up to three adversaries within Melee range. Targets you succeed against take <b>2d6</b> magic damage and must mark a Stress as flames erupt from your hand.</p>
@@ -103,7 +103,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b><em>Adjust Appearance:</em></b> You magically shift your appearance and clothing to avoid recognition.</p>
@@ -131,7 +131,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b><em>Runic Lock:</em></b> Make a <b>Spellcast Roll (15)</b> on an object you're touching that can close (such as a lock, chest, or box). Once per rest on a success, you can lock the object so it can only be opened by creatures of your choice. Someone with access to magic and an hour of time to study the spell can break it.</p>
@@ -160,7 +160,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b><em>Levitation:</em></b> Make a <b>Spellcast Roll</b> to temporarily lift a target you can see up into the air and move them within Close range of their original position.</p>
@@ -188,7 +188,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b><em>Mystic Tether:</em></b> Make a <b>Spellcast Roll</b> against a target within Far range. On a success, they're temporarily <em>Restrained</em> and must mark a Stress. If you target a flying creature, this spell grounds and temporarily Restrains them.</p>
@@ -215,7 +215,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b><em>Repudiate:</em></b> You can interrupt a magical effect taking place. Make a <b>Reaction Roll</b> using your Spellcast trait. Once per rest on a success, the effect stops and any consequences are avoided.</p>
@@ -242,7 +242,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b><em>Arcane Deflection:</em></b> Once per long rest, <b>spend a Hope</b> to negate the damage of an attack targeting you or an ally within Very Close range.</p>
@@ -270,7 +270,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll (15)</b>. Once per rest on a success, <b>spend a Hope</b> to create a temporary magical wall between two points within Far range. It can be up to 50 feet high and form at any angle. Creatures or objects in its path are shunted to a side of your choice. The wall stays up until your next rest or you cast Manifest Wall again.</p>`,
@@ -296,7 +296,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Once per long rest, you can instantly teleport yourself and any number of willing targets within Close range to a place you've been before. Choose one of the following options, then make a <b>Spellcast Roll (16)</b>:</p>
@@ -329,7 +329,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll</b> against a target within Close range. On a success, roll a number of <b>d20s</b> equal to your Spellcast trait. The target must make a reaction roll with a Difficulty equal to your highest result. On a success, the target must mark a Stress but isn't banished. Once per rest on a failure, they are banished from this realm.</p>
@@ -356,7 +356,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Mark an adversary within Close range with a sigil of retribution. The GM gains a Fear. When the marked adversary deals damage to you or your allies, place a <b>d8</b> on this card. You can hold a number of d8s equal to your level.</p>
@@ -383,7 +383,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b><em>Pass Through:</em></b> Make a <b>Spellcast Roll (13)</b>. Once per rest on a success, you and all creatures touching you can pass through a wall or door within Close range. The effect ends once everyone is on the other side.</p>
@@ -410,7 +410,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When 4 or more of the domain cards in your loadout are from the Codex domain, gain the following benefits:</p>
@@ -440,7 +440,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b><em>Memory Delve:</em></b> Make a <b>Spellcast Roll</b> against a target within Far range. On a success, peer into the target's mind and ask the GM a question. The GM describes any memories the target has pertaining to the answer.</p>
@@ -467,7 +467,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When you have a few minutes of calm to focus, you can <b>spend 2 Hope</b> to summon your Safe Haven, a large interdimensional home where you and your allies can take shelter.</p>
@@ -495,7 +495,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b><em>Transform:</em></b> Make a <b>Spellcast Roll (15)</b>. On a success, transform into an inanimate object no larger than twice your normal size. You can remain in this shape until you take damage.</p>
@@ -522,7 +522,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll (18)</b>. Once per long rest on a success, the GM tells you which adversaries within Far range have a Difficulty of 18 or lower. <b>Mark a Stress</b> for each one you wish to hit with this spell. They are killed and can't come back to life by any means.</p>`,
@@ -548,7 +548,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b><em>Timejammer:</em></b> Make a <b>Spellcast Roll (18)</b>. On a success, time temporarily slows to a halt for everyone within Far range except for you. It resumes the next time you make an action roll that targets another creature.</p>
@@ -575,7 +575,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Once per long rest, <b>spend 5 Hope</b> to cast this spell on two or more willing creatures. Until your next rest, when a creature connected by this union would mark Stress or Hit Points, the connected creatures can choose who marks it.</p>`,

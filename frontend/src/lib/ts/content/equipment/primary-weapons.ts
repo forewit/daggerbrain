@@ -14,16 +14,16 @@ export const TIER_1_PRIMARY_WEAPONS = {
         damage: "d8",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [{
+                behaviour: "bonus",
+                target_weapon: "primary",
+                target_stat: "attack_roll",
+                character_conditions: [],
+                value: 1,
+            }],
             title: "Reliable",
             description_html: "<p>+1 to attack rolls</p>",
-            character_modifiers: [{
-                behavior: "bonus",
-                character_conditions: [],
-                type: "flat",
-                value: 1,
-                target: "attack_roll_bonus"
-            }]
+            character_modifiers: []
         }]
     },
     longsword: {
@@ -64,11 +64,11 @@ export const TIER_1_PRIMARY_WEAPONS = {
         damage: "d10+3",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Massive",
             description_html: "<p>-1 to Evasion. On a successful attack, roll an additional damage die and discard the lowest result.</p>",
             character_modifiers: [{
-                behavior: "bonus",
+                behaviour: "bonus",
                 character_conditions: [],
                 type: "flat",
                 value: -1,
@@ -101,11 +101,11 @@ export const TIER_1_PRIMARY_WEAPONS = {
         damage: "d12+3",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Heavy",
             description_html: "<p>-1 to Evasion</p>",
             character_modifiers: [{
-                behavior: "bonus",
+                behaviour: "bonus",
                 character_conditions: [],
                 type: "flat",
                 value: -1,
@@ -164,7 +164,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
         damage: "d8",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Quick",
             description_html: "<p>When you make an attack, you can mark a Stress to target another creature within range.</p>",
             character_modifiers: []
@@ -234,11 +234,11 @@ export const TIER_1_PRIMARY_WEAPONS = {
         damage: "d8+3",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Cumbersome",
             description_html: "<p>-1 to Finesse</p>",
             character_modifiers: [{
-                behavior: "bonus",
+                behaviour: "bonus",
                 character_conditions: [],
                 type: "flat",
                 value: -1,
@@ -312,7 +312,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
         damage: "d8",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Returning",
             description_html: "<p>When this weapon is thrown within its range, it appears in your hand immediately after the attack.</p>",
             character_modifiers: []
@@ -356,7 +356,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
         damage: "d6+3",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Versatile",
             description_html: "<p>This weapon can also be used with these statistics—Presence, Melee, d8.</p>",
             character_modifiers: []
@@ -387,7 +387,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
         damage: "d6",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Powerful",
             description_html: "<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>",
             character_modifiers: []
@@ -408,16 +408,16 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d8+3",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [{
+                behaviour: "bonus",
+                target_weapon: "primary",
+                target_stat: "attack_roll",
+                character_conditions: [],
+                value: 1,
+            }],
             title: "Reliable",
             description_html: "<p>+1 to attack rolls</p>",
-            character_modifiers: [{
-                behavior: "bonus",
-                character_conditions: [],
-                type: "flat",
-                value: 1,
-                target: "attack_roll_bonus"
-            }]
+            character_modifiers: []
         }]
     },
     improved_longsword: {
@@ -458,11 +458,11 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d10+6",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Massive",
             description_html: "<p>-1 to Evasion. On a successful attack, roll an additional damage die and discard the lowest result.</p>",
             character_modifiers: [{
-                behavior: "bonus",
+                behaviour: "bonus",
                 character_conditions: [],
                 type: "flat",
                 value: -1,
@@ -495,11 +495,11 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d12+6",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Heavy",
             description_html: "<p>-1 to Evasion</p>",
             character_modifiers: [{
-                behavior: "bonus",
+                behaviour: "bonus",
                 character_conditions: [],
                 type: "flat",
                 value: -1,
@@ -558,7 +558,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d8+3",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Quick",
             description_html: "<p>When you make an attack, you can mark a Stress to target another creature within range.</p>",
             character_modifiers: []
@@ -576,11 +576,11 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d10+5",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Cumbersome",
             description_html: "<p>-1 to Finesse</p>",
             character_modifiers: [{
-                behavior: "bonus",
+                behaviour: "bonus",
                 character_conditions: [],
                 type: "flat",
                 value: -1,
@@ -640,11 +640,11 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d8+6",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Cumbersome",
             description_html: "<p>-1 to Finesse</p>",
             character_modifiers: [{
-                behavior: "bonus",
+                behaviour: "bonus",
                 character_conditions: [],
                 type: "flat",
                 value: -1,
@@ -665,7 +665,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d10+4",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Powerful",
             description_html: "<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>",
             character_modifiers: []
@@ -683,7 +683,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d10+6",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Brutal",
             description_html: "<p>When you roll the maximum value on a damage die, roll an additional damage die.</p>",
             character_modifiers: []
@@ -701,7 +701,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d8+3",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Deadly",
             description_html: "<p>When you deal Severe damage, the target must mark an additional HP.</p>",
             character_modifiers: []
@@ -719,7 +719,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d8+3",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Quick",
             description_html: "<p>When you make an attack, you can mark a Stress to target another creature within range.</p>",
             character_modifiers: []
@@ -737,7 +737,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d8+4",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Scary",
             description_html: "<p>On a successful attack, the target must mark a Stress.</p>",
             character_modifiers: []
@@ -755,16 +755,16 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d8+5",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [{
+                behaviour: "bonus",
+                target_weapon: "primary",
+                target_stat: "attack_roll",
+                character_conditions: [],
+                value: 1,
+            }],
             title: "Reliable",
             description_html: "<p>+1 to attack rolls</p>",
-            character_modifiers: [{
-                behavior: "bonus",
-                character_conditions: [],
-                type: "flat",
-                value: 1,
-                target: "attack_roll_bonus"
-            }]
+            character_modifiers: []
         }]
     },
     blunderbuss: {
@@ -779,7 +779,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d8+6",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Reloading",
             description_html: "<p>After you make an attack, roll a d6. On a result of 1, you must mark a Stress to reload this weapon before you can fire it again.</p>",
             character_modifiers: []
@@ -797,7 +797,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d6+6",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Powerful",
             description_html: "<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>",
             character_modifiers: []
@@ -815,16 +815,16 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d6+5",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [{
+                behaviour: "bonus",
+                target_weapon: "primary",
+                target_stat: "attack_roll",
+                character_conditions: [],
+                value: 1,
+            }],
             title: "Reliable",
             description_html: "<p>+1 to attack rolls</p>",
-            character_modifiers: [{
-                behavior: "bonus",
-                character_conditions: [],
-                type: "flat",
-                value: 1,
-                target: "attack_roll_bonus"
-            }]
+            character_modifiers: []
         }]
     },
 
@@ -893,7 +893,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d8+3",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Returning",
             description_html: "<p>When this weapon is thrown within its range, it appears in your hand immediately after the attack.</p>",
             character_modifiers: []
@@ -937,7 +937,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d6+3",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Versatile",
             description_html: "<p>This weapon can also be used with these statistics—Presence, Melee, d8+3.</p>",
             character_modifiers: []
@@ -968,7 +968,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d6+3",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Powerful",
             description_html: "<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>",
             character_modifiers: []
@@ -986,7 +986,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d12+4",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Pompous",
             description_html: "<p>You must have a Presence of 0 or lower to use this weapon.</p>",
             character_modifiers: []
@@ -1004,7 +1004,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d10+4",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Versatile",
             description_html: "<p>This weapon can also be used with these statistics—Knowledge, Far, d6+3.</p>",
             character_modifiers: []
@@ -1022,7 +1022,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d8+4",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Scary",
             description_html: "<p>On a successful attack, the target must mark a Stress.</p>",
             character_modifiers: []
@@ -1040,7 +1040,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d8+6",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Eruptive",
             description_html: "<p>On a successful attack against a target within Melee range, all other adversaries within Very Close range must succeed on a reaction roll (14) or take half damage.</p>",
             character_modifiers: []
@@ -1058,7 +1058,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d6+4",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Brutal",
             description_html: "<p>When you roll the maximum value on a damage die, roll an additional damage die.</p>",
             character_modifiers: []
@@ -1076,7 +1076,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d6+4",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Powerful",
             description_html: "<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>",
             character_modifiers: []
@@ -1094,7 +1094,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d6+3",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Invigorating",
             description_html: "<p>On a successful attack, roll a d4. On a result of 4, clear a Stress.</p>",
             character_modifiers: []
@@ -1112,7 +1112,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d6+4",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Persuasive",
             description_html: "<p>Before you make a Presence Roll, you can mark a Stress to gain a +2 bonus to the result.</p>",
             character_modifiers: []
@@ -1130,16 +1130,16 @@ export const TIER_2_PRIMARY_WEAPONS = {
         damage: "d6+4",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [{
+                behaviour: "bonus",
+                target_weapon: "primary",
+                target_stat: "attack_roll",
+                character_conditions: [],
+                value: 1,
+            }],
             title: "Reliable",
             description_html: "<p>+1 to attack rolls</p>",
-            character_modifiers: [{
-                behavior: "bonus",
-                character_conditions: [],
-                type: "flat",
-                value: 1,
-                target: "attack_roll_bonus"
-            }]
+            character_modifiers: []
         }]
     }
 } as const satisfies Record<string, Weapon>;
@@ -1158,16 +1158,16 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "d8+6",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [{
+                behaviour: "bonus",
+                target_weapon: "primary",
+                target_stat: "attack_roll",
+                character_conditions: [],
+                value: 1,
+            }],
             title: "Reliable",
             description_html: "<p>+1 to attack rolls</p>",
-            character_modifiers: [{
-                behavior: "bonus",
-                character_conditions: [],
-                type: "flat",
-                value: 1,
-                target: "attack_roll_bonus"
-            }]
+            character_modifiers: []
         }]
     },
     advanced_longsword: {
@@ -1208,11 +1208,11 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "d10+9",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Massive",
             description_html: "<p>−1 to Evasion; on a successful attack, roll an additional damage die and discard the lowest result.</p>",
             character_modifiers: [{
-                behavior: "bonus",
+                behaviour: "bonus",
                 character_conditions: [],
                 type: "flat",
                 value: -1,
@@ -1245,11 +1245,11 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "d12+9",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Heavy",
             description_html: "<p>−1 to Evasion</p>",
             character_modifiers: [{
-                behavior: "bonus",
+                behaviour: "bonus",
                 character_conditions: [],
                 type: "flat",
                 value: -1,
@@ -1308,7 +1308,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "d8+6",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Quick",
             description_html: "<p>When you make an attack, you can mark a Stress to target another creature within range.</p>",
             character_modifiers: []
@@ -1326,11 +1326,11 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "d10+8",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Cumbersome",
             description_html: "<p>−1 to Finesse</p>",
             character_modifiers: [{
-                behavior: "bonus",
+                behaviour: "bonus",
                 character_conditions: [],
                 type: "flat",
                 value: -1,
@@ -1390,11 +1390,11 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "d8+9",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Cumbersome",
             description_html: "<p>−1 to Finesse</p>",
             character_modifiers: [{
-                behavior: "bonus",
+                behaviour: "bonus",
                 character_conditions: [],
                 type: "flat",
                 value: -1,
@@ -1415,7 +1415,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "d8+5",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Sharpwing",
             description_html: "<p>Gain a bonus to your damage rolls equal to your Agility.</p>",
             character_modifiers: []
@@ -1433,19 +1433,19 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "d12+7",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Brave",
             description_html: "<p>−1 to Evasion; +3 to Severe damage threshold</p>",
             character_modifiers: [
                 {
-                    behavior: "bonus",
+                    behaviour: "bonus",
                     character_conditions: [],
                     type: "flat",
                     value: -1,
                     target: "evasion"
                 },
                 {
-                    behavior: "bonus",
+                    behaviour: "bonus",
                     character_conditions: [],
                     type: "flat",
                     value: 3,
@@ -1466,7 +1466,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "d10+7",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Devastating",
             description_html: "<p>Before you make an attack roll, you can mark a Stress to use a d20 as your damage die.</p>",
             character_modifiers: []
@@ -1484,11 +1484,11 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "d10+7",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Protective",
             description_html: "<p>+1 to Armor Score</p>",
             character_modifiers: [{
-                behavior: "bonus",
+                behaviour: "bonus",
                 character_conditions: [],
                 type: "flat",
                 value: 1,
@@ -1508,7 +1508,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "d10+5",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Dueling",
             description_html: "<p>When there are no other creatures within Close range of the target, gain advantage on your attack roll against them.</p>",
             character_modifiers: []
@@ -1526,7 +1526,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "d10+7",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Retractable",
             description_html: "<p>The blade can be hidden in the hilt to avoid detection.</p>",
             character_modifiers: []
@@ -1544,7 +1544,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "d10+8",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Powerful",
             description_html: "<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>",
             character_modifiers: []
@@ -1562,7 +1562,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "d10+7",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Brutal",
             description_html: "<p>When you roll the maximum value on a damage die, roll an additional damage die.</p>",
             character_modifiers: []
@@ -1580,7 +1580,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "d6+8",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Reloading",
             description_html: "<p>After you make an attack, roll a d6. On a result of 1, you must mark a Stress to reload this weapon before you can fire it again.</p>",
             character_modifiers: []
@@ -1598,7 +1598,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "d6+7",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Versatile",
             description_html: "<p>This weapon can also be used with these statistics—Agility, Melee, d10+5.</p>",
             character_modifiers: []
@@ -1669,7 +1669,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "1d8+6",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Returning",
             description_html: "<p>When this weapon is thrown within its range, it appears in your hand immediately after the attack.</p>",
             character_modifiers: []
@@ -1713,7 +1713,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "1d6+6",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Versatile",
             description_html: "<p>This weapon can also be used with these statistics—Presence, Melee, 1d8+4.</p>",
             character_modifiers: []
@@ -1744,7 +1744,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "1d6+6",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Powerful",
             description_html: "<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>",
             character_modifiers: []
@@ -1762,7 +1762,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "1d10+8",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Lucky",
             description_html: "<p>On a failed attack, you can mark a Stress to reroll your attack.</p>",
             character_modifiers: []
@@ -1780,7 +1780,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "1d10+6",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Healing",
             description_html: "<p>During downtime, automatically clear a Hit Point.</p>",
             character_modifiers: []
@@ -1799,7 +1799,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         // todo: allow for multiple damage types
         damage_type: "mag", // or "phy" depending on attack
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Otherworldly",
             description_html: "<p>On a successful attack, you can deal physical or magic damage.</p>",
             character_modifiers: []
@@ -1817,7 +1817,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "1d20+4",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Painful",
             description_html: "<p>Each time you make a successful attack, you must mark a Stress.</p>",
             character_modifiers: []
@@ -1835,7 +1835,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "1d10+5",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Timebending",
             description_html: "<p>You choose the target of your attack after making your attack roll.</p>",
             character_modifiers: []
@@ -1853,7 +1853,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "1d6+7",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Self-Correcting",
             description_html: "<p>When you roll a 1 on a damage die, it deals 6 damage instead.</p>",
             character_modifiers: []
@@ -1871,7 +1871,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "1d6+7",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Burning",
             description_html: "<p>When you roll a 6 on a damage die, the target must mark a Stress.</p>",
             character_modifiers: []
@@ -1889,7 +1889,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "1d6+7",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Powerful",
             description_html: "<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>",
             character_modifiers: []
@@ -1907,7 +1907,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
         damage: "1d6+6",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Reloading",
             description_html: "<p>After you make an attack, roll a d6. On a result of 1, you must mark a Stress to reload this weapon before you can fire it again.</p>",
             character_modifiers: []
@@ -1929,16 +1929,16 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d8+9",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [{
+                behaviour: "bonus",
+                target_weapon: "primary",
+                target_stat: "attack_roll",
+                character_conditions: [],
+                value: 1,
+            }],
             title: "Reliable",
             description_html: "<p>+1 to attack rolls</p>",
-            character_modifiers: [{
-                behavior: "bonus",
-                character_conditions: [],
-                type: "flat",
-                value: 1,
-                target: "attack_roll_bonus"
-            }]
+            character_modifiers: []
         }]
     },
     legendary_longsword: {
@@ -1979,11 +1979,11 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d10+12",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Massive",
             description_html: "<p>−1 to Evasion; on a successful attack, roll an additional damage die and discard the lowest result.</p>",
             character_modifiers: [{
-                behavior: "bonus",
+                behaviour: "bonus",
                 character_conditions: [],
                 type: "flat",
                 value: -1,
@@ -2016,11 +2016,11 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d12+12",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Heavy",
             description_html: "<p>−1 to Evasion</p>",
             character_modifiers: [{
-                behavior: "bonus",
+                behaviour: "bonus",
                 character_conditions: [],
                 type: "flat",
                 value: -1,
@@ -2079,7 +2079,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d8+9",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Quick",
             description_html: "<p>When you make an attack, you can mark a Stress to target another creature within range.</p>",
             character_modifiers: []
@@ -2097,11 +2097,11 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d10+11",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Cumbersome",
             description_html: "<p>−1 to Finesse</p>",
             character_modifiers: [{
-                behavior: "bonus",
+                behaviour: "bonus",
                 character_conditions: [],
                 type: "flat",
                 value: -1,
@@ -2161,11 +2161,11 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d8+12",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Cumbersome",
             description_html: "<p>−1 to Finesse</p>",
             character_modifiers: [{
-                behavior: "bonus",
+                behaviour: "bonus",
                 character_conditions: [],
                 type: "flat",
                 value: -1,
@@ -2186,7 +2186,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d10+9",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Quick",
             description_html: "<p>When you make an attack, you can mark a Stress to target another creature within range.</p>",
             character_modifiers: []
@@ -2204,7 +2204,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d10+11",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Concussive",
             description_html: "<p>On a successful attack, you can spend a Hope to knock the target back to Far range.</p>",
             character_modifiers: []
@@ -2222,11 +2222,11 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d12+13",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Destructive",
             description_html: "<p>−1 to Agility; on a successful attack, all adversaries within Very Close range must mark a Stress.</p>",
             character_modifiers: [{
-                behavior: "bonus",
+                behaviour: "bonus",
                 character_conditions: [],
                 type: "flat",
                 value: -1,
@@ -2247,7 +2247,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d8+9",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Serrated",
             description_html: "<p>When you roll a 1 on a damage die, it deals 8 damage instead.</p>",
             character_modifiers: []
@@ -2265,7 +2265,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d8+10",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Long",
             description_html: "<p>This weapon’s attack targets all adversaries in a line within range.</p>",
             character_modifiers: []
@@ -2283,7 +2283,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d8+9",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Grappling",
             description_html: "<p>On a successful attack, you can spend a Hope to Restrain the target or pull them into Melee range with you.</p>",
             character_modifiers: []
@@ -2301,7 +2301,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d6+11",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Bouncing",
             description_html: "<p>Mark 1 or more Stress to hit that many targets in range of the attack.</p>",
             character_modifiers: []
@@ -2319,16 +2319,16 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d6+11",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [{
+                behaviour: "bonus",
+                target_weapon: "primary",
+                target_stat: "attack_roll",
+                character_conditions: [],
+                value: 1,
+            }],
             title: "Reliable",
             description_html: "<p>+1 to attack rolls</p>",
-            character_modifiers: [{
-                behavior: "bonus",
-                character_conditions: [],
-                type: "flat",
-                value: 1,
-                target: "attack_roll_bonus"
-            }]
+            character_modifiers: []
         }]
     },
     hand_cannon: {
@@ -2343,7 +2343,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d6+12",
         damage_type: "phy",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Reloading",
             description_html: "<p>After you make an attack, roll a d6. On a 1, you must mark a Stress to reload this weapon before you can fire it again.</p>",
             character_modifiers: []
@@ -2413,7 +2413,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d8+9",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Returning",
             description_html: "<p>When this weapon is thrown within its range, it appears in your hand immediately after the attack.</p>",
             character_modifiers: []
@@ -2457,7 +2457,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d6+9",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Versatile",
             description_html: "<p>This weapon can also be used with these statistics—Presence, Melee, 1d8+6.</p>",
             character_modifiers: []
@@ -2488,7 +2488,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d6+9",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Powerful",
             description_html: "<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>",
             character_modifiers: []
@@ -2506,7 +2506,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d10+11",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Hot",
             description_html: "<p>This weapon cuts through solid material.</p>",
             character_modifiers: []
@@ -2524,7 +2524,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d10+9",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Lifestealing",
             description_html: "<p>On a successful attack, roll a d6. On a result of 6, clear a Hit Point or clear a Stress.</p>",
             character_modifiers: []
@@ -2542,11 +2542,11 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d10+9",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Greedy",
             description_html: "<p>Spend a handful of gold to gain a +1 bonus to your Proficiency on a damage roll.</p>",
             character_modifiers: [{
-                behavior: "bonus",
+                behaviour: "bonus",
                 character_conditions: [],
                 type: "flat",
                 value: 1,
@@ -2566,7 +2566,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d8+9",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Powerful",
             description_html: "<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>",
             character_modifiers: []
@@ -2584,7 +2584,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d20+7",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Painful",
             description_html: "<p>Each time you make a successful attack, you must mark a Stress.</p>",
             character_modifiers: []
@@ -2602,16 +2602,16 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d6+13",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [{
+                behaviour: "bonus",
+                target_weapon: "primary",
+                target_stat: "attack_roll",
+                character_conditions: [],
+                value: 1,
+            }],
             title: "Reliable",
             description_html: "<p>+1 to attack rolls</p>",
-            character_modifiers: [{
-                behavior: "bonus",
-                character_conditions: [],
-                type: "flat",
-                value: 1,
-                target: "attack_roll_bonus"
-            }]
+            character_modifiers: []
         }]
     },
     wand_of_essek: {
@@ -2626,7 +2626,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d8+13",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Timebending",
             description_html: "<p>You can choose the target of your attack after making your attack roll.</p>",
             character_modifiers: []
@@ -2644,7 +2644,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d6+13",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Reloading",
             description_html: "<p>After you make an attack, roll a d6. On a result of 1, you must mark a Stress to reload this weapon before you can fire it again.</p>",
             character_modifiers: []
@@ -2662,7 +2662,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
         damage: "1d6+9",
         damage_type: "mag",
         features: [{
-            attack_modifiers: [],
+            weapon_modifiers: [],
             title: "Bonded",
             description_html: "<p>Gain a bonus to your damage rolls equal to your level</p>",
             character_modifiers: []

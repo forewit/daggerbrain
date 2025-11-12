@@ -25,8 +25,9 @@ function createCharacter(uid: string) {
         if (!secondary_class || !character?.secondary_subclass_id) return null;
         return secondary_class.subclasses[character.secondary_subclass_id]
     })
-    let active_armor = $derived(get_armor(character?.active_armor_id));
-    let active_weapons = $derived(character?.active_weapon_ids.map(id => get_weapon(id)).filter(w => w !== null) || []);
+    let armor = $derived(get_armor(character?.armor_id));
+    let primary_weapon = $derived(get_weapon(character?.primary_weapon_id));
+    let secondary_weapon = $derived(get_weapon(character?.secondary_weapon_id))
     let level_up_domain_cards: {
         1: { A: Card<"domain"> | null, B: Card<"domain"> | null },
         2: { A: Card<"domain"> | null },
@@ -104,7 +105,7 @@ function createCharacter(uid: string) {
     );
 
 
-    // derived stats
+    // derived character stats
     let domain_card_vault: Card<"domain">[] = $state([]);
     let domain_card_loadout: Card<"domain">[] = $state([]);
     let traits: Traits = $state({ ...BASE_STATS.traits });
@@ -120,10 +121,12 @@ function createCharacter(uid: string) {
     let damage_thresholds: DamageThresholds = $state({ ...BASE_STATS.damage_thresholds });
     let primary_class_mastery_level: number = $state(BASE_STATS.primary_class_mastery_level);
     let secondary_class_mastery_level: number = $state(BASE_STATS.secondary_class_mastery_level);
-    let spellcast_trait: keyof Traits | null = $state(BASE_STATS.spellcast_trait);
     let experience_modifiers: number[] = $state(Array.from({ length: BASE_STATS.max_experiences }, () => BASE_STATS.experience_modifier));
-    let attack_roll_bonus: number = $state(BASE_STATS.attack_roll_bonus);
+   
+    let spellcast_trait: keyof Traits | null = $state(BASE_STATS.spellcast_trait);
     let spellcast_roll_bonus: number = $state(BASE_STATS.spellcast_roll_bonus);
+
+    // derived weapon stats
 
 
     // ! load character from app context
@@ -757,47 +760,42 @@ function createCharacter(uid: string) {
     })
 
 
-    // ! clear invalid active weapons
+    // ! clear invalid  weapons
     $effect(() => {
         if (!character) return;
 
-        const valid_weapon_ids = character.active_weapon_ids.filter(
-            (id) => {
-                const weapon = get_weapon(id);
-                if (!weapon) return false;
-                return weapon.level_requirement <= (character?.level || 0);
+        let total_burden = 0
+
+        if (primary_weapon !== null) {
+            if (primary_weapon.level_requirement <= character.level && primary_weapon.category === "Primary") {
+                total_burden = primary_weapon.burden
+            } else {
+                console.warn(`Removing invalid primary weapon ${primary_weapon.id}`)
+                character.primary_weapon_id = null;
             }
-        );
-
-        let total_burden = 0;
-        const selected_categories = new Set<"Primary" | "Secondary">();
-        const new_active_weapon_ids: string[] = [];
-
-        for (const id of valid_weapon_ids) {
-            const weapon = get_weapon(id);
-            if (!weapon) continue;
-            if (total_burden + weapon.burden > max_burden) continue;
-            if (selected_categories.has(weapon.category)) continue;
-
-            selected_categories.add(weapon.category);
-            total_burden += weapon.burden;
-            new_active_weapon_ids.push(id);
         }
 
-        if (new_active_weapon_ids.some((id, index) => id !== character?.active_weapon_ids[index])) {
-            console.warn(`Removing invalid active weapons`);
-            character.active_weapon_ids = new_active_weapon_ids;
+        if (secondary_weapon !== null) {
+            total_burden += secondary_weapon.burden
+            if (secondary_weapon.level_requirement <= character.level &&
+                secondary_weapon.category === "Secondary" &&
+                total_burden <= max_burden) {
+                    return
+                }
+
+            console.warn(`Removing invalid secondary weapon ${secondary_weapon.id}`)
+            character.secondary_weapon_id = null;
         }
     })
 
-    // ! clear invalid active armor
+    // ! clear invalid  armor
     $effect(() => {
         if (!character) return;
-        if (active_armor === null) return;
-        if (active_armor.level_requirement <= character.level) return
+        if (armor === null) return;
+        if (armor.level_requirement <= character.level) return
 
-        console.warn(`Removing active armor. level requirement not met`);
-        character.active_armor_id = null;
+        console.warn(`Removing invalid armor ${armor.id}. level requirement not met`);
+        character.armor_id = null;
 
     })
 
@@ -808,7 +806,7 @@ function createCharacter(uid: string) {
         if (condition.type === "level") {
             return character.level >= condition.min_level && character.level <= condition.max_level
         } else if (condition.type === "armor_equipped") {
-            const has_armor = character.active_armor_id !== null
+            const has_armor = character.armor_id !== null
             return condition.value === has_armor
         } else if (condition.type === "domain_card_choice") {
 
@@ -916,15 +914,16 @@ function createCharacter(uid: string) {
             }
         })
 
-        // modifiers from active armor
-        if (active_armor) {
-            active_armor.features.forEach(f => push_modifiers(f.character_modifiers))
+        // modifiers from active armor & weapons
+        if (armor) {
+            armor.features.forEach(f => push_modifiers(f.character_modifiers))
         }
-
-        // modifiers from active weapons
-        active_weapons.forEach(weapon => {
-            weapon.features.forEach(f => push_modifiers(f.character_modifiers))
-        })
+        if (primary_weapon) {
+            primary_weapon.features.forEach(f => push_modifiers(f.character_modifiers))
+        }
+        if (secondary_weapon) {
+            secondary_weapon.features.forEach(f => push_modifiers(f.character_modifiers))
+        }
 
 
         // additional cards
@@ -938,9 +937,9 @@ function createCharacter(uid: string) {
 
 
         // categorize by behavior
-        base_modifiers = all_modifiers.filter((e) => 'behavior' in e && e.behavior === 'base') as CharacterModifier[]
-        bonus_modifiers = all_modifiers.filter((e) => 'behavior' in e && e.behavior === 'bonus') as CharacterModifier[]
-        override_modifiers = all_modifiers.filter((e) => 'behavior' in e && e.behavior === 'override') as CharacterModifier[]
+        base_modifiers = all_modifiers.filter((e) => 'behavior' in e && e.behaviour === 'base') as CharacterModifier[]
+        bonus_modifiers = all_modifiers.filter((e) => 'behavior' in e && e.behaviour === 'bonus') as CharacterModifier[]
+        override_modifiers = all_modifiers.filter((e) => 'behavior' in e && e.behaviour === 'override') as CharacterModifier[]
 
         console.warn("Updated modifier list...")
     })
@@ -964,7 +963,7 @@ function createCharacter(uid: string) {
         let value = currentValue;
 
         for (const modifier of modifiers) {
-            if (modifier.target !== target || ('behavior' in modifier && modifier.behavior !== behavior)) {
+            if (modifier.target !== target || ('behavior' in modifier && modifier.behaviour !== behavior)) {
                 continue;
             }
 
@@ -1249,18 +1248,6 @@ function createCharacter(uid: string) {
         max_hp = new_max_hp;
     })
 
-    // * derive attack roll bonus
-    $effect(() => {
-        if (!character) return
-        let new_attack_roll_bonus: number = BASE_STATS.attack_roll_bonus;
-
-        new_attack_roll_bonus = apply_modifiers(base_modifiers, 'attack_roll_bonus', new_attack_roll_bonus, 'base')
-        new_attack_roll_bonus = apply_modifiers(bonus_modifiers, 'attack_roll_bonus', new_attack_roll_bonus, 'bonus')
-        new_attack_roll_bonus = apply_modifiers(override_modifiers, 'attack_roll_bonus', new_attack_roll_bonus, 'override')
-
-        attack_roll_bonus = new_attack_roll_bonus;
-    })
-
     // * derive spellcast roll bonus
     $effect(() => {
         if (!character) return
@@ -1394,9 +1381,9 @@ function createCharacter(uid: string) {
         }
 
         // override with currently equiped armor
-        if (active_armor) {
-            thresholds.major = active_armor.damage_thresholds.major
-            thresholds.severe = active_armor.damage_thresholds.severe
+        if (armor) {
+            thresholds.major = armor.damage_thresholds.major
+            thresholds.severe = armor.damage_thresholds.severe
         }
 
         thresholds.major = apply_modifiers(base_modifiers, 'major_damage_threshold', thresholds.major, 'base')
@@ -1474,8 +1461,9 @@ function createCharacter(uid: string) {
         get primary_subclass() { return primary_subclass },
         get secondary_class() { return secondary_class },
         get secondary_subclass() { return secondary_subclass },
-        get active_armor() { return active_armor },
-        get active_weapons() { return active_weapons },
+        get armor() { return armor },
+        get primary_weapon() { return primary_weapon },
+        get secondary_weapon() { return secondary_weapon },
         get level_up_domain_cards() { return level_up_domain_cards },
         get level_up_chosen_options() { return level_up_chosen_options },
         get additional_domain_cards() { return additional_domain_cards },
@@ -1498,7 +1486,6 @@ function createCharacter(uid: string) {
         get primary_class_mastery_level() { return primary_class_mastery_level },
         get secondary_class_mastery_level() { return secondary_class_mastery_level },
         get spellcast_trait() { return spellcast_trait },
-        get attack_roll_bonus() { return attack_roll_bonus },
         get spellcast_roll_bonus() { return spellcast_roll_bonus },
 
         // read/write

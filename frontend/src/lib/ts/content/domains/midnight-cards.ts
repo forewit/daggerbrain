@@ -19,7 +19,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>You have advantage on action rolls to pick nonmagical locks, disarm nonmagical traps, or steal items from a target (either through stealth or by force).</p>",
                 character_modifiers: []
@@ -44,7 +44,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p><b>Spend a Hope</b> to make a <b>Spellcast Roll</b> and conjure throwing blades that strike out at all targets within Very Close range. Targets you succeed against take <b>d8+2</b> magic damage using your Proficiency.</p><p>If a target you hit is <em>Vulnerable</em>, they take an extra <b>1d8</b> damage.</p>",
                 character_modifiers: []
@@ -69,7 +69,7 @@ forced_in_vault: false,
         tokens: true,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>When you have a few minutes to prepare, you can <b>mark a Stress</b> to don the facade of any humanoid you can picture clearly in your mind. While disguised, you have advantage on Presence Rolls to avoid scrutiny.</p><p>Place a number of tokens equal to your Spellcast trait on this card. When you take an action while disguised, spend a token from this card. After the action that spends the last token is resolved, the disguise drops.</p>",
                 character_modifiers: []
@@ -94,7 +94,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p><b>Spend a Hope</b> to summon a humanoid-sized spirit that can move or carry things for you until your next rest.</p><p>You can also send it to attack an adversary. When you do, make a <b>Spellcast Roll</b> against a target within Very Far range. On a success, the spirit moves into Melee range with that target. Roll a number of <b>d6s</b> equal to your Spellcast trait and deal that much magic damage to the target. The spirit then dissipates. You can only have one spirit at a time.</p>",
                 character_modifiers: []
@@ -119,7 +119,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>Make a <b>Spellcast Roll</b> against all adversaries within Very Close range. Targets you succeed against are temporarily <em>Restrained</em> as their shadow binds them in place.</p>",
                 character_modifiers: []
@@ -144,7 +144,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>When you position yourself behind a creature who's about your size, you can <b>mark a Stress</b> to pull them into a chokehold, making them temporarily <em>Vulnerable</em>.</p><p>When a creature attacks a target who is <em>Vulnerable</em> in this way, they deal an extra <b>2d6</b> damage.</p>",
                 character_modifiers: []
@@ -169,7 +169,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>Make a <b>Spellcast Roll (13)</b>. On a success, you can create a temporary curtain of darkness between two points within Far range. Only you can see through this darkness. You're considered <em>Hidden</em> to adversaries on the other side of the veil, and you have advantage on attacks you make through the darkness. The veil remains until you cast another spell.</p>",
                 character_modifiers: []
@@ -194,7 +194,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>Make a <b>Spellcast Roll</b> against a target within Very Close range. On a success, <b>spend a Hope</b> to conjure a dark glyph upon their body that exposes their weak points, temporarily reducing the target's Difficulty by a value equal to your Knowledge (minimum 1).</p>",
                 character_modifiers: []
@@ -219,7 +219,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>When you roll with Fear while attempting to move unnoticed through a dangerous area, you can <b>mark a Stress</b> to roll with Hope instead.</p><p>If an ally within Close range is also attempting to move unnoticed and rolls with Fear, you can <b>mark a Stress</b> to change their result to a roll with Hope.</p>",
                 character_modifiers: []
@@ -244,7 +244,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>Make a <b>Spellcast Roll</b> against a target within Close range. On a success, <b>spend a Hope</b> to conjure suppressive magic around the target that encompasses everything within Very Close range of them and follows them as they move.</p><p>The target and anything within the area is <em>Silenced</em> until the GM spends a Fear on their turn to clear this condition, you cast Hush again, or you take Major damage. While <em>Silenced</em>, they can't make noise and can't cast spells.</p>",
                 character_modifiers: []
@@ -269,7 +269,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p><b>Spend a Hope</b> to activate Phantom Retreat where you're currently standing. <b>Spend another Hope</b> at any time before your next rest to disappear from where you are and reappear where you were standing when you activated Phantom Retreat. This spell ends after you reappear.</p>",
                 character_modifiers: []
@@ -294,7 +294,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: `<p>You can speak into the mind of any person with whom you've made physical contact. Once you've opened a channel with them, they can speak back into your mind. Additionally, you can <b>mark a Stress</b> to make a <b>Spellcast Roll</b> against them. On a success, you can ask the GM one of the following questions and receive an answer:</p>
                                     <ul class="list-disc list-inside ml-2">
@@ -325,7 +325,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>When you have a few minutes of silence to focus, you can <b>mark a Stress</b> to change the appearance of all willing creatures within Close range. Their new forms must share a general body structure and size, and can be somebody or something you've seen before or entirely fabricated. A disguised creature has advantage on Presence Rolls to avoid scrutiny.</p><p>Activate a Countdown (8). It ticks down as a consequence the GM chooses. When it triggers, the disguise drops.</p>",
                 character_modifiers: []
@@ -350,7 +350,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: `<p>When 4 or more of the domain cards in your loadout are from the Midnight domain, gain the following benefits:</p>
                                     <ul class="list-disc list-inside ml-2">
@@ -379,7 +379,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>When an attack made against you that would deal physical damage fails, you can <b>spend a Hope</b> to envelop yourself in shadow, becoming <em>Hidden</em> and teleporting to a point within Close range of the attacker. You remain <em>Hidden</em> until the next time you make an action roll.</p>",
                 character_modifiers: []
@@ -404,7 +404,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>Your prowess is enhanced under the cover of shadow. While you're shrouded in low light or darkness, you gain a <b>+1</b> bonus to your Evasion and make attack rolls with advantage.</p>",
                 character_modifiers: []
@@ -429,7 +429,7 @@ forced_in_vault: false,
         tokens: true,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>When you take magic damage, place tokens equal to the number of Hit Points you marked on this card. You can store a number of tokens equal to your Spellcast trait.</p><p>When you make a successful attack against a target, you can spend any number of tokens to add a <b>d6</b> for each token spent to your damage roll.</p>",
                 character_modifiers: []
@@ -454,7 +454,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>Once per long rest, choose any targets within Very Close range to perceive you as a nightmarish horror. The targets must succeed on a Reaction Roll (16) or become temporarily <em>Horrified</em>. While <em>Horrified</em>, they're <em>Vulnerable</em>.</p><p>Steal a number of Fear from the GM equal to the number of targets that are <em>Horrified</em> (up to the number of Fear in the GM's pool). Roll a number of <b>d6s</b> equal to the number of stolen Fear and deal the total damage to each <em>Horrified</em> target. Discard the stolen Fear.</p>",
                 character_modifiers: []
@@ -479,7 +479,7 @@ forced_in_vault: false,
         tokens: true,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>Choose a target within Far range. When you succeed on an action roll against them that doesn't result in making a damage roll, place a token on this card. When you deal damage to this target, spend any number of tokens to add a <b>d12</b> for each token spent to your damage roll. You can only hold Twilight Toll on one creature at a time.</p><p>When you choose a new target or take a rest, clear all unspent tokens.</p>",
                 character_modifiers: []
@@ -504,7 +504,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>Make a <b>Spellcast Roll (16)</b>. Once per long rest on a success, plunge the entire area within Far range into complete darkness only you and your allies can see through. Attack rolls have disadvantage when targeting you or an ally within this shadow.</p><p>Additionally, when you or an ally succeeds with Hope against an adversary within this shadow, the target must <b>mark a Stress</b>.</p><p>This spell lasts until the GM spends a Fear on their turn to clear this effect or you take Severe damage.</p>",
                 character_modifiers: []
@@ -529,7 +529,7 @@ forced_in_vault: false,
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p><b>Mark a Stress</b> to become <em>Spectral</em> until you make an action roll targeting another creature. While <em>Spectral</em>, you're immune to physical damage and can float and pass through solid objects. Other creatures can still see you while you're in this form.</p>",
                 character_modifiers: []

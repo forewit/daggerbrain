@@ -32,9 +32,9 @@ export type Character = {
     }
 
     // equipment
-    active_armor_id: string | null;
-    // todo: change to primary_weapon_id: string and secondary_weapon_id: string
-    active_weapon_ids: string[];
+    armor_id: string | null;
+    primary_weapon_id: string | null;
+    secondary_weapon_id: string | null;
 
     // the void / other
     transformation_card_id: string | null,
@@ -135,7 +135,7 @@ export type CharacterCondition = {
 }
 
 export type CharacterModifier = ({
-    behavior: "bonus" | "base" | "override"
+    behaviour: "bonus" | "base" | "override"
     character_conditions: CharacterCondition[];
 } & ({
     type: "derived_from_trait"
@@ -151,7 +151,7 @@ export type CharacterModifier = ({
     type: "derived_from_level"
     multiplier: number
 }) & ({
-    target: "evasion" | "max_hp" | "max_stress" | "max_experiences" | "major_damage_threshold" | "severe_damage_threshold" | "primary_class_mastery_level" | "secondary_class_mastery_level" | "max_domain_card_loadout" | "max_hope" | "proficiency" | "max_armor" | "max_burden" | "attack_roll_bonus" | "spellcast_roll_bonus";
+    target: "evasion" | "max_hp" | "max_stress" | "max_experiences" | "major_damage_threshold" | "severe_damage_threshold" | "primary_class_mastery_level" | "secondary_class_mastery_level" | "max_domain_card_loadout" | "max_hope" | "proficiency" | "max_armor" | "max_burden" | "spellcast_roll_bonus";
 } | {
     target: "trait"
     trait: keyof Traits
@@ -161,32 +161,33 @@ export type CharacterModifier = ({
     choice_id: string
 }))
 
-// todo: finish and figure out how to apply properly
-// todo: will need to derive weapon damage and damage type for primary and secondary weapon
-export type AttackModifier = {
+export type WeaponModifier = {
     behaviour: "bonus" | "base" | "override"
+    target_weapon: "primary" | "secondary" | "unarmed" | "all"
     character_conditions: CharacterCondition[]
-
 } & ({
-    type: "damage"    
+    target_stat: "attack_roll"
+    value: number
 } | {
-    type: "change_damage_type"
-}) & ({
-    target: "primary_weapon_attack" | "secondary_weapon_attack" | "all"
+    target_stat: "damage"
+    numeric: number
+    dice: string
 } | {
-    target: "specific_weapon"
-    weapon_id: string
+    target_stat: "damage_type"
+    damage_type: "phy" | "mag"
+} | {
+    target_stat: "range"
+    range: Range
 })
 
 export type Feature = {
     title: string,
     description_html: string,
     character_modifiers: CharacterModifier[]
-    attack_modifiers: AttackModifier[]
+    weapon_modifiers: WeaponModifier[]
 }
 
 export type CardType = "domain" | "ancestry" | "community" | "transformation" | "subclass_foundation" | "subclass_specialization" | "subclass_mastery";
-
 
 export type DomainCardChoice = {
     choice_id: string,

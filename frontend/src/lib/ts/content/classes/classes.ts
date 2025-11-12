@@ -15,13 +15,13 @@ export const SUBCLASS_CARDS = {
                 title: "First Strike",
                 description_html: "<p>The first time in a scene you succeed on an attack roll, double the damage of the attack.</p>",
                 character_modifiers: [],
-                attack_modifiers: [],
+                weapon_modifiers: [],
             },
             {
                 title: "Ambush",
                 description_html: '<p>Your "Marked for Death" feature uses <b>d6s</b> instead of <b>d4s</b>.</p>',
                 character_modifiers: [],
-                attack_modifiers: [],
+                weapon_modifiers: [],
             },
         ],
     } satisfies Card<"subclass_foundation">,
@@ -38,13 +38,13 @@ export const SUBCLASS_CARDS = {
                 title: "Death Strike",
                 description_html: "<p>When you deal Severe damage to a creature, you can <b>mark a stress</b> to make them mark an additional Hit Point.</p>",
                 character_modifiers: [],
-                attack_modifiers: [],
+                weapon_modifiers: [],
             },
             {
                 title: "Scorpion's Poise",
                 description_html: "<p>You gain a <b>+2</b> bonus to your Evasion against any attacks made by a creature <i>Marked for Death</i>.</p>",
                 character_modifiers: [],
-                attack_modifiers: [],
+                weapon_modifiers: [],
             }
         ],
     } satisfies Card<"subclass_specialization">,
@@ -61,13 +61,13 @@ export const SUBCLASS_CARDS = {
                 title: "True Strike",
                 description_html: "<p>Once per long rest, when you fail an attack roll, you can <b>spend a hope</b> to make it a success instead.</p>",
                 character_modifiers: [],
-                attack_modifiers: [],
+                weapon_modifiers: [],
             },
             {
                 title: "Backstab",
                 description_html: '<p>Your "Marked for Death" feature uses <b>d8s</b> instead of <b>d6s</b>.</p>',
                 character_modifiers: [],
-                attack_modifiers: [],
+                weapon_modifiers: [],
             }
         ],
     } satisfies Card<"subclass_mastery">,
@@ -86,13 +86,13 @@ export const SUBCLASS_CARDS = {
                 description_html: `<p>Increase the <b>d8</b> damage dice for your unarmed attack to <b>d10s</b>. Additionally, you can mark a Stress to target two creatures within Melee range with a single attack roll.</p>`,
                 // todo: figure out how to add this as a modifier (maybe add an "unarmed strike" as a default weapon)
                 character_modifiers: [],
-                attack_modifiers: [],
+                weapon_modifiers: [],
             },
             {
                 title: "Overwhelm",
                 description_html: `<p>On a successful attack, you can spend a Hope to force the target to mark a Stress or to throw them within Close range.</p>`,
                 character_modifiers: [],
-                attack_modifiers: [],
+                weapon_modifiers: [],
             }
         ]
     } satisfies Card<"subclass_foundation">,
@@ -109,19 +109,19 @@ export const SUBCLASS_CARDS = {
                 title: "Rugged",
                 description_html: `<p>Gain a permanent +3 bonus to your Severe damage threshold. Additionally, your "Powerhouse" feature can target up to three creatures instead of two.</p>`,
                 character_modifiers: [{
-                    behavior: "bonus",
+                    behaviour: "bonus",
                     type: "flat",
                     value: 3,
                     target: "severe_damage_threshold",
                     character_conditions: [],
                 }],
-                attack_modifiers: [],
+                weapon_modifiers: [],
             },
             {
                 title: "Eye for an Eye",
                 description_html: `<p>When you mark more than one Hit Point from an attack in Melee range, the attacker must make a Reaction Roll (13). On a failure, once per rest, they immediately mark the same number of Hit Points in return.</p>`,
                 character_modifiers: [],
-                attack_modifiers: [],
+                weapon_modifiers: [],
             }
         ]
     } satisfies Card<"subclass_specialization">,
@@ -138,13 +138,13 @@ export const SUBCLASS_CARDS = {
                 title: "Pummeljoy",
                 description_html: `<p>When you critically succeed on a weapon attack in Melee range, you gain an additional Hope, clear an additional Stress, and gain a +1 bonus to your Proficiency for the attack.</p>`,
                 character_modifiers: [],
-                attack_modifiers: [],
+                weapon_modifiers: [],
             },
             {
                 title: "Not Done Yet",
                 description_html: `<p>When you mark more than one HP from an attack, you can gain a Hope or clear a Stress.</p>`,
                 character_modifiers: [],
-                attack_modifiers: [],
+                weapon_modifiers: [],
             }
         ]
     } satisfies Card<"subclass_mastery">
@@ -170,7 +170,7 @@ export const CLASSES = {
             title: "Grim Resolve",
             description_html: "<p><b>Spend 3 Hope</b> to clear 2 Stress.</p>",
             character_modifiers: [],
-            attack_modifiers: [],
+            weapon_modifiers: [],
         },
         primary_domain_id: "blade",
         secondary_domain_id: "midnight",
@@ -186,7 +186,7 @@ export const CLASSES = {
               to your Proficiency to remove the <i>Marked for Death</i> condition. Otherwise, it ends
               automatically when you take a rest.</p>`,
                 character_modifiers: [],
-                attack_modifiers: [],
+                weapon_modifiers: [],
             },
             {
                 title: "Get In & Get Out",
@@ -194,7 +194,7 @@ export const CLASSES = {
               into or out of a building or structure you can see. The next roll you make that capitalizes 
               on this information has advantage.</p>`,
                 character_modifiers: [],
-                attack_modifiers: [],
+                weapon_modifiers: [],
             },
         ],
         subclasses: {
@@ -226,7 +226,7 @@ export const CLASSES = {
             title: "Staggering Strike",
             description_html: "<p><b>Spend 3 Hope</b> when you succeed on an attack to temporarily Stagger your target and force them to mark a Stress. While Staggered, they have disadvantage on attack rolls.</p>",
             character_modifiers: [],
-            attack_modifiers: [],
+            weapon_modifiers: [],
         },
         primary_domain_id: "blade",
         secondary_domain_id: "grace",
@@ -240,7 +240,7 @@ export const CLASSES = {
                      </ul>`,
                 // todo: add modifiers
                 character_modifiers: [],
-                attack_modifiers: [],
+                weapon_modifiers: [],
             },
             {
                 title: "Combo Strikes",
@@ -259,7 +259,7 @@ export const CLASSES = {
                 // todo: find a way to update dice on changing tier
                 // todo: add a "change weapon type" modifier type
                 character_modifiers: [],
-                attack_modifiers: [],
+                weapon_modifiers: [],
             },
         ],
         subclasses: {

@@ -19,11 +19,11 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "Gain a bonus to your Evasion equal to half your Agility.",
                 character_modifiers: [{
-                    behavior: "bonus",
+                    behaviour: "bonus",
                     target: "evasion",
                     type: "derived_from_trait",
                     trait: "agility",
@@ -55,7 +55,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>Once per rest, <b>mark a Stress</b> to sprint anywhere within Far range without making an Agility Roll to get there. If you end this movement within Melee range of an adversary and immediately make an attack against them, gain a +1 bonus to the attack roll.</p>",
                 character_modifiers: []
@@ -80,7 +80,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>When you're targeted by an attack made from beyond Melee range, you can <b>mark a Stress</b> to roll a <b>d4</b> and gain a bonus to your Evasion equal to the result against the attack.</p>",
                 character_modifiers: []
@@ -105,7 +105,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>When you cause an adversary to mark 1 or more Hit Points, you can <b>spend 2 Hope</b> to increase your Evasion by the number of Hit Points they marked. This bonus lasts until after the next attack made against you.</p>",
                 character_modifiers: []
@@ -130,7 +130,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: true,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: `<p>After a long rest, place a number of tokens equal to your Knowledge on this card (minimum 1). The first time you move within Close range of an adversary and make an attack against them, you can spend one token to choose one of the following options:</p>
                                     <ul class="list-disc list-inside ml-2">
@@ -161,7 +161,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>When you mark an Armor Slot to reduce incoming damage, you can <b>mark a Stress</b> to mark an additional Armor Slot.</p>",
                 character_modifiers: []
@@ -186,7 +186,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>When you Help an Ally, they can spend a Hope to add one of your Experiences to their roll alongside your advantage die.</p><p>When making a Tag Team Roll, you can roll a <b>d20</b> as your Hope Die.</p>",
                 character_modifiers: []
@@ -211,7 +211,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p><b>Mark a Stress</b> to boost off a willing ally within Close range, fling yourself into the air, and perform an aerial attack against a target within Far range. You have advantage on the attack, add a <b>d10</b> to the damage roll, and end your move within Melee range of the target.</p>",
                 character_modifiers: []
@@ -236,7 +236,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>When an attack made against you from beyond Melee range fails, roll a number of <b>d6s</b> equal to your Proficiency. If any roll a 6, you can <b>mark a Stress</b> to redirect the attack to damage an adversary within Very Close range instead.</p>",
                 character_modifiers: []
@@ -261,7 +261,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: `<p>When observing a creature, you can make an <b>Instinct Roll</b> against them. On a success, <b>spend a Hope</b> and ask the GM for one set of information about the target from the following options:</p>
                                     <ul class="list-disc list-inside ml-2">
@@ -293,7 +293,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>Name and describe your signature combat move. Once per rest, when you perform this signature move as part of an action you're taking, you can roll a <b>d20</b> as your Hope Die. On a success, clear a Stress.</p>",
                 character_modifiers: []
@@ -318,7 +318,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>When an attack made against you from within Melee range fails, you can <b>mark a Stress</b> and seize the opportunity to deal the weapon damage of one of your active weapons to the attacker.</p>",
                 character_modifiers: []
@@ -343,7 +343,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>During a short rest, you can choose a long rest downtime move instead. You can <b>spend a Hope</b> to let an ally do the same.</p>",
                 character_modifiers: []
@@ -368,7 +368,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: `<p>When 4 or more of the domain cards in your loadout are from the Bone domain, gain the following benefits:</p>
                                     <ul class="list-disc list-inside ml-2">
@@ -377,7 +377,7 @@ export const BONE_DOMAIN_CARDS = {
                                     </ul>`,
                 character_modifiers: [
                     {
-                        behavior: "bonus",
+                        behaviour: "bonus",
                         target: "trait",
                         trait: "agility",
                         type: "flat",
@@ -410,7 +410,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>When you make a successful attack with a weapon, gain a bonus to your damage roll equal to either your Finesse or Agility.</p>",
                 character_modifiers: []
@@ -435,7 +435,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>When you make a successful attack, you can <b>mark a Stress</b> to make the next successful attack against that same target deal an extra <b>2d12</b> damage.</p>",
                 character_modifiers: []
@@ -460,7 +460,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>Make an Agility Roll against all targets within Close range. <b>Spend a Hope</b> to move targets you succeed against, and any willing allies within Close range, to another point within Close range.</p>",
                 character_modifiers: []
@@ -485,7 +485,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>When you have 2 or fewer Hit Points unmarked, you don't take Minor damage.</p>",
                 character_modifiers: []
@@ -510,7 +510,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p><b>Spend a Hope</b> and make an attack against all adversaries within your weapon's range. Once per long rest, on a success against any targets, roll your weapon's damage and distribute that damage however you wish between the targets you succeeded against. Before you deal damage to each target, roll an additional damage die and add its result to the damage you deal to them.</p>",
                 character_modifiers: []
@@ -535,7 +535,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>Spend <b>3 Hope</b> to run a straight path through the battlefield to a point within Far range, making an attack against all adversaries within your weapon's range along that path. Choose the order in which you deal damage to the targets you succeeded against.</p><p>For the first, roll your weapon damage with a <b>+1 bonus</b> to your Proficiency. Then remove a die from your damage roll and deal the remaining damage to the next target. Continue to remove a die for each subsequent target until you have no more damage dice or adversaries. You can't target the same adversary more than once per attack.</p>",
                 character_modifiers: []
@@ -560,7 +560,7 @@ export const BONE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html: "<p>When an attack made against you fails, clear a Stress. If you can't clear a Stress, gain a Hope.</p>",
                 character_modifiers: []

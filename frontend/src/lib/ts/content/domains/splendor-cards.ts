@@ -19,7 +19,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll</b> against a target within Far range. On a success, <b>spend a Hope</b> to send a bolt of shimmering light toward them, dealing <b>d8+2</b> magic damage using your Proficiency. The target becomes temporarily <em>Vulnerable</em> and glows brightly until this condition is cleared.</p>`,
@@ -46,7 +46,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>You lay your hands upon a creature and channel healing magic to close their wounds. When you can take a few minutes to focus on the target you're helping, you can <b>spend 2 Hope</b> to clear a Hit Point or a Stress on them.</p>
@@ -74,7 +74,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Once per rest, after an ally attempts an action roll but before the consequences take place, you can offer assistance or words of support. When you do, your ally can reroll their dice.</p>`,
@@ -101,7 +101,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>You can infuse a corpse with a moment of life to speak with it. Make a <b>Spellcast Roll (13)</b>.</p>
@@ -133,7 +133,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll (13)</b> and target a creature other than yourself within Melee range.</p>
@@ -165,7 +165,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Once per rest, when you succeed on an attack against an adversary, you can clear <b>3 Stress or a Hit Point</b>.</p>
@@ -193,7 +193,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>You speak with an unmatched power and authority. You have <b>advantage</b> on action rolls to de-escalate violent situations or convince someone to follow your lead.</p>
@@ -220,7 +220,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Once per long rest, <b>spend 3 Hope</b> to reach out to the forces beyond and ask one "yes or no" question about an event, person, place, or situation in the near future. For a moment, the present falls away and you see the answer before you.</p>`,
@@ -247,7 +247,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b>Spend 3 Hope</b> and choose an ally within Close range. They are marked with a glowing sigil of protection. When this ally would make a death move, they clear a Hit Point instead.</p>
@@ -275,7 +275,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b>Spend a Hope</b> to shape a section of natural material you're touching (such as stone, ice, or wood) to suit your purpose. The area of the material can be no larger than you.</p>
@@ -303,7 +303,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Once per rest, <b>spend 3 Hope</b> to charge your powerful smite. When you next successfully attack with a weapon, <b>double the result</b> of your damage roll. This attack deals magic damage regardless of the weapon's damage type.</p>`,
@@ -330,7 +330,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: true,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>After a long rest, place a number of tokens equal to your Spellcast trait on this card.</p>
@@ -360,7 +360,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: true,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll (16)</b>. Once per long rest on a success, choose a point within Far range and create a visible zone of protection there for all allies within Very Close range of that point.</p>
@@ -387,7 +387,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When you deal damage to an adversary, you can <b>spend 2 Hope</b> to clear a Hit Point on an ally within Close range.</p>`,
@@ -414,7 +414,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When 4 or more of the domain cards in your loadout are from the Splendor domain, gain the following benefits:</p>
@@ -424,7 +424,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
                      </ul>`,
                 character_modifiers: [
                     {
-                        behavior: "bonus",
+                        behaviour: "bonus",
                         target: "severe_damage_threshold",
                         type: "flat",
                         value: 3,
@@ -457,7 +457,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b>Mark a Stress</b> to cast a protective aura on a target within Very Close range. When the target marks an Armor Slot, they reduce the severity of the attack by an additional threshold. If this spell causes a creature who would be damaged to instead mark no Hit Points, the effect ends.</p>
@@ -485,7 +485,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll</b> to unleash powerful rays of burning sunlight against all adversaries in front of you within Far range. On a success, <b>spend any number of Hope</b> and force that many targets you succeeded against to make a <b>Reaction Roll (14)</b>.</p>
@@ -517,7 +517,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll (15)</b> to magically empower your aura. On a success, <b>spend 2 Hope</b> to make your Presence equal to your Spellcast trait until your next long rest.</p>
@@ -545,7 +545,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll (16)</b>. On a success, <b>mark any number of Stress</b> to target a line of allies within Far range.</p>
@@ -573,7 +573,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When you or an ally within Close range has used a feature that has an exhaustion limit (such as once per rest or once per session), you can <b>spend any number of Hope</b> and roll that many <b>d6s</b>. If any roll a 6, the feature can be used again.</p>`,
@@ -600,7 +600,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll (20)</b>. On a success, restore one creature who has been dead no longer than 100 years to full strength. Then roll a <b>d6</b>. On a result of 5 or lower, place this card in your vault permanently.</p>

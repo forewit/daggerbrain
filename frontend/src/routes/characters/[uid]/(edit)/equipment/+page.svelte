@@ -10,8 +10,8 @@
 
   let { data } = $props();
 
- const context = getCharacterContext()
- let character = $derived(context.character);
+  const context = getCharacterContext();
+  let character = $derived(context.character);
 </script>
 
 {#if character}
@@ -29,28 +29,28 @@
             <!-- Armor Slot -->
             <p class="text-sm font-medium pb-2 pt-1 px-1">Active Armor</p>
             <div class="flex gap-2 items-center flex-wrap justify-end">
-              {#if context.active_armor !== null}
+              {#if context.armor !== null}
                 <div
                   class="bg-card/50 rounded-md px-4 min-h-10 py-2 flex justify-end items-center gap-3 grow"
                 >
-                  <p class="text-sm grow">{context.active_armor.title}</p>
+                  <p class="text-sm grow">{context.armor.title}</p>
 
                   <div class="flex flex-wrap items-center gap-1 justify-end">
                     <div
                       class="text-xs flex items-center gap-1 bg-primary-muted rounded-full px-2 py-1"
                     >
-                      {context.active_armor.max_armor}<Shield class="size-3.5" />
+                      {context.armor.max_armor}<Shield class="size-3.5" />
                     </div>
                     <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
-                      {context.active_armor.damage_thresholds.major} / {context.active_armor
-                        .damage_thresholds.severe}
+                      {context.armor.damage_thresholds.major} / {context.armor.damage_thresholds
+                        .severe}
                     </div>
                   </div>
                 </div>
                 <Button
                   variant="link"
                   class="text-destructive"
-                  onclick={() => (character.active_armor_id = null)}>Unequip</Button
+                  onclick={() => (character.armor_id = null)}>Unequip</Button
                 >
               {:else}
                 <div
@@ -68,31 +68,33 @@
                 You can only equip one primary and one secondary weapon. Maximum burden is 2 hands.
               </p>
 
-              {#each context.active_weapons as weapon, i}
+              {#if context.primary_weapon !== null}
                 <div class="flex gap-2 items-center flex-wrap justify-end">
                   <div
                     class="relative bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center justify-end gap-3 grow"
                   >
                     <div class="grow flex flex-col">
-                      <p class="text-sm">{weapon.title}</p>
-                      <p class="text-xs text-muted-foreground italic">{weapon.category}</p>
+                      <p class="text-sm">{context.primary_weapon.title}</p>
+                      <p class="text-xs text-muted-foreground italic">
+                        {context.primary_weapon.category}
+                      </p>
                     </div>
 
                     <div class="flex flex-wrap items-center gap-1 justify-end">
                       <div
                         class="text-xs flex items-center gap-1 bg-primary-muted rounded-full px-2 py-1"
                       >
-                        {weapon.burden}<Hand class="size-3.5" />
+                        {context.primary_weapon.burden}<Hand class="size-3.5" />
                       </div>
                       <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
-                        {weapon.damage}
-                        {weapon.damage_type}
+                        {context.primary_weapon.damage}
+                        {context.primary_weapon.damage_type}
                       </div>
                       <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
-                        {capitalize(weapon.trait)}
+                        {capitalize(context.primary_weapon.trait)}
                       </div>
                       <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
-                        {weapon.range}
+                        {context.primary_weapon.range}
                       </div>
                     </div>
                   </div>
@@ -100,16 +102,62 @@
                   <Button
                     variant="link"
                     class="text-destructive"
-                    onclick={() => character.active_weapon_ids.splice(i, 1)}>Unequip</Button
+                    onclick={() => {
+                      character.primary_weapon_id = null;
+                    }}>Unequip</Button
                   >
                 </div>
-              {/each}
-
-              {#if context.active_weapons.length === 0}
+              {:else}
                 <div
                   class="bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center gap-3 grow truncate"
                 >
-                  <p class="text-sm text-muted-foreground">None</p>
+                  <p class="text-sm text-muted-foreground">No Primary Weapon</p>
+                </div>
+              {/if}
+              {#if context.secondary_weapon !== null}
+                <div class="flex gap-2 items-center flex-wrap justify-end">
+                  <div
+                    class="relative bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center justify-end gap-3 grow"
+                  >
+                    <div class="grow flex flex-col">
+                      <p class="text-sm">{context.secondary_weapon.title}</p>
+                      <p class="text-xs text-muted-foreground italic">
+                        {context.secondary_weapon.category}
+                      </p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-1 justify-end">
+                      <div
+                        class="text-xs flex items-center gap-1 bg-primary-muted rounded-full px-2 py-1"
+                      >
+                        {context.secondary_weapon.burden}<Hand class="size-3.5" />
+                      </div>
+                      <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
+                        {context.secondary_weapon.damage}
+                        {context.secondary_weapon.damage_type}
+                      </div>
+                      <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
+                        {capitalize(context.secondary_weapon.trait)}
+                      </div>
+                      <div class="text-xs bg-primary-muted rounded-full px-2 py-1">
+                        {context.secondary_weapon.range}
+                      </div>
+                    </div>
+                  </div>
+
+                  <Button
+                    variant="link"
+                    class="text-destructive"
+                    onclick={() => {
+                      character.secondary_weapon_id = null;
+                    }}>Unequip</Button
+                  >
+                </div>
+              {:else}
+                <div
+                  class="bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center gap-3 grow truncate"
+                >
+                  <p class="text-sm text-muted-foreground">No Secondary Weapon</p>
                 </div>
               {/if}
             </div>

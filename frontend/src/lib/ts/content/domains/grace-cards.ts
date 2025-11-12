@@ -20,7 +20,7 @@ export const GRACE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b>Spend a Hope</b> to gain advantage on a roll to deceive or trick someone into believing a lie you tell them.</p>`,
@@ -46,7 +46,7 @@ export const GRACE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll</b> against a target within Close range. On a success, they become temporarily <em>Enraptured</em>. While Enraptured, a target's attention is fixed on you, narrowing their field of view and drowning out any sound but your voice.</p>
@@ -73,7 +73,7 @@ export const GRACE_DOMAIN_CARDS = {
         tokens: true,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Your speech is imbued with power. After a long rest, place a number of tokens on this card equal to your Presence. When you speak with an ally, you can spend a token from this card to give them one benefit from the following options:</p>
@@ -105,7 +105,7 @@ export const GRACE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll</b> against a target within Very Close range. On a success, they can't lie to you while they remain within Close range, but they are not compelled to speak. If you ask them a question and they refuse to answer, they must <b>mark a Stress</b> and the effect ends. The target is typically unaware this spell has been cast on them until it causes them to utter the truth.</p>`,
@@ -131,7 +131,7 @@ export const GRACE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When you taunt or provoke a target within Far range, make a <b>Presence Roll</b> against them. Once per rest on a success, roll a number of <b>d4s</b> equal to your Proficiency. The target must mark Stress equal to the highest result rolled.</p>`,
@@ -157,7 +157,7 @@ export const GRACE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll</b> against all adversaries in front of you within Close range. Once per rest on a success, create an illusion of flashing colors and lights that temporarily <em>Stuns</em> targets you succeed against and forces them to <b>mark a Stress</b>.</p>
@@ -184,7 +184,7 @@ export const GRACE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>During a short rest, when you take the time to comfort another character while using the <em>Tend to Wounds</em> downtime move on them, clear an additional Hit Point on that character. When you do, you also clear 2 Hit Points.</p>`,
@@ -210,7 +210,7 @@ export const GRACE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Choose a target within Very Far range. You can see through their eyes and hear through their ears. You can transition between using your own senses or the target’s freely until you cast another spell or until your next rest.</p>`,
@@ -236,7 +236,7 @@ export const GRACE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>You can peek into the minds of others. <b>Spend a Hope</b> to read the vague surface thoughts of a target within Far range. Make a <b>Spellcast Roll</b> against the target to delve for deeper, more hidden thoughts.</p>
@@ -263,7 +263,7 @@ export const GRACE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Whisper words of discord to an adversary within Melee range and make a <b>Spellcast Roll (13)</b>. On a success, the target must <b>mark a Stress</b> and make an attack against another adversary instead of against you or your allies.</p>
@@ -290,7 +290,7 @@ export const GRACE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Once per rest, take on the Stress from a willing creature within Melee range. The target describes what intimate knowledge or emotions telepathically leak from their mind in this moment between you. Transfer any number of their marked Stress to you, then gain a Hope for each Stress transferred.</p>`,
@@ -316,7 +316,7 @@ export const GRACE_DOMAIN_CARDS = {
         tokens: true,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When you mark 1 or more Hit Points from an attack, you can <b>mark a Stress</b> to place a number of tokens equal to the number of Hit Points you marked on this card. On your next successful attack, gain a +5 bonus to your damage roll for each token on this card, then clear all tokens.</p>`,
@@ -342,7 +342,7 @@ export const GRACE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>After you make an action roll to persuade, lie, or garner favor, you can <b>spend a Hope</b> to reroll the Hope or Fear Die.</p>`,
@@ -368,7 +368,7 @@ export const GRACE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When 4 or more of the domain cards in your loadout are from the Grace domain, gain the following benefits:</p>
@@ -398,7 +398,7 @@ export const GRACE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Once per long rest, <b>mark a Stress</b> to create a projected copy of yourself that can appear anywhere you've been before.</p>
@@ -425,7 +425,7 @@ export const GRACE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll</b> against all targets within Far range. Targets you succeed against become temporarily <em>Enraptured</em>. While Enraptured, a target’s attention is fixed on you, narrowing their field of view and drowning out any sound but your voice.</p>
@@ -452,7 +452,7 @@ export const GRACE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Once per long rest, this card can mimic the features of another domain card of level 8 or lower in another player's loadout. <b>Spend Hope</b> equal to half the card's level to gain access to the feature. It lasts until your next rest or they place the card in their vault.</p>`,
@@ -516,13 +516,13 @@ export const GRACE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Gain a permanent +2 bonus to two of your Experiences or a permanent +3 bonus to one of your Experiences. Then place this card in your vault permanently.</p>`,
                 character_modifiers: [
                     {
-                        behavior: "bonus",
+                        behaviour: "bonus",
                         character_conditions: [
                             {
                                 type:"domain_card_choice",
@@ -538,7 +538,7 @@ export const GRACE_DOMAIN_CARDS = {
                         choice_id: "choose_two_experiences"
                     },
                     {
-                        behavior: "bonus",
+                        behaviour: "bonus",
                         character_conditions: [
                             {
                                 type:"domain_card_choice",
@@ -575,7 +575,7 @@ export const GRACE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When an ally within Close range deals damage to an adversary, you can make a <b>Spellcast Roll</b> against that same target. On a success, you deal the same damage to the target that your ally dealt.</p>
@@ -602,7 +602,7 @@ export const GRACE_DOMAIN_CARDS = {
         forced_in_vault: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>People know who you are and what you've done, and they treat you differently because of it. When you leverage your notoriety to get what you want, you can <b>mark a Stress</b> before you roll to gain a +10 bonus to the result.</p>
@@ -610,7 +610,7 @@ export const GRACE_DOMAIN_CARDS = {
                      <p>This card doesn't count against your loadout's domain card maximum of 5 and can't be placed in your vault.</p>`,
                 character_modifiers: [
                     {
-                        behavior: "bonus",
+                        behaviour: "bonus",
                         type: "flat",
                         value: 1,
                         target: "max_domain_card_loadout",

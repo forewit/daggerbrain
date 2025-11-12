@@ -20,7 +20,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When you're tracking a specific creature or group of creatures based on signs of their passage, you can <b>spend any number of Hope</b> and ask the GM that many questions from the following list:</p>
@@ -53,7 +53,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>You can speak the language of the natural world. When you want to speak to the plants and animals around you, make an <b>Instinct Roll (12)</b>. On a success, they'll give you the information they know. On a roll with Fear, their knowledge might be limited or come at a cost.</p>
@@ -80,7 +80,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll</b> against a target within Far range. On a success, roots and vines reach out from the ground, dealing <b>1d8+1</b> physical damage and temporarily <em>Restraining</em> the target.</p>
@@ -107,7 +107,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b><em>Tekaira Armored Beetles:</em></b> <b>Mark a Stress</b> to conjure armored beetles that encircle you. When you next take damage, reduce the severity by one threshold. You can <b>spend a Hope</b> to keep the beetles conjured after taking damage.</p>
@@ -134,7 +134,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b>Spend a Hope</b> to summon a small nature spirit or forest critter to your side until your next rest, you cast Natural Familiar again, or the familiar is targeted by an attack. If you <b>spend an additional Hope</b>, you can summon a familiar that flies.</p>
@@ -162,7 +162,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll</b> against a target within Far range. On a success, deal <b>d6+4</b> magic damage using your Proficiency.</p>
@@ -189,7 +189,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Once per rest, you can conjure a thick, twisting stalk within Close range that can be easily climbed. Its height can grow up to Far range.</p>
@@ -216,7 +216,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll</b> against a target within Close range and choose one of the following options:</p>
@@ -248,7 +248,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Once per long rest, you can conjure a field of healing plants around you. Everywhere within Close range of you bursts to life with vibrant nature, allowing you and all allies in the area to clear a Hit Point.</p>
@@ -275,7 +275,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: true,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Once per rest, <b>spend a Hope</b> to sprout thorns all over your body. When you do, place a number of tokens equal to your Spellcast trait on this card.</p>
@@ -303,7 +303,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: true,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll (13)</b>. On a success, <b>spend 2 Hope</b> to grow a natural barricade in the shape of a dome that you and one ally can take cover within.</p>
@@ -331,7 +331,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b>Spend any number of Hope</b> to conjure that many magical steeds (such as horses, camels, or elephants) that you and your allies can ride until your next long rest or the steeds take any damage.</p>
@@ -358,7 +358,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>As an additional downtime move you can choose, roll a <b>d6</b> to see what you forage. Work with the GM to describe it and add it to your inventory as a consumable. Your party can carry up to five foraged consumables at a time.</p>
@@ -392,7 +392,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>When 4 or more of the domain cards in your loadout are from the Sage domain, gain the following benefits:</p>
@@ -422,7 +422,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: true,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Once per long rest, <b>mark a Stress</b> to channel the natural world around you and enhance yourself. Describe how your appearance changes, then place a <b>d6</b> on this card with the 1 value facing up.</p>
@@ -450,7 +450,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll (13)</b>. On a success, <b>spend any number of Hope</b> to create an equal number of small forest sprites who appear at points you choose within Far range, providing the following benefits:</p>
@@ -481,7 +481,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll (15)</b>. Once per rest on a success, create a temporary barrier of protective energy around you at Very Close range. You and all allies within the barrier when this spell is cast clear <b>1d4 Hit Points</b>.</p>
@@ -508,7 +508,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: true,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>After a long rest, place a number of tokens equal to the number of Sage domain cards in your loadout and vault on this card.</p>
@@ -537,7 +537,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Make a <b>Spellcast Roll (18)</b>. Once per long rest on a success, you reshape the natural world, changing the surrounding plant life anywhere within Far range of you.</p>
@@ -564,7 +564,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p><b>Mark a Stress</b> to transform into a hulking nature spirit, gaining the following benefits:</p>
@@ -596,7 +596,7 @@ export const SAGE_DOMAIN_CARDS = {
         tokens: false,
         features: [
             {
-                attack_modifiers: [],
+                weapon_modifiers: [],
                 title: "",
                 description_html:
                     `<p>Choose one of the following tempests and make a <b>Spellcast Roll</b> against all targets within Far range. Targets you succeed against experience its effects until the GM spends a Fear on their turn to end this spell:</p>

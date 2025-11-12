@@ -58,8 +58,9 @@ export const JUST_JAMES: Character = {
 
 
     // equipment
-    active_armor_id: null,
-    active_weapon_ids: [],
+    armor_id: null,
+    primary_weapon_id: null,
+    secondary_weapon_id: null,
 
     // the void / other
     transformation_card_id: "werewolf",
@@ -165,8 +166,9 @@ export const NEW_CHARACTER: Character = {
     domain_card_tokens: {},
 
     // equipment
-    active_armor_id: null,
-    active_weapon_ids: [],
+    armor_id: null,
+    primary_weapon_id: null,
+    secondary_weapon_id: null,
 
     // the void / other
     transformation_card_id: null,

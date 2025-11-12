@@ -84,7 +84,7 @@ export const TIER_2_BASE_OPTIONS = {
         max: 2,
         costs_two_choices: false,
         character_modifiers: [{
-            behavior: "bonus",
+            behaviour: "bonus",
             target: "max_hp",
             type: "flat",
             value: 1,
@@ -97,7 +97,7 @@ export const TIER_2_BASE_OPTIONS = {
         max: 2,
         costs_two_choices: false,
         character_modifiers: [{
-            behavior: "bonus",
+            behaviour: "bonus",
             target: "max_stress",
             type: "flat",
             value: 1,
@@ -124,7 +124,7 @@ export const TIER_2_BASE_OPTIONS = {
         max: 1,
         costs_two_choices: false,
         character_modifiers: [{
-            behavior: "bonus",
+            behaviour: "bonus",
             target: "evasion",
             type: "flat",
             value: 1,
@@ -147,7 +147,7 @@ export const TIER_3_BASE_OPTIONS = {
         max: 2,
         costs_two_choices: false,
         character_modifiers: [{
-            behavior: "bonus",
+            behaviour: "bonus",
             target: "max_hp",
             type: "flat",
             value: 1,
@@ -160,7 +160,7 @@ export const TIER_3_BASE_OPTIONS = {
         max: 2,
         costs_two_choices: false,
         character_modifiers: [{
-            behavior: "bonus",
+            behaviour: "bonus",
             target: "max_stress",
             type: "flat",
             value: 1,
@@ -187,7 +187,7 @@ export const TIER_3_BASE_OPTIONS = {
         max: 1,
         costs_two_choices: false,
         character_modifiers: [{
-            behavior: "bonus",
+            behaviour: "bonus",
             target: "evasion",
             type: "flat",
             value: 1,
@@ -207,7 +207,7 @@ export const TIER_3_BASE_OPTIONS = {
         max: 1,
         costs_two_choices: true,
         character_modifiers: [{
-            behavior: "bonus",
+            behaviour: "bonus",
             target: "proficiency",
             type: "flat",
             value: 1,
@@ -237,7 +237,7 @@ export const TIER_4_BASE_OPTIONS = {
         max: 2,
         costs_two_choices: false,
         character_modifiers: [{
-            behavior: "bonus",
+            behaviour: "bonus",
             target: "max_hp",
             type: "flat",
             value: 1,
@@ -250,7 +250,7 @@ export const TIER_4_BASE_OPTIONS = {
         max: 2,
         costs_two_choices: false,
         character_modifiers: [{
-            behavior: "bonus",
+            behaviour: "bonus",
             target: "max_stress",
             type: "flat",
             value: 1,
@@ -277,7 +277,7 @@ export const TIER_4_BASE_OPTIONS = {
         max: 1,
         costs_two_choices: false,
         character_modifiers: [{
-            behavior: "bonus",
+            behaviour: "bonus",
             target: "evasion",
             type: "flat",
             value: 1,
@@ -297,7 +297,7 @@ export const TIER_4_BASE_OPTIONS = {
         max: 1,
         costs_two_choices: true,
         character_modifiers: [{
-            behavior: "bonus",
+            behaviour: "bonus",
             target: "proficiency",
             type: "flat",
             value: 1,
