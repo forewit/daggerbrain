@@ -966,32 +966,37 @@ function createCharacter(uid: string) {
             }
         }
 
-        function equivalent(a: WeaponChoices, b: WeaponChoices) {
+        function equivalent_choices(a: WeaponChoices, b: WeaponChoices) {
             return a.trait === b.trait && a.damage_type === b.damage_type;
         }
 
 
         // update values
-        if (!equivalent(new_primary_weapon_choices, character.primary_weapon_chocies)) {
+        if (!equivalent_choices(new_primary_weapon_choices, character.primary_weapon_chocies)) {
             character.primary_weapon_chocies = new_primary_weapon_choices
         }
-        if (!equivalent(new_secondary_weapon_choices, character.secondary_weapon_chocies)) {
+        if (!equivalent_choices(new_secondary_weapon_choices, character.secondary_weapon_chocies)) {
             character.secondary_weapon_chocies = new_secondary_weapon_choices
         }
-        if (!equivalent(new_unarmed_attack_choices, character.unarmed_attack_chocies)) {
+        if (!equivalent_choices(new_unarmed_attack_choices, character.unarmed_attack_chocies)) {
             character.unarmed_attack_chocies = new_unarmed_attack_choices
         }
 
-        primary_weapon = new_primary_weapon;
-        secondary_weapon = new_secondary_weapon;
-        unarmed_attack = new_unarmed_attack;
-    })
+        function equivalent_weapons(a: Weapon | null, b: Weapon | null) {
+            if (a === null && b === null) return true;
+            if (a === null || b === null) return false;
+            return a.id === b.id;
+        }
 
-    $effect(() => {
-        if (!character) return
-
-
-
+        if (!equivalent_weapons(primary_weapon, new_primary_weapon)) {
+            primary_weapon = new_primary_weapon;
+        }
+        if (!equivalent_weapons(secondary_weapon, new_secondary_weapon)) {
+            secondary_weapon = new_secondary_weapon;
+        }
+        if (!equivalent_weapons(unarmed_attack, new_unarmed_attack)) {
+            unarmed_attack = new_unarmed_attack;
+        }
     })
 
     // ! clear invalid  weapons

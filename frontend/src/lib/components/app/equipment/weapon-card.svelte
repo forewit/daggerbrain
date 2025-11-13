@@ -50,9 +50,9 @@
 <div class={cn("relative bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center justify-end gap-3", className)}>
   <div class="grow flex flex-col">
     <p class="text-sm">{weapon.title}</p>
-    <p class="text-xs text-muted-foreground italic">
+    <!-- <p class="text-xs text-muted-foreground italic">
       {weapon.category}
-    </p>
+    </p> -->
   </div>
 
   <div class="flex flex-wrap items-center gap-1 justify-end">

@@ -16,16 +16,16 @@ export const TIER_1_SECONDARY_WEAPONS = {
         damage_dice: "1d8",
         available_damage_types: ["phy"],
         features: [{
-            weapon_modifiers: [],
+            weapon_modifiers: [{
+                behaviour: "bonus",
+                target_weapon: "primary",
+                target_stat: "damage_bonus",
+                character_conditions: [],
+                value: 2
+            }],
             title: "Paired",
             description_html: "<p>+2 to primary weapon damage to targets within Melee range</p>",
-            character_modifiers: [{
-                behaviour: "bonus",
-                character_conditions: [],
-                type: "flat",
-                value: 2,
-                target: "major_damage_threshold" // representing primary weapon damage boost
-            }]
+            character_modifiers: []
         }]
     },
     round_shield: {
@@ -103,16 +103,16 @@ export const TIER_1_SECONDARY_WEAPONS = {
         damage_dice: "1d8",
         available_damage_types: ["phy"],
         features: [{
-            weapon_modifiers: [],
+            weapon_modifiers: [{
+                behaviour: "bonus",
+                target_weapon: "primary",
+                target_stat: "damage_bonus",
+                character_conditions: [],
+                value: 2
+            }],
             title: "Paired",
             description_html: "<p>+2 to primary weapon damage to targets within Melee range</p>",
-            character_modifiers: [{
-                behaviour: "bonus",
-                character_conditions: [],
-                type: "flat",
-                value: 2,
-                target: "major_damage_threshold"
-            }]
+            character_modifiers: []
         }]
     },
     whip: {
@@ -187,16 +187,16 @@ export const TIER_2_SECONDARY_WEAPONS = {
         damage_dice: "1d8",
         available_damage_types: ["phy"],
         features: [{
-            weapon_modifiers: [],
+            weapon_modifiers: [{
+                behaviour: "bonus",
+                target_weapon: "primary",
+                target_stat: "damage_bonus",
+                character_conditions: [],
+                value: 3
+            }],
             title: "Paired",
             description_html: "<p>+3 to primary weapon damage to targets within Melee range</p>",
-            character_modifiers: [{
-                behaviour: "bonus",
-                character_conditions: [],
-                type: "flat",
-                value: 3,
-                target: "major_damage_threshold"
-            }]
+            character_modifiers: []
         }]
     },
     improved_round_shield: {
@@ -274,16 +274,16 @@ export const TIER_2_SECONDARY_WEAPONS = {
         damage_dice: "1d8",
         available_damage_types: ["phy"],
         features: [{
-            weapon_modifiers: [],
+            weapon_modifiers: [{
+                behaviour: "bonus",
+                target_weapon: "primary",
+                target_stat: "damage_bonus",
+                character_conditions: [],
+                value: 3
+            }],
             title: "Paired",
             description_html: "<p>+3 to primary weapon damage to targets within Melee range</p>",
-            character_modifiers: [{
-                behaviour: "bonus",
-                character_conditions: [],
-                type: "flat",
-                value: 3,
-                target: "major_damage_threshold"
-            }]
+            character_modifiers: []
         }]
     },
     improved_whip: {
@@ -355,7 +355,13 @@ export const TIER_2_SECONDARY_WEAPONS = {
         damage_dice: "1d6",
         available_damage_types: ["phy"],
         features: [{
-            weapon_modifiers: [],
+            weapon_modifiers: [{
+                behaviour: "bonus",
+                target_weapon: "primary",
+                target_stat: "damage_bonus",
+                character_conditions: [],
+                value: 1
+            }],
             title: "Double Duty",
             description_html: "<p>+1 to Armor Score; +1 to primary weapon damage within Melee range</p>",
             character_modifiers: [
@@ -365,13 +371,6 @@ export const TIER_2_SECONDARY_WEAPONS = {
                     type: "flat",
                     value: 1,
                     target: "max_armor"
-                },
-                {
-                    behaviour: "bonus",
-                    character_conditions: [],
-                    type: "flat",
-                    value: 1,
-                    target: "major_damage_threshold"
                 }
             ]
         }]
@@ -435,16 +434,16 @@ export const TIER_3_SECONDARY_WEAPONS = {
         damage_dice: "1d8",
         available_damage_types: ["phy"],
         features: [{
-            weapon_modifiers: [],
+            weapon_modifiers: [{
+                behaviour: "bonus",
+                target_weapon: "primary",
+                target_stat: "damage_bonus",
+                character_conditions: [],
+                value: 4
+            }],
             title: "Paired",
             description_html: "<p>+4 to primary weapon damage to targets within Melee range</p>",
-            character_modifiers: [{
-                behaviour: "bonus",
-                character_conditions: [],
-                type: "flat",
-                value: 4,
-                target: "major_damage_threshold"
-            }]
+            character_modifiers: []
         }]
     },
     advanced_round_shield: {
@@ -522,16 +521,16 @@ export const TIER_3_SECONDARY_WEAPONS = {
         damage_dice: "1d8",
         available_damage_types: ["phy"],
         features: [{
-            weapon_modifiers: [],
+            weapon_modifiers: [{
+                behaviour: "bonus",
+                target_weapon: "primary",
+                target_stat: "damage_bonus",
+                character_conditions: [],
+                value: 4
+            }],
             title: "Paired",
             description_html: "<p>+4 to primary weapon damage to targets within Melee range</p>",
-            character_modifiers: [{
-                behaviour: "bonus",
-                character_conditions: [],
-                type: "flat",
-                value: 4,
-                target: "major_damage_threshold"
-            }]
+            character_modifiers: []
         }]
     },
     advanced_whip: {
@@ -626,13 +625,7 @@ export const TIER_3_SECONDARY_WEAPONS = {
             weapon_modifiers: [],
             title: "Charged",
             description_html: "<p>Mark a Stress to gain a +1 bonus to your Proficiency on a primary weapon attack.</p>",
-            character_modifiers: [{
-                behaviour: "bonus",
-                character_conditions: [],
-                type: "flat",
-                value: 1,
-                target: "proficiency"
-            }]
+            character_modifiers: []
         }]
     },
     hand_sling: {
@@ -672,16 +665,16 @@ export const TIER_4_SECONDARY_WEAPONS = {
         damage_dice: "1d8",
         available_damage_types: ["phy"],
         features: [{
-            weapon_modifiers: [],
+            weapon_modifiers: [{
+                behaviour: "bonus",
+                target_weapon: "primary",
+                target_stat: "damage_bonus",
+                character_conditions: [],
+                value: 5
+            }],
             title: "Paired",
             description_html: "<p>+5 to primary weapon damage to targets within Melee range</p>",
-            character_modifiers: [{
-                behaviour: "bonus",
-                character_conditions: [],
-                type: "flat",
-                value: 5,
-                target: "major_damage_threshold"
-            }]
+            character_modifiers: []
         }]
     },
     legendary_round_shield: {
@@ -759,16 +752,16 @@ export const TIER_4_SECONDARY_WEAPONS = {
         damage_dice: "1d8",
         available_damage_types: ["phy"],
         features: [{
-            weapon_modifiers: [],
+            weapon_modifiers: [{
+                behaviour: "bonus",
+                target_weapon: "primary",
+                target_stat: "damage_bonus",
+                character_conditions: [],
+                value: 5
+            }],
             title: "Paired",
             description_html: "<p>+5 to primary weapon damage to targets within Melee range</p>",
-            character_modifiers: [{
-                behaviour: "bonus",
-                character_conditions: [],
-                type: "flat",
-                value: 5,
-                target: "major_damage_threshold"
-            }]
+            character_modifiers: []
         }]
     },
     legendary_whip: {

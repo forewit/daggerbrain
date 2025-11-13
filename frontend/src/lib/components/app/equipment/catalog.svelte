@@ -8,6 +8,7 @@
   import Dropdown from "../leveling/dropdown.svelte";
   import * as ButtonGroup from "$lib/components/ui/button-group";
   import { getCharacterContext } from "$lib/ts/character/character.svelte";
+  import Search from "@lucide/svelte/icons/search";
 
   let searchQuery = $state("");
   let typeFilter = $state<"Primary" | "Secondary" | "Armor" | null>(null);
@@ -124,7 +125,10 @@
 <div class="flex flex-col gap-4">
   <!-- Search and Filters -->
   <div class="flex flex-col gap-2">
-    <Input bind:value={searchQuery} placeholder="Search items..." />
+    <div class="relative">
+      <Search class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+      <Input bind:value={searchQuery} placeholder="Search items..." class="pl-9" />
+    </div>
 
     <div class="flex gap-x-0.5 gap-y-2 flex-wrap">
       <!-- Type Filter Buttons -->

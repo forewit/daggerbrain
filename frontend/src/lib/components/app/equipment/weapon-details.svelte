@@ -16,7 +16,7 @@
     {/if}
 
     <!-- Stats Badges -->
-    <div class="grid sm:grid-cols-[auto_1fr] gap-4">
+    <div class="grid sm:grid-cols-[180px_1fr] gap-4">
       <div class="flex flex-col gap-2">
         <div class="flex flex-wrap items-center gap-2">
           <span class="text-xs font-medium text-muted-foreground">Burden:</span>
