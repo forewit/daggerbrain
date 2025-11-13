@@ -7,7 +7,8 @@
   import Shield from "@lucide/svelte/icons/shield";
   import Hand from "@lucide/svelte/icons/hand";
   import { getCharacterContext } from "$lib/ts/character/character.svelte.js";
-  import Inventory from "$lib/components/app/inventory/inventory.svelte";
+  import Catalog from "$lib/components/app/equipment/catalog.svelte";
+  import Inventory from "$lib/components/app/equipment/inventory.svelte";
 
   let { data } = $props();
 
@@ -167,12 +168,13 @@
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Inventory -->
-        <div class="p-2 mt-4">
           <Inventory />
         </div>
+      </Dropdown>
+
+      <Dropdown title="Add Items">
+        <Catalog />
       </Dropdown>
     </div>
   </div>

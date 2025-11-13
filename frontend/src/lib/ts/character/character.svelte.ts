@@ -2,7 +2,7 @@ import { getAppContext } from '$lib/ts/app.svelte';
 import { ALL_LEVEL_UP_OPTIONS, BASE_STATS, TRAIT_OPTIONS } from '$lib/ts/character/rules';
 import { getContext, setContext } from 'svelte';
 import { get_ancestry_card, get_armor, get_class, get_community_card, get_domain_card, get_transformation_card, get_weapon } from './helpers';
-import type { Card, Character, Class, CharacterCondition, DamageThresholds, LevelUpChoice, LevelUpOption, CharacterModifier, Subclass, Traits, Weapon, WeaponModifier, WeaponChoices } from './types';
+import type { Card, Character, Class, CharacterCondition, DamageThresholds, LevelUpChoice, LevelUpOption, CharacterModifier, Subclass, Traits, Weapon, WeaponModifier, WeaponChoices, Armor } from './types';
 import { BLANK_LEVEL_UP_CHOICE } from './constants';
 
 function createCharacter(uid: string) {
@@ -106,6 +106,24 @@ function createCharacter(uid: string) {
     let secondary_weapon: Weapon | null = $state(null);
     let unarmed_attack: Weapon | null = $state(null);
     let armor = $derived(get_armor(character?.armor_id));
+    let inventory_weapons: Record<string, Weapon> = $derived.by(() => {
+        if (!character) return {};
+        const new_inventory_weapons: Record<string, Weapon> = {};
+        for (const { weapon_id, choices } of Object.values(character.inventory.weapons)) {
+            const weapon = get_weapon(weapon_id);
+            if (weapon) new_inventory_weapons[weapon_id] = weapon;
+        }
+        return new_inventory_weapons;
+    });
+    let inventory_armor: Record<string, Armor> = $derived.by(() => {
+        if (!character) return {};
+        const new_inventory_armor: Record<string, Armor> = {};
+        for (const { armor_id } of Object.values(character.inventory.armor)) {
+            const armor = get_armor(armor_id);
+            if (armor) new_inventory_armor[armor_id] = armor;
+        }
+        return new_inventory_armor;
+    });
 
     // derived character stats
     let domain_card_vault: Card<"domain">[] = $state([]);
@@ -1734,6 +1752,13 @@ function createCharacter(uid: string) {
         max_domain_card_loadout = new_max_domain_card_loadout;
     })
 
+    const get_tier_from_level = (level: number): "1" | "2" | "3" | "4" => {
+        if (level === 1) return "1";
+        if (level >= 2 && level <= 4) return "2";
+        if (level >= 5 && level <= 7) return "3";
+        return "4";
+    }
+
     // --- cleanup ---
     const destroy = () => { }
 
@@ -1761,6 +1786,8 @@ function createCharacter(uid: string) {
         get primary_weapon() { return primary_weapon },
         get secondary_weapon() { return secondary_weapon },
         get unarmed_attack() { return unarmed_attack },
+        get inventory_weapons() { return inventory_weapons },
+        get inventory_armor() { return inventory_armor },
 
         // derived stats
         get domain_card_vault() { return domain_card_vault },
@@ -1788,6 +1815,7 @@ function createCharacter(uid: string) {
 
         // helper functions
         destroy,
+        get_tier_from_level,
     }
 }
 

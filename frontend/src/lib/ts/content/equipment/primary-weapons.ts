@@ -1175,7 +1175,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
     yutari_bloodbow: {
         id: "yutari_bloodbow",
         title: "Yutari Bloodbow",
-        description_html: "<p>When you roll the maximum value on a damage die, roll an additional damage die.</p>",
+        description_html: "",
         level_requirement: 2,
         category: "Primary",
         burden: 2,
@@ -1195,7 +1195,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
     elder_bow: {
         id: "elder_bow",
         title: "Elder Bow",
-        description_html: "<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>",
+        description_html: "",
         level_requirement: 2,
         category: "Primary",
         burden: 2,
@@ -1215,7 +1215,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
     scepter_of_elias: {
         id: "scepter_of_elias",
         title: "Scepter of Elias",
-        description_html: "<p>On a successful attack, roll a d4. On a result of 4, clear a Stress.</p>",
+        description_html: "",
         level_requirement: 2,
         category: "Primary",
         burden: 1,
@@ -1235,7 +1235,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
     wand_of_enthrallment: {
         id: "wand_of_enthrallment",
         title: "Wand of Enthrallment",
-        description_html: "<p>Before you make a Presence Roll, you can mark a Stress to gain a +2 bonus to the result.</p>",
+        description_html: "",
         level_requirement: 2,
         category: "Primary",
         burden: 1,
@@ -1255,7 +1255,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
     keepers_staff: {
         id: "keepers_staff",
         title: "Keeper's Staff",
-        description_html: "<p>+1 to attack rolls</p>",
+        description_html: "",
         level_requirement: 2,
         category: "Primary",
         burden: 2,
@@ -1285,7 +1285,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
     advanced_broadsword: {
         id: "advanced_broadsword",
         title: "Advanced Broadsword",
-        description_html: "<p>+1 to attack rolls</p>",
+        description_html: "",
         level_requirement: 5,
         category: "Primary",
         burden: 1,
@@ -1341,7 +1341,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
     advanced_greatsword: {
         id: "advanced_greatsword",
         title: "Advanced Greatsword",
-        description_html: "<p>−1 to Evasion; on a successful attack, roll an additional damage die and discard the lowest result.</p>",
+        description_html: "",
         level_requirement: 5,
         category: "Primary",
         burden: 2,
@@ -1382,7 +1382,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
     advanced_warhammer: {
         id: "advanced_warhammer",
         title: "Advanced Warhammer",
-        description_html: "<p>−1 to Evasion</p>",
+        description_html: "",
         level_requirement: 5,
         category: "Primary",
         burden: 2,
@@ -1453,7 +1453,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
     advanced_rapier: {
         id: "advanced_rapier",
         title: "Advanced Rapier",
-        description_html: "<p>When you make an attack, you can mark a Stress to target another creature within range.</p>",
+        description_html: "",
         level_requirement: 5,
         category: "Primary",
         burden: 1,
@@ -1473,7 +1473,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
     advanced_halberd: {
         id: "advanced_halberd",
         title: "Advanced Halberd",
-        description_html: "<p>−1 to Finesse</p>",
+        description_html: "",
         level_requirement: 5,
         category: "Primary",
         burden: 2,
@@ -1545,7 +1545,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
     advanced_longbow: {
         id: "advanced_longbow",
         title: "Advanced Longbow",
-        description_html: "<p>−1 to Finesse</p>",
+        description_html: "",
         level_requirement: 5,
         category: "Primary",
         burden: 2,
@@ -1572,7 +1572,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
     flickerfly_blade: {
         id: "flickerfly_blade",
         title: "Flickerfly Blade",
-        description_html: "<p>Gain a bonus to your damage rolls equal to your Agility.</p>",
+        description_html: "",
         level_requirement: 5,
         category: "Primary",
         burden: 1,
@@ -1592,7 +1592,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
     bravesword: {
         id: "bravesword",
         title: "Bravesword",
-        description_html: "<p>−1 to Evasion; +3 to Severe damage threshold</p>",
+        description_html: "",
         level_requirement: 5,
         category: "Primary",
         burden: 2,
@@ -1627,7 +1627,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
     hammer_of_wrath: {
         id: "hammer_of_wrath",
         title: "Hammer of Wrath",
-        description_html: "<p>Before you make an attack roll, you can mark a Stress to use a d20 as your damage die.</p>",
+        description_html: "",
         level_requirement: 5,
         category: "Primary",
         burden: 2,
@@ -1647,7 +1647,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
     labrys_axe: {
         id: "labrys_axe",
         title: "Labrys Axe",
-        description_html: "<p>+1 to Armor Score</p>",
+        description_html: "",
         level_requirement: 5,
         category: "Primary",
         burden: 2,
@@ -1673,7 +1673,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
     meridian_cutlass: {
         id: "meridian_cutlass",
         title: "Meridian Cutlass",
-        description_html: "<p>When there are no other creatures within Close range of the target, gain advantage on your attack roll against them.</p>",
+        description_html: "",
         level_requirement: 5,
         category: "Primary",
         burden: 1,
@@ -1693,7 +1693,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
     retractable_saber: {
         id: "retractable_saber",
         title: "Retractable Saber",
-        description_html: "<p>The blade can be hidden in the hilt to avoid detection.</p>",
+        description_html: "",
         level_requirement: 5,
         category: "Primary",
         burden: 1,
@@ -1713,7 +1713,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
     double_flail: {
         id: "double_flail",
         title: "Double Flail",
-        description_html: "<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>",
+        description_html: "",
         level_requirement: 5,
         category: "Primary",
         burden: 2,
@@ -1733,7 +1733,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
     talon_blades: {
         id: "talon_blades",
         title: "Talon Blades",
-        description_html: "<p>When you roll the maximum value on a damage die, roll an additional damage die.</p>",
+        description_html: "",
         level_requirement: 5,
         category: "Primary",
         burden: 2,
@@ -1753,7 +1753,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
     black_powder_revolver: {
         id: "black_powder_revolver",
         title: "Black Powder Revolver",
-        description_html: "<p>After you make an attack, roll a d6. On a result of 1, you must mark a Stress to reload this weapon before you can fire it again.</p>",
+        description_html: "",
         level_requirement: 5,
         category: "Primary",
         burden: 1,
@@ -1773,7 +1773,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
     spiked_bow: {
         id: "spiked_bow",
         title: "Spiked Bow",
-        description_html: "<p>This weapon can also be used with these statistics—Agility, Melee, d10+5.</p>",
+        description_html: "",
         level_requirement: 5,
         category: "Primary",
         burden: 2,

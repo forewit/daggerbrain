@@ -31,13 +31,24 @@ export type Character = {
         secondary_subclass_name: string
     }
 
-    // equipment
+    // active equipment
     armor_id: string | null;
     primary_weapon_id: string | null;
     secondary_weapon_id: string | null;
     primary_weapon_chocies: WeaponChoices
     secondary_weapon_chocies: WeaponChoices
     unarmed_attack_chocies: WeaponChoices
+
+    // inventory
+    inventory: {
+        weapons: Record<string,{
+            weapon_id: string,
+            choices: WeaponChoices,
+        }>,
+        armor: Record<string,{
+            armor_id: string,
+        }>,
+    }
 
     // the void / other
     transformation_card_id: string | null,

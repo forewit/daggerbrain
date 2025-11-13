@@ -1,8 +1,8 @@
 
 import { CLASSES } from "../content/classes/classes";
 import { DOMAINS } from "../content/domains/domains";
-import { PRIMARY_WEAPONS, SECONDARY_WEAPONS } from "../content/equipment/equipment";
-import { ARMOR } from "../content/equipment/equipment";
+import { ALL_WEAPONS, PRIMARY_WEAPONS, SECONDARY_WEAPONS } from "../content/equipment/equipment";
+import { ALL_ARMOR } from "../content/equipment/equipment";
 import { ANCESTRY_CARDS, COMMUNITY_CARDS } from "../content/heritage";
 import { TRANSFORMATION_CARDS } from "../content/void";
 import type { Armor, Card, Class, Weapon } from "./types";
@@ -29,12 +29,12 @@ export function get_class(class_id: string | null | undefined): Class | null {
 
 export function get_armor(armor_id: string | null | undefined): Armor | null {
     if (!armor_id) return null;
-    return ARMOR[armor_id as keyof typeof ARMOR] || null;
+    return ALL_ARMOR[armor_id as keyof typeof ALL_ARMOR] || null;
 }
 
 export function get_weapon(weapon_id: string | null | undefined): Weapon | null {
     if (!weapon_id) return null;
-    return PRIMARY_WEAPONS[weapon_id as keyof typeof PRIMARY_WEAPONS] || null;
+    return ALL_WEAPONS[weapon_id as keyof typeof ALL_WEAPONS] || null;
 }
 
 export function get_domain_card(domain_card_id: string | null | undefined): Card<"domain"> | null {
@@ -60,5 +60,5 @@ export function get_all_weapons(): Weapon[] {
 }
 
 export function get_all_armor(): Armor[] {
-    return Object.values(ARMOR);
+    return Object.values(ALL_ARMOR);
 }

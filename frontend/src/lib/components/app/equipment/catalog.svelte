@@ -5,6 +5,9 @@
   import type { Weapon, Armor } from "$lib/ts/character/types";
   import WeaponDetails from "./weapon-details.svelte";
   import ArmorDetails from "./armor-details.svelte";
+  import Dropdown from "../leveling/dropdown.svelte";
+  import * as ButtonGroup from "$lib/components/ui/button-group";
+  import { getCharacterContext } from "$lib/ts/character/character.svelte";
 
   let searchQuery = $state("");
   let typeFilter = $state<"Primary" | "Secondary" | "Armor" | null>(null);
@@ -13,6 +16,33 @@
   // Get all items
   let allWeapons = $derived(get_all_weapons());
   let allArmor = $derived(get_all_armor());
+
+  const context = getCharacterContext();
+  let character = $derived(context.character);
+
+  function addWeaponToInventory(weapon: Weapon) {
+    if (!character) return;
+    // Only add if not already in inventory
+    if (!(weapon.id in character.inventory.weapons)) {
+      character.inventory.weapons[weapon.id] = {
+        weapon_id: weapon.id,
+        choices: {
+          trait: null,
+          damage_type: null,
+        },
+      };
+    }
+  }
+
+  function addArmorToInventory(armor: Armor) {
+    if (!character) return;
+    // Only add if not already in inventory
+    if (!(armor.id in character.inventory.armor)) {
+      character.inventory.armor[armor.id] = {
+        armor_id: armor.id,
+      };
+    }
+  }
 
   // Helper function to strip HTML tags for search
   function stripHtml(html: string): string {
@@ -28,14 +58,6 @@
     return titleMatch || descMatch;
   }
 
-  // Helper function to get tier from level requirement
-  function getTier(levelRequirement: number): "1" | "2" | "3" | "4" {
-    if (levelRequirement === 1) return "1";
-    if (levelRequirement >= 2 && levelRequirement <= 4) return "2";
-    if (levelRequirement >= 5 && levelRequirement <= 7) return "3";
-    return "4";
-  }
-
   // Filter weapons
   let filteredWeapons = $derived(
     allWeapons.filter((weapon) => {
@@ -48,7 +70,7 @@
 
       // Tier filter
       if (tierFilter !== null) {
-        const weaponTier = getTier(weapon.level_requirement);
+        const weaponTier = context.get_tier_from_level(weapon.level_requirement);
         if (weaponTier !== tierFilter) return false;
       }
 
@@ -64,7 +86,7 @@
 
       // Tier filter
       if (tierFilter !== null) {
-        const armorTier = getTier(armor.level_requirement);
+        const armorTier = context.get_tier_from_level(armor.level_requirement);
         if (armorTier !== tierFilter) return false;
       }
 
@@ -72,14 +94,25 @@
     })
   );
 
+  // Check if user has applied any filter or search
+  let hasActiveFilter = $derived(
+    searchQuery.trim() !== "" || typeFilter !== null || tierFilter !== null
+  );
+
   // Combined filtered items based on type filter
+  // Only show results if user has applied a filter or entered a search query
   let filteredItems = $derived.by(() => {
+    // Don't show anything until user interacts (filter or search)
+    if (!hasActiveFilter) {
+      return [];
+    }
+
     if (typeFilter === "Primary" || typeFilter === "Secondary") {
       return filteredWeapons.map((w) => ({ type: "weapon" as const, item: w }));
     } else if (typeFilter === "Armor") {
       return filteredArmor.map((a) => ({ type: "armor" as const, item: a }));
     } else {
-      // No filter - combine both
+      // No type filter - combine both
       return [
         ...filteredWeapons.map((w) => ({ type: "weapon" as const, item: w })),
         ...filteredArmor.map((a) => ({ type: "armor" as const, item: a })),
@@ -93,7 +126,7 @@
   <div class="flex flex-col gap-2">
     <Input bind:value={searchQuery} placeholder="Search items..." />
 
-    <div class="flex gap-2 flex-wrap">
+    <div class="flex gap-x-0.5 gap-y-2 flex-wrap">
       <!-- Type Filter Buttons -->
       <div class="flex gap-1">
         <Button
@@ -119,6 +152,7 @@
         </Button>
       </div>
 
+      <div class="grow"></div>
       <!-- Tier Filter Buttons -->
       <div class="flex gap-1">
         <Button
@@ -155,12 +189,61 @@
 
   <!-- Results -->
   <div class="flex flex-col gap-2">
-    {#each filteredItems as entry (entry.item.id)}
-      {#if entry.type === "weapon"}
-        <WeaponDetails weapon={entry.item} />
-      {:else}
-        <ArmorDetails armor={entry.item} />
-      {/if}
-    {/each}
+    {#if !hasActiveFilter}
+      <p class="text-sm text-muted-foreground text-center py-4">Search or use the filters above</p>
+    {:else if filteredItems.length === 0}
+      <p class="text-sm text-muted-foreground text-center py-4">No results</p>
+    {:else}
+      {#each filteredItems as entry}
+        {#if entry.type === "weapon"}
+          {#snippet subtitle_snippet()}
+            <Button
+              size="sm"
+              onclick={(e) => {
+                e.stopPropagation();
+                addWeaponToInventory(entry.item);
+              }}>Add</Button
+            >
+          {/snippet}
+
+          {#snippet title_snippet()}
+            <div class="text-left gap-4">
+              <p class="text-md font-medium">{entry.item.title}</p>
+              <p class="text-[10px] text-muted-foreground leading-none italic truncate">
+                Tier {context.get_tier_from_level(entry.item.level_requirement)}
+                {entry.item.category} Weapon
+              </p>
+            </div>
+          {/snippet}
+
+          <Dropdown {title_snippet} {subtitle_snippet} class="border-2">
+            <WeaponDetails weapon={entry.item} />
+          </Dropdown>
+        {:else}
+          {#snippet subtitle_snippet()}
+            <Button
+              size="sm"
+              onclick={(e) => {
+                e.stopPropagation();
+                addArmorToInventory(entry.item);
+              }}>Add</Button
+            >
+          {/snippet}
+
+          {#snippet title_snippet()}
+            <div class="text-left gap-4">
+              <p class="text-md font-medium">{entry.item.title}</p>
+              <p class="text-[10px] text-muted-foreground leading-none italic truncate">
+                Tier {context.get_tier_from_level(entry.item.level_requirement)} Armor
+              </p>
+            </div>
+          {/snippet}
+
+          <Dropdown {title_snippet} {subtitle_snippet} class="border-2">
+            <ArmorDetails armor={entry.item} />
+          </Dropdown>
+        {/if}
+      {/each}
+    {/if}
   </div>
 </div>

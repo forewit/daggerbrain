@@ -73,6 +73,11 @@ export const JUST_JAMES: Character = {
         damage_type: null
     },
 
+    inventory: {
+        weapons: {},
+        armor: {},
+    },
+
     // the void / other
     transformation_card_id: "werewolf",
     additional_domain_card_ids: [
@@ -192,6 +197,11 @@ export const NEW_CHARACTER: Character = {
     unarmed_attack_chocies: {
         trait: null,
         damage_type: null
+    },
+
+    inventory: {
+        weapons: {},
+        armor: {},
     },
 
     // the void / other
