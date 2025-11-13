@@ -74,6 +74,7 @@ export const BASE_STATS = {
     primary_class_mastery_level: 0,
     secondary_class_mastery_level: 0,
     unarmed_attack: BASE_UNARMED_ATTACK
+    
 } as const
 
 export const TIER_1_BASE_OPTIONS = {

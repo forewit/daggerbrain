@@ -36,29 +36,23 @@
   let currentDamageType = $derived(
     weaponChoices?.damage_type || weapon.available_damage_types[0] || null
   );
-  let currentTrait = $derived(
-    weaponChoices?.trait || weapon.available_traits[0] || null
-  );
+  let currentTrait = $derived(weaponChoices?.trait || weapon.available_traits[0] || null);
 
   // Determine if selects should be shown
-  let showDamageTypeSelect = $derived(
-    bind_choices && weapon.available_damage_types.length > 1
-  );
+  let showDamageTypeSelect = $derived(bind_choices && weapon.available_damage_types.length > 1);
   let showTraitSelect = $derived(bind_choices && weapon.available_traits.length > 1);
 </script>
 
-<div class={cn("relative bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center justify-end gap-3", className)}>
-  <div class="grow flex flex-col">
-    <p class="text-sm">{weapon.title}</p>
-    <!-- <p class="text-xs text-muted-foreground italic">
-      {weapon.category}
-    </p> -->
-  </div>
+<div
+  class={cn(
+    "relative bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center justify-end gap-3",
+    className
+  )}
+>
+  <p class="text-sm grow">{weapon.title}</p>
 
   <div class="flex flex-wrap items-center gap-1 justify-end">
-    <div
-      class="text-xs flex items-center gap-1 bg-primary-muted rounded-full px-2 py-1"
-    >
+    <div class="text-xs flex items-center gap-1 bg-primary-muted rounded-full px-2 py-1">
       {weapon.burden}<Hand class="size-3.5" />
     </div>
     {#if showDamageTypeSelect}
@@ -120,4 +114,3 @@
     </div>
   </div>
 </div>
-

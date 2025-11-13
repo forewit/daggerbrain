@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getCharacterContext } from "$lib/ts/character/character.svelte";
-  import WeaponCard from "$lib/components/app/equipment/weapon-card.svelte";
-  import ArmorCard from "$lib/components/app/equipment/armor-card.svelte";
+  import WeaponCard from "$lib/components/app/equipment/weapon.svelte";
+  import ArmorCard from "$lib/components/app/equipment/armor.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import CircleMinus from "@lucide/svelte/icons/circle-minus";
 
@@ -27,9 +27,7 @@
         <CircleMinus class="size-4" />
       </Button>
     {:else}
-      <div
-        class="bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center gap-3 grow truncate"
-      >
+      <div class="bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center gap-3 grow truncate">
         <p class="text-sm text-muted-foreground">Unarmored</p>
       </div>
     {/if}
@@ -46,7 +44,7 @@
       {#if context.primary_weapon !== null}
         <div class="flex items-center flex-wrap justify-end">
           <div class="grow">
-            <WeaponCard weapon={context.primary_weapon} bind_choices={true} />
+            <WeaponCard weapon={context.primary_weapon} bind_choices />
           </div>
           <Button
             size="icon"
@@ -59,16 +57,14 @@
           </Button>
         </div>
       {:else}
-        <div
-          class="bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center gap-3 grow truncate"
-        >
+        <div class="bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center gap-3 grow truncate">
           <p class="text-sm text-muted-foreground">No Primary Weapon</p>
         </div>
       {/if}
       {#if context.secondary_weapon !== null}
         <div class="flex items-center flex-wrap justify-end">
           <div class="grow">
-            <WeaponCard weapon={context.secondary_weapon} bind_choices={true} />
+            <WeaponCard weapon={context.secondary_weapon} bind_choices />
           </div>
           <Button
             size="icon"
@@ -81,13 +77,10 @@
           </Button>
         </div>
       {:else}
-        <div
-          class="bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center gap-3 grow truncate"
-        >
+        <div class="bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center gap-3 grow truncate">
           <p class="text-sm text-muted-foreground">No Secondary Weapon</p>
         </div>
       {/if}
     </div>
   </div>
 </div>
-

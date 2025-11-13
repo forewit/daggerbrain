@@ -3,6 +3,7 @@ import type { SOURCES } from "./constants"
 export type Character = {
     settings: {
         void_enabled: boolean
+        use_gold_coins: boolean
     }
     uid: string,
     name: string,
@@ -41,13 +42,20 @@ export type Character = {
 
     // inventory
     inventory: {
-        weapons: Record<string,{
+        weapons: Record<string, {
             weapon_id: string,
             choices: WeaponChoices,
         }>,
-        armor: Record<string,{
+        armor: Record<string, {
             armor_id: string,
         }>,
+        loot: Record<string, {
+            loot_id: string,
+        }>,
+        consumables: Record<string, {
+            consumable_id: string,
+        }>,
+        gold_coins: number,
     }
 
     // the void / other

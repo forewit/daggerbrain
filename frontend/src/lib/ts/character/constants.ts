@@ -20,6 +20,7 @@ export const BLANK_LEVEL_UP_CHOICE = {
 export const JUST_JAMES: Character = {
     settings: {
         void_enabled: true,
+        use_gold_coins: false,
     },
     uid: "forewit-justjames",
     name: "Just-James",
@@ -76,6 +77,9 @@ export const JUST_JAMES: Character = {
     inventory: {
         weapons: {},
         armor: {},
+        loot: {},
+        consumables: {},
+        gold_coins: 0,
     },
 
     // the void / other
@@ -144,6 +148,7 @@ export const JUST_JAMES: Character = {
 export const NEW_CHARACTER: Character = {
     settings: {
         void_enabled: false,
+        use_gold_coins: false,
     },
     uid: "new-character",
     name: "New Character",
@@ -202,6 +207,9 @@ export const NEW_CHARACTER: Character = {
     inventory: {
         weapons: {},
         armor: {},
+        loot: {},
+        consumables: {},
+        gold_coins: 0,
     },
 
     // the void / other

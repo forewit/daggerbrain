@@ -30,6 +30,12 @@
         <Checkbox bind:checked={character.settings.void_enabled} />
       </Label>
 
+      <!-- Use Gold Coins -->
+      <Label>
+        Use Gold Coins:
+        <Checkbox bind:checked={character.settings.use_gold_coins} />
+      </Label>
+
       <Dialog.Root>
         <Dialog.Trigger
           class={cn(buttonVariants({ variant: "link" }), "text-destructive p-0 h-min w-min")}
