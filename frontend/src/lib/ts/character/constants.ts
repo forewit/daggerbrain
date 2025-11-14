@@ -55,30 +55,21 @@ export const JUST_JAMES: Character = {
     secondary_subclass_id: null,
     secondary_class_domain_id_choice: null,
 
-
+    // class dependant
+    background_questions: [],
+    connections: [],
+    class_choices: {},
 
     // equipment
     armor_id: null,
     primary_weapon_id: null,
     secondary_weapon_id: null,
-    primary_weapon_chocies: {
-        trait: null,
-        damage_type: null
-    },
-    secondary_weapon_chocies: {
-        trait: null,
-        damage_type: null
-    },
-    unarmed_attack_chocies: {
-        trait: null,
-        damage_type: null
-    },
-
     inventory: {
         weapons: {},
         armor: {},
         loot: {},
         consumables: {},
+        adventuring_gear: [],
         gold_coins: 0,
     },
 
@@ -183,32 +174,24 @@ export const NEW_CHARACTER: Character = {
     secondary_subclass_id: null,
     secondary_class_domain_id_choice: null,
 
-    domain_card_choices: {},
+    // class dependant
+    background_questions: [],
+    connections: [],
+    class_choices: {},
 
+    domain_card_choices: {},
     domain_card_tokens: {},
 
     // equipment
     armor_id: null,
     primary_weapon_id: null,
     secondary_weapon_id: null,
-    primary_weapon_chocies: {
-        trait: null,
-        damage_type: null
-    },
-    secondary_weapon_chocies: {
-        trait: null,
-        damage_type: null
-    },
-    unarmed_attack_chocies: {
-        trait: null,
-        damage_type: null
-    },
-
     inventory: {
         weapons: {},
         armor: {},
-        loot: {},
+        loot: {},   
         consumables: {},
+        adventuring_gear: [],
         gold_coins: 0,
     },
 

@@ -6,6 +6,7 @@
   import Inventory from "$lib/components/app/equipment/inventory.svelte";
   import ActiveEquipment from "$lib/components/app/equipment/active-equipment.svelte";
   import Gold from "$lib/components/app/equipment/gold.svelte";
+  import ClassStartingEqiupment from "$lib/components/app/equipment/starting-equipment.svelte";
 
   let { data } = $props();
 
@@ -21,14 +22,17 @@
     )}
   >
     <div class="m-4 flex flex-col gap-4">
-      <Dropdown title="Starting Equipment"></Dropdown>
+      <Dropdown title="Starting Equipment">
+        <ClassStartingEqiupment />
+      </Dropdown>
+
       <Dropdown title="Inventory">
         <div class="flex flex-col gap-4">
           <ActiveEquipment />
-          <div class="p-4 rounded-md border">
-          <Gold bind:gold_coins={character.inventory.gold_coins} />
-        </div>
-          <Inventory />
+          <div class="p-4">
+            <Gold bind:gold_coins={character.inventory.gold_coins} class="px-2 pb-4" />
+            <Inventory />
+          </div>
         </div>
       </Dropdown>
 

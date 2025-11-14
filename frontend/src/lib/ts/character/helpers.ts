@@ -1,11 +1,11 @@
 
 import { CLASSES } from "../content/classes/classes";
 import { DOMAINS } from "../content/domains/domains";
-import { ALL_WEAPONS, PRIMARY_WEAPONS, SECONDARY_WEAPONS } from "../content/equipment/equipment";
+import { ALL_CONSUMABLES, ALL_LOOT, ALL_WEAPONS, PRIMARY_WEAPONS, SECONDARY_WEAPONS } from "../content/equipment/equipment";
 import { ALL_ARMOR } from "../content/equipment/equipment";
 import { ANCESTRY_CARDS, COMMUNITY_CARDS } from "../content/heritage";
 import { TRANSFORMATION_CARDS } from "../content/void";
-import type { Armor, Card, Class, Weapon } from "./types";
+import type { Armor, Card, Class, Consumable, Loot, Weapon } from "./types";
 
 
 export function get_ancestry_card(ancestry_card_id: string | null | undefined): Card<"ancestry"> | null {
@@ -61,4 +61,22 @@ export function get_all_weapons(): Weapon[] {
 
 export function get_all_armor(): Armor[] {
     return Object.values(ALL_ARMOR);
+}
+
+export function get_all_consumables(): Consumable[] {
+    return Object.values(ALL_CONSUMABLES);
+}
+
+export function get_all_loot(): Loot[] {
+    return Object.values(ALL_LOOT);
+}
+
+export function get_consumable(consumable_id: string | null | undefined): Consumable | null {
+    if (!consumable_id) return null;
+    return ALL_CONSUMABLES[consumable_id as keyof typeof ALL_CONSUMABLES] || null;
+}
+
+export function get_loot(loot_id: string | null | undefined): Loot | null {
+    if (!loot_id) return null;
+    return ALL_LOOT[loot_id as keyof typeof ALL_LOOT] || null;
 }

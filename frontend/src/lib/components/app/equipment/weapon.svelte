@@ -19,24 +19,30 @@
   const context = getCharacterContext();
   let character = $derived(context.character);
 
-  // Determine which weapon choices to use based on weapon category
+  // Get weapon choices from inventory.weapons[weapon.id].choices
+  // Structure: inventory.weapons[weapon.id].choices[choice_id] = selection_id[]
   let weaponChoices = $derived.by(() => {
-    if (!character) return null;
-    if (weapon.category === "Primary") {
-      return character.primary_weapon_chocies;
-    } else if (weapon.category === "Secondary") {
-      return character.secondary_weapon_chocies;
-    } else if (weapon.category === "Unarmed") {
-      return character.unarmed_attack_chocies;
-    }
-    return null;
+    if (!character || !character.inventory.weapons[weapon.id]) return null;
+    return character.inventory.weapons[weapon.id].choices;
   });
 
-  // Get current damage type and trait values
-  let currentDamageType = $derived(
-    weaponChoices?.damage_type || weapon.available_damage_types[0] || null
-  );
-  let currentTrait = $derived(weaponChoices?.trait || weapon.available_traits[0] || null);
+  // Get current damage type and trait values from inventory choices
+  // The choices are stored as arrays, so we take the first element
+  let currentDamageType = $derived.by(() => {
+    const choices = weaponChoices?.["damage_type"];
+    if (choices && choices.length > 0) {
+      return choices[0] as DamageType;
+    }
+    return weapon.available_damage_types[0] || null;
+  });
+  
+  let currentTrait = $derived.by(() => {
+    const choices = weaponChoices?.["trait"];
+    if (choices && choices.length > 0) {
+      return choices[0] as keyof Traits;
+    }
+    return weapon.available_traits[0] || null;
+  });
 
   // Determine if selects should be shown
   let showDamageTypeSelect = $derived(bind_choices && weapon.available_damage_types.length > 1);
@@ -60,8 +66,16 @@
         type="single"
         value={currentDamageType || ""}
         onValueChange={(value) => {
-          if (!weaponChoices) return;
-          weaponChoices.damage_type = value === "" ? null : (value as DamageType);
+          if (!character) return;
+          if (!character.inventory.weapons[weapon.id]) {
+            // Initialize weapon entry if not present
+            character.inventory.weapons[weapon.id] = {
+              quantity: 1,
+              choices: {},
+            };
+          }
+          // Update the damage_type choice (stored as array)
+          character.inventory.weapons[weapon.id].choices["damage_type"] = value === "" ? [] : [value];
         }}
       >
         <Select.Trigger
@@ -89,8 +103,16 @@
         type="single"
         value={currentTrait || ""}
         onValueChange={(value) => {
-          if (!weaponChoices) return;
-          weaponChoices.trait = value === "" ? null : (value as keyof Traits);
+          if (!character) return;
+          if (!character.inventory.weapons[weapon.id]) {
+            // Initialize weapon entry if not present
+            character.inventory.weapons[weapon.id] = {
+              quantity: 1,
+              choices: {},
+            };
+          }
+          // Update the trait choice (stored as array)
+          character.inventory.weapons[weapon.id].choices["trait"] = value === "" ? [] : [value];
         }}
       >
         <Select.Trigger

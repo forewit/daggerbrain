@@ -211,7 +211,38 @@ export const CLASSES = {
                 mastery_card: SUBCLASS_CARDS.executioners_guild_mastery,
             }
         },
+        // suggestions
+        suggested_primary_weapon_id: "broadsword",
+        suggested_secondary_weapon_id: "shortsword",
+        suggested_armor_id: "leather_armor",
+        starting_inventory: {
+            gold_coins: 10,
+            free_gear: [
+                { title: "Torch" },
+                { title: "50 feet of rope" },
+                { title: "Basic Supplies" }
+            ],
+            loot_or_consumable_options: [
+                "minor_health_potion",
+                "minor_stamina_potion"
+            ],
+            class_gear_options: [
+                { title: "List of names with several marked off" },
+                { title: "Mortar and pestle inscribed with a mysterious insignia" }
+            ],
+        },
+        background_questions: [
+            "What organization trained you in the art of killing, and how did you gain membership into it?",
+            "Throughout your entire career, one target has eluded you. Who are they, and how have they managed to slip through your fingers?",
+            "You always do what you must to take down your target, but there's one line that you will never cross. What is it?"
+        ],
+        connections: [
+            "What about me frightens you?",
+            "You once asked me to do something that keeps you up at night. What was it?",
+            "What secret about myself did I tell you, and how did it change your view of me?"
+        ]
     },
+
     brawler: {
         source_id: "void_1_5",
         starting_evasion: 10,
@@ -246,10 +277,10 @@ export const CLASSES = {
                 character_modifiers: [{
                     behaviour: "bonus",
                     character_conditions: [{
-                        type: "primary_weapon_equiped",
+                        type: "primary_weapon_equipped",
                         weapon_id: null
                     }, {
-                        type: "secondary_weapon_equiped",
+                        type: "secondary_weapon_equipped",
                         weapon_id: null
                     }],
                     type: "flat",
@@ -259,34 +290,34 @@ export const CLASSES = {
                 weapon_modifiers: [{
                     behaviour: "base",
                     character_conditions: [{
-                        type: "primary_weapon_equiped",
+                        type: "primary_weapon_equipped",
                         weapon_id: null
                     }, {
-                        type: "secondary_weapon_equiped",
+                        type: "secondary_weapon_equipped",
                         weapon_id: null
                     }],
                     target_weapon: "unarmed",
                     target_stat: "range",
                     range: "Melee"
-                },{
+                }, {
                     behaviour: "base",
                     character_conditions: [{
-                        type: "primary_weapon_equiped",
+                        type: "primary_weapon_equipped",
                         weapon_id: null
                     }, {
-                        type: "secondary_weapon_equiped",
+                        type: "secondary_weapon_equipped",
                         weapon_id: null
                     }],
                     target_weapon: "unarmed",
                     target_stat: "damage_dice",
                     dice: "1d8+1d6"
-                },{
+                }, {
                     behaviour: "base",
                     character_conditions: [{
-                        type: "primary_weapon_equiped",
+                        type: "primary_weapon_equipped",
                         weapon_id: null
                     }, {
-                        type: "secondary_weapon_equiped",
+                        type: "secondary_weapon_equipped",
                         weapon_id: null
                     }],
                     target_weapon: "unarmed",
@@ -323,5 +354,16 @@ export const CLASSES = {
                 mastery_card: SUBCLASS_CARDS.juggernaut_mastery,
             }
         },
+        suggested_primary_weapon_id: null,
+        suggested_secondary_weapon_id: null,
+        suggested_armor_id: null,
+        starting_inventory: {
+            gold_coins: 0,
+            free_gear: [],
+            loot_or_consumable_options: [],
+            class_gear_options: [],
+        },
+        background_questions: [],
+        connections: [],
     }
 } as const satisfies Record<string, Class>

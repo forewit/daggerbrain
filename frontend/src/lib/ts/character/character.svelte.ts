@@ -109,7 +109,7 @@ function createCharacter(uid: string) {
     let inventory_weapons: Record<string, Weapon> = $derived.by(() => {
         if (!character) return {};
         const new_inventory_weapons: Record<string, Weapon> = {};
-        for (const { weapon_id, choices } of Object.values(character.inventory.weapons)) {
+        for (const weapon_id of Object.keys(character.inventory.weapons)) {
             const weapon = get_weapon(weapon_id);
             if (weapon) new_inventory_weapons[weapon_id] = weapon;
         }
@@ -118,7 +118,7 @@ function createCharacter(uid: string) {
     let inventory_armor: Record<string, Armor> = $derived.by(() => {
         if (!character) return {};
         const new_inventory_armor: Record<string, Armor> = {};
-        for (const { armor_id } of Object.values(character.inventory.armor)) {
+        for (const armor_id of Object.keys(character.inventory.armor)) {
             const armor = get_armor(armor_id);
             if (armor) new_inventory_armor[armor_id] = armor;
         }
@@ -180,6 +180,19 @@ function createCharacter(uid: string) {
         if (!character.secondary_class_id) {
             character.secondary_subclass_id = null;
             character.secondary_class_domain_id_choice = null;
+        }
+    })
+
+    // * initialize class choices, background questions, and connections
+    $effect(() => {
+        if (!character) return;
+        if (!primary_class) {
+            character.class_choices = {};
+            character.background_questions = [];
+            character.connections = [];
+        } else {
+            character.background_questions = primary_class.background_questions.map(question => ({ question, answer: "" }));
+            character.connections = primary_class.connections.map(question => ({ question, answer: "" }));
         }
     })
 
@@ -928,59 +941,6 @@ function createCharacter(uid: string) {
                     new_unarmed_attack.available_traits = [modifier.trait]
             }
         }
-        // ! clear invalid weapon choices
-        let new_primary_weapon_choices = character.primary_weapon_chocies
-        let new_secondary_weapon_choices = character.secondary_weapon_chocies
-        let new_unarmed_attack_choices = character.unarmed_attack_chocies
-
-        if (new_primary_weapon === null) {
-            new_primary_weapon_choices = { trait: null, damage_type: null, }
-        } else {
-            if (new_primary_weapon_choices.trait !== null && !new_primary_weapon.available_traits.includes(new_primary_weapon_choices.trait)) {
-                new_primary_weapon_choices.trait = null
-            }
-            if (new_primary_weapon_choices.damage_type !== null && !new_primary_weapon.available_damage_types.includes(new_primary_weapon_choices.damage_type)) {
-                new_primary_weapon_choices.damage_type = null
-            }
-        }
-
-        if (new_secondary_weapon === null) {
-            new_secondary_weapon_choices = { trait: null, damage_type: null, }
-        } else {
-            if (new_secondary_weapon_choices.trait !== null && !new_secondary_weapon.available_traits.includes(new_secondary_weapon_choices.trait)) {
-                new_secondary_weapon_choices.trait = null
-            }
-            if (new_secondary_weapon_choices.damage_type !== null && !new_secondary_weapon.available_damage_types.includes(new_secondary_weapon_choices.damage_type)) {
-                new_secondary_weapon_choices.damage_type = null
-            }
-        }
-
-        if (new_unarmed_attack === null) {
-            new_unarmed_attack_choices = { trait: null, damage_type: null, }
-        } else {
-            if (new_unarmed_attack_choices.trait !== null && !new_unarmed_attack.available_traits.includes(new_unarmed_attack_choices.trait)) {
-                new_unarmed_attack_choices.trait = null
-            }
-            if (new_unarmed_attack_choices.damage_type !== null && !new_unarmed_attack.available_damage_types.includes(new_unarmed_attack_choices.damage_type)) {
-                new_unarmed_attack_choices.damage_type = null
-            }
-        }
-
-        function equivalent_choices(a: WeaponChoices, b: WeaponChoices) {
-            return a.trait === b.trait && a.damage_type === b.damage_type;
-        }
-
-
-        // update values
-        if (!equivalent_choices(new_primary_weapon_choices, character.primary_weapon_chocies)) {
-            character.primary_weapon_chocies = new_primary_weapon_choices
-        }
-        if (!equivalent_choices(new_secondary_weapon_choices, character.secondary_weapon_chocies)) {
-            character.secondary_weapon_chocies = new_secondary_weapon_choices
-        }
-        if (!equivalent_choices(new_unarmed_attack_choices, character.unarmed_attack_chocies)) {
-            character.unarmed_attack_chocies = new_unarmed_attack_choices
-        }
 
         function equivalent_weapons(a: Weapon | null, b: Weapon | null) {
             if (a === null && b === null) return true;
@@ -1047,15 +1007,21 @@ function createCharacter(uid: string) {
         } else if (condition.type === "armor_equipped") {
             const has_armor = character.armor_id !== null
             return condition.value === has_armor
-        } else if (condition.type === "primary_weapon_equiped") {
+        } else if (condition.type === "primary_weapon_equipped") {
             return condition.weapon_id === character.primary_weapon_id
-        } else if (condition.type === "secondary_weapon_equiped") {
+        } else if (condition.type === "secondary_weapon_equipped") {
             return condition.weapon_id === character.secondary_weapon_id
         } else if (condition.type === "domain_card_choice") {
             if (!character.domain_card_choices[condition.domain_card_id] || !character.domain_card_choices[condition.domain_card_id][condition.choice_id]) {
                 return false
             } else {
                 return character.domain_card_choices[condition.domain_card_id][condition.choice_id].includes(condition.selection_id)
+            }
+        } else if (condition.type === "loot_choice") {
+            if (!character.inventory.loot[condition.loot_id] || !character.inventory.loot[condition.loot_id].choices[condition.choice_id]) {
+                return false
+            } else {
+                return character.inventory.loot[condition.loot_id].choices[condition.choice_id].includes(condition.selection_id)
             }
         } else if (condition.type === "min_loadout_cards_from_domain") {
             let count = 0;

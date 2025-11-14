@@ -27,7 +27,7 @@
         <CircleMinus class="size-4" />
       </Button>
     {:else}
-      <div class="bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center gap-3 grow truncate">
+      <div class="bg-card/30 rounded-md px-4 min-h-10 py-2 flex items-center gap-3 grow truncate">
         <p class="text-sm text-muted-foreground">Unarmored</p>
       </div>
     {/if}
@@ -57,7 +57,7 @@
           </Button>
         </div>
       {:else}
-        <div class="bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center gap-3 grow truncate">
+        <div class="bg-card/30 rounded-md px-4 min-h-10 py-2 flex items-center gap-3 grow truncate">
           <p class="text-sm text-muted-foreground">No Primary Weapon</p>
         </div>
       {/if}
@@ -77,7 +77,7 @@
           </Button>
         </div>
       {:else}
-        <div class="bg-card/50 rounded-md px-4 min-h-10 py-2 flex items-center gap-3 grow truncate">
+        <div class="bg-card/30 rounded-md px-4 min-h-10 py-2 flex items-center gap-3 grow truncate">
           <p class="text-sm text-muted-foreground">No Secondary Weapon</p>
         </div>
       {/if}

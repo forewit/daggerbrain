@@ -1,22 +1,31 @@
 <script lang="ts">
   import Input from "$lib/components/ui/input/input.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
-  import { get_all_weapons, get_all_armor } from "$lib/ts/character/helpers";
-  import type { Weapon, Armor } from "$lib/ts/character/types";
+  import { get_all_weapons, get_all_armor, get_all_consumables } from "$lib/ts/character/helpers";
+  import type { Weapon, Armor, Consumable } from "$lib/ts/character/types";
   import WeaponDetails from "./weapon-details.svelte";
   import ArmorDetails from "./armor-details.svelte";
+  import ConsumableDetails from "./consumable-details.svelte";
   import Dropdown from "../leveling/dropdown.svelte";
   import * as ButtonGroup from "$lib/components/ui/button-group";
   import { getCharacterContext } from "$lib/ts/character/character.svelte";
   import Search from "@lucide/svelte/icons/search";
 
   let searchQuery = $state("");
-  let typeFilter = $state<"Primary" | "Secondary" | "Armor" | null>(null);
+  let typeFilter = $state<"Primary" | "Secondary" | "Armor" | "Consumables" | null>(null);
   let tierFilter = $state<"1" | "2" | "3" | "4" | null>(null);
+
+  // Clear tier filter when consumables filter is selected (consumables don't have tiers)
+  $effect(() => {
+    if (typeFilter === "Consumables" && tierFilter !== null) {
+      tierFilter = null;
+    }
+  });
 
   // Get all items
   let allWeapons = $derived(get_all_weapons());
   let allArmor = $derived(get_all_armor());
+  let allConsumables = $derived(get_all_consumables());
 
   const context = getCharacterContext();
   let character = $derived(context.character);
@@ -26,12 +35,11 @@
     // Only add if not already in inventory
     if (!(weapon.id in character.inventory.weapons)) {
       character.inventory.weapons[weapon.id] = {
-        weapon_id: weapon.id,
-        choices: {
-          trait: null,
-          damage_type: null,
-        },
+        quantity: 1,
+        choices: {},
       };
+    } else {
+      character.inventory.weapons[weapon.id].quantity++;
     }
   }
 
@@ -40,8 +48,24 @@
     // Only add if not already in inventory
     if (!(armor.id in character.inventory.armor)) {
       character.inventory.armor[armor.id] = {
-        armor_id: armor.id,
+        quantity: 1,
+        choices: {},
       };
+    } else {
+      character.inventory.armor[armor.id].quantity++;
+    }
+  }
+
+  function addConsumableToInventory(consumable: Consumable) {
+    if (!character) return;
+    // Only add if not already in inventory
+    if (!(consumable.id in character.inventory.consumables)) {
+      character.inventory.consumables[consumable.id] = {
+        quantity: 1,
+        choices: {},
+      };
+    } else {
+      character.inventory.consumables[consumable.id].quantity++;
     }
   }
 
@@ -51,7 +75,7 @@
   }
 
   // Helper function to check if item matches search
-  function matchesSearch(item: Weapon | Armor, query: string): boolean {
+  function matchesSearch(item: Weapon | Armor | Consumable, query: string): boolean {
     if (!query) return true;
     const searchLower = query.toLowerCase();
     const titleMatch = item.title.toLowerCase().includes(searchLower);
@@ -95,6 +119,15 @@
     })
   );
 
+  // Filter consumables (consumables don't have tier/level requirements)
+  let filteredConsumables = $derived(
+    allConsumables.filter((consumable) => {
+      // Search filter
+      if (!matchesSearch(consumable, searchQuery)) return false;
+      return true;
+    })
+  );
+
   // Check if user has applied any filter or search
   let hasActiveFilter = $derived(
     searchQuery.trim() !== "" || typeFilter !== null || tierFilter !== null
@@ -112,11 +145,14 @@
       return filteredWeapons.map((w) => ({ type: "weapon" as const, item: w }));
     } else if (typeFilter === "Armor") {
       return filteredArmor.map((a) => ({ type: "armor" as const, item: a }));
+    } else if (typeFilter === "Consumables") {
+      return filteredConsumables.map((c) => ({ type: "consumable" as const, item: c }));
     } else {
-      // No type filter - combine both
+      // No type filter - combine all
       return [
         ...filteredWeapons.map((w) => ({ type: "weapon" as const, item: w })),
         ...filteredArmor.map((a) => ({ type: "armor" as const, item: a })),
+        ...filteredConsumables.map((c) => ({ type: "consumable" as const, item: c })),
       ];
     }
   });
@@ -154,6 +190,13 @@
         >
           Armor
         </Button>
+        <Button
+          size="sm"
+          variant={typeFilter === "Consumables" ? "default" : "outline"}
+          onclick={() => (typeFilter = typeFilter === "Consumables" ? null : "Consumables")}
+        >
+          Consumables
+        </Button>
       </div>
 
       <div class="grow"></div>
@@ -162,6 +205,7 @@
         <Button
           size="sm"
           variant={tierFilter === "1" ? "default" : "outline"}
+          disabled={typeFilter === "Consumables"}
           onclick={() => (tierFilter = tierFilter === "1" ? null : "1")}
         >
           Tier 1
@@ -169,6 +213,7 @@
         <Button
           size="sm"
           variant={tierFilter === "2" ? "default" : "outline"}
+          disabled={typeFilter === "Consumables"}
           onclick={() => (tierFilter = tierFilter === "2" ? null : "2")}
         >
           Tier 2
@@ -176,6 +221,7 @@
         <Button
           size="sm"
           variant={tierFilter === "3" ? "default" : "outline"}
+          disabled={typeFilter === "Consumables"}
           onclick={() => (tierFilter = tierFilter === "3" ? null : "3")}
         >
           Tier 3
@@ -183,6 +229,7 @@
         <Button
           size="sm"
           variant={tierFilter === "4" ? "default" : "outline"}
+          disabled={typeFilter === "Consumables"}
           onclick={() => (tierFilter = tierFilter === "4" ? null : "4")}
         >
           Tier 4
@@ -223,7 +270,7 @@
           <Dropdown {title_snippet} {subtitle_snippet} class="border-2">
             <WeaponDetails weapon={entry.item} />
           </Dropdown>
-        {:else}
+        {:else if entry.type === "armor"}
           {#snippet subtitle_snippet()}
             <Button
               size="sm"
@@ -245,6 +292,26 @@
 
           <Dropdown {title_snippet} {subtitle_snippet} class="border-2">
             <ArmorDetails armor={entry.item} />
+          </Dropdown>
+        {:else if entry.type === "consumable"}
+          {#snippet subtitle_snippet()}
+            <Button
+              size="sm"
+              onclick={(e) => {
+                e.stopPropagation();
+                addConsumableToInventory(entry.item);
+              }}>Add</Button
+            >
+          {/snippet}
+
+          {#snippet title_snippet()}
+            <div class="text-left gap-4">
+              <p class="text-md font-medium">{entry.item.title}</p>
+            </div>
+          {/snippet}
+
+          <Dropdown {title_snippet} {subtitle_snippet} class="border-2">
+            <ConsumableDetails consumable={entry.item} />
           </Dropdown>
         {/if}
       {/each}

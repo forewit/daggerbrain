@@ -1,5 +1,18 @@
 import type { SOURCES } from "./constants"
 
+// ============================================================================
+// Core Character Types
+// ============================================================================
+
+export type Traits = {
+    agility: number | null,
+    strength: number | null,
+    finesse: number | null,
+    instinct: number | null,
+    presence: number | null,
+    knowledge: number | null
+}
+
 export type Character = {
     settings: {
         void_enabled: boolean
@@ -23,6 +36,11 @@ export type Character = {
     secondary_subclass_id: string | null
     secondary_class_domain_id_choice: DomainIds | null
 
+    // class dependant
+    background_questions: {question: string, answer: string}[],
+    connections: {question: string, answer: string}[],
+    class_choices: Record<string, string[]>
+
     // descriptors (used to so that data isn't fetched too often)
     derived_descriptors: {
         ancestry_name: string
@@ -36,25 +54,14 @@ export type Character = {
     armor_id: string | null;
     primary_weapon_id: string | null;
     secondary_weapon_id: string | null;
-    primary_weapon_chocies: WeaponChoices
-    secondary_weapon_chocies: WeaponChoices
-    unarmed_attack_chocies: WeaponChoices
 
-    // inventory
+    // inventory. 
     inventory: {
-        weapons: Record<string, {
-            weapon_id: string,
-            choices: WeaponChoices,
-        }>,
-        armor: Record<string, {
-            armor_id: string,
-        }>,
-        loot: Record<string, {
-            loot_id: string,
-        }>,
-        consumables: Record<string, {
-            consumable_id: string,
-        }>,
+        weapons: Record<string, { quantity: number, choices: Record<string, string[]> }>,
+        armor: Record<string, { quantity: number, choices: Record<string, string[]> }>,
+        loot: Record<string, { quantity: number, choices: Record<string, string[]> }>,
+        consumables: Record<string, { quantity: number, choices: Record<string, string[]> }>,
+        adventuring_gear: (AdventuringGear & { quantity: number })[],
         gold_coins: number,
     }
 
@@ -105,18 +112,14 @@ export type Character = {
     }
 }
 
-export type WeaponChoices = {
-    trait: keyof Traits | null
-    damage_type: DamageType | null
-}
+// ============================================================================
+// Class & Subclass Types
+// ============================================================================
 
-export type Traits = {
-    agility: number | null,
-    strength: number | null,
-    finesse: number | null,
-    instinct: number | null,
-    presence: number | null,
-    knowledge: number | null
+export type ClassChoices = {
+    // id > Answer
+    background_questions: Record<string, string>
+    connections: Record<string, string>
 }
 
 export type Class = {
@@ -126,12 +129,29 @@ export type Class = {
     description_html: string
     starting_evasion: number
     starting_max_hp: number
-    suggested_traits: Traits
     hope_feature: Feature
     primary_domain_id: DomainIds
     secondary_domain_id: DomainIds
     class_features: Feature[]
     subclasses: Record<string, Subclass>
+
+    // suggestions
+    suggested_traits: Traits
+    suggested_primary_weapon_id: string | null
+    suggested_secondary_weapon_id: string | null
+    suggested_armor_id: string | null
+
+    // starting inventory
+    starting_inventory: {
+        gold_coins: number
+        free_gear: AdventuringGear[]
+        loot_or_consumable_options: string[],
+        class_gear_options: AdventuringGear[]
+    }
+
+    // id > Question
+    background_questions: string[]
+    connections: string[]
 }
 
 export type Subclass = {
@@ -141,6 +161,10 @@ export type Subclass = {
     specialization_card: Card<"subclass_specialization">
     mastery_card: Card<"subclass_mastery">
 }
+
+// ============================================================================
+// Modifier Types
+// ============================================================================
 
 export type CharacterCondition = {
     type: "armor_equipped"
@@ -155,11 +179,16 @@ export type CharacterCondition = {
     choice_id: string
     selection_id: string
 } | {
+    type: "loot_choice"
+    loot_id: string
+    choice_id: string
+    selection_id: string
+} | {
     type: "min_loadout_cards_from_domain"
     domain_id: DomainIds
     min_cards: number
 } | {
-    type: "primary_weapon_equiped" | "secondary_weapon_equiped"
+    type: "primary_weapon_equipped" | "secondary_weapon_equipped"
     weapon_id: string | null
 }
 
@@ -192,8 +221,9 @@ export type CharacterModifier = ({
 
 export type WeaponModifier = {
     behaviour: "bonus" | "base" | "override"
-    target_weapon: "primary" | "secondary" | "unarmed" | "all"
     character_conditions: CharacterCondition[]
+    target_weapon: "primary" | "secondary" | "unarmed" | "all"
+
 } & ({
     target_stat: "attack_roll"
     value: number
@@ -221,6 +251,10 @@ export type Feature = {
     weapon_modifiers: WeaponModifier[]
 }
 
+// ============================================================================
+// Card Types
+// ============================================================================
+
 export type CardType = "domain" | "ancestry" | "community" | "transformation" | "subclass_foundation" | "subclass_specialization" | "subclass_mastery";
 
 export type DomainCardChoice = {
@@ -234,6 +268,8 @@ export type DomainCardChoice = {
     type: "experience"
     max: number
 })
+
+export type DomainIds = "arcana" | "blade" | "bone" | "codex" | "grace" | "midnight" | "sage" | "splendor" | "valor";
 
 export type Card<T extends CardType> = {
     id: string
@@ -264,8 +300,6 @@ export type Card<T extends CardType> = {
         } : {}
     )
 
-export type DomainIds = "arcana" | "blade" | "bone" | "codex" | "grace" | "midnight" | "sage" | "splendor" | "valor";
-
 export type Domain = {
     name: string
     description_html: string
@@ -273,6 +307,10 @@ export type Domain = {
     foreground_color: string
     cards: Record<string, Card<"domain">>
 }
+
+// ============================================================================
+// Level-Up Types
+// ============================================================================
 
 export type Tier1OptionIds = "tier_1_domain_cards";
 export type Tier2OptionIds = "tier_2_domain_card" | "tier_2_traits" | "tier_2_experience_bonus" | "tier_2_max_hp" | "tier_2_max_stress" | "tier_2_evasion";
@@ -287,6 +325,7 @@ export type LevelUpChoice = {
     selected_domain_card_id: string | null,
     selected_subclass_upgrade: "primary" | "secondary" | null,
 }
+
 export type LevelUpOption = {
     title_html: string | null
     short_title: string | null
@@ -295,22 +334,17 @@ export type LevelUpOption = {
     character_modifiers: CharacterModifier[]
 }
 
-export type DamageThresholds = {
-    major: number,
-    severe: number
-}
-export type Armor = {
-    id: string,
-    level_requirement: number,
-    title: string,
-    description_html: string,
-    max_armor: number,
-    damage_thresholds: DamageThresholds
-    features: Feature[],
-}
+// ============================================================================
+// Equipment Types
+// ============================================================================
 
 export type Range = "Melee" | "Very Close" | "Close" | "Far" | "Very Far";
 export type DamageType = "phy" | "mag"
+
+export type WeaponChoices = {
+    trait: keyof Traits | null
+    damage_type: DamageType | null
+}
 
 export type Weapon = {
     id: string,
@@ -326,4 +360,44 @@ export type Weapon = {
     damage_dice: string;
     available_damage_types: DamageType[]
     burden: 0 | 1 | 2 // represents number of hands required to wield
+}
+
+export type DamageThresholds = {
+    major: number,
+    severe: number
+}
+
+export type Armor = {
+    id: string,
+    level_requirement: number,
+    title: string,
+    description_html: string,
+    max_armor: number,
+    damage_thresholds: DamageThresholds
+    features: Feature[],
+}
+
+export type LootChoices = {
+    applies_to_weapon: "primary" | "secondary" | "unarmed" | "all"
+    test: boolean
+}
+
+export type Loot = {
+    id: string,
+    rarity_roll: number,
+    title: string,
+    description_html: string,
+    character_modifiers: CharacterModifier[],
+    weapon_modifiers: WeaponModifier[],
+}
+
+export type Consumable = {
+    id: string,
+    rarity_roll: number,
+    title: string,
+    description_html: string,
+}
+
+export type AdventuringGear = {
+    title: string,
 }
