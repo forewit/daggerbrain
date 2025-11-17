@@ -168,7 +168,7 @@
 
     <div class="flex gap-x-0.5 gap-y-2 flex-wrap">
       <!-- Type Filter Buttons -->
-      <div class="flex gap-1">
+      <div class="flex gap-1 flex-wrap">
         <Button
           size="sm"
           variant={typeFilter === "Primary" ? "default" : "outline"}
@@ -199,9 +199,8 @@
         </Button>
       </div>
 
-      <div class="grow"></div>
       <!-- Tier Filter Buttons -->
-      <div class="flex gap-1">
+      <div class="flex gap-1 flex-wrap">
         <Button
           size="sm"
           variant={tierFilter === "1" ? "default" : "outline"}
@@ -245,7 +244,7 @@
     {:else if filteredItems.length === 0}
       <p class="text-sm text-muted-foreground text-center py-4">No results</p>
     {:else}
-      {#each filteredItems as entry}
+      {#each filteredItems as entry (entry.item.id)}
         {#if entry.type === "weapon"}
           {#snippet subtitle_snippet()}
             <Button

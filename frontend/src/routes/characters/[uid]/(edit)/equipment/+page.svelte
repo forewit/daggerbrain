@@ -29,7 +29,7 @@
       <Dropdown title="Inventory">
         <div class="flex flex-col gap-4">
           <ActiveEquipment />
-          <div class="p-4">
+          <div class="">
             <Gold bind:gold_coins={character.inventory.gold_coins} class="px-2 pb-4" />
             <Inventory />
           </div>

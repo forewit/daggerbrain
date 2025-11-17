@@ -9,13 +9,13 @@
   import CommunityCard from "$lib/components/app/cards/full-cards/community-card.svelte";
   import AncestryCard from "$lib/components/app/cards/full-cards/ancestry-card.svelte";
   import { getCharacterContext } from "$lib/ts/character/character.svelte.js";
-  import { ANCESTRIES, COMMUNITIES } from "$lib/ts/content/heritage";
-  import { TRANSFORMATIONS } from "$lib/ts/content/void";
-  
+  import { ANCESTRY_CARDS, COMMUNITY_CARDS } from "$lib/ts/content/heritage";
+  import { TRANSFORMATION_CARDS } from "$lib/ts/content/void";
+
   let { data } = $props();
 
-const context = getCharacterContext();
-let character = $derived(context.character);
+  const context = getCharacterContext();
+  let character = $derived(context.character);
 
   let ancestryDialogOpen = $state(false);
   let communityDialogOpen = $state(false);
@@ -36,21 +36,25 @@ let character = $derived(context.character);
         subtitle={context.ancestry_card?.title || "Choose an ancestry"}
       >
         <div class="flex flex-col gap-4">
-          <p class="text-sm italic">
-            {@html ANCESTRIES.description_html}
+          <p class="text-sm italic text-muted-foreground">
+            Ancestries represent your character's lineage which affects their physical appearance
+            and access to certain special abilities.
           </p>
           {#if context.ancestry_card}
             <HeritageCard card={context.ancestry_card} />
           {/if}
-          <div class="flex gap-2 justify-between">
-            <Button onclick={() => (ancestryDialogOpen = true)}
-              >{character.ancestry_card_id ? "Change your ancestry" : "Choose an ancestry"}</Button
-            >
-            <Button
-              variant="link"
-              class={cn("text-destructive", !character.ancestry_card_id && "hidden")}
-              onclick={() => (character.ancestry_card_id = null)}>Remove</Button
-            >
+          <div class="w-full flex gap-2 justify-between">
+            {#if !character.ancestry_card_id}
+              <Button onclick={() => (ancestryDialogOpen = true)}>Choose an ancestry</Button>
+            {:else}
+              <div class="w-full flex justify-center sm:justify-end">
+                <Button
+                  variant="link"
+                  class="text-destructive"
+                  onclick={() => (character.ancestry_card_id = null)}>Remove</Button
+                >
+              </div>
+            {/if}
           </div>
         </div>
       </Dropdown>
@@ -61,22 +65,26 @@ let character = $derived(context.character);
         subtitle={context.community_card?.title || "Choose a community"}
       >
         <div class="flex flex-col gap-4">
-          <p class="text-sm italic">
-            {@html COMMUNITIES.description_html}
+          <p class="text-sm italic text-muted-foreground">
+            Communities represent a key aspect of the culture class or environment of origin that
+            has had the most influence over your character's upbringing.
           </p>
           {#if context.community_card}
             <CommunityCard card={context.community_card} />
           {/if}
 
           <div class="flex gap-2 justify-between">
-            <Button onclick={() => (communityDialogOpen = true)}
-              >{character.community_card_id ? "Change your community" : "Choose a community"}</Button
-            >
-            <Button
-              variant="link"
-              class={cn("text-destructive", !character.community_card_id && "hidden")}
-              onclick={() => (character.community_card_id = null)}>Remove</Button
-            >
+            {#if !character.community_card_id}
+              <Button onclick={() => (communityDialogOpen = true)}>Choose a community</Button>
+            {:else}
+              <div class="w-full flex justify-center sm:justify-end">
+                <Button
+                  variant="link"
+                  class={cn("text-destructive", !character.community_card_id && "hidden")}
+                  onclick={() => (character.community_card_id = null)}>Remove</Button
+                >
+              </div>
+            {/if}
           </div>
         </div>
       </Dropdown>
@@ -84,27 +92,33 @@ let character = $derived(context.character);
       <Dropdown
         highlighted={!character.transformation_card_id}
         title="Transformation"
-        subtitle={context.transformation_card?.title || "Choose a transformation"}
+        subtitle={context.transformation_card?.title + " • Void 1.5" || "Choose a transformation"}
       >
         <div class="flex flex-col gap-4">
-          <p class="text-sm italic">
-            {@html TRANSFORMATIONS.description_html}
+          <p class="text-sm italic text-muted-foreground">
+            Transformations represent changes or augmentations to characters in Daggerheart. These
+            are optional aspects of a character's identity that may be given out by the GM during a
+            campaign for narrative purposes. GMs may also present transformations as an option at
+            character creation, at their discretion.
           </p>
           {#if context.transformation_card}
             <TransformationCard card={context.transformation_card} />
           {/if}
 
           <div class="flex gap-2 justify-between">
-            <Button onclick={() => (transformationDialogOpen = true)}
-              >{character.transformation_card_id
-                ? "Change your transformation"
-                : "Choose a transformation"}</Button
-            >
-            <Button
-              variant="link"
-              class={cn("text-destructive", !character.transformation_card_id && "hidden")}
-              onclick={() => (character.transformation_card_id = null)}>Remove</Button
-            >
+            {#if !character.transformation_card_id}
+              <Button onclick={() => (transformationDialogOpen = true)}>
+                Choose a transformation
+              </Button>
+            {:else}
+              <div class="w-full flex justify-center sm:justify-end">
+                <Button
+                  variant="link"
+                  class={cn("text-destructive", !character.transformation_card_id && "hidden")}
+                  onclick={() => (character.transformation_card_id = null)}>Remove</Button
+                >
+              </div>
+            {/if}
           </div>
         </div>
       </Dropdown>
@@ -117,7 +131,7 @@ let character = $derived(context.character);
         <Dialog.Title>Select an ancestry</Dialog.Title>
       </Dialog.Header>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto p-2">
-        {#each Object.entries(ANCESTRIES.cards) as [id, card]}
+        {#each Object.entries(ANCESTRY_CARDS) as [id, card]}
           <div>
             <AncestryCard {card}
               ><Button
@@ -143,7 +157,7 @@ let character = $derived(context.character);
         <Dialog.Title>Select a community</Dialog.Title>
       </Dialog.Header>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto p-2">
-        {#each Object.entries(COMMUNITIES.cards) as [id, card]}
+        {#each Object.entries(COMMUNITY_CARDS) as [id, card]}
           <div>
             <CommunityCard {card}
               ><Button
@@ -169,7 +183,7 @@ let character = $derived(context.character);
         <Dialog.Title>Select a transformation</Dialog.Title>
       </Dialog.Header>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto p-2">
-        {#each Object.entries(TRANSFORMATIONS.cards) as [id, card]}
+        {#each Object.entries(TRANSFORMATION_CARDS) as [id, card]}
           <div>
             <TransformationCard {card}
               ><Button

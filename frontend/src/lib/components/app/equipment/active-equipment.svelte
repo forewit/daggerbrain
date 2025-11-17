@@ -12,7 +12,7 @@
 <div class="bg-primary/50 p-2 rounded-md">
   <!-- Armor Slot -->
   <p class="text-sm font-medium pb-2 pt-1 px-1">Active Armor</p>
-  <div class="flex items-center flex-wrap justify-end">
+  <div class="flex items-center justify-end gap-1">
     {#if context.armor !== null}
       <div class="grow">
         <ArmorCard armor={context.armor} />
@@ -42,7 +42,7 @@
 
     <div class="flex flex-col gap-2">
       {#if context.primary_weapon !== null}
-        <div class="flex items-center flex-wrap justify-end">
+        <div class="flex items-center justify-end gap-1">
           <div class="grow">
             <WeaponCard weapon={context.primary_weapon} bind_choices />
           </div>
@@ -62,7 +62,7 @@
         </div>
       {/if}
       {#if context.secondary_weapon !== null}
-        <div class="flex items-center flex-wrap justify-end">
+        <div class="flex items-center justify-end gap-1">
           <div class="grow">
             <WeaponCard weapon={context.secondary_weapon} bind_choices />
           </div>

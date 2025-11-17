@@ -14,17 +14,17 @@
   {/if}
 
   <!-- Stats Badges -->
-  <div class="grid sm:grid-cols-[180px_1fr] gap-4">
-    <div class="flex flex-col gap-2">
-      <div class="flex flex-wrap items-center gap-2">
-        <span class="text-xs font-medium text-muted-foreground">Armor Score:</span>
-        <div class="text-xs flex items-center gap-1 bg-foreground/5 border rounded-full px-2 py-1">
+  <div class="grid gap-4">
+    <div class="flex justify-around sm:justify-start gap-4">
+      <div class="flex flex-wrap items-center justify-center gap-1">
+        <span class="text-xs font-medium text-muted-foreground">Armor Score</span>
+        <div class="text-nowrap text-xs flex items-center gap-1 bg-foreground/5 border rounded-full px-2 py-1">
           {armor.max_armor}<Shield class="size-3.5" />
         </div>
       </div>
-      <div class="flex flex-wrap items-center gap-2">
-        <span class="text-xs font-medium text-muted-foreground">Damage Thresholds:</span>
-        <div class="text-xs bg-foreground/5 border rounded-full px-2 py-1">
+      <div class="flex flex-wrap items-center justify-center gap-1">
+        <span class="text-xs font-medium text-muted-foreground">Damage Thresholds</span>
+        <div class="text-nowrap text-xs bg-foreground/5 border rounded-full px-2 py-1">
           {armor.damage_thresholds.major} / {armor.damage_thresholds.severe}
         </div>
       </div>

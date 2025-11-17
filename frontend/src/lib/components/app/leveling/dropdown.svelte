@@ -34,7 +34,7 @@
 >
   <button
     class={cn(
-      "truncate h-14 z-10 w-full px-6 border-b bg-primary-muted relative rounded-lg flex items-center",
+      "truncate h-14 z-10 w-full px-4 border-b bg-primary-muted relative rounded-lg flex items-center",
       disabled && "opacity-50 pointer-events-none",
       className
     )}
@@ -62,7 +62,7 @@
   </button>
 
   {#if open && !disabled}
-    <div class="z-5 -mt-2 relative p-4 pt-6 rounded-b-lg border-b border-x bg-primary/5">
+    <div class="z-5 -mt-2 relative p-3 pt-6 rounded-b-lg border-b border-x bg-primary/5">
       {@render children?.()}
     </div>
   {/if}

@@ -50,10 +50,6 @@ export const ANCESTRY_CARDS = {
     },
 } as const satisfies Record<string, Card<"ancestry">>
 
-export const ANCESTRIES = {
-    description_html: "Ancestries represent your character's lineage which affects their physical appearance and access to certain special abilities.",
-    cards: ANCESTRY_CARDS,
-} as const
 
 export const COMMUNITY_CARDS = {
     warborne: {
@@ -76,7 +72,4 @@ export const COMMUNITY_CARDS = {
     }
 } as const satisfies Record<string, Card<"community">>
 
-export const COMMUNITIES = {
-    description_html: "Communities represent a key aspect of the culture class or environment of origin that has had the most influence over your character's upbringing.",
-    cards: COMMUNITY_CARDS,
-} as const
+

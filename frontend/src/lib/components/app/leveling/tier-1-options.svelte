@@ -7,7 +7,10 @@
   import { SOURCES } from "$lib/ts/character/constants";
   import { DOMAINS } from "$lib/ts/content/domains/domains";
   import DomainCardSelector from "./secondary-options/domain-card-selector.svelte";
-  import { get_available_domain_cards, get_previously_chosen_domain_card_ids } from "./domain-card-utils";
+  import {
+    get_available_domain_cards,
+    get_previously_chosen_domain_card_ids,
+  } from "./domain-card-utils";
 
   let { class: className = "" } = $props();
 
@@ -41,17 +44,17 @@
     </Dropdown>
 
     <!-- Domain Cards -->
+    <!--       subtitle={[
+        context.level_up_domain_cards[1].A?.title,
+        context.level_up_domain_cards[1].B?.title,
+      ]
+        .filter((title) => title !== undefined)
+        .join(", ")} -->
     <Dropdown
       title="Level 1"
       disabled={!character.primary_class_id}
       highlighted={context.level_up_domain_cards[1].A === null ||
         context.level_up_domain_cards[1].B === null}
-      subtitle={[
-        context.level_up_domain_cards[1].A?.title,
-        context.level_up_domain_cards[1].B?.title,
-      ]
-        .filter((title) => title !== undefined)
-        .join(", ")}
     >
       {#if context.primary_class !== null}
         {@const description_html = `<p>Choose up to 2 level 1 domain cards from the

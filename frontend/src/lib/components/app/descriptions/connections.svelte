@@ -2,11 +2,8 @@
   import { getCharacterContext } from "$lib/ts/character/character.svelte";
   import Textarea from "$lib/components/ui/textarea/textarea.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
-  import CircleMinus from "@lucide/svelte/icons/circle-minus";
   import Plus from "@lucide/svelte/icons/plus";
   import SquarePen from "@lucide/svelte/icons/square-pen";
-  import Bookmark from "@lucide/svelte/icons/bookmark";
-  import Trash from "@lucide/svelte/icons/trash";
 
   const context = getCharacterContext();
   let character = $derived(context.character);
@@ -52,12 +49,12 @@
   function startEditing(index: number) {
     editingQuestionIndex = index;
     // Focus the textarea after it's rendered
-    setTimeout(() => {
-      if (questionTextareaRef) {
-        questionTextareaRef.focus();
-        questionTextareaRef.select();
-      }
-    }, 0);
+    // setTimeout(() => {
+    //   if (questionTextareaRef) {
+    //     questionTextareaRef.focus();
+    //     questionTextareaRef.select();
+    //   }
+    // }, 0);
   }
 
   function stopEditing() {
@@ -67,8 +64,8 @@
 
 {#if character && primary_class}
   {#each character.connections as item, i}
-    <div class="bg-primary/50 p-3 rounded-md">
-      <div class="flex gap-2 items-center justify-between mb-3">
+    <div class="bg-primary/50 p-3 rounded-md flex flex-col gap-3">
+      <div class="flex gap-2 items-start justify-between">
         {#if editingQuestionIndex === i}
           <Textarea
             bind:ref={questionTextareaRef}
@@ -76,16 +73,11 @@
             placeholder="Enter your connection question..."
             class="min-h-16 grow"
             onblur={(e: FocusEvent) => {
-                setTimeout(() => {
-                    if (editingQuestionIndex === i) stopEditing();
-                }, 1000);
+              setTimeout(() => {
+                if (editingQuestionIndex === i) stopEditing();
+              }, 1000);
             }}
           />
-
-            <Button variant="link" onclick={() => removeConnection(i)} class="text-destructive px-1 w-min">
-              <Trash class="size-4" />
-              Delete
-            </Button>
         {:else}
           <Button
             class="items-start grow text-left p-0 h-auto whitespace-normal"
@@ -97,13 +89,18 @@
           </Button>
         {/if}
       </div>
-      <div class="">
-        <Textarea
-          bind:value={item.answer}
-          placeholder="Your answer..."
-          class="min-h-24"
-        />
-      </div>
+      <Textarea bind:value={item.answer} placeholder="Your answer..." class="min-h-24" />
+      {#if editingQuestionIndex === i}
+        <div class="flex justify-center sm:justify-end">
+          <Button
+            variant="link"
+            onclick={() => removeConnection(i)}
+            class="text-destructive px-1 w-min -my-2"
+          >
+            Remove
+          </Button>
+        </div>
+      {/if}
     </div>
   {/each}
 

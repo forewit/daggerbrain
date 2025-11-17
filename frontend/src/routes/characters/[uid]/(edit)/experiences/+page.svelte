@@ -33,7 +33,7 @@
     <div class="m-4 flex flex-col gap-4">
       <Dropdown
         title="Experiences"
-        subtitle={character.experiences.filter((experience) => experience.trim()).join(" • ")}
+        subtitle={character.experiences.filter((experience) => experience.trim()).join(", ")}
         highlighted={experiencesHighlighted}
       >
         <div class="text-muted-foreground text-sm italic flex flex-col gap-2">
@@ -43,7 +43,10 @@
             life When your PC makes a move they can spend a Hope to add a relevant Experience's
             modifier to an action or reaction roll.
           </p>
-          <p>You get two Experiences at character creation each with a +2 modifier.</p>
+          <p>
+            You get two Experiences at character creation each with a +2 modifier and gain more as
+            you level up.
+          </p>
         </div>
         {#each character.experiences as experience, i}
           <div class="mt-4 bg-primary/50 px-2 py-3 rounded-md flex items-center">

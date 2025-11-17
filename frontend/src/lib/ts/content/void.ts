@@ -26,9 +26,3 @@ export const TRANSFORMATION_CARDS = {
         ],
     }
 } as const satisfies Record<string, Card<"transformation">>
-
-
-export const TRANSFORMATIONS = {
-    description_html: "Transformations represent changes or augmentations to characters in Daggerheart. These are optional aspects of a character's identity that may be given out by the GM during a campaign for narrative purposes. GMs may also present transformations as an option at character creation, at their discretion.",
-    cards: TRANSFORMATION_CARDS,
-} as const

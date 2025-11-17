@@ -212,6 +212,14 @@
         addAdventuringGear(gear);
       }
     }
+
+    // Reset the selections
+    selectedPrimaryWeapon = false;
+    selectedSecondaryWeapon = false;
+    selectedArmor = false;
+    selectedSupplies = false;
+    selectedLootOption = null;
+    selectedClassGearOption = null;
   }
 </script>
 
@@ -242,7 +250,7 @@
       {#if suggestedPrimaryWeapon}
         <Label
           class={cn(
-            "text-muted-foreground cursor-pointer font-normal",
+            "text-muted-foreground cursor-pointer font-normal text-sm",
             selectedPrimaryWeapon && "text-foreground"
           )}
         >
@@ -256,7 +264,7 @@
       {#if suggestedSecondaryWeapon}
         <Label
           class={cn(
-            "text-muted-foreground cursor-pointer font-normal",
+            "text-muted-foreground cursor-pointer font-normal text-sm",
             selectedSecondaryWeapon && " text-foreground"
           )}
         >
@@ -270,7 +278,7 @@
       {#if suggestedArmor}
         <Label
           class={cn(
-            "text-muted-foreground cursor-pointer font-normal",
+            "text-muted-foreground cursor-pointer font-normal text-sm",
             selectedArmor && "text-foreground"
           )}
         >
@@ -283,7 +291,7 @@
       <!-- Supplies (Free Gear + Gold) -->
       <Label
         class={cn(
-          "text-muted-foreground cursor-pointer font-normal",
+          "text-muted-foreground cursor-pointer font-normal text-sm",
           selectedSupplies && "text-foreground"
         )}
       >

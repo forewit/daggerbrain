@@ -88,7 +88,7 @@
       {/if}
 
       <!-- traits -->
-      <div class="grid grid-cols-1 @xs:grid-cols-2 @lg:grid-cols-3 gap-5 justify-items-center">
+      <div class="grid grid-cols-1 @xs:grid-cols-2 @lg:grid-cols-3 gap-3 justify-items-center">
         {#each Object.entries(character.selected_traits) as [trait, modifier], i}
           {@const total = context.traits[trait as keyof Traits] || 0}
           {@const bonus = total - (modifier || 0)}

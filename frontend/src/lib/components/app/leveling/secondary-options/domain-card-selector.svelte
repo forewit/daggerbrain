@@ -141,7 +141,6 @@
       <Button
         size="icon"
         variant="link"
-        class="text-destructive"
         onclick={() => (selected_card_id = null)}
       >
         <CircleMinus class="size-4" />

@@ -13,6 +13,8 @@
   import Trash2 from "@lucide/svelte/icons/trash-2";
   import CirclePlus from "@lucide/svelte/icons/circle-plus";
   import Search from "@lucide/svelte/icons/search";
+  import Minus from "@lucide/svelte/icons/minus";
+  import X from "@lucide/svelte/icons/x";
 
   const context = getCharacterContext();
   let character = $derived(context.character);
@@ -161,7 +163,7 @@
     Object.keys(context.inventory_armor).length > 0 ||
     Object.keys(character.inventory.consumables).length > 0 ||
     character.inventory.adventuring_gear.length > 0}
-  <div class="flex flex-col gap-2">
+  <div class="flex flex-col gap-4">
     {#if !hasItems}
       <p class="text-sm text-muted-foreground text-center py-4">Your inventory is empty</p>
     {:else}
@@ -174,6 +176,7 @@
       </div>
 
       {#if filteredWeapons.length > 0}
+        <div class="gap-1 flex flex-col">
         <p class="ml-2 font-medium">Weapons</p>
 
         {#each filteredWeapons as weapon (weapon.id)}
@@ -217,8 +220,8 @@
 
           <Dropdown {title_snippet} {subtitle_snippet} class="border-2">
             <WeaponDetails {weapon} />
-            <div class="flex justify-end mt-2 -mb-2">
-              {#if isWeaponEquipped(weapon)}
+            <div class="flex justify-center sm:justify-end mt-1 -mb-2">
+              <!-- {#if isWeaponEquipped(weapon)}
                 <Button variant="link" onclick={() => unequipWeapon(weapon)}>
                   <CircleMinus class="size-4" /> Unequip
                 </Button>
@@ -226,61 +229,63 @@
                 <Button variant="link" onclick={() => equipWeapon(weapon)}
                   ><CirclePlus class="size-4" /> Equip</Button
                 >
-              {/if}
+              {/if} -->
               <Button variant="link" class="text-destructive" onclick={() => removeWeapon(weapon)}>
-                <Trash2 class="size-4" />
+                <!-- <Trash2 class="size-4" /> -->
                 Remove
               </Button>
             </div>
           </Dropdown>
         {/each}
+        </div>
       {/if}
 
       {#if filteredArmor.length > 0}
-        <p class="ml-2 font-medium">Armor</p>
+        <div class="gap-1 flex flex-col">
+          <p class="ml-2 font-medium">Armor</p>
 
-        {#each filteredArmor as armor (armor.id)}
-          {#snippet subtitle_snippet()}
-            {@const equipped = isArmorEquipped(armor)}
-            <div class="flex items-center gap-2">
-              {#if equipped}
-                <span class="text-xs italic text-muted-foreground">Equipped</span>
-              {:else}
-                {@const canEquipItem = canEquip(armor)}
-                <Button
-                  size="sm"
-                  onclick={(e) => {
-                    e.stopPropagation();
-                    if (canEquipItem) equipArmor(armor);
-                  }}
-                  disabled={!canEquipItem}
-                  title={canEquipItem ? undefined : "Level requirement not met"}
-                >
-                  Equip
-                </Button>
-              {/if}
-            </div>
-          {/snippet}
-
-          {#snippet title_snippet()}
-            {@const quantity = character.inventory.armor[armor.id]?.quantity ?? 0}
-            <div class="text-left gap-4">
-              <p class="text-md font-medium">
-                {armor.title}
-                {#if quantity > 1}
-                  <span class="ml-1 text-sm italic text-muted-foreground">x{quantity}</span>
+          {#each filteredArmor as armor (armor.id)}
+            {#snippet subtitle_snippet()}
+              {@const equipped = isArmorEquipped(armor)}
+              <div class="flex items-center gap-2">
+                {#if equipped}
+                  <span class="text-xs italic text-muted-foreground">Equipped</span>
+                {:else}
+                  {@const canEquipItem = canEquip(armor)}
+                  <Button
+                    size="sm"
+                    onclick={(e) => {
+                      e.stopPropagation();
+                      if (canEquipItem) equipArmor(armor);
+                    }}
+                    disabled={!canEquipItem}
+                    title={canEquipItem ? undefined : "Level requirement not met"}
+                  >
+                    Equip
+                  </Button>
                 {/if}
-              </p>
-              <p class="text-[10px] text-muted-foreground leading-none italic truncate">
-                Tier {context.get_tier_from_level(armor.level_requirement)} Armor
-              </p>
-            </div>
-          {/snippet}
+              </div>
+            {/snippet}
 
-          <Dropdown {title_snippet} {subtitle_snippet} class="border-2">
-            <ArmorDetails {armor} />
-            <div class="flex justify-end mt-2 -mb-2">
-              {#if isArmorEquipped(armor)}
+            {#snippet title_snippet()}
+              {@const quantity = character.inventory.armor[armor.id]?.quantity ?? 0}
+              <div class="text-left gap-4">
+                <p class="text-md font-medium">
+                  {armor.title}
+                  {#if quantity > 1}
+                    <span class="ml-1 text-sm italic text-muted-foreground">x{quantity}</span>
+                  {/if}
+                </p>
+                <p class="text-[10px] text-muted-foreground leading-none italic truncate">
+                  Tier {context.get_tier_from_level(armor.level_requirement)} Armor
+                </p>
+              </div>
+            {/snippet}
+
+            <Dropdown {title_snippet} {subtitle_snippet} class="border-2">
+              <ArmorDetails {armor} />
+              <div class="flex justify-center sm:justify-end mt-1 -mb-2">
+                <!-- {#if isArmorEquipped(armor)}
                 <Button variant="link" onclick={() => unequipArmor(armor)}>
                   <CircleMinus class="size-4" /> Unequip
                 </Button>
@@ -288,74 +293,70 @@
                 <Button variant="link" onclick={() => equipArmor(armor)}
                   ><CirclePlus class="size-4" /> Equip</Button
                 >
-              {/if}
-              <Button variant="link" class="text-destructive" onclick={() => removeArmor(armor)}>
-                <Trash2 class="size-4" />
-                Remove
-              </Button>
-            </div>
-          </Dropdown>
-        {/each}
+              {/if} -->
+                <Button variant="link" class="text-destructive" onclick={() => removeArmor(armor)}>
+                  <!-- <Trash2 class="size-4" /> -->
+                  Remove
+                </Button>
+              </div>
+            </Dropdown>
+          {/each}
+        </div>
       {/if}
 
       {#if filteredConsumables.length > 0}
-        <p class="ml-2 font-medium">Consumables</p>
+        <div class="gap-1 flex flex-col">
+          <p class="ml-2 font-medium">Consumables</p>
 
-        {#each filteredConsumables as consumable (consumable.id)}
-          {#snippet title_snippet()}
-            {@const quantity = character.inventory.consumables[consumable.id]?.quantity ?? 0}
-            <div class="text-left gap-4">
-              <p class="text-md font-medium">
-                {consumable.title}
-                {#if quantity > 1}
-                  <span class="ml-1 text-sm italic text-muted-foreground">x{quantity}</span>
-                {/if}
-              </p>
-            </div>
-          {/snippet}
+          {#each filteredConsumables as consumable (consumable.id)}
+            {#snippet title_snippet()}
+              {@const quantity = character.inventory.consumables[consumable.id]?.quantity ?? 0}
+              <div class="text-left gap-4">
+                <p class="text-md font-medium">
+                  {consumable.title}
+                  {#if quantity > 1}
+                    <span class="ml-1 text-sm italic text-muted-foreground">x{quantity}</span>
+                  {/if}
+                </p>
+              </div>
+            {/snippet}
 
-          <Dropdown {title_snippet} class="border-2">
-            <ConsumableDetails {consumable} />
-            <div class="flex justify-end mt-2 -mb-2">
-              <Button
-                variant="link"
-                class="text-destructive"
-                onclick={() => removeConsumable(consumable)}
-              >
-                <Trash2 class="size-4" />
-                Remove
-              </Button>
-            </div>
-          </Dropdown>
-        {/each}
+            <Dropdown {title_snippet} class="border-2">
+              <ConsumableDetails {consumable} />
+              <div class="flex justify-center sm:justify-end mt-1 -mb-2">
+                <Button
+                  variant="link"
+                  class="text-destructive"
+                  onclick={() => removeConsumable(consumable)}
+                >
+                  Remove
+                </Button>
+              </div>
+            </Dropdown>
+          {/each}
+        </div>
       {/if}
 
       {#if filteredAdventuringGear.length > 0}
-        <p class="ml-2 font-medium">Adventuring Gear</p>
+        <div class="gap-1 flex flex-col">
+          <p class="ml-2 font-medium">Adventuring Gear</p>
 
-        {#each filteredAdventuringGear as { gear, originalIndex } (originalIndex)}
-          {#snippet title_snippet()}
-            <div class="text-left gap-4">
-              <p class="text-md font-medium">{gear.title}</p>
-            </div>
-          {/snippet}
-
-          <Dropdown {title_snippet} class="border-2">
-            <div class="text-sm text-muted-foreground">
-              <p>Adventuring Gear</p>
-            </div>
-            <div class="flex justify-end mt-2 -mb-2">
-              <Button
-                variant="link"
-                class="text-destructive"
-                onclick={() => removeAdventuringGear(gear, originalIndex)}
-              >
-                <Trash2 class="size-4" />
-                Remove
-              </Button>
-            </div>
-          </Dropdown>
-        {/each}
+          <ul class="">
+            {#each filteredAdventuringGear as { gear, originalIndex } (originalIndex)}
+              <li class="flex items-center text-sm text-muted-foreground">
+                <span class="ml-4 mr-3">•</span>
+                {gear.title}
+                <Button
+                  variant="link"
+                  class="ml-auto h-auto text-foreground"
+                  onclick={() => removeAdventuringGear(gear, originalIndex)}
+                >
+                  <CircleMinus class="size-4" />
+                </Button>
+              </li>
+            {/each}
+          </ul>
+        </div>
       {/if}
 
       {#if searchQuery.trim() && filteredWeapons.length === 0 && filteredArmor.length === 0 && filteredConsumables.length === 0 && filteredAdventuringGear.length === 0}

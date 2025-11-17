@@ -5,7 +5,7 @@
   import Plus from "@lucide/svelte/icons/plus";
   import SquarePen from "@lucide/svelte/icons/square-pen";
   import Bookmark from "@lucide/svelte/icons/bookmark";
-  import Trash from "@lucide/svelte/icons/trash";
+  import Trash2 from "@lucide/svelte/icons/trash-2";
 
   const context = getCharacterContext();
   let character = $derived(context.character);
@@ -51,12 +51,12 @@
   function startEditing(index: number) {
     editingQuestionIndex = index;
     // Focus the textarea after it's rendered
-    setTimeout(() => {
-      if (questionTextareaRef) {
-        questionTextareaRef.focus();
-        questionTextareaRef.select();
-      }
-    }, 0);
+    // setTimeout(() => {
+    //   if (questionTextareaRef) {
+    //     questionTextareaRef.focus();
+    //     questionTextareaRef.select();
+    //   }
+    // }, 0);
   }
 
   function stopEditing() {
@@ -66,8 +66,8 @@
 
 {#if character && primary_class}
   {#each character.background_questions as item, i}
-    <div class="bg-primary/50 p-3 rounded-md">
-      <div class="flex gap-2 items-center justify-between mb-3">
+    <div class="bg-primary/50 p-3 rounded-md flex flex-col gap-3">
+      <div class="flex gap-2 items-start justify-between">
         {#if editingQuestionIndex === i}
           <Textarea
             bind:ref={questionTextareaRef}
@@ -80,15 +80,6 @@
               }, 1000);
             }}
           />
-
-          <Button
-            variant="link"
-            onclick={() => removeQuestion(i)}
-            class="text-destructive px-1 w-min"
-          >
-            <Trash class="size-4" />
-            Delete
-          </Button>
         {:else}
           <Button
             class="items-start grow text-left p-0 h-auto whitespace-normal"
@@ -100,13 +91,18 @@
           </Button>
         {/if}
       </div>
-      <div class="">
-        <Textarea
-          bind:value={item.answer}
-          placeholder="Your answer..."
-          class="min-h-24"
-        />
-      </div>
+      <Textarea bind:value={item.answer} placeholder="Your answer..." class="min-h-24" />
+      {#if editingQuestionIndex === i}
+        <div class="flex justify-center sm:justify-end">
+          <Button
+            variant="link"
+            onclick={() => removeQuestion(i)}
+            class="text-destructive px-1 w-min -my-2"
+          >
+            Remove
+          </Button>
+        </div>
+      {/if}
     </div>
   {/each}
 
