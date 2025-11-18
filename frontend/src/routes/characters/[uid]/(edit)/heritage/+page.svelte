@@ -33,7 +33,7 @@
       <Dropdown
         highlighted={!character.ancestry_card_id}
         title="Ancestry"
-        subtitle={context.ancestry_card?.title || "Choose an ancestry"}
+        subtitle={context.ancestry_card?.title || ""}
       >
         <div class="flex flex-col gap-4">
           <p class="text-sm italic text-muted-foreground">
@@ -62,7 +62,7 @@
       <Dropdown
         highlighted={!character.community_card_id}
         title="Community"
-        subtitle={context.community_card?.title || "Choose a community"}
+        subtitle={context.community_card?.title || ""}
       >
         <div class="flex flex-col gap-4">
           <p class="text-sm italic text-muted-foreground">
@@ -92,7 +92,9 @@
       <Dropdown
         highlighted={!character.transformation_card_id}
         title="Transformation"
-        subtitle={context.transformation_card?.title + " • Void 1.5" || "Choose a transformation"}
+        subtitle={context.transformation_card?.title
+          ? context.transformation_card?.title + " • Void 1.5"
+          : ""}
       >
         <div class="flex flex-col gap-4">
           <p class="text-sm italic text-muted-foreground">

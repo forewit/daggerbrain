@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
   import Checkbox from "$lib/components/ui/checkbox/checkbox.svelte";
   import Label from "$lib/components/ui/label/label.svelte";
   import { getAppContext } from "$lib/ts/app.svelte";
@@ -55,8 +56,13 @@
             >
             <Dialog.Close
               class={buttonVariants({ variant: "destructive" })}
-              onclick={() => {
-                app.deleteCharacter(character.uid);
+              onclick={async () => {
+                try {
+                  await app.deleteCharacter(character.uid);
+                  await goto("/characters/");
+                } catch (error) {
+                  console.error(error);
+                }
               }}>Delete</Dialog.Close
             >
           </Dialog.Footer>

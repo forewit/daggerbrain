@@ -18,11 +18,15 @@
     showDeleteDialog = true;
   }
 
-  function confirmDelete() {
+  async function confirmDelete() {
     if (characterToDelete) {
-      app.deleteCharacter(characterToDelete.uid);
-      characterToDelete = null;
-      showDeleteDialog = false;
+      try {
+        await app.deleteCharacter(characterToDelete.uid);
+        characterToDelete = null;
+        showDeleteDialog = false;
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 
@@ -42,26 +46,30 @@
       <Button
         variant="outline"
         class="ml-auto"
-        onclick={() => {
+        onclick={async () => {
           redirecting = true;
-          const uid = app.newJustJames();
-          goto(`/characters/${uid}/edit/`).catch((err) => {
+          try {
+            const uid = await app.newJustJames();
+            await goto(`/characters/${uid}/edit/`);
+          } catch (err) {
             console.error(err);
             redirecting = false;
-          });
+          }
         }}
       >
         +JJ
       </Button>
       <Button
         variant="outline"
-        onclick={() => {
+        onclick={async () => {
           redirecting = true;
-          const uid = app.newCharacter();
-          goto(`/characters/${uid}/edit/`).catch((err) => {
+          try {
+            const uid = await app.newCharacter();
+            await goto(`/characters/${uid}/edit/`);
+          } catch (err) {
             console.error(err);
             redirecting = false;
-          });
+          }
         }}
       >
         <Plus /> New Character
