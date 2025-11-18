@@ -44,9 +44,22 @@
 
   let fileInput = $state<HTMLInputElement>();
 
-  function onImageUploadSuccess(dataUrl: string) {
-    if (character) {
-      character.image = dataUrl;
+  async function onImageUploadSuccess(dataUrl: string) {
+    if (!character) return;
+    
+    try {
+      // Upload to R2 and get URL
+      const { uploadCharacterImage } = await import("$lib/ts/images.remote");
+      const result = await uploadCharacterImage({
+        characterId: character.uid,
+        imageData: dataUrl
+      });
+      
+      // Update character with R2 URL instead of base64
+      character.image = result.url;
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+      alert('Failed to upload image. Please try again.');
     }
   }
 

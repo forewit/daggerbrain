@@ -4,6 +4,7 @@ import { getContext, setContext } from 'svelte';
 import { get_ancestry_card, get_armor, get_class, get_community_card, get_domain_card, get_transformation_card, get_weapon } from './helpers';
 import type { Card, Character, Class, CharacterCondition, DamageThresholds, LevelUpChoice, LevelUpOption, CharacterModifier, Subclass, Traits, Weapon, WeaponModifier, WeaponChoices, Armor } from './types';
 import { BLANK_LEVEL_UP_CHOICE } from './constants';
+import { updateCharacter } from '../characters.remote';
 
 function createCharacter(uid: string) {
     const app = getAppContext();
@@ -1729,6 +1730,48 @@ function createCharacter(uid: string) {
         if (level >= 5 && level <= 7) return "3";
         return "4";
     }
+
+    // Auto-save character changes to database
+    let isInitialLoad = $state(true);
+    let lastSavedCharacter = $state<string | null>(null);
+    
+    // Track when character is first loaded to avoid saving on initial load
+    $effect(() => {
+        if (character && isInitialLoad) {
+            // Small delay to ensure this is the initial load, not a user change
+            const timer = setTimeout(() => {
+                isInitialLoad = false;
+                // Set initial saved state
+                lastSavedCharacter = JSON.stringify(character);
+            }, 500);
+            return () => clearTimeout(timer);
+        }
+    });
+    
+    // Simple effect to save whenever character changes (but only if it actually changed)
+    $effect(() => {
+        if (!character || isInitialLoad) return;
+        
+        const currentCharacterJson = JSON.stringify(character);
+        // Only save if the character actually changed from the last saved state
+        if (currentCharacterJson === lastSavedCharacter) return;
+        
+        // Update last saved state immediately to prevent duplicate saves
+        lastSavedCharacter = currentCharacterJson;
+        
+        // Use JSON serialization for deep clone to avoid structuredClone issues
+        const cloned = JSON.parse(JSON.stringify(character));
+        updateCharacter(cloned)
+            .then(() => {
+                // Update lastSavedCharacter after successful save to match what's in DB
+                lastSavedCharacter = JSON.stringify(character);
+            })
+            .catch((error) => {
+                console.error('Failed to auto-save character:', error);
+                // Reset lastSavedCharacter on error so we can retry
+                lastSavedCharacter = null;
+            });
+    });
 
     // --- cleanup ---
     const destroy = () => { }

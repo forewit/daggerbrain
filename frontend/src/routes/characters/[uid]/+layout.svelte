@@ -11,7 +11,7 @@
   const character = $derived(context.character);
 
   $effect(() => {
-    if (!character && app.initialLoad) {
+    if (!character) {
       goto("/characters");
     }
   });

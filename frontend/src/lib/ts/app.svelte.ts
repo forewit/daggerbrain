@@ -1,81 +1,89 @@
 import type { Character } from './character/types';
 import { getContext, setContext } from 'svelte';
-import { loadCharacters, saveCharacters } from './data';
-import { JUST_JAMES, NEW_CHARACTER } from './character/constants';
+import { loadCharacters } from './data';
+import {
+	createCharacter as createCharacterCommand,
+	createJustJames as createJustJamesCommand,
+	deleteCharacter as deleteCharacterCommand,
+	getCharacters
+} from './characters.remote';
 
-function createApp() {
-  // --- ephemeral state ---
-  let showFooter = $state(true);
+function createApp(initialCharacters: Character[] = []) {
+	let showFooter = $state(true);
+	let characters: Character[] = $state(structuredClone(initialCharacters));
 
-  // --- persistant state --- 
-  let characters: Character[] = $state([])
+	async function refreshCharacters() {
+		try {
+			const latest = await loadCharacters();
+			characters = structuredClone(latest);
+		} catch (error) {
+			console.error('Failed to refresh characters', error);
+		}
+	}
 
-  // --- derived state ---
+	async function newCharacter(from?: string): Promise<string> {
+		try {
+			const response = await createCharacterCommand({ fromUid: from ?? null }).updates(
+				getCharacters()
+			);
+			await refreshCharacters();
+			return response.uid;
+		} catch (error) {
+			console.error('Failed to create character', error);
+			throw error;
+		}
+	}
 
-  // --- helper functions ---
-  function newCharacter(from?: string): string {
-    const uid = crypto.randomUUID()
-    if (from) {
-      const character = characters.find((c) => c.uid === from)
-      if (character) {
-        characters.push({ ...JSON.parse(JSON.stringify(character)), uid })
-      }
-    } else {
-      characters.push({ ...JSON.parse(JSON.stringify(NEW_CHARACTER)), uid })
-    }
-    return uid
-  }
+	async function newJustJames(): Promise<string> {
+		try {
+			const response = await createJustJamesCommand().updates(getCharacters());
+			await refreshCharacters();
+			return response.uid;
+		} catch (error) {
+			console.error('Failed to create Just-James', error);
+			throw error;
+		}
+	}
 
-  function newJustJames(from?: string): string {
-    const uid = crypto.randomUUID()
-    characters.push({ ...JSON.parse(JSON.stringify(JUST_JAMES)), uid })
+	async function deleteCharacter(uid: string): Promise<void> {
+		try {
+			await deleteCharacterCommand({ uid }).updates(getCharacters());
+			await refreshCharacters();
+		} catch (error) {
+			console.error('Failed to delete character', error);
+			throw error;
+		}
+	}
 
-    return uid
-  }
+	const destroy = () => {
+		// noop for now
+	};
 
-  function deleteCharacter(uid: string): void {
-    characters = characters.filter((c) => c.uid !== uid)
-  }
-
-  // --- loading and saving handlers ---
-  let initialLoad = $state(false)
-  $effect(() => {
-    if (initialLoad) return;
-    characters = loadCharacters([])
-    initialLoad = true;
-  })
-  $effect(() => {
-    characters
-    if (!initialLoad) return
-    saveCharacters(characters)
-  })
-
-  // --- cleanup ---
-  const destroy = () => { }
-
-  return {
-    // read only
-    get initialLoad() { return initialLoad },
-    get characters() { return characters },
-
-    // helper functions
-    destroy,
-    newCharacter,
-    newJustJames,
-    deleteCharacter,
-
-    get showFooter() { return showFooter },
-    set showFooter(value) { showFooter = value },
-  }
+	return {
+		get characters() {
+			return characters;
+		},
+		newCharacter,
+		newJustJames,
+		deleteCharacter,
+		refreshCharacters,
+		destroy,
+		get showFooter() {
+			return showFooter;
+		},
+		set showFooter(value: boolean) {
+			showFooter = value;
+		}
+	};
 }
 
-const APP_KEY = Symbol('App')
+const APP_KEY = Symbol('App');
 
-export const setAppContext = () => {
-  const newApp = createApp();
-  return setContext(APP_KEY, newApp)
-}
+export const setAppContext = (initialCharacters: Character[] = []) => {
+	const newApp = createApp(initialCharacters);
+	return setContext(APP_KEY, newApp);
+};
 
 export const getAppContext = (): ReturnType<typeof setAppContext> => {
-  return getContext(APP_KEY)
-}
+	return getContext(APP_KEY);
+};
