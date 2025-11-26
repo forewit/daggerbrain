@@ -2,7 +2,7 @@ import { getUserContext } from './user.svelte';
 import { ALL_LEVEL_UP_OPTIONS, BASE_STATS, TRAIT_OPTIONS } from '../types/rules';
 import { getContext, setContext } from 'svelte';
 import type { Character, DomainCardId } from '$lib/types/character-types';
-import type { AllTierOptionIds, LevelUpChoice, } from '$lib/types/rule-types';
+import type { AllTierOptionIds, LevelUpChoice } from '$lib/types/rule-types';
 import type {
 	DamageThresholds,
 	Traits,
@@ -10,7 +10,7 @@ import type {
 	CharacterCondition,
 	CharacterModifier,
 	WeaponModifier,
-	DomainCard,
+	DomainCard
 } from '$lib/types/compendium-types';
 import { BLANK_LEVEL_UP_CHOICE } from '$lib/types/constants';
 import { update_character } from '$lib/remote/characters.remote';
@@ -21,9 +21,9 @@ function createCharacter(id: string) {
 	const compendium = getCompendiumContext();
 
 	let character = <Character | null>$state(null);
-	$effect(()=>{
-		character = user.all_characters.find((c) => c.id === id) || null
-	})
+	$effect(() => {
+		character = user.all_characters.find((c) => c.id === id) || null;
+	});
 
 	// ================================================
 	// DERIVED COMPENDIUM REFERENCES

@@ -10,7 +10,14 @@ import { join } from 'node:path';
  * and allows drizzle-kit push to work with it directly.
  */
 
-const D1_STATE_DIR = join(process.cwd(), '.wrangler', 'state', 'v3', 'd1', 'miniflare-D1DatabaseObject');
+const D1_STATE_DIR = join(
+	process.cwd(),
+	'.wrangler',
+	'state',
+	'v3',
+	'd1',
+	'miniflare-D1DatabaseObject'
+);
 
 /**
  * Find the SQLite database file in the miniflare D1 state directory.
@@ -46,4 +53,3 @@ export default defineConfig({
 	verbose: true,
 	strict: true
 });
-

@@ -26,4 +26,3 @@ export const get_all_sources = query(async () => {
 
 	return validatedSources;
 });
-

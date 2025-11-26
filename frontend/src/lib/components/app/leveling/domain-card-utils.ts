@@ -1,7 +1,7 @@
-import { getCharacterContext } from "$lib/state/character.svelte";
-import { getCompendiumContext } from "$lib/state/compendium.svelte";
-import type { DomainCardId } from "$lib/types/character-types";
-import type { DomainCard, DomainIds } from "$lib/types/compendium-types";
+import { getCharacterContext } from '$lib/state/character.svelte';
+import { getCompendiumContext } from '$lib/state/compendium.svelte';
+import type { DomainCardId } from '$lib/types/character-types';
+import type { DomainCard, DomainIds } from '$lib/types/compendium-types';
 
 /**
  * Calculate previously chosen domain cards up to the given level.
@@ -11,31 +11,34 @@ import type { DomainCard, DomainIds } from "$lib/types/compendium-types";
  * @returns Array of previously chosen domain cards
  */
 export function get_previously_chosen_domain_card_ids(
-  context: ReturnType<typeof getCharacterContext>,
-  level: number,
-  option_ids_to_check: string[]
+	context: ReturnType<typeof getCharacterContext>,
+	level: number,
+	option_ids_to_check: string[]
 ): DomainCardId[] {
-  if (!context.character) return [];
-  const domain_card_ids = Object.values(context.character.level_up_domain_card_ids[1]).filter(
-    (id) => id !== null
-  );
+	if (!context.character) return [];
+	const domain_card_ids = Object.values(context.character.level_up_domain_card_ids[1]).filter(
+		(id) => id !== null
+	);
 
-  for (let i = 2; i <= level; i++) {
-    const level_up_domain_card_ids =
-      context.character.level_up_domain_card_ids[i as keyof typeof context.character.level_up_domain_card_ids];
-    if (level_up_domain_card_ids.A !== null) domain_card_ids.push(level_up_domain_card_ids.A);
+	for (let i = 2; i <= level; i++) {
+		const level_up_domain_card_ids =
+			context.character.level_up_domain_card_ids[
+				i as keyof typeof context.character.level_up_domain_card_ids
+			];
+		if (level_up_domain_card_ids.A !== null) domain_card_ids.push(level_up_domain_card_ids.A);
 
-    const choices = context.character.level_up_choices[i as keyof typeof context.character.level_up_choices];
-    if (option_ids_to_check.includes(choices.A.option_id || "")) {
-      if (choices.A.selected_domain_card_id !== null)
-        domain_card_ids.push(choices.A.selected_domain_card_id);
-    }
-    if (option_ids_to_check.includes(choices.B.option_id || "")) {
-      if (choices.B.selected_domain_card_id !== null)
-        domain_card_ids.push(choices.B.selected_domain_card_id);
-    }
-  }
-  return domain_card_ids;
+		const choices =
+			context.character.level_up_choices[i as keyof typeof context.character.level_up_choices];
+		if (option_ids_to_check.includes(choices.A.option_id || '')) {
+			if (choices.A.selected_domain_card_id !== null)
+				domain_card_ids.push(choices.A.selected_domain_card_id);
+		}
+		if (option_ids_to_check.includes(choices.B.option_id || '')) {
+			if (choices.B.selected_domain_card_id !== null)
+				domain_card_ids.push(choices.B.selected_domain_card_id);
+		}
+	}
+	return domain_card_ids;
 }
 
 /**
@@ -48,41 +51,40 @@ export function get_previously_chosen_domain_card_ids(
  * @returns Array of available domain cards
  */
 export function get_available_domain_cards(
-  context: ReturnType<typeof getCharacterContext>,
-  level: number,
-  max_level: number,
-  include_secondary_class_domain: boolean = false
+	context: ReturnType<typeof getCharacterContext>,
+	level: number,
+	max_level: number,
+	include_secondary_class_domain: boolean = false
 ): Record<string, DomainCard> {
-  if (!context.primary_class || !context.character) return {};
-  const primary_domain_id = context.primary_class.primary_domain_id;
-  const secondary_domain_id = context.primary_class.secondary_domain_id;
-  const secondary_class_domain_id_choice = context.character.secondary_class_domain_id_choice;
+	if (!context.primary_class || !context.character) return {};
+	const primary_domain_id = context.primary_class.primary_domain_id;
+	const secondary_domain_id = context.primary_class.secondary_domain_id;
+	const secondary_class_domain_id_choice = context.character.secondary_class_domain_id_choice;
 
-  const compendium = getCompendiumContext();
-  let domain_cards: Record<string, DomainCard> = {
-    ...compendium.domain_cards[primary_domain_id],
-    ...compendium.domain_cards[secondary_domain_id]
-  }
+	const compendium = getCompendiumContext();
+	let domain_cards: Record<string, DomainCard> = {
+		...compendium.domain_cards[primary_domain_id],
+		...compendium.domain_cards[secondary_domain_id]
+	};
 
-  if (
-    secondary_class_domain_id_choice &&
-    include_secondary_class_domain &&
-    secondary_class_domain_id_choice !== primary_domain_id &&
-    secondary_class_domain_id_choice !== secondary_domain_id
-  ) {
-    domain_cards = {
-      ...domain_cards,
-      ...compendium.domain_cards[secondary_class_domain_id_choice as DomainIds]
-    }
-  }
+	if (
+		secondary_class_domain_id_choice &&
+		include_secondary_class_domain &&
+		secondary_class_domain_id_choice !== primary_domain_id &&
+		secondary_class_domain_id_choice !== secondary_domain_id
+	) {
+		domain_cards = {
+			...domain_cards,
+			...compendium.domain_cards[secondary_class_domain_id_choice as DomainIds]
+		};
+	}
 
-  // remove any cards that are not valid for the current level
-  for (const [id, card] of Object.entries(domain_cards)) {
-    if (card.level_requirement > Math.min(level, max_level)) {
-      delete domain_cards[id];
-    }
-  }
+	// remove any cards that are not valid for the current level
+	for (const [id, card] of Object.entries(domain_cards)) {
+		if (card.level_requirement > Math.min(level, max_level)) {
+			delete domain_cards[id];
+		}
+	}
 
-  return domain_cards;
+	return domain_cards;
 }
-

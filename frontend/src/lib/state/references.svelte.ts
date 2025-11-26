@@ -54,15 +54,11 @@ const context = getCharacterContext();
 let character = $derived(context.character);
 
 export let ancestry_card = $derived(
-	character?.ancestry_card_id
-		? await get_ancestry_card(character.ancestry_card_id)
-		: null
+	character?.ancestry_card_id ? await get_ancestry_card(character.ancestry_card_id) : null
 );
 
 export let community_card = $derived(
-	character?.community_card_id
-		? await get_community_card(character.community_card_id)
-		: null
+	character?.community_card_id ? await get_community_card(character.community_card_id) : null
 );
 
 export let transformation_card = $derived(
@@ -112,10 +108,7 @@ export let level_up_domain_cards = $derived.by(async () => {
 });
 
 export let additional_domain_cards = $derived(
-	await Promise.all(
-		character?.additional_domain_card_ids || []
-			.map((id) => get_domain_card(id))
-	)
+	await Promise.all(character?.additional_domain_card_ids || [].map((id) => get_domain_card(id)))
 );
 
 export let primary_weapon = $derived(
@@ -136,12 +129,9 @@ export let armor = $derived(
 
 export let inventory_primary_weapons = $derived(
 	await Promise.all(
-		Object.keys(character?.inventory.primary_weapons || {})
-			.map((id) => get_primary_weapon(id))
+		Object.keys(character?.inventory.primary_weapons || {}).map((id) => get_primary_weapon(id))
 	)
 );
-
-
 
 // todo: move to stats.svelte
 export let leve_up_chosen_options = $derived.by(() => {

@@ -10,7 +10,6 @@ export type WithoutChildren<T> = T extends { children?: any } ? Omit<T, 'childre
 export type WithoutChildrenOrChild<T> = WithoutChildren<WithoutChild<T>>;
 export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & { ref?: U | null };
 
-
 export function capitalize(string: string): string {
 	return string.charAt(0).toUpperCase() + string.slice(1);
-  }
+}

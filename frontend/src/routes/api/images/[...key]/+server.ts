@@ -38,4 +38,3 @@ export const GET: RequestHandler = async ({ params, platform }) => {
 	// Return the image as a Response
 	return new Response(arrayBuffer, { headers });
 };
-

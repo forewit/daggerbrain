@@ -1,230 +1,239 @@
 <script lang="ts">
-  import Button from "$lib/components/ui/button/button.svelte";
-  import Input from "$lib/components/ui/input/input.svelte";
-  import type { Weapon, Armor, Consumable, AdventuringGear } from "$lib/types/compendium-types";
-  import WeaponDetails from "./weapon-details.svelte";
-  import ArmorDetails from "./armor-details.svelte";
-  import ConsumableDetails from "./consumable-details.svelte";
-  import Dropdown from "../leveling/dropdown.svelte";
-  import { getCharacterContext } from "$lib/state/character.svelte";
-  import { getCompendiumContext } from "$lib/state/compendium.svelte";
-  import { cn } from "$lib/utils";
-  import CircleMinus from "@lucide/svelte/icons/circle-minus";
-  import Search from "@lucide/svelte/icons/search";
+	import Button from '$lib/components/ui/button/button.svelte';
+	import Input from '$lib/components/ui/input/input.svelte';
+	import type { Weapon, Armor, Consumable, AdventuringGear } from '$lib/types/compendium-types';
+	import WeaponDetails from './weapon-details.svelte';
+	import ArmorDetails from './armor-details.svelte';
+	import ConsumableDetails from './consumable-details.svelte';
+	import Dropdown from '../leveling/dropdown.svelte';
+	import { getCharacterContext } from '$lib/state/character.svelte';
+	import { getCompendiumContext } from '$lib/state/compendium.svelte';
+	import { cn } from '$lib/utils';
+	import CircleMinus from '@lucide/svelte/icons/circle-minus';
+	import Search from '@lucide/svelte/icons/search';
 
-  const context = getCharacterContext();
-  const compendium = getCompendiumContext();
-  let character = $derived(context.character);
-  let searchQuery = $state("");
+	const context = getCharacterContext();
+	const compendium = getCompendiumContext();
+	let character = $derived(context.character);
+	let searchQuery = $state('');
 
-  // Helper function to check if item matches search
-  function matchesSearch(
-    item: Weapon | Armor | Consumable | AdventuringGear,
-    query: string
-  ): boolean {
-    if (!query.trim()) return true;
-    const searchLower = query.toLowerCase();
-    return item.title.toLowerCase().includes(searchLower);
-  }
+	// Helper function to check if item matches search
+	function matchesSearch(
+		item: Weapon | Armor | Consumable | AdventuringGear,
+		query: string
+	): boolean {
+		if (!query.trim()) return true;
+		const searchLower = query.toLowerCase();
+		return item.title.toLowerCase().includes(searchLower);
+	}
 
-  // Filtered weapons and armor
-  let filteredWeapons = $derived(
-    [...context.inventory_primary_weapons, ...context.inventory_secondary_weapons].filter((weapon) => matchesSearch(weapon, searchQuery))
-  );
+	// Filtered weapons and armor
+	let filteredWeapons = $derived(
+		[...context.inventory_primary_weapons, ...context.inventory_secondary_weapons].filter(
+			(weapon) => matchesSearch(weapon, searchQuery)
+		)
+	);
 
-  let filteredArmor = $derived(
-    Object.values(context.inventory_armor).filter((armor) => matchesSearch(armor, searchQuery))
-  );
+	let filteredArmor = $derived(
+		Object.values(context.inventory_armor).filter((armor) => matchesSearch(armor, searchQuery))
+	);
 
-  // Filtered consumables
-  let filteredConsumables = $derived.by(() => {
-    if (!character) return [];
-    const consumables: (Consumable & { quantity: number })[] = [];
-    for (const [consumable_id, data] of Object.entries(character.inventory.consumables)) {
-      const consumable = compendium.consumables[consumable_id];
-      if (consumable && matchesSearch(consumable, searchQuery)) {
-        consumables.push({ ...consumable, quantity: data.quantity });
-      }
-    }
-    return consumables;
-  });
+	// Filtered consumables
+	let filteredConsumables = $derived.by(() => {
+		if (!character) return [];
+		const consumables: (Consumable & { quantity: number })[] = [];
+		for (const [consumable_id, data] of Object.entries(character.inventory.consumables)) {
+			const consumable = compendium.consumables[consumable_id];
+			if (consumable && matchesSearch(consumable, searchQuery)) {
+				consumables.push({ ...consumable, quantity: data.quantity });
+			}
+		}
+		return consumables;
+	});
 
-  // Filtered adventuring gear (with original index)
-  let filteredAdventuringGear = $derived.by(() => {
-    if (!character) return [];
-    return character.inventory.adventuring_gear
-      .map((gear, index) => ({ gear, originalIndex: index }))
-      .filter(({ gear }) => matchesSearch(gear, searchQuery));
-  });
+	// Filtered adventuring gear (with original index)
+	let filteredAdventuringGear = $derived.by(() => {
+		if (!character) return [];
+		return character.inventory.adventuring_gear
+			.map((gear, index) => ({ gear, originalIndex: index }))
+			.filter(({ gear }) => matchesSearch(gear, searchQuery));
+	});
 
-  function equipWeapon(weapon: Weapon) {
-    if (!character) return;
-    if (weapon.category === "Primary") {
-      character.active_primary_weapon_id = weapon.id;
-    } else if (weapon.category === "Secondary") {
-      character.active_secondary_weapon_id = weapon.id;
-    }
-  }
+	function equipWeapon(weapon: Weapon) {
+		if (!character) return;
+		if (weapon.category === 'Primary') {
+			character.active_primary_weapon_id = weapon.id;
+		} else if (weapon.category === 'Secondary') {
+			character.active_secondary_weapon_id = weapon.id;
+		}
+	}
 
-  function equipArmor(armor: Armor) {
-    if (!character) return;
-    character.active_armor_id = armor.id;
-  }
+	function equipArmor(armor: Armor) {
+		if (!character) return;
+		character.active_armor_id = armor.id;
+	}
 
-  function unequipArmor(armor: Armor) {
-    if (!character) return;
-    if (character.active_armor_id === armor.id) {
-      character.active_armor_id = null;
-    }
-  }
+	function unequipArmor(armor: Armor) {
+		if (!character) return;
+		if (character.active_armor_id === armor.id) {
+			character.active_armor_id = null;
+		}
+	}
 
-  function unequipWeapon(weapon: Weapon) {
-    if (!character) return;
-    if (character.active_primary_weapon_id === weapon.id) {
-      character.active_primary_weapon_id = null;
-    }
-    if (character.active_secondary_weapon_id === weapon.id) {
-      character.active_secondary_weapon_id = null;
-    }
-  }
-  function removeWeapon(weapon: Weapon) {
-    if (!character) return;
-    unequipWeapon(weapon);
+	function unequipWeapon(weapon: Weapon) {
+		if (!character) return;
+		if (character.active_primary_weapon_id === weapon.id) {
+			character.active_primary_weapon_id = null;
+		}
+		if (character.active_secondary_weapon_id === weapon.id) {
+			character.active_secondary_weapon_id = null;
+		}
+	}
+	function removeWeapon(weapon: Weapon) {
+		if (!character) return;
+		unequipWeapon(weapon);
 
-    const inventory = weapon.category === "Primary" 
-      ? character.inventory.primary_weapons 
-      : character.inventory.secondary_weapons;
-    
-    if (weapon.id in inventory) {
-      inventory[weapon.id].quantity--;
-      if (inventory[weapon.id].quantity <= 0) {
-        delete inventory[weapon.id];
-      }
-    }
-  }
+		const inventory =
+			weapon.category === 'Primary'
+				? character.inventory.primary_weapons
+				: character.inventory.secondary_weapons;
 
-  function removeArmor(armor: Armor) {
-    if (!character) return;
-    unequipArmor(armor);
+		if (weapon.id in inventory) {
+			inventory[weapon.id].quantity--;
+			if (inventory[weapon.id].quantity <= 0) {
+				delete inventory[weapon.id];
+			}
+		}
+	}
 
-    if (armor.id in character.inventory.armor) {
-      character.inventory.armor[armor.id].quantity--;
-      if (character.inventory.armor[armor.id].quantity <= 0) {
-        delete character.inventory.armor[armor.id];
-      }
-    }
-  }
+	function removeArmor(armor: Armor) {
+		if (!character) return;
+		unequipArmor(armor);
 
-  function removeConsumable(consumable: Consumable) {
-    if (!character) return;
+		if (armor.id in character.inventory.armor) {
+			character.inventory.armor[armor.id].quantity--;
+			if (character.inventory.armor[armor.id].quantity <= 0) {
+				delete character.inventory.armor[armor.id];
+			}
+		}
+	}
 
-    if (consumable.id in character.inventory.consumables) {
-      character.inventory.consumables[consumable.id].quantity--;
-      if (character.inventory.consumables[consumable.id].quantity <= 0) {
-        delete character.inventory.consumables[consumable.id];
-      }
-    }
-  }
+	function removeConsumable(consumable: Consumable) {
+		if (!character) return;
 
-  function removeAdventuringGear(
-    gear: AdventuringGear & { quantity: number },
-    originalIndex: number
-  ) {
-    if (!character) return;
+		if (consumable.id in character.inventory.consumables) {
+			character.inventory.consumables[consumable.id].quantity--;
+			if (character.inventory.consumables[consumable.id].quantity <= 0) {
+				delete character.inventory.consumables[consumable.id];
+			}
+		}
+	}
 
-    if (gear.quantity > 1) {
-      character.inventory.adventuring_gear[originalIndex].quantity--;
-    } else {
-      character.inventory.adventuring_gear.splice(originalIndex, 1);
-    }
-  }
+	function removeAdventuringGear(
+		gear: AdventuringGear & { quantity: number },
+		originalIndex: number
+	) {
+		if (!character) return;
 
-  // Helper function to check if character level meets requirement
-  function canEquip(item: Weapon | Armor): boolean {
-    if (!character) return false;
-    return character.level >= item.level_requirement;
-  }
+		if (gear.quantity > 1) {
+			character.inventory.adventuring_gear[originalIndex].quantity--;
+		} else {
+			character.inventory.adventuring_gear.splice(originalIndex, 1);
+		}
+	}
 
-  // Helper function to check if weapon is equipped
-  function isWeaponEquipped(weapon: Weapon): boolean {
-    if (!character) return false;
-    return character.active_primary_weapon_id === weapon.id || character.active_secondary_weapon_id === weapon.id;
-  }
+	// Helper function to check if character level meets requirement
+	function canEquip(item: Weapon | Armor): boolean {
+		if (!character) return false;
+		return character.level >= item.level_requirement;
+	}
 
-  // Helper function to check if armor is equipped
-  function isArmorEquipped(armor: Armor): boolean {
-    if (!character) return false;
-    return character.active_armor_id === armor.id;
-  }
+	// Helper function to check if weapon is equipped
+	function isWeaponEquipped(weapon: Weapon): boolean {
+		if (!character) return false;
+		return (
+			character.active_primary_weapon_id === weapon.id ||
+			character.active_secondary_weapon_id === weapon.id
+		);
+	}
+
+	// Helper function to check if armor is equipped
+	function isArmorEquipped(armor: Armor): boolean {
+		if (!character) return false;
+		return character.active_armor_id === armor.id;
+	}
 </script>
 
 {#if character}
-  {@const hasItems =
-    context.inventory_primary_weapons.length > 0 ||
-    context.inventory_secondary_weapons.length > 0 ||
-    Object.keys(context.inventory_armor).length > 0 ||
-    Object.keys(character.inventory.consumables).length > 0 ||
-    character.inventory.adventuring_gear.length > 0}
-  <div class="flex flex-col gap-4">
-    {#if !hasItems}
-      <p class="text-sm text-muted-foreground text-center py-4">Your inventory is empty</p>
-    {:else}
-      <!-- Search Box -->
-      <div class="relative mb-2">
-        <Search
-          class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground"
-        />
-        <Input bind:value={searchQuery} placeholder="Search inventory..." class="pl-9" />
-      </div>
+	{@const hasItems =
+		context.inventory_primary_weapons.length > 0 ||
+		context.inventory_secondary_weapons.length > 0 ||
+		Object.keys(context.inventory_armor).length > 0 ||
+		Object.keys(character.inventory.consumables).length > 0 ||
+		character.inventory.adventuring_gear.length > 0}
+	<div class="flex flex-col gap-4">
+		{#if !hasItems}
+			<p class="py-4 text-center text-sm text-muted-foreground">Your inventory is empty</p>
+		{:else}
+			<!-- Search Box -->
+			<div class="relative mb-2">
+				<Search
+					class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+				/>
+				<Input bind:value={searchQuery} placeholder="Search inventory..." class="pl-9" />
+			</div>
 
-      {#if filteredWeapons.length > 0}
-        <div class="gap-1 flex flex-col">
-        <p class="ml-2 font-medium">Weapons</p>
+			{#if filteredWeapons.length > 0}
+				<div class="flex flex-col gap-1">
+					<p class="ml-2 font-medium">Weapons</p>
 
-        {#each filteredWeapons as weapon (weapon.id)}
-          {#snippet subtitle_snippet()}
-            {@const equipped = isWeaponEquipped(weapon)}
-            <div class="flex items-center gap-2">
-              {#if equipped}
-                <span class="text-xs italic text-muted-foreground">Equipped</span>
-              {:else}
-                {@const canEquipItem = canEquip(weapon)}
-                <Button
-                  size="sm"
-                  onclick={(e) => {
-                    e.stopPropagation();
-                    if (canEquipItem) equipWeapon(weapon);
-                  }}
-                  title={canEquipItem ? undefined : "Level requirement not met"}
-                  class={cn(!canEquipItem && "cursor-not-allowed opacity-50 hover:bg-primary")}
-                >
-                  Equip
-                </Button>
-              {/if}
-            </div>
-          {/snippet}
+					{#each filteredWeapons as weapon (weapon.id)}
+						{#snippet subtitle_snippet()}
+							{@const equipped = isWeaponEquipped(weapon)}
+							<div class="flex items-center gap-2">
+								{#if equipped}
+									<span class="text-xs text-muted-foreground italic">Equipped</span>
+								{:else}
+									{@const canEquipItem = canEquip(weapon)}
+									<Button
+										size="sm"
+										onclick={(e) => {
+											e.stopPropagation();
+											if (canEquipItem) equipWeapon(weapon);
+										}}
+										title={canEquipItem ? undefined : 'Level requirement not met'}
+										class={cn(!canEquipItem && 'cursor-not-allowed opacity-50 hover:bg-primary')}
+									>
+										Equip
+									</Button>
+								{/if}
+							</div>
+						{/snippet}
 
-          {#snippet title_snippet()}
-            {@const inventory = weapon.category === "Primary" ? character.inventory.primary_weapons : character.inventory.secondary_weapons}
-            {@const quantity = inventory[weapon.id]?.quantity ?? 0}
-            <div class="text-left gap-4">
-              <p class="text-md font-medium">
-                {weapon.title}
-                {#if quantity > 1}
-                  <span class="ml-1 text-sm italic text-muted-foreground">x{quantity}</span>
-                {/if}
-              </p>
-              <p class="text-[10px] text-muted-foreground leading-none italic truncate">
-                Tier {context.get_tier_from_level(weapon.level_requirement)}
-                {weapon.category} Weapon
-              </p>
-            </div>
-          {/snippet}
+						{#snippet title_snippet()}
+							{@const inventory =
+								weapon.category === 'Primary'
+									? character.inventory.primary_weapons
+									: character.inventory.secondary_weapons}
+							{@const quantity = inventory[weapon.id]?.quantity ?? 0}
+							<div class="gap-4 text-left">
+								<p class="text-md font-medium">
+									{weapon.title}
+									{#if quantity > 1}
+										<span class="ml-1 text-sm text-muted-foreground italic">x{quantity}</span>
+									{/if}
+								</p>
+								<p class="truncate text-[10px] leading-none text-muted-foreground italic">
+									Tier {context.get_tier_from_level(weapon.level_requirement)}
+									{weapon.category} Weapon
+								</p>
+							</div>
+						{/snippet}
 
-          <Dropdown {title_snippet} {subtitle_snippet} class="border-2">
-            <WeaponDetails {weapon} />
-            <div class="flex justify-center sm:justify-end mt-1 -mb-2">
-              <!-- {#if isWeaponEquipped(weapon)}
+						<Dropdown {title_snippet} {subtitle_snippet} class="border-2">
+							<WeaponDetails {weapon} />
+							<div class="mt-1 -mb-2 flex justify-center sm:justify-end">
+								<!-- {#if isWeaponEquipped(weapon)}
                 <Button variant="link" onclick={() => unequipWeapon(weapon)}>
                   <CircleMinus class="size-4" /> Unequip
                 </Button>
@@ -233,62 +242,66 @@
                   ><CirclePlus class="size-4" /> Equip</Button
                 >
               {/if} -->
-              <Button variant="link" class="text-destructive" onclick={() => removeWeapon(weapon)}>
-                <!-- <Trash2 class="size-4" /> -->
-                Remove
-              </Button>
-            </div>
-          </Dropdown>
-        {/each}
-        </div>
-      {/if}
+								<Button
+									variant="link"
+									class="text-destructive"
+									onclick={() => removeWeapon(weapon)}
+								>
+									<!-- <Trash2 class="size-4" /> -->
+									Remove
+								</Button>
+							</div>
+						</Dropdown>
+					{/each}
+				</div>
+			{/if}
 
-      {#if filteredArmor.length > 0}
-        <div class="gap-1 flex flex-col">
-          <p class="ml-2 font-medium">Armor</p>
+			{#if filteredArmor.length > 0}
+				<div class="flex flex-col gap-1">
+					<p class="ml-2 font-medium">Armor</p>
 
-          {#each filteredArmor as armor (armor.id)}
-            {#snippet subtitle_snippet()}
-              {@const equipped = isArmorEquipped(armor)}
-              <div class="flex items-center gap-2">
-                {#if equipped}
-                  <span class="text-xs italic text-muted-foreground">Equipped</span>
-                {:else}
-                  {@const canEquipItem = canEquip(armor)}
-                  <Button
-                    size="sm"
-                    onclick={(e) => {
-                      e.stopPropagation();
-                      if (canEquipItem) equipArmor(armor);
-                    }}
-                    disabled={!canEquipItem}
-                    title={canEquipItem ? undefined : "Level requirement not met"}
-                  >
-                    Equip
-                  </Button>
-                {/if}
-              </div>
-            {/snippet}
+					{#each filteredArmor as armor (armor.id)}
+						{#snippet subtitle_snippet()}
+							{@const equipped = isArmorEquipped(armor)}
+							<div class="flex items-center gap-2">
+								{#if equipped}
+									<span class="text-xs text-muted-foreground italic">Equipped</span>
+								{:else}
+									{@const canEquipItem = canEquip(armor)}
+									<Button
+										size="sm"
+										onclick={(e) => {
+											e.stopPropagation();
+											if (canEquipItem) equipArmor(armor);
+										}}
+										disabled={!canEquipItem}
+										title={canEquipItem ? undefined : 'Level requirement not met'}
+									>
+										Equip
+									</Button>
+								{/if}
+							</div>
+						{/snippet}
 
-            {#snippet title_snippet()}
-              {@const quantity = character.inventory.armor[armor.id]?.quantity ?? 0}
-              <div class="text-left gap-4">
-                <p class="text-md font-medium">
-                  {armor.title}
-                  {#if quantity > 1}
-                    <span class="ml-1 text-sm italic text-muted-foreground">x{quantity}</span>
-                  {/if}
-                </p>
-                <p class="text-[10px] text-muted-foreground leading-none italic truncate">
-                  Tier {context.get_tier_from_level(armor.level_requirement)} Armor
-                </p>
-              </div>
-            {/snippet}
+						{#snippet title_snippet()}
+							{@const quantity = character.inventory.armor[armor.id]?.quantity ?? 0}
+							<div class="gap-4 text-left">
+								<p class="text-md font-medium">
+									{armor.title}
+									{#if quantity > 1}
+										<span class="ml-1 text-sm text-muted-foreground italic">x{quantity}</span>
+									{/if}
+								</p>
+								<p class="truncate text-[10px] leading-none text-muted-foreground italic">
+									Tier {context.get_tier_from_level(armor.level_requirement)} Armor
+								</p>
+							</div>
+						{/snippet}
 
-            <Dropdown {title_snippet} {subtitle_snippet} class="border-2">
-              <ArmorDetails {armor} />
-              <div class="flex justify-center sm:justify-end mt-1 -mb-2">
-                <!-- {#if isArmorEquipped(armor)}
+						<Dropdown {title_snippet} {subtitle_snippet} class="border-2">
+							<ArmorDetails {armor} />
+							<div class="mt-1 -mb-2 flex justify-center sm:justify-end">
+								<!-- {#if isArmorEquipped(armor)}
                 <Button variant="link" onclick={() => unequipArmor(armor)}>
                   <CircleMinus class="size-4" /> Unequip
                 </Button>
@@ -297,74 +310,74 @@
                   ><CirclePlus class="size-4" /> Equip</Button
                 >
               {/if} -->
-                <Button variant="link" class="text-destructive" onclick={() => removeArmor(armor)}>
-                  <!-- <Trash2 class="size-4" /> -->
-                  Remove
-                </Button>
-              </div>
-            </Dropdown>
-          {/each}
-        </div>
-      {/if}
+								<Button variant="link" class="text-destructive" onclick={() => removeArmor(armor)}>
+									<!-- <Trash2 class="size-4" /> -->
+									Remove
+								</Button>
+							</div>
+						</Dropdown>
+					{/each}
+				</div>
+			{/if}
 
-      {#if filteredConsumables.length > 0}
-        <div class="gap-1 flex flex-col">
-          <p class="ml-2 font-medium">Consumables</p>
+			{#if filteredConsumables.length > 0}
+				<div class="flex flex-col gap-1">
+					<p class="ml-2 font-medium">Consumables</p>
 
-          {#each filteredConsumables as consumable (consumable.id)}
-            {#snippet title_snippet()}
-              {@const quantity = character.inventory.consumables[consumable.id]?.quantity ?? 0}
-              <div class="text-left gap-4">
-                <p class="text-md font-medium">
-                  {consumable.title}
-                  {#if quantity > 1}
-                    <span class="ml-1 text-sm italic text-muted-foreground">x{quantity}</span>
-                  {/if}
-                </p>
-              </div>
-            {/snippet}
+					{#each filteredConsumables as consumable (consumable.id)}
+						{#snippet title_snippet()}
+							{@const quantity = character.inventory.consumables[consumable.id]?.quantity ?? 0}
+							<div class="gap-4 text-left">
+								<p class="text-md font-medium">
+									{consumable.title}
+									{#if quantity > 1}
+										<span class="ml-1 text-sm text-muted-foreground italic">x{quantity}</span>
+									{/if}
+								</p>
+							</div>
+						{/snippet}
 
-            <Dropdown {title_snippet} class="border-2">
-              <ConsumableDetails {consumable} />
-              <div class="flex justify-center sm:justify-end mt-1 -mb-2">
-                <Button
-                  variant="link"
-                  class="text-destructive"
-                  onclick={() => removeConsumable(consumable)}
-                >
-                  Remove
-                </Button>
-              </div>
-            </Dropdown>
-          {/each}
-        </div>
-      {/if}
+						<Dropdown {title_snippet} class="border-2">
+							<ConsumableDetails {consumable} />
+							<div class="mt-1 -mb-2 flex justify-center sm:justify-end">
+								<Button
+									variant="link"
+									class="text-destructive"
+									onclick={() => removeConsumable(consumable)}
+								>
+									Remove
+								</Button>
+							</div>
+						</Dropdown>
+					{/each}
+				</div>
+			{/if}
 
-      {#if filteredAdventuringGear.length > 0}
-        <div class="gap-1 flex flex-col">
-          <p class="ml-2 font-medium">Adventuring Gear</p>
+			{#if filteredAdventuringGear.length > 0}
+				<div class="flex flex-col gap-1">
+					<p class="ml-2 font-medium">Adventuring Gear</p>
 
-          <ul class="">
-            {#each filteredAdventuringGear as { gear, originalIndex } (originalIndex)}
-              <li class="flex items-center text-sm text-muted-foreground">
-                <span class="ml-4 mr-3">•</span>
-                {gear.title}
-                <Button
-                  variant="link"
-                  class="ml-auto h-auto text-foreground"
-                  onclick={() => removeAdventuringGear(gear, originalIndex)}
-                >
-                  <CircleMinus class="size-4" />
-                </Button>
-              </li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
+					<ul class="">
+						{#each filteredAdventuringGear as { gear, originalIndex } (originalIndex)}
+							<li class="flex items-center text-sm text-muted-foreground">
+								<span class="mr-3 ml-4">•</span>
+								{gear.title}
+								<Button
+									variant="link"
+									class="ml-auto h-auto text-foreground"
+									onclick={() => removeAdventuringGear(gear, originalIndex)}
+								>
+									<CircleMinus class="size-4" />
+								</Button>
+							</li>
+						{/each}
+					</ul>
+				</div>
+			{/if}
 
-      {#if searchQuery.trim() && filteredWeapons.length === 0 && filteredArmor.length === 0 && filteredConsumables.length === 0 && filteredAdventuringGear.length === 0}
-        <p class="text-sm text-muted-foreground text-center py-4">No results</p>
-      {/if}
-    {/if}
-  </div>
+			{#if searchQuery.trim() && filteredWeapons.length === 0 && filteredArmor.length === 0 && filteredConsumables.length === 0 && filteredAdventuringGear.length === 0}
+				<p class="py-4 text-center text-sm text-muted-foreground">No results</p>
+			{/if}
+		{/if}
+	</div>
 {/if}

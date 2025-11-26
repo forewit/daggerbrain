@@ -65,10 +65,13 @@ export const get_domain_cards = query(DomainIdsSchema, async (domainId) => {
 	return validatedCards;
 });
 
-export const get_domain_card = query(z.object({ domainId: DomainIdsSchema, cardId: z.string() }), async ({ domainId, cardId }) => {
-	const cards = await get_domain_cards(domainId);
-	if (!cards || !cards[cardId]) {
-		throw error(404, 'Domain card not found');
+export const get_domain_card = query(
+	z.object({ domainId: DomainIdsSchema, cardId: z.string() }),
+	async ({ domainId, cardId }) => {
+		const cards = await get_domain_cards(domainId);
+		if (!cards || !cards[cardId]) {
+			throw error(404, 'Domain card not found');
+		}
+		return cards[cardId];
 	}
-	return cards[cardId];
-});
+);

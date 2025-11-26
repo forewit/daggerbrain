@@ -33,7 +33,15 @@ export const DomainIdsSchema = z.enum([
 	'valor'
 ]);
 
-export const CardTypesSchema = z.enum(['domain', 'ancestry', 'community', 'transformation', 'subclass_foundation', 'subclass_specialization', 'subclass_mastery']);
+export const CardTypesSchema = z.enum([
+	'domain',
+	'ancestry',
+	'community',
+	'transformation',
+	'subclass_foundation',
+	'subclass_specialization',
+	'subclass_mastery'
+]);
 
 export const SourceIdsSchema = z.enum(['Void 1.5', 'SRD', 'Homebrew']);
 

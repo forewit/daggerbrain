@@ -1,52 +1,57 @@
 <script lang="ts">
-  import { cn } from "$lib/utils";
-  import { getCharacterContext } from "$lib/state/character.svelte";
+	import { cn } from '$lib/utils';
+	import { getCharacterContext } from '$lib/state/character.svelte';
 
-  let { class: className = "" }: { class?: string } = $props();
+	let { class: className = '' }: { class?: string } = $props();
 
-  const context = getCharacterContext();
-  let character = $derived(context.character);
+	const context = getCharacterContext();
+	let character = $derived(context.character);
 </script>
 
 {#if character}
-  <div class={cn("flex flex-col justify-center text-center gap-3", className)}>
-    <button onclick={()=>{character.marked_hope = 0}} class="text-sm font-medium text-accent">HOPE</button>
-    <div class="mt-1 justify-center flex flex-wrap gap-4">
-      {#each Array(context.max_hope) as _, index}
-        <button
-          aria-label="hope-slot"
-          class={cn(
-            "w-[16px] h-[16px] rounded-[2px] aspect-square border border-accent transition-all duration-300 transform rotate-45",
-            index < character.marked_hope ? "bg-accent" : "bg-transparent",
-            character.marked_hope === context.max_hope &&
-              "shadow-[0_0_8px_rgba(253,212,113,0.4),0_0_16px_rgba(253,212,113,0.2)]"
-          )}
-          onclick={() => {
-            if (index + 1 === character.marked_hope) {
-              character.marked_hope = Math.max(0, character.marked_hope - 1);
-            } else {
-              character.marked_hope = index + 1;
-            }
-          }}
-          type="button"
-        ></button>
-      {/each}
-    </div>
+	<div class={cn('flex flex-col justify-center gap-3 text-center', className)}>
+		<button
+			onclick={() => {
+				character.marked_hope = 0;
+			}}
+			class="text-sm font-medium text-accent">HOPE</button
+		>
+		<div class="mt-1 flex flex-wrap justify-center gap-4">
+			{#each Array(context.max_hope) as _, index}
+				<button
+					aria-label="hope-slot"
+					class={cn(
+						'aspect-square h-[16px] w-[16px] rotate-45 transform rounded-[2px] border border-accent transition-all duration-300',
+						index < character.marked_hope ? 'bg-accent' : 'bg-transparent',
+						character.marked_hope === context.max_hope &&
+							'shadow-[0_0_8px_rgba(253,212,113,0.4),0_0_16px_rgba(253,212,113,0.2)]'
+					)}
+					onclick={() => {
+						if (index + 1 === character.marked_hope) {
+							character.marked_hope = Math.max(0, character.marked_hope - 1);
+						} else {
+							character.marked_hope = index + 1;
+						}
+					}}
+					type="button"
+				></button>
+			{/each}
+		</div>
 
-    {#if context.primary_class}
-      <div class="relative mx-auto">
-        <button
-          class="text-sm p-3 relative"
-          onclick={() => {
-            if (character.marked_hope >= 3) {
-              character.marked_hope -= 3;
-            }
-          }}
-        >
-          <span class="italic font-medium pr-1">{context.primary_class.hope_feature.title}:</span>
-          {@html context.primary_class.hope_feature.description_html}
-        </button>
-      </div>
-    {/if}
-  </div>
+		{#if context.primary_class}
+			<div class="relative mx-auto">
+				<button
+					class="relative p-3 text-sm"
+					onclick={() => {
+						if (character.marked_hope >= 3) {
+							character.marked_hope -= 3;
+						}
+					}}
+				>
+					<span class="pr-1 font-medium italic">{context.primary_class.hope_feature.title}:</span>
+					{@html context.primary_class.hope_feature.description_html}
+				</button>
+			</div>
+		{/if}
+	</div>
 {/if}

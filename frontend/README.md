@@ -1,10 +1,9 @@
 # Daggerbrain
 
-
-
 ### Environment Setup
 
 1. Create a `.dev.vars` file in the root directory for local development:
+
    ```bash
    # Cloudflare Configuration
    CLOUDFLARE_ACCOUNT_ID=your_account_id
@@ -34,11 +33,13 @@
 ### Database Setup
 
 1. Run database migrations:
+
    ```bash
    bun run db:push
    ```
 
    Or generate migrations first:
+
    ```bash
    bun run db:generate
    bun run db:migrate
@@ -62,6 +63,7 @@ This will interactively prompt you to select which data to seed.
 ### Running Locally
 
 1. Start the development server:
+
    ```bash
    bun run dev
    ```
@@ -69,18 +71,15 @@ This will interactively prompt you to select which data to seed.
    The app will be available at `http://localhost:5173` (or the port shown in the terminal).
 
 2. For preview with Cloudflare Workers (requires Wrangler):
+
    ```bash
    bun run preview
    ```
 
    This builds the app and runs it with Wrangler, which provides access to Cloudflare bindings (D1, KV, R2) locally.
 
-
-
-
-
-
 ## Page Styling
+
 ```svelte
 <div
 	class={cn(
@@ -89,5 +88,7 @@ This will interactively prompt you to select which data to seed.
 	)}
 ></div>
 ```
+
 ## On Zscaler use:
+
 NODE_TLS_REJECT_UNAUTHORIZED=0 bun

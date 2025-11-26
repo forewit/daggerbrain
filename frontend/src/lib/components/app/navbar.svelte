@@ -19,7 +19,7 @@
 >
 	<nav
 		style="scrollbar-width: none;"
-		class="justiy-between flex h-16 w-full max-w-6xl px-4 items-center"
+		class="justiy-between flex h-16 w-full max-w-6xl items-center px-4"
 	>
 		<a href="/" class="flex shrink-0 items-center gap-2 text-lg font-bold">
 			<img src="/images/daggerbrain.svg" alt="Daggerbrain" class="size-6" />

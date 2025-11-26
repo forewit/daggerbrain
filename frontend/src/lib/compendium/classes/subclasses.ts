@@ -88,7 +88,7 @@ export const SUBCLASSES = {
 	brawler_juggernaut: {
 		id: 'juggernaut',
 		source_id: 'Void 1.5',
-        class_id: 'brawler',
+		class_id: 'brawler',
 		name: 'Juggernaut',
 		description_html: '<p></p>',
 		foundation_card: {

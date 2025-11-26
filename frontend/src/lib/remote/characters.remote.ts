@@ -49,7 +49,7 @@ export const delete_character = command(z.string(), async (characterId) => {
 
 export const create_character = command(async () => {
 	console.log('create_character');
-	
+
 	const event = getRequestEvent();
 	const userId = get_userId(event);
 	const db = get_db(event);

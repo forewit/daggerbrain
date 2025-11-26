@@ -30,8 +30,6 @@ import {
 } from '$lib/remote/equipment.remote';
 import { get_all_sources } from '$lib/remote/sources.remote';
 
-
-
 function createCompendium() {
 	let ancestry_cards: Record<string, AncestryCard> = $state({});
 	let community_cards: Record<string, CommunityCard> = $state({});
@@ -80,25 +78,61 @@ function createCompendium() {
 	}
 
 	// Fetch all data once on initialization
-	fetchWithRetry(get_all_ancestry_cards, (r) => { ancestry_cards = r; });
-	fetchWithRetry(get_all_community_cards, (r) => { community_cards = r; });
-	fetchWithRetry(get_all_transformation_cards, (r) => { transformation_cards = r; });
-	fetchWithRetry(get_all_classes, (r) => { classes = r; });
-	fetchWithRetry(get_all_subclasses, (r) => { subclasses = r; });
-	fetchWithRetry(get_all_domains, (r) => { domains = r; });
-	fetchWithRetry(get_all_primary_weapons, (r) => { primary_weapons = r; });
-	fetchWithRetry(get_all_secondary_weapons, (r) => { secondary_weapons = r; });
-	fetchWithRetry(get_all_armor, (r) => { armor = r; });
-	fetchWithRetry(get_all_loot, (r) => { loot = r; });
-	fetchWithRetry(get_all_consumables, (r) => { consumables = r; });
-	fetchWithRetry(get_all_sources, (r) => { sources = r; });
+	fetchWithRetry(get_all_ancestry_cards, (r) => {
+		ancestry_cards = r;
+	});
+	fetchWithRetry(get_all_community_cards, (r) => {
+		community_cards = r;
+	});
+	fetchWithRetry(get_all_transformation_cards, (r) => {
+		transformation_cards = r;
+	});
+	fetchWithRetry(get_all_classes, (r) => {
+		classes = r;
+	});
+	fetchWithRetry(get_all_subclasses, (r) => {
+		subclasses = r;
+	});
+	fetchWithRetry(get_all_domains, (r) => {
+		domains = r;
+	});
+	fetchWithRetry(get_all_primary_weapons, (r) => {
+		primary_weapons = r;
+	});
+	fetchWithRetry(get_all_secondary_weapons, (r) => {
+		secondary_weapons = r;
+	});
+	fetchWithRetry(get_all_armor, (r) => {
+		armor = r;
+	});
+	fetchWithRetry(get_all_loot, (r) => {
+		loot = r;
+	});
+	fetchWithRetry(get_all_consumables, (r) => {
+		consumables = r;
+	});
+	fetchWithRetry(get_all_sources, (r) => {
+		sources = r;
+	});
 
 	// Fetch all domain cards
-	const domainIds: DomainIds[] = ['arcana', 'blade', 'bone', 'codex', 'grace', 'midnight', 'sage', 'splendor', 'valor'];
+	const domainIds: DomainIds[] = [
+		'arcana',
+		'blade',
+		'bone',
+		'codex',
+		'grace',
+		'midnight',
+		'sage',
+		'splendor',
+		'valor'
+	];
 	for (const domainId of domainIds) {
 		fetchWithRetry(
 			() => get_domain_cards(domainId),
-			(r) => { domain_cards[domainId] = r; }
+			(r) => {
+				domain_cards[domainId] = r;
+			}
 		);
 	}
 	const destroy = () => {};
