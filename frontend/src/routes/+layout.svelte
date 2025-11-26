@@ -2,6 +2,7 @@
   import "../app.css";
   import { onDestroy } from "svelte";
 import { setAppContext } from "$lib/ts/app.svelte";
+import { setContentContext } from "$lib/ts/content/store";
 import { ModeWatcher, setMode } from "mode-watcher";
 import { cn } from "$lib/utils";
 import { Button, buttonVariants } from "$lib/components/ui/button";
@@ -18,6 +19,11 @@ import {
   let { children, data } = $props();
 
   const app = setAppContext(data.initialCharacters ?? []);
+  
+  // Set content context from server data
+  if (data.content) {
+    setContentContext(data.content);
+  }
 
   setMode("dark");
 

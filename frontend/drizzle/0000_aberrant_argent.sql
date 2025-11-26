@@ -32,6 +32,8 @@ CREATE TABLE `character_audit_log` (
 	FOREIGN KEY (`character_id`) REFERENCES `characters`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
 );
+CREATE INDEX `idx_character_audit_log_character_id` ON `character_audit_log`(`character_id`);
+CREATE INDEX `idx_character_audit_log_user_id` ON `character_audit_log`(`user_id`);
 --> statement-breakpoint
 CREATE TABLE `character_choices` (
 	`character_id` text PRIMARY KEY NOT NULL,
@@ -112,6 +114,7 @@ CREATE TABLE `characters` (
 	`updated_at` integer DEFAULT (unixepoch()) NOT NULL,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
 );
+CREATE INDEX `idx_characters_user_id` ON `characters`(`user_id`);
 --> statement-breakpoint
 CREATE TABLE `class_subclasses` (
 	`id` text PRIMARY KEY NOT NULL,
@@ -125,6 +128,7 @@ CREATE TABLE `class_subclasses` (
 	`updated_at` integer DEFAULT (unixepoch()) NOT NULL,
 	FOREIGN KEY (`class_id`) REFERENCES `classes`(`id`) ON UPDATE no action ON DELETE cascade
 );
+CREATE INDEX `idx_class_subclasses_class_id` ON `class_subclasses`(`class_id`);
 --> statement-breakpoint
 CREATE TABLE `classes` (
 	`id` text PRIMARY KEY NOT NULL,
@@ -191,6 +195,7 @@ CREATE TABLE `domain_cards` (
 	`updated_at` integer DEFAULT (unixepoch()) NOT NULL,
 	FOREIGN KEY (`domain_id`) REFERENCES `domains`(`id`) ON UPDATE no action ON DELETE cascade
 );
+CREATE INDEX `idx_domain_cards_domain_id` ON `domain_cards`(`domain_id`);
 --> statement-breakpoint
 CREATE TABLE `domains` (
 	`id` text PRIMARY KEY NOT NULL,

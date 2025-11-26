@@ -2,6 +2,7 @@ import { sql } from 'drizzle-orm';
 import {
 	integer,
 	primaryKey,
+	foreignKey,
 	sqliteTable,
 	text
 } from 'drizzle-orm/sqlite-core';
@@ -48,9 +49,9 @@ export const characterHeritage = sqliteTable('character_heritage', {
 	characterId: text('character_id')
 		.primaryKey()
 		.references(() => characters.id, { onDelete: 'cascade' }),
-	ancestryCardId: text('ancestry_card_id'),
-	communityCardId: text('community_card_id'),
-	transformationCardId: text('transformation_card_id'),
+	ancestryCardId: text('ancestry_card_id').references(() => ancestryCards.id, { onDelete: 'cascade' }),
+	communityCardId: text('community_card_id').references(() => communityCards.id, { onDelete: 'cascade' }),
+	transformationCardId: text('transformation_card_id').references(() => transformationCards.id, { onDelete: 'cascade' }),
 	experiencesJson: text('experiences_json').notNull()
 });
 
@@ -58,10 +59,10 @@ export const characterClasses = sqliteTable('character_classes', {
 	characterId: text('character_id')
 		.primaryKey()
 		.references(() => characters.id, { onDelete: 'cascade' }),
-	primaryClassId: text('primary_class_id'),
-	primarySubclassId: text('primary_subclass_id'),
-	secondaryClassId: text('secondary_class_id'),
-	secondarySubclassId: text('secondary_subclass_id'),
+	primaryClassId: text('primary_class_id').references(() => classes.id, { onDelete: 'cascade' }),
+	primarySubclassId: text('primary_subclass_id').references(() => classSubclasses.id, { onDelete: 'cascade' }),
+	secondaryClassId: text('secondary_class_id').references(() => classes.id, { onDelete: 'cascade' }),
+	secondarySubclassId: text('secondary_subclass_id').references(() => classSubclasses.id, { onDelete: 'cascade' }),
 	secondaryClassDomainChoice: text('secondary_class_domain_choice')
 });
 
@@ -78,9 +79,9 @@ export const characterInventory = sqliteTable('character_inventory', {
 	characterId: text('character_id')
 		.primaryKey()
 		.references(() => characters.id, { onDelete: 'cascade' }),
-	armorId: text('armor_id'),
-	primaryWeaponId: text('primary_weapon_id'),
-	secondaryWeaponId: text('secondary_weapon_id'),
+	armorId: text('armor_id').references(() => armor.id, { onDelete: 'cascade' }),
+	primaryWeaponId: text('primary_weapon_id').references(() => weapons.id, { onDelete: 'cascade' }),
+	secondaryWeaponId: text('secondary_weapon_id').references(() => weapons.id, { onDelete: 'cascade' }),
 	inventoryJson: text('inventory_json').notNull(),
 	additionalDomainCardIdsJson: text('additional_domain_card_ids_json').notNull(),
 	additionalCharacterModsJson: text('additional_character_mods_json').notNull(),
@@ -128,14 +129,14 @@ export const classes = sqliteTable('classes', {
 	startingEvasion: integer('starting_evasion', { mode: 'number' }).notNull(),
 	startingMaxHp: integer('starting_max_hp', { mode: 'number' }).notNull(),
 	hopeFeatureJson: text('hope_feature_json').notNull(),
-	primaryDomainId: text('primary_domain_id').notNull(),
-	secondaryDomainId: text('secondary_domain_id').notNull(),
+	primaryDomainId: text('primary_domain_id').notNull().references(() => domains.id, { onDelete: 'cascade' }),
+	secondaryDomainId: text('secondary_domain_id').notNull().references(() => domains.id, { onDelete: 'cascade' }),
 	classFeaturesJson: text('class_features_json').notNull(),
 	subclassesJson: text('subclasses_json').notNull(),
 	suggestedTraitsJson: text('suggested_traits_json').notNull(),
-	suggestedPrimaryWeaponId: text('suggested_primary_weapon_id'),
-	suggestedSecondaryWeaponId: text('suggested_secondary_weapon_id'),
-	suggestedArmorId: text('suggested_armor_id'),
+	suggestedPrimaryWeaponId: text('suggested_primary_weapon_id').references(() => weapons.id, { onDelete: 'cascade' }),
+	suggestedSecondaryWeaponId: text('suggested_secondary_weapon_id').references(() => weapons.id, { onDelete: 'cascade' }),
+	suggestedArmorId: text('suggested_armor_id').references(() => armor.id, { onDelete: 'cascade' }),
 	startingInventoryJson: text('starting_inventory_json').notNull(),
 	backgroundQuestionsJson: text('background_questions_json').notNull(),
 	connectionsJson: text('connections_json').notNull(),

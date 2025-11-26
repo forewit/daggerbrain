@@ -67,6 +67,8 @@ const deleteCharacterSchema = z.object({
 export const updateCharacter = command(CharacterSchema, async (character) => {
 	const { event, auth } = getAuthContext();
 	const db = getDb(event);
+	// Ensure user exists in database before updating character
+	await ensureUser(db, auth.userId);
 	const validated = CharacterSchema.parse(character) as Character;
 	await upsertCharacter(db, auth.userId, validated);
 	const updated = await listCharacters(db, auth.userId);
@@ -76,6 +78,8 @@ export const updateCharacter = command(CharacterSchema, async (character) => {
 export const deleteCharacter = command(deleteCharacterSchema, async ({ uid }) => {
 	const { event, auth } = getAuthContext();
 	const db = getDb(event);
+	// Ensure user exists in database before deleting character
+	await ensureUser(db, auth.userId);
 	await deleteCharacterDb(db, auth.userId, uid);
 	const updated = await listCharacters(db, auth.userId);
 	getCharacters().set(updated);

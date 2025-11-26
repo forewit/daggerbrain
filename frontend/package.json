@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
+    "types": "wrangler types",
     "dev": "vite dev",
     "dev:wrangler": "wrangler dev",
     "build": "vite build",
@@ -15,7 +16,8 @@
     "test": "vitest",
     "test:run": "vitest run",
     "db:generate": "drizzle-kit generate --config drizzle.config.ts",
-    "db:push": "drizzle-kit push --config drizzle.config.ts"
+    "db:push": "drizzle-kit push --config drizzle.config.ts",
+    "db:seed": "bun run scripts/seed-content.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.44.7",

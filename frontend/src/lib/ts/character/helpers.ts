@@ -1,82 +1,95 @@
+import { getContentContext } from '../content/store';
+import type { Armor, Card, Class, Consumable, Loot, Weapon } from './types';
 
-import { CLASSES } from "../content/classes/classes";
-import { DOMAINS } from "../content/domains/domains";
-import { ALL_CONSUMABLES, ALL_LOOT, ALL_WEAPONS, PRIMARY_WEAPONS, SECONDARY_WEAPONS } from "../content/equipment/equipment";
-import { ALL_ARMOR } from "../content/equipment/equipment";
-import { ANCESTRY_CARDS, COMMUNITY_CARDS } from "../content/heritage";
-import { TRANSFORMATION_CARDS } from "../content/void";
-import type { Armor, Card, Class, Consumable, Loot, Weapon } from "./types";
-
-
-export function get_ancestry_card(ancestry_card_id: string | null | undefined): Card<"ancestry"> | null {
-    if (!ancestry_card_id) return null;
-    return ANCESTRY_CARDS[ancestry_card_id as keyof typeof ANCESTRY_CARDS] || null;
+function getContent() {
+	return getContentContext();
 }
 
-export function get_community_card(community_card_id: string | null | undefined): Card<"community"> | null {
-    if (!community_card_id) return null;
-    return COMMUNITY_CARDS[community_card_id as keyof typeof COMMUNITY_CARDS] || null;
+export function get_ancestry_card(ancestry_card_id: string | null | undefined): Card<'ancestry'> | null {
+	if (!ancestry_card_id) return null;
+	const content = getContent();
+	return content.ancestryCards[ancestry_card_id] || null;
 }
-export function get_transformation_card(transformation_card_id: string | null | undefined): Card<"transformation"> | null {
-    if (!transformation_card_id) return null;
-    return TRANSFORMATION_CARDS[transformation_card_id as keyof typeof TRANSFORMATION_CARDS] || null;
+
+export function get_community_card(community_card_id: string | null | undefined): Card<'community'> | null {
+	if (!community_card_id) return null;
+	const content = getContent();
+	return content.communityCards[community_card_id] || null;
+}
+
+export function get_transformation_card(transformation_card_id: string | null | undefined): Card<'transformation'> | null {
+	if (!transformation_card_id) return null;
+	const content = getContent();
+	return content.transformationCards[transformation_card_id] || null;
 }
 
 export function get_class(class_id: string | null | undefined): Class | null {
-    if (!class_id) return null;
-    return CLASSES[class_id as keyof typeof CLASSES] || null;
+	if (!class_id) return null;
+	const content = getContent();
+	return content.classes[class_id] || null;
 }
 
 export function get_armor(armor_id: string | null | undefined): Armor | null {
-    if (!armor_id) return null;
-    return ALL_ARMOR[armor_id as keyof typeof ALL_ARMOR] || null;
+	if (!armor_id) return null;
+	const content = getContent();
+	return content.armor[armor_id] || null;
 }
 
 export function get_weapon(weapon_id: string | null | undefined): Weapon | null {
-    if (!weapon_id) return null;
-    return ALL_WEAPONS[weapon_id as keyof typeof ALL_WEAPONS] || null;
+	if (!weapon_id) return null;
+	const content = getContent();
+	return content.weapons[weapon_id] || null;
 }
 
-export function get_domain_card(domain_card_id: string | null | undefined): Card<"domain"> | null {
-    if (!domain_card_id) return null;
-    // loop through each domain and check if the card is in the cards object
-    for (const domain of Object.values(DOMAINS)) {
-        const card = domain.cards[domain_card_id as keyof typeof domain.cards];
-        if (card) return card;
-    }
-    return null;
+export function get_domain_card(domain_card_id: string | null | undefined): Card<'domain'> | null {
+	if (!domain_card_id) return null;
+	const content = getContent();
+	// loop through each domain and check if the card is in the cards object
+	for (const domain of Object.values(content.domains)) {
+		const card = domain.cards[domain_card_id];
+		if (card) return card;
+	}
+	return null;
 }
 
 export function get_all_primary_weapons(): Weapon[] {
-    return Object.values(PRIMARY_WEAPONS);
+	const content = getContent();
+	return Object.values(content.weapons).filter((w) => w.category === 'Primary');
 }
 
 export function get_all_secondary_weapons(): Weapon[] {
-    return Object.values(SECONDARY_WEAPONS);
+	const content = getContent();
+	return Object.values(content.weapons).filter((w) => w.category === 'Secondary');
 }
 
 export function get_all_weapons(): Weapon[] {
-    return [...get_all_primary_weapons(), ...get_all_secondary_weapons()];
+	const content = getContent();
+	return Object.values(content.weapons);
 }
 
 export function get_all_armor(): Armor[] {
-    return Object.values(ALL_ARMOR);
+	const content = getContent();
+	return Object.values(content.armor);
 }
 
 export function get_all_consumables(): Consumable[] {
-    return Object.values(ALL_CONSUMABLES);
+	const content = getContent();
+	return Object.values(content.consumables);
 }
 
 export function get_all_loot(): Loot[] {
-    return Object.values(ALL_LOOT);
+	const content = getContent();
+	return Object.values(content.loot);
 }
 
 export function get_consumable(consumable_id: string | null | undefined): Consumable | null {
-    if (!consumable_id) return null;
-    return ALL_CONSUMABLES[consumable_id as keyof typeof ALL_CONSUMABLES] || null;
+	if (!consumable_id) return null;
+	const content = getContent();
+	return content.consumables[consumable_id] || null;
 }
 
 export function get_loot(loot_id: string | null | undefined): Loot | null {
-    if (!loot_id) return null;
-    return ALL_LOOT[loot_id as keyof typeof ALL_LOOT] || null;
+	if (!loot_id) return null;
+	const content = getContent();
+	return content.loot[loot_id] || null;
 }

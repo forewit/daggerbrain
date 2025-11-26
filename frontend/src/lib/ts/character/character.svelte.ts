@@ -554,7 +554,6 @@ function createCharacter(uid: string) {
 
 
     // ! clear invalid domain card choices at each level and update the domain card vault
-    // * derived domain card vault (can't be done with modifiers)
     $effect(() => {
         if (!character) return;
 
@@ -1732,45 +1731,71 @@ function createCharacter(uid: string) {
     }
 
     // Auto-save character changes to database
-    let isInitialLoad = $state(true);
+    let initialLoadComplete = $state(false);
     let lastSavedCharacter = $state<string | null>(null);
+    let inFlightSave: Promise<void> | null = null;
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
     
-    // Track when character is first loaded to avoid saving on initial load
+    // Track when character is first loaded from the authoritative source
     $effect(() => {
-        if (character && isInitialLoad) {
-            // Small delay to ensure this is the initial load, not a user change
-            const timer = setTimeout(() => {
-                isInitialLoad = false;
-                // Set initial saved state
-                lastSavedCharacter = JSON.stringify(character);
-            }, 500);
-            return () => clearTimeout(timer);
+        if (character && !initialLoadComplete) {
+            // Character has been loaded from app.characters, mark initial load as complete
+            initialLoadComplete = true;
+            // Set initial saved state to match what was loaded
+            lastSavedCharacter = JSON.stringify(character);
         }
     });
     
-    // Simple effect to save whenever character changes (but only if it actually changed)
+    // Debounced auto-save effect
     $effect(() => {
-        if (!character || isInitialLoad) return;
+        if (!character || !initialLoadComplete) return;
         
         const currentCharacterJson = JSON.stringify(character);
         // Only save if the character actually changed from the last saved state
         if (currentCharacterJson === lastSavedCharacter) return;
         
-        // Update last saved state immediately to prevent duplicate saves
-        lastSavedCharacter = currentCharacterJson;
+        // Clear any existing debounce timer
+        if (debounceTimer) {
+            clearTimeout(debounceTimer);
+            debounceTimer = null;
+        }
         
-        // Use JSON serialization for deep clone to avoid structuredClone issues
-        const cloned = JSON.parse(JSON.stringify(character));
-        updateCharacter(cloned)
-            .then(() => {
-                // Update lastSavedCharacter after successful save to match what's in DB
-                lastSavedCharacter = JSON.stringify(character);
-            })
-            .catch((error) => {
-                console.error('Failed to auto-save character:', error);
-                // Reset lastSavedCharacter on error so we can retry
-                lastSavedCharacter = null;
-            });
+        // Debounce: wait 300ms before triggering save
+        debounceTimer = setTimeout(() => {
+            debounceTimer = null;
+            
+            // Don't start a new save if one is already in flight
+            if (inFlightSave) {
+                return;
+            }
+            
+            // Use JSON serialization for deep clone to avoid structuredClone issues
+            const cloned = JSON.parse(JSON.stringify(character));
+            const savePromise = updateCharacter(cloned)
+                .then(() => {
+                    // Only update lastSavedCharacter after successful save
+                    lastSavedCharacter = JSON.stringify(character);
+                })
+                .catch((error) => {
+                    console.error('Failed to auto-save character:', error);
+                    // Leave lastSavedCharacter unchanged so the next debounced change will retry
+                })
+                .finally(() => {
+                    // Clear the in-flight save promise when done
+                    if (inFlightSave === savePromise) {
+                        inFlightSave = null;
+                    }
+                });
+            
+            inFlightSave = savePromise;
+        }, 300);
+        
+        return () => {
+            if (debounceTimer) {
+                clearTimeout(debounceTimer);
+                debounceTimer = null;
+            }
+        };
     });
 
     // --- cleanup ---
