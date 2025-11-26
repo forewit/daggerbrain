@@ -4,7 +4,7 @@
   import Button, { buttonVariants } from "$lib/components/ui/button/button.svelte";
   import Label from "$lib/components/ui/label/label.svelte";
   import Switch from "$lib/components/ui/switch/switch.svelte";
-  import type { Card, Character } from "$lib/ts/character/types";
+  import type { DomainCard } from "$lib/types/compendium-types";
   import { cn } from "$lib/utils";
   import Tent from "@lucide/svelte/icons/tent";
   import ArrowUp from "@lucide/svelte/icons/arrow-up";
@@ -13,14 +13,14 @@
   import ChevronDown from "@lucide/svelte/icons/chevron-down";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import ArrowLeftRight from "@lucide/svelte/icons/arrow-left-right";
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
+  import { getCharacterContext } from "$lib/state/character.svelte";
 
   let { class: className = "" }: { class?: string } = $props();
 
   const context = getCharacterContext();
   let character = $derived(context.character);
 
-  let vault: Card<"domain">[] = $derived(
+  let vault: DomainCard[] = $derived(
     (context.domain_card_vault || []).filter(
       (card) => !context.domain_card_loadout.some((loadoutCard) => loadoutCard.id === card.id)
     )
@@ -35,7 +35,7 @@
   let expanded = $state(true);
 
   let remainingStress = $derived(
-    character ? context.max_stress - character.ephemeral_stats.marked_stress : 0
+    character ? context.max_stress - character.marked_stress : 0
   );
 </script>
 
@@ -87,11 +87,11 @@
                     onclick={() => {
                       if (!character) return;
                       if (
-                        character.ephemeral_stats.loadout_domain_card_ids.length <
+                        character.loadout_domain_card_ids.length <
                         context.max_domain_card_loadout
                       ) {
-                        character.ephemeral_stats.loadout_domain_card_ids.push(
-                          selectedVaultCard.id
+                        character.loadout_domain_card_ids.push(
+                          { domainId: selectedVaultCard.domain_id, cardId: selectedVaultCard.id }
                         );
                       }
                     }}
@@ -116,13 +116,13 @@
                     onclick={() => {
                       if (!character) return;
                       if (
-                        character.ephemeral_stats.loadout_domain_card_ids.length <
+                        character.loadout_domain_card_ids.length <
                           context.max_domain_card_loadout &&
                         selectedVaultCard?.recall_cost <= remainingStress
                       ) {
-                        character.ephemeral_stats.marked_stress += selectedVaultCard.recall_cost;
-                        character.ephemeral_stats.loadout_domain_card_ids.push(
-                          selectedVaultCard.id
+                        character.marked_stress += selectedVaultCard.recall_cost;
+                        character.loadout_domain_card_ids.push(
+                          { domainId: selectedVaultCard.domain_id, cardId: selectedVaultCard.id }
                         );
                       }
                     }}
@@ -192,8 +192,9 @@
           size="sm"
           onclick={() => {
             const selected_id = context.domain_card_loadout[selectedLoadoutIndex].id;
-            character.ephemeral_stats.loadout_domain_card_ids =
-              character.ephemeral_stats.loadout_domain_card_ids.filter((id) => id !== selected_id);
+            const selected_domain_id = context.domain_card_loadout[selectedLoadoutIndex].domain_id;
+            character.loadout_domain_card_ids =
+              character.loadout_domain_card_ids.filter((id) => id.cardId !== selected_id || id.domainId !== selected_domain_id);
           }}
           class="absolute -bottom-[2px] left-1/2 -translate-x-1/2 rounded-full"
         >

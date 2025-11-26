@@ -1,13 +1,14 @@
 <script lang="ts">
-  import type { Card } from "$lib/ts/character/types";
+  import type { DomainCard } from "$lib/types/compendium-types";
   import { cn } from "$lib/utils";
   import { buttonVariants } from "$lib/components/ui/button";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import * as Dialog from "$lib/components/ui/dialog/";
-  import DomainCard from "$lib/components/app/cards/full-cards/domain-card.svelte";
+    import DomainCardComponent from "$lib/components/app/cards/full-cards/domain-card.svelte";
   import CardCarousel from "$lib/components/app/cards/card-carousel.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import CircleMinus from "@lucide/svelte/icons/circle-minus";
+	import type { DomainCardId } from "$lib/types/character-types";
 
   let {
     selected_card_id = $bindable(),
@@ -16,16 +17,32 @@
     description_html,
     title = "Select a Domain Card",
   }: {
-    selected_card_id: string | null;
-    available_cards: Record<string, Card<"domain">>;
-    previously_chosen_card_ids: string[];
+    selected_card_id: DomainCardId | null;
+    available_cards: Record<string, DomainCard>;
+    previously_chosen_card_ids: DomainCardId[];
     description_html: string;
     title?: string;
   } = $props();
 
+  // Helper function to compare DomainCardId objects
+  function domainCardIdEqual(a: DomainCardId, b: DomainCardId): boolean {
+    return a.domainId === b.domainId && a.cardId === b.cardId;
+  }
+
+  // Helper function to get DomainCardId from a card
+  function getDomainCardId(card: DomainCard): DomainCardId {
+    return { domainId: card.domain_id, cardId: card.id };
+  }
+
+  // Helper function to get card from available_cards using DomainCardId
+  function getCardById(id: DomainCardId | null): DomainCard | undefined {
+    if (!id) return undefined;
+    return available_cards[id.cardId];
+  }
+
   let cardsArray = $derived(
     Object.entries(available_cards)
-      .map(([id, card]) => ({ id, card }))
+      .map(([_, card]) => ({ id: getDomainCardId(card), card }))
       .sort((a, b) => {
         // Sort by level requirement first
         if (a.card.level_requirement !== b.card.level_requirement) {
@@ -39,21 +56,34 @@
   let disabled_indices = $derived(
     new Set(
       cardsArray
-        .map((item, index) =>
-          previously_chosen_card_ids.includes(item.id) && item.id !== selected_card_id ? index : -1
-        )
+        .map((item, index) => {
+          if (!selected_card_id) {
+            return previously_chosen_card_ids.some((id) => domainCardIdEqual(id, item.id))
+              ? index
+              : -1;
+          }
+          const isPreviouslyChosen = previously_chosen_card_ids.some((id) =>
+            domainCardIdEqual(id, item.id)
+          );
+          const isSelected = domainCardIdEqual(item.id, selected_card_id);
+          return isPreviouslyChosen && !isSelected ? index : -1;
+        })
         .filter((index) => index !== -1)
     )
   );
 
   let highlighted_indices = $derived(
-    new Set([cardsArray.findIndex(({ id }) => id === selected_card_id)])
+    new Set([
+      cardsArray.findIndex(({ id }) => selected_card_id && domainCardIdEqual(id, selected_card_id))
+    ])
   );
 
   let selectedIndex = $state(0);
   let selectedCard = $derived(cardsArray[selectedIndex]);
   let isSelectedCardDisabled = $derived(
-    selectedCard ? previously_chosen_card_ids.includes(selectedCard.id) : false
+    selectedCard
+      ? previously_chosen_card_ids.some((id) => domainCardIdEqual(id, selectedCard.id))
+      : false
   );
 
   let dialog_open = $state(false);
@@ -74,7 +104,7 @@
         )}
       >
         <p class="truncate">
-          {selected_card_id ? available_cards[selected_card_id]?.title : "Select a domain card"}
+          {selected_card_id ? getCardById(selected_card_id)?.title : "Select a domain card"}
         </p>
         <ChevronRight class="size-4 opacity-50" />
       </Dialog.Trigger>
@@ -95,7 +125,7 @@
             {disabled_indices}
             {highlighted_indices}
             emptyMessage="No Domain Cards"
-            scroll_to_index={cardsArray.findIndex(({ id }) => id === selected_card_id)}
+            scroll_to_index={cardsArray.findIndex(({ id }) => selected_card_id && domainCardIdEqual(id, selected_card_id))}
           />
           {#if cardsArray.length > 0}
             <Button
@@ -104,7 +134,7 @@
                 if (highlighted_indices.has(selectedIndex)) {
                   dialog_open = false;
                   selected_card_id = null;
-                } else if (!isSelectedCardDisabled) {
+                } else if (!isSelectedCardDisabled && selectedCard) {
                   dialog_open = false;
                   selected_card_id = selectedCard.id;
                 }
@@ -147,9 +177,9 @@
       </Button>
     {/if}
   </div>
-  {#if selected_card_id !== null && available_cards[selected_card_id]}
+  {#if selected_card_id !== null && getCardById(selected_card_id)}
     <div class="px-2">
-      <DomainCard card={available_cards[selected_card_id]} bind_choice_select bind_token_count />
+      <DomainCardComponent card={getCardById(selected_card_id)!} bind_choice_select bind_token_count />
     </div>
   {/if}
 </div>

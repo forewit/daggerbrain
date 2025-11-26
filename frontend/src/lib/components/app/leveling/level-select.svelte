@@ -3,13 +3,13 @@
   import * as Select from "$lib/components/ui/select";
   import { buttonVariants } from "$lib/components/ui/button";
   import { cn } from "$lib/utils";
-  import type { Character } from "$lib/ts/character/types";
+  import type { LevelUpChoices } from "$lib/types/character-types";
 
   let {
     level = $bindable(),
     level_up_choices = $bindable(),
     class: className = "",
-  }: { level: number; level_up_choices: Character["level_up_choices"]; class?: string } = $props();
+  }: { level: number; level_up_choices: LevelUpChoices; class?: string } = $props();
 
   let open = $state(false);
   let newLevel = $derived(level);

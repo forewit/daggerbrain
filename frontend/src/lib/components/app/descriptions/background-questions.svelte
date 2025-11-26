@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
+  import { getCharacterContext } from "$lib/state/character.svelte";
   import Textarea from "$lib/components/ui/textarea/textarea.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import Plus from "@lucide/svelte/icons/plus";
   import SquarePen from "@lucide/svelte/icons/square-pen";
-  import Bookmark from "@lucide/svelte/icons/bookmark";
-  import Trash2 from "@lucide/svelte/icons/trash-2";
 
   const context = getCharacterContext();
   let character = $derived(context.character);
@@ -15,9 +13,9 @@
 
   function addQuestion() {
     if (character) {
-      character.background_questions.push({ question: "", answer: "" });
+      character.background_question_answers.push({ question: "", answer: "" });
       // Start editing the new question
-      editingQuestionIndex = character.background_questions.length - 1;
+      editingQuestionIndex = character.background_question_answers.length - 1;
       // Focus the textarea after it's rendered
       setTimeout(() => {
         if (questionTextareaRef) {
@@ -29,7 +27,7 @@
 
   function removeQuestion(index: number) {
     if (character) {
-      character.background_questions.splice(index, 1);
+      character.background_question_answers.splice(index, 1);
       if (editingQuestionIndex === index) {
         editingQuestionIndex = null;
       } else if (editingQuestionIndex !== null && editingQuestionIndex > index) {
@@ -40,7 +38,7 @@
 
   function resetQuestions() {
     if (character && primary_class) {
-      character.background_questions = primary_class.background_questions.map((question) => ({
+      character.background_question_answers = primary_class.background_questions.map((question) => ({
         question,
         answer: "",
       }));
@@ -65,7 +63,7 @@
 </script>
 
 {#if character && primary_class}
-  {#each character.background_questions as item, i}
+  {#each character.background_question_answers as item, i}
     <div class="bg-primary/50 p-3 rounded-md flex flex-col gap-3">
       <div class="flex gap-2 items-start justify-between">
         {#if editingQuestionIndex === i}

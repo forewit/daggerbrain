@@ -1,0 +1,127 @@
+<!-- src/routes/+page.svelte -->
+<script lang="ts">
+	import { cn } from '$lib/utils';
+	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import Plus from '@lucide/svelte/icons/plus';
+	import { goto } from '$app/navigation';
+	import { getUserContext } from '$lib/state/user.svelte';
+	import { ContextMenu } from 'bits-ui';
+
+	const user = getUserContext();
+
+	let characterToDelete = $state<{ id: string; name: string } | null>(null);
+	let showDeleteDialog = $state(false);
+	let redirecting_to_character = $state("")
+
+	async function handleCreateCharacter() {
+		redirecting_to_character = await user.create_character();
+		await goto(`/characters/${redirecting_to_character}/edit/`);
+	}
+	function handleDeleteCharacter(characterId: string, characterName: string) {
+		characterToDelete = { id: characterId, name: characterName };
+		showDeleteDialog = true;
+	}
+
+	async function confirmDelete() {
+		if (characterToDelete) {
+			try {
+				await user.delete_character(characterToDelete.id);
+				characterToDelete = null;
+				showDeleteDialog = false;
+			} catch (error) {
+				console.error(error);
+			}
+		}
+	}
+</script>
+
+<div
+	class={cn(
+		'pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]',
+		'mx-auto max-w-6xl px-4 py-2'
+	)}
+>
+	<!-- Header -->
+	<div class="mb-2 flex justify-between gap-2 py-2">
+		<p class="text-2xl font-bold">Characters</p>
+
+		<Button variant="outline" onclick={handleCreateCharacter}>
+			<Plus /> New Character
+		</Button>
+	</div>
+
+	<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+		{#each user.all_characters as char}
+		{#if char.id !== redirecting_to_character}
+			<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
+				<a
+					href={`/characters/${char.id}/`}
+					class="flex gap-2 border bg-primary-muted p-1 hover:bg-primary-muted/80"
+				>
+					<div class=" h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2">
+						<img
+							src={char.image_url || '/images/portrait-placeholder.png'}
+							alt={char.name.trim() || 'Unnamed Character'}
+							class="h-full w-full object-cover"
+						/>
+					</div>
+					<div class="truncate">
+						<p class="mt-1 truncate text-lg font-bold">{char.name.trim() || 'Unnamed Character'}</p>
+
+						<p class="mt-1 truncate text-xs text-muted-foreground">
+							{char.derived_descriptors.ancestry_name || 'No ancestry'}
+							&ensp;•&ensp;
+							{char.derived_descriptors.primary_class_name || 'No class'}
+							&ensp;•&ensp;
+							{char.derived_descriptors.primary_subclass_name || 'No subclass'}
+						</p>
+					</div>
+				</a>
+				<div class="flex bg-muted">
+					<Button
+						variant="ghost"
+						size="sm"
+						class="hover:text-text grow rounded-none border"
+						href={`/characters/${char.id}/`}>View</Button
+					>
+					<Button
+						variant="ghost"
+						size="sm"
+						class="hover:text-text grow rounded-none border border-x-0"
+						href={`/characters/${char.id}/edit`}>Edit</Button
+					>
+					<Button
+						variant="ghost"
+						size="sm"
+						class=" grow rounded-none border text-destructive hover:text-destructive"
+						onclick={() => handleDeleteCharacter(char.id, char.name)}>Delete</Button
+					>
+				</div>
+			</div>
+			{/if}
+		{/each}
+	</div>
+</div>
+
+<!-- Delete Confirmation Dialog -->
+<Dialog.Root bind:open={showDeleteDialog}>
+	<Dialog.Content class="sm:max-w-md">
+		<Dialog.Header>
+			<Dialog.Title>Delete Character</Dialog.Title>
+			<Dialog.Description>
+				Are you sure you want to delete <strong
+					>{characterToDelete?.name.trim() || 'Unnamed Character'}</strong
+				>? This action cannot be undone.
+			</Dialog.Description>
+		</Dialog.Header>
+		<Dialog.Footer class="flex gap-3 pt-4">
+			<Dialog.Close class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
+				>Cancel</Dialog.Close
+			>
+			<Dialog.Close class={buttonVariants({ variant: 'destructive' })} onclick={confirmDelete}
+				>Delete</Dialog.Close
+			>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Card } from "$lib/ts/character/types";
+  import type { CommunityCard } from "$lib/types/compendium-types";
   import { cn } from "$lib/utils";
   import type { Snippet } from "svelte";
 
@@ -9,7 +9,7 @@
     variant = "responsive",
     children,
   }: {
-    card: Card<"community">;
+    card: CommunityCard;
     variant?: "responsive" | "card";
     class?: string;
     children?: Snippet;

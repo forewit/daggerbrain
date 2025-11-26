@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { Character, Card } from "$lib/ts/character/types";
+  import type { SubclassSpecializationCard, SubclassMasteryCard } from "$lib/types/compendium-types";
   import { cn } from "$lib/utils";
   import * as Select from "$lib/components/ui/select/";
   import SubclassCard from "$lib/components/app/cards/full-cards/subclass-card.svelte";
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
+  import { getCharacterContext } from "$lib/state/character.svelte";
 
   let {
     selected_upgrade = $bindable(),
@@ -22,7 +22,7 @@
 
   // Calculate which card to show for tier-4 primary subclass upgrade
   // This is complex logic that depends on the level order of tier_3_subclass_upgrade and tier_4_subclass_upgrade
-  function get_card_to_show(): Card<"subclass_specialization"> | Card<"subclass_mastery"> | null {
+  function get_card_to_show(): SubclassSpecializationCard | SubclassMasteryCard | null {
     if (selected_upgrade !== "primary" || !context.primary_subclass || !character) return null;
 
     // Only applies when both tier_3 and tier_4 subclass upgrades are used

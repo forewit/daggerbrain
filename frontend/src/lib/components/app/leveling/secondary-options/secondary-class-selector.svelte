@@ -1,19 +1,20 @@
 <script lang="ts">
-  import type { Character } from "$lib/ts/character/types";
   import { Button, buttonVariants } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog/";
   import * as Collapsible from "$lib/components/ui/collapsible/";
   import { cn } from "$lib/utils";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
-  import { CLASSES } from "$lib/ts/content/classes/classes";
   import ClassSummary from "../class-summary.svelte";
   import SubclassCard from "$lib/components/app/cards/full-cards/subclass-card.svelte";
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
+  import { getCharacterContext } from "$lib/state/character.svelte";
+  import { getCompendiumContext } from "$lib/state/compendium.svelte";
 
   let { after_remove_secondary_class = () => {} } = $props();
 
   const context = getCharacterContext();
   let character = $derived(context.character);
+
+  const compendium = getCompendiumContext();
 
   let secondary_class_dialog_open = $state(false);
   let remove_secondary_class_dialog_open = $state(false);
@@ -121,7 +122,7 @@
       </Dialog.Header>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto">
         <!-- each class -->
-        {#each Object.entries(CLASSES).filter(([id, c]) => c.name !== context.primary_class?.name) as [id, c]}
+        {#each Object.entries(compendium.classes).filter(([id, c]) => c.name !== context.primary_class?.name) as [id, c]}
           <div class="flex gap-3 border-2 rounded-md p-3 bg-primary-muted">
             <ClassSummary hide_starting_stats character_class={c} bannerClasses="-mt-3">
               <Button
@@ -181,7 +182,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto">
         <!-- each class -->
         {#if context.secondary_class}
-          {#each Object.entries(context.secondary_class.subclasses) as [id, subclass]}
+          {#each Object.entries(compendium.subclasses).filter(([id, s]) => s.class_id === context.secondary_class?.id) as [id, subclass]}
             <div class="flex flex-col gap-3 border-2 rounded-md p-3 bg-primary-muted">
               <p class="text-lg font-medium">{subclass.name}</p>
               <p class="-mt-2 text-xs italic text-muted-foreground">

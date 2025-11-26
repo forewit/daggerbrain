@@ -1,22 +1,19 @@
 <script lang="ts">
   import Button from "$lib/components/ui/button/button.svelte";
   import Input from "$lib/components/ui/input/input.svelte";
-  import type { Weapon, Armor, Consumable, AdventuringGear } from "$lib/ts/character/types";
+  import type { Weapon, Armor, Consumable, AdventuringGear } from "$lib/types/compendium-types";
   import WeaponDetails from "./weapon-details.svelte";
   import ArmorDetails from "./armor-details.svelte";
   import ConsumableDetails from "./consumable-details.svelte";
   import Dropdown from "../leveling/dropdown.svelte";
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
-  import { get_consumable } from "$lib/ts/character/helpers";
+  import { getCharacterContext } from "$lib/state/character.svelte";
+  import { getCompendiumContext } from "$lib/state/compendium.svelte";
   import { cn } from "$lib/utils";
   import CircleMinus from "@lucide/svelte/icons/circle-minus";
-  import Trash2 from "@lucide/svelte/icons/trash-2";
-  import CirclePlus from "@lucide/svelte/icons/circle-plus";
   import Search from "@lucide/svelte/icons/search";
-  import Minus from "@lucide/svelte/icons/minus";
-  import X from "@lucide/svelte/icons/x";
 
   const context = getCharacterContext();
+  const compendium = getCompendiumContext();
   let character = $derived(context.character);
   let searchQuery = $state("");
 
@@ -32,7 +29,7 @@
 
   // Filtered weapons and armor
   let filteredWeapons = $derived(
-    Object.values(context.inventory_weapons).filter((weapon) => matchesSearch(weapon, searchQuery))
+    [...context.inventory_primary_weapons, ...context.inventory_secondary_weapons].filter((weapon) => matchesSearch(weapon, searchQuery))
   );
 
   let filteredArmor = $derived(
@@ -44,7 +41,7 @@
     if (!character) return [];
     const consumables: (Consumable & { quantity: number })[] = [];
     for (const [consumable_id, data] of Object.entries(character.inventory.consumables)) {
-      const consumable = get_consumable(consumable_id);
+      const consumable = compendium.consumables[consumable_id];
       if (consumable && matchesSearch(consumable, searchQuery)) {
         consumables.push({ ...consumable, quantity: data.quantity });
       }
@@ -63,41 +60,45 @@
   function equipWeapon(weapon: Weapon) {
     if (!character) return;
     if (weapon.category === "Primary") {
-      character.primary_weapon_id = weapon.id;
+      character.active_primary_weapon_id = weapon.id;
     } else if (weapon.category === "Secondary") {
-      character.secondary_weapon_id = weapon.id;
+      character.active_secondary_weapon_id = weapon.id;
     }
   }
 
   function equipArmor(armor: Armor) {
     if (!character) return;
-    character.armor_id = armor.id;
+    character.active_armor_id = armor.id;
   }
 
   function unequipArmor(armor: Armor) {
     if (!character) return;
-    if (character.armor_id === armor.id) {
-      character.armor_id = null;
+    if (character.active_armor_id === armor.id) {
+      character.active_armor_id = null;
     }
   }
 
   function unequipWeapon(weapon: Weapon) {
     if (!character) return;
-    if (character.primary_weapon_id === weapon.id) {
-      character.primary_weapon_id = null;
+    if (character.active_primary_weapon_id === weapon.id) {
+      character.active_primary_weapon_id = null;
     }
-    if (character.secondary_weapon_id === weapon.id) {
-      character.secondary_weapon_id = null;
+    if (character.active_secondary_weapon_id === weapon.id) {
+      character.active_secondary_weapon_id = null;
     }
   }
   function removeWeapon(weapon: Weapon) {
     if (!character) return;
     unequipWeapon(weapon);
 
-    if (weapon.id in character.inventory.weapons) {
-      character.inventory.weapons[weapon.id].quantity--;
-      if (character.inventory.weapons[weapon.id].quantity <= 0) {
-        delete character.inventory.weapons[weapon.id];
+    const inventory = weapon.category === "Primary" 
+      ? character.inventory.primary_weapons 
+      : character.inventory.secondary_weapons;
+    
+    if (weapon.id in inventory) {
+      inventory[weapon.id].quantity--;
+      if (inventory[weapon.id].quantity <= 0) {
+        delete inventory[weapon.id];
       }
     }
   }
@@ -147,19 +148,20 @@
   // Helper function to check if weapon is equipped
   function isWeaponEquipped(weapon: Weapon): boolean {
     if (!character) return false;
-    return character.primary_weapon_id === weapon.id || character.secondary_weapon_id === weapon.id;
+    return character.active_primary_weapon_id === weapon.id || character.active_secondary_weapon_id === weapon.id;
   }
 
   // Helper function to check if armor is equipped
   function isArmorEquipped(armor: Armor): boolean {
     if (!character) return false;
-    return character.armor_id === armor.id;
+    return character.active_armor_id === armor.id;
   }
 </script>
 
 {#if character}
   {@const hasItems =
-    Object.keys(context.inventory_weapons).length > 0 ||
+    context.inventory_primary_weapons.length > 0 ||
+    context.inventory_secondary_weapons.length > 0 ||
     Object.keys(context.inventory_armor).length > 0 ||
     Object.keys(character.inventory.consumables).length > 0 ||
     character.inventory.adventuring_gear.length > 0}
@@ -203,7 +205,8 @@
           {/snippet}
 
           {#snippet title_snippet()}
-            {@const quantity = character.inventory.weapons[weapon.id]?.quantity ?? 0}
+            {@const inventory = weapon.category === "Primary" ? character.inventory.primary_weapons : character.inventory.secondary_weapons}
+            {@const quantity = inventory[weapon.id]?.quantity ?? 0}
             <div class="text-left gap-4">
               <p class="text-md font-medium">
                 {weapon.title}

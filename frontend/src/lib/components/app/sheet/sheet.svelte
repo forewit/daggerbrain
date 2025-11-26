@@ -1,7 +1,6 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
   import Traits from "./traits.svelte";
-  import type { Character, Card } from "$lib/ts/character/types";
   import Banner from "../cards/class-banner.svelte";
   import DamageThresholds from "./damage-thresholds.svelte";
   import ArmorSlots from "./armor-slots.svelte";
@@ -12,14 +11,14 @@
   import ClassFeatures from "./class-features.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import Pencil from "@lucide/svelte/icons/pencil";
-  import * as Dialog from "$lib/components/ui/dialog/index";
-  import { handleImageUpload } from "$lib/utils";
+  import { save_user_image } from "$lib/remote/images.remote";
   import Experiences from "./experiences.svelte";
   import ChevronDown from "@lucide/svelte/icons/chevron-down";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import CardCarousel from "../cards/card-carousel.svelte";
   import Loadout from "./loadout.svelte";
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
+  import { getCharacterContext } from "$lib/state/character.svelte";
+  import type { DomainCard, AncestryCard, CommunityCard, TransformationCard, SubclassFoundationCard, SubclassSpecializationCard, SubclassMasteryCard } from "$lib/types/compendium-types";
 
   let { class: className = "" }: { class?: string } = $props();
 
@@ -27,7 +26,7 @@
   let character = $derived(context.character);
 
   let character_cards_expanded = $state(true);
-  let character_cards: Card<any>[] = $derived(
+  let character_cards: (DomainCard | AncestryCard | CommunityCard | TransformationCard | SubclassFoundationCard | SubclassSpecializationCard | SubclassMasteryCard)[] = $derived(
     [
       context.primary_class_mastery_level >= 1 && context.primary_subclass?.foundation_card,
       context.primary_class_mastery_level >= 2 && context.primary_subclass?.specialization_card,
@@ -44,9 +43,23 @@
 
   let fileInput = $state<HTMLInputElement>();
 
-  function onImageUploadSuccess(dataUrl: string) {
-    if (character) {
-      character.image = dataUrl;
+  async function handleImageUpload(event: Event) {
+    if (!character) return;
+    
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    
+    if (!file) return;
+    
+    try {
+      // Upload to R2 and get URL
+      const url = await save_user_image(file);
+      
+      // Update character with R2 URL
+      character.image_url = url;
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+      alert('Failed to upload image. Please try again.');
     }
   }
 
@@ -62,7 +75,7 @@
       bind:this={fileInput}
       type="file"
       accept="image/*"
-      onchange={(event) => handleImageUpload(event, onImageUploadSuccess)}
+      onchange={handleImageUpload}
       class="hidden"
     />
 
@@ -74,7 +87,7 @@
           <!-- level class subclass -->
           <div class="flex overflow-hidden items-center mt-4 mb-2.5 truncate max-w-[400px] h-9">
             <a
-              href={`/characters/${character.uid}/class/`}
+              href={`/characters/${character.id}/class/`}
               class="border-b border-accent/10 min-w-[72px] relative grid place-items-center text-xs font-medium pl-4 pr-3 rounded-l-full bg-accent/10 hover:bg-accent/20 h-full text-accent overflow-hidden group"
             >
               <span class="transition-transform duration-200 group-hover:-translate-y-[150%]">
@@ -87,7 +100,7 @@
               </span>
             </a>
             <Button
-              href={`/characters/${character.uid}/class/`}
+              href={`/characters/${character.id}/class/`}
               class={cn(
                 "h-full truncate grow justify-start gap-2  rounded-l-none rounded-r-full",
                 "border-0 border-b"
@@ -112,7 +125,7 @@
             >
               <img
                 class="h-full w-full rounded-md object-cover"
-                src={character.image}
+                src={character.image_url}
                 alt={character.name}
               />
             </button>

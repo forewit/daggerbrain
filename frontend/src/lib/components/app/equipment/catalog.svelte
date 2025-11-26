@@ -1,14 +1,14 @@
 <script lang="ts">
   import Input from "$lib/components/ui/input/input.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
-  import { get_all_weapons, get_all_armor, get_all_consumables } from "$lib/ts/character/helpers";
-  import type { Weapon, Armor, Consumable } from "$lib/ts/character/types";
+  import type { Weapon, Armor, Consumable } from "$lib/types/compendium-types";
   import WeaponDetails from "./weapon-details.svelte";
   import ArmorDetails from "./armor-details.svelte";
   import ConsumableDetails from "./consumable-details.svelte";
   import Dropdown from "../leveling/dropdown.svelte";
   import * as ButtonGroup from "$lib/components/ui/button-group";
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
+  import { getCharacterContext } from "$lib/state/character.svelte";
+  import { getCompendiumContext } from "$lib/state/compendium.svelte";
   import Search from "@lucide/svelte/icons/search";
 
   let searchQuery = $state("");
@@ -22,24 +22,33 @@
     }
   });
 
-  // Get all items
-  let allWeapons = $derived(get_all_weapons());
-  let allArmor = $derived(get_all_armor());
-  let allConsumables = $derived(get_all_consumables());
-
   const context = getCharacterContext();
+  const compendium = getCompendiumContext();
   let character = $derived(context.character);
 
-  function addWeaponToInventory(weapon: Weapon) {
+  function addPrimaryWeaponToInventory(weapon: Weapon) {
     if (!character) return;
     // Only add if not already in inventory
-    if (!(weapon.id in character.inventory.weapons)) {
-      character.inventory.weapons[weapon.id] = {
+    if (!(weapon.id in character.inventory.primary_weapons)) {
+      character.inventory.primary_weapons[weapon.id] = {
         quantity: 1,
         choices: {},
       };
     } else {
-      character.inventory.weapons[weapon.id].quantity++;
+      character.inventory.primary_weapons[weapon.id].quantity++;
+    }
+  }
+
+  function addSecondaryWeaponToInventory(weapon: Weapon) {
+    if (!character) return;
+    // Only add if not already in inventory
+    if (!(weapon.id in character.inventory.secondary_weapons)) {
+      character.inventory.secondary_weapons[weapon.id] = {
+        quantity: 1,
+        choices: {},
+      };
+    } else {
+      character.inventory.secondary_weapons[weapon.id].quantity++;
     }
   }
 
@@ -83,15 +92,33 @@
     return titleMatch || descMatch;
   }
 
-  // Filter weapons
-  let filteredWeapons = $derived(
-    allWeapons.filter((weapon) => {
+  // Filter primary weapons
+  let filteredPrimaryWeapons = $derived(
+    Object.values(compendium.primary_weapons).filter((weapon) => {
       // Search filter
       if (!matchesSearch(weapon, searchQuery)) return false;
 
-      // Type filter - filter by category
-      if (typeFilter === "Primary" && weapon.category !== "Primary") return false;
-      if (typeFilter === "Secondary" && weapon.category !== "Secondary") return false;
+      // Type filter - only show if Primary filter is selected or no type filter
+      if (typeFilter === "Secondary") return false;
+
+      // Tier filter
+      if (tierFilter !== null) {
+        const weaponTier = context.get_tier_from_level(weapon.level_requirement);
+        if (weaponTier !== tierFilter) return false;
+      }
+
+      return true;
+    })
+  );
+
+  // Filter secondary weapons
+  let filteredSecondaryWeapons = $derived(
+    Object.values(compendium.secondary_weapons).filter((weapon) => {
+      // Search filter
+      if (!matchesSearch(weapon, searchQuery)) return false;
+
+      // Type filter - only show if Secondary filter is selected or no type filter
+      if (typeFilter === "Primary") return false;
 
       // Tier filter
       if (tierFilter !== null) {
@@ -105,7 +132,7 @@
 
   // Filter armor
   let filteredArmor = $derived(
-    allArmor.filter((armor) => {
+    Object.values(compendium.armor).filter((armor) => {
       // Search filter
       if (!matchesSearch(armor, searchQuery)) return false;
 
@@ -121,7 +148,7 @@
 
   // Filter consumables (consumables don't have tier/level requirements)
   let filteredConsumables = $derived(
-    allConsumables.filter((consumable) => {
+    Object.values(compendium.consumables).filter((consumable) => {
       // Search filter
       if (!matchesSearch(consumable, searchQuery)) return false;
       return true;
@@ -141,8 +168,10 @@
       return [];
     }
 
-    if (typeFilter === "Primary" || typeFilter === "Secondary") {
-      return filteredWeapons.map((w) => ({ type: "weapon" as const, item: w }));
+    if (typeFilter === "Primary") {
+      return filteredPrimaryWeapons.map((w) => ({ type: "weapon" as const, item: w }));
+    } else if (typeFilter === "Secondary") {
+      return filteredSecondaryWeapons.map((w) => ({ type: "weapon" as const, item: w }));
     } else if (typeFilter === "Armor") {
       return filteredArmor.map((a) => ({ type: "armor" as const, item: a }));
     } else if (typeFilter === "Consumables") {
@@ -150,7 +179,8 @@
     } else {
       // No type filter - combine all
       return [
-        ...filteredWeapons.map((w) => ({ type: "weapon" as const, item: w })),
+        ...filteredPrimaryWeapons.map((w) => ({ type: "weapon" as const, item: w })),
+        ...filteredSecondaryWeapons.map((w) => ({ type: "weapon" as const, item: w })),
         ...filteredArmor.map((a) => ({ type: "armor" as const, item: a })),
         ...filteredConsumables.map((c) => ({ type: "consumable" as const, item: c })),
       ];
@@ -251,7 +281,11 @@
               size="sm"
               onclick={(e) => {
                 e.stopPropagation();
-                addWeaponToInventory(entry.item);
+                if (entry.item.category === "Primary") {
+                  addPrimaryWeaponToInventory(entry.item);
+                } else {
+                  addSecondaryWeaponToInventory(entry.item);
+                }
               }}>Add</Button
             >
           {/snippet}

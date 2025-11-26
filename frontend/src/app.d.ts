@@ -1,12 +1,21 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
+/// <reference types="svelte-clerk/env" />
+
+import type { KVNamespace, D1Database, R2Bucket } from '@cloudflare/workers-types';
+
 declare global {
 	namespace App {
-		// interface Error {}
-		// interface Locals {}
-		// interface PageData {}
-		// interface PageState {}
-		// interface Platform {}
+		interface Platform {
+			env: {
+				R2_IMAGES: R2Bucket;
+				R2_USERCONTENT: R2Bucket;
+				DB: D1Database;
+				KV: KVNamespace;
+			};
+			cf: CfProperties;
+			ctx: ExecutionContext;
+		}
 	}
 }
 

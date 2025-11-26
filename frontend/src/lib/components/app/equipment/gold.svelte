@@ -1,6 +1,6 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
+  import { getCharacterContext } from "$lib/state/character.svelte";
   import PlusIcon from "@lucide/svelte/icons/plus";
   import MinusIcon from "@lucide/svelte/icons/minus";
 

@@ -1,9 +1,8 @@
 <script lang="ts">
-  import type { LevelUpOption, Character } from "$lib/ts/character/types";
   import { cn } from "$lib/utils";
   import * as Select from "$lib/components/ui/select/";
-  import { TIER_2_BASE_OPTIONS, TIER_3_BASE_OPTIONS } from "$lib/ts/character/rules";
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
+  import { TIER_2_BASE_OPTIONS, TIER_3_BASE_OPTIONS } from "$lib/types/rules";
+  import { getCharacterContext } from "$lib/state/character.svelte";
   import Dropdown from "./dropdown.svelte";
   import {
     get_previously_chosen_domain_card_ids,
@@ -16,7 +15,7 @@
   import TierOptionsGroup from "./tier-options-group.svelte";
   import SecondarySubclassSelector from "./secondary-options/secondary-subclass-selector.svelte";
   import SecondaryClassSelector from "./secondary-options/secondary-class-selector.svelte";
-  import { BLANK_LEVEL_UP_CHOICE } from "$lib/ts/character/constants";
+  import { BLANK_LEVEL_UP_CHOICE } from "$lib/types/constants";
 
   let {
     class: className = "",

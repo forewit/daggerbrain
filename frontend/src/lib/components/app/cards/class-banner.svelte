@@ -1,13 +1,15 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
-  import type { Class, DomainIds } from "$lib/ts/character/types";
-  import { DOMAINS } from "$lib/ts/content/domains/domains";
+  import type { Class, DomainIds } from "$lib/types/compendium-types";
+	import { getCompendiumContext } from "$lib/state/compendium.svelte";
 
   let { class: className = "", character_class }: { class?: string; character_class: Class } =
     $props();
 
-  let primaryDomain = $state(DOMAINS[character_class.primary_domain_id]);
-  let secondaryDomain = $state(DOMAINS[character_class.secondary_domain_id]);
+    const compendium = getCompendiumContext()
+
+  let primaryDomain = $state(compendium.domains[character_class.primary_domain_id]);
+  let secondaryDomain = $state(compendium.domains[character_class.secondary_domain_id]);
 </script>
 
 {#snippet domainSVG(domain_id: DomainIds)}
@@ -220,7 +222,7 @@
     <img class="h-full w-full" src="/images/card/banner.webp" alt="banner" />
     <div
       class="absolute inset-0 flex flex-col items-center justify-center pb-3 gap-1 pt-0.5"
-      style="color: {DOMAINS[character_class.primary_domain_id]
+      style="color: {compendium.domains[character_class.primary_domain_id]
         .foreground_color};"
     >
       <div class="w-9 h-auto aspect-contain">

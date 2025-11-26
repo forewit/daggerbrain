@@ -1,6 +1,7 @@
-import type { getCharacterContext } from "$lib/ts/character/character.svelte";
-import type { Character, Card, Class } from "$lib/ts/character/types";
-import { DOMAINS } from "$lib/ts/content/domains/domains";
+import { getCharacterContext } from "$lib/state/character.svelte";
+import { getCompendiumContext } from "$lib/state/compendium.svelte";
+import type { DomainCardId } from "$lib/types/character-types";
+import type { DomainCard, DomainIds } from "$lib/types/compendium-types";
 
 /**
  * Calculate previously chosen domain cards up to the given level.
@@ -13,7 +14,7 @@ export function get_previously_chosen_domain_card_ids(
   context: ReturnType<typeof getCharacterContext>,
   level: number,
   option_ids_to_check: string[]
-): string[] {
+): DomainCardId[] {
   if (!context.character) return [];
   const domain_card_ids = Object.values(context.character.level_up_domain_card_ids[1]).filter(
     (id) => id !== null
@@ -51,15 +52,16 @@ export function get_available_domain_cards(
   level: number,
   max_level: number,
   include_secondary_class_domain: boolean = false
-): Record<string, Card<"domain">> {
-  if (!context.primary_class) return {};
+): Record<string, DomainCard> {
+  if (!context.primary_class || !context.character) return {};
   const primary_domain_id = context.primary_class.primary_domain_id;
   const secondary_domain_id = context.primary_class.secondary_domain_id;
-  const secondary_class_domain_id_choice = context.character?.secondary_class_domain_id_choice;
+  const secondary_class_domain_id_choice = context.character.secondary_class_domain_id_choice;
 
-  let domain_cards: Record<string, Card<"domain">> = {
-    ...DOMAINS[primary_domain_id].cards,
-    ...DOMAINS[secondary_domain_id].cards
+  const compendium = getCompendiumContext();
+  let domain_cards: Record<string, DomainCard> = {
+    ...compendium.domain_cards[primary_domain_id],
+    ...compendium.domain_cards[secondary_domain_id]
   }
 
   if (
@@ -70,7 +72,7 @@ export function get_available_domain_cards(
   ) {
     domain_cards = {
       ...domain_cards,
-      ...DOMAINS[secondary_class_domain_id_choice].cards
+      ...compendium.domain_cards[secondary_class_domain_id_choice as DomainIds]
     }
   }
 

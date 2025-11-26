@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { Card, DomainCardChoice } from "$lib/ts/character/types";
+  import type { DomainCard, DomainCardChoice } from "$lib/types/compendium-types";
   import { cn } from "$lib/utils";
   import type { Snippet } from "svelte";
   import DomainBanner from "../domain-banner.svelte";
-  import { DOMAINS } from "$lib/ts/content/domains/domains";
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
+  import { getCharacterContext } from "$lib/state/character.svelte";
   import ChoiceSelector from "$lib/components/app/leveling/secondary-options/choice-selector.svelte";
+  import { getCompendiumContext } from "$lib/state/compendium.svelte";
 
   let {
     bind_choice_select = false,
@@ -17,7 +17,7 @@
   }: {
     bind_choice_select?: boolean;
     bind_token_count?: boolean;
-    card: Card<"domain">;
+    card: DomainCard;
     variant?: "responsive" | "card";
     class?: string;
     children?: Snippet;
@@ -27,6 +27,9 @@
 
   const context = getCharacterContext();
   let character = $derived(context.character);
+
+  const compendium = getCompendiumContext();
+
   let width = $state(300);
 </script>
 
@@ -174,7 +177,7 @@
       <!-- title and community label -->
       <div class="relative flex flex-row-reverse flex-wrap gap-2 justify-between">
         <div class="mr-auto shadow-md px-2 py-1 bg-accent rounded h-min">
-          <p class="text-xs uppercase text-black tracking-[2px] font-bold">{card.type}</p>
+          <p class="text-xs uppercase text-black tracking-[2px] font-bold">{card.category}</p>
         </div>
 
         <p class="grow text-wrap font-eveleth uppercase">
@@ -259,14 +262,14 @@
           </div>
         </div>
         <div
-          style="background: {DOMAINS[card.domain_id].color};"
+          style="background: {compendium.domains[card.domain_id].color};"
           class="clip-card-type absolute left-[111px] bottom-[3px] w-[135px] h-[23px]"
         ></div>
         <p
-          style="color: {DOMAINS[card.domain_id].foreground_color};"
+          style="color: {compendium.domains[card.domain_id].foreground_color};"
           class="z-5 absolute uppercase leading-none bottom-[8px] left-[180px] -translate-x-1/2 text-[12px] font-bold"
         >
-          {card.type}
+          {card.category}
         </p>
       </div>
 

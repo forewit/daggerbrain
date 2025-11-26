@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { AllTierOptionIds, LevelUpChoice, LevelUpOption } from "$lib/ts/character/types";
+  import type { AllTierOptionIds, LevelUpChoice, LevelUpOption } from "$lib/types/rule-types";
   import { cn } from "$lib/utils";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import Square from "@lucide/svelte/icons/square";
@@ -8,7 +8,7 @@
   import CheckCheck from "@lucide/svelte/icons/check-check";
   import * as Select from "$lib/components/ui/select/";
   import * as Collapsible from "$lib/components/ui/collapsible/";
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
+  import { getCharacterContext } from "$lib/state/character.svelte";
 
   let {
     tier_number,
@@ -29,7 +29,7 @@
   const context = getCharacterContext();
 
   function calculate_disabled(
-    option_id: string,
+    option_id: AllTierOptionIds,
     option: LevelUpOption,
     tier_number: number
   ): { disabled: boolean; rule_disabled: boolean } {
@@ -88,7 +88,7 @@
     </Collapsible.Trigger>
     <Collapsible.Content>
       {#each Object.entries(options) as [option_id, option]}
-        {@const { disabled, rule_disabled } = calculate_disabled(option_id, option, tier_number)}
+        {@const { disabled, rule_disabled } = calculate_disabled(option_id as AllTierOptionIds, option, tier_number)}
 
         <button
           {disabled}
@@ -103,7 +103,7 @@
                 ></span>
               {/if}
               {#each Array(option.max) as _, i}
-                {@const Icon = i < context.options_used[option_id] ? SquareCheck : Square}
+                {@const Icon = i < context.options_used[option_id as AllTierOptionIds] ? SquareCheck : Square}
                 {@const double = option.costs_two_choices}
 
                 {#if double}
