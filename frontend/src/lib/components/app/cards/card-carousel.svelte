@@ -1,12 +1,12 @@
 <script lang="ts">
-  import type { Card, CardType } from "$lib/ts/character/types";
+  import type { DomainCard, AncestryCard, CommunityCard, TransformationCard, SubclassFoundationCard, SubclassSpecializationCard, SubclassMasteryCard } from "$lib/types/compendium-types";
   import { cn } from "$lib/utils";
   import { onMount, tick } from "svelte";
-  import AncestryCard from "./full-cards/ancestry-card.svelte";
-  import CommunityCard from "./full-cards/community-card.svelte";
-  import DomainCard from "./full-cards/domain-card.svelte";
-  import TransformationCard from "./full-cards/transformation-card.svelte";
-  import SubclassCard from "./full-cards/subclass-card.svelte";
+  import AncestryCardComponent from "./full-cards/ancestry-card.svelte";
+  import CommunityCardComponent from "./full-cards/community-card.svelte";
+  import DomainCardComponent from "./full-cards/domain-card.svelte";
+  import TransformationCardComponent from "./full-cards/transformation-card.svelte";
+  import SubclassCardComponent from "./full-cards/subclass-card.svelte";
 
   let {
     class: className = "",
@@ -19,7 +19,7 @@
     scroll_to_index = -1,
   }: {
     class?: string;
-    cards: Card<CardType>[];
+    cards: (DomainCard | AncestryCard | CommunityCard | TransformationCard | SubclassFoundationCard | SubclassSpecializationCard | SubclassMasteryCard)[];
     cardWidth?: number;
     selectedIndex?: number;
     disabled_indices?: Set<number>;
@@ -94,18 +94,16 @@
         )}
       ></span>
       {#if card.card_type === "domain"}
-        <DomainCard card={card as Card<"domain">} variant="card" />
+        <DomainCardComponent card={card as DomainCard} variant="card" />
       {:else if card.card_type === "ancestry"}
-        <AncestryCard card={card as Card<"ancestry">} variant="card" />
+        <AncestryCardComponent card={card as AncestryCard} variant="card" />
       {:else if card.card_type === "community"}
-        <CommunityCard card={card as Card<"community">} variant="card" />
+        <CommunityCardComponent card={card as CommunityCard} variant="card" />
       {:else if card.card_type === "transformation"}
-        <TransformationCard card={card as Card<"transformation">} variant="card" />
+        <TransformationCardComponent card={card as TransformationCard} variant="card" />
       {:else if card.card_type === "subclass_foundation" || card.card_type === "subclass_specialization" || card.card_type === "subclass_mastery"}
-        <SubclassCard
-          card={card as Card<
-            "subclass_foundation" | "subclass_specialization" | "subclass_mastery"
-          >}
+        <SubclassCardComponent
+          card={card as SubclassFoundationCard | SubclassSpecializationCard | SubclassMasteryCard}
           variant="card"
         />
       {/if}

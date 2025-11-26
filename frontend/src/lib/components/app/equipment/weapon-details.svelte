@@ -1,6 +1,6 @@
 <script lang="ts">
   import { capitalize } from "$lib/utils";
-  import type { Weapon } from "$lib/ts/character/types";
+  import type { Weapon } from "$lib/types/compendium-types";
   import Hand from "@lucide/svelte/icons/hand";
 
   let { weapon }: { weapon: Weapon } = $props();

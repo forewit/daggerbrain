@@ -1,8 +1,8 @@
 <script lang="ts">
   import Input from "$lib/components/ui/input/input.svelte";
   import { cn } from "$lib/utils";
-  import type { Traits } from "$lib/ts/character/types";
-  import { TRAITS } from "$lib/ts/character/rules";
+  import type { Traits } from "$lib/types/compendium-types";
+  import { TRAITS } from "$lib/types/rules";
 
   let { class: className = "", traits = $bindable() }: { class?: string; traits: Traits } =
     $props();

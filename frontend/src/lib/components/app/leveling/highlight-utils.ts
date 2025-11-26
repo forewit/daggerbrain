@@ -1,4 +1,4 @@
-import type { getCharacterContext } from "$lib/ts/character/character.svelte";
+import type { getCharacterContext } from "$lib/state/character.svelte";
 
 /**
  * Calculate if the level-up section should be highlighted (indicating incomplete selections).

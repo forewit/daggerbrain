@@ -1,7 +1,7 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
   import Shield from "@lucide/svelte/icons/shield";
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
+  import { getCharacterContext } from "$lib/state/character.svelte";
 
   let { class: className = "" }: { class?: string } = $props();
 
@@ -11,7 +11,7 @@
 
 {#if character}
 <div class={cn("flex gap-2 h-min text-center border-2 rounded-md p-2", className)}>
-  <button onclick={() => (character.ephemeral_stats.marked_armor = 0)}>
+  <button onclick={() => (character.marked_armor = 0)}>
     <p class="text-lg font-bold">
       {context.max_armor}
     </p>
@@ -31,16 +31,16 @@
         aria-label="armor-slot"
         class="size-min outline-offset-2 rounded"
         onclick={() => {
-          if (index + 1 === character.ephemeral_stats.marked_armor) {
-            character.ephemeral_stats.marked_armor = Math.max(0, character.ephemeral_stats.marked_armor - 1);
+          if (index + 1 === character.marked_armor) {
+            character.marked_armor = Math.max(0, character.marked_armor - 1);
           } else {
-            character.ephemeral_stats.marked_armor = index + 1;
+            character.marked_armor = index + 1;
           }
         }}
         type="button"
       >
         <Shield
-          class="size-4 transition-all text-muted-foreground {index < character.ephemeral_stats.marked_armor
+          class="size-4 transition-all text-muted-foreground {index < character.marked_armor
             ? 'fill-muted-foreground'
             : 'fill-transparent'}"
         />

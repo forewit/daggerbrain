@@ -3,19 +3,20 @@
   import Dropdown from "./dropdown.svelte";
   import PrimaryClassSelector from "./secondary-options/primary-class-selector.svelte";
   import PrimarySubclassSelector from "./secondary-options/primary-subclass-selector.svelte";
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
-  import { SOURCES } from "$lib/ts/character/constants";
-  import { DOMAINS } from "$lib/ts/content/domains/domains";
+  import { getCharacterContext } from "$lib/state/character.svelte";
   import DomainCardSelector from "./secondary-options/domain-card-selector.svelte";
   import {
     get_available_domain_cards,
     get_previously_chosen_domain_card_ids,
   } from "./domain-card-utils";
+	import { getCompendiumContext } from "$lib/state/compendium.svelte";
 
   let { class: className = "" } = $props();
 
   const context = getCharacterContext();
   let character = $derived(context.character);
+
+  const compendium = getCompendiumContext();
 </script>
 
 {#if character}
@@ -27,7 +28,7 @@
       subtitle={context.primary_class
         ? character.derived_descriptors.primary_class_name +
           " • " +
-          SOURCES[context.primary_class.source_id].short_title
+          compendium.sources[context.primary_class.source_id].short_title
         : ""}
     >
       <PrimaryClassSelector />
@@ -58,9 +59,9 @@
     >
       {#if context.primary_class !== null}
         {@const description_html = `<p>Choose up to 2 level 1 domain cards from the
-            <b>${DOMAINS[context.primary_class.primary_domain_id].name}</b>
+            <b>${compendium.domains[context.primary_class.primary_domain_id].name}</b>
             and
-            <b>${DOMAINS[context.primary_class.secondary_domain_id].name}</b>
+            <b>${compendium.domains[context.primary_class.secondary_domain_id].name}</b>
             domains.</p>`}
         <div class="flex flex-col gap-2 bg-primary/50 p-2 rounded-md">
           <p class="py-1 px-2 text-xs italic text-muted-foreground">

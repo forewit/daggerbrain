@@ -1,15 +1,18 @@
 <script lang="ts">
-  import type { Character } from "$lib/ts/character/types";
   import { Button, buttonVariants } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog/";
   import * as Collapsible from "$lib/components/ui/collapsible/";
   import SubclassCard from "$lib/components/app/cards/full-cards/subclass-card.svelte";
   import { cn } from "$lib/utils";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
+  import { getCharacterContext } from "$lib/state/character.svelte";
+  import { getCompendiumContext } from "$lib/state/compendium.svelte";
 
   const context = getCharacterContext();
   let character = $derived(context.character);
+
+  const compendium = getCompendiumContext();
+  
 
   let subclass_dialog_open = $state(false);
   let subclass_cards_open = $state(false);
@@ -61,7 +64,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto">
         <!-- each class -->
         {#if context.primary_class}
-          {#each Object.entries(context.primary_class.subclasses) as [id, subclass]}
+          {#each Object.entries(compendium.subclasses).filter(([id, s]) => s.class_id === context.primary_class?.id) as [id, subclass]}
             <div class="flex flex-col gap-3 border-2 rounded-md p-3 bg-primary-muted">
               <p class="text-lg font-medium">{subclass.name}</p>
               <p class="-mt-2 text-xs italic text-muted-foreground">

@@ -1,8 +1,7 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
-  import type { Class, Domain, DomainIds } from "$lib/ts/character/types";
-  import { DOMAINS } from "$lib/ts/content/domains/domains";
-
+  import type { DomainIds } from "$lib/types/compendium-types";
+  import {getCompendiumContext} from "$lib/state/compendium.svelte";
   let {
     class: className = "",
     style = "",
@@ -15,7 +14,8 @@
     level_requirement?: number;
   } = $props();
 
-  let domain = $derived(DOMAINS[domain_id]);
+  const compendium = getCompendiumContext();
+  let domain = $state(compendium.domains[domain_id]);
 </script>
 
 {#snippet domainSVG(domain_id: DomainIds)}
@@ -228,7 +228,7 @@
     <img class="h-full w-full" src="/images/card/banner.webp" alt="banner" />
     <div
       class="absolute inset-0 flex flex-col items-center justify-center pb-3 gap-1 pt-0.5"
-      style="color: {DOMAINS[domain_id].foreground_color};"
+      style="color: {compendium.domains[domain_id].foreground_color};"
     >
       <div class="w-9 h-auto aspect-contain flex items-center justify-center">
         <p class="text-xl font-bold">{level_requirement}</p>

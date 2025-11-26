@@ -2,16 +2,17 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import Checkbox from "$lib/components/ui/checkbox/checkbox.svelte";
   import Label from "$lib/components/ui/label/label.svelte";
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
-  import { get_weapon, get_armor, get_loot, get_consumable } from "$lib/ts/character/helpers";
-  import type { Weapon, Armor, Loot, Consumable, AdventuringGear } from "$lib/ts/character/types";
+  import { getCharacterContext } from "$lib/state/character.svelte";
+  import type { Weapon, Armor, Loot, Consumable, AdventuringGear } from "$lib/types/compendium-types";
   import { cn } from "$lib/utils";
-  import WeaponCard from "./weapon.svelte";
   import ArmorCard from "./armor.svelte";
+  import { getCompendiumContext } from "$lib/state/compendium.svelte";
 
   const context = getCharacterContext();
   let character = $derived(context.character);
   let primary_class = $derived(context.primary_class);
+
+  const compendium = getCompendiumContext();
 
   // State for checkbox selections
   let selectedPrimaryWeapon = $state(false);
@@ -26,17 +27,17 @@
   // Get suggested items
   let suggestedPrimaryWeapon = $derived.by(() => {
     if (!primary_class?.suggested_primary_weapon_id) return null;
-    return get_weapon(primary_class.suggested_primary_weapon_id);
+    return compendium.primary_weapons[primary_class.suggested_primary_weapon_id];
   });
 
   let suggestedSecondaryWeapon = $derived.by(() => {
     if (!primary_class?.suggested_secondary_weapon_id) return null;
-    return get_weapon(primary_class.suggested_secondary_weapon_id);
+    return compendium.secondary_weapons[primary_class.suggested_secondary_weapon_id];
   });
 
   let suggestedArmor = $derived.by(() => {
     if (!primary_class?.suggested_armor_id) return null;
-    return get_armor(primary_class.suggested_armor_id);
+    return compendium.armor[primary_class.suggested_armor_id];
   });
 
   // Get loot options (can be either loot or consumables)
@@ -49,9 +50,9 @@
     return primary_class.starting_inventory.loot_or_consumable_options
       .map((id): LootOption | null => {
         // Try loot first, then consumable
-        const loot = get_loot(id);
+        const loot = compendium.loot[id];
         if (loot) return { id, item: loot, type: "loot" as const };
-        const consumable = get_consumable(id);
+        const consumable = compendium.consumables[id];
         if (consumable) return { id, item: consumable, type: "consumable" as const };
         return null;
       })
@@ -118,15 +119,29 @@
   }
 
   // Functions to add items
-  function addWeaponToInventory(weapon: Weapon) {
+  function addPrimaryWeaponToInventory(weapon: Weapon) {
     if (!character || !weapon) return;
-    if (!(weapon.id in character.inventory.weapons)) {
-      character.inventory.weapons[weapon.id] = {
+    // Only add if not already in inventory
+    if (!(weapon.id in character.inventory.primary_weapons)) {
+      character.inventory.primary_weapons[weapon.id] = {
         quantity: 1,
         choices: {},
       };
     } else {
-      character.inventory.weapons[weapon.id].quantity++;
+      character.inventory.primary_weapons[weapon.id].quantity++;
+    }
+  }
+
+  function addSecondaryWeaponToInventory(weapon: Weapon) {
+    if (!character || !weapon) return;
+    // Only add if not already in inventory
+    if (!(weapon.id in character.inventory.secondary_weapons)) {
+      character.inventory.secondary_weapons[weapon.id] = {
+        quantity: 1,
+        choices: {},
+      };
+    } else {
+      character.inventory.secondary_weapons[weapon.id].quantity++;
     }
   }
 
@@ -176,12 +191,12 @@
 
     // Add selected primary weapon
     if (selectedPrimaryWeapon && suggestedPrimaryWeapon) {
-      addWeaponToInventory(suggestedPrimaryWeapon);
+      addPrimaryWeaponToInventory(suggestedPrimaryWeapon);
     }
 
     // Add selected secondary weapon
     if (selectedSecondaryWeapon && suggestedSecondaryWeapon) {
-      addWeaponToInventory(suggestedSecondaryWeapon);
+      addSecondaryWeaponToInventory(suggestedSecondaryWeapon);
     }
 
     // Add selected armor

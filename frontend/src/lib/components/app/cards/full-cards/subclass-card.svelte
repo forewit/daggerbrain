@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { Card, Class } from "$lib/ts/character/types";
+  import type { SubclassFoundationCard, SubclassSpecializationCard, SubclassMasteryCard } from "$lib/types/compendium-types";
   import { cn } from "$lib/utils";
   import type { Snippet } from "svelte";
   import ClassBanner from "../class-banner.svelte";
-  import { CLASSES } from "$lib/ts/content/classes/classes";
-  import { DOMAINS } from "$lib/ts/content/domains/domains";
+	import { getCompendiumContext } from "$lib/state/compendium.svelte";
+
 
   let {
     card = $bindable(),
@@ -13,7 +13,7 @@
     hideImage = false,
     variant = "responsive",
   }: {
-    card: Card<"subclass_foundation" | "subclass_specialization" | "subclass_mastery">;
+    card: SubclassFoundationCard | SubclassSpecializationCard | SubclassMasteryCard;
     class?: string;
     children?: Snippet;
     hideImage?: boolean;
@@ -22,7 +22,9 @@
 
   let clientWidth = $state(360);
 
-  const character_class = CLASSES[card.class_id as keyof typeof CLASSES];
+  const compendium = getCompendiumContext()
+
+  const character_class = compendium.classes[card.class_id as keyof typeof compendium.classes];
 </script>
 
 {#if variant === "responsive"}
@@ -55,10 +57,10 @@
       </div>
 
       <!-- spellcast trait -->
-      {#if (card as Card<"subclass_foundation">).spellcast_trait}
+      {#if card.card_type === "subclass_foundation" && (card as SubclassFoundationCard).spellcast_trait}
         <p class="text-xs text-center">
           <b><em>Spellcast Trait:</em></b>
-          {(card as Card<"subclass_foundation">).spellcast_trait}
+          {(card as SubclassFoundationCard).spellcast_trait}
         </p>
       {/if}
 
@@ -95,8 +97,8 @@
         <ClassBanner {character_class} class="absolute -top-[2px] left-[14px] w-[75px]" />
 
         <div
-          style="background: linear-gradient(to right, {DOMAINS[character_class.primary_domain_id]
-            .color}, {DOMAINS[character_class.secondary_domain_id].color});"
+          style="background: linear-gradient(to right, {compendium.domains[character_class.primary_domain_id]
+            .color}, {compendium.domains[character_class.secondary_domain_id].color});"
           class="clip-card-type absolute left-[110px] bottom-[5px] w-[129px] h-[21px]"
         ></div>
         <p
@@ -119,10 +121,10 @@
             {card.description_html}
           </p>
 
-          {#if card.card_type === "subclass_foundation" && (card as Card<"subclass_foundation">).spellcast_trait}
+          {#if card.card_type === "subclass_foundation" && (card as SubclassFoundationCard).spellcast_trait}
             <p class="text-[14px] text-black text-center uppercase">
               <b>Spellcast Trait:</b>
-              {(card as Card<"subclass_foundation">).spellcast_trait}
+              {(card as SubclassFoundationCard).spellcast_trait}
             </p>
           {/if}
         </div>

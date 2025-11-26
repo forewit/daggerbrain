@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
+  import { getCharacterContext } from "$lib/state/character.svelte";
   import Textarea from "$lib/components/ui/textarea/textarea.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import Plus from "@lucide/svelte/icons/plus";
@@ -13,9 +13,9 @@
 
   function addConnection() {
     if (character) {
-      character.connections.push({ question: "", answer: "" });
+      character.connection_answers.push({ question: "", answer: "" });
       // Start editing the new connection
-      editingQuestionIndex = character.connections.length - 1;
+      editingQuestionIndex = character.connection_answers.length - 1;
       // Focus the textarea after it's rendered
       setTimeout(() => {
         if (questionTextareaRef) {
@@ -27,7 +27,7 @@
 
   function removeConnection(index: number) {
     if (character) {
-      character.connections.splice(index, 1);
+      character.connection_answers.splice(index, 1);
       if (editingQuestionIndex === index) {
         editingQuestionIndex = null;
       } else if (editingQuestionIndex !== null && editingQuestionIndex > index) {
@@ -38,7 +38,7 @@
 
   function resetConnections() {
     if (character && primary_class) {
-      character.connections = primary_class.connections.map((question) => ({
+      character.connection_answers = primary_class.connections.map((question) => ({
         question,
         answer: "",
       }));
@@ -63,7 +63,7 @@
 </script>
 
 {#if character && primary_class}
-  {#each character.connections as item, i}
+  {#each character.connection_answers as item, i}
     <div class="bg-primary/50 p-3 rounded-md flex flex-col gap-3">
       <div class="flex gap-2 items-start justify-between">
         {#if editingQuestionIndex === i}

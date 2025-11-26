@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { Traits } from "$lib/ts/character/types";
-  import { TRAITS } from "$lib/ts/character/rules";
+  import type { Traits } from "$lib/types/compendium-types";
+  import { TRAITS } from "$lib/types/rules";
   import * as Select from "$lib/components/ui/select/";
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
+  import { getCharacterContext } from "$lib/state/character.svelte";
 
   let {
     selected_traits = $bindable(),

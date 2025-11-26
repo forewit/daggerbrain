@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Consumable } from "$lib/ts/character/types";
+  import type { Consumable } from "$lib/types/compendium-types";
 
   let { consumable }: { consumable: Consumable } = $props();
 </script>

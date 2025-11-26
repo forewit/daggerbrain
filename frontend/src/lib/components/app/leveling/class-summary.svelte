@@ -1,11 +1,11 @@
 <script lang="ts">
   import Banner from "$lib/components/app/cards/class-banner.svelte";
-  import { DOMAINS } from "$lib/ts/content/domains/domains";
-  import type { Class, DomainIds } from "$lib/ts/character/types";
+  import type { Class, DomainIds } from "$lib/types/compendium-types";
   import { cn } from "$lib/utils";
   import type { Snippet } from "svelte";
   import * as Select from "$lib/components/ui/select/";
   import DomainBanner from "$lib/components/app/cards/domain-banner.svelte";
+  import { getCompendiumContext } from "$lib/state/compendium.svelte";
 
   let {
     character_class,
@@ -13,7 +13,7 @@
     bannerClasses = "",
     children,
     multiclass = false,
-    domain_id_selection: domain_selection = $bindable(null),
+    domain_id_selection = $bindable(null),
     hide_starting_stats = false,
   }: {
     character_class: Class;
@@ -24,6 +24,8 @@
     hide_starting_stats?: boolean;
     domain_id_selection?: DomainIds | null;
   } = $props();
+
+  const compendium = getCompendiumContext();
 </script>
 
 <div class={cn("flex flex-col gap-3", className)}>
@@ -42,19 +44,19 @@
           <p class="text-xs font-medium">Multiclass domain</p>
           <Select.Root
             type="single"
-            value={domain_selection ?? ""}
+            value={domain_id_selection ?? ""}
             onValueChange={(value) => {
-              if (value === "") domain_selection = null;
-              else domain_selection = value as DomainIds;
+              if (value === "") domain_id_selection = null;
+              else domain_id_selection = value as DomainIds;
             }}
           >
             <Select.Trigger
-              highlighted={domain_selection === null}
+              highlighted={domain_id_selection === null}
               class="w-full truncate bg-muted-foreground/8 hover:bg-muted-foreground/5"
             >
               <p class="truncate">
-                {domain_selection
-                  ? DOMAINS[domain_selection].name
+                {domain_id_selection
+                  ? compendium.domains[domain_id_selection].name
                   : "Select a domain"}
               </p>
             </Select.Trigger>
@@ -65,11 +67,11 @@
               <Select.Label>Domains</Select.Label>
               <!-- primary domain -->
               <Select.Item value={character_class.primary_domain_id}
-                >{DOMAINS[character_class.primary_domain_id].name}</Select.Item
+                >{compendium.domains[character_class.primary_domain_id].name}</Select.Item
               >
               <!-- secondary domain -->
               <Select.Item value={character_class.secondary_domain_id}
-                >{DOMAINS[character_class.secondary_domain_id]
+                >{compendium.domains[character_class.secondary_domain_id]
                   .name}</Select.Item
               >
             </Select.Content>
@@ -77,8 +79,8 @@
         {:else}
           <p class="text-xs text-muted-foreground">
             <b class="text-foreground"><i>Domains:</i></b>
-            {DOMAINS[character_class.primary_domain_id].name} /
-            {DOMAINS[character_class.secondary_domain_id].name}
+            {compendium.domains[character_class.primary_domain_id].name} /
+            {compendium.domains[character_class.secondary_domain_id].name}
           </p>
 
           {#if !hide_starting_stats}
@@ -95,8 +97,8 @@
       </div>
     </div>
 
-    {#if multiclass && domain_selection !== null}
-      <DomainBanner domain_id={domain_selection} />
+    {#if multiclass && domain_id_selection !== null}
+      <DomainBanner domain_id={domain_id_selection} />
     {:else}
       <Banner {character_class} class={bannerClasses} />
     {/if}

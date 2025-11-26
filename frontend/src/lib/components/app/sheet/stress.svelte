@@ -1,6 +1,6 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
+  import { getCharacterContext } from "$lib/state/character.svelte";
 
   let {
     class: className = "",
@@ -26,7 +26,7 @@
 >
   <button
     onclick={() => {
-      character.ephemeral_stats.marked_stress = 0;
+      character.marked_stress = 0;
     }}
     class="text-sm font-medium">STRESS</button
   >
@@ -36,19 +36,19 @@
         aria-label="character.stress-slot"
         class={cn(
           "w-6 h-3 rounded-md border border-muted-foreground transition-colors",
-          index < character.ephemeral_stats.marked_stress
+          index < character.marked_stress
             ? "bg-muted-foreground"
             : "bg-transparent",
           slotClasses
         )}
         onclick={() => {
-          if (index + 1 === character.ephemeral_stats.marked_stress) {
-            character.ephemeral_stats.marked_stress = Math.max(
+          if (index + 1 === character.marked_stress) {
+            character.marked_stress = Math.max(
               0,
-              character.ephemeral_stats.marked_stress - 1
+              character.marked_stress - 1
             );
           } else {
-            character.ephemeral_stats.marked_stress = index + 1;
+            character.marked_stress = index + 1;
           }
         }}
         type="button"
@@ -56,11 +56,11 @@
     {/each}
   </div>
 
-  {#if context.max_stress === character.ephemeral_stats.marked_stress && !displayOnly}
+  {#if context.max_stress === character.marked_stress && !displayOnly}
     <button
       onclick={() => {
-        if (character.ephemeral_stats.marked_hp < context.max_hp)
-          character.ephemeral_stats.marked_hp++;
+        if (character.marked_hp < context.max_hp)
+          character.marked_hp++;
       }}
       class="p-2 text-xs text-nowrap bg-border rounded-md hover:bg-muted-foreground/20 grid place-items-center leading-none"
     >

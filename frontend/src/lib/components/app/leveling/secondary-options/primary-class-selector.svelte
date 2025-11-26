@@ -1,13 +1,14 @@
 <script lang="ts">
-  import type { Character } from "$lib/ts/character/types";
   import { Button, buttonVariants } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog/";
-  import { CLASSES } from "$lib/ts/content/classes/classes";
   import ClassSummary from "../class-summary.svelte";
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
+  import { getCharacterContext } from "$lib/state/character.svelte";
+  import { getCompendiumContext } from "$lib/state/compendium.svelte";
 
   const context = getCharacterContext();
   let character = $derived(context.character);
+
+  const compendium = getCompendiumContext();
 
   let class_dialog_open = $state(false);
   let remove_class_dialog_open = $state(false);
@@ -51,7 +52,7 @@
       </Dialog.Header>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto">
         <!-- each class -->
-        {#each Object.entries(CLASSES) as [id, c]}
+        {#each Object.entries(compendium.classes) as [id, c]}
           <div class="flex gap-3 border-2 rounded-md p-3 bg-primary-muted">
             <ClassSummary character_class={c} bannerClasses="-mt-3">
               <Button

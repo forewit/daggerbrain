@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Armor } from "$lib/ts/character/types";
+  import type { Armor } from "$lib/types/compendium-types";
   import Shield from "@lucide/svelte/icons/shield";
 
   let { armor }: { armor: Armor } = $props();

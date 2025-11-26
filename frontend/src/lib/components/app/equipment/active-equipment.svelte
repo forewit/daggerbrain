@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { getCharacterContext } from "$lib/ts/character/character.svelte";
-  import WeaponCard from "$lib/components/app/equipment/weapon.svelte";
+  import { getCharacterContext } from "$lib/state/character.svelte";
+  import PrimaryWeaponCard from "$lib/components/app/equipment/primary-weapon.svelte";
+  import SecondaryWeaponCard from "$lib/components/app/equipment/secondary-weapon.svelte";
   import ArmorCard from "$lib/components/app/equipment/armor.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import CircleMinus from "@lucide/svelte/icons/circle-minus";
@@ -13,15 +14,15 @@
   <!-- Armor Slot -->
   <p class="text-sm font-medium pb-2 pt-1 px-1">Active Armor</p>
   <div class="flex items-center justify-end gap-1">
-    {#if context.armor !== null}
+    {#if context.active_armor !== null}
       <div class="grow">
-        <ArmorCard armor={context.armor} />
+        <ArmorCard armor={context.active_armor} />
       </div>
       <Button
         size="icon"
         variant="link"
         onclick={() => {
-          if (character) character.armor_id = null;
+          if (character) character.active_armor_id = null;
         }}
       >
         <CircleMinus class="size-4" />
@@ -41,16 +42,16 @@
     </p>
 
     <div class="flex flex-col gap-2">
-      {#if context.primary_weapon !== null}
+      {#if context.derived_primary_weapon !== null}
         <div class="flex items-center justify-end gap-1">
           <div class="grow">
-            <WeaponCard weapon={context.primary_weapon} bind_choices />
+            <PrimaryWeaponCard weapon={context.derived_primary_weapon} bind_choices />
           </div>
           <Button
             size="icon"
             variant="link"
             onclick={() => {
-              if (character) character.primary_weapon_id = null;
+              if (character) character.active_primary_weapon_id = null;
             }}
           >
             <CircleMinus class="size-4" />
@@ -61,16 +62,16 @@
           <p class="text-sm text-muted-foreground">No Primary Weapon</p>
         </div>
       {/if}
-      {#if context.secondary_weapon !== null}
+      {#if context.derived_secondary_weapon !== null}
         <div class="flex items-center justify-end gap-1">
           <div class="grow">
-            <WeaponCard weapon={context.secondary_weapon} bind_choices />
+            <SecondaryWeaponCard weapon={context.derived_secondary_weapon} bind_choices />
           </div>
           <Button
             size="icon"
             variant="link"
             onclick={() => {
-              if (character) character.secondary_weapon_id = null;
+              if (character) character.active_secondary_weapon_id = null;
             }}
           >
             <CircleMinus class="size-4" />
