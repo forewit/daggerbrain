@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "5abca7c3-4659-4867-95fe-bed2e5505551",
+  "id": "7434184a-3e84-4f45-8e44-3ed013c752e5",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "characters_table": {
@@ -13,7 +13,7 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": false,
-          "default": "'234f262c-7d34-4eb1-bec4-d8239482772e'"
+          "default": "'e78d171e-1665-410b-b41f-3afd6fe66c91'"
         },
         "clerk_user_id": {
           "name": "clerk_user_id",
@@ -28,7 +28,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "''"
+          "default": "'New Character'"
         },
         "image_url": {
           "name": "image_url",
@@ -36,7 +36,180 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "''"
+          "default": "'/images/portrait-placeholder.png'"
+        },
+        "settings": {
+          "name": "settings",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'{\"void_enabled\":false,\"use_gold_coins\":false}'"
+        },
+        "derived_descriptors": {
+          "name": "derived_descriptors",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'{\"ancestry_name\":\"\",\"primary_class_name\":\"\",\"primary_subclass_name\":\"\",\"secondary_class_name\":\"\",\"secondary_subclass_name\":\"\"}'"
+        },
+        "ancestry_card_id": {
+          "name": "ancestry_card_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "community_card_id": {
+          "name": "community_card_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "experiences": {
+          "name": "experiences",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'[\"\",\"\"]'"
+        },
+        "primary_class_id": {
+          "name": "primary_class_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "primary_subclass_id": {
+          "name": "primary_subclass_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "secondary_class_id": {
+          "name": "secondary_class_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "secondary_subclass_id": {
+          "name": "secondary_subclass_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "secondary_class_domain_id_choice": {
+          "name": "secondary_class_domain_id_choice",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "background_questions": {
+          "name": "background_questions",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'[]'"
+        },
+        "connections": {
+          "name": "connections",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'[]'"
+        },
+        "active_armor_id": {
+          "name": "active_armor_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "active_primary_weapon_id": {
+          "name": "active_primary_weapon_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "active_secondary_weapon_id": {
+          "name": "active_secondary_weapon_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "inventory": {
+          "name": "inventory",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'{\"primary_weapons\":{},\"secondary_weapons\":{},\"armor\":{},\"loot\":{},\"consumables\":{},\"adventuring_gear\":[],\"gold_coins\":0}'"
+        },
+        "transformation_card_id": {
+          "name": "transformation_card_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "additional_domain_card_ids": {
+          "name": "additional_domain_card_ids",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'[]'"
+        },
+        "additional_character_modifiers": {
+          "name": "additional_character_modifiers",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'[]'"
+        },
+        "additional_weapon_modifiers": {
+          "name": "additional_weapon_modifiers",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'[]'"
+        },
+        "domain_card_choices": {
+          "name": "domain_card_choices",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'{}'"
+        },
+        "domain_card_tokens": {
+          "name": "domain_card_tokens",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'{}'"
+        },
+        "selected_traits": {
+          "name": "selected_traits",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'{\"agility\":null,\"strength\":null,\"finesse\":null,\"instinct\":null,\"presence\":null,\"knowledge\":null}'"
         },
         "marked_hp": {
           "name": "marked_hp",
@@ -70,112 +243,6 @@
           "autoincrement": false,
           "default": 0
         },
-        "active_armor_id": {
-          "name": "active_armor_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "active_primary_weapon_id": {
-          "name": "active_primary_weapon_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "active_secondary_weapon_id": {
-          "name": "active_secondary_weapon_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "ancestry_card_id": {
-          "name": "ancestry_card_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "community_card_id": {
-          "name": "community_card_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "transformation_card_id": {
-          "name": "transformation_card_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "derived_descriptors": {
-          "name": "derived_descriptors",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'{\"ancestry_name\": \"\", \"primary_class_name\": \"\", \"primary_subclass_name\": \"\", \"secondary_class_name\": \"\", \"secondary_subclass_name\": \"\"}'"
-        },
-        "inventory": {
-          "name": "inventory",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'{\"primary_weapons\": {}, \"secondary_weapons\": {}, \"armor\": {}, \"loot\": {}, \"consumables\": {}, \"adventuring_gear\": [], \"gold_coins\": 0}'"
-        },
-        "settings": {
-          "name": "settings",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'{\"void_enabled\": false, \"use_gold_coins\": false}'"
-        },
-        "background_questions": {
-          "name": "background_questions",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'[]'"
-        },
-        "connections": {
-          "name": "connections",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'[]'"
-        },
-        "additional_character_modifiers": {
-          "name": "additional_character_modifiers",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'[]'"
-        },
-        "additional_weapon_modifiers": {
-          "name": "additional_weapon_modifiers",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'[]'"
-        },
-        "additional_domain_card_ids": {
-          "name": "additional_domain_card_ids",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'[]'"
-        },
         "loadout_domain_card_ids": {
           "name": "loadout_domain_card_ids",
           "type": "text",
@@ -183,6 +250,30 @@
           "notNull": true,
           "autoincrement": false,
           "default": "'[]'"
+        },
+        "level": {
+          "name": "level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
+        "level_up_domain_card_ids": {
+          "name": "level_up_domain_card_ids",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'{\"1\":{\"A\":null,\"B\":null},\"2\":{\"A\":null},\"3\":{\"A\":null},\"4\":{\"A\":null},\"5\":{\"A\":null},\"6\":{\"A\":null},\"7\":{\"A\":null},\"8\":{\"A\":null},\"9\":{\"A\":null},\"10\":{\"A\":null}}'"
+        },
+        "level_up_choices": {
+          "name": "level_up_choices",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'{\"2\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"3\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"4\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"5\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"6\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"7\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"8\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"9\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"10\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}}}'"
         }
       },
       "indexes": {},

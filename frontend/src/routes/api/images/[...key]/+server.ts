@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
+// Serves images from the daggerbrain-images R2 bucket (compendium images)
 export const GET: RequestHandler = async ({ params, platform }) => {
 	const { key } = params;
 
@@ -11,11 +12,11 @@ export const GET: RequestHandler = async ({ params, platform }) => {
 	// key is an array when using catch-all, join it back to the original path
 	const imageKey = Array.isArray(key) ? key.join('/') : key;
 
-	if (!platform?.env?.R2) {
+	if (!platform?.env?.R2_IMAGES) {
 		throw error(500, 'Internal server error');
 	}
 
-	const r2 = platform.env.R2;
+	const r2 = platform.env.R2_IMAGES;
 	const object = await r2.get(imageKey);
 
 	if (!object) {

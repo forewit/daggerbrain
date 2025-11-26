@@ -6,6 +6,7 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import { goto } from '$app/navigation';
 	import { getUserContext } from '$lib/state/user.svelte';
+	import { ContextMenu } from 'bits-ui';
 
 	const user = getUserContext();
 

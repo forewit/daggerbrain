@@ -27,10 +27,18 @@ export const get_kv = (event: RequestEvent) => {
 	return event.platform.env.KV;
 };
 
-export const get_r2 = (event: RequestEvent) => {
-	if (!event.platform?.env?.R2) {
-		throw new Error('R2 not available');
+export const get_r2_images = (event: RequestEvent) => {
+	if (!event.platform?.env?.R2_IMAGES) {
+		throw new Error('R2_IMAGES not available');
 	}
 
-	return event.platform.env.R2;
+	return event.platform.env.R2_IMAGES;
+};
+
+export const get_r2_usercontent = (event: RequestEvent) => {
+	if (!event.platform?.env?.R2_USERCONTENT) {
+		throw new Error('R2_USERCONTENT not available');
+	}
+
+	return event.platform.env.R2_USERCONTENT;
 };

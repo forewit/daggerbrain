@@ -5,71 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1764000024244,
-      "tag": "0000_misty_scrambler",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1764007930402,
-      "tag": "0001_rich_hellion",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1764007950681,
-      "tag": "0002_wakeful_korg",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1764008006359,
-      "tag": "0003_famous_ikaris",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1764008027376,
-      "tag": "0004_public_patch",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1764009112733,
-      "tag": "0005_milky_raider",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "6",
-      "when": 1764017942852,
-      "tag": "0006_illegal_ravenous",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "6",
-      "when": 1764106785747,
-      "tag": "0007_legal_power_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "6",
-      "when": 1764152256743,
-      "tag": "0008_little_blue_shield",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "6",
-      "when": 1764153743698,
-      "tag": "0009_parched_squadron_sinister",
+      "when": 1764170425865,
+      "tag": "0000_round_anita_blake",
       "breakpoints": true
     }
   ]

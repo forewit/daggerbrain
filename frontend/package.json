@@ -4,8 +4,7 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev:reset": "rm -rf .wrangler/state && drizzle-kit generate && sh -c 'for file in drizzle/*.sql; do [ -f \"$file\" ] && wrangler d1 execute daggerbrain-db --file=\"$file\" --local; done' && bun run src/lib/compendium/generate-compendium-json.ts && wrangler kv bulk put src/lib/compendium/compendium-data.json --binding=KV --local",
-		"dev": "NODE_TLS_REJECT_UNAUTHORIZED=0 bun run dev:reset && vite dev",
+		"dev": "NODE_TLS_REJECT_UNAUTHORIZED=0 vite dev",
 		"build": "vite build",
 		"preview": "bun run build && wrangler dev",
 		"prepare": "svelte-kit sync || echo ''",
@@ -15,10 +14,11 @@
 		"lint": "prettier --check .",
 		"test:unit": "vitest",
 		"test": "bun run test:unit -- --run",
+		"db:push": "drizzle-kit push",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
 		"db:studio": "drizzle-kit studio",
-		"seed:kv": "bun run src/lib/compendium/generate-compendium-json.ts && wrangler kv bulk put src/lib/compendium/compendium-data.json --binding=KV --remote",
+		"seed": "bun run src/lib/scripts/seed.ts",
 		"deploy": "bun run build && wrangler deploy",
 		"cf-typegen": "wrangler types ./src/worker-configuration.d.ts"
 	},

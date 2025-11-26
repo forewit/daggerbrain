@@ -8,7 +8,8 @@ declare global {
 	namespace App {
 		interface Platform {
 			env: {
-				R2: R2Bucket;
+				R2_IMAGES: R2Bucket;
+				R2_USERCONTENT: R2Bucket;
 				DB: D1Database;
 				KV: KVNamespace;
 			};

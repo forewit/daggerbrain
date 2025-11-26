@@ -5,7 +5,7 @@ export const ANCESTRY_CARDS = {
 		id: 'half_clank',
 		source_id: 'Homebrew',
 		card_type: 'ancestry',
-		image_url: '/images/card/art/ancestries/clank.webp',
+		image_url: '/api/images/card/art/ancestries/clank.webp',
 		title: 'Half-Clank',
 		description_html: 'Half sentient mechanical being, half human.',
 		artist_name: 'Mat Wilma',
@@ -37,7 +37,7 @@ export const ANCESTRY_CARDS = {
 		id: 'drakona',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/images/card/art/ancestries/drakona.webp',
+		image_url: '/api/images/card/art/ancestries/drakona.webp',
 		title: 'Drakona',
 		description_html:
 			'Drakona resemble wingless dragons in humanoid form and possess a powerful elemental breath.',

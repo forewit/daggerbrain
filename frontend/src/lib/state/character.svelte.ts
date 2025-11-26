@@ -1,51 +1,16 @@
 import { getUserContext } from './user.svelte';
 import { ALL_LEVEL_UP_OPTIONS, BASE_STATS, TRAIT_OPTIONS } from '../types/rules';
 import { getContext, setContext } from 'svelte';
-import {
-	get_all_ancestry_cards,
-	get_all_community_cards,
-	get_all_transformation_cards,
-	get_ancestry_card,
-	get_community_card,
-	get_transformation_card
-} from '$lib/remote/heritages.remote';
-import {
-	get_all_classes,
-	get_all_subclasses,
-	get_class,
-	get_subclass
-} from '$lib/remote/classes.remote';
-import { get_all_domains, get_domain_card, get_domain_cards } from '$lib/remote/domains.remote';
-import {
-	get_all_primary_weapons,
-	get_all_secondary_weapons,
-	get_primary_weapon,
-	get_secondary_weapon,
-	get_all_armor,
-	get_all_loot,
-	get_all_consumables,
-	get_armor
-} from '$lib/remote/equipment.remote';
 import type { Character, DomainCardId } from '$lib/types/character-types';
-import type { AllTierOptionIds, LevelUpChoice, LevelUpOption } from '$lib/types/rule-types';
+import type { AllTierOptionIds, LevelUpChoice, } from '$lib/types/rule-types';
 import type {
 	DamageThresholds,
-	AncestryCard,
-	CommunityCard,
-	TransformationCard,
-	Class,
-	Subclass,
 	Traits,
 	Weapon,
-	Armor,
-	Loot,
-	Consumable,
 	CharacterCondition,
 	CharacterModifier,
 	WeaponModifier,
-	DomainIds,
 	DomainCard,
-	DomainCardChoice
 } from '$lib/types/compendium-types';
 import { BLANK_LEVEL_UP_CHOICE } from '$lib/types/constants';
 import { update_character } from '$lib/remote/characters.remote';
@@ -55,7 +20,10 @@ function createCharacter(id: string) {
 	const user = getUserContext();
 	const compendium = getCompendiumContext();
 
-	let character = <Character | null>$derived(user.all_characters.find((c) => c.id === id) || null);
+	let character = <Character | null>$state(null);
+	$effect(()=>{
+		character = user.all_characters.find((c) => c.id === id) || null
+	})
 
 	// ================================================
 	// DERIVED COMPENDIUM REFERENCES

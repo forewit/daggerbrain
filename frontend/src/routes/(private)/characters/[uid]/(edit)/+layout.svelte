@@ -64,7 +64,6 @@
       // };
     });
 
-    let test = $derived(await get_all_ancestry_cards());
   </script>
   
   {#if character}

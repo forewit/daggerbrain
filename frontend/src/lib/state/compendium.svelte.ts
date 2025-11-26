@@ -30,31 +30,7 @@ import {
 } from '$lib/remote/equipment.remote';
 import { get_all_sources } from '$lib/remote/sources.remote';
 
-// let ancestry_cards = $derived(await get_all_ancestry_cards());
-// let community_cards = $derived(await get_all_community_cards());
-// let transformation_cards = $derived(await get_all_transformation_cards());
-// let classes = $derived(await get_all_classes());
-// let subclasses = $derived(await get_all_subclasses());
-// let domains = $derived(await get_all_domains());
 
-// let domain_cards = $derived({
-// 	arcana: await get_domain_cards('arcana'),
-// 	blade: await get_domain_cards('blade'),
-// 	bone: await get_domain_cards('bone'),
-// 	codex: await get_domain_cards('codex'),
-// 	grace: await get_domain_cards('grace'),
-// 	midnight: await get_domain_cards('midnight'),
-// 	sage: await get_domain_cards('sage'),
-// 	splendor: await get_domain_cards('splendor'),
-// 	valor: await get_domain_cards('valor')
-// } as Record<DomainIds, Record<string, DomainCard>>);
-
-// let primary_weapons = $derived(await get_all_primary_weapons());
-// let secondary_weapons = $derived(await get_all_secondary_weapons());
-// let armor = $derived(await get_all_armor());
-// let loot = $derived(await get_all_loot());
-// let consumables = $derived(await get_all_consumables());
-// let sources = $derived(await get_all_sources());
 
 function createCompendium() {
 	let ancestry_cards: Record<string, AncestryCard> = $state({});
@@ -81,87 +57,50 @@ function createCompendium() {
 	let consumables: Record<string, Consumable> = $state({});
 	let sources: Record<string, Source> = $state({});
 
-	$effect(() => {
-		if (Object.keys(ancestry_cards).length === 0) {
-			get_all_ancestry_cards().then((result) => {
-				ancestry_cards = result;
-			});
-		}
-
-		if (Object.keys(community_cards).length === 0) {
-			get_all_community_cards().then((result) => {
-				community_cards = result;
-			});
-		}
-
-		if (Object.keys(transformation_cards).length === 0) {
-			get_all_transformation_cards().then((result) => {
-				transformation_cards = result;
-			});
-		}
-		
-		if (Object.keys(classes).length === 0) {
-			get_all_classes().then((result) => {
-				classes = result;
-			});
-		}
-		
-		if (Object.keys(subclasses).length === 0) {
-			get_all_subclasses().then((result) => {
-				subclasses = result;
-			});
-		}
-		
-		if (Object.keys(domains).length === 0) {
-			get_all_domains().then((result) => {
-				domains = result;
-			});
-		}
-		
-		for (const [domainId, domain] of Object.entries(domain_cards)) {
-			if (Object.keys(domain).length === 0) {
-				get_domain_cards(domainId as DomainIds).then((result) => {
-					domain_cards[domainId as DomainIds] = result;
-				});
+	// Helper to fetch with retry on failure
+	async function fetchWithRetry<T>(
+		fetcher: () => Promise<T>,
+		onSuccess: (result: T) => void,
+		retries = 3,
+		delay = 1000
+	): Promise<void> {
+		for (let attempt = 1; attempt <= retries; attempt++) {
+			try {
+				const result = await fetcher();
+				onSuccess(result);
+				return;
+			} catch (error) {
+				console.error(`Fetch attempt ${attempt}/${retries} failed:`, error);
+				if (attempt < retries) {
+					await new Promise((resolve) => setTimeout(resolve, delay * attempt));
+				}
 			}
 		}
+		console.error('All fetch retries exhausted');
+	}
 
-		if (Object.keys(primary_weapons).length === 0) {
-			get_all_primary_weapons().then((result) => {
-				primary_weapons = result;
-			});
-		}
-		
-		if (Object.keys(secondary_weapons).length === 0) {
-			get_all_secondary_weapons().then((result) => {
-				secondary_weapons = result;
-			});
-		}
-		
-		if (Object.keys(armor).length === 0) {
-			get_all_armor().then((result) => {
-				armor = result;
-			});
-		}
-		
-		if (Object.keys(loot).length === 0) {
-			get_all_loot().then((result) => {
-				loot = result;
-			});
-		}
-		
-		if (Object.keys(consumables).length === 0) {
-			get_all_consumables().then((result) => {
-				consumables = result;
-			});
-		}
-		
-		if (Object.keys(sources).length === 0) {
-			get_all_sources().then((result) => {
-				sources = result;
-			});
-		}
-	});
+	// Fetch all data once on initialization
+	fetchWithRetry(get_all_ancestry_cards, (r) => { ancestry_cards = r; });
+	fetchWithRetry(get_all_community_cards, (r) => { community_cards = r; });
+	fetchWithRetry(get_all_transformation_cards, (r) => { transformation_cards = r; });
+	fetchWithRetry(get_all_classes, (r) => { classes = r; });
+	fetchWithRetry(get_all_subclasses, (r) => { subclasses = r; });
+	fetchWithRetry(get_all_domains, (r) => { domains = r; });
+	fetchWithRetry(get_all_primary_weapons, (r) => { primary_weapons = r; });
+	fetchWithRetry(get_all_secondary_weapons, (r) => { secondary_weapons = r; });
+	fetchWithRetry(get_all_armor, (r) => { armor = r; });
+	fetchWithRetry(get_all_loot, (r) => { loot = r; });
+	fetchWithRetry(get_all_consumables, (r) => { consumables = r; });
+	fetchWithRetry(get_all_sources, (r) => { sources = r; });
+
+	// Fetch all domain cards
+	const domainIds: DomainIds[] = ['arcana', 'blade', 'bone', 'codex', 'grace', 'midnight', 'sage', 'splendor', 'valor'];
+	for (const domainId of domainIds) {
+		fetchWithRetry(
+			() => get_domain_cards(domainId),
+			(r) => { domain_cards[domainId] = r; }
+		);
+	}
 	const destroy = () => {};
 
 	return {
