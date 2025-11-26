@@ -42,5 +42,3 @@ vite.config.ts.timestamp-*
 # Sentry
 .env.sentry-build-plugin
 
-# Drizzle
-drizzle/
