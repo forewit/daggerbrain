@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
+	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import type {
@@ -29,6 +30,9 @@
 	// State for radio button selections (only one per group)
 	let selectedLootOption = $state<string | null>(null);
 	let selectedClassGearOption = $state<number | null>(null);
+
+	// State for spellbook input
+	let spellbookInput = $state('');
 
 	// Get suggested items
 	let suggestedPrimaryWeapon = $derived.by(() => {
@@ -68,6 +72,9 @@
 	// Get class gear options
 	let classGearOptions = $derived(primary_class?.starting_inventory.class_gear_options || []);
 
+	// Get spellbook prompt
+	let spellbookPrompt = $derived(primary_class?.starting_inventory.spellbook_prompt || null);
+
 	// Check if button should be enabled (at least one checkbox must be checked)
 	let canAddStartingEquipment = $derived.by(() => {
 		// Check if any of the main equipment checkboxes are selected
@@ -77,7 +84,8 @@
 			(suggestedArmor && selectedArmor) ||
 			selectedSupplies ||
 			selectedLootOption !== null ||
-			selectedClassGearOption !== null;
+			selectedClassGearOption !== null ||
+			spellbookInput.trim() !== '';
 
 		return hasMainEquipment;
 	});
@@ -234,6 +242,11 @@
 			}
 		}
 
+		// Add spellbook item if input has content
+		if (spellbookInput.trim() !== '') {
+			addAdventuringGear({ title: spellbookInput.trim() });
+		}
+
 		// Reset the selections
 		selectedPrimaryWeapon = false;
 		selectedSecondaryWeapon = false;
@@ -241,6 +254,7 @@
 		selectedSupplies = false;
 		selectedLootOption = null;
 		selectedClassGearOption = null;
+		spellbookInput = '';
 	}
 </script>
 
@@ -379,6 +393,21 @@
 					</Label>
 				{/each}
 			</div>
+		{/if}
+
+		<!-- Spellbook Options -->
+		{#if spellbookPrompt}
+			<p class="text-center text-xs font-medium text-muted-foreground uppercase">
+				Decide What You Carry Your Spells In:
+			</p>
+
+				<Input
+					bind:value={spellbookInput}
+					placeholder={spellbookPrompt}
+					class={cn(
+						'rounded-xl border bg-background px-4 h-12',
+						spellbookInput.trim() !== '' && 'border-primary/50 bg-muted/50'
+					)}				/>
 		{/if}
 
 		<!-- Add Starting Equipment Button -->

@@ -4,40 +4,52 @@ import { get_r2_usercontent, get_userId } from './utils';
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
 
-const imageFileSchema = z
-	.instanceof(File, {
-		message: 'Invalid file provided'
+const imageDataSchema = z
+	.object({
+		data: z.string(), // base64 encoded image data
+		name: z.string(),
+		type: z.string()
 	})
-	.refine((file) => file.size <= MAX_IMAGE_SIZE, {
-		message: `Image size must be less than or equal to ${MAX_IMAGE_SIZE / (1024 * 1024)}MB`
-	})
-	.refine((file) => file.type.startsWith('image/'), {
+	.refine(
+		(obj) => {
+			// Validate size (base64 is ~33% larger than binary)
+			const sizeInBytes = (obj.data.length * 3) / 4;
+			return sizeInBytes <= MAX_IMAGE_SIZE;
+		},
+		{
+			message: `Image size must be less than ${MAX_IMAGE_SIZE / (1024 * 1024)}MB`
+		}
+	)
+	.refine((obj) => obj.type.startsWith('image/'), {
 		message: 'File must be an image'
 	});
 
-export const save_user_image = command(imageFileSchema, async (file) => {
-	console.log('save_image');
+export const upload_user_image = command(imageDataSchema, async ({ data, name, type }) => {
+	console.log('uploadImage');
 
 	const event = getRequestEvent();
 	const userId = get_userId(event);
 	const r2 = get_r2_usercontent(event);
 
+	// Decode base64 to ArrayBuffer
+	const binaryString = atob(data);
+	const bytes = new Uint8Array(binaryString.length);
+	for (let i = 0; i < binaryString.length; i++) {
+		bytes[i] = binaryString.charCodeAt(i);
+	}
+
 	// Generate a unique key for the image
-	// Format: {userId}/{uuid}.{extension}
-	const fileExtension = file.name.split('.').pop() || 'bin';
+	const fileExtension = name.split('.').pop() || 'bin';
 	const imageKey = `${userId}/${crypto.randomUUID()}.${fileExtension}`;
 
-	// Convert File to ArrayBuffer for R2 upload
-	const arrayBuffer = await file.arrayBuffer();
-
 	// Upload to R2 usercontent bucket
-	await r2.put(imageKey, arrayBuffer, {
+	await r2.put(imageKey, bytes.buffer, {
 		httpMetadata: {
-			contentType: file.type
+			contentType: type
 		}
 	});
 
-	// Generate the URL for the image (served from usercontent route)
+	// Generate the URL for the image
 	const url = new URL(`/api/usercontent/images/${imageKey}`, event.url.origin);
 
 	return url.toString();

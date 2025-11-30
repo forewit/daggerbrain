@@ -63,8 +63,8 @@
             and
             <b>${compendium.domains[context.primary_class.secondary_domain_id].name}</b>
             domains.</p>`}
-				<div class="flex flex-col gap-2 rounded-md bg-primary/50 p-2">
-					<p class="px-2 py-1 text-xs text-muted-foreground italic">
+				<div class="flex flex-col gap-3 rounded-md bg-primary/50 p-2">
+					<p class="px-2 pt-1 text-xs text-muted-foreground italic">
 						{@html description_html}
 					</p>
 					<DomainCardSelector

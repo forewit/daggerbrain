@@ -257,7 +257,8 @@ export const ClassSchema = z.object({
 		gold_coins: z.number(),
 		free_gear: z.array(AdventuringGearSchema),
 		loot_or_consumable_options: z.array(z.string()),
-		class_gear_options: z.array(AdventuringGearSchema)
+		class_gear_options: z.array(AdventuringGearSchema),
+		spellbook_prompt: z.string().nullable()
 	}),
 	background_questions: z.array(z.string()),
 	connections: z.array(z.string())

@@ -44,6 +44,13 @@ import { SOURCES } from '../compendium/sources/sources.js';
 type Environment = 'local' | 'remote';
 type SeedType = 'd1' | 'kv' | 'r2';
 
+interface FolderNode {
+	name: string;
+	path: string; // Relative path from COMPENDIUM_IMAGES_DIR
+	imageCount: number;
+	children: FolderNode[];
+}
+
 // Paths
 const WRANGLER_STATE_DIR = join(process.cwd(), '.wrangler', 'state', 'v3');
 const COMPENDIUM_IMAGES_DIR = join(process.cwd(), 'src', 'lib', 'compendium', 'images');
@@ -154,6 +161,106 @@ function generateCompendiumJson(): string {
 }
 
 /**
+ * Build a hierarchical folder tree with image counts
+ */
+function buildFolderTree(dir: string, relativePath: string = ''): FolderNode[] {
+	if (!existsSync(dir)) {
+		return [];
+	}
+
+	const entries = readdirSync(dir, { withFileTypes: true });
+	const folders: FolderNode[] = [];
+
+	for (const entry of entries) {
+		if (entry.isDirectory()) {
+			const fullPath = join(dir, entry.name);
+			const childRelativePath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+			const children = buildFolderTree(fullPath, childRelativePath);
+
+			// Count images directly in this folder (not in subfolders)
+			const directImages = readdirSync(fullPath, { withFileTypes: true }).filter(
+				(e) => e.isFile() && IMAGE_EXTENSIONS.has(extname(e.name).toLowerCase())
+			).length;
+
+			// Total images = direct + all children
+			const totalImages =
+				directImages + children.reduce((sum, child) => sum + child.imageCount, 0);
+
+			folders.push({
+				name: entry.name,
+				path: childRelativePath,
+				imageCount: totalImages,
+				children
+			});
+		}
+	}
+
+	return folders.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Flatten folder tree into checkbox choices with indentation
+ */
+function flattenFolderTree(
+	nodes: FolderNode[],
+	depth: number = 0
+): Array<{ name: string; value: string }> {
+	const choices: Array<{ name: string; value: string }> = [];
+
+	for (const node of nodes) {
+		const indent = '  '.repeat(depth);
+		const hasChildren = node.children.length > 0;
+		const prefix = hasChildren ? '📁' : '📄';
+
+		choices.push({
+			name: `${indent}${prefix} ${node.name} (${node.imageCount} images)`,
+			value: node.path
+		});
+
+		if (hasChildren) {
+			choices.push(...flattenFolderTree(node.children, depth + 1));
+		}
+	}
+
+	return choices;
+}
+
+/**
+ * Get all descendant paths for a folder (including itself)
+ */
+function getAllDescendantPaths(nodes: FolderNode[], targetPath: string): string[] {
+	for (const node of nodes) {
+		if (node.path === targetPath) {
+			// Found the target, return it and all descendants
+			const paths = [node.path];
+			const collectDescendants = (n: FolderNode) => {
+				for (const child of n.children) {
+					paths.push(child.path);
+					collectDescendants(child);
+				}
+			};
+			collectDescendants(node);
+			return paths;
+		}
+
+		// Search in children
+		const found = getAllDescendantPaths(node.children, targetPath);
+		if (found.length > 0) {
+			return found;
+		}
+	}
+
+	return [];
+}
+
+/**
+ * Check if a path is a descendant of another path
+ */
+function isDescendantOf(childPath: string, parentPath: string): boolean {
+	return childPath.startsWith(parentPath + '/');
+}
+
+/**
  * Recursively get all image files in a directory
  */
 function getImageFiles(dir: string): string[] {
@@ -177,6 +284,18 @@ function getImageFiles(dir: string): string[] {
 		}
 	}
 
+	return files;
+}
+
+/**
+ * Get image files from specific folder paths (supports nested paths like "art/domains/arcana")
+ */
+function getImageFilesFromFolders(baseDir: string, folderPaths: string[]): string[] {
+	const files: string[] = [];
+	for (const folderPath of folderPaths) {
+		const fullPath = join(baseDir, folderPath);
+		files.push(...getImageFiles(fullPath));
+	}
 	return files;
 }
 
@@ -256,9 +375,55 @@ async function seedKV(environment: Environment): Promise<void> {
 }
 
 /**
+ * Prompt user to select which image folders to upload
+ * Shows hierarchical folder structure, selecting a parent includes all children
+ */
+async function selectImageFolders(): Promise<string[] | null> {
+	const folderTree = buildFolderTree(COMPENDIUM_IMAGES_DIR);
+
+	if (folderTree.length === 0) {
+		return null;
+	}
+
+	const choices = flattenFolderTree(folderTree);
+
+	const selected = await checkbox<string>({
+		message: 'Select image folders to upload:',
+		choices,
+		loop: false
+	});
+
+	if (selected.length === 0) {
+		return [];
+	}
+
+	// Expand parent selections to include all children
+	const expandedPaths = new Set<string>();
+	for (const path of selected) {
+		const descendants = getAllDescendantPaths(folderTree, path);
+		for (const desc of descendants) {
+			expandedPaths.add(desc);
+		}
+	}
+
+	// Remove redundant child selections if parent is already selected
+	const finalPaths = Array.from(expandedPaths).filter((path) => {
+		// Keep if no ancestor is in the set
+		for (const other of expandedPaths) {
+			if (other !== path && isDescendantOf(path, other)) {
+				return false; // This is a child of another selected path
+			}
+		}
+		return true;
+	});
+
+	return finalPaths;
+}
+
+/**
  * Seed R2 bucket with compendium images
  */
-async function seedR2(environment: Environment): Promise<void> {
+async function seedR2(environment: Environment, selectedFolders: string[]): Promise<void> {
 	console.log(`\n📦 Seeding R2 Bucket (${environment.toUpperCase()})...\n`);
 
 	if (environment === 'local') {
@@ -267,15 +432,15 @@ async function seedR2(environment: Environment): Promise<void> {
 
 	const isRemote = environment === 'remote';
 
-	// Get all image files
-	const imageFiles = getImageFiles(COMPENDIUM_IMAGES_DIR);
+	// Get image files from selected folders only
+	const imageFiles = getImageFilesFromFolders(COMPENDIUM_IMAGES_DIR, selectedFolders);
 
 	if (imageFiles.length === 0) {
-		console.log('  ⚠️  No images found to upload.');
+		console.log('  ⚠️  No images found in selected folders.');
 		return;
 	}
 
-	console.log(`  Found ${imageFiles.length} images to upload\n`);
+	console.log(`  Uploading ${imageFiles.length} images from: ${selectedFolders.join(', ')}\n`);
 
 	let successCount = 0;
 	let failCount = 0;
@@ -331,7 +496,8 @@ async function main(): Promise<void> {
 
 	const selectedSeeds = await checkbox<SeedType>({
 		message: 'Select data to seed:',
-		choices: seedChoices
+		choices: seedChoices,
+		loop: false
 	});
 
 	if (selectedSeeds.length === 0) {
@@ -339,25 +505,61 @@ async function main(): Promise<void> {
 		return;
 	}
 
-	// Confirm for remote operations
-	if (environment === 'remote') {
-		const confirm = await select({
-			message: '⚠️  You are about to seed REMOTE resources. Are you sure?',
-			choices: [
-				{ name: 'Yes, proceed', value: true },
-				{ name: 'No, cancel', value: false }
-			]
-		});
+	// Step 3: Gather additional options for each seed type BEFORE confirming
+	let r2Folders: string[] = [];
 
-		if (!confirm) {
-			console.log('\n❌ Operation cancelled.\n');
-			return;
+	if (selectedSeeds.includes('r2')) {
+		const folders = await selectImageFolders();
+
+		if (folders === null) {
+			console.log('\n⚠️  No image folders found. Removing R2 from selection.\n');
+			selectedSeeds.splice(selectedSeeds.indexOf('r2'), 1);
+		} else if (folders.length === 0) {
+			console.log('\n⚠️  No folders selected. Removing R2 from selection.\n');
+			selectedSeeds.splice(selectedSeeds.indexOf('r2'), 1);
+		} else {
+			r2Folders = folders;
 		}
+	}
+
+	// Check if we still have seeds to run
+	if (selectedSeeds.length === 0) {
+		console.log('\n⚠️  No seeds remaining. Exiting.\n');
+		return;
+	}
+
+	// Step 4: Show summary and confirm
+	console.log('\n' + '─'.repeat(50));
+	console.log('\n📋 Summary:\n');
+	console.log(`  Environment: ${environment.toUpperCase()}`);
+	console.log(`  Seeds: ${selectedSeeds.join(', ').toUpperCase()}`);
+	if (r2Folders.length > 0) {
+		console.log(`  R2 Folders: ${r2Folders.join(', ')}`);
+	}
+	console.log('');
+
+	const confirmMessage =
+		environment === 'remote'
+			? '⚠️  You are about to seed REMOTE resources. Proceed?'
+			: 'Proceed with seeding?';
+
+	const confirm = await select({
+		message: confirmMessage,
+		choices: [
+			{ name: 'Yes, proceed', value: true },
+			{ name: 'No, cancel', value: false }
+		],
+		default: false
+	});
+
+	if (!confirm) {
+		console.log('\n❌ Operation cancelled.\n');
+		return;
 	}
 
 	console.log('\n' + '─'.repeat(50));
 
-	// Execute selected seeds
+	// Step 5: Execute selected seeds
 	for (const seed of selectedSeeds) {
 		switch (seed) {
 			case 'd1':
@@ -367,7 +569,7 @@ async function main(): Promise<void> {
 				await seedKV(environment);
 				break;
 			case 'r2':
-				await seedR2(environment);
+				await seedR2(environment, r2Folders);
 				break;
 		}
 	}

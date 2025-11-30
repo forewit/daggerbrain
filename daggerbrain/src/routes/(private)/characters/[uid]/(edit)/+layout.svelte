@@ -10,7 +10,7 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { goto } from '$app/navigation';
-	import { save_user_image } from '$lib/remote/images.remote';
+	import { upload_user_image } from '$lib/remote/images.remote';
 	import { get_all_ancestry_cards } from '$lib/remote/heritages.remote.js';
 
 	let { data, children } = $props();
@@ -25,30 +25,40 @@
 			.filter((t) => !!t)
 			.pop() || 'edit'
 	);
-	let fileInput = $state<HTMLInputElement>();
-
-	async function handleImageUpload(event: Event) {
-		if (!character) return;
-
-		const target = event.target as HTMLInputElement;
-		const file = target.files?.[0];
-
-		if (!file) return;
-
-		try {
-			// Upload to R2 and get URL
-			const url = await save_user_image(file);
-
-			// Update character with R2 URL
-			character.image_url = url;
-		} catch (error) {
-			console.error('Failed to upload image:', error);
-			alert('Failed to upload image. Please try again.');
-		}
-	}
+	let fileInputRef = $state<HTMLInputElement>();
 
 	function triggerImageUpload() {
-		fileInput?.click();
+		fileInputRef?.click();
+	}
+
+	async function handleImageUpload(event: Event) {
+		const target = event.target as HTMLInputElement;
+		const file = target.files?.[0];
+		if (!file || !character) return;
+
+		// Convert file to base64
+		const reader = new FileReader();
+		reader.onload = async () => {
+			const dataUrl = reader.result as string;
+			// Remove the "data:image/...;base64," prefix
+			const base64 = dataUrl.split(',')[1];
+
+			try {
+				const url = await upload_user_image({
+					data: base64,
+					name: file.name,
+					type: file.type
+				});
+				character.image_url = url;
+			} catch (error) {
+				console.error('Failed to upload image:', error);
+				alert('Failed to upload image. Please try again.');
+			}
+
+			// Reset the input so the same file can be selected again
+			target.value = '';
+		};
+		reader.readAsDataURL(file);
 	}
 
 	function scrollToActiveTab(instant?: boolean) {
@@ -165,7 +175,7 @@
 
 				<!-- hidden file input for image upload -->
 				<input
-					bind:this={fileInput}
+					bind:this={fileInputRef}
 					type="file"
 					accept="image/*"
 					onchange={handleImageUpload}

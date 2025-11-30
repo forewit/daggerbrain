@@ -11,7 +11,7 @@
 	import ClassFeatures from './class-features.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Pencil from '@lucide/svelte/icons/pencil';
-	import { save_user_image } from '$lib/remote/images.remote';
+	import { upload_user_image } from '$lib/remote/images.remote';
 	import Experiences from './experiences.svelte';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
@@ -60,23 +60,33 @@
 	let fileInput = $state<HTMLInputElement>();
 
 	async function handleImageUpload(event: Event) {
-		if (!character) return;
-
 		const target = event.target as HTMLInputElement;
 		const file = target.files?.[0];
+		if (!file || !character) return;
 
-		if (!file) return;
+		// Convert file to base64
+		const reader = new FileReader();
+		reader.onload = async () => {
+			const dataUrl = reader.result as string;
+			// Remove the "data:image/...;base64," prefix
+			const base64 = dataUrl.split(',')[1];
 
-		try {
-			// Upload to R2 and get URL
-			const url = await save_user_image(file);
+			try {
+				const url = await upload_user_image({
+					data: base64,
+					name: file.name,
+					type: file.type
+				});
+				character.image_url = url;
+			} catch (error) {
+				console.error('Failed to upload image:', error);
+				alert('Failed to upload image. Please try again.');
+			}
 
-			// Update character with R2 URL
-			character.image_url = url;
-		} catch (error) {
-			console.error('Failed to upload image:', error);
-			alert('Failed to upload image. Please try again.');
-		}
+			// Reset the input so the same file can be selected again
+			target.value = '';
+		};
+		reader.readAsDataURL(file);
 	}
 
 	function triggerImageUpload() {
