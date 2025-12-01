@@ -10,6 +10,12 @@
 <div class={cn(className)}>
 	{#if context.primary_class}
 		<div class="flex flex-col gap-4">
+			<div class="relative text-sm">
+				<p class="pb-2 text-[1rem] font-medium">{context.primary_class.hope_feature.title}</p>
+				<div class="flex flex-col gap-2 pl-2 leading-relaxed">
+					{@html context.primary_class.hope_feature.description_html}
+				</div>
+			</div>
 			{#each context.primary_class?.class_features as feature}
 				<div class="relative text-sm">
 					<p class="pb-2 text-[1rem] font-medium">{feature.title}</p>

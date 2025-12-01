@@ -37,21 +37,5 @@
 				></button>
 			{/each}
 		</div>
-
-		{#if context.primary_class}
-			<div class="relative mx-auto">
-				<button
-					class="relative p-3 text-sm"
-					onclick={() => {
-						if (character.marked_hope >= 3) {
-							character.marked_hope -= 3;
-						}
-					}}
-				>
-					<span class="pr-1 font-medium italic">{context.primary_class.hope_feature.title}:</span>
-					{@html context.primary_class.hope_feature.description_html}
-				</button>
-			</div>
-		{/if}
 	</div>
 {/if}
