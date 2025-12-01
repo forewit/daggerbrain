@@ -10,13 +10,15 @@
 
 	let { class: className = '' }: { class?: string } = $props();
 
+	let tab = $state<'features' | 'weapons' | 'inventory' | 'background' | 'notes'>('features');
+
 	const context = getCharacterContext();
 </script>
 
 <div class={cn('relative rounded-md border-2 p-4', className)}>
-	<Tabs.Root value="features">
-		<Tabs.List class="mx-auto -mt-3 flex flex-wrap h-auto gap-y-1">
-			<Tabs.Trigger value="weapons" class="text-xs">Active Weapons & Armor</Tabs.Trigger>
+	<Tabs.Root bind:value={tab}>
+		<Tabs.List class="mx-auto -mt-3 -mb-1 flex h-auto flex-wrap gap-y-1">
+			<Tabs.Trigger value="weapons">Active Weapons & Armor</Tabs.Trigger>
 			<Tabs.Trigger value="features">Class Features</Tabs.Trigger>
 			<Tabs.Trigger value="inventory">Inventory</Tabs.Trigger>
 			<Tabs.Trigger value="background">Background</Tabs.Trigger>
@@ -26,7 +28,7 @@
 			<ClassFeatures />
 		</Tabs.Content>
 		<Tabs.Content value="weapons">
-			<ActiveEquipment />
+			<ActiveEquipment gotoInventory={() => (tab = 'inventory')} />
 		</Tabs.Content>
 		<Tabs.Content value="inventory">
 			<Inventory />

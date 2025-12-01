@@ -21,7 +21,7 @@
 						{#if item.answer}
 							<p class="pl-2 text-sm leading-relaxed text-muted-foreground">{item.answer}</p>
 						{:else}
-							<p class="pl-2 text-sm italic text-muted-foreground/50">No answer provided</p>
+							<p class="pl-2 text-sm text-muted-foreground/50 italic">No answer provided</p>
 						{/if}
 					</div>
 				{/each}
@@ -38,7 +38,7 @@
 						{#if item.answer}
 							<p class="pl-2 text-sm leading-relaxed text-muted-foreground">{item.answer}</p>
 						{:else}
-							<p class="pl-2 text-sm italic text-muted-foreground/50">No answer provided</p>
+							<p class="pl-2 text-sm text-muted-foreground/50 italic">No answer provided</p>
 						{/if}
 					</div>
 				{/each}
@@ -56,4 +56,3 @@
 		</p>
 	{/if}
 </div>
-

@@ -242,6 +242,11 @@
                   ><CirclePlus class="size-4" /> Equip</Button
                 >
               {/if} -->
+								{#if isWeaponEquipped(weapon)}
+									<Button variant="outline" size="sm" onclick={() => unequipWeapon(weapon)}>
+										Unequip
+									</Button>
+								{/if}
 								<Button
 									variant="link"
 									class="text-destructive"
@@ -310,6 +315,11 @@
                   ><CirclePlus class="size-4" /> Equip</Button
                 >
               {/if} -->
+								{#if isArmorEquipped(armor)}
+									<Button variant="outline" size="sm" onclick={() => unequipArmor(armor)}>
+										Unequip
+									</Button>
+								{/if}
 								<Button variant="link" class="text-destructive" onclick={() => removeArmor(armor)}>
 									<!-- <Trash2 class="size-4" /> -->
 									Remove

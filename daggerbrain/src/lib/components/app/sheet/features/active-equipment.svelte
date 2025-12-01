@@ -1,90 +1,83 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import { getCharacterContext } from '$lib/state/character.svelte';
-	import PrimaryWeaponCard from '$lib/components/app/equipment/primary-weapon.svelte';
-	import SecondaryWeaponCard from '$lib/components/app/equipment/secondary-weapon.svelte';
-	import ArmorCard from '$lib/components/app/equipment/armor.svelte';
+	import WeaponCard from './equipment/weapon-card.svelte';
+	import ArmorCard from './equipment/armor-card.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import CircleMinus from '@lucide/svelte/icons/circle-minus';
 
-	let { class: className = '' }: { class?: string } = $props();
+	let {
+		class: className = '',
+		gotoInventory = () => {}
+	}: { class?: string; gotoInventory?: () => void } = $props();
 
 	const context = getCharacterContext();
-	let character = $derived(context.character);
 </script>
 
-<div class={cn('rounded-md bg-primary/50 p-2', className)}>
+<div class={cn(className)}>
 	<!-- Armor Slot -->
-	<p class="px-1 pt-1 pb-2 text-sm font-medium">Active Armor</p>
-	<div class="flex items-center justify-end gap-1">
-		{#if context.active_armor !== null}
-			<div class="grow">
+	{#if context.active_armor !== null}
+		<table class="w-full border-collapse">
+			<colgroup>
+				<col />
+				<col class="w-20" />
+				<col class="w-26" />
+				<col class="hidden w-22 sm:table-column" />
+			</colgroup>
+			<thead>
+				<tr class="border-b text-xs text-muted-foreground bg-card">
+					<th class="px-4 py-2 text-left">Armor</th>
+					<th class="px-4 py-2 text-center">Slots</th>
+					<th class="px-4 py-2 text-center">Thresholds</th>
+					<th class="hidden px-4 py-2 text-right sm:table-cell">Features</th>
+				</tr>
+			</thead>
+			<tbody>
 				<ArmorCard armor={context.active_armor} />
-			</div>
+			</tbody>
+		</table>
+	{:else}
+		<p class="p-1 pt-3 text-xs text-muted-foreground">
+			Unarmored
 			<Button
-				size="icon"
+				size="sm"
 				variant="link"
-				onclick={() => {
-					if (character) character.active_armor_id = null;
-				}}
+				class="ml-2 h-auto font-normal italic"
+				onclick={gotoInventory}>Open Inventory?</Button
 			>
-				<CircleMinus class="size-4" />
-			</Button>
-		{:else}
-			<div class="flex min-h-10 grow items-center gap-3 truncate rounded-md bg-card/30 px-4 py-2">
-				<p class="text-sm text-muted-foreground">Unarmored</p>
-			</div>
-		{/if}
-	</div>
+		</p>
+	{/if}
 
 	<!-- Active Weapons -->
-	<div class="grow">
-		<p class="px-1 pt-4 pb-1 text-sm font-medium">Active Weapons</p>
-		<p class="px-1 pb-2 text-xs text-muted-foreground italic">
-			You can only equip one primary and one secondary weapon. Maximum burden is 2 hands.
-		</p>
-
-		<div class="flex flex-col gap-2">
-			{#if context.derived_primary_weapon !== null}
-				<div class="flex items-center justify-end gap-1">
-					<div class="grow">
-						<PrimaryWeaponCard weapon={context.derived_primary_weapon} bind_choices />
-					</div>
-					<Button
-						size="icon"
-						variant="link"
-						onclick={() => {
-							if (character) character.active_primary_weapon_id = null;
-						}}
-					>
-						<CircleMinus class="size-4" />
-					</Button>
-				</div>
-			{:else}
-				<div class="flex min-h-10 grow items-center gap-3 truncate rounded-md bg-card/30 px-4 py-2">
-					<p class="text-sm text-muted-foreground">No Primary Weapon</p>
-				</div>
-			{/if}
-			{#if context.derived_secondary_weapon !== null}
-				<div class="flex items-center justify-end gap-1">
-					<div class="grow">
-						<SecondaryWeaponCard weapon={context.derived_secondary_weapon} bind_choices />
-					</div>
-					<Button
-						size="icon"
-						variant="link"
-						onclick={() => {
-							if (character) character.active_secondary_weapon_id = null;
-						}}
-					>
-						<CircleMinus class="size-4" />
-					</Button>
-				</div>
-			{:else}
-				<div class="flex min-h-10 grow items-center gap-3 truncate rounded-md bg-card/30 px-4 py-2">
-					<p class="text-sm text-muted-foreground">No Secondary Weapon</p>
-				</div>
-			{/if}
-		</div>
+	<div class="grow pt-4">
+		{#if context.derived_primary_weapon !== null || context.derived_secondary_weapon !== null}
+			<table class="w-full border-collapse">
+				<colgroup>
+					<col />
+					<col class="w-16" />
+					<col class="w-18" />
+					<col class="w-18" />
+					<col class="hidden w-22 sm:table-column" />
+				</colgroup>
+				<thead>
+					<tr class="border-b text-xs text-muted-foreground bg-card">
+						<th class="px-4 py-2 text-left">Weapons</th>
+						<th class="px-4 py-2 text-center">Range</th>
+						<th class="px-4 py-2 text-center">To Hit</th>
+						<th class="px-4 py-2 text-center">Damage</th>
+						<th class="hidden px-4 py-2 text-right sm:table-cell">Features</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#if context.derived_primary_weapon !== null}
+						<WeaponCard class="" weapon={context.derived_primary_weapon} weaponType="primary" bind_choices />
+					{/if}
+					{#if context.derived_secondary_weapon !== null}
+						<WeaponCard class="" weapon={context.derived_secondary_weapon} weaponType="secondary" bind_choices />
+					{/if}
+				</tbody>
+			</table>
+		{:else}
+			<p class="p-1 pt-3 text-xs text-muted-foreground">Unarmed</p>
+		{/if}
 	</div>
 </div>

@@ -11,8 +11,11 @@
 	import { cn } from '$lib/utils';
 	import CircleMinus from '@lucide/svelte/icons/circle-minus';
 	import Search from '@lucide/svelte/icons/search';
+	import Catalog from '../../equipment/catalog.svelte';
 
-	let { class: className = '' }: { class?: string } = $props();
+	let {
+		class: className = '',
+	}: { class?: string; openCatalog?: () => void } = $props();
 
 	const context = getCharacterContext();
 	const compendium = getCompendiumContext();
@@ -178,7 +181,7 @@
 			<p class="py-4 text-center text-sm text-muted-foreground">Your inventory is empty</p>
 		{:else}
 			<!-- Search Box -->
-			<div class="relative mb-2">
+			<div class="mb- relative">
 				<Search
 					class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
 				/>
@@ -187,14 +190,14 @@
 
 			{#if filteredWeapons.length > 0}
 				<div class="flex flex-col gap-1">
-					<p class="ml-2 font-medium">Weapons</p>
+					<p class="ml-1 text-xs font-medium text-muted-foreground">Weapons</p>
 
 					{#each filteredWeapons as weapon (weapon.id)}
 						{#snippet subtitle_snippet()}
 							{@const equipped = isWeaponEquipped(weapon)}
 							<div class="flex items-center gap-2">
 								{#if equipped}
-									<span class="text-xs text-muted-foreground italic">Equipped</span>
+									<span class="text-xs text-muted-foreground italic"> Equipped </span>
 								{:else}
 									{@const canEquipItem = canEquip(weapon)}
 									<Button
@@ -232,9 +235,14 @@
 							</div>
 						{/snippet}
 
-						<Dropdown {title_snippet} {subtitle_snippet} class="border-2">
+						<Dropdown {title_snippet} {subtitle_snippet} class="h-10 border bg-card">
 							<WeaponDetails {weapon} />
 							<div class="mt-1 -mb-2 flex justify-center sm:justify-end">
+								{#if isWeaponEquipped(weapon)}
+									<Button variant="outline" size="sm" onclick={() => unequipWeapon(weapon)}>
+										Unequip
+									</Button>
+								{/if}
 								<Button
 									variant="link"
 									class="text-destructive"
@@ -250,7 +258,7 @@
 
 			{#if filteredArmor.length > 0}
 				<div class="flex flex-col gap-1">
-					<p class="ml-2 font-medium">Armor</p>
+					<p class="ml-2 text-xs font-medium text-muted-foreground">Armor</p>
 
 					{#each filteredArmor as armor (armor.id)}
 						{#snippet subtitle_snippet()}
@@ -293,6 +301,13 @@
 						<Dropdown {title_snippet} {subtitle_snippet} class="border-2">
 							<ArmorDetails {armor} />
 							<div class="mt-1 -mb-2 flex justify-center sm:justify-end">
+								{#if isArmorEquipped(armor)}
+									<Button variant="link" class="" onclick={() => unequipArmor(armor)}>
+										Unequip
+									</Button>
+								{:else}
+									<Button variant="link" class="" onclick={() => equipArmor(armor)}>Equip</Button>
+								{/if}
 								<Button variant="link" class="text-destructive" onclick={() => removeArmor(armor)}>
 									Remove
 								</Button>
@@ -304,7 +319,7 @@
 
 			{#if filteredConsumables.length > 0}
 				<div class="flex flex-col gap-1">
-					<p class="ml-2 font-medium">Consumables</p>
+					<p class="ml-1 text-xs font-medium text-muted-foreground">Consumables</p>
 
 					{#each filteredConsumables as consumable (consumable.id)}
 						{#snippet title_snippet()}
@@ -337,7 +352,7 @@
 
 			{#if filteredAdventuringGear.length > 0}
 				<div class="flex flex-col gap-1">
-					<p class="ml-2 font-medium">Adventuring Gear</p>
+					<p class="ml-1 text-xs font-medium text-muted-foreground">Adventuring Gear</p>
 
 					<ul class="">
 						{#each filteredAdventuringGear as { gear, originalIndex } (originalIndex)}
