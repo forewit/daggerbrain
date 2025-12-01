@@ -385,10 +385,7 @@ export const CLASSES = {
 			gold_coins: 10,
 			free_gear: [{ title: 'Torch' }, { title: '50 feet of rope' }, { title: 'Basic Supplies' }],
 			loot_or_consumable_options: ['minor_health_potion', 'minor_stamina_potion'],
-			class_gear_options: [
-				{ title: 'A totem from your mentor' },
-				{ title: 'A secret key' }
-			],
+			class_gear_options: [{ title: 'A totem from your mentor' }, { title: 'A secret key' }],
 			spellbook_prompt: null
 		},
 		background_questions: [
@@ -522,10 +519,7 @@ export const CLASSES = {
 			gold_coins: 10,
 			free_gear: [{ title: 'Torch' }, { title: '50 feet of rope' }, { title: 'Basic Supplies' }],
 			loot_or_consumable_options: ['minor_health_potion', 'minor_stamina_potion'],
-			class_gear_options: [
-				{ title: 'A set of forgery tools' },
-				{ title: 'A grappling hook' }
-			],
+			class_gear_options: [{ title: 'A set of forgery tools' }, { title: 'A grappling hook' }],
 			spellbook_prompt: null
 		},
 		background_questions: [
@@ -537,6 +531,273 @@ export const CLASSES = {
 			'What did I recently convince you to do that got us both in trouble?',
 			'What have I discovered about your past that I hold secret from the others?',
 			'Who do you know from my past, and how have they influenced your feelings about me?'
+		]
+	},
+
+	seraph: {
+		id: 'seraph',
+		source_id: 'SRD',
+		starting_evasion: 9,
+		starting_max_hp: 7,
+		suggested_traits: {
+			agility: 0,
+			strength: 2,
+			finesse: 0,
+			instinct: 1,
+			presence: 1,
+			knowledge: -1
+		},
+		name: 'Seraph',
+		image_url: '/images/wip.avif',
+		description_html:
+			"<p>As a seraph, you've taken a vow to a god who helps you channel sacred arcane power to keep your party on their feet.</p>",
+		hope_feature: {
+			title: 'Life Support',
+			description_html:
+				'<p><b>Spend 3 Hope</b> to clear a Hit Point on an ally within Close range.</p>',
+			character_modifiers: [],
+			weapon_modifiers: []
+		},
+		primary_domain_id: 'splendor',
+		secondary_domain_id: 'valor',
+		class_features: [
+			{
+				title: 'Prayer Dice',
+				description_html: `<p>At the beginning of each session, roll a number of <b>d4s</b> equal to your subclass's Spellcast trait and place them on your character sheet in the space provided. These are your Prayer Dice. You can spend any number of Prayer Dice to aid yourself or an ally within Far range. You can use a spent die's value to reduce incoming damage, add to a roll's result after the roll is made, or gain Hope equal to the result. At the end of each session, clear all unspent Prayer Dice.</p>`,
+				character_modifiers: [],
+				weapon_modifiers: []
+			}
+		],
+		subclass_ids: ['seraph_divine_wielder', 'seraph_winged_sentinel'],
+		suggested_primary_weapon_id: 'hallowed_axe',
+		suggested_secondary_weapon_id: 'round_shield',
+		suggested_armor_id: 'chainmail_armor',
+		starting_inventory: {
+			gold_coins: 10,
+			free_gear: [{ title: 'Torch' }, { title: '50 feet of rope' }, { title: 'Basic Supplies' }],
+			loot_or_consumable_options: ['minor_health_potion', 'minor_stamina_potion'],
+			class_gear_options: [{ title: 'A bundle of offerings' }, { title: 'A sigil of your god' }],
+			spellbook_prompt: null
+		},
+		background_questions: [
+			'Which god did you devote yourself to? What incredible feat did they perform for you in a moment of desperation?',
+			'How did your appearance change after taking your oath?',
+			'In what strange or unique way do you communicate with your god?'
+		],
+		connections: [
+			'What promise did you make me agree to, should you die on the battlefield?',
+			'Why do you ask me so many questions about my god?',
+			"You've told me to protect one member of our party above all others, even yourself. Who are they and why?"
+		]
+	},
+
+	sorcerer: {
+		id: 'sorcerer',
+		source_id: 'SRD',
+		starting_evasion: 10,
+		starting_max_hp: 6,
+		suggested_traits: {
+			agility: 0,
+			strength: -1,
+			finesse: 1,
+			instinct: 2,
+			presence: 1,
+			knowledge: 0
+		},
+		name: 'Sorcerer',
+		image_url: '/images/wip.avif',
+		description_html:
+			"<p>As a sorcerer, you were born with innate magical power, and you've learned how to wield that power to get what you want.</p>",
+		hope_feature: {
+			title: 'Volatile Magic',
+			description_html:
+				'<p><b>Spend 3 Hope</b> to reroll any number of your damage dice on an attack that deals magic damage.</p>',
+			character_modifiers: [],
+			weapon_modifiers: []
+		},
+		primary_domain_id: 'arcana',
+		secondary_domain_id: 'midnight',
+		class_features: [
+			{
+				title: 'Arcane Sense',
+				description_html:
+					'<p>You can sense the presence of magical people and objects within Close range.</p>',
+				character_modifiers: [],
+				weapon_modifiers: []
+			},
+			{
+				title: 'Minor Illusion',
+				description_html:
+					'<p>Make a Spellcast Roll (10). On a success, you create a minor visual illusion no larger than yourself within Close range. This illusion is convincing to anyone at Close range or farther.</p>',
+				character_modifiers: [],
+				weapon_modifiers: []
+			},
+			{
+				title: 'Channel Raw Power',
+				description_html: `<p>Once per long rest, you can place a domain card from your loadout into your vault and choose to either:</p>
+				<ul class="list-disc list-inside ml-2">
+					<li>Gain Hope equal to the level of the card.</li>
+					<li>Enhance a spell that deals damage, gaining a bonus to your damage roll equal to twice the level of the card.</li>
+				</ul>`,
+				character_modifiers: [],
+				weapon_modifiers: []
+			}
+		],
+		subclass_ids: ['sorcerer_elemental_origin', 'sorcerer_primal_origin'],
+		suggested_primary_weapon_id: 'dualstaff',
+		suggested_secondary_weapon_id: null,
+		suggested_armor_id: 'gambeson_armor',
+		starting_inventory: {
+			gold_coins: 10,
+			free_gear: [{ title: 'Torch' }, { title: '50 feet of rope' }, { title: 'Basic Supplies' }],
+			loot_or_consumable_options: ['minor_health_potion', 'minor_stamina_potion'],
+			class_gear_options: [{ title: 'A whispering orb' }, { title: 'A family heirloom' }],
+			spellbook_prompt: null
+		},
+		background_questions: [
+			'What did you do that made the people in your community wary of you?',
+			'What mentor taught you to control your untamed magic, and why are they no longer able to guide you?',
+			'You have a deep fear you hide from everyone. What is it, and why does it scare you?'
+		],
+		connections: [
+			'Why do you trust me so deeply?',
+			'What did I do that makes you cautious around me?',
+			'Why do we keep our shared past a secret?'
+		]
+	},
+
+	warrior: {
+		id: 'warrior',
+		source_id: 'SRD',
+		starting_evasion: 11,
+		starting_max_hp: 6,
+		suggested_traits: {
+			agility: 0,
+			strength: -1,
+			finesse: 1,
+			instinct: 2,
+			presence: 1,
+			knowledge: 0
+		},
+		name: 'Warrior',
+		image_url: '/images/wip.avif',
+		description_html:
+			'<p>As a warrior, you have trained your body and mind to face any challenge that comes your way.</p>',
+		hope_feature: {
+			title: 'No Mercy',
+			description_html:
+				'<p><b>Spend 3 Hope</b> to gain a <b>+1</b> bonus to your attack rolls until your next rest.</p>',
+			character_modifiers: [],
+			weapon_modifiers: []
+		},
+		primary_domain_id: 'blade',
+		secondary_domain_id: 'bone',
+		class_features: [
+			{
+				title: 'Attack of Opportunity',
+				description_html: `<p>If an adversary within Melee range attempts to leave that range, make a reaction roll using a trait of your choice against their Difficulty. Choose one effect on a success, or two if you critically succeed:</p>
+				<ul class="list-disc list-inside ml-2">
+					<li>They can't move from where they are.</li>
+					<li>You deal damage to them equal to your primary weapon's damage.</li>
+					<li>You move with them.</li>
+				</ul>`,
+				character_modifiers: [],
+				weapon_modifiers: []
+			},
+			{
+				title: 'Combat Training',
+				description_html: `<p>You ignore burden when equipping weapons. When you deal physical damage, you gain a bonus to your damage roll equal to your level.</p>`,
+				character_modifiers: [],
+				weapon_modifiers: []
+			}
+		],
+		subclass_ids: ['warrior_call_of_the_brave', 'warrior_call_of_the_slayer'],
+		suggested_primary_weapon_id: 'dualstaff',
+		suggested_secondary_weapon_id: null,
+		suggested_armor_id: 'gambeson_armor',
+		starting_inventory: {
+			gold_coins: 10,
+			free_gear: [{ title: 'Torch' }, { title: '50 feet of rope' }, { title: 'Basic Supplies' }],
+			loot_or_consumable_options: ['minor_health_potion', 'minor_stamina_potion'],
+			class_gear_options: [{ title: 'The drawing of a lover' }, { title: 'A sharpening stone' }],
+			spellbook_prompt: null
+		},
+		background_questions: [
+			'Who taught you to fight, and why did they stay behind when you left home?',
+			'Somebody defeated you in battle years ago and left you to die. Who was it, and how did they betray you?',
+			'What legendary place have you always wanted to visit, and why is it so special?'
+		],
+		connections: [
+			'We knew each other long before this party came together. How?',
+			'What mundane task do you usually help me with off the battlefield?',
+			'What fear am I helping you overcome?'
+		]
+	},
+
+	wizard: {
+		id: 'wizard',
+		source_id: 'SRD',
+		starting_evasion: 11,
+		starting_max_hp: 5,
+		suggested_traits: {
+			agility: -1,
+			strength: 0,
+			finesse: 0,
+			instinct: 1,
+			presence: 1,
+			knowledge: 2
+		},
+		name: 'Wizard',
+		image_url: '/images/wip.avif',
+		description_html:
+			"<p>As a wizard, you've become familiar with the arcane through the relentless study of grimoires and other tools of magic.</p>",
+		hope_feature: {
+			title: 'Not This Time',
+			description_html:
+				'<p><b>Spend 3 Hope</b> to force an adversary within Far range to reroll an attack or damage roll.</p>',
+			character_modifiers: [],
+			weapon_modifiers: []
+		},
+		primary_domain_id: 'codex',
+		secondary_domain_id: 'splendor',
+		class_features: [
+			{
+				title: 'Prestidigitation',
+				description_html: `<p>You can perform harmless, subtle magical effects at will. For example, you can change an object's color, create a smell, light a candle, cause a tiny object to float, illuminate a room, or repair a small object.</p>`,
+				character_modifiers: [],
+				weapon_modifiers: []
+			},
+			{
+				title: 'Strange Patterns',
+				description_html: `<p>Choose a number between 1 and 12. When you roll that number on a Duality Die, gain a Hope or clear a Stress.</p>
+				<p>You can change this number when you take a long rest.</p>`,
+				character_modifiers: [],
+				weapon_modifiers: []
+			}
+		],
+		subclass_ids: ['wizard_school_of_knowledge', 'wizard_school_of_war'],
+		suggested_primary_weapon_id: 'greatstaff',
+		suggested_secondary_weapon_id: null,
+		suggested_armor_id: 'leather_armor',
+		starting_inventory: {
+			gold_coins: 10,
+			free_gear: [{ title: 'Torch' }, { title: '50 feet of rope' }, { title: 'Basic Supplies' }],
+			loot_or_consumable_options: ['minor_health_potion', 'minor_stamina_potion'],
+			class_gear_options: [
+				{ title: "A book you're trying to translate" },
+				{ title: 'A tiny, harmless elemental pet' }
+			],
+			spellbook_prompt: 'Large tomes, tarot cards, etc.'
+		},
+		background_questions: [
+			'What responsibilities did your community once count on you for? How did you let them down?',
+			"You've spent your life searching for a book or object of great significance. What is it, and why is it so important to you?",
+			'You have a powerful rival. Who are they, and why are you so determined to defeat them?'
+		],
+		connections: [
+			"What favor have I asked of you that you're not sure you can fulfill?",
+			'What weird hobby or strange fascination do we both share?',
+			'What secret about yourself have you entrusted only to me?'
 		]
 	}
 } as const satisfies Record<string, Class>;

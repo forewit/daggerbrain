@@ -184,7 +184,8 @@ export const SUBCLASSES = {
 		source_id: 'SRD',
 		class_id: 'bard',
 		name: 'Troubadour',
-		description_html: '<p>Play the Troubadour if you want to play music to bolster your allies.</p>',
+		description_html:
+			'<p>Play the Troubadour if you want to play music to bolster your allies.</p>',
 		foundation_card: {
 			id: 'troubadour_foundation',
 			card_type: 'subclass_foundation',
@@ -326,7 +327,8 @@ export const SUBCLASSES = {
 		source_id: 'SRD',
 		class_id: 'druid',
 		name: 'Warden of Renewal',
-		description_html: '<p>Play the Warden of Renewal if you want to focus on healing and protection.</p>',
+		description_html:
+			'<p>Play the Warden of Renewal if you want to focus on healing and protection.</p>',
 		foundation_card: {
 			id: 'warden_of_renewal_foundation',
 			card_type: 'subclass_foundation',
@@ -403,7 +405,8 @@ export const SUBCLASSES = {
 		source_id: 'SRD',
 		class_id: 'druid',
 		name: 'Warden of the Elements',
-		description_html: '<p>Play the Warden of the Elements if you want to channel elemental power.</p>',
+		description_html:
+			'<p>Play the Warden of the Elements if you want to channel elemental power.</p>',
 		foundation_card: {
 			id: 'warden_of_the_elements_foundation',
 			card_type: 'subclass_foundation',
@@ -486,7 +489,7 @@ export const SUBCLASSES = {
 			id: 'guardian_stalwart_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Reiko Murakami',
-			image_url: '/api/images/card/art/subclasses/guardian-stalwart.webp',
+			image_url: '/api/images/card/art/subclasses/stalwart.webp',
 			title: 'Stalwart',
 			description_html: 'Foundation',
 			spellcast_trait: null,
@@ -494,8 +497,7 @@ export const SUBCLASSES = {
 			features: [
 				{
 					title: 'Unwavering',
-					description_html:
-						'<p>Gain a permanent <b>+1</b> bonus to your damage thresholds.</p>',
+					description_html: '<p>Gain a permanent <b>+1</b> bonus to your damage thresholds.</p>',
 					character_modifiers: [],
 					weapon_modifiers: []
 				},
@@ -512,15 +514,14 @@ export const SUBCLASSES = {
 			id: 'guardian_stalwart_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Reiko Murakami',
-			image_url: '/api/images/card/art/subclasses/guardian-stalwart.webp',
+			image_url: '/api/images/card/art/subclasses/stalwart.webp',
 			title: 'Stalwart',
 			description_html: 'Specialization',
 			class_id: 'guardian',
 			features: [
 				{
 					title: 'Unrelenting',
-					description_html:
-						'<p>Gain a permanent <b>+2</b> bonus to your damage thresholds.</p>',
+					description_html: '<p>Gain a permanent <b>+2</b> bonus to your damage thresholds.</p>',
 					character_modifiers: [],
 					weapon_modifiers: []
 				},
@@ -537,22 +538,21 @@ export const SUBCLASSES = {
 			id: 'guardian_stalwart_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Reiko Murakami',
-			image_url: '/api/images/card/art/subclasses/guardian-stalwart.webp',
+			image_url: '/api/images/card/art/subclasses/stalwart.webp',
 			title: 'Stalwart',
 			description_html: 'Mastery',
 			class_id: 'guardian',
 			features: [
 				{
 					title: 'Undaunted',
-					description_html:
-						'<p>Gain a permanent <b>+3</b> bonus to your damage thresholds.</p>',
+					description_html: '<p>Gain a permanent <b>+3</b> bonus to your damage thresholds.</p>',
 					character_modifiers: [],
 					weapon_modifiers: []
 				},
 				{
 					title: 'Loyal Protector',
 					description_html:
-						"<p>When an ally within Close range has 2 or fewer Hit Points and would take damage, you can <b>mark a Stress</b> to sprint to their side and take the damage instead.</p>",
+						'<p>When an ally within Close range has 2 or fewer Hit Points and would take damage, you can <b>mark a Stress</b> to sprint to their side and take the damage instead.</p>',
 					character_modifiers: [],
 					weapon_modifiers: []
 				}
@@ -570,7 +570,7 @@ export const SUBCLASSES = {
 			id: 'guardian_vengeance_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Linda Lithén',
-			image_url: '/api/images/card/art/subclasses/guardian-vengeance.webp',
+			image_url: '/api/images/card/art/subclasses/vengeance.webp',
 			title: 'Vengeance',
 			description_html: 'Foundation',
 			spellcast_trait: null,
@@ -595,7 +595,7 @@ export const SUBCLASSES = {
 			id: 'guardian_vengeance_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Linda Lithén',
-			image_url: '/api/images/card/art/subclasses/guardian-vengeance.webp',
+			image_url: '/api/images/card/art/subclasses/vengeance.webp',
 			title: 'Vengeance',
 			description_html: 'Specialization',
 			class_id: 'guardian',
@@ -613,7 +613,7 @@ export const SUBCLASSES = {
 			id: 'guardian_vengeance_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Linda Lithén',
-			image_url: '/api/images/card/art/subclasses/guardian-vengeance.webp',
+			image_url: '/api/images/card/art/subclasses/vengeance.webp',
 			title: 'Vengeance',
 			description_html: 'Mastery',
 			class_id: 'guardian',
@@ -634,12 +634,13 @@ export const SUBCLASSES = {
 		source_id: 'SRD',
 		class_id: 'ranger',
 		name: 'Wayfinder',
-		description_html: '<p>Play the Wayfinder if you want to be a relentless tracker and hunter.</p>',
+		description_html:
+			'<p>Play the Wayfinder if you want to be a relentless tracker and hunter.</p>',
 		foundation_card: {
 			id: 'ranger_wayfinder_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Simon Pape',
-			image_url: '/api/images/card/art/subclasses/ranger-wayfinder.webp',
+			image_url: '/api/images/card/art/subclasses/wayfinder.webp',
 			title: 'Wayfinder',
 			description_html: 'Foundation',
 			spellcast_trait: 'agility',
@@ -665,7 +666,7 @@ export const SUBCLASSES = {
 			id: 'ranger_wayfinder_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Simon Pape',
-			image_url: '/api/images/card/art/subclasses/ranger-wayfinder.webp',
+			image_url: '/api/images/card/art/subclasses/wayfinder.webp',
 			title: 'Wayfinder',
 			description_html: 'Specialization',
 			class_id: 'ranger',
@@ -683,7 +684,7 @@ export const SUBCLASSES = {
 			id: 'ranger_wayfinder_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Simon Pape',
-			image_url: '/api/images/card/art/subclasses/ranger-wayfinder.webp',
+			image_url: '/api/images/card/art/subclasses/wayfinder.webp',
 			title: 'Wayfinder',
 			description_html: 'Mastery',
 			class_id: 'ranger',
@@ -704,12 +705,13 @@ export const SUBCLASSES = {
 		source_id: 'SRD',
 		class_id: 'ranger',
 		name: 'Beastbound',
-		description_html: '<p>Play the Beastbound if you want to fight alongside an animal companion.</p>',
+		description_html:
+			'<p>Play the Beastbound if you want to fight alongside an animal companion.</p>',
 		foundation_card: {
 			id: 'ranger_beastbound_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Jenny Tan',
-			image_url: '/api/images/card/art/subclasses/ranger-beastbound.webp',
+			image_url: '/api/images/card/art/subclasses/beastbound.webp',
 			title: 'Beastbound',
 			description_html: 'Foundation',
 			spellcast_trait: 'agility',
@@ -728,15 +730,14 @@ export const SUBCLASSES = {
 			id: 'ranger_beastbound_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Jenny Tan',
-			image_url: '/api/images/card/art/subclasses/ranger-beastbound.webp',
+			image_url: '/api/images/card/art/subclasses/beastbound.webp',
 			title: 'Beastbound',
 			description_html: 'Specialization',
 			class_id: 'ranger',
 			features: [
 				{
 					title: 'Expert Training',
-					description_html:
-						'<p>Choose an additional level-up option for your companion.</p>',
+					description_html: '<p>Choose an additional level-up option for your companion.</p>',
 					character_modifiers: [],
 					weapon_modifiers: []
 				},
@@ -753,15 +754,14 @@ export const SUBCLASSES = {
 			id: 'ranger_beastbound_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Jenny Tan',
-			image_url: '/api/images/card/art/subclasses/ranger-beastbound.webp',
+			image_url: '/api/images/card/art/subclasses/beastbound.webp',
 			title: 'Beastbound',
 			description_html: 'Mastery',
 			class_id: 'ranger',
 			features: [
 				{
 					title: 'Advanced Training',
-					description_html:
-						'<p>Choose two additional level-up options for your companion.</p>',
+					description_html: '<p>Choose two additional level-up options for your companion.</p>',
 					character_modifiers: [],
 					weapon_modifiers: []
 				},
@@ -786,7 +786,7 @@ export const SUBCLASSES = {
 			id: 'rogue_syndicate_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Jenny Tan',
-			image_url: '/api/images/card/art/subclasses/rogue-syndicate.webp',
+			image_url: '/api/images/card/art/subclasses/syndicate.webp',
 			title: 'Syndicate',
 			description_html: 'Foundation',
 			spellcast_trait: 'finesse',
@@ -811,7 +811,7 @@ export const SUBCLASSES = {
 			id: 'rogue_syndicate_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Jenny Tan',
-			image_url: '/api/images/card/art/subclasses/rogue-syndicate.webp',
+			image_url: '/api/images/card/art/subclasses/syndicate.webp',
 			title: 'Syndicate',
 			description_html: 'Specialization',
 			class_id: 'rogue',
@@ -833,7 +833,7 @@ export const SUBCLASSES = {
 			id: 'rogue_syndicate_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Jenny Tan',
-			image_url: '/api/images/card/art/subclasses/rogue-syndicate.webp',
+			image_url: '/api/images/card/art/subclasses/syndicate.webp',
 			title: 'Syndicate',
 			description_html: 'Mastery',
 			class_id: 'rogue',
@@ -862,7 +862,7 @@ export const SUBCLASSES = {
 			id: 'rogue_nightwalker_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Juan S. Almencion',
-			image_url: '/api/images/card/art/subclasses/rogue-nightwalker.webp',
+			image_url: '/api/images/card/art/subclasses/nightwalker.webp',
 			title: 'Nightwalker',
 			description_html: 'Foundation',
 			spellcast_trait: 'finesse',
@@ -881,7 +881,7 @@ export const SUBCLASSES = {
 			id: 'rogue_nightwalker_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Juan S. Almencion',
-			image_url: '/api/images/card/art/subclasses/rogue-nightwalker.webp',
+			image_url: '/api/images/card/art/subclasses/nightwalker.webp',
 			title: 'Nightwalker',
 			description_html: 'Specialization',
 			class_id: 'rogue',
@@ -906,7 +906,7 @@ export const SUBCLASSES = {
 			id: 'rogue_nightwalker_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Juan S. Almencion',
-			image_url: '/api/images/card/art/subclasses/rogue-nightwalker.webp',
+			image_url: '/api/images/card/art/subclasses/nightwalker.webp',
 			title: 'Nightwalker',
 			description_html: 'Mastery',
 			class_id: 'rogue',
@@ -922,6 +922,600 @@ export const SUBCLASSES = {
 					title: 'Vanishing Act',
 					description_html:
 						'<p><b>Mark a Stress</b> to become <i>Cloaked</i> at any time. When <i>Cloaked</i> from this feature, you automatically clear the <i>Restrained</i> condition if you have it. You remain <i>Cloaked</i> in this way until you roll with Fear or until your next rest.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		}
+	},
+
+	seraph_divine_wielder: {
+		id: 'seraph_divine_wielder',
+		source_id: 'SRD',
+		class_id: 'seraph',
+		name: 'Divine Wielder',
+		description_html:
+			'<p>Play the Divine Wielder if you want to channel divine power through your weapon.</p>',
+		foundation_card: {
+			id: 'seraph_divine_wielder_foundation',
+			card_type: 'subclass_foundation',
+			artist_name: 'Jenny Tan',
+			image_url: '/api/images/card/art/subclasses/divine-wielder.webp',
+			title: 'Divine Wielder',
+			description_html: 'Foundation',
+			spellcast_trait: 'strength',
+			class_id: 'seraph',
+			features: [
+				{
+					title: 'Spirit Weapon',
+					description_html:
+						'<p>When you have an equipped weapon with a range of Melee or Very Close, it can fly from your hand to attack an adversary within Close range and then return to you. You can <b>mark a Stress</b> to target an additional adversary within range with the same attack roll.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				},
+				{
+					title: 'Sparing Touch',
+					description_html:
+						'<p>Once per long rest, touch a creature and clear 2 Hit Points or 2 Stress from them.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		},
+		specialization_card: {
+			id: 'seraph_divine_wielder_specialization',
+			card_type: 'subclass_specialization',
+			artist_name: 'Jenny Tan',
+			image_url: '/api/images/card/art/subclasses/divine-wielder.webp',
+			title: 'Divine Wielder',
+			description_html: 'Specialization',
+			class_id: 'seraph',
+			features: [
+				{
+					title: 'Devout',
+					description_html:
+						'<p>When you roll your Prayer Dice, you can roll an additional die and discard the lowest result. Additionally, you can use your "Sparing Touch" feature twice instead of once per long rest.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		},
+		mastery_card: {
+			id: 'seraph_divine_wielder_mastery',
+			card_type: 'subclass_mastery',
+			artist_name: 'Jenny Tan',
+			image_url: '/api/images/card/art/subclasses/divine-wielder.webp',
+			title: 'Divine Wielder',
+			description_html: 'Mastery',
+			class_id: 'seraph',
+			features: [
+				{
+					title: 'Sacred Resonance',
+					description_html:
+						'<p>When you roll damage for your "Spirit Weapon" feature, if any of the die results match, double the value of each matching die. For example, if you roll two 5s, they count as two 10s.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		}
+	},
+
+	seraph_winged_sentinel: {
+		id: 'seraph_winged_sentinel',
+		source_id: 'SRD',
+		class_id: 'seraph',
+		name: 'Winged Sentinel',
+		description_html:
+			'<p>Play the Winged Sentinel if you want to take flight and protect from above.</p>',
+		foundation_card: {
+			id: 'seraph_winged_sentinel_foundation',
+			card_type: 'subclass_foundation',
+			artist_name: 'Stephanie Cost',
+			image_url: '/api/images/card/art/subclasses/winged-sentinel.webp',
+			title: 'Winged Sentinel',
+			description_html: 'Foundation',
+			spellcast_trait: 'strength',
+			class_id: 'seraph',
+			features: [
+				{
+					title: 'Wings of Light',
+					description_html: `<p>You can fly. While flying, you can do the following:</p>
+					<ul class="list-disc list-inside ml-2">
+						<li><b>Mark a Stress</b> to pick up and carry another willing creature approximately your size or smaller.</li>
+						<li><b>Spend a Hope</b> to deal an extra <b>1d8</b> damage on a successful attack.</li>
+					</ul>`,
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		},
+		specialization_card: {
+			id: 'seraph_winged_sentinel_specialization',
+			card_type: 'subclass_specialization',
+			artist_name: 'Stephanie Cost',
+			image_url: '/api/images/card/art/subclasses/winged-sentinel.webp',
+			title: 'Winged Sentinel',
+			description_html: 'Specialization',
+			class_id: 'seraph',
+			features: [
+				{
+					title: 'Ethereal Visage',
+					description_html:
+						"<p>Your supernatural visage strikes awe and fear. While flying, you have advantage on Presence Rolls. When you succeed with Hope on a Presence Roll, you can remove a Fear from the GM's Fear pool instead of gaining Hope.</p>",
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		},
+		mastery_card: {
+			id: 'seraph_winged_sentinel_mastery',
+			card_type: 'subclass_mastery',
+			artist_name: 'Stephanie Cost',
+			image_url: '/api/images/card/art/subclasses/winged-sentinel.webp',
+			title: 'Winged Sentinel',
+			description_html: 'Mastery',
+			class_id: 'seraph',
+			features: [
+				{
+					title: 'Ascendant',
+					description_html:
+						'<p>Gain a permanent <b>+4</b> bonus to your Severe damage threshold.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				},
+				{
+					title: 'Power of the Gods',
+					description_html:
+						'<p>While flying, you deal an extra <b>1d12</b> damage instead of <b>1d8</b> with your "Wings of Light" feature.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		}
+	},
+
+	sorcerer_elemental_origin: {
+		id: 'sorcerer_elemental_origin',
+		source_id: 'SRD',
+		class_id: 'sorcerer',
+		name: 'Elemental Origin',
+		description_html: '<p>Play the Elemental Origin if you want to command the elements.</p>',
+		foundation_card: {
+			id: 'sorcerer_elemental_origin_foundation',
+			card_type: 'subclass_foundation',
+			artist_name: 'Bear Frymire',
+			image_url: '/api/images/card/art/subclasses/elemental-origin.webp',
+			title: 'Elemental Origin',
+			description_html: 'Foundation',
+			spellcast_trait: 'instinct',
+			class_id: 'sorcerer',
+			features: [
+				{
+					title: 'Elementalist',
+					description_html: `<p>Choose one of the following elements at character creation:</p>
+					<p><b>Air · Earth · Fire · Lightning · Water</b></p>
+					<p>You can shape this element into harmless effects. Additionally, <b>spend a Hope</b> and describe how your control over this element helps an action roll you're about to make, then either gain a <b>+2</b> bonus to the roll or a <b>+3</b> bonus to the roll's damage.</p>`,
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		},
+		specialization_card: {
+			id: 'sorcerer_elemental_origin_specialization',
+			card_type: 'subclass_specialization',
+			artist_name: 'Bear Frymire',
+			image_url: '/api/images/card/art/subclasses/elemental-origin.webp',
+			title: 'Elemental Origin',
+			description_html: 'Specialization',
+			class_id: 'sorcerer',
+			features: [
+				{
+					title: 'Natural Evasion',
+					description_html:
+						'<p>You can call forth your element to protect you from harm. When an attack roll against you succeeds, you can <b>mark a Stress</b> and describe how you use your element to defend you. When you do, roll a <b>d6</b> and add its result to your Evasion against the attack.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		},
+		mastery_card: {
+			id: 'sorcerer_elemental_origin_mastery',
+			card_type: 'subclass_mastery',
+			artist_name: 'Bear Frymire',
+			image_url: '/api/images/card/art/subclasses/elemental-origin.webp',
+			title: 'Elemental Origin',
+			description_html: 'Mastery',
+			class_id: 'sorcerer',
+			features: [
+				{
+					title: 'Transcendence',
+					description_html: `<p>Once per long rest, you can transform into a physical manifestation of your element. When you do, describe your transformation and choose two of the following benefits to gain until your next rest:</p>
+					<ul class="list-disc list-inside ml-2">
+						<li><b>+4</b> bonus to your Severe threshold</li>
+						<li><b>+1</b> bonus to a character trait of your choice</li>
+						<li><b>+1</b> bonus to your Proficiency</li>
+						<li><b>+2</b> bonus to your Evasion</li>
+					</ul>`,
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		}
+	},
+
+	sorcerer_primal_origin: {
+		id: 'sorcerer_primal_origin',
+		source_id: 'SRD',
+		class_id: 'sorcerer',
+		name: 'Primal Origin',
+		description_html:
+			'<p>Play the Primal Origin if you want to manipulate the essence of magic itself.</p>',
+		foundation_card: {
+			id: 'sorcerer_primal_origin_foundation',
+			card_type: 'subclass_foundation',
+			artist_name: 'Laura Galli',
+			image_url: '/api/images/card/art/subclasses/primal-origin.webp',
+			title: 'Primal Origin',
+			description_html: 'Foundation',
+			spellcast_trait: 'instinct',
+			class_id: 'sorcerer',
+			features: [
+				{
+					title: 'Manipulate Magic',
+					description_html: `<p>Your primal origin allows you to modify the essence of magic itself. After you cast a spell or make an attack using a weapon that deals magic damage, you can <b>mark a Stress</b> to do one of the following:</p>
+					<ul class="list-disc list-inside ml-2">
+						<li>Extend the spell or attack's reach by one range</li>
+						<li>Gain a <b>+2</b> bonus to the action roll's result</li>
+						<li>Double a damage die of your choice</li>
+						<li>Hit an additional target within range</li>
+					</ul>`,
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		},
+		specialization_card: {
+			id: 'sorcerer_primal_origin_specialization',
+			card_type: 'subclass_specialization',
+			artist_name: 'Laura Galli',
+			image_url: '/api/images/card/art/subclasses/primal-origin.webp',
+			title: 'Primal Origin',
+			description_html: 'Specialization',
+			class_id: 'sorcerer',
+			features: [
+				{
+					title: 'Enchanted Aid',
+					description_html:
+						'<p>You can enhance the magic of others with your essence. When you Help an Ally with a Spellcast Roll, you can roll a <b>d8</b> as your advantage die. Once per long rest, after an ally has made a Spellcast Roll with your help, you can swap the results of their Duality Dice.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		},
+		mastery_card: {
+			id: 'sorcerer_primal_origin_mastery',
+			card_type: 'subclass_mastery',
+			artist_name: 'Laura Galli',
+			image_url: '/api/images/card/art/subclasses/primal-origin.webp',
+			title: 'Primal Origin',
+			description_html: 'Mastery',
+			class_id: 'sorcerer',
+			features: [
+				{
+					title: 'Arcane Charge',
+					description_html:
+						'<p>When you use your "Channel Raw Power" feature, you become <i>Charged</i>. While <i>Charged</i>, you gain a <b>+1</b> bonus to your damage rolls or a <b>+1</b> bonus to the Difficulty of reaction rolls made against you. You remain <i>Charged</i> until you roll with Fear or until your next rest.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		}
+	},
+
+	warrior_call_of_the_brave: {
+		id: 'warrior_call_of_the_brave',
+		source_id: 'SRD',
+		class_id: 'warrior',
+		name: 'Call of the Brave',
+		description_html:
+			'<p>Play Call of the Brave if you want to inspire courage and face danger head-on.</p>',
+		foundation_card: {
+			id: 'call_of_the_brave_foundation',
+			card_type: 'subclass_foundation',
+			artist_name: 'Mat Wilma',
+			image_url: '/images/wip.avif',
+			title: 'Call of the Brave',
+			description_html: 'Foundation',
+			spellcast_trait: null,
+			class_id: 'warrior',
+			features: [
+				{
+					title: 'Courage',
+					description_html: '<p>When you fail a roll with Fear, you gain a Hope.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				},
+				{
+					title: 'Battle Ritual',
+					description_html:
+						'<p>Once per long rest, before you attempt something incredibly dangerous or face off against a foe who clearly outmatches you, describe what ritual you perform or preparations you make. When you do, clear 2 Stress and gain 2 Hope.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		},
+		specialization_card: {
+			id: 'call_of_the_brave_specialization',
+			card_type: 'subclass_specialization',
+			artist_name: 'Mat Wilma',
+			image_url: '/images/wip.avif',
+			title: 'Call of the Brave',
+			description_html: 'Specialization',
+			class_id: 'warrior',
+			features: [
+				{
+					title: 'Rise to the Challenge',
+					description_html:
+						'<p>You are vigilant in the face of mounting danger. While you have 2 or fewer Hit Points unmarked, you can roll a <b>d20</b> as your Hope Die.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		},
+		mastery_card: {
+			id: 'call_of_the_brave_mastery',
+			card_type: 'subclass_mastery',
+			artist_name: 'Mat Wilma',
+			image_url: '/images/wip.avif',
+			title: 'Call of the Brave',
+			description_html: 'Mastery',
+			class_id: 'warrior',
+			features: [
+				{
+					title: 'Camaraderie',
+					description_html:
+						'<p>Your unwavering bravery is a rallying point for your allies. You can initiate a Tag Team Roll one additional time per session. Additionally, when an ally initiates a Tag Team Roll with you, they only need to spend 2 Hope to do so.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		}
+	},
+
+	warrior_call_of_the_slayer: {
+		id: 'warrior_call_of_the_slayer',
+		source_id: 'SRD',
+		class_id: 'warrior',
+		name: 'Call of the Slayer',
+		description_html:
+			'<p>Play Call of the Slayer if you want to be a relentless combatant who builds power through battle.</p>',
+		foundation_card: {
+			id: 'call_of_the_slayer_foundation',
+			card_type: 'subclass_foundation',
+			artist_name: 'Reiko Murakami',
+			image_url: '/images/wip.avif',
+			title: 'Call of the Slayer',
+			description_html: 'Foundation',
+			spellcast_trait: null,
+			class_id: 'warrior',
+			features: [
+				{
+					title: 'Slayer',
+					description_html: `<p>You gain a pool of dice called Slayer Dice. On a roll with Hope, you can place a <b>d6</b> on this card instead of gaining a Hope, adding the die to the pool. You can store a number of Slayer Dice equal to your Proficiency. When you make an attack roll or damage roll, you can spend any number of these Slayer Dice, rolling them and adding their result to the roll. At the end of each session, clear any unspent Slayer Dice on this card and gain a Hope per die cleared.</p>`,
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		},
+		specialization_card: {
+			id: 'call_of_the_slayer_specialization',
+			card_type: 'subclass_specialization',
+			artist_name: 'Reiko Murakami',
+			image_url: '/images/wip.avif',
+			title: 'Call of the Slayer',
+			description_html: 'Specialization',
+			class_id: 'warrior',
+			features: [
+				{
+					title: 'Weapon Specialist',
+					description_html: `<p>You can wield multiple weapons with dangerous ease. When you succeed on an attack, you can spend a Hope to add one of the damage dice from your secondary weapon to the damage roll.</p>
+					<p>Additionally, once per long rest when you roll your Slayer Dice, reroll any 1s.</p>`,
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		},
+		mastery_card: {
+			id: 'call_of_the_slayer_mastery',
+			card_type: 'subclass_mastery',
+			artist_name: 'Reiko Murakami',
+			image_url: '/images/wip.avif',
+			title: 'Call of the Slayer',
+			description_html: 'Mastery',
+			class_id: 'warrior',
+			features: [
+				{
+					title: 'Martial Preparation',
+					description_html:
+						"<p>You're an inspirational warrior to all who travel with you. Your party gains access to the Martial Preparation downtime move. To use this move during a rest, describe how you instruct and train with your party. You and each ally who chooses this downtime move gain a <b>d6 Slayer Die</b>. A PC with a Slayer Die can spend it to roll the die and add the result to an attack or damage roll of their choice.</p>",
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		}
+	},
+
+	wizard_school_of_knowledge: {
+		id: 'wizard_school_of_knowledge',
+		source_id: 'SRD',
+		class_id: 'wizard',
+		name: 'School of Knowledge',
+		description_html:
+			'<p>Play School of Knowledge if you want to master the arcane through study and preparation.</p>',
+		foundation_card: {
+			id: 'school_of_knowledge_foundation',
+			card_type: 'subclass_foundation',
+			artist_name: 'Bear Frymire',
+			image_url: '/images/wip.avif',
+			title: 'School of Knowledge',
+			description_html: 'Foundation',
+			spellcast_trait: 'knowledge',
+			class_id: 'wizard',
+			features: [
+				{
+					title: 'Prepared',
+					description_html:
+						'<p>Take an additional domain card of your level or lower from a domain you have access to.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				},
+				{
+					title: 'Adept',
+					description_html:
+						'<p>When you Utilize an Experience, you can mark a Stress instead of spending a Hope. If you do, double your Experience modifier for that roll.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		},
+		specialization_card: {
+			id: 'school_of_knowledge_specialization',
+			card_type: 'subclass_specialization',
+			artist_name: 'Bear Frymire',
+			image_url: '/images/wip.avif',
+			title: 'School of Knowledge',
+			description_html: 'Specialization',
+			class_id: 'wizard',
+			features: [
+				{
+					title: 'Accomplished',
+					description_html:
+						'<p>Take an additional domain card of your level or lower from a domain you have access to.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				},
+				{
+					title: 'Perfect Recall',
+					description_html:
+						'<p>Once per rest, when you recall a domain card in your vault, you can reduce its Recall Cost by 1.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		},
+		mastery_card: {
+			id: 'school_of_knowledge_mastery',
+			card_type: 'subclass_mastery',
+			artist_name: 'Bear Frymire',
+			image_url: '/images/wip.avif',
+			title: 'School of Knowledge',
+			description_html: 'Mastery',
+			class_id: 'wizard',
+			features: [
+				{
+					title: 'Brilliant',
+					description_html:
+						'<p>Take an additional domain card of your level or lower from a domain you have access to.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				},
+				{
+					title: 'Honed Expertise',
+					description_html:
+						'<p>When you use an Experience, roll a <b>d6</b>. On a result of 5 or higher, you can use it without spending Hope.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		}
+	},
+
+	wizard_school_of_war: {
+		id: 'wizard_school_of_war',
+		source_id: 'SRD',
+		class_id: 'wizard',
+		name: 'School of War',
+		description_html:
+			'<p>Play School of War if you want to be a battle-focused wizard who thrives in combat.</p>',
+		foundation_card: {
+			id: 'school_of_war_foundation',
+			card_type: 'subclass_foundation',
+			artist_name: 'Nikki Dawes',
+			image_url: '/images/wip.avif',
+			title: 'School of War',
+			description_html: 'Foundation',
+			spellcast_trait: 'knowledge',
+			class_id: 'wizard',
+			features: [
+				{
+					title: 'Battlemage',
+					description_html:
+						"<p>You've focused your studies on becoming an unconquerable force on the battlefield. Gain an additional Hit Point slot.</p>",
+					character_modifiers: [
+						{
+							behaviour: 'bonus',
+							character_conditions: [],
+							type: 'flat',
+							value: 1,
+							target: 'max_hp'
+						}
+					],
+					weapon_modifiers: []
+				},
+				{
+					title: 'Face Your Fear',
+					description_html:
+						'<p>When you succeed with Fear on an attack roll, you deal an extra <b>1d10</b> magic damage.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		},
+		specialization_card: {
+			id: 'school_of_war_specialization',
+			card_type: 'subclass_specialization',
+			artist_name: 'Nikki Dawes',
+			image_url: '/images/wip.avif',
+			title: 'School of War',
+			description_html: 'Specialization',
+			class_id: 'wizard',
+			features: [
+				{
+					title: 'Conjure Shield',
+					description_html:
+						'<p>You can maintain a protective barrier of magic. While you have at least 2 Hope, you add your Proficiency to your Evasion.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				},
+				{
+					title: 'Fueled by Fear',
+					description_html:
+						'<p>The extra magic damage from your "Face Your Fear" feature increases to <b>2d10</b>.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				}
+			]
+		},
+		mastery_card: {
+			id: 'school_of_war_mastery',
+			card_type: 'subclass_mastery',
+			artist_name: 'Nikki Dawes',
+			image_url: '/images/wip.avif',
+			title: 'School of War',
+			description_html: 'Mastery',
+			class_id: 'wizard',
+			features: [
+				{
+					title: 'Thrive in Chaos',
+					description_html:
+						'<p>When you succeed on an attack, you can mark a Stress after rolling damage to force the target to mark an additional Hit Point.</p>',
+					character_modifiers: [],
+					weapon_modifiers: []
+				},
+				{
+					title: 'Have No Fear',
+					description_html:
+						'<p>The extra magic damage from your "Face Your Fear" feature increases to <b>3d10</b>.</p>',
 					character_modifiers: [],
 					weapon_modifiers: []
 				}

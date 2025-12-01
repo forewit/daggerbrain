@@ -401,13 +401,14 @@
 				Decide What You Carry Your Spells In:
 			</p>
 
-				<Input
-					bind:value={spellbookInput}
-					placeholder={spellbookPrompt}
-					class={cn(
-						'rounded-xl border bg-background px-4 h-12',
-						spellbookInput.trim() !== '' && 'border-primary/50 bg-muted/50'
-					)}				/>
+			<Input
+				bind:value={spellbookInput}
+				placeholder={spellbookPrompt}
+				class={cn(
+					'h-12 rounded-xl border bg-background px-4',
+					spellbookInput.trim() !== '' && 'border-primary/50 bg-muted/50'
+				)}
+			/>
 		{/if}
 
 		<!-- Add Starting Equipment Button -->

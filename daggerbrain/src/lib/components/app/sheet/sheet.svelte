@@ -8,7 +8,7 @@
 	import Hp from './hp.svelte';
 	import Stress from './stress.svelte';
 	import Hope from './hope.svelte';
-	import ClassFeatures from './class-features.svelte';
+	import ClassFeatures from './features/class-features.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import { upload_user_image } from '$lib/remote/images.remote';
@@ -27,6 +27,7 @@
 		SubclassSpecializationCard,
 		SubclassMasteryCard
 	} from '$lib/types/compendium-types';
+	import Features from './features/features.svelte';
 
 	let { class: className = '' }: { class?: string } = $props();
 
@@ -200,13 +201,8 @@
 			<!-- hope -->
 			<Hope />
 
-			<!-- class features -->
-			{#if context.primary_class}
-				<ClassFeatures character_class={context.primary_class} class="mx-2" />
-			{/if}
-			{#if context.secondary_class}
-				<ClassFeatures character_class={context.secondary_class} class="mx-2" />
-			{/if}
+			<!-- features tabs -->
+			<Features class="mx-2" />
 
 			<!-- experiences -->
 			{#if character.experiences.some((experience) => experience !== '')}

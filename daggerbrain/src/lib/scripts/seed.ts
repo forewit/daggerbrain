@@ -183,8 +183,7 @@ function buildFolderTree(dir: string, relativePath: string = ''): FolderNode[] {
 			).length;
 
 			// Total images = direct + all children
-			const totalImages =
-				directImages + children.reduce((sum, child) => sum + child.imageCount, 0);
+			const totalImages = directImages + children.reduce((sum, child) => sum + child.imageCount, 0);
 
 			folders.push({
 				name: entry.name,
