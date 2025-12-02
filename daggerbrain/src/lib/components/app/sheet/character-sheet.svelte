@@ -25,9 +25,35 @@
 		TransformationCard,
 		SubclassFoundationCard,
 		SubclassSpecializationCard,
-		SubclassMasteryCard
+		SubclassMasteryCard,
+		Weapon,
+		Armor,
+		Consumable,
+		Loot
 	} from '$lib/types/compendium-types';
 	import Features from './features/features.svelte';
+	import ContentSheet, { type SheetContent } from './content-sheet/content-sheet.svelte';
+
+	let sheetOpen = $state(false);
+	let sheetContent = $state<SheetContent>(null);
+
+	function openItemSheet(
+		type: 'weapon' | 'armor' | 'consumable' | 'loot',
+		item: Weapon | Armor | Consumable | Loot
+	) {
+		sheetContent = { type, data: item } as SheetContent;
+		sheetOpen = true;
+	}
+
+	function openExperienceSheet() {
+		sheetContent = { type: 'experience' };
+		sheetOpen = true;
+	}
+
+	function openCatalogSheet() {
+		sheetContent = { type: 'catalog' };
+		sheetOpen = true;
+	}
 
 	let { class: className = '' }: { class?: string } = $props();
 
@@ -59,7 +85,6 @@
 
 	// svelte-ignore state_referenced_locally
 	let character_cards_expanded = $state(character_cards.length > 0);
-
 
 	let fileInput = $state<HTMLInputElement>();
 
@@ -205,7 +230,12 @@
 			<Hope class="-mt-2" />
 
 			<!-- features tabs -->
-			<Features class="mx-2" />
+			<Features
+				class="mx-2"
+				onItemClick={openItemSheet}
+				onExperienceClick={openExperienceSheet}
+				onAddItems={openCatalogSheet}
+			/>
 		</div>
 
 		<!-- Character cards -->
@@ -221,10 +251,10 @@
 				{/if}
 				Character Cards
 				<div
-				class="ml-2 grid h-4.5 place-items-center rounded-full bg-accent px-1.5 text-xs font-bold text-background"
-			>
-				{character_cards.length}
-			</div>
+					class="ml-2 grid h-4.5 place-items-center rounded-full bg-accent px-1.5 text-xs font-bold text-background"
+				>
+					{character_cards.length}
+				</div>
 			</button>
 			{#if character_cards_expanded}
 				<CardCarousel cards={character_cards} emptyMessage="None" />
@@ -234,4 +264,7 @@
 		<!-- domain card loadout -->
 		<Loadout />
 	</div>
+
+	<!-- Item/Experience detail sheet -->
+	<ContentSheet bind:open={sheetOpen} content={sheetContent} />
 {/if}

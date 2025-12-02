@@ -66,3 +66,11 @@ export type ConnectionAnswer = {
 	question: string;
 	answer: string;
 };
+
+export type CharacterDescriptions = {
+	clothes: string;
+	eyes: string;
+	body: string;
+	skin: string;
+	attitude: string;
+};

@@ -19,8 +19,19 @@
 
 	let {
 		class: className = '',
-		onAddItems = () => {}
-	}: { class?: string; onAddItems?: () => void } = $props();
+		onAddItems = () => {},
+		onItemClick = (
+			_type: 'weapon' | 'armor' | 'consumable' | 'loot',
+			_item: Weapon | Armor | Consumable | Loot
+		) => {}
+	}: {
+		class?: string;
+		onAddItems?: () => void;
+		onItemClick?: (
+			type: 'weapon' | 'armor' | 'consumable' | 'loot',
+			item: Weapon | Armor | Consumable | Loot
+		) => void;
+	} = $props();
 
 	const context = getCharacterContext();
 	const compendium = getCompendiumContext();
@@ -132,6 +143,7 @@
 									{armor}
 									showEquipButton={true}
 									quantity={character.inventory.armor[armor.id]?.quantity ?? 1}
+									onclick={() => onItemClick('armor', armor)}
 								/>
 							{/each}
 						</tbody>
@@ -170,6 +182,7 @@
 									{weapon}
 									showEquipButton={true}
 									quantity={inventory[weapon.id]?.quantity ?? 1}
+									onclick={() => onItemClick('weapon', weapon)}
 								/>
 							{/each}
 						</tbody>
@@ -193,7 +206,11 @@
 						</thead>
 						<tbody>
 							{#each filteredConsumables as consumable (consumable.id)}
-								<ConsumableCard {consumable} quantity={consumable.quantity} />
+								<ConsumableCard
+									{consumable}
+									quantity={consumable.quantity}
+									onclick={() => onItemClick('consumable', consumable)}
+								/>
 							{/each}
 						</tbody>
 					</table>
@@ -212,13 +229,17 @@
 						<thead>
 							<tr class="border-b bg-card text-xs text-muted-foreground">
 								<th class="px-4 py-2 text-left sm:text-left">Loot</th>
-								<th class="hidden py-2 pr-4 text-right md:text-left sm:table-cell">Description</th>
+								<th class="hidden py-2 pr-4 text-right sm:table-cell md:text-left">Description</th>
 								<th class="hidden py-2 pr-4 text-right md:table-cell">Modifiers</th>
 							</tr>
 						</thead>
 						<tbody>
 							{#each filteredLoot as loot (loot.id)}
-								<LootCard {loot} quantity={loot.quantity} />
+								<LootCard
+									{loot}
+									quantity={loot.quantity}
+									onclick={() => onItemClick('loot', loot)}
+								/>
 							{/each}
 						</tbody>
 					</table>

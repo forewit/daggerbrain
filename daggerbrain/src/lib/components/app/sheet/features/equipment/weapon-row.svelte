@@ -41,7 +41,7 @@
 	function toggleEquip(e: MouseEvent) {
 		e.stopPropagation();
 		if (!weaponType) return;
-		
+
 		if (isEquipped) {
 			context.unequipItem(weapon, weaponType);
 		} else {
@@ -98,9 +98,10 @@
 <tr
 	class={cn('cursor-pointer text-xs', className)}
 	onclick={(e) => {
-		// Don't trigger onclick if clicking on interactive elements
+		// Don't trigger onclick if clicking on interactive elements (but allow the row itself)
 		const target = e.target as HTMLElement;
-		if (target.closest('button, [role="button"], select, input')) {
+		const interactive = target.closest('button, select, input');
+		if (interactive && interactive !== e.currentTarget) {
 			return;
 		}
 		onclick?.();
@@ -117,26 +118,27 @@
 	<td class="px-4 py-2">
 		<div class="flex items-center gap-1">
 			{#if showEquipButton && weaponType}
-				<button 
-					class="pr-1 -ml-4 pl-4 -my-2 self-stretch group"
+				<button
+					class="group -my-2 -ml-4 self-stretch pr-1 pl-4"
 					onclick={toggleEquip}
 					title={isEquipped ? 'Unequip' : 'Equip'}
 				>
-				<div class="size-[16px] rounded-full border-2 border-muted-foreground flex items-center justify-center group-hover:border-foreground transition-colors">
-					{#if isEquipped}
-						<div class="size-[8px] rounded-full bg-muted-foreground"></div>
-					{/if}
-				</div>
+					<div
+						class="flex size-[16px] items-center justify-center rounded-full border-2 border-muted-foreground transition-colors group-hover:border-foreground"
+					>
+						{#if isEquipped}
+							<div class="size-[8px] rounded-full bg-muted-foreground"></div>
+						{/if}
+					</div>
 				</button>
 			{/if}
 			{#if weapon.category !== 'Unarmed'}
-
 				<div class="-mb-1">
 					<p>{weapon.title}</p>
-						<p class="text-[10px] text-muted-foreground">{weapon.category}</p>
+					<p class="text-[10px] text-muted-foreground">{weapon.category}</p>
 				</div>
 			{:else}
-			<p>{weapon.title}</p>
+				<p>{weapon.title}</p>
 			{/if}
 
 			{#if quantity > 1}
@@ -153,12 +155,12 @@
 			{/if}
 		</div>
 	</td>
-	<td class="py-2 pr-4 whitespace-nowrap text-right sm:text-center">
-		<div class="ml-auto sm:mx-auto w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs">
+	<td class="py-2 pr-4 text-right whitespace-nowrap sm:text-center">
+		<div class="ml-auto w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs sm:mx-auto">
 			{formattedDamage}
 		</div>
 	</td>
-	<td class="hidden py-2 pr-4 text-xs text-right sm:table-cell">
+	<td class="hidden py-2 pr-4 text-right text-xs sm:table-cell">
 		<div class="ml-auto w-min text-right">
 			{weapon.features.map((f) => f.title).join(', ') || '—'}
 		</div>

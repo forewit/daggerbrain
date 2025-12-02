@@ -8,7 +8,8 @@ import type {
 	CharacterInventory,
 	LevelUpDomainCardIds,
 	LevelUpChoices,
-	DomainCardId
+	DomainCardId,
+	CharacterDescriptions
 } from '../../types/character-types';
 import type {
 	CharacterModifier,
@@ -50,6 +51,8 @@ export const characters_table = sqliteTable('characters_table', {
 	secondary_class_id: text('secondary_class_id'),
 	secondary_subclass_id: text('secondary_subclass_id'),
 	secondary_class_domain_id_choice: text('secondary_class_domain_id_choice').$type<DomainIds>(),
+
+	// notes / descriptions
 	background_question_answers: text('background_questions', { mode: 'json' })
 		.notNull()
 		.default(CHARACTER_DEFAULTS.background_question_answers)
@@ -58,6 +61,11 @@ export const characters_table = sqliteTable('characters_table', {
 		.notNull()
 		.default(CHARACTER_DEFAULTS.connection_answers)
 		.$type<ConnectionAnswer[]>(),
+	character_descriptions: text('character_descriptions', { mode: 'json' })
+		.notNull()
+		.default(CHARACTER_DEFAULTS.character_descriptions)
+		.$type<CharacterDescriptions>(),
+	notes: text('notes').notNull().default(CHARACTER_DEFAULTS.notes),
 
 	// equipment
 	active_armor_id: text('active_armor_id'),
@@ -69,7 +77,6 @@ export const characters_table = sqliteTable('characters_table', {
 		.$type<CharacterInventory>(),
 
 	// the void / other
-	notes: text('notes').notNull().default(CHARACTER_DEFAULTS.notes),
 	transformation_card_id: text('transformation_card_id'),
 	additional_domain_card_ids: text('additional_domain_card_ids', { mode: 'json' })
 		.notNull()

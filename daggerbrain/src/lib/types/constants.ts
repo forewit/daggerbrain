@@ -1,11 +1,11 @@
 import type {
 	BackgroundQuestionAnswer,
-	Character,
 	CharacterInventory,
 	CharacterSettings,
 	ConnectionAnswer,
 	DerivedDescriptors,
 	DomainCardId,
+	CharacterDescriptions,
 	LevelUpChoices,
 	LevelUpDomainCardIds
 } from '$lib/types/character-types';
@@ -49,8 +49,18 @@ export const CHARACTER_DEFAULTS = {
 	secondary_class_id: null,
 	secondary_subclass_id: null,
 	secondary_class_domain_id_choice: null,
+
+	// notes / descriptions
 	background_question_answers: <BackgroundQuestionAnswer[]>[],
 	connection_answers: <ConnectionAnswer[]>[],
+	character_descriptions: <CharacterDescriptions>{
+		clothes: '',
+		eyes: '',
+		body: '',
+		skin: '',
+		attitude: ''
+	},
+	notes: '',
 
 	// equipment
 	unarmed_attack_choices: <Record<string, string[]>>{},
@@ -68,7 +78,6 @@ export const CHARACTER_DEFAULTS = {
 	},
 
 	// the void / other
-	notes: '',
 	transformation_card_id: null,
 	additional_domain_card_ids: <string[]>[],
 	additional_character_modifiers: <CharacterModifier[]>[],

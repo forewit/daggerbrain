@@ -261,7 +261,14 @@ export const ClassSchema = z.object({
 		spellbook_prompt: z.string().nullable()
 	}),
 	background_questions: z.array(z.string()),
-	connections: z.array(z.string())
+	connection_questions: z.array(z.string()),
+	character_description_suggestions: z.object({
+		clothes: z.string(),
+		eyes: z.string(),
+		body: z.string(),
+		skin: z.string(),
+		attitude: z.string()
+	})
 });
 
 // ============================================================================

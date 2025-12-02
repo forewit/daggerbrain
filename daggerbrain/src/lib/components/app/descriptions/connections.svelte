@@ -38,7 +38,7 @@
 
 	function resetConnections() {
 		if (character && primary_class) {
-			character.connection_answers = primary_class.connections.map((question) => ({
+			character.connection_answers = primary_class.connection_questions.map((question) => ({
 				question,
 				answer: ''
 			}));

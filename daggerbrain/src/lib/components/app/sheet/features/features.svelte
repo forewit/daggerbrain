@@ -8,10 +8,29 @@
 	import Background from './background.svelte';
 	import Notes from './notes.svelte';
 	import Experiences from './experiences.svelte';
+	import type { Weapon, Armor, Consumable, Loot } from '$lib/types/compendium-types';
 
-	let { class: className = '' }: { class?: string } = $props();
+	let {
+		class: className = '',
+		onItemClick = (
+			_type: 'weapon' | 'armor' | 'consumable' | 'loot',
+			_item: Weapon | Armor | Consumable | Loot
+		) => {},
+		onExperienceClick = () => {},
+		onAddItems = () => {}
+	}: {
+		class?: string;
+		onItemClick?: (
+			type: 'weapon' | 'armor' | 'consumable' | 'loot',
+			item: Weapon | Armor | Consumable | Loot
+		) => void;
+		onExperienceClick?: () => void;
+		onAddItems?: () => void;
+	} = $props();
 
-	let tab = $state<'weapons'  | 'features' | 'experiences'| 'inventory' | 'background' | 'notes'>('weapons');
+	let tab = $state<'weapons' | 'features' | 'experiences' | 'inventory' | 'background' | 'notes'>(
+		'weapons'
+	);
 
 	const context = getCharacterContext();
 </script>
@@ -28,16 +47,16 @@
 		</Tabs.List>
 
 		<Tabs.Content value="weapons">
-			<ActiveEquipment gotoInventory={() => (tab = 'inventory')} />
+			<ActiveEquipment gotoInventory={() => (tab = 'inventory')} {onItemClick} />
 		</Tabs.Content>
 		<Tabs.Content value="features">
 			<ClassFeatures />
 		</Tabs.Content>
 		<Tabs.Content value="experiences">
-			<Experiences />
+			<Experiences {onExperienceClick} />
 		</Tabs.Content>
 		<Tabs.Content value="inventory">
-			<Inventory />
+			<Inventory {onItemClick} {onAddItems} />
 		</Tabs.Content>
 		<Tabs.Content value="background">
 			<Background />

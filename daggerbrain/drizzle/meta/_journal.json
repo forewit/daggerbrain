@@ -15,6 +15,13 @@
       "when": 1764518347384,
       "tag": "0001_redundant_mister_fear",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1764711465490,
+      "tag": "0002_misty_jigsaw",
+      "breakpoints": true
     }
   ]
 }

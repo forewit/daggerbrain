@@ -319,7 +319,7 @@ function createCharacter(id: string) {
 			character.background_question_answers = primary_class.background_questions.map(
 				(question) => ({ question, answer: '' })
 			);
-			character.connection_answers = primary_class.connections.map((question) => ({
+			character.connection_answers = primary_class.connection_questions.map((question) => ({
 				question,
 				answer: ''
 			}));
@@ -2318,7 +2318,7 @@ function createCharacter(id: string) {
 				});
 
 			inFlightSave = savePromise;
-		}, 1000);
+		}, 300);
 
 		return () => {
 			if (debounceTimer) {

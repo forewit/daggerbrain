@@ -52,12 +52,12 @@
 				{/if}
 				Loadout
 				<div
-				class="ml-2 grid h-4.5 place-items-center rounded-full bg-accent px-1.5 text-xs font-bold text-background"
-			>
-				{context.domain_card_loadout.length} / {context.max_domain_card_loadout}
-			</div>
+					class="ml-2 grid h-4.5 place-items-center rounded-full bg-accent px-1.5 text-xs font-bold text-background"
+				>
+					{context.domain_card_loadout.length} / {context.max_domain_card_loadout}
+				</div>
 			</button>
-			
+
 			<Dialog.Root>
 				<Dialog.Trigger class={cn(buttonVariants({ size: 'sm' }), 'relative')}>
 					<ArrowLeftRight class="size-3" />

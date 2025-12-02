@@ -18,8 +18,10 @@
 <tr
 	class={cn('cursor-pointer text-xs', className)}
 	onclick={(e) => {
+		// Don't trigger onclick if clicking on interactive elements (but allow the row itself)
 		const target = e.target as HTMLElement;
-		if (target.closest('button, [role="button"], select, input')) {
+		const interactive = target.closest('button, select, input');
+		if (interactive && interactive !== e.currentTarget) {
 			return;
 		}
 		onclick?.();
@@ -39,7 +41,7 @@
 			<span class="ml-1 text-muted-foreground italic">×{quantity}</span>
 		{/if}
 	</td>
-	<td class="hidden py-2 pr-4 text-right md:text-left sm:table-cell">
+	<td class="hidden py-2 pr-4 text-right sm:table-cell md:text-left">
 		{#if loot.description_html}
 			<div class="line-clamp-1 text-muted-foreground">
 				{@html loot.description_html}

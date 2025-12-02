@@ -4,11 +4,23 @@
 	import WeaponCard from './equipment/weapon-row.svelte';
 	import ArmorCard from './equipment/armor-row.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import type { Weapon, Armor, Consumable, Loot } from '$lib/types/compendium-types';
 
 	let {
 		class: className = '',
-		gotoInventory = () => {}
-	}: { class?: string; gotoInventory?: () => void } = $props();
+		gotoInventory = () => {},
+		onItemClick = (
+			_type: 'weapon' | 'armor' | 'consumable' | 'loot',
+			_item: Weapon | Armor | Consumable | Loot
+		) => {}
+	}: {
+		class?: string;
+		gotoInventory?: () => void;
+		onItemClick?: (
+			type: 'weapon' | 'armor' | 'consumable' | 'loot',
+			item: Weapon | Armor | Consumable | Loot
+		) => void;
+	} = $props();
 
 	const context = getCharacterContext();
 </script>
@@ -32,7 +44,10 @@
 		</thead>
 		<tbody>
 			{#if context.derived_armor !== null}
-				<ArmorCard armor={context.derived_armor} />
+				<ArmorCard
+					armor={context.derived_armor}
+					onclick={() => onItemClick('armor', context.derived_armor!)}
+				/>
 			{/if}
 		</tbody>
 	</table>
@@ -58,13 +73,22 @@
 			</thead>
 			<tbody>
 				{#if context.derived_primary_weapon !== null}
-					<WeaponCard weapon={context.derived_primary_weapon} />
+					<WeaponCard
+						weapon={context.derived_primary_weapon}
+						onclick={() => onItemClick('weapon', context.derived_primary_weapon!)}
+					/>
 				{/if}
 				{#if context.derived_secondary_weapon !== null}
-					<WeaponCard weapon={context.derived_secondary_weapon} />
+					<WeaponCard
+						weapon={context.derived_secondary_weapon}
+						onclick={() => onItemClick('weapon', context.derived_secondary_weapon!)}
+					/>
 				{/if}
 				{#if context.derived_unarmed_attack !== null}
-					<WeaponCard weapon={context.derived_unarmed_attack} />
+					<WeaponCard
+						weapon={context.derived_unarmed_attack}
+						onclick={() => onItemClick('weapon', context.derived_unarmed_attack!)}
+					/>
 				{/if}
 			</tbody>
 		</table>

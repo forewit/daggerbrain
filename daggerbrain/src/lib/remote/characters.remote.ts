@@ -83,7 +83,7 @@ export const update_character = command(characters_table_update_schema, async (c
 		.set(character)
 		.where(and(eq(characters_table.id, character.id), eq(characters_table.clerk_user_id, userId)));
 
-	get_all_characters().refresh();
+	//get_all_characters().refresh();
 
 	return character.id;
 });

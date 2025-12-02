@@ -13,8 +13,10 @@
 <tr
 	class={cn('cursor-pointer text-xs', className)}
 	onclick={(e) => {
+		// Don't trigger onclick if clicking on interactive elements (but allow the row itself)
 		const target = e.target as HTMLElement;
-		if (target.closest('button, [role="button"], select, input')) {
+		const interactive = target.closest('button, select, input');
+		if (interactive && interactive !== e.currentTarget) {
 			return;
 		}
 		onclick?.();

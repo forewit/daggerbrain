@@ -69,11 +69,18 @@ export const CLASSES = {
 			'Throughout your entire career, one target has eluded you. Who are they, and how have they managed to slip through your fingers?',
 			"You always do what you must to take down your target, but there's one line that you will never cross. What is it?"
 		],
-		connections: [
+		connection_questions: [
 			'What about me frightens you?',
 			'You once asked me to do something that keeps you up at night. What was it?',
 			'What secret about myself did I tell you, and how did it change your view of me?'
-		]
+		],
+		character_description_suggestions: {
+			clothes: 'sinister, weathered, hooded, finely tailored, incognito, padded for silence',
+			eyes: 'carnations, earth, endless ocean, fire, ivy, lilacs, night, seafoam, winter',
+			body: 'broad, carved, curvy, lanky, rotund, short, stocky, tall, thin, tiny, toned',
+			skin: 'ashes, clover, falling snow, fine sand, obsidian, rose, sapphire, wisteria',
+			attitude: 'a hidden razor, a judge, an owl, a butcher, a coiled viper, a merchant, a hunter'
+		}
 	},
 
 	brawler: {
@@ -100,8 +107,8 @@ export const CLASSES = {
 			character_modifiers: [],
 			weapon_modifiers: []
 		},
-		primary_domain_id: 'blade',
-		secondary_domain_id: 'grace',
+		primary_domain_id: 'bone',
+		secondary_domain_id: 'valor',
 		class_features: [
 			{
 				title: 'I am the Weapon',
@@ -200,18 +207,37 @@ export const CLASSES = {
 			}
 		],
 		subclass_ids: ['brawler_juggernaut'],
-		suggested_primary_weapon_id: null,
+		suggested_primary_weapon_id: 'quarterstaff',
 		suggested_secondary_weapon_id: null,
-		suggested_armor_id: null,
+		suggested_armor_id: 'leather_armor',
 		starting_inventory: {
-			gold_coins: 0,
-			free_gear: [],
-			loot_or_consumable_options: [],
-			class_gear_options: [],
+			gold_coins: 10,
+			free_gear: [{ title: 'Torch' }, { title: '50 feet of rope' }, { title: 'Basic Supplies' }],
+			loot_or_consumable_options: ['minor_health_potion', 'minor_stamina_potion'],
+			class_gear_options: [
+				{ title: 'Hand wraps from a mentor' },
+				{ title: 'A book about your secret hobby' }
+			],
 			spellbook_prompt: null
 		},
-		background_questions: [],
-		connections: []
+		background_questions: [
+			'Where did you spend time during your formative years that taught you, directly or indirectly, how to fight in the style you use?',
+			'What group or organization has always had your back, and how did you get in their good graces?',
+			'Who did you lose a fight to long ago that you are desperate for a rematch against?'
+		],
+		connection_questions: [
+			"What is one thing we're both afraid of?",
+			'I rely on you for something important during our travels together. What is it and how do you feel about it?',
+			"I still haven't forgiven you for something you said to me. What was it and why did you say it?"
+		],
+		character_description_suggestions: {
+			clothes: "practical, haphazard, pristine, standard-issue, bright, someone else's",
+			eyes: 'carnations, earth, endless ocean, fire, ivy, lilacs, night, seafoam, winter',
+			body: 'broad, carved, curvy, lanky, rotund, short, stocky, tall, thin, tiny, toned',
+			skin: 'ashes, clover, falling snow, fine sand, obsidian, rose, sapphire, wisteria',
+			attitude:
+				'a loose cannon, a parent, a veteran, a flowing river, a golden retriever, a protector'
+		}
 	},
 
 	bard: {
@@ -264,11 +290,18 @@ export const CLASSES = {
 			'You were in love once. Who did you adore, and how did they hurt you?',
 			"You've always looked up to another bard. Who are they, and why do you idolize them?"
 		],
-		connections: [
+		connection_questions: [
 			'What made you realize we were going to be such good friends?',
 			'What do I do that annoys you?',
 			'Why do you grab my hand at night?'
-		]
+		],
+		character_description_suggestions: {
+			clothes: 'extravagant, fancy, loud, oversized, ragged, sleek, wild',
+			eyes: 'carnations, earth, endless ocean, fire, ivy, lilacs, night, seafoam, winter',
+			body: 'broad, carved, curvy, lanky, rotund, short, stocky, tall, thin, tiny, toned',
+			skin: 'ashes, clover, falling snow, fine sand, obsidian, rose, sapphire, wisteria',
+			attitude: 'a barkeep, a magician, a ringmaster, a rock star, a swashbuckler'
+		}
 	},
 
 	druid: {
@@ -331,11 +364,18 @@ export const CLASSES = {
 			'Who was the first wild animal you bonded with? Why did your bond end?',
 			'Who has been trying to hunt you down? What do they want from you?'
 		],
-		connections: [
+		connection_questions: [
 			'What did you confide in me that makes me leap into danger for you every time?',
 			'What animal do I say you remind me of?',
 			'What affectionate nickname have you given me?'
-		]
+		],
+		character_description_suggestions: {
+			clothes: 'camouflaged, grown, loose, natural, patchwork, regal, scraps',
+			eyes: 'carnations, earth, endless ocean, fire, ivy, lilacs, night, seafoam, winter',
+			body: 'broad, carved, curvy, lanky, rotund, short, stocky, tall, thin, tiny, toned',
+			skin: 'ashes, clover, falling snow, fine sand, obsidian, rose, sapphire, wisteria',
+			attitude: 'a firecracker, a fox, a guide, a hippie, a witch'
+		}
 	},
 
 	guardian: {
@@ -393,11 +433,18 @@ export const CLASSES = {
 			"You've been tasked with protecting something important and delivering it somewhere dangerous. What is it, and where does it need to go?",
 			'You consider an aspect of yourself to be a weakness. What is it, and how has it affected you?'
 		],
-		connections: [
+		connection_questions: [
 			'How did I save your life the first time we met?',
 			'What small gift did you give me that you notice I always carry with me?',
 			'What lie have you told me about yourself that I absolutely believe?'
-		]
+		],
+		character_description_suggestions: {
+			clothes: 'casual, intricate, loose, padded, royal, tactical, weathered',
+			eyes: 'carnations, earth, endless ocean, fire, ivy, lilacs, night, seafoam, winter',
+			body: 'broad, carved, curvy, lanky, rotund, short, stocky, tall, thin, tiny, toned',
+			skin: 'ashes, clover, falling snow, fine sand, obsidian, rose, sapphire, wisteria',
+			attitude: 'a captain, a caretaker, an elephant, a general, a wrestler'
+		}
 	},
 
 	ranger: {
@@ -458,11 +505,18 @@ export const CLASSES = {
 			'Your first kill almost killed you, too. What was it, and what part of you was never the same after that event?',
 			"You've traveled many dangerous lands, but what is the one place you refuse to go?"
 		],
-		connections: [
+		connection_questions: [
 			'What friendly competition do we have?',
 			"Why do you act differently when we're alone than when others are around?",
 			'What threat have you asked me to watch for, and why are you worried about it?'
-		]
+		],
+		character_description_suggestions: {
+			clothes: 'flowing, muted, natural, stained, tactical, tight, woven',
+			eyes: 'carnations, earth, endless ocean, fire, ivy, lilacs, night, seafoam, winter',
+			body: 'broad, carved, curvy, lanky, rotund, short, stocky, tall, thin, tiny, toned',
+			skin: 'ashes, clover, falling snow, fine sand, obsidian, rose, sapphire, wisteria',
+			attitude: 'a child, a ghost, a survivalist, a teacher, a watchdog'
+		}
 	},
 
 	rogue: {
@@ -527,11 +581,18 @@ export const CLASSES = {
 			"You used to have a different life, but you've tried to leave it behind. Who from your past is still chasing you?",
 			'Who from your past were you most sad to say goodbye to?'
 		],
-		connections: [
+		connection_questions: [
 			'What did I recently convince you to do that got us both in trouble?',
 			'What have I discovered about your past that I hold secret from the others?',
 			'Who do you know from my past, and how have they influenced your feelings about me?'
-		]
+		],
+		character_description_suggestions: {
+			clothes: 'clean, dark, inconspicuous, leather, scary, tactical, tight',
+			eyes: 'carnations, earth, endless ocean, fire, ivy, lilacs, night, seafoam, winter',
+			body: 'broad, carved, curvy, lanky, rotund, short, stocky, tall, thin, tiny, toned',
+			skin: 'ashes, clover, falling snow, fine sand, obsidian, rose, sapphire, wisteria',
+			attitude: 'a bandit, a con artist, a gambler, a mob boss, a pirate'
+		}
 	},
 
 	seraph: {
@@ -584,11 +645,18 @@ export const CLASSES = {
 			'How did your appearance change after taking your oath?',
 			'In what strange or unique way do you communicate with your god?'
 		],
-		connections: [
+		connection_questions: [
 			'What promise did you make me agree to, should you die on the battlefield?',
 			'Why do you ask me so many questions about my god?',
 			"You've told me to protect one member of our party above all others, even yourself. Who are they and why?"
-		]
+		],
+		character_description_suggestions: {
+			clothes: 'glowing, rippling, ornate, tight, modest, strange, natural',
+			eyes: 'carnations, earth, endless ocean, fire, ivy, lilacs, night, seafoam, winter',
+			body: 'broad, carved, curvy, lanky, rotund, short, stocky, tall, thin, tiny, toned',
+			skin: 'ashes, clover, falling snow, fine sand, obsidian, rose, sapphire, wisteria',
+			attitude: 'an angel, a doctor, an evangelist, a monk, a priest'
+		}
 	},
 
 	sorcerer: {
@@ -659,11 +727,18 @@ export const CLASSES = {
 			'What mentor taught you to control your untamed magic, and why are they no longer able to guide you?',
 			'You have a deep fear you hide from everyone. What is it, and why does it scare you?'
 		],
-		connections: [
+		connection_questions: [
 			'Why do you trust me so deeply?',
 			'What did I do that makes you cautious around me?',
 			'Why do we keep our shared past a secret?'
-		]
+		],
+		character_description_suggestions: {
+			clothes: 'always moving, flamboyant, inconspicuous, layered, ornate, tight',
+			eyes: 'carnations, earth, endless ocean, fire, ivy, lilacs, night, seafoam, winter',
+			body: 'broad, carved, curvy, lanky, rotund, short, stocky, tall, thin, tiny, toned',
+			skin: 'ashes, clover, falling snow, fine sand, obsidian, rose, sapphire, wisteria',
+			attitude: "a celebrity, a commander, a politician, a prankster, a wolf in sheep's clothing"
+		}
 	},
 
 	warrior: {
@@ -727,11 +802,18 @@ export const CLASSES = {
 			'Somebody defeated you in battle years ago and left you to die. Who was it, and how did they betray you?',
 			'What legendary place have you always wanted to visit, and why is it so special?'
 		],
-		connections: [
+		connection_questions: [
 			'We knew each other long before this party came together. How?',
 			'What mundane task do you usually help me with off the battlefield?',
 			'What fear am I helping you overcome?'
-		]
+		],
+		character_description_suggestions: {
+			clothes: 'bold, patched, reinforced, royal, sleek, sparing, weathered',
+			eyes: 'carnations, earth, endless ocean, fire, ivy, lilacs, night, seafoam, winter',
+			body: 'broad, carved, curvy, lanky, rotund, short, stocky, tall, thin, tiny, toned',
+			skin: 'ashes, clover, falling snow, fine sand, obsidian, rose, sapphire, wisteria',
+			attitude: 'a bull, a dedicated soldier, a gladiator, a hero, a hired hand'
+		}
 	},
 
 	wizard: {
@@ -794,10 +876,17 @@ export const CLASSES = {
 			"You've spent your life searching for a book or object of great significance. What is it, and why is it so important to you?",
 			'You have a powerful rival. Who are they, and why are you so determined to defeat them?'
 		],
-		connections: [
+		connection_questions: [
 			"What favor have I asked of you that you're not sure you can fulfill?",
 			'What weird hobby or strange fascination do we both share?',
 			'What secret about yourself have you entrusted only to me?'
-		]
+		],
+		character_description_suggestions: {
+			clothes: 'beautiful, clean, common, flowing, layered, patchwork, tight',
+			eyes: 'carnations, earth, endless ocean, fire, ivy, lilacs, night, seafoam, winter',
+			body: 'broad, carved, curvy, lanky, rotund, short, stocky, tall, thin, tiny, toned',
+			skin: 'ashes, clover, falling snow, fine sand, obsidian, rose, sapphire, wisteria',
+			attitude: 'an eccentric, a librarian, a lit fuse, a philosopher, a professor'
+		}
 	}
 } as const satisfies Record<string, Class>;

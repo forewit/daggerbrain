@@ -5,6 +5,7 @@
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import BackgroundQuestions from '$lib/components/app/descriptions/background-questions.svelte';
 	import Connections from '$lib/components/app/descriptions/connections.svelte';
+	import Descriptions from '$lib/components/app/descriptions/descriptions.svelte';
 
 	const context = getCharacterContext();
 	let character = $derived(context.character);
@@ -20,6 +21,17 @@
 	// Check if connections dropdown should be highlighted
 	let connectionsHighlighted = $derived(
 		character?.connection_answers.some((item) => !item.answer.trim()) ?? false
+	);
+
+	// Check if description dropdown should be highlighted (all fields are blank)
+	let descriptionsHighlighted = $derived(
+		character
+			? !character.character_descriptions.clothes.trim() &&
+					!character.character_descriptions.eyes.trim() &&
+					!character.character_descriptions.body.trim() &&
+					!character.character_descriptions.skin.trim() &&
+					!character.character_descriptions.attitude.trim()
+			: false
 	);
 </script>
 
@@ -75,6 +87,15 @@
 						create your own questions.
 					</p>
 					<Connections />
+				</div>
+			</Dropdown>
+
+			<Dropdown title="Description" highlighted={descriptionsHighlighted}>
+				<div class="flex flex-col gap-4">
+					<p class="text-sm text-muted-foreground italic">
+						Describe your character's appearance and demeanor.
+					</p>
+					<Descriptions />
 				</div>
 			</Dropdown>
 		</div>

@@ -9,8 +9,5 @@
 
 {#if character}
 	<p class="pb-2 text-sm font-medium">Character Notes</p>
-	<Textarea
-		bind:value={character.notes}
-		class="min-h-48 resize-y"
-	/>
+	<Textarea bind:value={character.notes} class="min-h-48 resize-y" />
 {/if}
