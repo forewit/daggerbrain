@@ -59,108 +59,9 @@
 			.filter(({ gear }) => matchesSearch(gear, searchQuery));
 	});
 
-	function equipWeapon(weapon: Weapon) {
-		if (!character) return;
-		if (weapon.category === 'Primary') {
-			character.active_primary_weapon_id = weapon.id;
-		} else if (weapon.category === 'Secondary') {
-			character.active_secondary_weapon_id = weapon.id;
-		}
-	}
-
-	function equipArmor(armor: Armor) {
-		if (!character) return;
-		character.active_armor_id = armor.id;
-	}
-
-	function unequipArmor(armor: Armor) {
-		if (!character) return;
-		if (character.active_armor_id === armor.id) {
-			character.active_armor_id = null;
-		}
-	}
-
-	function unequipWeapon(weapon: Weapon) {
-		if (!character) return;
-		if (character.active_primary_weapon_id === weapon.id) {
-			character.active_primary_weapon_id = null;
-		}
-		if (character.active_secondary_weapon_id === weapon.id) {
-			character.active_secondary_weapon_id = null;
-		}
-	}
-	function removeWeapon(weapon: Weapon) {
-		if (!character) return;
-		unequipWeapon(weapon);
-
-		const inventory =
-			weapon.category === 'Primary'
-				? character.inventory.primary_weapons
-				: character.inventory.secondary_weapons;
-
-		if (weapon.id in inventory) {
-			inventory[weapon.id].quantity--;
-			if (inventory[weapon.id].quantity <= 0) {
-				delete inventory[weapon.id];
-			}
-		}
-	}
-
-	function removeArmor(armor: Armor) {
-		if (!character) return;
-		unequipArmor(armor);
-
-		if (armor.id in character.inventory.armor) {
-			character.inventory.armor[armor.id].quantity--;
-			if (character.inventory.armor[armor.id].quantity <= 0) {
-				delete character.inventory.armor[armor.id];
-			}
-		}
-	}
-
-	function removeConsumable(consumable: Consumable) {
-		if (!character) return;
-
-		if (consumable.id in character.inventory.consumables) {
-			character.inventory.consumables[consumable.id].quantity--;
-			if (character.inventory.consumables[consumable.id].quantity <= 0) {
-				delete character.inventory.consumables[consumable.id];
-			}
-		}
-	}
-
-	function removeAdventuringGear(
-		gear: AdventuringGear & { quantity: number },
-		originalIndex: number
-	) {
-		if (!character) return;
-
-		if (gear.quantity > 1) {
-			character.inventory.adventuring_gear[originalIndex].quantity--;
-		} else {
-			character.inventory.adventuring_gear.splice(originalIndex, 1);
-		}
-	}
-
-	// Helper function to check if character level meets requirement
-	function canEquip(item: Weapon | Armor): boolean {
-		if (!character) return false;
-		return character.level >= item.level_requirement;
-	}
-
-	// Helper function to check if weapon is equipped
-	function isWeaponEquipped(weapon: Weapon): boolean {
-		if (!character) return false;
-		return (
-			character.active_primary_weapon_id === weapon.id ||
-			character.active_secondary_weapon_id === weapon.id
-		);
-	}
-
-	// Helper function to check if armor is equipped
-	function isArmorEquipped(armor: Armor): boolean {
-		if (!character) return false;
-		return character.active_armor_id === armor.id;
+	// Helper function to get weapon type for context functions
+	function getWeaponType(weapon: Weapon): 'primary_weapon' | 'secondary_weapon' {
+		return weapon.category === 'Primary' ? 'primary_weapon' : 'secondary_weapon';
 	}
 </script>
 
@@ -189,17 +90,18 @@
 
 					{#each filteredWeapons as weapon (weapon.id)}
 						{#snippet subtitle_snippet()}
-							{@const equipped = isWeaponEquipped(weapon)}
+							{@const weaponType = getWeaponType(weapon)}
+							{@const equipped = context.isItemEquipped(weapon, weaponType)}
 							<div class="flex items-center gap-2">
 								{#if equipped}
 									<span class="text-xs text-muted-foreground italic">Equipped</span>
 								{:else}
-									{@const canEquipItem = canEquip(weapon)}
+									{@const canEquipItem = context.canEquipItem(weapon)}
 									<Button
 										size="sm"
 										onclick={(e) => {
 											e.stopPropagation();
-											if (canEquipItem) equipWeapon(weapon);
+											if (canEquipItem) context.equipItem(weapon, weaponType);
 										}}
 										title={canEquipItem ? undefined : 'Level requirement not met'}
 										class={cn(!canEquipItem && 'cursor-not-allowed opacity-50 hover:bg-primary')}
@@ -232,27 +134,22 @@
 
 						<Dropdown {title_snippet} {subtitle_snippet} class="border-2">
 							<WeaponDetails {weapon} />
+							{@const weaponType = getWeaponType(weapon)}
 							<div class="mt-1 -mb-2 flex justify-center sm:justify-end">
-								<!-- {#if isWeaponEquipped(weapon)}
-                <Button variant="link" onclick={() => unequipWeapon(weapon)}>
-                  <CircleMinus class="size-4" /> Unequip
-                </Button>
-              {:else}
-                <Button variant="link" onclick={() => equipWeapon(weapon)}
-                  ><CirclePlus class="size-4" /> Equip</Button
-                >
-              {/if} -->
-								{#if isWeaponEquipped(weapon)}
-									<Button variant="outline" size="sm" onclick={() => unequipWeapon(weapon)}>
+								{#if context.isItemEquipped(weapon, weaponType)}
+									<Button
+										variant="outline"
+										size="sm"
+										onclick={() => context.unequipItem(weapon, weaponType)}
+									>
 										Unequip
 									</Button>
 								{/if}
 								<Button
 									variant="link"
 									class="text-destructive"
-									onclick={() => removeWeapon(weapon)}
+									onclick={() => context.removeFromInventory(weapon, weaponType)}
 								>
-									<!-- <Trash2 class="size-4" /> -->
 									Remove
 								</Button>
 							</div>
@@ -267,17 +164,17 @@
 
 					{#each filteredArmor as armor (armor.id)}
 						{#snippet subtitle_snippet()}
-							{@const equipped = isArmorEquipped(armor)}
+							{@const equipped = context.isItemEquipped(armor, 'armor')}
 							<div class="flex items-center gap-2">
 								{#if equipped}
 									<span class="text-xs text-muted-foreground italic">Equipped</span>
 								{:else}
-									{@const canEquipItem = canEquip(armor)}
+									{@const canEquipItem = context.canEquipItem(armor)}
 									<Button
 										size="sm"
 										onclick={(e) => {
 											e.stopPropagation();
-											if (canEquipItem) equipArmor(armor);
+											if (canEquipItem) context.equipItem(armor, 'armor');
 										}}
 										disabled={!canEquipItem}
 										title={canEquipItem ? undefined : 'Level requirement not met'}
@@ -306,22 +203,20 @@
 						<Dropdown {title_snippet} {subtitle_snippet} class="border-2">
 							<ArmorDetails {armor} />
 							<div class="mt-1 -mb-2 flex justify-center sm:justify-end">
-								<!-- {#if isArmorEquipped(armor)}
-                <Button variant="link" onclick={() => unequipArmor(armor)}>
-                  <CircleMinus class="size-4" /> Unequip
-                </Button>
-              {:else}
-                <Button variant="link" onclick={() => equipArmor(armor)}
-                  ><CirclePlus class="size-4" /> Equip</Button
-                >
-              {/if} -->
-								{#if isArmorEquipped(armor)}
-									<Button variant="outline" size="sm" onclick={() => unequipArmor(armor)}>
+								{#if context.isItemEquipped(armor, 'armor')}
+									<Button
+										variant="outline"
+										size="sm"
+										onclick={() => context.unequipItem(armor, 'armor')}
+									>
 										Unequip
 									</Button>
 								{/if}
-								<Button variant="link" class="text-destructive" onclick={() => removeArmor(armor)}>
-									<!-- <Trash2 class="size-4" /> -->
+								<Button
+									variant="link"
+									class="text-destructive"
+									onclick={() => context.removeFromInventory(armor, 'armor')}
+								>
 									Remove
 								</Button>
 							</div>
@@ -353,7 +248,7 @@
 								<Button
 									variant="link"
 									class="text-destructive"
-									onclick={() => removeConsumable(consumable)}
+									onclick={() => context.removeFromInventory(consumable, 'consumable')}
 								>
 									Remove
 								</Button>
@@ -375,7 +270,12 @@
 								<Button
 									variant="link"
 									class="ml-auto h-auto text-foreground"
-									onclick={() => removeAdventuringGear(gear, originalIndex)}
+									onclick={() =>
+										context.removeFromInventory(
+											{ id: gear.title },
+											'adventuring_gear',
+											originalIndex
+										)}
 								>
 									<CircleMinus class="size-4" />
 								</Button>

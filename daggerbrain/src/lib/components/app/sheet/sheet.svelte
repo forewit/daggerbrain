@@ -12,7 +12,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import { upload_user_image } from '$lib/remote/images.remote';
-	import Experiences from './experiences.svelte';
+	import Experiences from './features/experiences.svelte';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import CardCarousel from '../cards/card-carousel.svelte';
@@ -34,7 +34,6 @@
 	const context = getCharacterContext();
 	let character = $derived(context.character);
 
-	let character_cards_expanded = $state(true);
 	let character_cards: (
 		| DomainCard
 		| AncestryCard
@@ -57,6 +56,10 @@
 			...context.additional_domain_cards
 		].filter((c) => !!c)
 	);
+
+	// svelte-ignore state_referenced_locally
+	let character_cards_expanded = $state(character_cards.length > 0);
+
 
 	let fileInput = $state<HTMLInputElement>();
 
@@ -193,21 +196,16 @@
 			</div>
 
 			<!-- hp and stress -->
-			<div class="mx-2 flex flex-col gap-2">
+			<div class="mx-2 grid gap-2 sm:grid-cols-2">
 				<Hp class="justify-center sm:justify-start" />
 				<Stress class="justify-center sm:justify-start" />
 			</div>
 
 			<!-- hope -->
-			<Hope />
+			<Hope class="-mt-2" />
 
 			<!-- features tabs -->
 			<Features class="mx-2" />
-
-			<!-- experiences -->
-			{#if character.experiences.some((experience) => experience !== '')}
-				<Experiences class="mx-2" />
-			{/if}
 		</div>
 
 		<!-- Character cards -->
@@ -222,6 +220,11 @@
 					<ChevronRight class="w-k h-4" />
 				{/if}
 				Character Cards
+				<div
+				class="ml-2 grid h-4.5 place-items-center rounded-full bg-accent px-1.5 text-xs font-bold text-background"
+			>
+				{character_cards.length}
+			</div>
 			</button>
 			{#if character_cards_expanded}
 				<CardCarousel cards={character_cards} emptyMessage="None" />

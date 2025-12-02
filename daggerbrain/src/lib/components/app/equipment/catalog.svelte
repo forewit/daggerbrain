@@ -26,58 +26,6 @@
 	const compendium = getCompendiumContext();
 	let character = $derived(context.character);
 
-	function addPrimaryWeaponToInventory(weapon: Weapon) {
-		if (!character) return;
-		// Only add if not already in inventory
-		if (!(weapon.id in character.inventory.primary_weapons)) {
-			character.inventory.primary_weapons[weapon.id] = {
-				quantity: 1,
-				choices: {}
-			};
-		} else {
-			character.inventory.primary_weapons[weapon.id].quantity++;
-		}
-	}
-
-	function addSecondaryWeaponToInventory(weapon: Weapon) {
-		if (!character) return;
-		// Only add if not already in inventory
-		if (!(weapon.id in character.inventory.secondary_weapons)) {
-			character.inventory.secondary_weapons[weapon.id] = {
-				quantity: 1,
-				choices: {}
-			};
-		} else {
-			character.inventory.secondary_weapons[weapon.id].quantity++;
-		}
-	}
-
-	function addArmorToInventory(armor: Armor) {
-		if (!character) return;
-		// Only add if not already in inventory
-		if (!(armor.id in character.inventory.armor)) {
-			character.inventory.armor[armor.id] = {
-				quantity: 1,
-				choices: {}
-			};
-		} else {
-			character.inventory.armor[armor.id].quantity++;
-		}
-	}
-
-	function addConsumableToInventory(consumable: Consumable) {
-		if (!character) return;
-		// Only add if not already in inventory
-		if (!(consumable.id in character.inventory.consumables)) {
-			character.inventory.consumables[consumable.id] = {
-				quantity: 1,
-				choices: {}
-			};
-		} else {
-			character.inventory.consumables[consumable.id].quantity++;
-		}
-	}
-
 	// Helper function to strip HTML tags for search
 	function stripHtml(html: string): string {
 		return html.replace(/<[^>]*>/g, '').trim();
@@ -283,11 +231,10 @@
 							size="sm"
 							onclick={(e) => {
 								e.stopPropagation();
-								if (entry.item.category === 'Primary') {
-									addPrimaryWeaponToInventory(entry.item);
-								} else {
-									addSecondaryWeaponToInventory(entry.item);
-								}
+								context.addToInventory(
+									entry.item,
+									entry.item.category === 'Primary' ? 'primary_weapon' : 'secondary_weapon'
+								);
 							}}>Add</Button
 						>
 					{/snippet}
@@ -311,7 +258,7 @@
 							size="sm"
 							onclick={(e) => {
 								e.stopPropagation();
-								addArmorToInventory(entry.item);
+								context.addToInventory(entry.item, 'armor');
 							}}>Add</Button
 						>
 					{/snippet}
@@ -334,7 +281,7 @@
 							size="sm"
 							onclick={(e) => {
 								e.stopPropagation();
-								addConsumableToInventory(entry.item);
+								context.addToInventory(entry.item, 'consumable');
 							}}>Add</Button
 						>
 					{/snippet}

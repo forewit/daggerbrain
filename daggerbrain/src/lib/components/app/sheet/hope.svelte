@@ -9,7 +9,7 @@
 </script>
 
 {#if character}
-	<div class={cn('flex flex-col justify-center gap-3 text-center', className)}>
+	<div class={cn('flex flex-col justify-center gap-2 text-center', className)}>
 		<button
 			onclick={() => {
 				character.marked_hope = 0;

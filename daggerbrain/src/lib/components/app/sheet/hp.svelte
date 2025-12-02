@@ -9,7 +9,7 @@
 </script>
 
 {#if character}
-	<div class={cn('flex h-12 items-center gap-4 rounded-md border-2 px-4', className)}>
+	<div class={cn('flex items-center gap-4 rounded-md border-2 px-4 py-2', className)}>
 		<button
 			onclick={() => {
 				character.marked_hp = 0;

@@ -1,17 +1,16 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
+	import { getCharacterContext } from '$lib/state/character.svelte';
 
-	let { class: className = '' }: { class?: string } = $props();
-
-	let notes = $state('');
+	const context = getCharacterContext();
+	let character = $derived(context.character);
 </script>
 
-<div class={cn('flex flex-col gap-2', className)}>
-	<p class="text-sm text-muted-foreground">Session notes (not saved)</p>
+{#if character}
+	<p class="pb-2 text-sm font-medium">Character Notes</p>
 	<Textarea
-		bind:value={notes}
-		placeholder="Write your session notes here..."
+		bind:value={character.notes}
 		class="min-h-48 resize-y"
 	/>
-</div>
+{/if}

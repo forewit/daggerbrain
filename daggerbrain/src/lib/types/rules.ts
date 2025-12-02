@@ -6,33 +6,39 @@ import type {
 	Tier3OptionIds,
 	Tier4OptionIds
 } from '$lib/types/rule-types';
-import type { Weapon } from '$lib/types/compendium-types';
+import type { Armor, Weapon } from '$lib/types/compendium-types';
 
 export const TRAIT_OPTIONS = [2, 1, 1, 0, 0, -1] as const;
 
 export const TRAITS = {
 	agility: {
 		name: 'Agility',
+		short_name: 'agi',
 		examples: ['Sprint', 'Leap', 'Maneuver']
 	},
 	strength: {
 		name: 'Strength',
+		short_name: 'str',
 		examples: ['Lift', 'Smash', 'Grapple']
 	},
 	finesse: {
 		name: 'Finesse',
+		short_name: 'fin',
 		examples: ['Control', 'Hide', 'Tinker']
 	},
 	instinct: {
 		name: 'Instinct',
+		short_name: 'inst',
 		examples: ['Perceive', 'Sense', 'Navigate']
 	},
 	presence: {
 		name: 'Presence',
+		short_name: 'pres',
 		examples: ['Charm', 'Perform', 'Deceive']
 	},
 	knowledge: {
 		name: 'Knowledge',
+		short_name: 'know',
 		examples: ['Recall', 'Analyze', 'Comprehend']
 	}
 } as const;
@@ -54,7 +60,22 @@ export const BASE_UNARMED_ATTACK: Weapon = {
 	burden: 0
 };
 
+export const BASE_ARMOR: Armor = {
+	id: 'unarmored',
+	source_id: 'SRD',
+	title: 'Unarmored',
+	description_html: '',
+	level_requirement: 1,
+	max_armor: 0,
+	damage_thresholds: {
+		major: 0,
+		severe: 0
+	},
+	features: []
+};
+
 export const BASE_STATS = {
+	unarmored: BASE_ARMOR,
 	traits: {
 		agility: 0,
 		strength: 0,

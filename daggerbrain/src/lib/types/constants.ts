@@ -53,6 +53,7 @@ export const CHARACTER_DEFAULTS = {
 	connection_answers: <ConnectionAnswer[]>[],
 
 	// equipment
+	unarmed_attack_choices: <Record<string, string[]>>{},
 	active_armor_id: null,
 	active_primary_weapon_id: null,
 	active_secondary_weapon_id: null,
@@ -67,6 +68,7 @@ export const CHARACTER_DEFAULTS = {
 	},
 
 	// the void / other
+	notes: '',
 	transformation_card_id: null,
 	additional_domain_card_ids: <string[]>[],
 	additional_character_modifiers: <CharacterModifier[]>[],

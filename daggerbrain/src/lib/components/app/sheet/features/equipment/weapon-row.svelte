@@ -1,0 +1,166 @@
+<script lang="ts">
+	import { cn, capitalize } from '$lib/utils';
+	import * as Select from '$lib/components/ui/select/';
+	import type { Weapon, Traits, DamageTypes } from '$lib/types/compendium-types';
+	import { getCharacterContext } from '$lib/state/character.svelte';
+	import Check from '@lucide/svelte/icons/check';
+	import { TRAITS } from '$lib/types/rules';
+
+	let {
+		weapon,
+		showEquipButton = false,
+		quantity = 1,
+		class: className = '',
+		onclick
+	}: {
+		weapon: Weapon;
+		showEquipButton?: boolean;
+		quantity?: number;
+		class?: string;
+		onclick?: () => void;
+	} = $props();
+
+	const context = getCharacterContext();
+	let character = $derived(context.character);
+	let traits = $derived(context.traits);
+
+	// Determine weapon type for equip/unequip functions
+	let weaponType = $derived.by(() => {
+		if (weapon.category === 'Primary') return 'primary_weapon' as const;
+		if (weapon.category === 'Secondary') return 'secondary_weapon' as const;
+		return null;
+	});
+
+	// Check if this weapon is currently equipped
+	let isEquipped = $derived.by(() => {
+		if (!weaponType) return false;
+		return context.isItemEquipped(weapon, weaponType);
+	});
+
+	// Toggle equip/unequip
+	function toggleEquip(e: MouseEvent) {
+		e.stopPropagation();
+		if (!weaponType) return;
+		
+		if (isEquipped) {
+			context.unequipItem(weapon, weaponType);
+		} else {
+			context.equipItem(weapon, weaponType);
+		}
+	}
+
+	// Get weapon choices from inventory based on weapon type
+	let weaponChoices = $derived.by(() => {
+		if (!character) return null;
+
+		if (weapon.category === 'Unarmed') {
+			return character.unarmed_attack_choices;
+		} else if (weapon.category === 'Primary') {
+			return character.inventory.primary_weapons[weapon.id]?.choices ?? null;
+		} else if (weapon.category === 'Secondary') {
+			return character.inventory.secondary_weapons[weapon.id]?.choices ?? null;
+		}
+	});
+
+	// Get current damage type and trait values from inventory choices
+	let currentDamageType = $derived.by(() => {
+		const choices = weaponChoices?.['damage_type'];
+		if (choices && choices.length > 0) {
+			return choices[0] as DamageTypes;
+		}
+		return weapon.available_damage_types[0] || null;
+	});
+
+	let currentTrait = $derived.by(() => {
+		const choices = weaponChoices?.['trait'];
+		if (choices && choices.length > 0) {
+			return choices[0] as keyof Traits;
+		}
+		return weapon.available_traits[0] || null;
+	});
+
+	// Calculate to hit: weapon attack_roll_bonus + character trait value
+	let toHit = $derived.by(() => {
+		if (!currentTrait || !traits) return weapon.attack_roll_bonus;
+		const traitValue = traits[currentTrait] || 0;
+		return weapon.attack_roll_bonus + traitValue;
+	});
+
+	// Format to hit for display
+	let formattedToHit = $derived(toHit >= 0 ? `+${toHit}` : `${toHit}`);
+
+	// Format damage for Damage column
+	let formattedDamage = $derived(
+		`${weapon.damage_dice}${currentDamageType ? ' ' + currentDamageType : ''}`
+	);
+</script>
+
+<tr
+	class={cn('cursor-pointer text-xs', className)}
+	onclick={(e) => {
+		// Don't trigger onclick if clicking on interactive elements
+		const target = e.target as HTMLElement;
+		if (target.closest('button, [role="button"], select, input')) {
+			return;
+		}
+		onclick?.();
+	}}
+	role="button"
+	tabindex="0"
+	onkeydown={(e) => {
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			onclick?.();
+		}
+	}}
+>
+	<td class="px-4 py-2">
+		<div class="flex items-center gap-1">
+			{#if showEquipButton && weaponType}
+				<button 
+					class="pr-1 -ml-4 pl-4 -my-2 self-stretch group"
+					onclick={toggleEquip}
+					title={isEquipped ? 'Unequip' : 'Equip'}
+				>
+				<div class="size-[16px] rounded-full border-2 border-muted-foreground flex items-center justify-center group-hover:border-foreground transition-colors">
+					{#if isEquipped}
+						<div class="size-[8px] rounded-full bg-muted-foreground"></div>
+					{/if}
+				</div>
+				</button>
+			{/if}
+			{#if weapon.category !== 'Unarmed'}
+
+				<div class="-mb-1">
+					<p>{weapon.title}</p>
+						<p class="text-[10px] text-muted-foreground">{weapon.category}</p>
+				</div>
+			{:else}
+			<p>{weapon.title}</p>
+			{/if}
+
+			{#if quantity > 1}
+				<span class="text-muted-foreground italic">×{quantity}</span>
+			{/if}
+		</div>
+	</td>
+	<td class="py-2 pr-4 text-center whitespace-nowrap">{weapon.range}</td>
+	<td class="py-2 pr-4 whitespace-nowrap">
+		<div class="mx-auto w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs">
+			{formattedToHit}
+			{#if currentTrait}
+				<span class="text-xs">{TRAITS[currentTrait].short_name}</span>
+			{/if}
+		</div>
+	</td>
+	<td class="py-2 pr-4 whitespace-nowrap text-right sm:text-center">
+		<div class="ml-auto sm:mx-auto w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs">
+			{formattedDamage}
+		</div>
+	</td>
+	<td class="hidden py-2 pr-4 text-xs text-right sm:table-cell">
+		<div class="ml-auto w-min text-right">
+			{weapon.features.map((f) => f.title).join(', ') || '—'}
+		</div>
+	</td>
+</tr>

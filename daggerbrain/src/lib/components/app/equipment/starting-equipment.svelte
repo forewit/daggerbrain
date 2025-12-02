@@ -4,13 +4,7 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
-	import type {
-		Weapon,
-		Armor,
-		Loot,
-		Consumable,
-		AdventuringGear
-	} from '$lib/types/compendium-types';
+	import type { Loot, Consumable } from '$lib/types/compendium-types';
 	import { cn } from '$lib/utils';
 	import ArmorCard from './armor.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
@@ -132,97 +126,29 @@
 		}
 	}
 
-	// Functions to add items
-	function addPrimaryWeaponToInventory(weapon: Weapon) {
-		if (!character || !weapon) return;
-		// Only add if not already in inventory
-		if (!(weapon.id in character.inventory.primary_weapons)) {
-			character.inventory.primary_weapons[weapon.id] = {
-				quantity: 1,
-				choices: {}
-			};
-		} else {
-			character.inventory.primary_weapons[weapon.id].quantity++;
-		}
-	}
-
-	function addSecondaryWeaponToInventory(weapon: Weapon) {
-		if (!character || !weapon) return;
-		// Only add if not already in inventory
-		if (!(weapon.id in character.inventory.secondary_weapons)) {
-			character.inventory.secondary_weapons[weapon.id] = {
-				quantity: 1,
-				choices: {}
-			};
-		} else {
-			character.inventory.secondary_weapons[weapon.id].quantity++;
-		}
-	}
-
-	function addArmorToInventory(armor: Armor) {
-		if (!character || !armor) return;
-		if (!(armor.id in character.inventory.armor)) {
-			character.inventory.armor[armor.id] = {
-				quantity: 1,
-				choices: {}
-			};
-		} else {
-			character.inventory.armor[armor.id].quantity++;
-		}
-	}
-
-	function addLootToInventory(lootId: string, type: 'loot' | 'consumable') {
-		if (!character) return;
-		if (type === 'loot') {
-			if (!(lootId in character.inventory.loot)) {
-				character.inventory.loot[lootId] = {
-					quantity: 1,
-					choices: {}
-				};
-			} else {
-				character.inventory.loot[lootId].quantity++;
-			}
-		} else {
-			// It's a consumable
-			if (!(lootId in character.inventory.consumables)) {
-				character.inventory.consumables[lootId] = {
-					quantity: 1,
-					choices: {}
-				};
-			} else {
-				character.inventory.consumables[lootId].quantity++;
-			}
-		}
-	}
-
-	function addAdventuringGear(gear: AdventuringGear) {
-		if (!character) return;
-		character.inventory.adventuring_gear.push({ ...gear, quantity: 1 });
-	}
-
 	function addStartingEquipment() {
 		if (!character || !primary_class) return;
 
 		// Add selected primary weapon
 		if (selectedPrimaryWeapon && suggestedPrimaryWeapon) {
-			addPrimaryWeaponToInventory(suggestedPrimaryWeapon);
+			context.addToInventory(suggestedPrimaryWeapon, 'primary_weapon');
 		}
 
 		// Add selected secondary weapon
 		if (selectedSecondaryWeapon && suggestedSecondaryWeapon) {
-			addSecondaryWeaponToInventory(suggestedSecondaryWeapon);
+			context.addToInventory(suggestedSecondaryWeapon, 'secondary_weapon');
 		}
 
 		// Add selected armor
 		if (selectedArmor && suggestedArmor) {
-			addArmorToInventory(suggestedArmor);
+			context.addToInventory(suggestedArmor, 'armor');
 		}
 
 		// Add selected supplies (gold and free gear)
 		if (selectedSupplies) {
 			character.inventory.gold_coins += primary_class.starting_inventory.gold_coins;
 			primary_class.starting_inventory.free_gear.forEach((gear) => {
-				addAdventuringGear(gear);
+				context.addToInventory({ id: gear.title, title: gear.title }, 'adventuring_gear');
 			});
 		}
 
@@ -230,7 +156,10 @@
 		if (selectedLootOption) {
 			const option = lootOptions.find((opt) => opt.id === selectedLootOption);
 			if (option) {
-				addLootToInventory(selectedLootOption, option.type);
+				context.addToInventory(
+					{ id: selectedLootOption },
+					option.type === 'loot' ? 'loot' : 'consumable'
+				);
 			}
 		}
 
@@ -238,13 +167,16 @@
 		if (selectedClassGearOption !== null) {
 			const gear = classGearOptions[selectedClassGearOption];
 			if (gear) {
-				addAdventuringGear(gear);
+				context.addToInventory({ id: gear.title, title: gear.title }, 'adventuring_gear');
 			}
 		}
 
 		// Add spellbook item if input has content
 		if (spellbookInput.trim() !== '') {
-			addAdventuringGear({ title: spellbookInput.trim() });
+			context.addToInventory(
+				{ id: spellbookInput.trim(), title: spellbookInput.trim() },
+				'adventuring_gear'
+			);
 		}
 
 		// Reset the selections

@@ -69,6 +69,7 @@ export const characters_table = sqliteTable('characters_table', {
 		.$type<CharacterInventory>(),
 
 	// the void / other
+	notes: text('notes').notNull().default(CHARACTER_DEFAULTS.notes),
 	transformation_card_id: text('transformation_card_id'),
 	additional_domain_card_ids: text('additional_domain_card_ids', { mode: 'json' })
 		.notNull()
@@ -84,6 +85,10 @@ export const characters_table = sqliteTable('characters_table', {
 		.$type<WeaponModifier[]>(),
 
 	// ephemeral stats set by the player
+	unarmed_attack_choices: text('unarmed_attack_choices', { mode: 'json' })
+		.notNull()
+		.default(CHARACTER_DEFAULTS.unarmed_attack_choices)
+		.$type<Record<string, string[]>>(),
 	domain_card_choices: text('domain_card_choices', { mode: 'json' })
 		.notNull()
 		.default(CHARACTER_DEFAULTS.domain_card_choices)

@@ -19,7 +19,7 @@
 {#if character}
 	<div
 		class={cn(
-			'flex h-12 items-center gap-4 rounded-md border-2 px-4',
+			'flex items-center gap-4 rounded-md border-2 px-4 py-2',
 			displayOnly && 'pointer-events-none',
 			className
 		)}

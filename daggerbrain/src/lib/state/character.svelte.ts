@@ -10,7 +10,8 @@ import type {
 	CharacterCondition,
 	CharacterModifier,
 	WeaponModifier,
-	DomainCard
+	DomainCard,
+	Armor
 } from '$lib/types/compendium-types';
 import { BLANK_LEVEL_UP_CHOICE } from '$lib/types/constants';
 import { update_character } from '$lib/remote/characters.remote';
@@ -222,6 +223,7 @@ function createCharacter(id: string) {
 	let derived_primary_weapon: Weapon | null = $state(null);
 	let derived_secondary_weapon: Weapon | null = $state(null);
 	let derived_unarmed_attack: Weapon | null = $state(null);
+	let derived_armor: Armor | null = $state(null);
 	let domain_card_vault: DomainCard[] = $state([]);
 	let domain_card_loadout: DomainCard[] = $state([]);
 	let traits: Traits = $state({ ...BASE_STATS.traits });
@@ -301,8 +303,15 @@ function createCharacter(id: string) {
 	});
 
 	// ! initialize class choices, background questions, and connections
+	let last_primary_class_id_for_background: string | null = null;
 	$effect(() => {
 		if (!character) return;
+
+		// Only reset if the primary class actually changed
+		const current_class_id = character.primary_class_id;
+		if (current_class_id === last_primary_class_id_for_background) return;
+		last_primary_class_id_for_background = current_class_id;
+
 		if (!primary_class) {
 			character.background_question_answers = [];
 			character.connection_answers = [];
@@ -1204,8 +1213,8 @@ function createCharacter(id: string) {
 		});
 
 		// modifiers from active armor & derived weapons
-		if (active_armor) {
-			active_armor.features.forEach((f) => {
+		if (derived_armor) {
+			derived_armor.features.forEach((f) => {
 				push_character_modifiers(f.character_modifiers);
 				push_weapon_modifiers(f.weapon_modifiers);
 			});
@@ -1268,11 +1277,25 @@ function createCharacter(id: string) {
 	// ! derive armor and clear if invalid
 	$effect(() => {
 		if (!character) return;
-		if (active_armor === null) return;
-		if (active_armor.level_requirement <= character.level) return;
 
-		console.warn(`Removing invalid armor ${active_armor.id}. level requirement not met`);
-		character.active_armor_id = null;
+		let new_armor: Armor = BASE_STATS.unarmored;
+
+		if (active_armor !== null && active_armor.level_requirement < character.level) {
+			console.warn(`Removing invalid armor ${active_armor.id}. level requirement not met`);
+			character.active_armor_id = null;
+		} else if (active_armor !== null) {
+			new_armor = active_armor;
+		}
+
+		function equivalent_armor(a: Armor | null, b: Armor | null) {
+			if (a === null && b === null) return true;
+			if (a === null || b === null) return false;
+			return a.id === b.id;
+		}
+
+		if (!equivalent_armor(derived_armor, new_armor)) {
+			derived_armor = new_armor;
+		}
 	});
 
 	// ! derive weapons and apply weapon modifiers
@@ -2054,6 +2077,10 @@ function createCharacter(id: string) {
 		if (!character) return;
 		let new_max_armor: number = BASE_STATS.max_armor;
 
+		if (derived_armor !== null) {
+			new_max_armor = derived_armor.max_armor;
+		}
+
 		new_max_armor = apply_modifiers(base_character_modifiers, 'max_armor', new_max_armor, 'base');
 		new_max_armor = apply_modifiers(bonus_character_modifiers, 'max_armor', new_max_armor, 'bonus');
 		new_max_armor = apply_modifiers(
@@ -2103,9 +2130,9 @@ function createCharacter(id: string) {
 		};
 
 		// override with currently equiped armor
-		if (active_armor) {
-			thresholds.major = active_armor.damage_thresholds.major;
-			thresholds.severe = active_armor.damage_thresholds.severe;
+		if (derived_armor !== null && derived_armor.id !== 'unarmored') {
+			thresholds.major = derived_armor.damage_thresholds.major;
+			thresholds.severe = derived_armor.damage_thresholds.severe;
 		}
 
 		thresholds.major = apply_modifiers(
@@ -2291,7 +2318,7 @@ function createCharacter(id: string) {
 				});
 
 			inFlightSave = savePromise;
-		}, 300);
+		}, 1000);
 
 		return () => {
 			if (debounceTimer) {
@@ -2300,6 +2327,206 @@ function createCharacter(id: string) {
 			}
 		};
 	});
+
+	// ================================================
+	// INVENTORY HELPER FUNCTIONS
+	// ================================================
+
+	/**
+	 * Add an item to the character's inventory
+	 */
+	function addToInventory(
+		item: { id: string; title?: string },
+		type:
+			| 'primary_weapon'
+			| 'secondary_weapon'
+			| 'armor'
+			| 'consumable'
+			| 'loot'
+			| 'adventuring_gear'
+	) {
+		if (!character) return;
+
+		if (type === 'primary_weapon') {
+			if (!(item.id in character.inventory.primary_weapons)) {
+				character.inventory.primary_weapons[item.id] = { quantity: 1, choices: {} };
+			} else {
+				character.inventory.primary_weapons[item.id].quantity++;
+			}
+		} else if (type === 'secondary_weapon') {
+			if (!(item.id in character.inventory.secondary_weapons)) {
+				character.inventory.secondary_weapons[item.id] = { quantity: 1, choices: {} };
+			} else {
+				character.inventory.secondary_weapons[item.id].quantity++;
+			}
+		} else if (type === 'armor') {
+			if (!(item.id in character.inventory.armor)) {
+				character.inventory.armor[item.id] = { quantity: 1, choices: {} };
+			} else {
+				character.inventory.armor[item.id].quantity++;
+			}
+		} else if (type === 'consumable') {
+			if (!(item.id in character.inventory.consumables)) {
+				character.inventory.consumables[item.id] = { quantity: 1, choices: {} };
+			} else {
+				character.inventory.consumables[item.id].quantity++;
+			}
+		} else if (type === 'loot') {
+			if (!(item.id in character.inventory.loot)) {
+				character.inventory.loot[item.id] = { quantity: 1, choices: {} };
+			} else {
+				character.inventory.loot[item.id].quantity++;
+			}
+		} else if (type === 'adventuring_gear') {
+			const title = item.title || item.id;
+			const existingIndex = character.inventory.adventuring_gear.findIndex(
+				(gear) => gear.title === title
+			);
+			if (existingIndex !== -1) {
+				character.inventory.adventuring_gear[existingIndex].quantity++;
+			} else {
+				character.inventory.adventuring_gear.push({ title, quantity: 1 });
+			}
+		}
+	}
+
+	/**
+	 * Remove an item from the character's inventory
+	 * For adventuring_gear, pass the originalIndex parameter
+	 */
+	function removeFromInventory(
+		item: { id: string },
+		type:
+			| 'primary_weapon'
+			| 'secondary_weapon'
+			| 'armor'
+			| 'consumable'
+			| 'loot'
+			| 'adventuring_gear',
+		originalIndex?: number
+	) {
+		if (!character) return;
+
+		if (type === 'primary_weapon') {
+			// Unequip if currently equipped
+			if (character.active_primary_weapon_id === item.id) {
+				character.active_primary_weapon_id = null;
+			}
+			if (item.id in character.inventory.primary_weapons) {
+				character.inventory.primary_weapons[item.id].quantity--;
+				if (character.inventory.primary_weapons[item.id].quantity <= 0) {
+					delete character.inventory.primary_weapons[item.id];
+				}
+			}
+		} else if (type === 'secondary_weapon') {
+			// Unequip if currently equipped
+			if (character.active_secondary_weapon_id === item.id) {
+				character.active_secondary_weapon_id = null;
+			}
+			if (item.id in character.inventory.secondary_weapons) {
+				character.inventory.secondary_weapons[item.id].quantity--;
+				if (character.inventory.secondary_weapons[item.id].quantity <= 0) {
+					delete character.inventory.secondary_weapons[item.id];
+				}
+			}
+		} else if (type === 'armor') {
+			// Unequip if currently equipped
+			if (character.active_armor_id === item.id) {
+				character.active_armor_id = null;
+			}
+			if (item.id in character.inventory.armor) {
+				character.inventory.armor[item.id].quantity--;
+				if (character.inventory.armor[item.id].quantity <= 0) {
+					delete character.inventory.armor[item.id];
+				}
+			}
+		} else if (type === 'consumable') {
+			if (item.id in character.inventory.consumables) {
+				character.inventory.consumables[item.id].quantity--;
+				if (character.inventory.consumables[item.id].quantity <= 0) {
+					delete character.inventory.consumables[item.id];
+				}
+			}
+		} else if (type === 'loot') {
+			if (item.id in character.inventory.loot) {
+				character.inventory.loot[item.id].quantity--;
+				if (character.inventory.loot[item.id].quantity <= 0) {
+					delete character.inventory.loot[item.id];
+				}
+			}
+		} else if (type === 'adventuring_gear' && originalIndex !== undefined) {
+			const gear = character.inventory.adventuring_gear[originalIndex];
+			if (gear && gear.quantity > 1) {
+				gear.quantity--;
+			} else {
+				character.inventory.adventuring_gear.splice(originalIndex, 1);
+			}
+		}
+	}
+
+	/**
+	 * Equip an armor or weapon
+	 */
+	function equipItem(
+		item: { id: string; level_requirement: number },
+		type: 'primary_weapon' | 'secondary_weapon' | 'armor'
+	) {
+		if (!character) return;
+		if (character.level < item.level_requirement) return; // Level requirement not met
+
+		if (type === 'primary_weapon') {
+			character.active_primary_weapon_id = item.id;
+		} else if (type === 'secondary_weapon') {
+			character.active_secondary_weapon_id = item.id;
+		} else if (type === 'armor') {
+			character.active_armor_id = item.id;
+		}
+	}
+
+	/**
+	 * Unequip an armor or weapon
+	 */
+	function unequipItem(
+		item: { id: string },
+		type: 'primary_weapon' | 'secondary_weapon' | 'armor'
+	) {
+		if (!character) return;
+
+		if (type === 'primary_weapon' && character.active_primary_weapon_id === item.id) {
+			character.active_primary_weapon_id = null;
+		} else if (type === 'secondary_weapon' && character.active_secondary_weapon_id === item.id) {
+			character.active_secondary_weapon_id = null;
+		} else if (type === 'armor' && character.active_armor_id === item.id) {
+			character.active_armor_id = null;
+		}
+	}
+
+	/**
+	 * Check if an armor or weapon is equipped
+	 */
+	function isItemEquipped(
+		item: { id: string },
+		type: 'primary_weapon' | 'secondary_weapon' | 'armor'
+	): boolean {
+		if (!character) return false;
+
+		if (type === 'primary_weapon') {
+			return character.active_primary_weapon_id === item.id;
+		} else if (type === 'secondary_weapon') {
+			return character.active_secondary_weapon_id === item.id;
+		} else if (type === 'armor') {
+			return character.active_armor_id === item.id;
+		}
+		return false;
+	}
+
+	/**
+	 * Check if the character meets the level requirement to equip an item
+	 */
+	function canEquipItem(item: { level_requirement: number }): boolean {
+		if (!character) return false;
+		return character.level >= item.level_requirement;
+	}
 
 	const destroy = () => {};
 
@@ -2351,8 +2578,8 @@ function createCharacter(id: string) {
 		},
 
 		// derived equipment
-		get active_armor() {
-			return active_armor;
+		get derived_armor() {
+			return derived_armor;
 		},
 		get derived_primary_weapon() {
 			return derived_primary_weapon;
@@ -2445,7 +2672,15 @@ function createCharacter(id: string) {
 
 		// helper functions
 		destroy,
-		get_tier_from_level
+		get_tier_from_level,
+
+		// inventory helper functions
+		addToInventory,
+		removeFromInventory,
+		equipItem,
+		unequipItem,
+		isItemEquipped,
+		canEquipItem
 	};
 }
 

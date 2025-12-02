@@ -32,7 +32,8 @@
 	let selectedLoadoutIndex = $state(0);
 
 	let restMode = $state(false);
-	let expanded = $state(true);
+	// svelte-ignore state_referenced_locally
+	let expanded = $state(context.domain_card_loadout.length > 0);
 
 	let remainingStress = $derived(character ? context.max_stress - character.marked_stress : 0);
 </script>
@@ -50,21 +51,22 @@
 					<ChevronRight class="w-k h-4" />
 				{/if}
 				Loadout
-			</button>
-			<div
-				class=" grid h-4.5 place-items-center rounded-full bg-accent px-1.5 text-xs font-bold text-background"
+				<div
+				class="ml-2 grid h-4.5 place-items-center rounded-full bg-accent px-1.5 text-xs font-bold text-background"
 			>
 				{context.domain_card_loadout.length} / {context.max_domain_card_loadout}
 			</div>
+			</button>
+			
 			<Dialog.Root>
 				<Dialog.Trigger class={cn(buttonVariants({ size: 'sm' }), 'relative')}>
 					<ArrowLeftRight class="size-3" />
 					Vault
-					<span
+					<!-- <span
 						class="absolute top-1 right-0 grid h-4.5 translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-accent px-1.5 text-xs font-bold text-background"
 					>
 						{vault.length}
-					</span>
+					</span> -->
 				</Dialog.Trigger>
 				<Dialog.Content class="flex max-h-[90%] min-w-[calc(100%-1rem)] flex-col px-0 md:min-w-3xl">
 					<Dialog.Header class="px-6">
