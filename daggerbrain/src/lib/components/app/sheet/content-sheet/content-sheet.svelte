@@ -31,53 +31,18 @@
 
 <Sheet.Root bind:open>
 	<Sheet.Content>
-		<Sheet.Header>
-			<Sheet.Title>
-				{#if content?.type === 'weapon'}
-					{content.data.title}
-				{:else if content?.type === 'armor'}
-					{content.data.title}
-				{:else if content?.type === 'consumable'}
-					{content.data.title}
-				{:else if content?.type === 'loot'}
-					{content.data.title}
-				{:else if content?.type === 'experience'}
-					Experiences
-				{:else if content?.type === 'catalog'}
-					Add Items
-				{/if}
-			</Sheet.Title>
-			<Sheet.Description>
-				{#if content?.type === 'weapon'}
-					{content.data.category} Weapon
-				{:else if content?.type === 'armor'}
-					Armor
-				{:else if content?.type === 'consumable'}
-					Consumable
-				{:else if content?.type === 'loot'}
-					Loot
-				{:else if content?.type === 'experience'}
-					Character Experiences
-				{:else if content?.type === 'catalog'}
-					Browse and add items to your inventory
-				{/if}
-			</Sheet.Description>
-		</Sheet.Header>
-
-		<div class="py-4">
-			{#if content?.type === 'weapon'}
-				<WeaponContent weapon={content.data} />
-			{:else if content?.type === 'armor'}
-				<ArmorContent armor={content.data} />
-			{:else if content?.type === 'consumable'}
-				<ConsumableContent consumable={content.data} />
-			{:else if content?.type === 'loot'}
-				<LootContent loot={content.data} />
-			{:else if content?.type === 'experience'}
-				<ExperienceContent />
-			{:else if content?.type === 'catalog'}
-				<CatalogContent />
-			{/if}
-		</div>
+		{#if content?.type === 'weapon'}
+			<WeaponContent weapon={content.data} />
+		{:else if content?.type === 'armor'}
+			<ArmorContent armor={content.data} />
+		{:else if content?.type === 'consumable'}
+			<ConsumableContent consumable={content.data} />
+		{:else if content?.type === 'loot'}
+			<LootContent loot={content.data} />
+		{:else if content?.type === 'experience'}
+			<ExperienceContent />
+		{:else if content?.type === 'catalog'}
+			<CatalogContent />
+		{/if}
 	</Sheet.Content>
 </Sheet.Root>

@@ -83,8 +83,7 @@
 		].filter((c) => !!c)
 	);
 
-	// svelte-ignore state_referenced_locally
-	let character_cards_expanded = $state(character_cards.length > 0);
+	let character_cards_expanded = $state(true);
 
 	let fileInput = $state<HTMLInputElement>();
 

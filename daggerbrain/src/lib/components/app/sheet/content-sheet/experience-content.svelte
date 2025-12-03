@@ -1,12 +1,18 @@
 <script lang="ts">
 	import { getCharacterContext } from '$lib/state/character.svelte';
+	import * as Sheet from '$lib/components/ui/sheet';
 
 	const context = getCharacterContext();
 	let character = $derived(context.character);
 </script>
 
+<Sheet.Header>
+	<Sheet.Title>Experiences</Sheet.Title>
+	<Sheet.Description>Character Experiences</Sheet.Description>
+</Sheet.Header>
+
 {#if character}
-	<div class="space-y-3 text-sm">
+	<div class="space-y-3 py-4 text-sm">
 		{#each character.experiences as experience, i}
 			<div class="flex items-start gap-3">
 				<div class="shrink-0 rounded-full border bg-foreground/5 px-2 py-1 text-xs">

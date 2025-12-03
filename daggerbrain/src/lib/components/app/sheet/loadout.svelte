@@ -32,8 +32,7 @@
 	let selectedLoadoutIndex = $state(0);
 
 	let restMode = $state(false);
-	// svelte-ignore state_referenced_locally
-	let expanded = $state(context.domain_card_loadout.length > 0);
+	let expanded = $state(true);
 
 	let remainingStress = $derived(character ? context.max_stress - character.marked_stress : 0);
 </script>
