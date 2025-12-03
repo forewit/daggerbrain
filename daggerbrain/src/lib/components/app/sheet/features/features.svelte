@@ -8,22 +8,16 @@
 	import Background from './background.svelte';
 	import Notes from './notes.svelte';
 	import Experiences from './experiences.svelte';
-	import type { Weapon, Armor, Consumable, Loot } from '$lib/types/compendium-types';
+	import { type ItemClickHandler } from '../content-sheet/content-sheet.svelte';
 
 	let {
 		class: className = '',
-		onItemClick = (
-			_type: 'weapon' | 'armor' | 'consumable' | 'loot',
-			_item: Weapon | Armor | Consumable | Loot
-		) => {},
+		onItemClick = (() => {}) as ItemClickHandler,
 		onExperienceClick = () => {},
 		onAddItems = () => {}
 	}: {
 		class?: string;
-		onItemClick?: (
-			type: 'weapon' | 'armor' | 'consumable' | 'loot',
-			item: Weapon | Armor | Consumable | Loot
-		) => void;
+		onItemClick?: ItemClickHandler;
 		onExperienceClick?: () => void;
 		onAddItems?: () => void;
 	} = $props();
@@ -37,7 +31,7 @@
 
 <div class={cn('relative rounded-md border-2 p-4', className)}>
 	<Tabs.Root bind:value={tab}>
-		<Tabs.List class="mx-auto -mt-3 mb-1 flex h-auto flex-wrap gap-y-1">
+		<Tabs.List class="mx-auto -mt-2 mb-1 flex h-auto flex-wrap gap-y-1">
 			<Tabs.Trigger value="weapons" class="flex-initial">Active Weapons & Armor</Tabs.Trigger>
 			<Tabs.Trigger value="features" class="flex-initial">Class Features</Tabs.Trigger>
 			<Tabs.Trigger value="experiences" class="flex-initial">Experiences</Tabs.Trigger>

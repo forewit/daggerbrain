@@ -4,22 +4,16 @@
 	import WeaponCard from './equipment/weapon-row.svelte';
 	import ArmorCard from './equipment/armor-row.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import type { Weapon, Armor, Consumable, Loot } from '$lib/types/compendium-types';
+	import { type ItemClickHandler } from '../content-sheet/content-sheet.svelte';
 
 	let {
 		class: className = '',
 		gotoInventory = () => {},
-		onItemClick = (
-			_type: 'weapon' | 'armor' | 'consumable' | 'loot',
-			_item: Weapon | Armor | Consumable | Loot
-		) => {}
+		onItemClick = (() => {}) as ItemClickHandler
 	}: {
 		class?: string;
 		gotoInventory?: () => void;
-		onItemClick?: (
-			type: 'weapon' | 'armor' | 'consumable' | 'loot',
-			item: Weapon | Armor | Consumable | Loot
-		) => void;
+		onItemClick?: ItemClickHandler;
 	} = $props();
 
 	const context = getCharacterContext();

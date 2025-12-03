@@ -27,31 +27,23 @@
 		TransformationCard,
 		SubclassFoundationCard,
 		SubclassSpecializationCard,
-		SubclassMasteryCard,
-		Weapon,
-		Armor,
-		Consumable,
-		Loot,
-		AdventuringGear
+		SubclassMasteryCard
 	} from '$lib/types/compendium-types';
 	import Features from './features/features.svelte';
-	import ContentSheet, { type SheetContent } from './content-sheet/content-sheet.svelte';
+	import ContentSheet, { type SheetContent, type ItemClickHandler } from './content-sheet/content-sheet.svelte';
 	import Tent from '@lucide/svelte/icons/tent';
 
 	let sheetOpen = $state(false);
 	let sheetContent = $state<SheetContent>(null);
 
-	function openItemSheet(
-		type: 'weapon' | 'armor' | 'consumable' | 'loot' | 'adventuring_gear',
-		item: Weapon | Armor | Consumable | Loot | AdventuringGear | null
-	) {
+	const openItemSheet: ItemClickHandler = (type, item) => {
 		if (type === 'adventuring_gear') {
 			sheetContent = { type: 'adventuring_gear' } as SheetContent;
 		} else {
 			sheetContent = { type, data: item } as SheetContent;
 		}
 		sheetOpen = true;
-	}
+	};
 
 	function openExperienceSheet() {
 		sheetContent = { type: 'experience' };
@@ -265,7 +257,7 @@
 			</div>
 
 			<!-- hope -->
-			<Hope class="-mt-2" />
+			<Hope class="mb-3" />
 
 			<!-- features tabs -->
 			<Features

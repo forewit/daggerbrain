@@ -1,5 +1,5 @@
 <script lang="ts" module>
-	import type { Weapon, Armor, Consumable, Loot } from '$lib/types/compendium-types';
+	import type { Weapon, Armor, Consumable, Loot, AdventuringGear } from '$lib/types/compendium-types';
 
 	export type SheetContent =
 		| { type: 'weapon'; data: Weapon }
@@ -13,6 +13,10 @@
 		| { type: 'death-move' }
 		| { type: 'downtime' }
 		| null;
+
+	export type ItemType = 'weapon' | 'armor' | 'consumable' | 'loot' | 'adventuring_gear';
+	export type Item = Weapon | Armor | Consumable | Loot | AdventuringGear | null;
+	export type ItemClickHandler = (type: ItemType, item: Item) => void;
 </script>
 
 <script lang="ts">

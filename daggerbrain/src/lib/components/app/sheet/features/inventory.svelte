@@ -7,6 +7,7 @@
 		Loot,
 		AdventuringGear
 	} from '$lib/types/compendium-types';
+	import { type ItemClickHandler } from '../content-sheet/content-sheet.svelte';
 	import WeaponCard from './equipment/weapon-row.svelte';
 	import ArmorCard from './equipment/armor-row.svelte';
 	import ConsumableCard from './equipment/consumable-row.svelte';
@@ -20,17 +21,11 @@
 	let {
 		class: className = '',
 		onAddItems = () => {},
-		onItemClick = (
-			_type: 'weapon' | 'armor' | 'consumable' | 'loot' | 'adventuring_gear',
-			_item: Weapon | Armor | Consumable | Loot | AdventuringGear | null
-		) => {}
+		onItemClick = (() => {}) as ItemClickHandler
 	}: {
 		class?: string;
 		onAddItems?: () => void;
-		onItemClick?: (
-			type: 'weapon' | 'armor' | 'consumable' | 'loot' | 'adventuring_gear',
-			item: Weapon | Armor | Consumable | Loot | AdventuringGear | null
-		) => void;
+		onItemClick?: ItemClickHandler;
 	} = $props();
 
 	const context = getCharacterContext();
