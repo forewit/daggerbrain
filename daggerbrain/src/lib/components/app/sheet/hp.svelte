@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import { getCharacterContext } from '$lib/state/character.svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import Skull from '@lucide/svelte/icons/skull';
 
 	let { class: className = '', onDeathMove }: { class?: string; onDeathMove?: () => void } =
 		$props();
@@ -37,14 +39,17 @@
 		</div>
 
 		{#if context.max_hp === character.marked_hp}
-			<button
+			<Button
 				onclick={() => {
 					onDeathMove?.();
 				}}
-				class="grid place-items-center rounded-md bg-border p-2 text-xs leading-none text-nowrap hover:bg-muted-foreground/20"
+				size="sm"
+				variant="ghost"
+				class="-my-2 h-7 px-1"
 			>
-				Death Move
-			</button>
+				<Skull class="size-4" />
+				Death move?
+			</Button>
 		{/if}
 	</div>
 {/if}

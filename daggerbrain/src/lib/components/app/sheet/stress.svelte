@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import { getCharacterContext } from '$lib/state/character.svelte';
+	import { Button } from '$lib/components/ui/button';
+	import HeartCrack from '@lucide/svelte/icons/heart-crack';
 
 	let {
 		class: className = '',
@@ -52,14 +54,18 @@
 		</div>
 
 		{#if context.max_stress === character.marked_stress && !displayOnly}
-			<button
+			<Button
 				onclick={() => {
 					if (character.marked_hp < context.max_hp) character.marked_hp++;
 				}}
-				class="grid place-items-center rounded-md bg-border p-2 text-xs leading-none text-nowrap hover:bg-muted-foreground/20"
+				size="sm"
+				variant="ghost"
+				class="-my-2 h-7 px-1"
+				disabled={character.marked_hp >= context.max_hp}
 			>
-				Mark HP
-			</button>
+				<HeartCrack class="size-4" />
+				Mark HP?
+			</Button>
 		{/if}
 	</div>
 {/if}

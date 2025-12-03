@@ -19,7 +19,7 @@
 <div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
 	<!-- HIDDEN Condition -->
 	<div class="space-y-2">
-		<div class="flex items-center gap-2">
+		<label for="condition-hidden" class="flex cursor-pointer items-center gap-2">
 			<svg class="size-4" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
 				<path
 					fill="currentColor"
@@ -28,6 +28,7 @@
 			</svg>
 			<h3 class="text-sm font-bold">HIDDEN</h3>
 			<Switch
+				id="condition-hidden"
 				class="ml-auto"
 				onCheckedChange={(checked) => {
 					if (checked) {
@@ -38,7 +39,7 @@
 				}}
 				checked={character?.active_conditions.includes('hidden')}
 			/>
-		</div>
+		</label>
 		<p class="pl-6 text-xs text-muted-foreground">
 			While you're out of sight from all enemies and they don't otherwise know your location, you
 			gain the Hidden condition. Any rolls against a Hidden creature have disadvantage. After an
@@ -49,7 +50,7 @@
 
 	<!-- RESTRAINED Condition -->
 	<div class="space-y-2">
-		<div class="flex items-center gap-2">
+		<label for="condition-restrained" class="flex cursor-pointer items-center gap-2">
 			<svg class="size-4" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"
 				><path
 					fill="currentColor"
@@ -58,6 +59,7 @@
 			>
 			<h3 class="text-sm font-bold">RESTRAINED</h3>
 			<Switch
+				id="condition-restrained"
 				class="ml-auto"
 				onCheckedChange={(checked) => {
 					if (checked) {
@@ -68,7 +70,7 @@
 				}}
 				checked={character?.active_conditions.includes('restrained')}
 			/>
-		</div>
+		</label>
 		<p class="pl-6 text-xs text-muted-foreground">
 			Restrained characters can't move, but you can still take actions from their current position.
 		</p>
@@ -76,7 +78,7 @@
 
 	<!-- VULNERABLE Condition -->
 	<div class="space-y-2">
-		<div class="flex items-center gap-2">
+		<label for="condition-vulnerable" class="flex cursor-pointer items-center gap-2">
 			<svg class="size-4" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
 				<path
 					fill="currentColor"
@@ -85,6 +87,7 @@
 			</svg>
 			<h3 class="text-sm font-bold">VULNERABLE</h3>
 			<Switch
+				id="condition-vulnerable"
 				class="ml-auto"
 				onCheckedChange={(checked) => {
 					if (checked) {
@@ -95,7 +98,7 @@
 				}}
 				checked={character?.active_conditions.includes('vulnerable')}
 			/>
-		</div>
+		</label>
 		<p class="pl-6 text-xs text-muted-foreground">
 			When a creature is Vulnerable, all rolls targeting them have advantage.
 		</p>

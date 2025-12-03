@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "7434184a-3e84-4f45-8e44-3ed013c752e5",
+  "id": "476796b7-3213-4da8-88ef-669352c45e4b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "characters_table": {
@@ -13,7 +13,7 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": false,
-          "default": "'e78d171e-1665-410b-b41f-3afd6fe66c91'"
+          "default": "'ee7da842-4bdb-4924-8af0-0f8fbc3a9efc'"
         },
         "clerk_user_id": {
           "name": "clerk_user_id",
@@ -127,6 +127,22 @@
           "autoincrement": false,
           "default": "'[]'"
         },
+        "character_descriptions": {
+          "name": "character_descriptions",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'{\"clothes\":\"\",\"eyes\":\"\",\"body\":\"\",\"skin\":\"\",\"attitude\":\"\"}'"
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
+        },
         "active_armor_id": {
           "name": "active_armor_id",
           "type": "text",
@@ -155,6 +171,14 @@
           "notNull": true,
           "autoincrement": false,
           "default": "'{\"primary_weapons\":{},\"secondary_weapons\":{},\"armor\":{},\"loot\":{},\"consumables\":{},\"adventuring_gear\":[],\"gold_coins\":0}'"
+        },
+        "active_conditions": {
+          "name": "active_conditions",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'[]'"
         },
         "transformation_card_id": {
           "name": "transformation_card_id",
@@ -186,6 +210,14 @@
           "notNull": true,
           "autoincrement": false,
           "default": "'[]'"
+        },
+        "unarmed_attack_choices": {
+          "name": "unarmed_attack_choices",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'{}'"
         },
         "domain_card_choices": {
           "name": "domain_card_choices",

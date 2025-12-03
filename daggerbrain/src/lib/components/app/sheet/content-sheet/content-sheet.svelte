@@ -10,6 +10,8 @@
 		| { type: 'experience' }
 		| { type: 'conditions' }
 		| { type: 'catalog' }
+		| { type: 'death-move' }
+		| { type: 'downtime' }
 		| null;
 </script>
 
@@ -23,6 +25,8 @@
 	import ExperienceContent from './experience-content.svelte';
 	import ConditionsContent from './conditions-content.svelte';
 	import CatalogContent from './catalog-content.svelte';
+	import DeathMoveContent from './death-move-content.svelte';
+	import DowntimeContent from './downtime-content.svelte';
 
 	let {
 		open = $bindable(false),
@@ -51,6 +55,10 @@
 			<ConditionsContent />
 		{:else if content?.type === 'catalog'}
 			<CatalogContent />
+		{:else if content?.type === 'death-move'}
+			<DeathMoveContent />
+		{:else if content?.type === 'downtime'}
+			<DowntimeContent />
 		{/if}
 	</Sheet.Content>
 </Sheet.Root>

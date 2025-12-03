@@ -36,14 +36,10 @@
 	} from '$lib/types/compendium-types';
 	import Features from './features/features.svelte';
 	import ContentSheet, { type SheetContent } from './content-sheet/content-sheet.svelte';
-	import DeathMoveDialog from './death-move-dialog.svelte';
-	import DowntimeDialog from './downtime-dialog.svelte';
 	import Tent from '@lucide/svelte/icons/tent';
 
 	let sheetOpen = $state(false);
 	let sheetContent = $state<SheetContent>(null);
-	let deathMoveDialogOpen = $state(false);
-	let downtimeDialogOpen = $state(false);
 
 	function openItemSheet(
 		type: 'weapon' | 'armor' | 'consumable' | 'loot' | 'adventuring_gear',
@@ -69,6 +65,16 @@
 
 	function openConditionsSheet() {
 		sheetContent = { type: 'conditions' };
+		sheetOpen = true;
+	}
+
+	function openDeathMoveSheet() {
+		sheetContent = { type: 'death-move' };
+		sheetOpen = true;
+	}
+
+	function openDowntimeSheet() {
+		sheetContent = { type: 'downtime' };
 		sheetOpen = true;
 	}
 
@@ -137,14 +143,6 @@
 	function triggerImageUpload() {
 		fileInput?.click();
 	}
-
-	function openDeathMoveDialog() {
-		deathMoveDialogOpen = true;
-	}
-
-	function openDowntimeDialog() {
-		downtimeDialogOpen = true;
-	}
 </script>
 
 {#if character}
@@ -161,7 +159,7 @@
 		<!-- main content -->
 		<div class="mx-auto flex w-full max-w-2xl min-w-[260px] flex-col gap-6">
 			<!-- top bar -->
-			<div class="flex gap-2 px-2 pr-4">
+			<div class="flex gap-4 px-2 pr-3">
 				<div class="relative grow truncate">
 					<!-- level class subclass -->
 					<div class="mt-4 mb-2.5 flex h-9 max-w-[400px] items-center truncate overflow-hidden">
@@ -232,13 +230,13 @@
 
 			<!-- rest & death moves -->
 			<div class="flex items-center justify-center gap-3">
-				{#if character.marked_hp >= context.max_hp}
-					<Button onclick={openDeathMoveDialog}>
+				<!-- {#if character.marked_hp >= context.max_hp}
+					<Button onclick={openDeathMoveSheet}>
 						<Skull class="size-4" />
 						Death Move
 					</Button>
-				{/if}
-				<Button variant="outline" onclick={openDowntimeDialog}>
+				{/if} -->
+				<Button variant="outline" onclick={openDowntimeSheet}>
 					<Tent class="size-4" />
 					Downtime
 				</Button>
@@ -262,7 +260,7 @@
 
 			<!-- hp and stress -->
 			<div class="mx-2 grid gap-2 sm:grid-cols-2">
-				<Hp class="justify-center sm:justify-start" onDeathMove={openDeathMoveDialog} />
+				<Hp class="justify-center sm:justify-start" onDeathMove={openDeathMoveSheet} />
 				<Stress class="justify-center sm:justify-start" />
 			</div>
 
@@ -307,10 +305,4 @@
 
 	<!-- Item/Experience detail sheet -->
 	<ContentSheet bind:open={sheetOpen} content={sheetContent} />
-
-	<!-- Death Move Dialog -->
-	<DeathMoveDialog bind:open={deathMoveDialogOpen} />
-
-	<!-- Downtime Dialog -->
-	<DowntimeDialog bind:open={downtimeDialogOpen} />
 {/if}
