@@ -1,8 +1,8 @@
 import { getUserContext } from './user.svelte';
-import { ALL_LEVEL_UP_OPTIONS, BASE_STATS, TRAIT_OPTIONS } from '../types/rules';
+import { ALL_LEVEL_UP_OPTIONS, BASE_STATS, CONDITIONS, TRAIT_OPTIONS } from '../types/rules';
 import { getContext, setContext } from 'svelte';
 import type { Character, DomainCardId } from '$lib/types/character-types';
-import type { AllTierOptionIds, LevelUpChoice } from '$lib/types/rule-types';
+import type { AllTierOptionIds, ConditionIds, LevelUpChoice } from '$lib/types/rule-types';
 import type {
 	DamageThresholds,
 	Traits,
@@ -323,6 +323,21 @@ function createCharacter(id: string) {
 				question,
 				answer: ''
 			}));
+		}
+	});
+
+	// ! clear duplicate or invalid active_conditions
+	$effect(() => {
+		if (!character) return;
+
+		const validConditionIds = Object.keys(CONDITIONS) as ConditionIds[];
+		const cleaned = character.active_conditions
+			.filter((condition) => validConditionIds.includes(condition))
+			.filter((condition, index, array) => array.indexOf(condition) === index)
+			.sort();
+
+		if (JSON.stringify(cleaned) !== JSON.stringify(character.active_conditions)) {
+			character.active_conditions = cleaned;
 		}
 	});
 
@@ -2528,6 +2543,32 @@ function createCharacter(id: string) {
 		return character.level >= item.level_requirement;
 	}
 
+	/**
+	 * Add a condition to the character's active conditions
+	 */
+	function addCondition(conditionId: ConditionIds) {
+		if (!character) return;
+		const validConditionIds = Object.keys(CONDITIONS) as ConditionIds[];
+		if (!validConditionIds.includes(conditionId)) {
+			console.warn(`Invalid condition ID: ${conditionId}`);
+			return;
+		}
+		if (!character.active_conditions.includes(conditionId)) {
+			character.active_conditions.push(conditionId);
+		}
+	}
+
+	/**
+	 * Remove a condition from the character's active conditions
+	 */
+	function removeCondition(conditionId: ConditionIds) {
+		if (!character) return;
+		const index = character.active_conditions.indexOf(conditionId);
+		if (index !== -1) {
+			character.active_conditions.splice(index, 1);
+		}
+	}
+
 	const destroy = () => {};
 
 	return {
@@ -2680,7 +2721,11 @@ function createCharacter(id: string) {
 		equipItem,
 		unequipItem,
 		isItemEquipped,
-		canEquipItem
+		canEquipItem,
+
+		// condition helper functions
+		addCondition,
+		removeCondition
 	};
 }
 

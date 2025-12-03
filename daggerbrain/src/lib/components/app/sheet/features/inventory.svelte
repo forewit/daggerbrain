@@ -130,7 +130,7 @@
 							<col class="hidden w-20 sm:table-column" />
 						</colgroup>
 						<thead>
-							<tr class="border-b bg-card text-xs text-muted-foreground">
+							<tr class="border-b bg-primary-muted/50 text-xs text-muted-foreground">
 								<th class="px-4 py-2 text-left">Armor</th>
 								<th class="py-2 pr-4 text-center">Slots</th>
 								<th class="py-2 pr-4 text-right sm:text-center">Base Thresholds</th>
@@ -163,7 +163,7 @@
 							<col class="hidden w-20 sm:table-column" />
 						</colgroup>
 						<thead>
-							<tr class="border-b bg-card text-xs text-muted-foreground">
+							<tr class="border-b bg-primary-muted/50 text-xs text-muted-foreground">
 								<th class="px-4 py-2 text-left">Weapons</th>
 								<th class="py-2 pr-4 text-center">Range</th>
 								<th class="py-2 pr-4 text-center">To Hit</th>
@@ -199,7 +199,7 @@
 							<col />
 						</colgroup>
 						<thead>
-							<tr class="border-b bg-card text-xs text-muted-foreground">
+							<tr class="border-b bg-primary-muted/50 text-xs text-muted-foreground">
 								<th class="px-4 py-2 text-left">Consumables</th>
 								<th class="py-2 pr-4 text-right">Description</th>
 							</tr>
@@ -227,7 +227,7 @@
 							<col class="hidden w-20 md:table-column" />
 						</colgroup>
 						<thead>
-							<tr class="border-b bg-card text-xs text-muted-foreground">
+							<tr class="border-b bg-primary-muted/50 text-xs text-muted-foreground">
 								<th class="px-4 py-2 text-left sm:text-left">Loot</th>
 								<th class="hidden py-2 pr-4 text-right sm:table-cell md:text-left">Description</th>
 								<th class="hidden py-2 pr-4 text-right md:table-cell">Modifiers</th>
@@ -249,12 +249,14 @@
 			<!-- Adventuring Gear -->
 			{#if filteredAdventuringGear.length > 0}
 				<div class="flex flex-col gap-1">
-					<p class="border-b bg-card px-4 py-2 text-xs font-medium text-muted-foreground">
+					<p
+						class="border-b bg-primary-muted/50 px-4 py-2 text-xs font-medium text-muted-foreground"
+					>
 						Adventuring Gear
 					</p>
 
 					<button
-						class="flex w-full items-center text-left text-xs px-4 py-2"
+						class="flex w-full items-center px-4 py-2 text-left text-xs"
 						onclick={() => onItemClick('adventuring_gear', null)}
 					>
 						<ul class="w-full">

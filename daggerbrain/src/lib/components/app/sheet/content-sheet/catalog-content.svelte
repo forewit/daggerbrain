@@ -8,7 +8,6 @@
 	<Sheet.Description>Browse and add items to your inventory</Sheet.Description>
 </Sheet.Header>
 
-<div class="px-4 pb-6 overflow-y-auto">
+<div class="overflow-y-auto px-4 pb-6">
 	<Catalog />
 </div>
-

@@ -19,6 +19,7 @@ import type {
 } from '../../types/compendium-types';
 import { CHARACTER_DEFAULTS } from '../../types/constants';
 import { DomainIdsSchema } from '../../compendium/compendium-schemas';
+import type { ConditionIds } from '$lib/types/rule-types';
 
 export const characters_table = sqliteTable('characters_table', {
 	// core
@@ -77,6 +78,10 @@ export const characters_table = sqliteTable('characters_table', {
 		.$type<CharacterInventory>(),
 
 	// the void / other
+	active_conditions: text('active_conditions', { mode: 'json' })
+		.notNull()
+		.default(CHARACTER_DEFAULTS.active_conditions)
+		.$type<ConditionIds[]>(),
 	transformation_card_id: text('transformation_card_id'),
 	additional_domain_card_ids: text('additional_domain_card_ids', { mode: 'json' })
 		.notNull()

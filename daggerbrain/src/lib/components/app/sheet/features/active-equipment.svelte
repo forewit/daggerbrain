@@ -35,7 +35,7 @@
 			<col class="hidden w-20 sm:table-column" />
 		</colgroup>
 		<thead>
-			<tr class="border-b bg-card text-xs text-muted-foreground">
+			<tr class="border-b bg-primary-muted/50 text-xs text-muted-foreground">
 				<th class="px-4 py-2 text-left">Armor</th>
 				<th class="py-2 pr-4 text-center">Slots</th>
 				<th class="py-2 pr-4 text-right sm:text-center">Base Thresholds</th>
@@ -63,7 +63,7 @@
 				<col class="hidden w-20 sm:table-column" />
 			</colgroup>
 			<thead>
-				<tr class="border-b bg-card text-xs text-muted-foreground">
+				<tr class="border-b bg-primary-muted/50 text-xs text-muted-foreground">
 					<th class="px-4 py-2 text-left">Weapons</th>
 					<th class="py-2 pr-4 text-center">Range</th>
 					<th class="py-2 pr-4 text-center">Hit</th>

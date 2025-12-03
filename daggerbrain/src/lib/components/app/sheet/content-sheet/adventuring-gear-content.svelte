@@ -18,7 +18,7 @@
 	<Sheet.Title>Adventuring Gear</Sheet.Title>
 </Sheet.Header>
 
-<div class="px-4 flex flex-col gap-6 overflow-y-auto">
+<div class="flex flex-col gap-6 overflow-y-auto px-4">
 	{#if adventuringGear.length > 0}
 		<!-- Adventuring Gear Table -->
 		<table class="w-full border-collapse text-sm">
@@ -35,8 +35,9 @@
 							<Button
 								variant="ghost"
 								size="sm"
-                                class="h-auto"
-								onclick={() => context.removeFromInventory({ id: gear.title }, 'adventuring_gear', index)}
+								class="h-auto"
+								onclick={() =>
+									context.removeFromInventory({ id: gear.title }, 'adventuring_gear', index)}
 							>
 								<CircleMinus class="size-3.5" />
 							</Button>
@@ -46,10 +47,10 @@
 			</tbody>
 		</table>
 	{:else}
-		<p class="py-4 text-sm text-muted-foreground italic text-center">No adventuring gear</p>
+		<p class="py-4 text-center text-sm text-muted-foreground italic">No adventuring gear</p>
 	{/if}
 
-    <!-- todo: fill out -->
+	<!-- todo: fill out -->
 	<!-- <Collapsible.Root bind:open={whatIsAdventuringGearOpen} class="pt-2">
 		<Collapsible.Trigger class="flex items-center gap-1">
 			<ChevronRight

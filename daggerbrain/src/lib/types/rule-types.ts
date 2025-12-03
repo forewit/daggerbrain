@@ -1,4 +1,4 @@
-import type { CharacterModifier, TraitNames } from '$lib/types/compendium-types';
+import type { CharacterModifier, TraitIds as TraitIds } from '$lib/types/compendium-types';
 import type { DomainCardId } from './character-types';
 
 export type Tier1OptionIds = 'tier_1_domain_cards';
@@ -33,7 +33,7 @@ export type AllTierOptionIds = Tier1OptionIds | Tier2OptionIds | Tier3OptionIds 
 
 export type LevelUpChoice = {
 	option_id: AllTierOptionIds | null;
-	marked_traits: { A: TraitNames | null; B: TraitNames | null };
+	marked_traits: { A: TraitIds | null; B: TraitIds | null };
 	selected_experiences: number[];
 	selected_domain_card_id: DomainCardId | null;
 	selected_subclass_upgrade: 'primary' | 'secondary' | null;
@@ -45,4 +45,19 @@ export type LevelUpOption = {
 	max: number;
 	costs_two_choices: boolean;
 	character_modifiers: CharacterModifier[];
+};
+
+export type Trait = {
+	id: TraitIds;
+	name: string;
+	short_name: string;
+	examples: string[];
+};
+
+export type ConditionIds = 'hidden' | 'restrained' | 'vulnerable';
+
+export type Condition = {
+	id: ConditionIds;
+	title: string;
+	description_html: string;
 };

@@ -2,7 +2,8 @@
 	import { cn } from '$lib/utils';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 
-	let { class: className = '', onDeathMove }: { class?: string; onDeathMove?: () => void } = $props();
+	let { class: className = '', onDeathMove }: { class?: string; onDeathMove?: () => void } =
+		$props();
 
 	const context = getCharacterContext();
 	let character = $derived(context.character);

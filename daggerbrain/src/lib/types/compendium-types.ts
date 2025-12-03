@@ -1,6 +1,6 @@
 import type {
 	CharacterModifierSchema,
-	TraitNamesSchema,
+	TraitIdsSchema,
 	TraitsSchema,
 	DomainIdsSchema,
 	SourceIdsSchema,
@@ -34,7 +34,7 @@ import type { z } from 'zod';
 // Core Enums & IDs
 // ============================================================================
 
-export type TraitNames = z.infer<typeof TraitNamesSchema>;
+export type TraitIds = z.infer<typeof TraitIdsSchema>;
 export type Traits = z.infer<typeof TraitsSchema>;
 export type DomainIds = z.infer<typeof DomainIdsSchema>;
 export type SourceIds = z.infer<typeof SourceIdsSchema>;

@@ -3,7 +3,7 @@ import { z } from 'zod';
 // Helper Types
 // ============================================================================
 
-export const TraitNamesSchema = z.enum([
+export const TraitIdsSchema = z.enum([
 	'agility',
 	'strength',
 	'finesse',
@@ -97,7 +97,7 @@ export const CharacterModifierSchema = z
 		z.discriminatedUnion('type', [
 			z.object({
 				type: z.literal('derived_from_trait'),
-				trait: TraitNamesSchema,
+				trait: TraitIdsSchema,
 				multiplier: z.number()
 			}),
 			z.object({
@@ -136,7 +136,7 @@ export const CharacterModifierSchema = z
 			}),
 			z.object({
 				target: z.literal('trait'),
-				trait: TraitNamesSchema
+				trait: TraitIdsSchema
 			}),
 			z.object({
 				target: z.literal('experience_from_selection'),
@@ -176,7 +176,7 @@ export const WeaponModifierSchema = z
 			}),
 			z.object({
 				target_stat: z.literal('trait'),
-				trait: TraitNamesSchema
+				trait: TraitIdsSchema
 			})
 		])
 	);
@@ -199,7 +199,7 @@ export const SubclassFoundationCardSchema = z.object({
 	description_html: z.string(),
 	artist_name: z.string(),
 	features: z.array(FeatureSchema),
-	spellcast_trait: TraitNamesSchema.nullable(),
+	spellcast_trait: TraitIdsSchema.nullable(),
 	class_id: z.string()
 });
 
@@ -387,7 +387,7 @@ export const WeaponSchema = z.object({
 	description_html: z.string(),
 	level_requirement: z.number(),
 	category: WeaponCategoriesSchema,
-	available_traits: z.array(TraitNamesSchema),
+	available_traits: z.array(TraitIdsSchema),
 	range: RangesSchema,
 	features: z.array(FeatureSchema),
 	attack_roll_bonus: z.number(),

@@ -1,42 +1,72 @@
 import type {
 	AllTierOptionIds,
+	Condition,
+	ConditionIds,
 	LevelUpOption,
 	Tier1OptionIds,
 	Tier2OptionIds,
 	Tier3OptionIds,
-	Tier4OptionIds
+	Tier4OptionIds,
+	Trait
 } from '$lib/types/rule-types';
-import type { Armor, Weapon } from '$lib/types/compendium-types';
+import type { Armor, TraitIds, Weapon } from '$lib/types/compendium-types';
+
+export const CONDITIONS: Record<ConditionIds, Condition> = {
+	hidden: {
+		id: 'hidden',
+		title: 'Hidden',
+		description_html:
+			"<p>While you're out of sight from all enemies and they don't otherwise know your location, you gain the Hidden condition. Any rolls against a Hidden creature have disadvantage. After an adversary moves to where they would see you, you move into their line of sight, or you make an attack, you are no longer Hidden.</p>"
+	},
+	restrained: {
+		id: 'restrained',
+		title: 'Restrained',
+		description_html:
+			"<p>Restrained characters can't move, but you can still take actions from their current position.</p>"
+	},
+	vulnerable: {
+		id: 'vulnerable',
+		title: 'Vulnerable',
+		description_html:
+			'<p>When a creature is Vulnerable, all rolls targeting them have advantage.</p>'
+	}
+} as const;
 
 export const TRAIT_OPTIONS = [2, 1, 1, 0, 0, -1] as const;
 
-export const TRAITS = {
+export const TRAITS: Record<TraitIds, Trait> = {
 	agility: {
+		id: 'agility',
 		name: 'Agility',
 		short_name: 'agi',
 		examples: ['Sprint', 'Leap', 'Maneuver']
 	},
 	strength: {
+		id: 'strength',
 		name: 'Strength',
 		short_name: 'str',
 		examples: ['Lift', 'Smash', 'Grapple']
 	},
 	finesse: {
+		id: 'finesse',
 		name: 'Finesse',
 		short_name: 'fin',
 		examples: ['Control', 'Hide', 'Tinker']
 	},
 	instinct: {
+		id: 'instinct',
 		name: 'Instinct',
 		short_name: 'inst',
 		examples: ['Perceive', 'Sense', 'Navigate']
 	},
 	presence: {
+		id: 'presence',
 		name: 'Presence',
 		short_name: 'pres',
 		examples: ['Charm', 'Perform', 'Deceive']
 	},
 	knowledge: {
+		id: 'knowledge',
 		name: 'Knowledge',
 		short_name: 'know',
 		examples: ['Recall', 'Analyze', 'Comprehend']

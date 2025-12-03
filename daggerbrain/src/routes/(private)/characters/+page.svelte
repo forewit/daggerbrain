@@ -16,13 +16,14 @@
 	let redirecting_to_character = $state('');
 
 	async function handleCreateCharacter() {
-
-		user.create_character().then(id => {
-			goto(`/characters/${id}/edit/`);
-
-		}).catch(err => {
-			error(500, err.message);
-		});
+		user
+			.create_character()
+			.then((id) => {
+				goto(`/characters/${id}/edit/`);
+			})
+			.catch((err) => {
+				error(500, err.message);
+			});
 	}
 	function handleDeleteCharacter(characterId: string, characterName: string) {
 		characterToDelete = { id: characterId, name: characterName };
@@ -31,13 +32,15 @@
 
 	async function confirmDelete() {
 		if (characterToDelete) {
-
-			user.delete_character(characterToDelete.id).catch(err => {
-				error(500, err.message);
-			}).finally(() => {
-				characterToDelete = null;
-				showDeleteDialog = false;
-			});
+			user
+				.delete_character(characterToDelete.id)
+				.catch((err) => {
+					error(500, err.message);
+				})
+				.finally(() => {
+					characterToDelete = null;
+					showDeleteDialog = false;
+				});
 		}
 	}
 </script>

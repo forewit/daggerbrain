@@ -1,5 +1,5 @@
 <script lang="ts" module>
-	import type { Weapon, Armor, Consumable, Loot, AdventuringGear } from '$lib/types/compendium-types';
+	import type { Weapon, Armor, Consumable, Loot } from '$lib/types/compendium-types';
 
 	export type SheetContent =
 		| { type: 'weapon'; data: Weapon }
@@ -8,6 +8,7 @@
 		| { type: 'loot'; data: Loot }
 		| { type: 'adventuring_gear' }
 		| { type: 'experience' }
+		| { type: 'conditions' }
 		| { type: 'catalog' }
 		| null;
 </script>
@@ -20,6 +21,7 @@
 	import LootContent from './loot-content.svelte';
 	import AdventuringGearContent from './adventuring-gear-content.svelte';
 	import ExperienceContent from './experience-content.svelte';
+	import ConditionsContent from './conditions-content.svelte';
 	import CatalogContent from './catalog-content.svelte';
 
 	let {
@@ -45,6 +47,8 @@
 			<AdventuringGearContent />
 		{:else if content?.type === 'experience'}
 			<ExperienceContent />
+		{:else if content?.type === 'conditions'}
+			<ConditionsContent />
 		{:else if content?.type === 'catalog'}
 			<CatalogContent />
 		{/if}

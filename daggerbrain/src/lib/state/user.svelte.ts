@@ -17,7 +17,7 @@ function userContext() {
 			.then((chars) => {
 				all_characters = chars;
 			})
-			.catch(err => {
+			.catch((err) => {
 				error(500, err.message);
 			})
 			.finally(() => {

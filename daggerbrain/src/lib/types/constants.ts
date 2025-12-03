@@ -9,7 +9,7 @@ import type {
 	LevelUpChoices,
 	LevelUpDomainCardIds
 } from '$lib/types/character-types';
-import type { LevelUpChoice } from '$lib/types/rule-types';
+import type { ConditionIds, LevelUpChoice } from '$lib/types/rule-types';
 import type { CharacterModifier, WeaponModifier, Traits } from './compendium-types';
 
 export const BLANK_LEVEL_UP_CHOICE = {
@@ -78,6 +78,7 @@ export const CHARACTER_DEFAULTS = {
 	},
 
 	// the void / other
+	active_conditions: <ConditionIds[]>[],
 	transformation_card_id: null,
 	additional_domain_card_ids: <string[]>[],
 	additional_character_modifiers: <CharacterModifier[]>[],

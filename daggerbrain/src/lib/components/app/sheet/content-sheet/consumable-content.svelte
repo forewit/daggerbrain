@@ -12,21 +12,21 @@
 
 <Sheet.Header>
 	<Sheet.Title>{consumable.title}</Sheet.Title>
-	<p class="text-muted-foreground text-xs italic">Consumable</p>
+	<p class="text-xs text-muted-foreground italic">Consumable</p>
 </Sheet.Header>
 
-<div class="px-4 flex flex-col gap-6 overflow-y-auto">
+<div class="flex flex-col gap-6 overflow-y-auto px-4">
 	<!-- Description -->
-	<div class="rounded-lg bg-primary/5 px-4 py-3 border">
+	<div class="rounded-lg border bg-primary/5 px-4 py-3">
 		<p class="text-sm">Description</p>
 		{#if consumable.description_html.trim().length > 0}
 			<div class="mt-3">
 				<div class="border-l-2 border-accent/30 pl-3">
-					<p class="text-muted-foreground text-xs">{@html consumable.description_html}</p>
+					<p class="text-xs text-muted-foreground">{@html consumable.description_html}</p>
 				</div>
 			</div>
 		{:else}
-			<p class="text-muted-foreground italic text-xs mt-2 text-right">None</p>
+			<p class="mt-2 text-right text-xs text-muted-foreground italic">None</p>
 		{/if}
 	</div>
 
@@ -35,11 +35,13 @@
 			<ChevronRight
 				class={cn('size-4 transition-transform', whatIsConsumablesOpen && 'rotate-90')}
 			/>
-			<p class="text-sm font-medium">What are Consumables?</p>
+			<p class="text-sm font-medium">More info</p>
 		</Collapsible.Trigger>
 		<Collapsible.Content>
-			<p class="pl-5 pt-2 text-xs text-muted-foreground italic">
-				Consumables are loot that can only be used once. You can hold up to five of each consumable at a time. Using a consumable doesn't require a roll unless required by the GM or the demands of the fiction.
+			<p class="pt-2 pl-5 text-xs text-muted-foreground italic">
+				Consumables are loot that can only be used once. You can hold up to five of each consumable
+				at a time. Using a consumable doesn't require a roll unless required by the GM or the
+				demands of the fiction.
 			</p>
 		</Collapsible.Content>
 	</Collapsible.Root>
