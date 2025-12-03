@@ -4,9 +4,10 @@
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import Plus from '@lucide/svelte/icons/plus';
+	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { goto } from '$app/navigation';
 	import { getUserContext } from '$lib/state/user.svelte';
-	import { ContextMenu } from 'bits-ui';
+	import { error } from '@sveltejs/kit';
 
 	const user = getUserContext();
 
@@ -15,8 +16,13 @@
 	let redirecting_to_character = $state('');
 
 	async function handleCreateCharacter() {
-		redirecting_to_character = await user.create_character();
-		await goto(`/characters/${redirecting_to_character}/edit/`);
+
+		user.create_character().then(id => {
+			goto(`/characters/${id}/edit/`);
+
+		}).catch(err => {
+			error(500, err.message);
+		});
 	}
 	function handleDeleteCharacter(characterId: string, characterName: string) {
 		characterToDelete = { id: characterId, name: characterName };
@@ -25,13 +31,13 @@
 
 	async function confirmDelete() {
 		if (characterToDelete) {
-			try {
-				await user.delete_character(characterToDelete.id);
+
+			user.delete_character(characterToDelete.id).catch(err => {
+				error(500, err.message);
+			}).finally(() => {
 				characterToDelete = null;
 				showDeleteDialog = false;
-			} catch (error) {
-				console.error(error);
-			}
+			});
 		}
 	}
 </script>
@@ -51,59 +57,65 @@
 		</Button>
 	</div>
 
-	<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-		{#each user.all_characters as char}
-			{#if char.id !== redirecting_to_character}
-				<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
-					<a
-						href={`/characters/${char.id}/`}
-						class="flex gap-2 border bg-primary-muted p-1 hover:bg-primary-muted/80"
-					>
-						<div class=" h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2">
-							<img
-								src={char.image_url || '/images/portrait-placeholder.png'}
-								alt={char.name.trim() || 'Unnamed Character'}
-								class="h-full w-full object-cover"
-							/>
-						</div>
-						<div class="truncate">
-							<p class="mt-1 truncate text-lg font-bold">
-								{char.name.trim() || 'Unnamed Character'}
-							</p>
+	{#if user.loading}
+		<div class="flex items-center justify-center py-12">
+			<LoaderCircle class="h-8 w-8 animate-spin text-muted-foreground" />
+		</div>
+	{:else}
+		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+			{#each user.all_characters as char}
+				{#if char.id !== redirecting_to_character}
+					<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
+						<a
+							href={`/characters/${char.id}/`}
+							class="flex gap-2 border bg-primary-muted p-1 hover:bg-primary-muted/80"
+						>
+							<div class=" h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2">
+								<img
+									src={char.image_url || '/images/portrait-placeholder.png'}
+									alt={char.name.trim() || 'Unnamed Character'}
+									class="h-full w-full object-cover"
+								/>
+							</div>
+							<div class="truncate">
+								<p class="mt-1 truncate text-lg font-bold">
+									{char.name.trim() || 'Unnamed Character'}
+								</p>
 
-							<p class="mt-1 truncate text-xs text-muted-foreground">
-								{char.derived_descriptors.ancestry_name || 'No ancestry'}
-								&ensp;•&ensp;
-								{char.derived_descriptors.primary_class_name || 'No class'}
-								&ensp;•&ensp;
-								{char.derived_descriptors.primary_subclass_name || 'No subclass'}
-							</p>
+								<p class="mt-1 truncate text-xs text-muted-foreground">
+									{char.derived_descriptors.ancestry_name || 'No ancestry'}
+									&ensp;•&ensp;
+									{char.derived_descriptors.primary_class_name || 'No class'}
+									&ensp;•&ensp;
+									{char.derived_descriptors.primary_subclass_name || 'No subclass'}
+								</p>
+							</div>
+						</a>
+						<div class="flex bg-muted">
+							<Button
+								variant="ghost"
+								size="sm"
+								class="hover:text-text grow rounded-none border"
+								href={`/characters/${char.id}/`}>View</Button
+							>
+							<Button
+								variant="ghost"
+								size="sm"
+								class="hover:text-text grow rounded-none border border-x-0"
+								href={`/characters/${char.id}/edit`}>Edit</Button
+							>
+							<Button
+								variant="ghost"
+								size="sm"
+								class=" grow rounded-none border text-destructive hover:text-destructive"
+								onclick={() => handleDeleteCharacter(char.id, char.name)}>Delete</Button
+							>
 						</div>
-					</a>
-					<div class="flex bg-muted">
-						<Button
-							variant="ghost"
-							size="sm"
-							class="hover:text-text grow rounded-none border"
-							href={`/characters/${char.id}/`}>View</Button
-						>
-						<Button
-							variant="ghost"
-							size="sm"
-							class="hover:text-text grow rounded-none border border-x-0"
-							href={`/characters/${char.id}/edit`}>Edit</Button
-						>
-						<Button
-							variant="ghost"
-							size="sm"
-							class=" grow rounded-none border text-destructive hover:text-destructive"
-							onclick={() => handleDeleteCharacter(char.id, char.name)}>Delete</Button
-						>
 					</div>
-				</div>
-			{/if}
-		{/each}
-	</div>
+				{/if}
+			{/each}
+		</div>
+	{/if}
 </div>
 
 <!-- Delete Confirmation Dialog -->

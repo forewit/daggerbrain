@@ -5,14 +5,24 @@ import {
 } from '$lib/remote/characters.remote';
 import type { Character } from '$lib/types/character-types';
 import { getContext, setContext } from 'svelte';
+import { error } from '@sveltejs/kit';
 
 function userContext() {
 	let all_characters = $state<Character[]>([]);
+	let loading = $state(true);
 
 	$effect(() => {
-		get_all_characters().then((chars) => {
-			all_characters = chars;
-		});
+		loading = true;
+		get_all_characters()
+			.then((chars) => {
+				all_characters = chars;
+			})
+			.catch(err => {
+				error(500, err.message);
+			})
+			.finally(() => {
+				loading = false;
+			});
 	});
 
 	const destroy = () => {
@@ -22,6 +32,9 @@ function userContext() {
 	return {
 		get all_characters() {
 			return all_characters;
+		},
+		get loading() {
+			return loading;
 		},
 		create_character,
 		delete_character,
