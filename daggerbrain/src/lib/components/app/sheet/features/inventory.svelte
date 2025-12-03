@@ -21,15 +21,15 @@
 		class: className = '',
 		onAddItems = () => {},
 		onItemClick = (
-			_type: 'weapon' | 'armor' | 'consumable' | 'loot',
-			_item: Weapon | Armor | Consumable | Loot
+			_type: 'weapon' | 'armor' | 'consumable' | 'loot' | 'adventuring_gear',
+			_item: Weapon | Armor | Consumable | Loot | AdventuringGear | null
 		) => {}
 	}: {
 		class?: string;
 		onAddItems?: () => void;
 		onItemClick?: (
-			type: 'weapon' | 'armor' | 'consumable' | 'loot',
-			item: Weapon | Armor | Consumable | Loot
+			type: 'weapon' | 'armor' | 'consumable' | 'loot' | 'adventuring_gear',
+			item: Weapon | Armor | Consumable | Loot | AdventuringGear | null
 		) => void;
 	} = $props();
 
@@ -253,17 +253,22 @@
 						Adventuring Gear
 					</p>
 
-					<ul>
-						{#each filteredAdventuringGear as { gear, originalIndex } (originalIndex)}
-							<li class="flex items-center text-xs">
-								<span class="mr-3 ml-4">•</span>
-								{gear.title}
-								{#if gear.quantity > 1}
-									<span class="ml-1 text-xs text-muted-foreground italic">×{gear.quantity}</span>
-								{/if}
-							</li>
-						{/each}
-					</ul>
+					<button
+						class="flex w-full items-center text-left text-xs px-4 py-2"
+						onclick={() => onItemClick('adventuring_gear', null)}
+					>
+						<ul class="w-full">
+							{#each filteredAdventuringGear as { gear, originalIndex } (originalIndex)}
+								<li class="flex items-center">
+									<span class="mr-3">•</span>
+									{gear.title}
+									{#if gear.quantity > 1}
+										<span class="ml-1 text-xs text-muted-foreground italic">×{gear.quantity}</span>
+									{/if}
+								</li>
+							{/each}
+						</ul>
+					</button>
 				</div>
 			{/if}
 

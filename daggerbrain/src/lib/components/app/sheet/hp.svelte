@@ -2,7 +2,7 @@
 	import { cn } from '$lib/utils';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 
-	let { class: className = '' }: { class?: string } = $props();
+	let { class: className = '', onDeathMove }: { class?: string; onDeathMove?: () => void } = $props();
 
 	const context = getCharacterContext();
 	let character = $derived(context.character);
@@ -38,7 +38,7 @@
 		{#if context.max_hp === character.marked_hp}
 			<button
 				onclick={() => {
-					alert('Death Move');
+					onDeathMove?.();
 				}}
 				class="grid place-items-center rounded-md bg-border p-2 text-xs leading-none text-nowrap hover:bg-muted-foreground/20"
 			>

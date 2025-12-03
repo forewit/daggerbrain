@@ -61,26 +61,21 @@
 		</table>
 
 		<!-- Features -->
-		<div class="rounded-lg bg-primary/5 px-4 py-3 border">
-			<div class="flex items-center justify-between">
-				<p class="text-sm text-muted-foreground">Features</p>
-				{#if weapon.features.length > 0}
-					<span class="rounded-full bg-accent/20 px-2 py-0.5 text-xs font-medium text-accent">{weapon.features.length}</span>
-				{/if}
-			</div>
-			{#if weapon.features.length > 0}
+		{#if weapon.features.length > 0}
+			<div class="rounded-lg bg-primary/5 px-4 py-3 border">
+				<div class="flex items-center justify-between">
+					<p class="text-sm">Features</p>
+				</div>
 				<div class="mt-3 space-y-3">
 					{#each weapon.features as feature}
 						<div class="border-l-2 border-accent/30 pl-3">
-							<p class="font-medium text-sm">{feature.title}</p>
+							<p class="font-medium text-muted-foreground text-sm">{feature.title}</p>
 							<p class="text-muted-foreground text-xs mt-0.5">{@html feature.description_html}</p>
 						</div>
 					{/each}
 				</div>
-			{:else}
-				<p class="text-muted-foreground italic text-xs mt-2 text-right">None</p>
-			{/if}
-		</div>
+			</div>
+		{/if}
 
 	<Collapsible.Root bind:open={whatIsWeaponsOpen} class="pt-2">
 		<Collapsible.Trigger class="flex items-center gap-1">
