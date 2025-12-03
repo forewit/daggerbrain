@@ -15,7 +15,7 @@
 	<Sheet.Title>Experiences</Sheet.Title>
 </Sheet.Header>
 
-<div class="flex flex-col gap-6 overflow-y-auto px-4">
+<div class="flex flex-col gap-6 overflow-y-auto pb-6 px-4">
 	{#if character}
 		<!-- Experiences Table -->
 		<table class="w-full border-collapse text-sm">
