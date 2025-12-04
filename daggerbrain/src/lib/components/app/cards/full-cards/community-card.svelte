@@ -2,13 +2,16 @@
 	import type { CommunityCard } from '$lib/types/compendium-types';
 	import { cn } from '$lib/utils';
 	import type { Snippet } from 'svelte';
+	import { getCharacterContext } from '$lib/state/character.svelte';
 
 	let {
+		bind_token_count = false,
 		card = $bindable(),
 		class: className = '',
 		variant = 'responsive',
 		children
 	}: {
+		bind_token_count?: boolean;
 		card: CommunityCard;
 		variant?: 'responsive' | 'card';
 		class?: string;
@@ -16,7 +19,72 @@
 	} = $props();
 
 	let clientWidth = $state(360);
+
+	const context = getCharacterContext();
+	let character = $derived(context.character);
 </script>
+
+{#snippet token_count()}
+	{#if character && bind_token_count && card.tokens}
+		{@const current_count = character.community_card_tokens || 0}
+		<div class="flex items-center justify-center gap-2">
+			<!-- Minus Button -->
+			<button
+				type="button"
+				onclick={() => {
+					if (!character) return;
+					const current = character.community_card_tokens || 0;
+					character.community_card_tokens = Math.max(0, current - 1);
+				}}
+				disabled={current_count === 0}
+				class="flex size-7 items-center justify-center rounded-full bg-red-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+				aria-label="Decrease token count"
+			>
+				−
+			</button>
+
+			<!-- Coin Stack -->
+			<div class="relative flex items-center justify-center">
+				<!-- Stack of coins (background coins) -->
+				<div class="relative h-12 w-12">
+					<!-- Bottom coin -->
+					<div
+						class="absolute inset-0 rounded-full border-2 border-yellow-700 bg-gradient-to-b from-yellow-400 to-yellow-600"
+						style="transform: translate(2px, 4px);"
+					></div>
+					<!-- Middle coin -->
+					<div
+						class="absolute inset-0 rounded-full border-2 border-yellow-700 bg-gradient-to-b from-yellow-400 to-yellow-600"
+						style="transform: translate(1px, 2px);"
+					></div>
+					<!-- Top coin with number -->
+					<div
+						class="absolute inset-0 flex items-center justify-center rounded-full border-2 border-yellow-700 bg-gradient-to-b from-yellow-300 to-yellow-500 shadow-lg"
+					>
+						<span class="text-sm font-bold text-yellow-900 drop-shadow-sm">
+							{current_count}
+						</span>
+					</div>
+				</div>
+			</div>
+
+			<!-- Plus Button -->
+			<button
+				type="button"
+				onclick={() => {
+					if (!character) return;
+					const current = character.community_card_tokens || 0;
+					character.community_card_tokens = Math.min(99, current + 1);
+				}}
+				disabled={current_count === 99}
+				class="flex size-7 items-center justify-center rounded-full bg-green-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+				aria-label="Increase token count"
+			>
+				+
+			</button>
+		</div>
+	{/if}
+{/snippet}
 
 {#if variant === 'responsive'}
 	<div
@@ -55,6 +123,10 @@
 					{@html feature.description_html}
 				</p>
 			{/each}
+
+			<!-- token count -->
+			{@render token_count()}
+
 			{@render children?.()}
 		</div>
 	</div>
@@ -97,6 +169,8 @@
 						{@html feature.description_html}
 					</p>
 				{/each}
+
+				{@render token_count()}
 			</div>
 
 			<!-- credits -->

@@ -40,7 +40,7 @@
 						and access to certain special abilities.
 					</p>
 					{#if context.ancestry_card}
-						<HeritageCard card={context.ancestry_card} />
+						<HeritageCard card={context.ancestry_card} bind_choice_select />
 					{/if}
 					<div class="flex w-full justify-between gap-2">
 						{#if !character.ancestry_card_id}

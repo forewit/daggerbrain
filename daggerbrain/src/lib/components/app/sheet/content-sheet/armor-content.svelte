@@ -6,6 +6,7 @@
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import Shield from '@lucide/svelte/icons/shield';
 	import { getCharacterContext } from '$lib/state/character.svelte';
+	import ArmorRules from '../../rules/armor-rules.svelte';
 
 	let { armor }: { armor: Armor } = $props();
 
@@ -22,7 +23,7 @@
 	{/if}
 </Sheet.Header>
 
-<div class="flex flex-col gap-6 overflow-y-auto px-4">
+<div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
 	{#if armor.description_html.trim().length > 0}
 		<p class="py-4 text-sm">{@html armor.description_html}</p>
 	{/if}
@@ -70,27 +71,7 @@
 			<p class="text-sm font-medium">More info</p>
 		</Collapsible.Trigger>
 		<Collapsible.Content>
-			{#if armor.id !== 'unarmored'}
-				<ul class="list-disc space-y-3 pt-2 pl-5 text-xs text-muted-foreground italic">
-					<li>
-						An armor's <b>base armor score</b> indicates how many Armor Slots it provides its wearer
-						before additional bonuses are added to calculate their total Armor Score. A PC's Armor Score
-						can't exceed 12.
-					</li>
-					<li>
-						An armor's <b>base thresholds</b> determine its wearer's Major and Severe damage thresholds
-						before adding bonuses to calculate their final damage thresholds. When recording your character's
-						damage thresholds, you always add your character's level to those values.
-					</li>
-					<li>
-						An armor's <b>feature</b> is a special rule that stays in effect while the armor is equipped.
-					</li>
-					<li>
-						While <b>unarmored</b>, your character's base Armor Score is 0, their Major threshold is
-						equal to their level, and their Severe threshold is equal to twice their level.
-					</li>
-				</ul>
-			{/if}
+			<ArmorRules class="pt-2 pl-5" />
 		</Collapsible.Content>
 	</Collapsible.Root>
 </div>

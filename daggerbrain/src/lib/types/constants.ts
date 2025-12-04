@@ -85,6 +85,8 @@ export const CHARACTER_DEFAULTS = {
 	additional_weapon_modifiers: <WeaponModifier[]>[],
 
 	// ephemeral stats set by the player
+	ancestry_card_choices: <Record<string, string[]>>{},
+	community_card_tokens: 0,
 	domain_card_choices: <Record<string, Record<string, string[]>>>{},
 	domain_card_tokens: <Record<string, number>>{},
 	selected_traits: <Traits>{

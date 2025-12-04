@@ -146,9 +146,9 @@
 			<Input bind:value={searchQuery} placeholder="Search items..." class="pl-9" />
 		</div>
 
-		<div class="flex flex-wrap gap-x-0.5 gap-y-2">
+		<div class="flex grow flex-wrap gap-x-0.5 gap-y-2">
 			<!-- Type Filter Buttons -->
-			<div class="flex flex-wrap gap-1">
+			<div class="flex flex-wrap justify-center gap-1">
 				<Button
 					size="sm"
 					variant={typeFilter === 'Primary' ? 'default' : 'outline'}
@@ -180,7 +180,7 @@
 			</div>
 
 			<!-- Tier Filter Buttons -->
-			<div class="flex flex-wrap gap-1">
+			<div class="flex grow flex-wrap justify-center gap-1">
 				<Button
 					size="sm"
 					variant={tierFilter === '1' ? 'default' : 'outline'}

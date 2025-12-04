@@ -4,6 +4,7 @@
 	import * as Collapsible from '$lib/components/ui/collapsible';
 	import { cn } from '$lib/utils';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import LootRules from '../../rules/loot-rules.svelte';
 
 	let { loot }: { loot: Loot } = $props();
 
@@ -15,7 +16,7 @@
 	<p class="text-xs text-muted-foreground italic">Loot</p>
 </Sheet.Header>
 
-<div class="flex flex-col gap-6 overflow-y-auto px-4">
+<div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
 	<!-- Description -->
 	<div class="rounded-lg border bg-primary/5 px-4 py-3">
 		<p class="text-sm">Description</p>
@@ -36,10 +37,7 @@
 			<p class="text-sm font-medium">More info</p>
 		</Collapsible.Trigger>
 		<Collapsible.Content>
-			<p class="pt-2 pl-5 text-xs text-muted-foreground italic">
-				Loot is treasure and equipment found during adventures. Unlike consumables, loot items can
-				be used repeatedly and may provide ongoing bonuses or special abilities.
-			</p>
+			<LootRules class="pt-2 pl-5" />
 		</Collapsible.Content>
 	</Collapsible.Root>
 </div>

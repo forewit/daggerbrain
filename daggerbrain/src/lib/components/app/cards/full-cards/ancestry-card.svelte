@@ -1,14 +1,18 @@
 <script lang="ts">
-	import type { AncestryCard } from '$lib/types/compendium-types';
+	import type { AncestryCard, AncestryCardChoice } from '$lib/types/compendium-types';
 	import { cn } from '$lib/utils';
 	import type { Snippet } from 'svelte';
+	import { getCharacterContext } from '$lib/state/character.svelte';
+	import ChoiceSelector from '$lib/components/app/leveling/secondary-options/choice-selector.svelte';
 
 	let {
+		bind_choice_select = false,
 		card = $bindable(),
 		class: className = '',
 		variant = 'responsive',
 		children
 	}: {
+		bind_choice_select?: boolean;
 		card: AncestryCard;
 		variant?: 'responsive' | 'card';
 		class?: string;
@@ -16,7 +20,51 @@
 	} = $props();
 
 	let clientWidth = $state(360);
+
+	const context = getCharacterContext();
+	let character = $derived(context.character);
+
+	let width = $state(300);
 </script>
+
+{#snippet choice_select(choice: AncestryCardChoice)}
+	{#if character && card.choices.length > 0 && bind_choice_select}
+		{@const conditional_choice_id = choice.conditional_choice?.choice_id || null}
+		{@const conditional_selection_id = choice.conditional_choice?.selection_id || null}
+
+		{#if character.ancestry_card_choices[choice.choice_id]}
+			{#if choice.conditional_choice === null || (conditional_choice_id && conditional_selection_id && character.ancestry_card_choices[conditional_choice_id] && character.ancestry_card_choices[conditional_choice_id].includes(conditional_selection_id))}
+				{#if choice.type === 'arbitrary'}
+					<ChoiceSelector
+						class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
+						bind:selected_ids={character.ancestry_card_choices[choice.choice_id]}
+						max={choice.max}
+						options={choice.options}
+						{width}
+					/>
+				{:else if choice.type === 'experience'}
+					<ChoiceSelector
+						class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
+						bind:selected_ids={character.ancestry_card_choices[choice.choice_id]}
+						max={choice.max}
+						options={character.experiences.map((exp, i) => {
+							return {
+								selection_id: i.toString(),
+								title: exp,
+								short_title: exp
+							};
+						})}
+						term="Experience"
+						term_plural="Experiences"
+						{width}
+					/>
+				{/if}
+			{:else}
+				<!-- conditional choice not met -->
+			{/if}
+		{/if}
+	{/if}
+{/snippet}
 
 {#if variant === 'responsive'}
 	<div
@@ -31,7 +79,7 @@
 		</div>
 
 		<!-- content -->
-		<div class="flex flex-2 flex-col gap-2 px-3 py-2">
+		<div class="flex flex-2 flex-col gap-2 px-3 py-2" bind:clientWidth={width}>
 			<!-- title and community label -->
 			<div class="relative flex justify-between gap-2">
 				<p class="font-eveleth uppercase">
@@ -55,6 +103,12 @@
 					{@html feature.description_html}
 				</p>
 			{/each}
+
+			<!-- choices -->
+			{#each card.choices as choice}
+				{@render choice_select(choice)}
+			{/each}
+
 			{@render children?.()}
 		</div>
 	</div>
@@ -96,6 +150,11 @@
 						<b><em>{feature.title}:</em></b>
 						{@html feature.description_html}
 					</p>
+				{/each}
+
+				<!-- choices -->
+				{#each card.choices as choice}
+					{@render choice_select(choice)}
 				{/each}
 			</div>
 

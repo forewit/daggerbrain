@@ -18,7 +18,7 @@
 	<Sheet.Title>Adventuring Gear</Sheet.Title>
 </Sheet.Header>
 
-<div class="flex flex-col gap-6 overflow-y-auto px-4">
+<div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
 	{#if adventuringGear.length > 0}
 		<!-- Adventuring Gear Table -->
 		<table class="w-full border-collapse text-sm">
@@ -49,19 +49,4 @@
 	{:else}
 		<p class="py-4 text-center text-sm text-muted-foreground italic">No adventuring gear</p>
 	{/if}
-
-	<!-- todo: fill out -->
-	<!-- <Collapsible.Root bind:open={whatIsAdventuringGearOpen} class="pt-2">
-		<Collapsible.Trigger class="flex items-center gap-1">
-			<ChevronRight
-				class={cn('size-4 transition-transform', whatIsAdventuringGearOpen && 'rotate-90')}
-			/>
-			<p class="text-sm font-medium">What is Adventuring Gear?</p>
-		</Collapsible.Trigger>
-		<Collapsible.Content>
-			<p class="pl-5 pt-2 text-xs text-muted-foreground italic">
-				Adventuring gear is...
-			</p>
-		</Collapsible.Content>
-	</Collapsible.Root> -->
 </div>

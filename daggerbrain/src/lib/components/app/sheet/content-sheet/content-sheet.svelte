@@ -1,5 +1,11 @@
 <script lang="ts" module>
-	import type { Weapon, Armor, Consumable, Loot, AdventuringGear } from '$lib/types/compendium-types';
+	import type {
+		Weapon,
+		Armor,
+		Consumable,
+		Loot,
+		AdventuringGear
+	} from '$lib/types/compendium-types';
 
 	export type SheetContent =
 		| { type: 'weapon'; data: Weapon }

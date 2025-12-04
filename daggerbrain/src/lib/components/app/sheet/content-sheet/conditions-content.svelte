@@ -6,6 +6,7 @@
 	import { cn } from '$lib/utils';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import ConditionsRules from '../../rules/conditions-rules.svelte';
 
 	const context = getCharacterContext();
 	let character = $derived(context.character);
@@ -20,12 +21,14 @@
 	<Sheet.Title>Conditions</Sheet.Title>
 </Sheet.Header>
 
-<div class="flex flex-col gap-6 pb-6 overflow-y-auto px-4">
+<div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
 	{#if character}
 		<div class="space-y-2">
 			<!-- HIDDEN Condition -->
 			<Collapsible.Root bind:open={hiddenOpen}>
-				<Collapsible.Trigger class="flex w-full items-center bg-primary/5 justify-between rounded-md border p-3">
+				<Collapsible.Trigger
+					class="flex w-full items-center justify-between rounded-md border bg-primary/5 p-3"
+				>
 					<div class="flex items-center gap-2">
 						<svg class="size-4" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
 							<path
@@ -48,24 +51,24 @@
 							checked={character?.active_conditions.includes('hidden')}
 							onclick={(e) => e.stopPropagation()}
 						/>
-						<ChevronLeft
-							class={cn('size-4 transition-transform', hiddenOpen && '-rotate-90')}
-						/>
+						<ChevronLeft class={cn('size-4 transition-transform', hiddenOpen && '-rotate-90')} />
 					</div>
 				</Collapsible.Trigger>
 				<Collapsible.Content>
-					<div class="px-3 pb-3 pt-2 text-xs text-muted-foreground">
-						While you're out of sight from all enemies and they don't otherwise know your location, you
-						gain the Hidden condition. Any rolls against a Hidden creature have disadvantage. After an
-						adversary moves to where they would see you, you move into their line of sight, or you make an
-						attack, you are no longer Hidden.
+					<div class="px-3 pt-2 pb-3 text-xs text-muted-foreground">
+						While you're out of sight from all enemies and they don't otherwise know your location,
+						you gain the Hidden condition. Any rolls against a Hidden creature have disadvantage.
+						After an adversary moves to where they would see you, you move into their line of sight,
+						or you make an attack, you are no longer Hidden.
 					</div>
 				</Collapsible.Content>
 			</Collapsible.Root>
 
 			<!-- RESTRAINED Condition -->
 			<Collapsible.Root bind:open={restrainedOpen}>
-				<Collapsible.Trigger class="flex w-full items-center bg-primary/5 justify-between rounded-md border p-3">
+				<Collapsible.Trigger
+					class="flex w-full items-center justify-between rounded-md border bg-primary/5 p-3"
+				>
 					<div class="flex items-center gap-2">
 						<svg class="size-4" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
 							<path
@@ -94,15 +97,18 @@
 					</div>
 				</Collapsible.Trigger>
 				<Collapsible.Content>
-					<div class="px-3 pb-3 pt-2 text-xs text-muted-foreground">
-						Restrained characters can't move, but you can still take actions from their current position.
+					<div class="px-3 pt-2 pb-3 text-xs text-muted-foreground">
+						Restrained characters can't move, but you can still take actions from their current
+						position.
 					</div>
 				</Collapsible.Content>
 			</Collapsible.Root>
 
 			<!-- VULNERABLE Condition -->
 			<Collapsible.Root bind:open={vulnerableOpen}>
-				<Collapsible.Trigger class="flex w-full items-center bg-primary/5 justify-between rounded-md border p-3">
+				<Collapsible.Trigger
+					class="flex w-full items-center justify-between rounded-md border bg-primary/5 p-3"
+				>
 					<div class="flex items-center gap-2">
 						<svg class="size-4" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
 							<path
@@ -131,7 +137,7 @@
 					</div>
 				</Collapsible.Trigger>
 				<Collapsible.Content>
-					<div class="px-3 pb-3 pt-2 text-xs text-muted-foreground">
+					<div class="px-3 pt-2 pb-3 text-xs text-muted-foreground">
 						When a creature is Vulnerable, all rolls targeting them have advantage.
 					</div>
 				</Collapsible.Content>
@@ -141,21 +147,11 @@
 
 	<Collapsible.Root bind:open={moreInfoOpen} class="pt-2">
 		<Collapsible.Trigger class="flex items-center gap-1">
-			<ChevronRight
-				class={cn('size-4 transition-transform', moreInfoOpen && 'rotate-90')}
-			/>
+			<ChevronRight class={cn('size-4 transition-transform', moreInfoOpen && 'rotate-90')} />
 			<p class="text-sm font-medium">More info</p>
 		</Collapsible.Trigger>
 		<Collapsible.Content>
-			<div class="space-y-2 pt-2 pl-5 text-xs text-muted-foreground italic">
-				<p>
-					Some features can apply special or unique conditions, which work as described in the feature
-					text.
-				</p>
-				<p>
-					Unless otherwise noted, the same condition can't be applied more than once to the same target.
-				</p>
-			</div>
+			<ConditionsRules class="pt-2 pl-5" />
 		</Collapsible.Content>
 	</Collapsible.Root>
 </div>

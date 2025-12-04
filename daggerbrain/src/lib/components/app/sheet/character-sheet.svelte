@@ -30,7 +30,10 @@
 		SubclassMasteryCard
 	} from '$lib/types/compendium-types';
 	import Features from './features/features.svelte';
-	import ContentSheet, { type SheetContent, type ItemClickHandler } from './content-sheet/content-sheet.svelte';
+	import ContentSheet, {
+		type SheetContent,
+		type ItemClickHandler
+	} from './content-sheet/content-sheet.svelte';
 	import Tent from '@lucide/svelte/icons/tent';
 
 	let sheetOpen = $state(false);

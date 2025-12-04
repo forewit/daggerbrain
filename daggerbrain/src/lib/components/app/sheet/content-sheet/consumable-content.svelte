@@ -4,6 +4,7 @@
 	import * as Collapsible from '$lib/components/ui/collapsible';
 	import { cn } from '$lib/utils';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import ConsumableRules from '../../rules/consumable-rules.svelte';
 
 	let { consumable }: { consumable: Consumable } = $props();
 
@@ -15,7 +16,7 @@
 	<p class="text-xs text-muted-foreground italic">Consumable</p>
 </Sheet.Header>
 
-<div class="flex flex-col gap-6 overflow-y-auto px-4">
+<div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
 	<!-- Description -->
 	<div class="rounded-lg border bg-primary/5 px-4 py-3">
 		<p class="text-sm">Description</p>
@@ -38,11 +39,7 @@
 			<p class="text-sm font-medium">More info</p>
 		</Collapsible.Trigger>
 		<Collapsible.Content>
-			<p class="pt-2 pl-5 text-xs text-muted-foreground italic">
-				Consumables are loot that can only be used once. You can hold up to five of each consumable
-				at a time. Using a consumable doesn't require a roll unless required by the GM or the
-				demands of the fiction.
-			</p>
+			<ConsumableRules class="pt-2 pl-5" />
 		</Collapsible.Content>
 	</Collapsible.Root>
 </div>

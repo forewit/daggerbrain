@@ -123,6 +123,8 @@ export const BASE_STATS = {
 	max_hp: 0,
 	max_stress: 6,
 	max_burden: 2,
+	max_short_rest_actions: 2,
+	max_long_rest_actions: 2,
 	evasion: 0,
 	spellcast_roll_bonus: 0,
 	damage_thresholds: {

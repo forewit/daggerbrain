@@ -26,7 +26,8 @@ import type {
 	ArmorSchema,
 	LootSchema,
 	ConsumableSchema,
-	SourcesSchema
+	SourcesSchema,
+	AncestryCardChoiceSchema
 } from '$lib/compendium/compendium-schemas';
 import type { z } from 'zod';
 
@@ -72,6 +73,7 @@ export type DomainCard = z.infer<typeof DomainCardSchema>;
 // ============================================================================
 
 export type AncestryCard = z.infer<typeof AncestryCardSchema>;
+export type AncestryCardChoice = z.infer<typeof AncestryCardChoiceSchema>;
 export type CommunityCard = z.infer<typeof CommunityCardSchema>;
 export type TransformationCard = z.infer<typeof TransformationCardSchema>;
 

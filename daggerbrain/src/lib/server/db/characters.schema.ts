@@ -101,6 +101,13 @@ export const characters_table = sqliteTable('characters_table', {
 		.notNull()
 		.default(CHARACTER_DEFAULTS.unarmed_attack_choices)
 		.$type<Record<string, string[]>>(),
+	ancestry_card_choices: text('ancestry_card_choices', { mode: 'json' })
+		.notNull()
+		.default(CHARACTER_DEFAULTS.ancestry_card_choices)
+		.$type<Record<string, string[]>>(),
+	community_card_tokens: integer('community_card_tokens')
+		.notNull()
+		.default(CHARACTER_DEFAULTS.community_card_tokens),
 	domain_card_choices: text('domain_card_choices', { mode: 'json' })
 		.notNull()
 		.default(CHARACTER_DEFAULTS.domain_card_choices)

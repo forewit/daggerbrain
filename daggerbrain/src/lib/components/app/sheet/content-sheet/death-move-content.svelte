@@ -7,6 +7,7 @@
 	import { cn } from '$lib/utils';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import Skull from '@lucide/svelte/icons/skull';
+	import DeathMoveRules from '../../rules/death-move-rules.svelte';
 
 	let moreInfoOpen = $state(false);
 
@@ -18,26 +19,24 @@
 
 	function makeDeathMove() {
 		if (!selectedDeathMove) return;
-		
+
 		// TODO: Implement death move logic
 		console.log('Making death move:', selectedDeathMove);
-		
+
 		// Reset selection after making death move
 		selectedDeathMove = null;
 	}
 </script>
 
 <Sheet.Header>
-	<Sheet.Title class="flex gap-2">
-		Death Move
-	</Sheet.Title>
+	<Sheet.Title class="flex gap-2">Death Move</Sheet.Title>
 </Sheet.Header>
 
-<div class="flex flex-col gap-6 overflow-y-auto px-4">
+<div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
 	<!-- Death Move Selection Section -->
 	<div class="space-y-2">
-			<p class="text-sm font-bold">Choose One</p>
-			
+		<p class="text-sm font-bold">Choose One</p>
+
 		<div class="flex flex-col gap-3 rounded-xl border bg-primary/5 p-3 text-sm text-wrap">
 			<Label
 				class={cn(
@@ -54,7 +53,8 @@
 				/>
 				<p>
 					<span class="font-semibold">Blaze of Glory:</span>
-					Take one final action that automatically critically succeeds, then cross through the veil of death.
+					Take one final action that automatically critically succeeds, then cross through the veil of
+					death.
 				</p>
 			</Label>
 
@@ -73,7 +73,8 @@
 				/>
 				<p>
 					<span class="font-semibold">Avoid Death:</span>
-					Drop unconscious temporarily. Roll Hope Die; if ≤ level, gain a scar (permanently cross out a Hope slot).
+					Drop unconscious temporarily. Roll Hope Die; if ≤ level, gain a scar (permanently cross out
+					a Hope slot).
 				</p>
 			</Label>
 
@@ -92,7 +93,8 @@
 				/>
 				<p>
 					<span class="font-semibold">Risk It All:</span>
-					Roll Duality Dice. Hope higher: clear HP/Stress equal to Hope Die. Fear higher: death. Matching: clear all HP and Stress.
+					Roll Duality Dice. Hope higher: clear HP/Stress equal to Hope Die. Fear higher: death. Matching:
+					clear all HP and Stress.
 				</p>
 			</Label>
 
@@ -114,49 +116,7 @@
 			<p class="text-sm font-medium">More info</p>
 		</Collapsible.Trigger>
 		<Collapsible.Content>
-			<div class="flex flex-col gap-6 pt-2 pb-6 pl-5">
-				<p class="text-xs text-muted-foreground">
-					When a PC marks their last Hit Point, they must make a death move by choosing one of the
-					following options:
-				</p>
-
-				<!-- Blaze of Glory -->
-				<div class="space-y-2">
-					<h3 class="text-sm font-bold">Blaze of Glory:</h3>
-					<p class="pl-6 text-xs text-muted-foreground">
-						Your character embraces death and goes out in a blaze of glory. Take one final action. It
-						automatically critically succeeds (with GM approval), and then you cross through the veil of
-						death.
-					</p>
-				</div>
-
-				<!-- Avoid Death -->
-				<div class="space-y-2">
-					<h3 class="text-sm font-bold">Avoid Death:</h3>
-					<p class="pl-6 text-xs text-muted-foreground">
-						Your character avoids death and faces the consequences. They temporarily drop unconscious, and
-						then you work with the GM to describe how the situation worsens. While unconscious, your
-						character can't move or act, and they can't be targeted by an attack. They return to
-						consciousness when an ally clears 1 or more of their marked Hit Points or when the party
-						finishes a long rest. After your character falls unconscious, roll your Hope Die. If its value
-						is equal to or less than your character's level, they gain a scar: permanently cross out a
-						Hope slot and work with the GM to determine its lasting narrative impact and how, if possible,
-						it can be restored. If you ever cross out your last Hope slot, your character's journey ends.
-					</p>
-				</div>
-
-				<!-- Risk It All -->
-				<div class="space-y-2">
-					<h3 class="text-sm font-bold">Risk It All:</h3>
-					<p class="pl-6 text-xs text-muted-foreground">
-						Roll your Duality Dice. If the Hope Die is higher, your character stays on their feet and
-						clears a number of Hit Points or Stress equal to the value of the Hope Die (you can divide the
-						Hope Die value between Hit Points and Stress however you'd prefer). If the Fear Die is higher,
-						your character crosses through the veil of death. If the Duality Dice show matching results,
-						your character stays up and clears all Hit Points and Stress.
-					</p>
-				</div>
-			</div>
+			<DeathMoveRules class="pt-2 pl-5" />
 		</Collapsible.Content>
 	</Collapsible.Root>
 </div>

@@ -72,6 +72,12 @@ export const CharacterConditionSchema = z.discriminatedUnion('type', [
 		selection_id: z.string()
 	}),
 	z.object({
+		type: z.literal('ancestry_card_choice'),
+		ancestry_card_id: z.string(),
+		choice_id: z.string(),
+		selection_id: z.string()
+	}),
+	z.object({
 		type: z.literal('loot_choice'),
 		loot_id: z.string(),
 		choice_id: z.string(),
@@ -131,7 +137,9 @@ export const CharacterModifierSchema = z
 					'proficiency',
 					'max_armor',
 					'max_burden',
-					'spellcast_roll_bonus'
+					'spellcast_roll_bonus',
+					'max_short_rest_actions',
+					'max_long_rest_actions',
 				])
 			}),
 			z.object({
@@ -139,8 +147,12 @@ export const CharacterModifierSchema = z
 				trait: TraitIdsSchema
 			}),
 			z.object({
-				target: z.literal('experience_from_selection'),
+				target: z.literal('experience_from_domain_card_choice_selection'),
 				domain_card_id: z.string(),
+				choice_id: z.string()
+			}),
+			z.object({
+				target: z.literal('experience_from_ancestry_card_choice_selection'),
 				choice_id: z.string()
 			})
 		])
@@ -337,6 +349,36 @@ export const DomainCardSchema = z.object({
 // Heritages (Ancestries, Communities, Transformations)
 // ============================================================================
 
+export const AncestryCardChoiceSchema = z
+	.object({
+		choice_id: z.string(),
+		conditional_choice: z
+			.object({
+				choice_id: z.string(),
+				selection_id: z.string()
+			})
+			.nullable()
+	})
+	.and(
+		z.discriminatedUnion('type', [
+			z.object({
+				type: z.literal('arbitrary'),
+				max: z.number(),
+				options: z.array(
+					z.object({
+						selection_id: z.string(),
+						title: z.string(),
+						short_title: z.string()
+					})
+				)
+			}),
+			z.object({
+				type: z.literal('experience'),
+				max: z.number()
+			})
+		])
+	);
+
 export const AncestryCardSchema = z.object({
 	id: z.string(),
 	source_id: SourceIdsSchema,
@@ -345,7 +387,8 @@ export const AncestryCardSchema = z.object({
 	title: z.string(),
 	description_html: z.string(),
 	artist_name: z.string(),
-	features: z.array(FeatureSchema)
+	features: z.array(FeatureSchema),
+	choices: z.array(AncestryCardChoiceSchema)
 });
 
 export const CommunityCardSchema = z.object({
@@ -355,6 +398,7 @@ export const CommunityCardSchema = z.object({
 	image_url: z.string(),
 	title: z.string(),
 	description_html: z.string(),
+	tokens: z.boolean(),
 	artist_name: z.string(),
 	features: z.array(FeatureSchema)
 });

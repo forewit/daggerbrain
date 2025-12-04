@@ -235,6 +235,8 @@ function createCharacter(id: string) {
 	let max_hp: number = $state(BASE_STATS.max_hp);
 	let max_stress: number = $state(BASE_STATS.max_stress);
 	let max_burden: number = $state(BASE_STATS.max_burden);
+	let max_short_rest_actions: number = $state(BASE_STATS.max_short_rest_actions);
+	let max_long_rest_actions: number = $state(BASE_STATS.max_long_rest_actions);
 	let evasion: number = $state(BASE_STATS.evasion);
 	let damage_thresholds: DamageThresholds = $state({ ...BASE_STATS.damage_thresholds });
 	let primary_class_mastery_level: number = $state(BASE_STATS.primary_class_mastery_level);
@@ -245,9 +247,61 @@ function createCharacter(id: string) {
 	let spellcast_trait: keyof Traits | null = $state(BASE_STATS.spellcast_trait);
 	let spellcast_roll_bonus: number = $state(BASE_STATS.spellcast_roll_bonus);
 
+
 	// ================================================
 	// CHARACTER VALIDATION EFFECTS
 	// ================================================
+
+	// ! clear invalid ancestry card choices
+	$effect(() => {
+		if (!character) return;
+		let new_ancestry_card_choices: Record<string, string[]> = JSON.parse(
+			JSON.stringify(character.ancestry_card_choices)
+		);
+
+		// initialize choices
+		if (ancestry_card) {
+			for (const choice of ancestry_card.choices) {
+				if (!new_ancestry_card_choices[choice.choice_id]) {
+					console.warn(`Creating arbitrary_choice slot for ${choice.choice_id}`);
+					new_ancestry_card_choices[choice.choice_id] = [];
+				}
+			}
+			// delete other attributes
+			for (const choice_id of Object.keys(new_ancestry_card_choices)) {
+				if (!ancestry_card.choices.some((choice) => choice.choice_id === choice_id)) {
+					delete new_ancestry_card_choices[choice_id];
+				}
+			}
+		} else {
+			new_ancestry_card_choices = {};
+		}
+
+		function deepEqualRecords(a: Record<string, string[]>, b: Record<string, string[]>): boolean {
+			const aKeys = Object.keys(a);
+			const bKeys = Object.keys(b);
+			if (aKeys.length !== bKeys.length) return false;
+
+			for (const key of aKeys) {
+				if (!b.hasOwnProperty(key)) return false;
+
+				const aValues = [...a[key]].sort();
+				const bValues = [...b[key]].sort();
+
+				if (aValues.length !== bValues.length) return false;
+				for (let i = 0; i < aValues.length; i++) {
+					if (aValues[i] !== bValues[i]) return false;
+				}
+			}
+
+			return true;
+		}
+
+		if (!deepEqualRecords(character.ancestry_card_choices, new_ancestry_card_choices)) {
+			console.warn('ancestry_card_choices updated');
+			character.ancestry_card_choices = new_ancestry_card_choices;
+		}
+	});
 
 	// ! clear invalid selected traits
 	$effect(() => {
@@ -749,6 +803,13 @@ function createCharacter(id: string) {
 			? secondary_subclass.name
 			: '';
 	});
+
+	// ! clear invalid community card tokens
+	$effect(()=>{
+		if (!character) return;
+
+		if (!community_card?.tokens) character.community_card_tokens = 0;
+	})
 
 	// ! build domain card vault and clear invalid domain card choices at each level
 	$effect(() => {
@@ -1266,25 +1327,15 @@ function createCharacter(id: string) {
 		push_weapon_modifiers(character.additional_weapon_modifiers);
 
 		// categorize by behavior
-		base_character_modifiers = all_character_modifiers.filter(
-			(e) => 'behavior' in e && e.behaviour === 'base'
-		);
-		bonus_character_modifiers = all_character_modifiers.filter(
-			(e) => 'behavior' in e && e.behaviour === 'bonus'
-		);
+		base_character_modifiers = all_character_modifiers.filter((m) => m.behaviour === 'base');
+		bonus_character_modifiers = all_character_modifiers.filter((m) => m.behaviour === 'bonus');
 		override_character_modifiers = all_character_modifiers.filter(
-			(e) => 'behavior' in e && e.behaviour === 'override'
+			(m) => m.behaviour === 'override'
 		);
 
-		base_weapon_modifiers = all_weapon_modifiers.filter(
-			(e) => 'behavior' in e && e.behaviour === 'base'
-		);
-		bonus_weapon_modifiers = all_weapon_modifiers.filter(
-			(e) => 'behavior' in e && e.behaviour === 'bonus'
-		);
-		override_weapon_modifiers = all_weapon_modifiers.filter(
-			(e) => 'behavior' in e && e.behaviour === 'override'
-		);
+		base_weapon_modifiers = all_weapon_modifiers.filter((m) => m.behaviour === 'base');
+		bonus_weapon_modifiers = all_weapon_modifiers.filter((m) => m.behaviour === 'bonus');
+		override_weapon_modifiers = all_weapon_modifiers.filter((m) => m.behaviour === 'override');
 
 		console.warn('Updated modifier list...');
 	});
@@ -1510,6 +1561,14 @@ function createCharacter(id: string) {
 					condition.choice_id
 				].includes(condition.selection_id);
 			}
+		} else if (condition.type === 'ancestry_card_choice') {
+			if (!character.ancestry_card_choices[condition.choice_id]) {
+				return false;
+			} else {
+				return character.ancestry_card_choices[condition.choice_id].includes(
+					condition.selection_id
+				);
+			}
 		} else if (condition.type === 'loot_choice') {
 			if (
 				!character.inventory.loot[condition.loot_id] ||
@@ -1720,10 +1779,21 @@ function createCharacter(id: string) {
 			);
 			if (!conditions_met) continue;
 
-			if (modifier.target === 'experience_from_selection') {
-				const experience_indices: number[] = character.domain_card_choices[modifier.domain_card_id][
-					modifier.choice_id
-				].map((str) => parseInt(str));
+			if (
+				modifier.target === 'experience_from_domain_card_choice_selection' ||
+				modifier.target === 'experience_from_ancestry_card_choice_selection'
+			) {
+				let experience_indices: number[] = [];
+				if (modifier.target === 'experience_from_domain_card_choice_selection') {
+					experience_indices = character.domain_card_choices[modifier.domain_card_id][
+						modifier.choice_id
+					].map((str) => parseInt(str));
+				} else if (modifier.target === 'experience_from_ancestry_card_choice_selection') {
+					experience_indices = character.ancestry_card_choices[modifier.choice_id].map((str) =>
+						parseInt(str)
+					);
+				}
+				console.log(experience_indices);
 
 				if (!experience_indices || experience_indices.length === 0) continue;
 
@@ -1779,10 +1849,20 @@ function createCharacter(id: string) {
 			);
 			if (!conditions_met) continue;
 
-			if (modifier.target === 'experience_from_selection') {
-				const experience_indices: number[] = character.domain_card_choices[modifier.domain_card_id][
-					modifier.choice_id
-				].map((str) => parseInt(str));
+			if (
+				modifier.target === 'experience_from_domain_card_choice_selection' ||
+				modifier.target === 'experience_from_ancestry_card_choice_selection'
+			) {
+				let experience_indices: number[] = [];
+				if (modifier.target === 'experience_from_domain_card_choice_selection') {
+					experience_indices = character.domain_card_choices[modifier.domain_card_id][
+						modifier.choice_id
+					].map((str) => parseInt(str));
+				} else if (modifier.target === 'experience_from_ancestry_card_choice_selection') {
+					experience_indices = character.ancestry_card_choices[modifier.choice_id].map((str) =>
+						parseInt(str)
+					);
+				}
 
 				if (!experience_indices || experience_indices.length === 0) continue;
 
@@ -1811,10 +1891,20 @@ function createCharacter(id: string) {
 			);
 			if (!conditions_met) continue;
 
-			if (modifier.target === 'experience_from_selection') {
-				const experience_indices: number[] = character.domain_card_choices[modifier.domain_card_id][
-					modifier.choice_id
-				].map((str) => parseInt(str));
+			if (
+				modifier.target === 'experience_from_domain_card_choice_selection' ||
+				modifier.target === 'experience_from_ancestry_card_choice_selection'
+			) {
+				let experience_indices: number[] = [];
+				if (modifier.target === 'experience_from_domain_card_choice_selection') {
+					experience_indices = character.domain_card_choices[modifier.domain_card_id][
+						modifier.choice_id
+					].map((str) => parseInt(str));
+				} else if (modifier.target === 'experience_from_ancestry_card_choice_selection') {
+					experience_indices = character.ancestry_card_choices[modifier.choice_id].map((str) =>
+						parseInt(str)
+					);
+				}
 
 				if (!experience_indices || experience_indices.length === 0) continue;
 
@@ -1903,6 +1993,30 @@ function createCharacter(id: string) {
 		new_max_hp = apply_modifiers(override_character_modifiers, 'max_hp', new_max_hp, 'override');
 
 		max_hp = new_max_hp;
+	});
+
+	// * derived max_short_rest_actions
+	$effect(() => {
+		if (!character) return;
+		let new_max_short_rest_actions: number = BASE_STATS.max_short_rest_actions;
+
+		new_max_short_rest_actions = apply_modifiers(base_character_modifiers, 'max_short_rest_actions', new_max_short_rest_actions, 'base');
+		new_max_short_rest_actions = apply_modifiers(bonus_character_modifiers, 'max_short_rest_actions', new_max_short_rest_actions, 'bonus');
+		new_max_short_rest_actions = apply_modifiers(override_character_modifiers, 'max_short_rest_actions', new_max_short_rest_actions, 'override');
+
+		max_short_rest_actions = new_max_short_rest_actions;
+	});
+
+	// * derived max_long_rest_actions
+	$effect(() => {
+		if (!character) return;
+		let new_max_long_rest_actions: number = BASE_STATS.max_long_rest_actions;
+
+		new_max_long_rest_actions = apply_modifiers(base_character_modifiers, 'max_long_rest_actions', new_max_long_rest_actions, 'base');
+		new_max_long_rest_actions = apply_modifiers(bonus_character_modifiers, 'max_long_rest_actions', new_max_long_rest_actions, 'bonus');
+		new_max_long_rest_actions = apply_modifiers(override_character_modifiers, 'max_long_rest_actions', new_max_long_rest_actions, 'override');
+
+		max_long_rest_actions = new_max_long_rest_actions;
 	});
 
 	// * derive spellcast roll bonus
@@ -2683,6 +2797,12 @@ function createCharacter(id: string) {
 		},
 		get max_burden() {
 			return max_burden;
+		},
+		get max_short_rest_actions() {
+			return max_short_rest_actions;
+		},
+		get max_long_rest_actions() {
+			return max_long_rest_actions;
 		},
 		get evasion() {
 			return evasion;

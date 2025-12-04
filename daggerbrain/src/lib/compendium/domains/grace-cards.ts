@@ -514,7 +514,7 @@ export const GRACE_DOMAIN_CARDS = {
 						],
 						type: 'flat',
 						value: 2,
-						target: 'experience_from_selection',
+						target: 'experience_from_domain_card_choice_selection',
 						domain_card_id: 'master_of_the_craft',
 						choice_id: 'choose_two_experiences'
 					},
@@ -530,7 +530,7 @@ export const GRACE_DOMAIN_CARDS = {
 						],
 						type: 'flat',
 						value: 3,
-						target: 'experience_from_selection',
+						target: 'experience_from_domain_card_choice_selection',
 						domain_card_id: 'master_of_the_craft',
 						choice_id: 'choose_one_experience'
 					}
