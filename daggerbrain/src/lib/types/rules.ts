@@ -125,6 +125,7 @@ export const BASE_STATS = {
 	max_burden: 2,
 	max_short_rest_actions: 2,
 	max_long_rest_actions: 2,
+	max_consumables: 5,
 	evasion: 0,
 	spellcast_roll_bonus: 0,
 	damage_thresholds: {

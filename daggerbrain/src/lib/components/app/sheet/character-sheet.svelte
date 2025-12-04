@@ -35,6 +35,7 @@
 		type ItemClickHandler
 	} from './content-sheet/content-sheet.svelte';
 	import Tent from '@lucide/svelte/icons/tent';
+	import Proficiency from './proficiency.svelte';
 
 	let sheetOpen = $state(false);
 	let sheetContent = $state<SheetContent>(null);
@@ -210,9 +211,6 @@
 								&ensp;•&ensp;
 								{context.community_card?.title || 'No community'}
 							</p>
-							<p class="truncate text-xs text-muted-foreground">
-								Proficiency: {context.proficiency}
-							</p>
 						</div>
 					</div>
 				</div>
@@ -237,6 +235,8 @@
 				</Button>
 
 				<Conditions onConditionsClick={openConditionsSheet} />
+
+				<Proficiency />
 			</div>
 
 			<!-- traits -->

@@ -237,6 +237,14 @@ function createCharacter(id: string) {
 	let max_burden: number = $state(BASE_STATS.max_burden);
 	let max_short_rest_actions: number = $state(BASE_STATS.max_short_rest_actions);
 	let max_long_rest_actions: number = $state(BASE_STATS.max_long_rest_actions);
+	let max_consumables: number = $state(BASE_STATS.max_consumables);
+	let consumable_count = $derived.by(() => {
+		if (!character) return 0;
+		return Object.values(character.inventory.consumables || {}).reduce(
+			(total, item) => total + (item.quantity || 0),
+			0
+		);
+	});
 	let evasion: number = $state(BASE_STATS.evasion);
 	let damage_thresholds: DamageThresholds = $state({ ...BASE_STATS.damage_thresholds });
 	let primary_class_mastery_level: number = $state(BASE_STATS.primary_class_mastery_level);
@@ -251,6 +259,36 @@ function createCharacter(id: string) {
 	// ================================================
 	// CHARACTER VALIDATION EFFECTS
 	// ================================================
+
+	// ! clear consumables above max
+	$effect(() => {
+		if (!character) return;
+
+		const currentCount = consumable_count;
+		const max = max_consumables;
+
+		if (currentCount <= max) return;
+
+		const excess = currentCount - max;
+		let removed = 0;
+
+		// Iterate through consumables and remove excess quantities
+		for (const [id, item] of Object.entries(character.inventory.consumables)) {
+			if (removed >= excess) break;
+
+			const toRemove = Math.min(item.quantity, excess - removed);
+			item.quantity -= toRemove;
+			removed += toRemove;
+
+			if (item.quantity <= 0) {
+				delete character.inventory.consumables[id];
+			}
+		}
+
+		if (removed > 0) {
+			console.warn(`Removed ${removed} consumables to stay within max of ${max}`);
+		}
+	})
 
 	// ! clear invalid ancestry card choices
 	$effect(() => {
@@ -1657,15 +1695,15 @@ function createCharacter(id: string) {
 	$effect(() => {
 		if (!character) return;
 		const base_traits = { ...character.selected_traits };
-		if (
-			base_traits.agility === null ||
-			base_traits.strength === null ||
-			base_traits.finesse === null ||
-			base_traits.instinct === null ||
-			base_traits.presence === null ||
-			base_traits.knowledge === null
-		)
-			return;
+		// if (
+		// 	base_traits.agility === null ||
+		// 	base_traits.strength === null ||
+		// 	base_traits.finesse === null ||
+		// 	base_traits.instinct === null ||
+		// 	base_traits.presence === null ||
+		// 	base_traits.knowledge === null
+		// )
+		// 	return;
 
 		// apply base effects targeting traits (set base values)
 		for (const modifier of base_character_modifiers) {
@@ -1690,32 +1728,32 @@ function createCharacter(id: string) {
 		// start from base + marked trait bonuses
 		let new_traits = {
 			agility:
-				base_traits.agility +
+				base_traits.agility || 0 +
 				(tier_2_marked_traits.agility ? 1 : 0) +
 				(tier_3_marked_traits.agility ? 1 : 0) +
 				(tier_4_marked_traits.agility ? 1 : 0),
 			strength:
-				base_traits.strength +
+				base_traits.strength || 0 +
 				(tier_2_marked_traits.strength ? 1 : 0) +
 				(tier_3_marked_traits.strength ? 1 : 0) +
 				(tier_4_marked_traits.strength ? 1 : 0),
 			finesse:
-				base_traits.finesse +
+				base_traits.finesse || 0 +
 				(tier_2_marked_traits.finesse ? 1 : 0) +
 				(tier_3_marked_traits.finesse ? 1 : 0) +
 				(tier_4_marked_traits.finesse ? 1 : 0),
 			instinct:
-				base_traits.instinct +
+				base_traits.instinct || 0 +
 				(tier_2_marked_traits.instinct ? 1 : 0) +
 				(tier_3_marked_traits.instinct ? 1 : 0) +
 				(tier_4_marked_traits.instinct ? 1 : 0),
 			presence:
-				base_traits.presence +
+				base_traits.presence || 0 +
 				(tier_2_marked_traits.presence ? 1 : 0) +
 				(tier_3_marked_traits.presence ? 1 : 0) +
 				(tier_4_marked_traits.presence ? 1 : 0),
 			knowledge:
-				base_traits.knowledge +
+				base_traits.knowledge || 0 +
 				(tier_2_marked_traits.knowledge ? 1 : 0) +
 				(tier_3_marked_traits.knowledge ? 1 : 0) +
 				(tier_4_marked_traits.knowledge ? 1 : 0)
@@ -2495,6 +2533,7 @@ function createCharacter(id: string) {
 				character.inventory.armor[item.id].quantity++;
 			}
 		} else if (type === 'consumable') {
+
 			if (!(item.id in character.inventory.consumables)) {
 				character.inventory.consumables[item.id] = { quantity: 1, choices: {} };
 			} else {
@@ -2803,6 +2842,12 @@ function createCharacter(id: string) {
 		},
 		get max_long_rest_actions() {
 			return max_long_rest_actions;
+		},
+		get max_consumables() {
+			return max_consumables;
+		},
+		get consumable_count() {
+			return consumable_count;
 		},
 		get evasion() {
 			return evasion;

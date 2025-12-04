@@ -4,9 +4,6 @@
 	import { cn } from '$lib/utils';
 	import Menu from '@lucide/svelte/icons/menu';
 	import * as Sheet from '$lib/components/ui/sheet';
-	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
-
-	const isMobile = new IsMobile();
 
 	let open = $state(false);
 </script>
@@ -26,9 +23,8 @@
 			Daggerbrain
 		</a>
 
-		{#if isMobile.current}
-			<Sheet.Root bind:open>
-				<Sheet.Trigger class={cn('ml-auto', buttonVariants({ variant: 'link', size: 'icon' }))}>
+			<Sheet.Root bind:open >
+				<Sheet.Trigger class={cn('sm:hidden ml-auto', buttonVariants({ variant: 'link', size: 'icon' }))}>
 					<Menu />
 				</Sheet.Trigger>
 				<Sheet.Content>
@@ -46,8 +42,8 @@
 					</SignedIn>
 				</Sheet.Content>
 			</Sheet.Root>
-		{:else}
-			<div class="ml-auto flex items-center gap-3">
+
+			<div class="hidden sm:flex ml-auto items-center gap-3">
 				<SignedOut>
 					<Button variant="link" onclick={() => (open = false)} href="/">Home</Button>
 					<SignInButton class={buttonVariants()}>Sign In</SignInButton>
@@ -59,6 +55,5 @@
 					<SignOutButton class={buttonVariants()}>Sign Out</SignOutButton>
 				</SignedIn>
 			</div>
-		{/if}
 	</nav>
 </header>

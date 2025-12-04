@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { cn, capitalize } from '$lib/utils';
+	import { cn, capitalize, applyProficiencyToDice } from '$lib/utils';
 	import * as Select from '$lib/components/ui/select/';
 	import type { Weapon, Traits, DamageTypes } from '$lib/types/compendium-types';
 	import { getCharacterContext } from '$lib/state/character.svelte';
@@ -23,6 +23,7 @@
 	const context = getCharacterContext();
 	let character = $derived(context.character);
 	let traits = $derived(context.traits);
+	let proficiency = $derived(context.proficiency);
 
 	// Determine weapon type for equip/unequip functions
 	let weaponType = $derived.by(() => {
@@ -89,10 +90,11 @@
 	// Format to hit for display
 	let formattedToHit = $derived(toHit >= 0 ? `+${toHit}` : `${toHit}`);
 
-	// Format damage for Damage column
-	let formattedDamage = $derived(
-		`${weapon.damage_dice}${currentDamageType ? ' ' + currentDamageType : ''}`
-	);
+	// Format damage for Damage column (with proficiency applied)
+	let formattedDamage = $derived.by(() => {
+		const diceWithProficiency = applyProficiencyToDice(weapon.damage_dice, proficiency);
+		return `${diceWithProficiency}${currentDamageType ? ' ' + currentDamageType : ''}`;
+	});
 </script>
 
 <tr

@@ -11,7 +11,6 @@
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { goto } from '$app/navigation';
 	import { upload_user_image } from '$lib/remote/images.remote';
-	import { get_all_ancestry_cards } from '$lib/remote/heritages.remote.js';
 
 	let { data, children } = $props();
 

@@ -146,7 +146,7 @@
 			<Input bind:value={searchQuery} placeholder="Search items..." class="pl-9" />
 		</div>
 
-		<div class="flex grow flex-wrap gap-x-0.5 gap-y-2">
+		<div class="flex grow flex-wrap gap-x-0.5 gap-y-2 justify-center">
 			<!-- Type Filter Buttons -->
 			<div class="flex flex-wrap justify-center gap-1">
 				<Button
@@ -279,6 +279,7 @@
 					{#snippet subtitle_snippet()}
 						<Button
 							size="sm"
+							disabled={context.consumable_count >= context.max_consumables}
 							onclick={(e) => {
 								e.stopPropagation();
 								context.addToInventory(entry.item, 'consumable');

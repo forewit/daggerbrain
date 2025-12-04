@@ -37,6 +37,23 @@
 	function isOptionIndexDisabled(currentTrait: string, idx: number): boolean {
 		return Object.entries(trait_option_indices).some(([t, i]) => t !== currentTrait && i === idx);
 	}
+
+	let hasSelectedTraits = $derived.by(() => {
+		if (!character) return false;
+		return Object.values(character.selected_traits).some((val) => val !== null);
+	});
+
+	function clearAllTraits() {
+		if (!character) return;
+		const cleared: Partial<Traits> = {};
+		for (const trait of Object.keys(character.selected_traits)) {
+			cleared[trait as keyof Traits] = null;
+		}
+		character.selected_traits = { ...character.selected_traits, ...cleared };
+	}
+
+	$inspect(character?.selected_traits)
+	$inspect(context.traits)
 </script>
 
 {#if character}
@@ -47,45 +64,50 @@
 		)}
 	>
 		<div class="m-4 flex flex-col gap-2">
-			{#if context.primary_class}
-				<Dialog.Root>
-					<Dialog.Trigger class={cn(buttonVariants({ variant: 'link' }), 'ml-auto')}>
-						Suggested traits?
-					</Dialog.Trigger>
-					<Dialog.Content>
-						<Dialog.Header
-							><Dialog.Title
-								>Suggested Traits: {character.derived_descriptors.primary_class_name}</Dialog.Title
-							></Dialog.Header
-						>
-						<Dialog.Description>
-							<div class="flex flex-wrap gap-1">
-								{#each Object.entries(context.primary_class.suggested_traits) as [trait, modifier], i}
-									<p class="text-nowrap">
-										{modifier && modifier > 0 ? '+' + modifier : modifier}
-										{capitalize(trait)}{i <
-										Object.entries(context.primary_class.suggested_traits).length - 1
-											? ','
-											: ''}
-									</p>
-								{/each}
-							</div>
-						</Dialog.Description>
-						<Dialog.Footer>
-							<Dialog.Close class={buttonVariants({ variant: 'link' })}>Cancel</Dialog.Close>
-							<Dialog.Close
-								class={buttonVariants()}
-								onclick={() => {
-									if (!context.primary_class) return;
-									character.selected_traits = { ...context.primary_class.suggested_traits };
-								}}
+			<div class="flex justify-end gap-2">
+				{#if context.primary_class}
+					<Dialog.Root>
+						<Dialog.Trigger class={cn(buttonVariants({ variant: 'link' }))}>
+							Suggested traits?
+						</Dialog.Trigger>
+						<Dialog.Content>
+							<Dialog.Header
+								><Dialog.Title
+									>Suggested Traits: {character.derived_descriptors.primary_class_name}</Dialog.Title
+								></Dialog.Header
 							>
-								Use Suggested Traits
-							</Dialog.Close>
-						</Dialog.Footer>
-					</Dialog.Content>
-				</Dialog.Root>
-			{/if}
+							<Dialog.Description>
+								<div class="flex flex-wrap gap-1">
+									{#each Object.entries(context.primary_class.suggested_traits) as [trait, modifier], i}
+										<p class="text-nowrap">
+											{modifier && modifier > 0 ? '+' + modifier : modifier}
+											{capitalize(trait)}{i <
+											Object.entries(context.primary_class.suggested_traits).length - 1
+												? ','
+												: ''}
+										</p>
+									{/each}
+								</div>
+							</Dialog.Description>
+							<Dialog.Footer>
+								<Dialog.Close class={buttonVariants({ variant: 'link' })}>Cancel</Dialog.Close>
+								<Dialog.Close
+									class={buttonVariants()}
+									onclick={() => {
+										if (!context.primary_class) return;
+										character.selected_traits = { ...context.primary_class.suggested_traits };
+									}}
+								>
+									Use Suggested Traits
+								</Dialog.Close>
+							</Dialog.Footer>
+						</Dialog.Content>
+					</Dialog.Root>
+				{/if}
+					<Button disabled={!hasSelectedTraits} variant="link" class="text-destructive" onclick={clearAllTraits}>
+						Clear All
+					</Button>
+			</div>
 
 			<!-- traits -->
 			<div class="grid grid-cols-1 justify-items-center gap-3 @xs:grid-cols-2 @lg:grid-cols-3">
@@ -99,7 +121,7 @@
 						<p class="text-sm font-bold">{capitalize(trait)}</p>
 						<Select.Root
 							type="single"
-							value={(trait_option_indices[trait] ?? '').toString()}
+							value={(trait_option_indices[trait] || '').toString()}
 							onValueChange={(value) => {
 								if (value === '') {
 									trait_option_indices[trait] = null;
