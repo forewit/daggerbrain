@@ -10,6 +10,7 @@
 	import AncestryCard from '$lib/components/app/cards/full-cards/ancestry-card.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
+	import { BASE_MIXED_ANCESTRY_CARD } from '$lib/types/rules.js';
 
 	let { data } = $props();
 
@@ -19,6 +20,8 @@
 	let ancestryDialogOpen = $state(false);
 	let communityDialogOpen = $state(false);
 	let transformationDialogOpen = $state(false);
+
+	
 </script>
 
 {#if character}
@@ -145,6 +148,17 @@
 						</AncestryCard>
 					</div>
 				{/each}
+				<div>
+					<AncestryCard card={BASE_MIXED_ANCESTRY_CARD}>
+						<Button
+							onclick={() => {
+								character.ancestry_card_id = BASE_MIXED_ANCESTRY_CARD.id;
+								ancestryDialogOpen = false;
+							}}
+							class="mt-auto w-min">Select Mixed Ancestry</Button
+						>
+					</AncestryCard>
+				</div>
 			</div>
 			<Dialog.Footer>
 				<Dialog.Close class={buttonVariants({ variant: 'link' })}>Cancel</Dialog.Close>

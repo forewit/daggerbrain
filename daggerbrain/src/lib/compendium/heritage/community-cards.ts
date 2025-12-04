@@ -15,7 +15,7 @@ export const COMMUNITY_CARDS = {
 			{
 				title: 'Brave Face',
 				description_html:
-					'<p>Once per session, when an attack would cause you to <b>mark a stress</b>, you can <b>spend a hope</b> instead.</p>',
+					'<span>Once per session, when an attack would cause you to <b>mark a stress</b>, you can <b>spend a hope</b> instead.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -35,7 +35,7 @@ export const COMMUNITY_CARDS = {
 			{
 				title: 'Privilege',
 				description_html:
-					'<p>You have advantage on rolls to consort with nobles, negotiate prices, or leverage your reputation to get what you want.</p>',
+					'<span>You have advantage on rolls to consort with nobles, negotiate prices, or leverage your reputation to get what you want.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -55,7 +55,7 @@ export const COMMUNITY_CARDS = {
 			{
 				title: 'Ancient Knowledge',
 				description_html:
-					'<p>You have advantage on rolls related to history, ancient lore, or identifying magical or historical artifacts.</p>',
+					'<span>You have advantage on rolls related to history, ancient lore, or identifying magical or historical artifacts.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -75,7 +75,7 @@ export const COMMUNITY_CARDS = {
 			{
 				title: 'Dedicated',
 				description_html:
-					'<p>Record three sayings or values your upbringing instilled in you. Once per rest, when you describe how you\'re embodying one of these principles through your current action, you can roll a <b>d20</b> as your Hope Die.</p>',
+					'<span>Record three sayings or values your upbringing instilled in you. Once per rest, when you describe how you\'re embodying one of these principles through your current action, you can roll a <b>d20</b> as your Hope Die.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -95,7 +95,7 @@ export const COMMUNITY_CARDS = {
 			{
 				title: 'Steady',
 				description_html:
-					'<p>You have advantage on rolls to traverse dangerous cliffs and ledges, navigate harsh environments, and use your survival knowledge.</p>',
+					'<span>You have advantage on rolls to traverse dangerous cliffs and ledges, navigate harsh environments, and use your survival knowledge.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -115,7 +115,7 @@ export const COMMUNITY_CARDS = {
 			{
 				title: 'Know the Tide',
 				description_html:
-					'<p>You can sense the ebb and flow of life. When you roll with Fear, place a token on this card. You can hold a number of tokens equal to your level. Before you make an action roll, you can spend any number of these tokens to gain a +1 bonus to the roll for each token spent. At the end of each session, clear all unspent tokens.</p>',
+					'<span>You can sense the ebb and flow of life. When you roll with Fear, place a token on this card. You can hold a number of tokens equal to your level. Before you make an action roll, you can spend any number of these tokens to gain a +1 bonus to the roll for each token spent. At the end of each session, clear all unspent tokens.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -135,7 +135,7 @@ export const COMMUNITY_CARDS = {
 			{
 				title: 'Scoundrel',
 				description_html:
-					'<p>You have advantage on rolls to negotiate with criminals, detect lies, or find a safe place to hide.</p>',
+					'<span>You have advantage on rolls to negotiate with criminals, detect lies, or find a safe place to hide.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -155,7 +155,7 @@ export const COMMUNITY_CARDS = {
 			{
 				title: 'Low-Light Living',
 				description_html:
-					'<p>When you\'re in an area with low light or heavy shadow, you have advantage on rolls to hide, investigate, or perceive details within that area.</p>',
+					'<span>When you\'re in an area with low light or heavy shadow, you have advantage on rolls to hide, investigate, or perceive details within that area.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -175,7 +175,7 @@ export const COMMUNITY_CARDS = {
 			{
 				title: 'Nomadic Pack',
 				description_html:
-					'<p>Add a Nomadic Pack to your inventory. Once per session, you can <b>spend a Hope</b> to reach into this pack and pull out a mundane item that\'s useful to your situation. Work with the GM to figure out what item you take out.</p>',
+					'<span>Add a Nomadic Pack to your inventory. Once per session, you can <b>spend a Hope</b> to reach into this pack and pull out a mundane item that\'s useful to your situation. Work with the GM to figure out what item you take out.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -195,7 +195,7 @@ export const COMMUNITY_CARDS = {
 			{
 				title: 'Lightfoot',
 				description_html:
-					'<p>Your movement is naturally silent. You have advantage on rolls to move without being heard.</p>',
+					'<span>Your movement is naturally silent. You have advantage on rolls to move without being heard.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}

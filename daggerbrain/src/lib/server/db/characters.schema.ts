@@ -40,6 +40,8 @@ export const characters_table = sqliteTable('characters_table', {
 
 	// heritage
 	ancestry_card_id: text('ancestry_card_id'),
+	custom_top_ancestry: text('custom_top_ancestry'),
+	custom_bottom_ancestry: text('custom_bottom_ancestry'),
 	community_card_id: text('community_card_id'),
 	experiences: text('experiences', { mode: 'json' })
 		.notNull()

@@ -16,14 +16,14 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Scales',
 				description_html:
-					'<p>Your scales act as natural protection. When you would take Severe damage, you can <b>mark a Stress</b> to mark 1 fewer Hit Points.</p>',
+					'<span>Your scales act as natural protection. When you would take Severe damage, you can <b>mark a Stress</b> to mark 1 fewer Hit Points.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Elemental Breath',
 				description_html:
-					'<p>Choose an element for your breath (such as electricity, fire, or ice). You can use this breath against a target or group of targets within Very Close range, treating it as an Instinct weapon that deals <b>d8</b> magic damage using your Proficiency.</p>',
+					'<span>Choose an element for your breath (such as electricity, fire, or ice). You can use this breath against a target or group of targets within Very Close range, treating it as an Instinct weapon that deals <b>d8</b> magic damage using your Proficiency.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -41,6 +41,7 @@ export const ANCESTRY_CARDS = {
 		choices: [
 			{
 				choice_id: 'choose_experience',
+				feature_index: 0,
 				type: 'experience',
 				max: 1,
 				conditional_choice: null
@@ -50,7 +51,7 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Purposeful Design',
 				description_html:
-					'<p>Decide who made you and for what purpose. At character creation, choose one of your Experiences that best aligns with this purpose and gain a permanent +1 bonus to it.</p>',
+					'<span>Decide who made you and for what purpose. At character creation, choose one of your Experiences that best aligns with this purpose and gain a permanent +1 bonus to it.</span>',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -66,7 +67,7 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Efficient',
 				description_html:
-					'<p>When you take a short rest, you can choose a long rest move instead of a short rest move.</p>',
+					'<span>When you take a short rest, you can choose a long rest move instead of a short rest move.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -86,13 +87,13 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Thick Skin',
 				description_html:
-					'<p>When you take Minor damage, you can <b>mark 2 Stress</b> instead of marking a Hit Point.</p>',
+					'<span>When you take Minor damage, you can <b>mark 2 Stress</b> instead of marking a Hit Point.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Increased Fortitude',
-				description_html: '<p><b>Spend 3 Hope</b> to halve incoming physical damage.</p>',
+				description_html: '<span><b>Spend 3 Hope</b> to halve incoming physical damage.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -112,14 +113,14 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Quick Reactions',
 				description_html:
-					'<p><b>Mark a Stress</b> to gain advantage on a reaction roll.</p>',
+					'<span><b>Mark a Stress</b> to gain advantage on a reaction roll.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Celestial Trance',
 				description_html:
-					'<p>During a rest, you can drop into a trance to choose an additional downtime move.</p>',
+					'<span>During a rest, you can drop into a trance to choose an additional downtime move.</span>',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -153,14 +154,14 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Luckbender',
 				description_html:
-					'<p>Once per session, after you or a willing ally within Close range makes an action roll, you can <b>spend 3 Hope</b> to reroll the Duality Dice.</p>',
+					'<span>Once per session, after you or a willing ally within Close range makes an action roll, you can <b>spend 3 Hope</b> to reroll the Duality Dice.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Wings',
 				description_html:
-					'<p>You can fly. While flying, you can <b>mark a Stress</b> after an adversary makes an attack against you to gain a +2 bonus to your Evasion against that attack.</p>',
+					'<span>You can fly. While flying, you can <b>mark a Stress</b> after an adversary makes an attack against you to gain a +2 bonus to your Evasion against that attack.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -180,14 +181,14 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Caprine Leap',
 				description_html:
-					'<p>You can leap anywhere within Close range as though you were using normal movement, allowing you to vault obstacles, jump across gaps, or scale barriers with ease.</p>',
+					'<span>You can leap anywhere within Close range as though you were using normal movement, allowing you to vault obstacles, jump across gaps, or scale barriers with ease.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Kick',
 				description_html:
-					'<p>When you succeed on an attack against a target within Melee range, you can <b>mark a Stress</b> to kick yourself off them, dealing an extra <b>2d6</b> damage and knocking back either yourself or the target to Very Close range.</p>',
+					'<span>When you succeed on an attack against a target within Melee range, you can <b>mark a Stress</b> to kick yourself off them, dealing an extra <b>2d6</b> damage and knocking back either yourself or the target to Very Close range.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -207,14 +208,14 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Charge',
 				description_html:
-					'<p>When you succeed on an Agility Roll to move from Far or Very Far range into Melee range with one or more targets, you can <b>mark a Stress</b> to deal <b>1d12</b> physical damage to all targets within Melee range.</p>',
+					'<span>When you succeed on an Agility Roll to move from Far or Very Far range into Melee range with one or more targets, you can <b>mark a Stress</b> to deal <b>1d12</b> physical damage to all targets within Melee range.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Unshakable',
 				description_html:
-					'<p>When you would mark a Stress, roll a <b>d6</b>. On a result of 6, don\'t mark it.</p>',
+					'<span>When you would mark a Stress, roll a <b>d6</b>. On a result of 6, don\'t mark it.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -233,14 +234,14 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Fungril Network',
 				description_html:
-					'<p>Make an <b>Instinct Roll (12)</b> to use your mycelial array to speak with others of your ancestry. On a success, you can communicate across any distance.</p>',
+					'<span>Make an <b>Instinct Roll (12)</b> to use your mycelial array to speak with others of your ancestry. On a success, you can communicate across any distance.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Death Connection',
 				description_html:
-					'<p>While touching a corpse that died recently, you can <b>mark a Stress</b> to extract one memory from the corpse related to a specific emotion or sensation of your choice.</p>',
+					'<span>While touching a corpse that died recently, you can <b>mark a Stress</b> to extract one memory from the corpse related to a specific emotion or sensation of your choice.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -260,7 +261,7 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Shell',
 				description_html:
-					'<p>Gain a bonus to your damage thresholds equal to your Proficiency.</p>',
+					'<span>Gain a bonus to your damage thresholds equal to your Proficiency.</span>',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -282,7 +283,7 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Retract',
 				description_html:
-					'<p><b>Mark a Stress</b> to retract into your shell. While in your shell, you have resistance to physical damage, you have disadvantage on action rolls, and you can\'t move.</p>',
+					'<span><b>Mark a Stress</b> to retract into your shell. While in your shell, you have resistance to physical damage, you have disadvantage on action rolls, and you can\'t move.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -301,7 +302,7 @@ export const ANCESTRY_CARDS = {
 		features: [
 			{
 				title: 'Endurance',
-				description_html: '<p>Gain an additional Hit Point slot at character creation.</p>',
+				description_html: '<span>Gain an additional Hit Point slot at character creation.</span>',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -316,7 +317,7 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Reach',
 				description_html:
-					'<p>Treat any weapon, ability, spell, or other feature that has a Melee range as though it has a Very Close range instead.</p>',
+					'<span>Treat any weapon, ability, spell, or other feature that has a Melee range as though it has a Very Close range instead.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -335,14 +336,14 @@ export const ANCESTRY_CARDS = {
 		features: [
 			{
 				title: 'Surefooted',
-				description_html: '<p>You ignore disadvantage on Agility Rolls.</p>',
+				description_html: '<span>You ignore disadvantage on Agility Rolls.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Danger Sense',
 				description_html:
-					'<p>Once per rest, <b>mark a Stress</b> to force an adversary to reroll an attack against you or an ally within Very Close range.</p>',
+					'<span>Once per rest, <b>mark a Stress</b> to force an adversary to reroll an attack against you or an ally within Very Close range.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -352,7 +353,7 @@ export const ANCESTRY_CARDS = {
 		id: 'halfling',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/halfling.webp',
+		image_url: '/api/images/card/art/ancestries/halflings.webp',
 		title: 'Halfling',
 		description_html:
 			'<p>Halflings are small humanoids with large hairy feet and prominent rounded ears.</p>',
@@ -362,14 +363,14 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Luckbringer',
 				description_html:
-					'<p>At the start of each session, everyone in your party gains a Hope.</p>',
+					'<span>At the start of each session, everyone in your party gains a Hope.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Internal Compass',
 				description_html:
-					'<p>When you roll a 1 on your Hope Die, you can reroll it.</p>',
+					'<span>When you roll a 1 on your Hope Die, you can reroll it.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -388,7 +389,7 @@ export const ANCESTRY_CARDS = {
 		features: [
 			{
 				title: 'High Stamina',
-				description_html: '<p>Gain an additional Stress slot at character creation.</p>',
+				description_html: '<span>Gain an additional Stress slot at character creation.</span>',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -403,7 +404,7 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Adaptability',
 				description_html:
-					'<p>When you fail a roll that utilized one of your Experiences, you can <b>mark a Stress</b> to reroll.</p>',
+					'<span>When you fail a roll that utilized one of your Experiences, you can <b>mark a Stress</b> to reroll.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -423,14 +424,14 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Fearless',
 				description_html:
-					'<p>When you roll with Fear, you can <b>mark 2 Stress</b> to change it into a roll with Hope instead.</p>',
+					'<span>When you roll with Fear, you can <b>mark 2 Stress</b> to change it into a roll with Hope instead.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Dread Visage',
 				description_html:
-					'<p>You have advantage on rolls to intimidate hostile creatures.</p>',
+					'<span>You have advantage on rolls to intimidate hostile creatures.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -450,14 +451,14 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Feline Instincts',
 				description_html:
-					'<p>When you make an Agility Roll, you can <b>spend 2 Hope</b> to reroll your Hope Die.</p>',
+					'<span>When you make an Agility Roll, you can <b>spend 2 Hope</b> to reroll your Hope Die.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Retracting Claws',
 				description_html:
-					'<p>Make an <b>Agility Roll</b> to scratch a target within Melee range. On a success, they become temporarily Vulnerable.</p>',
+					'<span>Make an <b>Agility Roll</b> to scratch a target within Melee range. On a success, they become temporarily Vulnerable.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -467,7 +468,7 @@ export const ANCESTRY_CARDS = {
 		id: 'orc',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/orc.webp',
+		image_url: '/api/images/card/art/ancestries/orcs.webp',
 		title: 'Orc',
 		description_html:
 			'<p>Orcs are humanoids most easily recognized by their square features and boar-like tusks that protrude from their lower jaw.</p>',
@@ -477,14 +478,14 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Sturdy',
 				description_html:
-					'<p>When you have 1 Hit Point remaining, attacks against you have disadvantage.</p>',
+					'<span>When you have 1 Hit Point remaining, attacks against you have disadvantage.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Tusks',
 				description_html:
-					'<p>When you succeed on an attack against a target within Melee range, you can <b>spend a Hope</b> to gore the target with your tusks, dealing an extra <b>1d6</b> damage.</p>',
+					'<span>When you succeed on an attack against a target within Melee range, you can <b>spend a Hope</b> to gore the target with your tusks, dealing an extra <b>1d6</b> damage.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -504,14 +505,14 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Amphibious',
 				description_html:
-					'<p>You can breathe and move naturally underwater.</p>',
+					'<span>You can breathe and move naturally underwater.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Long Tongue',
 				description_html:
-					'<p>You can use your long tongue to grab onto things within Close range. <b>Mark a Stress</b> to use your tongue as a Finesse Close weapon that deals <b>d12</b> physical damage using your Proficiency.</p>',
+					'<span>You can use your long tongue to grab onto things within Close range. <b>Mark a Stress</b> to use your tongue as a Finesse Close weapon that deals <b>d12</b> physical damage using your Proficiency.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -531,14 +532,14 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Natural Climber',
 				description_html:
-					'<p>You have advantage on Agility Rolls that involve balancing and climbing.</p>',
+					'<span>You have advantage on Agility Rolls that involve balancing and climbing.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Nimble',
 				description_html:
-					'<p>Gain a permanent +1 bonus to your Evasion at character creation.</p>',
+					'<span>Gain a permanent +1 bonus to your Evasion at character creation.</span>',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',

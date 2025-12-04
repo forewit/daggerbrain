@@ -22,6 +22,20 @@
       "when": 1764865588953,
       "tag": "0002_quick_zemo",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1764879607854,
+      "tag": "0003_safe_pixie",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1764879893841,
+      "tag": "0004_bored_tombstone",
+      "breakpoints": true
     }
   ]
 }

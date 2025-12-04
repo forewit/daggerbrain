@@ -3,7 +3,10 @@
 	import { cn } from '$lib/utils';
 	import type { Snippet } from 'svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
+	import { getCompendiumContext } from '$lib/state/compendium.svelte';
+	import { BASE_MIXED_ANCESTRY_CARD } from '$lib/types/rules';
 	import ChoiceSelector from '$lib/components/app/leveling/secondary-options/choice-selector.svelte';
+	import * as Select from '$lib/components/ui/select/';
 
 	let {
 		bind_choice_select = false,
@@ -23,8 +26,19 @@
 
 	const context = getCharacterContext();
 	let character = $derived(context.character);
+	const compendium = getCompendiumContext();
 
 	let width = $state(300);
+
+	let isMixedAncestry = $derived(card.id === BASE_MIXED_ANCESTRY_CARD.id);
+	let ancestryOptions = $derived(
+		Object.entries(compendium.ancestry_cards)
+			.filter(([id]) => id !== BASE_MIXED_ANCESTRY_CARD.id)
+			.map(([id, card]) => ({
+				value: id,
+				label: card.title
+			}))
+	);
 </script>
 
 {#snippet choice_select(choice: AncestryCardChoice)}
@@ -66,6 +80,89 @@
 	{/if}
 {/snippet}
 
+{#snippet mixed_ancestry_selectors(textSizeClass: string, gapClass: string)}
+	{#if character && isMixedAncestry && bind_choice_select}
+		<div class={cn('flex flex-col', gapClass)}>
+			<Select.Root
+			
+				type="single"
+				value={character.custom_top_ancestry || ''}
+				onValueChange={(value: string) => {
+					character.custom_top_ancestry = value || null;
+				}}
+			>
+				<Select.Trigger
+				highlighted={character.custom_top_ancestry !== null}
+					class={cn(
+						'w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*="text-"])]:text-muted',
+						textSizeClass
+					)}
+				>
+					<p class="truncate">
+						{character.custom_top_ancestry
+							? ancestryOptions.find((o) => o.value === character.custom_top_ancestry)?.label ||
+								'Unknown'
+							: 'Select top ancestry feature'}
+					</p>
+				</Select.Trigger>
+				<Select.Content class="rounded-md" align="start">
+					<div style="max-width: {width}px;" class="p-2">
+						<Select.Item
+							value=""
+							class="justify-center font-bold text-destructive hover:cursor-pointer"
+						>
+							-- Clear selection --
+						</Select.Item>
+						{#each ancestryOptions as option}
+							<Select.Item value={option.value} class="hover:cursor-pointer">
+								{option.label}
+							</Select.Item>
+						{/each}
+					</div>
+				</Select.Content>
+			</Select.Root>
+
+			<Select.Root
+				type="single"
+				value={character.custom_bottom_ancestry || ''}
+				onValueChange={(value: string) => {
+					character.custom_bottom_ancestry = value || null;
+				}}
+			>
+				<Select.Trigger
+				highlighted={character.custom_bottom_ancestry !== null}
+					class={cn(
+						'w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*="text-"])]:text-muted',
+						textSizeClass
+					)}
+				>
+					<p class="truncate">
+						{character.custom_bottom_ancestry
+							? ancestryOptions.find((o) => o.value === character.custom_bottom_ancestry)?.label ||
+								'Unknown'
+							: 'Select bottom ancestry feature'}
+					</p>
+				</Select.Trigger>
+				<Select.Content class="rounded-md" align="start">
+					<div style="max-width: {width}px;" class="p-2">
+						<Select.Item
+							value=""
+							class="justify-center font-bold text-destructive hover:cursor-pointer"
+						>
+							-- Clear selection --
+						</Select.Item>
+						{#each ancestryOptions as option}
+							<Select.Item value={option.value} class="hover:cursor-pointer">
+								{option.label}
+							</Select.Item>
+						{/each}
+					</div>
+				</Select.Content>
+			</Select.Root>
+		</div>
+	{/if}
+{/snippet}
+
 {#if variant === 'responsive'}
 	<div
 		class={cn(
@@ -95,6 +192,9 @@
 			<p class="text-xs italic">
 				{@html card.description_html}
 			</p>
+
+			<!-- mixed ancestry selectors -->
+			{@render mixed_ancestry_selectors('text-xs', 'gap-2')}
 
 			<!-- features -->
 			{#each card.features as feature}
@@ -141,10 +241,14 @@
 
 			<!-- content -->
 			<div class="flex shrink-0 flex-col gap-[6px] px-[12px] pt-[14px] pb-[6px]">
-				<p class="z-5 font-eveleth text-[26px] leading-none text-black uppercase">{card.title}</p>
+				<p class="max-w-[70%] z-5 font-eveleth text-[26px] leading-none text-black uppercase">{card.title}</p>
 				<p class="text-[12px] text-black italic">
 					{@html card.description_html}
 				</p>
+
+				<!-- mixed ancestry selectors -->
+				{@render mixed_ancestry_selectors('text-[12px]', 'gap-[6px]')}
+
 				{#each card.features as feature}
 					<p class="text-[12px] text-black">
 						<b><em>{feature.title}:</em></b>

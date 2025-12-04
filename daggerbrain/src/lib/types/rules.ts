@@ -9,7 +9,7 @@ import type {
 	Tier4OptionIds,
 	Trait
 } from '$lib/types/rule-types';
-import type { Armor, TraitIds, Weapon } from '$lib/types/compendium-types';
+import type { AncestryCard, Armor, TraitIds, Weapon } from '$lib/types/compendium-types';
 
 export const CONDITIONS: Record<ConditionIds, Condition> = {
 	hidden: {
@@ -72,6 +72,18 @@ export const TRAITS: Record<TraitIds, Trait> = {
 		examples: ['Recall', 'Analyze', 'Comprehend']
 	}
 } as const;
+
+export const BASE_MIXED_ANCESTRY_CARD: AncestryCard = {
+	id: 'mixed-ancestry',
+	source_id: 'SRD',
+	card_type: 'ancestry',
+	image_url: '/images/wip.avif',
+	title: 'Mixed Ancestry',
+	artist_name: '',
+	description_html: '<p> Anyone\'s appearance and abilities can be shaped by blood, magic, proximity, or a variety of other factors. </p>',
+	features: [],
+	choices: []
+};
 
 export const BASE_UNARMED_ATTACK: Weapon = {
 	id: 'unarmed_attack',

@@ -1,5 +1,5 @@
 import { getUserContext } from './user.svelte';
-import { ALL_LEVEL_UP_OPTIONS, BASE_STATS, CONDITIONS, TRAIT_OPTIONS } from '../types/rules';
+import { ALL_LEVEL_UP_OPTIONS, BASE_MIXED_ANCESTRY_CARD, BASE_STATS, CONDITIONS, TRAIT_OPTIONS } from '../types/rules';
 import { getContext, setContext } from 'svelte';
 import type { Character, DomainCardId } from '$lib/types/character-types';
 import type { AllTierOptionIds, ConditionIds, LevelUpChoice } from '$lib/types/rule-types';
@@ -11,7 +11,9 @@ import type {
 	CharacterModifier,
 	WeaponModifier,
 	DomainCard,
-	Armor
+	Armor,
+	CommunityCard,
+	AncestryCard
 } from '$lib/types/compendium-types';
 import { BLANK_LEVEL_UP_CHOICE } from '$lib/types/constants';
 import { update_character } from '$lib/remote/characters.remote';
@@ -31,10 +33,26 @@ function createCharacter(id: string) {
 	// ================================================
 
 	// Heritage
-	let ancestry_card = $derived(
-		character?.ancestry_card_id ? compendium.ancestry_cards[character.ancestry_card_id] : null
-	);
-	let community_card = $derived(
+	let ancestry_card: AncestryCard | null = $derived.by(()=>{
+		if (!character) return null;
+
+		if (character.ancestry_card_id === BASE_MIXED_ANCESTRY_CARD.id) {
+			const custom_top_ancestry = character.custom_top_ancestry ? compendium.ancestry_cards[character.custom_top_ancestry] : null;
+			const custom_bottom_ancestry = character.custom_bottom_ancestry ? compendium.ancestry_cards[character.custom_bottom_ancestry] : null;
+
+			return {
+				...BASE_MIXED_ANCESTRY_CARD,
+				features: [custom_top_ancestry?.features[0], custom_bottom_ancestry?.features[1]].filter((f) => !!f),
+				choices: [
+					...(custom_top_ancestry?.choices.filter((c) => c.feature_index === 0) || []),
+					...(custom_bottom_ancestry?.choices.filter((c) => c.feature_index === 1) || [])
+				].filter((c) => !!c)
+			}
+		} else {
+			return character?.ancestry_card_id ? compendium.ancestry_cards[character.ancestry_card_id] : null
+		}
+});
+	let community_card= $derived(
 		character?.community_card_id ? compendium.community_cards[character.community_card_id] : null
 	);
 	let transformation_card = $derived(
@@ -259,6 +277,15 @@ function createCharacter(id: string) {
 	// ================================================
 	// CHARACTER VALIDATION EFFECTS
 	// ================================================
+
+	// ! clear invalid mixed-ancestry
+	$effect(() => {
+		if (!character) return;
+		if (character.ancestry_card_id !== BASE_MIXED_ANCESTRY_CARD.id) {
+			character.custom_top_ancestry = null;
+			character.custom_bottom_ancestry = null;
+		}
+	})
 
 	// ! clear consumables above max
 	$effect(() => {
@@ -1695,15 +1722,6 @@ function createCharacter(id: string) {
 	$effect(() => {
 		if (!character) return;
 		const base_traits = { ...character.selected_traits };
-		// if (
-		// 	base_traits.agility === null ||
-		// 	base_traits.strength === null ||
-		// 	base_traits.finesse === null ||
-		// 	base_traits.instinct === null ||
-		// 	base_traits.presence === null ||
-		// 	base_traits.knowledge === null
-		// )
-		// 	return;
 
 		// apply base effects targeting traits (set base values)
 		for (const modifier of base_character_modifiers) {

@@ -352,6 +352,7 @@ export const DomainCardSchema = z.object({
 export const AncestryCardChoiceSchema = z
 	.object({
 		choice_id: z.string(),
+		feature_index: z.number(),
 		conditional_choice: z
 			.object({
 				choice_id: z.string(),

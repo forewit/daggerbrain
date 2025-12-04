@@ -11,49 +11,48 @@
 	const context = getCharacterContext();
 	let character = $derived(context.character);
 
-	let trait_option_indices = $derived.by(() => {
+	// Map each trait to its selected option index (or null)
+	let traitIndices = $derived.by(() => {
 		if (!character) return {};
 		const indices: Record<string, number | null> = {};
-		const used: Set<number> = new Set();
-		for (const trait of Object.keys(character.selected_traits)) {
-			const val = character.selected_traits[trait as keyof Traits];
-			if (val === null) {
+		const usedIndices = new Set<number>();
+
+		for (const [trait, value] of Object.entries(character.selected_traits)) {
+			if (value === null) {
 				indices[trait] = null;
 			} else {
-				let foundIdx = null;
-				for (let i = 0; i < TRAIT_OPTIONS.length; i++) {
-					if (TRAIT_OPTIONS[i] === val && !used.has(i)) {
-						foundIdx = i;
-						used.add(i);
-						break;
-					}
-				}
-				indices[trait] = foundIdx; // do not fallback: only assign an index if available
+				// Find first available index with this value
+				const index = TRAIT_OPTIONS.findIndex((opt, i) => opt === value && !usedIndices.has(i));
+				indices[trait] = index >= 0 ? index : null;
+				if (index >= 0) usedIndices.add(index);
 			}
 		}
 		return indices;
 	});
 
-	function isOptionIndexDisabled(currentTrait: string, idx: number): boolean {
-		return Object.entries(trait_option_indices).some(([t, i]) => t !== currentTrait && i === idx);
+	// Check if an option index is already used by another trait
+	function isOptionDisabled(currentTrait: string, optionIndex: number): boolean {
+		return Object.entries(traitIndices).some(
+			([trait, index]) => trait !== currentTrait && index === optionIndex
+		);
+	}
+
+	function clearAllTraits() {
+		if (!character) return;
+		character.selected_traits = {
+			agility: null,
+			strength: null,
+			finesse: null,
+			instinct: null,
+			presence: null,
+			knowledge: null
+		};
 	}
 
 	let hasSelectedTraits = $derived.by(() => {
 		if (!character) return false;
 		return Object.values(character.selected_traits).some((val) => val !== null);
 	});
-
-	function clearAllTraits() {
-		if (!character) return;
-		const cleared: Partial<Traits> = {};
-		for (const trait of Object.keys(character.selected_traits)) {
-			cleared[trait as keyof Traits] = null;
-		}
-		character.selected_traits = { ...character.selected_traits, ...cleared };
-	}
-
-	$inspect(character?.selected_traits)
-	$inspect(context.traits)
 </script>
 
 {#if character}
@@ -64,7 +63,10 @@
 		)}
 	>
 		<div class="m-4 flex flex-col gap-2">
-			<div class="flex justify-end gap-2">
+			<div class="flex justify-between gap-2">
+				<Button disabled={!hasSelectedTraits} variant="link" onclick={clearAllTraits}>
+					Reset?
+				</Button>
 				{#if context.primary_class}
 					<Dialog.Root>
 						<Dialog.Trigger class={cn(buttonVariants({ variant: 'link' }))}>
@@ -104,9 +106,7 @@
 						</Dialog.Content>
 					</Dialog.Root>
 				{/if}
-					<Button disabled={!hasSelectedTraits} variant="link" class="text-destructive" onclick={clearAllTraits}>
-						Clear All
-					</Button>
+
 			</div>
 
 			<!-- traits -->
@@ -121,14 +121,12 @@
 						<p class="text-sm font-bold">{capitalize(trait)}</p>
 						<Select.Root
 							type="single"
-							value={(trait_option_indices[trait] || '').toString()}
+							value={(traitIndices[trait] ?? '').toString()}
 							onValueChange={(value) => {
 								if (value === '') {
-									trait_option_indices[trait] = null;
 									character.selected_traits[trait as keyof Traits] = null;
 								} else {
 									const idx = parseInt(value);
-									trait_option_indices[trait] = idx;
 									character.selected_traits[trait as keyof Traits] = TRAIT_OPTIONS[idx];
 								}
 							}}
@@ -154,7 +152,7 @@
 									<Select.Item
 										class="hover:cursor-pointer"
 										value={j.toString()}
-										disabled={isOptionIndexDisabled(trait, j)}
+										disabled={isOptionDisabled(trait, j)}
 									>
 										{option > 0 ? '+' + option : option}
 									</Select.Item>
