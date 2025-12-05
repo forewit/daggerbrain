@@ -1759,41 +1759,35 @@ function createCharacter(id: string) {
 		// start from base + marked trait bonuses
 		let new_traits = {
 			agility:
-				base_traits.agility ||
-				0 +
-					(tier_2_marked_traits.agility ? 1 : 0) +
-					(tier_3_marked_traits.agility ? 1 : 0) +
-					(tier_4_marked_traits.agility ? 1 : 0),
+				(base_traits.agility || 0) +
+				(tier_2_marked_traits.agility ? 1 : 0) +
+				(tier_3_marked_traits.agility ? 1 : 0) +
+				(tier_4_marked_traits.agility ? 1 : 0),
 			strength:
-				base_traits.strength ||
-				0 +
-					(tier_2_marked_traits.strength ? 1 : 0) +
-					(tier_3_marked_traits.strength ? 1 : 0) +
-					(tier_4_marked_traits.strength ? 1 : 0),
+				(base_traits.strength || 0) +
+				(tier_2_marked_traits.strength ? 1 : 0) +
+				(tier_3_marked_traits.strength ? 1 : 0) +
+				(tier_4_marked_traits.strength ? 1 : 0),
 			finesse:
-				base_traits.finesse ||
-				0 +
-					(tier_2_marked_traits.finesse ? 1 : 0) +
-					(tier_3_marked_traits.finesse ? 1 : 0) +
-					(tier_4_marked_traits.finesse ? 1 : 0),
+				(base_traits.finesse || 0) +
+				(tier_2_marked_traits.finesse ? 1 : 0) +
+				(tier_3_marked_traits.finesse ? 1 : 0) +
+				(tier_4_marked_traits.finesse ? 1 : 0),
 			instinct:
-				base_traits.instinct ||
-				0 +
-					(tier_2_marked_traits.instinct ? 1 : 0) +
-					(tier_3_marked_traits.instinct ? 1 : 0) +
-					(tier_4_marked_traits.instinct ? 1 : 0),
+				(base_traits.instinct || 0) +
+				(tier_2_marked_traits.instinct ? 1 : 0) +
+				(tier_3_marked_traits.instinct ? 1 : 0) +
+				(tier_4_marked_traits.instinct ? 1 : 0),
 			presence:
-				base_traits.presence ||
-				0 +
-					(tier_2_marked_traits.presence ? 1 : 0) +
-					(tier_3_marked_traits.presence ? 1 : 0) +
-					(tier_4_marked_traits.presence ? 1 : 0),
+				(base_traits.presence || 0) +
+				(tier_2_marked_traits.presence ? 1 : 0) +
+				(tier_3_marked_traits.presence ? 1 : 0) +
+				(tier_4_marked_traits.presence ? 1 : 0),
 			knowledge:
-				base_traits.knowledge ||
-				0 +
-					(tier_2_marked_traits.knowledge ? 1 : 0) +
-					(tier_3_marked_traits.knowledge ? 1 : 0) +
-					(tier_4_marked_traits.knowledge ? 1 : 0)
+				(base_traits.knowledge || 0) +
+				(tier_2_marked_traits.knowledge ? 1 : 0) +
+				(tier_3_marked_traits.knowledge ? 1 : 0) +
+				(tier_4_marked_traits.knowledge ? 1 : 0)
 		};
 
 		// apply bonus effects targeting traits (additive or derived)

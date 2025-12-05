@@ -104,7 +104,7 @@
 		Object.keys(character.inventory.loot).length > 0 ||
 		character.inventory.adventuring_gear.length > 0}
 	<div class={cn('flex flex-col gap-6', className)}>
-		<Gold bind:gold_coins={character.inventory.gold_coins} class="justify-center mx-4" />
+		<Gold bind:gold_coins={character.inventory.gold_coins} class="mx-4 justify-center" />
 		{#if !hasItems}
 			<p class="py-2 text-center text-sm text-muted-foreground">Your inventory is empty</p>
 		{:else}

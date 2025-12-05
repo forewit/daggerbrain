@@ -19,40 +19,35 @@
 </script>
 
 {#if character}
-	<div
-		class={cn(
-			'flex items-center gap-4',
-			displayOnly && 'pointer-events-none',
-			className
-		)}
-	>
-		<button
-			onclick={() => {
-				character.marked_stress = 0;
-			}}
-			class="text-sm font-medium">STRESS</button
-		>
-		<div class="flex flex-wrap gap-2">
-			{#each Array(context.max_stress) as _, index}
-				<button
-					aria-label="character.stress-slot"
-					class={cn(
-						'h-3 w-6 rounded-md border border-muted-foreground transition-colors',
-						index < character.marked_stress ? 'bg-muted-foreground' : 'bg-transparent',
-						slotClasses
-					)}
-					onclick={() => {
-						if (index + 1 === character.marked_stress) {
-							character.marked_stress = Math.max(0, character.marked_stress - 1);
-						} else {
-							character.marked_stress = index + 1;
-						}
-					}}
-					type="button"
-				></button>
-			{/each}
+	<div class={cn('relative', displayOnly && 'pointer-events-none', className)}>
+		<div class="flex items-center gap-4">
+			<button
+				onclick={() => {
+					character.marked_stress = 0;
+				}}
+				class="text-sm font-medium">STRESS</button
+			>
+			<div class="flex flex-wrap gap-2">
+				{#each Array(context.max_stress) as _, index}
+					<button
+						aria-label="character.stress-slot"
+						class={cn(
+							'h-3 w-6 rounded-md border border-muted-foreground transition-colors',
+							index < character.marked_stress ? 'bg-muted-foreground' : 'bg-transparent',
+							slotClasses
+						)}
+						onclick={() => {
+							if (index + 1 === character.marked_stress) {
+								character.marked_stress = Math.max(0, character.marked_stress - 1);
+							} else {
+								character.marked_stress = index + 1;
+							}
+						}}
+						type="button"
+					></button>
+				{/each}
+			</div>
 		</div>
-
 		{#if context.max_stress === character.marked_stress && !displayOnly}
 			<Button
 				onclick={() => {
@@ -60,7 +55,7 @@
 				}}
 				size="sm"
 				variant="ghost"
-				class="-my-2 h-7 px-1"
+				class="absolute -bottom-8 left-1/2 -translate-x-1/2"
 				disabled={character.marked_hp >= context.max_hp}
 			>
 				<HeartCrack class="size-4" />

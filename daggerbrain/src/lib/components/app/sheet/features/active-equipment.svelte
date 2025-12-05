@@ -48,18 +48,18 @@
 			/>
 		</svg>
 
-		<div class="absolute top-1/2 left-10 -translate-y-1/2 flex items-center gap-5">
+		<div class="absolute top-1/2 left-10 flex -translate-y-1/2 items-center gap-5">
 			<p class=" text-[12px] leading-none font-bold text-muted-foreground">PROFICIENCY</p>
 			<div class="flex items-center gap-2.5">
-			{#each [1, 2, 3, 4, 5, 6] as prof}
-				<div
-					class="flex size-[16px] items-center justify-center rounded-full border-2 border-muted-foreground transition-colors group-hover:border-foreground"
-				>
-					{#if prof <= context.proficiency}
-						<div class="size-[8px] rounded-full bg-muted-foreground"></div>
-					{/if}
-				</div>
-			{/each}
+				{#each [1, 2, 3, 4, 5, 6] as prof}
+					<div
+						class="flex size-[16px] items-center justify-center rounded-full border-2 border-muted-foreground transition-colors group-hover:border-foreground"
+					>
+						{#if prof <= context.proficiency}
+							<div class="size-[8px] rounded-full bg-muted-foreground"></div>
+						{/if}
+					</div>
+				{/each}
 			</div>
 		</div>
 	</div>

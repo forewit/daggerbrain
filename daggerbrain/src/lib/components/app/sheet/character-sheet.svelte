@@ -221,7 +221,7 @@
 			</div>
 
 			<!-- rest & death moves -->
-			<div class="flex items-center justify-center gap-4 -my-1">
+			<div class="-my-1 flex items-center justify-center gap-4">
 				<Button variant="outline" onclick={openDowntimeSheet}>
 					<Tent class="size-4" />
 					Downtime
@@ -243,13 +243,13 @@
 			</div>
 
 			<!-- hp and stress -->
-			<div class="mx-2 gap-6 flex flex-col sm:flex-row justify-evenly">
+			<div class="mx-2 mt-2 flex flex-col justify-evenly gap-6 sm:flex-row">
 				<Hp class="justify-center sm:justify-start" onDeathMove={openDeathMoveSheet} />
 				<Stress class="justify-center sm:justify-start" />
 			</div>
 
 			<!-- hope -->
-			<Hope />
+			<Hope class="my-1" />
 
 			<!-- features tabs -->
 			<Features
