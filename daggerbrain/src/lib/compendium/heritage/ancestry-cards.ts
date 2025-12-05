@@ -112,8 +112,7 @@ export const ANCESTRY_CARDS = {
 		features: [
 			{
 				title: 'Quick Reactions',
-				description_html:
-					'<span><b>Mark a Stress</b> to gain advantage on a reaction roll.</span>',
+				description_html: '<span><b>Mark a Stress</b> to gain advantage on a reaction roll.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
@@ -215,7 +214,7 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Unshakable',
 				description_html:
-					'<span>When you would mark a Stress, roll a <b>d6</b>. On a result of 6, don\'t mark it.</span>',
+					"<span>When you would mark a Stress, roll a <b>d6</b>. On a result of 6, don't mark it.</span>",
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -283,7 +282,7 @@ export const ANCESTRY_CARDS = {
 			{
 				title: 'Retract',
 				description_html:
-					'<span><b>Mark a Stress</b> to retract into your shell. While in your shell, you have resistance to physical damage, you have disadvantage on action rolls, and you can\'t move.</span>',
+					"<span><b>Mark a Stress</b> to retract into your shell. While in your shell, you have resistance to physical damage, you have disadvantage on action rolls, and you can't move.</span>",
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -369,8 +368,7 @@ export const ANCESTRY_CARDS = {
 			},
 			{
 				title: 'Internal Compass',
-				description_html:
-					'<span>When you roll a 1 on your Hope Die, you can reroll it.</span>',
+				description_html: '<span>When you roll a 1 on your Hope Die, you can reroll it.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -504,8 +502,7 @@ export const ANCESTRY_CARDS = {
 		features: [
 			{
 				title: 'Amphibious',
-				description_html:
-					'<span>You can breathe and move naturally underwater.</span>',
+				description_html: '<span>You can breathe and move naturally underwater.</span>',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},

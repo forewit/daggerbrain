@@ -2,6 +2,7 @@
 	import { cn } from '$lib/utils';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { CONDITIONS } from '$lib/types/rules';
+	import Button from '$lib/components/ui/button/button.svelte';
 
 	let {
 		class: className = '',
@@ -16,12 +17,12 @@
 </script>
 
 {#if character}
-	<button
-		class={cn('rounded-md border-2 p-3 pt-2 text-center', className)}
+	<Button
+	variant="outline"
+		class={cn('gap-3',className)}
 		onclick={onConditionsClick}
 	>
-		<p class="mb-2 text-sm font-medium">Conditions</p>
-		<div class="flex items-center justify-center gap-2">
+		Conditions
 			{#if character.active_conditions.length > 0}
 				{#each character.active_conditions as id}
 					{#if id === 'hidden'}
@@ -48,8 +49,8 @@
 					{/if}
 				{/each}
 			{:else}
-				<p class="text-xs text-muted-foreground">None</p>
+				<p class=" text-xs text-muted-foreground">None</p>
 			{/if}
-		</div>
-	</button>
+		
+	</Button>
 {/if}

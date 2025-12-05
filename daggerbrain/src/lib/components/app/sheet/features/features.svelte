@@ -29,9 +29,9 @@
 	const context = getCharacterContext();
 </script>
 
-<div class={cn('relative rounded-md border-2 p-4', className)}>
+<div class={cn('relative border-3 py-4 corner-bevel rounded-2xl', className)}>
 	<Tabs.Root bind:value={tab}>
-		<Tabs.List class="mx-auto -mt-2 mb-1 flex h-auto flex-wrap gap-y-1">
+		<Tabs.List class="mx-auto px-2 -mt-2 mb-1 flex h-auto flex-wrap gap-y-1">
 			<Tabs.Trigger value="weapons" class="flex-initial">Active Weapons & Armor</Tabs.Trigger>
 			<Tabs.Trigger value="features" class="flex-initial">Class Features</Tabs.Trigger>
 			<Tabs.Trigger value="experiences" class="flex-initial">Experiences</Tabs.Trigger>
@@ -43,7 +43,7 @@
 		<Tabs.Content value="weapons">
 			<ActiveEquipment gotoInventory={() => (tab = 'inventory')} {onItemClick} />
 		</Tabs.Content>
-		<Tabs.Content value="features">
+		<Tabs.Content value="features" class="px-4">
 			<ClassFeatures />
 		</Tabs.Content>
 		<Tabs.Content value="experiences">
@@ -52,10 +52,10 @@
 		<Tabs.Content value="inventory">
 			<Inventory {onItemClick} {onAddItems} />
 		</Tabs.Content>
-		<Tabs.Content value="background">
+		<Tabs.Content value="background" class="px-4">
 			<Background />
 		</Tabs.Content>
-		<Tabs.Content value="notes">
+		<Tabs.Content value="notes" class="px-4">
 			<Notes />
 		</Tabs.Content>
 	</Tabs.Root>

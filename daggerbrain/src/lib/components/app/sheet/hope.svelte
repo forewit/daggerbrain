@@ -16,7 +16,7 @@
 			}}
 			class="text-sm font-medium text-accent">HOPE</button
 		>
-		<div class="mt-1 flex flex-wrap justify-center gap-4">
+		<div class="mb-2 flex flex-wrap justify-center gap-4">
 			{#each Array(context.max_hope) as _, index}
 				<button
 					aria-label="hope-slot"
@@ -37,5 +37,12 @@
 				></button>
 			{/each}
 		</div>
+
+		{#if context.primary_class}
+		<p class="flex items-center justify-center text-xs text-muted-foreground">
+			<span class="mr-1 text-foreground text-xs font-medium">{context.primary_class.hope_feature.title}:</span>
+			{@html context.primary_class.hope_feature.description_html}
+		</p>
+		{/if}
 	</div>
 {/if}

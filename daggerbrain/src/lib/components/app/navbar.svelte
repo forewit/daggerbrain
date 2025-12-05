@@ -23,37 +23,39 @@
 			Daggerbrain
 		</a>
 
-			<Sheet.Root bind:open >
-				<Sheet.Trigger class={cn('sm:hidden ml-auto', buttonVariants({ variant: 'link', size: 'icon' }))}>
-					<Menu />
-				</Sheet.Trigger>
-				<Sheet.Content>
-					<Sheet.Header></Sheet.Header>
-					<SignedOut>
-						<Button variant="link" onclick={() => (open = false)} href="/">Home</Button>
-						<SignInButton class={cn(buttonVariants(), 'mx-auto w-min')}>Sign In</SignInButton>
-					</SignedOut>
-					<SignedIn>
-						<Button variant="link" onclick={() => (open = false)} href="/">Home</Button>
-						<Button variant="link" onclick={() => (open = false)} href="/characters">
-							My Characters
-						</Button>
-						<SignOutButton class={cn(buttonVariants(), 'mx-auto w-min')}>Sign Out</SignOutButton>
-					</SignedIn>
-				</Sheet.Content>
-			</Sheet.Root>
-
-			<div class="hidden sm:flex ml-auto items-center gap-3">
+		<Sheet.Root bind:open>
+			<Sheet.Trigger
+				class={cn('ml-auto sm:hidden', buttonVariants({ variant: 'link', size: 'icon' }))}
+			>
+				<Menu />
+			</Sheet.Trigger>
+			<Sheet.Content>
+				<Sheet.Header></Sheet.Header>
 				<SignedOut>
 					<Button variant="link" onclick={() => (open = false)} href="/">Home</Button>
-					<SignInButton class={buttonVariants()}>Sign In</SignInButton>
+					<SignInButton class={cn(buttonVariants(), 'mx-auto w-min')}>Sign In</SignInButton>
 				</SignedOut>
 				<SignedIn>
+					<Button variant="link" onclick={() => (open = false)} href="/">Home</Button>
 					<Button variant="link" onclick={() => (open = false)} href="/characters">
 						My Characters
 					</Button>
-					<SignOutButton class={buttonVariants()}>Sign Out</SignOutButton>
+					<SignOutButton class={cn(buttonVariants(), 'mx-auto w-min')}>Sign Out</SignOutButton>
 				</SignedIn>
-			</div>
+			</Sheet.Content>
+		</Sheet.Root>
+
+		<div class="ml-auto hidden items-center gap-3 sm:flex">
+			<SignedOut>
+				<Button variant="link" onclick={() => (open = false)} href="/">Home</Button>
+				<SignInButton class={buttonVariants()}>Sign In</SignInButton>
+			</SignedOut>
+			<SignedIn>
+				<Button variant="link" onclick={() => (open = false)} href="/characters">
+					My Characters
+				</Button>
+				<SignOutButton class={buttonVariants()}>Sign Out</SignOutButton>
+			</SignedIn>
+		</div>
 	</nav>
 </header>

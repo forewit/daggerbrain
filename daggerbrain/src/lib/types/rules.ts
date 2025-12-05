@@ -80,7 +80,8 @@ export const BASE_MIXED_ANCESTRY_CARD: AncestryCard = {
 	image_url: '/images/wip.avif',
 	title: 'Mixed Ancestry',
 	artist_name: '',
-	description_html: '<p> Anyone\'s appearance and abilities can be shaped by blood, magic, proximity, or a variety of other factors. </p>',
+	description_html:
+		"<p> Anyone's appearance and abilities can be shaped by blood, magic, proximity, or a variety of other factors. </p>",
 	features: [],
 	choices: []
 };

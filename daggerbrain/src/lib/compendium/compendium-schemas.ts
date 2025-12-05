@@ -139,7 +139,7 @@ export const CharacterModifierSchema = z
 					'max_burden',
 					'spellcast_roll_bonus',
 					'max_short_rest_actions',
-					'max_long_rest_actions',
+					'max_long_rest_actions'
 				])
 			}),
 			z.object({

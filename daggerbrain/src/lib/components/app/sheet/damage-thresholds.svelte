@@ -42,20 +42,20 @@
 	</svg>
 
 	<div
-		class="absolute top-[7px] left-[20px] text-center text-xs leading-none font-bold text-background"
+		class="absolute top-[8px] left-[19px] text-center text-xs leading-none font-bold text-background"
 	>
 		<p class="mb-[2px]">MINOR</p>
 		<p>DAMAGE</p>
 	</div>
 
 	<div
-		class="absolute top-[7px] left-[155px] text-center text-xs leading-none font-bold text-background"
+		class="absolute top-[8px] left-[155px] text-center text-xs leading-none font-bold text-background"
 	>
 		<p class="mb-[2px]">MAJOR</p>
 		<p>DAMAGE</p>
 	</div>
 	<div
-		class="absolute top-[7px] right-[16px] text-center text-xs leading-none font-bold text-background"
+		class="absolute top-[8px] right-[16px] text-center text-xs leading-none font-bold text-background"
 	>
 		<p class="mb-[2px]">SEVERE</p>
 		<p>DAMAGE</p>

@@ -1,5 +1,11 @@
 import { getUserContext } from './user.svelte';
-import { ALL_LEVEL_UP_OPTIONS, BASE_MIXED_ANCESTRY_CARD, BASE_STATS, CONDITIONS, TRAIT_OPTIONS } from '../types/rules';
+import {
+	ALL_LEVEL_UP_OPTIONS,
+	BASE_MIXED_ANCESTRY_CARD,
+	BASE_STATS,
+	CONDITIONS,
+	TRAIT_OPTIONS
+} from '../types/rules';
 import { getContext, setContext } from 'svelte';
 import type { Character, DomainCardId } from '$lib/types/character-types';
 import type { AllTierOptionIds, ConditionIds, LevelUpChoice } from '$lib/types/rule-types';
@@ -33,26 +39,34 @@ function createCharacter(id: string) {
 	// ================================================
 
 	// Heritage
-	let ancestry_card: AncestryCard | null = $derived.by(()=>{
+	let ancestry_card: AncestryCard | null = $derived.by(() => {
 		if (!character) return null;
 
 		if (character.ancestry_card_id === BASE_MIXED_ANCESTRY_CARD.id) {
-			const custom_top_ancestry = character.custom_top_ancestry ? compendium.ancestry_cards[character.custom_top_ancestry] : null;
-			const custom_bottom_ancestry = character.custom_bottom_ancestry ? compendium.ancestry_cards[character.custom_bottom_ancestry] : null;
+			const custom_top_ancestry = character.custom_top_ancestry
+				? compendium.ancestry_cards[character.custom_top_ancestry]
+				: null;
+			const custom_bottom_ancestry = character.custom_bottom_ancestry
+				? compendium.ancestry_cards[character.custom_bottom_ancestry]
+				: null;
 
 			return {
 				...BASE_MIXED_ANCESTRY_CARD,
-				features: [custom_top_ancestry?.features[0], custom_bottom_ancestry?.features[1]].filter((f) => !!f),
+				features: [custom_top_ancestry?.features[0], custom_bottom_ancestry?.features[1]].filter(
+					(f) => !!f
+				),
 				choices: [
 					...(custom_top_ancestry?.choices.filter((c) => c.feature_index === 0) || []),
 					...(custom_bottom_ancestry?.choices.filter((c) => c.feature_index === 1) || [])
 				].filter((c) => !!c)
-			}
+			};
 		} else {
-			return character?.ancestry_card_id ? compendium.ancestry_cards[character.ancestry_card_id] : null
+			return character?.ancestry_card_id
+				? compendium.ancestry_cards[character.ancestry_card_id]
+				: null;
 		}
-});
-	let community_card= $derived(
+	});
+	let community_card = $derived(
 		character?.community_card_id ? compendium.community_cards[character.community_card_id] : null
 	);
 	let transformation_card = $derived(
@@ -273,7 +287,6 @@ function createCharacter(id: string) {
 	let spellcast_trait: keyof Traits | null = $state(BASE_STATS.spellcast_trait);
 	let spellcast_roll_bonus: number = $state(BASE_STATS.spellcast_roll_bonus);
 
-
 	// ================================================
 	// CHARACTER VALIDATION EFFECTS
 	// ================================================
@@ -285,7 +298,7 @@ function createCharacter(id: string) {
 			character.custom_top_ancestry = null;
 			character.custom_bottom_ancestry = null;
 		}
-	})
+	});
 
 	// ! clear consumables above max
 	$effect(() => {
@@ -315,7 +328,7 @@ function createCharacter(id: string) {
 		if (removed > 0) {
 			console.warn(`Removed ${removed} consumables to stay within max of ${max}`);
 		}
-	})
+	});
 
 	// ! clear invalid ancestry card choices
 	$effect(() => {
@@ -870,11 +883,11 @@ function createCharacter(id: string) {
 	});
 
 	// ! clear invalid community card tokens
-	$effect(()=>{
+	$effect(() => {
 		if (!character) return;
 
 		if (!community_card?.tokens) character.community_card_tokens = 0;
-	})
+	});
 
 	// ! build domain card vault and clear invalid domain card choices at each level
 	$effect(() => {
@@ -1746,35 +1759,41 @@ function createCharacter(id: string) {
 		// start from base + marked trait bonuses
 		let new_traits = {
 			agility:
-				base_traits.agility || 0 +
-				(tier_2_marked_traits.agility ? 1 : 0) +
-				(tier_3_marked_traits.agility ? 1 : 0) +
-				(tier_4_marked_traits.agility ? 1 : 0),
+				base_traits.agility ||
+				0 +
+					(tier_2_marked_traits.agility ? 1 : 0) +
+					(tier_3_marked_traits.agility ? 1 : 0) +
+					(tier_4_marked_traits.agility ? 1 : 0),
 			strength:
-				base_traits.strength || 0 +
-				(tier_2_marked_traits.strength ? 1 : 0) +
-				(tier_3_marked_traits.strength ? 1 : 0) +
-				(tier_4_marked_traits.strength ? 1 : 0),
+				base_traits.strength ||
+				0 +
+					(tier_2_marked_traits.strength ? 1 : 0) +
+					(tier_3_marked_traits.strength ? 1 : 0) +
+					(tier_4_marked_traits.strength ? 1 : 0),
 			finesse:
-				base_traits.finesse || 0 +
-				(tier_2_marked_traits.finesse ? 1 : 0) +
-				(tier_3_marked_traits.finesse ? 1 : 0) +
-				(tier_4_marked_traits.finesse ? 1 : 0),
+				base_traits.finesse ||
+				0 +
+					(tier_2_marked_traits.finesse ? 1 : 0) +
+					(tier_3_marked_traits.finesse ? 1 : 0) +
+					(tier_4_marked_traits.finesse ? 1 : 0),
 			instinct:
-				base_traits.instinct || 0 +
-				(tier_2_marked_traits.instinct ? 1 : 0) +
-				(tier_3_marked_traits.instinct ? 1 : 0) +
-				(tier_4_marked_traits.instinct ? 1 : 0),
+				base_traits.instinct ||
+				0 +
+					(tier_2_marked_traits.instinct ? 1 : 0) +
+					(tier_3_marked_traits.instinct ? 1 : 0) +
+					(tier_4_marked_traits.instinct ? 1 : 0),
 			presence:
-				base_traits.presence || 0 +
-				(tier_2_marked_traits.presence ? 1 : 0) +
-				(tier_3_marked_traits.presence ? 1 : 0) +
-				(tier_4_marked_traits.presence ? 1 : 0),
+				base_traits.presence ||
+				0 +
+					(tier_2_marked_traits.presence ? 1 : 0) +
+					(tier_3_marked_traits.presence ? 1 : 0) +
+					(tier_4_marked_traits.presence ? 1 : 0),
 			knowledge:
-				base_traits.knowledge || 0 +
-				(tier_2_marked_traits.knowledge ? 1 : 0) +
-				(tier_3_marked_traits.knowledge ? 1 : 0) +
-				(tier_4_marked_traits.knowledge ? 1 : 0)
+				base_traits.knowledge ||
+				0 +
+					(tier_2_marked_traits.knowledge ? 1 : 0) +
+					(tier_3_marked_traits.knowledge ? 1 : 0) +
+					(tier_4_marked_traits.knowledge ? 1 : 0)
 		};
 
 		// apply bonus effects targeting traits (additive or derived)
@@ -2056,9 +2075,24 @@ function createCharacter(id: string) {
 		if (!character) return;
 		let new_max_short_rest_actions: number = BASE_STATS.max_short_rest_actions;
 
-		new_max_short_rest_actions = apply_modifiers(base_character_modifiers, 'max_short_rest_actions', new_max_short_rest_actions, 'base');
-		new_max_short_rest_actions = apply_modifiers(bonus_character_modifiers, 'max_short_rest_actions', new_max_short_rest_actions, 'bonus');
-		new_max_short_rest_actions = apply_modifiers(override_character_modifiers, 'max_short_rest_actions', new_max_short_rest_actions, 'override');
+		new_max_short_rest_actions = apply_modifiers(
+			base_character_modifiers,
+			'max_short_rest_actions',
+			new_max_short_rest_actions,
+			'base'
+		);
+		new_max_short_rest_actions = apply_modifiers(
+			bonus_character_modifiers,
+			'max_short_rest_actions',
+			new_max_short_rest_actions,
+			'bonus'
+		);
+		new_max_short_rest_actions = apply_modifiers(
+			override_character_modifiers,
+			'max_short_rest_actions',
+			new_max_short_rest_actions,
+			'override'
+		);
 
 		max_short_rest_actions = new_max_short_rest_actions;
 	});
@@ -2068,9 +2102,24 @@ function createCharacter(id: string) {
 		if (!character) return;
 		let new_max_long_rest_actions: number = BASE_STATS.max_long_rest_actions;
 
-		new_max_long_rest_actions = apply_modifiers(base_character_modifiers, 'max_long_rest_actions', new_max_long_rest_actions, 'base');
-		new_max_long_rest_actions = apply_modifiers(bonus_character_modifiers, 'max_long_rest_actions', new_max_long_rest_actions, 'bonus');
-		new_max_long_rest_actions = apply_modifiers(override_character_modifiers, 'max_long_rest_actions', new_max_long_rest_actions, 'override');
+		new_max_long_rest_actions = apply_modifiers(
+			base_character_modifiers,
+			'max_long_rest_actions',
+			new_max_long_rest_actions,
+			'base'
+		);
+		new_max_long_rest_actions = apply_modifiers(
+			bonus_character_modifiers,
+			'max_long_rest_actions',
+			new_max_long_rest_actions,
+			'bonus'
+		);
+		new_max_long_rest_actions = apply_modifiers(
+			override_character_modifiers,
+			'max_long_rest_actions',
+			new_max_long_rest_actions,
+			'override'
+		);
 
 		max_long_rest_actions = new_max_long_rest_actions;
 	});
@@ -2551,7 +2600,6 @@ function createCharacter(id: string) {
 				character.inventory.armor[item.id].quantity++;
 			}
 		} else if (type === 'consumable') {
-
 			if (!(item.id in character.inventory.consumables)) {
 				character.inventory.consumables[item.id] = { quantity: 1, choices: {} };
 			} else {

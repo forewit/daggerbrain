@@ -30,7 +30,7 @@ export const COMMUNITY_CARDS = {
 		tokens: false,
 		title: 'Highborne',
 		description_html:
-			'<p>Being part of a highborne community means you\'re accustomed to a life of elegance, opulence, and prestige within the upper echelons of society.</p>',
+			"<p>Being part of a highborne community means you're accustomed to a life of elegance, opulence, and prestige within the upper echelons of society.</p>",
 		features: [
 			{
 				title: 'Privilege',
@@ -70,12 +70,12 @@ export const COMMUNITY_CARDS = {
 		tokens: false,
 		title: 'Orderborne',
 		description_html:
-			'<p>Being part of an orderborne community means you\'re from a collective that focuses on discipline or faith, and you uphold a set of principles that reflect your experience there.</p>',
+			"<p>Being part of an orderborne community means you're from a collective that focuses on discipline or faith, and you uphold a set of principles that reflect your experience there.</p>",
 		features: [
 			{
 				title: 'Dedicated',
 				description_html:
-					'<span>Record three sayings or values your upbringing instilled in you. Once per rest, when you describe how you\'re embodying one of these principles through your current action, you can roll a <b>d20</b> as your Hope Die.</span>',
+					"<span>Record three sayings or values your upbringing instilled in you. Once per rest, when you describe how you're embodying one of these principles through your current action, you can roll a <b>d20</b> as your Hope Die.</span>",
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -90,7 +90,7 @@ export const COMMUNITY_CARDS = {
 		tokens: false,
 		title: 'Ridgeborne',
 		description_html:
-			'<p>Being part of a ridgeborne community means you\'ve called the rocky peaks and sharp cliffs of the mountainside home.</p>',
+			"<p>Being part of a ridgeborne community means you've called the rocky peaks and sharp cliffs of the mountainside home.</p>",
 		features: [
 			{
 				title: 'Steady',
@@ -150,12 +150,12 @@ export const COMMUNITY_CARDS = {
 		tokens: false,
 		title: 'Underborne',
 		description_html:
-			'<p>Being part of an underborne community means you\'re from a subterranean society.</p>',
+			"<p>Being part of an underborne community means you're from a subterranean society.</p>",
 		features: [
 			{
 				title: 'Low-Light Living',
 				description_html:
-					'<span>When you\'re in an area with low light or heavy shadow, you have advantage on rolls to hide, investigate, or perceive details within that area.</span>',
+					"<span>When you're in an area with low light or heavy shadow, you have advantage on rolls to hide, investigate, or perceive details within that area.</span>",
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -170,12 +170,12 @@ export const COMMUNITY_CARDS = {
 		tokens: false,
 		title: 'Wanderborne',
 		description_html:
-			'<p>Being part of a wanderborne community means you\'ve lived as a nomad, forgoing a permanent home and experiencing a wide variety of cultures.</p>',
+			"<p>Being part of a wanderborne community means you've lived as a nomad, forgoing a permanent home and experiencing a wide variety of cultures.</p>",
 		features: [
 			{
 				title: 'Nomadic Pack',
 				description_html:
-					'<span>Add a Nomadic Pack to your inventory. Once per session, you can <b>spend a Hope</b> to reach into this pack and pull out a mundane item that\'s useful to your situation. Work with the GM to figure out what item you take out.</span>',
+					"<span>Add a Nomadic Pack to your inventory. Once per session, you can <b>spend a Hope</b> to reach into this pack and pull out a mundane item that's useful to your situation. Work with the GM to figure out what item you take out.</span>",
 				character_modifiers: [],
 				weapon_modifiers: []
 			}

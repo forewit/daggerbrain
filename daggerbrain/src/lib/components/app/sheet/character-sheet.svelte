@@ -35,7 +35,6 @@
 		type ItemClickHandler
 	} from './content-sheet/content-sheet.svelte';
 	import Tent from '@lucide/svelte/icons/tent';
-	import Proficiency from './proficiency.svelte';
 
 	let sheetOpen = $state(false);
 	let sheetContent = $state<SheetContent>(null);
@@ -222,31 +221,21 @@
 			</div>
 
 			<!-- rest & death moves -->
-			<div class="flex items-center justify-center gap-3">
-				<!-- {#if character.marked_hp >= context.max_hp}
-					<Button onclick={openDeathMoveSheet}>
-						<Skull class="size-4" />
-						Death Move
-					</Button>
-				{/if} -->
+			<div class="flex items-center justify-center gap-4 -my-1">
 				<Button variant="outline" onclick={openDowntimeSheet}>
 					<Tent class="size-4" />
 					Downtime
 				</Button>
 
 				<Conditions onConditionsClick={openConditionsSheet} />
-
-				<Proficiency />
 			</div>
 
 			<!-- traits -->
 			<Traits traits={context.traits} class="mx-2 " />
 
 			<!-- evasion and armor -->
-			<div
-				class="mx-auto grid grid-cols-1 place-items-center gap-x-6 gap-y-2 sm:grid-cols-[auto_auto]"
-			>
-				<div class="flex gap-2">
+			<div class="mx-auto grid grid-cols-1 place-items-center gap-6 sm:grid-cols-[auto_auto]">
+				<div class="flex gap-6">
 					<Evasion />
 					<ArmorSlots />
 				</div>
@@ -254,13 +243,13 @@
 			</div>
 
 			<!-- hp and stress -->
-			<div class="mx-2 grid gap-2 sm:grid-cols-2">
+			<div class="mx-2 gap-6 flex flex-col sm:flex-row justify-evenly">
 				<Hp class="justify-center sm:justify-start" onDeathMove={openDeathMoveSheet} />
 				<Stress class="justify-center sm:justify-start" />
 			</div>
 
 			<!-- hope -->
-			<Hope class="mb-3" />
+			<Hope />
 
 			<!-- features tabs -->
 			<Features

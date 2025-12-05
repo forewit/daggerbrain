@@ -20,8 +20,6 @@
 	let ancestryDialogOpen = $state(false);
 	let communityDialogOpen = $state(false);
 	let transformationDialogOpen = $state(false);
-
-	
 </script>
 
 {#if character}

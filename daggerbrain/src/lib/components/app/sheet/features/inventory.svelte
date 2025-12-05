@@ -104,12 +104,12 @@
 		Object.keys(character.inventory.loot).length > 0 ||
 		character.inventory.adventuring_gear.length > 0}
 	<div class={cn('flex flex-col gap-6', className)}>
-		<Gold bind:gold_coins={character.inventory.gold_coins} class="justify-center"/>
+		<Gold bind:gold_coins={character.inventory.gold_coins} class="justify-center mx-4" />
 		{#if !hasItems}
 			<p class="py-2 text-center text-sm text-muted-foreground">Your inventory is empty</p>
 		{:else}
 			<!-- Search Box -->
-			<div class="relative">
+			<div class="relative mx-4">
 				<Search
 					class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
 				/>
@@ -276,6 +276,6 @@
 			{/if}
 		{/if}
 
-		<Button variant="outline" onclick={onAddItems}>Add Items</Button>
+		<Button class="mx-4" variant="outline" onclick={onAddItems}>Add Items</Button>
 	</div>
 {/if}

@@ -82,9 +82,8 @@
 
 {#snippet mixed_ancestry_selectors(textSizeClass: string, gapClass: string)}
 	{#if character && isMixedAncestry && bind_choice_select}
-		<div class={cn('flex flex-col', gapClass)}>
+		<div class={cn('flex flex-col gap-1', gapClass)}>
 			<Select.Root
-			
 				type="single"
 				value={character.custom_top_ancestry || ''}
 				onValueChange={(value: string) => {
@@ -92,7 +91,7 @@
 				}}
 			>
 				<Select.Trigger
-				highlighted={character.custom_top_ancestry !== null}
+					highlighted={!character.custom_top_ancestry}
 					class={cn(
 						'w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*="text-"])]:text-muted',
 						textSizeClass
@@ -130,7 +129,7 @@
 				}}
 			>
 				<Select.Trigger
-				highlighted={character.custom_bottom_ancestry !== null}
+					highlighted={!character.custom_bottom_ancestry}
 					class={cn(
 						'w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*="text-"])]:text-muted',
 						textSizeClass
@@ -241,7 +240,9 @@
 
 			<!-- content -->
 			<div class="flex shrink-0 flex-col gap-[6px] px-[12px] pt-[14px] pb-[6px]">
-				<p class="max-w-[70%] z-5 font-eveleth text-[26px] leading-none text-black uppercase">{card.title}</p>
+				<p class="z-5 max-w-[70%] font-eveleth text-[26px] leading-none text-black uppercase">
+					{card.title}
+				</p>
 				<p class="text-[12px] text-black italic">
 					{@html card.description_html}
 				</p>

@@ -146,7 +146,7 @@
 			<Input bind:value={searchQuery} placeholder="Search items..." class="pl-9" />
 		</div>
 
-		<div class="flex grow flex-wrap gap-x-0.5 gap-y-2 justify-center">
+		<div class="flex grow flex-wrap justify-center gap-x-0.5 gap-y-2">
 			<!-- Type Filter Buttons -->
 			<div class="flex flex-wrap justify-center gap-1">
 				<Button

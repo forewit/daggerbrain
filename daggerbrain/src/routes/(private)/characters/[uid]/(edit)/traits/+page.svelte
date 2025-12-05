@@ -75,7 +75,8 @@
 						<Dialog.Content>
 							<Dialog.Header
 								><Dialog.Title
-									>Suggested Traits: {character.derived_descriptors.primary_class_name}</Dialog.Title
+									>Suggested Traits: {character.derived_descriptors
+										.primary_class_name}</Dialog.Title
 								></Dialog.Header
 							>
 							<Dialog.Description>
@@ -106,7 +107,6 @@
 						</Dialog.Content>
 					</Dialog.Root>
 				{/if}
-
 			</div>
 
 			<!-- traits -->

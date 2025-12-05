@@ -32,6 +32,7 @@
 		"@sveltejs/kit": "^2.48.5",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@tailwindcss/vite": "^4.1.14",
+		"@toolwind/corner-shape": "^0.0.8-3",
 		"@types/node": "^24.10.1",
 		"@vitest/browser-playwright": "^4.0.5",
 		"bits-ui": "^2.14.3",

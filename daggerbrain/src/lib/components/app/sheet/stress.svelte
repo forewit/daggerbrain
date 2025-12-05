@@ -21,7 +21,7 @@
 {#if character}
 	<div
 		class={cn(
-			'flex items-center gap-4 rounded-md border-2 px-4 py-2',
+			'flex items-center gap-4',
 			displayOnly && 'pointer-events-none',
 			className
 		)}

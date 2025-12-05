@@ -17,11 +17,11 @@ export function capitalize(string: string): string {
 /**
  * Applies proficiency multiplier to dice in a dice string.
  * Multiplies the number of dice (XdY) by proficiency, but keeps static bonuses unchanged.
- * 
+ *
  * @param diceString - The dice string (e.g., "1d6+2", "2d4+1d6+4")
  * @param proficiency - The proficiency multiplier (e.g., 1, 2, 3)
  * @returns The modified dice string with dice counts multiplied by proficiency
- * 
+ *
  * @example
  * applyProficiencyToDice("1d6", 2) // "2d6"
  * applyProficiencyToDice("2d4+1d6+4", 2) // "4d4+2d6+4"

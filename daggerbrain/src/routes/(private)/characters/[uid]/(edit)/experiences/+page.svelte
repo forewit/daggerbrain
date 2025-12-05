@@ -33,7 +33,6 @@
 					!character.character_descriptions.attitude.trim()
 			: false
 	);
-
 </script>
 
 {#if character}
