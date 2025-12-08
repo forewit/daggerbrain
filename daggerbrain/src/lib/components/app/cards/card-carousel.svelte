@@ -52,7 +52,6 @@
 	} = $props();
 
 	let scrollContainer: HTMLDivElement;
-	let mainContainer: HTMLDivElement;
 	let containerWidth: number = $state(null!);
 	let isShiftPressed = $state(false);
 	let isHovered = $state(false);
@@ -140,6 +139,20 @@
 		window.addEventListener('keydown', handleKeyDown);
 		window.addEventListener('keyup', handleKeyUp);
 
+		// Initialize scroll position to match selectedIndex
+			if (scrollContainer && cards.length > 0 && selectedIndex >= 0 && selectedIndex < cards.length) {
+				// Use instant scroll for initial positioning to avoid animation
+				const cardButtons = scrollContainer.querySelectorAll('button.snap-center');
+				const targetButton = cardButtons[selectedIndex] as HTMLButtonElement | undefined;
+				if (targetButton) {
+					targetButton.scrollIntoView({
+						behavior: 'instant',
+						block: 'center',
+						inline: 'center'
+					});
+				}
+			}
+
 		return () => {
 			scrollContainer?.removeEventListener('scroll', handleScroll);
 			window.removeEventListener('keydown', handleKeyDown);
@@ -151,7 +164,6 @@
 
 <div 
 	class="relative" 
-	bind:this={mainContainer}
 	role="region"
 	onmouseenter={() => isHovered = true}
 	onmouseleave={() => isHovered = false}
@@ -196,13 +208,13 @@
 				<DomainCardComponent
 					card={card as DomainCard}
 					variant="card"
-					bind_choice_select
-					bind_token_count
+					{bind_choice_select}
+					{bind_token_count}
 				/>
 			{:else if card.card_type === 'ancestry'}
-				<AncestryCardComponent card={card as AncestryCard} variant="card" bind_choice_select />
+				<AncestryCardComponent card={card as AncestryCard} variant="card" {bind_choice_select} />
 			{:else if card.card_type === 'community'}
-				<CommunityCardComponent card={card as CommunityCard} variant="card" bind_token_count />
+				<CommunityCardComponent card={card as CommunityCard} variant="card" {bind_token_count} />
 			{:else if card.card_type === 'transformation'}
 				<TransformationCardComponent card={card as TransformationCard} variant="card" />
 			{:else if ['subclass_foundation', 'subclass_specialization', 'subclass_mastery'].includes(card.card_type)}

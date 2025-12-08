@@ -8,6 +8,7 @@
 	import { goto } from '$app/navigation';
 	import { getUserContext } from '$lib/state/user.svelte';
 	import { error } from '@sveltejs/kit';
+	import DomainCardCatalog from '$lib/components/app/cards/domain-card-catalog.svelte';
 
 	const user = getUserContext();
 
