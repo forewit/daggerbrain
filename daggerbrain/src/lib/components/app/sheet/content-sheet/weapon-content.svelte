@@ -24,7 +24,7 @@
 		return (
 			context.inventory_primary_weapons.find((w) => w.id === weaponId) ||
 			context.inventory_secondary_weapons.find((w) => w.id === weaponId) ||
-			null
+			(context.derived_unarmed_attack?.id === weaponId ? context.derived_unarmed_attack : null)
 		);
 	});
 

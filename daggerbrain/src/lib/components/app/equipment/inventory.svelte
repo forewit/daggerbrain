@@ -43,13 +43,10 @@
 		context.inventory_consumables.filter((consumable) => matchesSearch(consumable, searchQuery))
 	);
 
-	// Filtered adventuring gear (with original index)
-	let filteredAdventuringGear = $derived.by(() => {
-		if (!character) return [];
-		return character.inventory.adventuring_gear
-			.map((gear, index) => ({ gear, originalIndex: index }))
-			.filter(({ gear }) => matchesSearch(gear, searchQuery));
-	});
+	// Filtered adventuring gear
+	let filteredAdventuringGear = $derived(
+		character?.inventory.adventuring_gear.filter((gear) => matchesSearch(gear, searchQuery)) || []
+	);
 
 	// Helper function to get weapon type for context functions
 	function getWeaponType(weapon: Weapon): 'primary_weapon' | 'secondary_weapon' {
@@ -239,7 +236,7 @@
 					<p class="ml-2 font-medium">Adventuring Gear</p>
 
 					<ul class="">
-						{#each filteredAdventuringGear as { gear, originalIndex } (originalIndex)}
+						{#each filteredAdventuringGear as gear (gear.title)}
 							<li class="flex items-center text-sm text-muted-foreground">
 								<span class="mr-3 ml-4">•</span>
 								{gear.title}
@@ -248,9 +245,8 @@
 									class="ml-auto h-auto py-1 text-foreground"
 									onclick={() =>
 										context.removeFromInventory(
-											{ compendium_id: gear.title },
-											'adventuring_gear',
-											originalIndex
+											{ id: gear.title },
+											'adventuring_gear'
 										)}
 								>
 									<CircleMinus class="size-4" />

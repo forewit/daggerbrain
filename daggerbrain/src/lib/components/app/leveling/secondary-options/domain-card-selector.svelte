@@ -109,7 +109,7 @@
 				<ChevronRight class="size-4 opacity-50" />
 			</Dialog.Trigger>
 
-			<Dialog.Content class="flex max-h-[90%] min-w-[calc(100%-1rem)] flex-col gap-4 md:min-w-3xl">
+			<Dialog.Content class="overflow-y-auto flex max-h-[90%] min-w-[calc(100%-1rem)] flex-col gap-4 md:min-w-3xl">
 				<Dialog.Header>
 					<Dialog.Title>{title}</Dialog.Title>
 				</Dialog.Header>
@@ -118,16 +118,13 @@
 						{@html description_html}
 					</p>
 				</Dialog.Description>
-				<div class="relative overflow-y-auto">
+				<div class="relative">
 					<CardCarousel
 						cards={cardsArray.map(({ card }) => card)}
 						bind:selectedIndex
 						{disabled_indices}
 						{highlighted_indices}
 						emptyMessage="No Domain Cards"
-						scroll_to_index={cardsArray.findIndex(
-							({ id }) => selected_card_id && domainCardIdEqual(id, selected_card_id)
-						)}
 					/>
 					{#if cardsArray.length > 0}
 						<Button
@@ -143,7 +140,7 @@
 							}}
 							hidden={highlighted_indices.has(selectedIndex)}
 							class={cn(
-								'absolute -bottom-[2px] left-1/2 -translate-x-1/2 rounded-full',
+								'absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full',
 								isSelectedCardDisabled &&
 									'cursor-default border-3 border-destructive bg-muted hover:bg-muted'
 							)}

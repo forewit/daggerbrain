@@ -29,7 +29,7 @@
 	const context = getCharacterContext();
 </script>
 
-<div class={cn('relative overflow-hidden rounded-2xl border-3 py-4 corner-bevel', className)}>
+<div class={cn('relative overflow-hidden rounded-xl border-3 py-4', className)}>
 	<Tabs.Root bind:value={tab}>
 		<Tabs.List class="mx-auto -mt-2 mb-1 flex h-auto flex-wrap gap-y-1 px-2">
 			<Tabs.Trigger value="weapons" class="flex-initial">Active Weapons & Armor</Tabs.Trigger>

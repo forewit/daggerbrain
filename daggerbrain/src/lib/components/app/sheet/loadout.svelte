@@ -64,17 +64,17 @@
 				<Dialog.Trigger class={cn(buttonVariants({ size: 'sm' }), 'relative')}>
 					<ArrowLeftRight class="size-3" />
 					Vault
-					<!-- <span
+					<span
 						class="absolute top-1 right-0 grid h-4.5 translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-accent px-1.5 text-xs font-bold text-background"
 					>
 						{vault.length}
-					</span> -->
+					</span>
 				</Dialog.Trigger>
-				<Dialog.Content class="flex max-h-[90%] min-w-[calc(100%-1rem)] flex-col px-0 md:min-w-3xl">
+				<Dialog.Content class="overflow-y-auto flex max-h-[90%] min-w-[calc(100%-1rem)] flex-col px-0 md:min-w-3xl">
 					<Dialog.Header class="px-6">
 						<Dialog.Title>Vault</Dialog.Title>
 					</Dialog.Header>
-					<div class="flex flex-col overflow-y-auto">
+					<div class="flex flex-col">
 						<!-- vault -->
 						<div class="relative mb-5 shrink">
 							<CardCarousel
@@ -100,7 +100,7 @@
 											}
 										}}
 										class={cn(
-											'absolute -bottom-[2px] left-1/2 -translate-x-1/2 rounded-full',
+											'absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full',
 											context.domain_card_loadout.length >= context.max_domain_card_loadout &&
 												'cursor-default border-3 border-destructive bg-muted hover:bg-muted'
 										)}
@@ -156,7 +156,7 @@
 							{#if !restMode}
 								<Stress
 									class={cn(
-										'h-10 rounded-full bg-muted'
+										'px-4 py-2 rounded-full bg-muted'
 										// character.ephemeral_stats.marked_stress >= character.derived_stats.max_stress &&
 										//"border-3 border-destructive"
 									)}
@@ -203,7 +203,7 @@
 							(id) => id.cardId !== selected_id || id.domainId !== selected_domain_id
 						);
 					}}
-					class="absolute -bottom-[2px] left-1/2 -translate-x-1/2 rounded-full"
+					class="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full"
 				>
 					Move to Vault
 					<ArrowUpRight class="size-4" />

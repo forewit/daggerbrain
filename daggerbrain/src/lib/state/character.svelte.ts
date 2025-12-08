@@ -2684,8 +2684,7 @@ function createCharacter(id: string) {
 
 	/**
 	 * Remove an item from the character's inventory
-	 * @param item - The item to remove, where item.id is the unique inventory item id
-	 * @param originalIndex - For adventuring_gear, pass the originalIndex parameter
+	 * @param item - The item to remove, where item.id is the unique inventory item id (or title for adventuring_gear)
 	 */
 	function removeFromInventory(
 		item: { id: string },
@@ -2695,8 +2694,7 @@ function createCharacter(id: string) {
 			| 'armor'
 			| 'consumable'
 			| 'loot'
-			| 'adventuring_gear',
-		originalIndex?: number
+			| 'adventuring_gear'
 	) {
 		if (!character) return;
 
@@ -2732,8 +2730,11 @@ function createCharacter(id: string) {
 			if (item.id in character.inventory.loot) {
 				delete character.inventory.loot[item.id];
 			}
-		} else if (type === 'adventuring_gear' && originalIndex !== undefined) {
-			character.inventory.adventuring_gear.splice(originalIndex, 1);
+		} else if (type === 'adventuring_gear') {
+			const index = character.inventory.adventuring_gear.findIndex((gear) => gear.title === item.id);
+			if (index !== -1) {
+				character.inventory.adventuring_gear.splice(index, 1);
+			}
 		}
 	}
 

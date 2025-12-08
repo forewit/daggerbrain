@@ -72,8 +72,8 @@
 	</div>
 {/snippet}
 
-<div class={cn('flex flex-wrap justify-around gap-y-2 sm:flex-nowrap', className)}>
-	<div class="flex grow justify-evenly gap-2">
+<div class={cn('flex flex-wrap justify-evenly gap-x-1.5 gap-y-2 sm:flex-nowrap', className)}>
+	<div class="flex grow justify-around gap-2">
 		{@render trait('agility')}
 		{@render trait('strength')}
 		{@render trait('finesse')}

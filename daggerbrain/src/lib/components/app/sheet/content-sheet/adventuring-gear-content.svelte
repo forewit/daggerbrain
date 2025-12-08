@@ -58,7 +58,7 @@
 		<!-- Adventuring Gear Table -->
 		<table class="w-full border-collapse text-sm">
 			<tbody>
-				{#each adventuringGear as gear, index (index)}
+				{#each adventuringGear as gear (gear.title)}
 					<tr class="border-b">
 						<td class="py-2 pr-4 text-left text-muted-foreground">
 							{gear.title}
@@ -70,9 +70,8 @@
 								class="h-auto"
 								onclick={() =>
 									context.removeFromInventory(
-										{ compendium_id: gear.title },
-										'adventuring_gear',
-										index
+										{ id: gear.title },
+										'adventuring_gear'
 									)}
 							>
 								<CircleMinus class="size-3.5" />

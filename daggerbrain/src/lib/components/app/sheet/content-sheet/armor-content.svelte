@@ -19,9 +19,10 @@
 	let customizeOpen = $state(false);
 
 	// Get armor from inventory
-	let armor = $derived.by(() => {
-		return context.inventory_armor.find((a) => a.id === armorId) || null;
-	});
+	let armor = $derived(
+		context.inventory_armor.find((a) => a.id === armorId) ||
+			(context.derived_armor?.id === armorId ? context.derived_armor : null)
+	);
 
 	// Get the inventory item
 	let inventoryItem = $derived.by(() => {

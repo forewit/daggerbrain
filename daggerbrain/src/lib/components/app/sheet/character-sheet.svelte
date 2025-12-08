@@ -226,7 +226,7 @@
 			</div>
 
 			<!-- traits -->
-			<Traits traits={context.traits} class="mx-2 " />
+			<Traits traits={context.traits} class="mx-2" />
 
 			<!-- evasion and armor -->
 			<div class="mx-auto grid grid-cols-1 place-items-center gap-6 sm:grid-cols-[auto_auto]">
