@@ -19,34 +19,34 @@
 </script>
 
 {#if character}
-	<div class={cn('relative', displayOnly && 'pointer-events-none', className)}>
-		<div class="flex items-center gap-4">
-			<button
-				onclick={() => {
-					character.marked_stress = 0;
-				}}
-				class="text-sm font-medium">STRESS</button
-			>
-			<div class="flex flex-wrap gap-2">
-				{#each Array(context.max_stress) as _, index}
-					<button
-						aria-label="character.stress-slot"
-						class={cn(
-							'h-3 w-6 rounded-md border border-muted-foreground transition-colors',
-							index < character.marked_stress ? 'bg-muted-foreground' : 'bg-transparent',
-							slotClasses
-						)}
-						onclick={() => {
-							if (index + 1 === character.marked_stress) {
-								character.marked_stress = Math.max(0, character.marked_stress - 1);
-							} else {
-								character.marked_stress = index + 1;
-							}
-						}}
-						type="button"
-					></button>
-				{/each}
-			</div>
+	<div
+		class={cn('relative flex items-center gap-4', displayOnly && 'pointer-events-none', className)}
+	>
+		<button
+			onclick={() => {
+				character.marked_stress = 0;
+			}}
+			class="text-sm font-medium">STRESS</button
+		>
+		<div class="flex flex-wrap gap-2">
+			{#each Array(context.max_stress) as _, index}
+				<button
+					aria-label="character.stress-slot"
+					class={cn(
+						'h-3 w-6 rounded-md border border-muted-foreground transition-colors',
+						index < character.marked_stress ? 'bg-muted-foreground' : 'bg-transparent',
+						slotClasses
+					)}
+					onclick={() => {
+						if (index + 1 === character.marked_stress) {
+							character.marked_stress = Math.max(0, character.marked_stress - 1);
+						} else {
+							character.marked_stress = index + 1;
+						}
+					}}
+					type="button"
+				></button>
+			{/each}
 		</div>
 		{#if context.max_stress === character.marked_stress && !displayOnly}
 			<Button

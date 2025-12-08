@@ -1,19 +1,23 @@
 <script lang="ts">
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import * as Collapsible from '$lib/components/ui/collapsible';
 	import type { Weapon, Armor, Consumable } from '$lib/types/compendium-types';
 	import WeaponDetails from './weapon-details.svelte';
 	import ArmorDetails from './armor-details.svelte';
 	import ConsumableDetails from './consumable-details.svelte';
 	import Dropdown from '../leveling/dropdown.svelte';
-	import * as ButtonGroup from '$lib/components/ui/button-group';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import Search from '@lucide/svelte/icons/search';
+	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+	import { cn } from '$lib/utils';
 
 	let searchQuery = $state('');
 	let typeFilter = $state<'Primary' | 'Secondary' | 'Armor' | 'Consumables' | null>(null);
-	let tierFilter = $state<'1' | '2' | '3' | '4' | null>(null);
+	let tierFilter = $state<1 | 2 | 3 | 4 | null>(null);
+	let customItemOpen = $state(false);
+	let customItemTitle = $state('');
 
 	// Clear tier filter when consumables filter is selected (consumables don't have tiers)
 	$effect(() => {
@@ -24,7 +28,6 @@
 
 	const context = getCharacterContext();
 	const compendium = getCompendiumContext();
-	let character = $derived(context.character);
 
 	// Helper function to strip HTML tags for search
 	function stripHtml(html: string): string {
@@ -51,7 +54,7 @@
 
 			// Tier filter
 			if (tierFilter !== null) {
-				const weaponTier = context.get_tier_from_level(weapon.level_requirement);
+				const weaponTier = context.level_to_tier(weapon.level_requirement);
 				if (weaponTier !== tierFilter) return false;
 			}
 
@@ -70,7 +73,7 @@
 
 			// Tier filter
 			if (tierFilter !== null) {
-				const weaponTier = context.get_tier_from_level(weapon.level_requirement);
+				const weaponTier = context.level_to_tier(weapon.level_requirement);
 				if (weaponTier !== tierFilter) return false;
 			}
 
@@ -86,7 +89,7 @@
 
 			// Tier filter
 			if (tierFilter !== null) {
-				const armorTier = context.get_tier_from_level(armor.level_requirement);
+				const armorTier = context.level_to_tier(armor.level_requirement);
 				if (armorTier !== tierFilter) return false;
 			}
 
@@ -137,6 +140,49 @@
 </script>
 
 <div class="flex flex-col gap-4">
+	<!-- Custom Item Collapsible -->
+	<Collapsible.Root bind:open={customItemOpen}>
+		<Collapsible.Trigger
+			class={cn(
+				'flex w-full items-center justify-between rounded-md border bg-card px-3 py-2 text-sm',
+				customItemOpen && 'rounded-b-none'
+			)}
+		>
+			<span>Custom item</span>
+			<ChevronLeft class={cn('size-4 transition-transform', customItemOpen && '-rotate-90')} />
+		</Collapsible.Trigger>
+		<Collapsible.Content class="space-y-2 rounded-b-md border bg-card/50 p-2">
+			<Input
+				bind:value={customItemTitle}
+				placeholder="Enter item title..."
+				onkeydown={(e) => {
+					if (e.key === 'Enter' && customItemTitle.trim()) {
+						context.addToInventory(
+							{ compendium_id: customItemTitle.trim(), title: customItemTitle.trim() },
+							'adventuring_gear'
+						);
+						customItemTitle = '';
+					}
+				}}
+			/>
+			<Button
+				size="sm"
+				disabled={!customItemTitle.trim()}
+				onclick={() => {
+					if (customItemTitle.trim()) {
+						context.addToInventory(
+							{ compendium_id: customItemTitle.trim(), title: customItemTitle.trim() },
+							'adventuring_gear'
+						);
+						customItemTitle = '';
+					}
+				}}
+			>
+				Add Item
+			</Button>
+		</Collapsible.Content>
+	</Collapsible.Root>
+
 	<!-- Search and Filters -->
 	<div class="flex flex-col gap-2">
 		<div class="relative">
@@ -183,33 +229,33 @@
 			<div class="flex grow flex-wrap justify-center gap-1">
 				<Button
 					size="sm"
-					variant={tierFilter === '1' ? 'default' : 'outline'}
+					variant={tierFilter === 1 ? 'default' : 'outline'}
 					disabled={typeFilter === 'Consumables'}
-					onclick={() => (tierFilter = tierFilter === '1' ? null : '1')}
+					onclick={() => (tierFilter = tierFilter === 1 ? null : 1)}
 				>
 					Tier 1
 				</Button>
 				<Button
 					size="sm"
-					variant={tierFilter === '2' ? 'default' : 'outline'}
+					variant={tierFilter === 2 ? 'default' : 'outline'}
 					disabled={typeFilter === 'Consumables'}
-					onclick={() => (tierFilter = tierFilter === '2' ? null : '2')}
+					onclick={() => (tierFilter = tierFilter === 2 ? null : 2)}
 				>
 					Tier 2
 				</Button>
 				<Button
 					size="sm"
-					variant={tierFilter === '3' ? 'default' : 'outline'}
+					variant={tierFilter === 3 ? 'default' : 'outline'}
 					disabled={typeFilter === 'Consumables'}
-					onclick={() => (tierFilter = tierFilter === '3' ? null : '3')}
+					onclick={() => (tierFilter = tierFilter === 3 ? null : 3)}
 				>
 					Tier 3
 				</Button>
 				<Button
 					size="sm"
-					variant={tierFilter === '4' ? 'default' : 'outline'}
+					variant={tierFilter === 4 ? 'default' : 'outline'}
 					disabled={typeFilter === 'Consumables'}
-					onclick={() => (tierFilter = tierFilter === '4' ? null : '4')}
+					onclick={() => (tierFilter = tierFilter === 4 ? null : 4)}
 				>
 					Tier 4
 				</Button>
@@ -224,7 +270,7 @@
 		{:else if filteredItems.length === 0}
 			<p class="py-4 text-center text-sm text-muted-foreground">No results</p>
 		{:else}
-			{#each filteredItems as entry (entry.item.id)}
+			{#each filteredItems as entry (entry.item.compendium_id)}
 				{#if entry.type === 'weapon'}
 					{#snippet subtitle_snippet()}
 						<Button
@@ -243,7 +289,7 @@
 						<div class="gap-4 text-left">
 							<p class="text-md font-medium">{entry.item.title}</p>
 							<p class="truncate text-[10px] leading-none text-muted-foreground italic">
-								Tier {context.get_tier_from_level(entry.item.level_requirement)}
+								Tier {context.level_to_tier(entry.item.level_requirement)}
 								{entry.item.category} Weapon
 							</p>
 						</div>
@@ -267,7 +313,7 @@
 						<div class="gap-4 text-left">
 							<p class="text-md font-medium">{entry.item.title}</p>
 							<p class="truncate text-[10px] leading-none text-muted-foreground italic">
-								Tier {context.get_tier_from_level(entry.item.level_requirement)} Armor
+								Tier {context.level_to_tier(entry.item.level_requirement)} Armor
 							</p>
 						</div>
 					{/snippet}

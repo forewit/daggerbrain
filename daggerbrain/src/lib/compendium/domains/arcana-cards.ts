@@ -2,7 +2,7 @@ import type { DomainCard } from '$lib/types/compendium-types';
 
 export const ARCANA_DOMAIN_CARDS = {
 	rune_ward: {
-		id: 'rune_ward',
+		compendium_id: 'rune_ward',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -28,7 +28,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	unleash_chaos: {
-		id: 'unleash_chaos',
+		compendium_id: 'unleash_chaos',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -54,7 +54,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	wall_walk: {
-		id: 'wall_walk',
+		compendium_id: 'wall_walk',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -80,7 +80,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	cinder_grasp: {
-		id: 'cinder_grasp',
+		compendium_id: 'cinder_grasp',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -106,7 +106,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	floating_eye: {
-		id: 'floating_eye',
+		compendium_id: 'floating_eye',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -132,7 +132,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	counterspell: {
-		id: 'counterspell',
+		compendium_id: 'counterspell',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -158,7 +158,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	flight: {
-		id: 'flight',
+		compendium_id: 'flight',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -184,7 +184,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	blink_out: {
-		id: 'blink_out',
+		compendium_id: 'blink_out',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -210,7 +210,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	preservation_blast: {
-		id: 'preservation_blast',
+		compendium_id: 'preservation_blast',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -236,7 +236,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	chain_lightning: {
-		id: 'chain_lightning',
+		compendium_id: 'chain_lightning',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -262,7 +262,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	premonition: {
-		id: 'premonition',
+		compendium_id: 'premonition',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -288,7 +288,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	rift_walker: {
-		id: 'rift_walker',
+		compendium_id: 'rift_walker',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -314,7 +314,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	telekinesis: {
-		id: 'telekinesis',
+		compendium_id: 'telekinesis',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -340,7 +340,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	arcana_touched: {
-		id: 'arcana_touched',
+		compendium_id: 'arcana_touched',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -383,7 +383,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	cloaking_blast: {
-		id: 'cloaking_blast',
+		compendium_id: 'cloaking_blast',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -409,7 +409,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	arcane_reflection: {
-		id: 'arcane_reflection',
+		compendium_id: 'arcane_reflection',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -435,7 +435,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	confusing_aura: {
-		id: 'confusing_aura',
+		compendium_id: 'confusing_aura',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -461,7 +461,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	earthquake: {
-		id: 'earthquake',
+		compendium_id: 'earthquake',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -487,7 +487,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	sensory_projection: {
-		id: 'sensory_projection',
+		compendium_id: 'sensory_projection',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -513,7 +513,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	adjust_reality: {
-		id: 'adjust_reality',
+		compendium_id: 'adjust_reality',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',
@@ -539,7 +539,7 @@ export const ARCANA_DOMAIN_CARDS = {
 		]
 	},
 	falling_sky: {
-		id: 'falling_sky',
+		compendium_id: 'falling_sky',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'arcana',

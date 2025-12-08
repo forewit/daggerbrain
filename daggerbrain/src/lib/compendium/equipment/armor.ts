@@ -2,7 +2,7 @@ import type { Armor } from '$lib/types/compendium-types';
 
 export const TIER_1_ARMOR = {
 	gambeson_armor: {
-		id: 'gambeson_armor',
+		compendium_id: 'gambeson_armor',
 		source_id: 'SRD',
 		title: 'Gambeson Armor',
 		description_html: '',
@@ -30,7 +30,7 @@ export const TIER_1_ARMOR = {
 		]
 	},
 	leather_armor: {
-		id: 'leather_armor',
+		compendium_id: 'leather_armor',
 		source_id: 'SRD',
 		title: 'Leather Armor',
 		description_html: '',
@@ -43,7 +43,7 @@ export const TIER_1_ARMOR = {
 		features: []
 	},
 	chainmail_armor: {
-		id: 'chainmail_armor',
+		compendium_id: 'chainmail_armor',
 		source_id: 'SRD',
 		title: 'Chainmail Armor',
 		description_html: '',
@@ -71,7 +71,7 @@ export const TIER_1_ARMOR = {
 		]
 	},
 	full_plate_armor: {
-		id: 'full_plate_armor',
+		compendium_id: 'full_plate_armor',
 		source_id: 'SRD',
 		title: 'Full Plate Armor',
 		description_html: '',
@@ -110,7 +110,7 @@ export const TIER_1_ARMOR = {
 
 export const TIER_2_ARMOR = {
 	improved_gambeson_armor: {
-		id: 'improved_gambeson_armor',
+		compendium_id: 'improved_gambeson_armor',
 		source_id: 'SRD',
 		title: 'Improved Gambeson Armor',
 		description_html: '',
@@ -138,7 +138,7 @@ export const TIER_2_ARMOR = {
 		]
 	},
 	improved_leather_armor: {
-		id: 'improved_leather_armor',
+		compendium_id: 'improved_leather_armor',
 		source_id: 'SRD',
 		title: 'Improved Leather Armor',
 		description_html: '',
@@ -151,7 +151,7 @@ export const TIER_2_ARMOR = {
 		features: []
 	},
 	improved_chainmail_armor: {
-		id: 'improved_chainmail_armor',
+		compendium_id: 'improved_chainmail_armor',
 		source_id: 'SRD',
 		title: 'Improved Chainmail Armor',
 		description_html: '',
@@ -179,7 +179,7 @@ export const TIER_2_ARMOR = {
 		]
 	},
 	improved_full_plate_armor: {
-		id: 'improved_full_plate_armor',
+		compendium_id: 'improved_full_plate_armor',
 		source_id: 'SRD',
 		title: 'Improved Full Plate Armor',
 		description_html: '',
@@ -215,7 +215,7 @@ export const TIER_2_ARMOR = {
 		]
 	},
 	elundrian_chain_armor: {
-		id: 'elundrian_chain_armor',
+		compendium_id: 'elundrian_chain_armor',
 		source_id: 'SRD',
 		title: 'Elundrian Chain Armor',
 		description_html: '',
@@ -236,7 +236,7 @@ export const TIER_2_ARMOR = {
 		]
 	},
 	harrowbone_armor: {
-		id: 'harrowbone_armor',
+		compendium_id: 'harrowbone_armor',
 		source_id: 'SRD',
 		title: 'Harrowbone Armor',
 		description_html: '',
@@ -257,7 +257,7 @@ export const TIER_2_ARMOR = {
 		]
 	},
 	irontree_breastplate_armor: {
-		id: 'irontree_breastplate_armor',
+		compendium_id: 'irontree_breastplate_armor',
 		source_id: 'SRD',
 		title: 'Irontree Breastplate Armor',
 		description_html: '',
@@ -278,7 +278,7 @@ export const TIER_2_ARMOR = {
 		]
 	},
 	runetan_floating_armor: {
-		id: 'runetan_floating_armor',
+		compendium_id: 'runetan_floating_armor',
 		source_id: 'SRD',
 		title: 'Runetan Floating Armor',
 		description_html: '',
@@ -299,7 +299,7 @@ export const TIER_2_ARMOR = {
 		]
 	},
 	tyris_soft_armor: {
-		id: 'tyris_soft_armor',
+		compendium_id: 'tyris_soft_armor',
 		source_id: 'SRD',
 		title: 'Tyris Soft Armor',
 		description_html: '',
@@ -319,7 +319,7 @@ export const TIER_2_ARMOR = {
 		]
 	},
 	rosewild_armor: {
-		id: 'rosewild_armor',
+		compendium_id: 'rosewild_armor',
 		source_id: 'SRD',
 		title: 'Rosewild Armor',
 		description_html: '',
@@ -342,7 +342,7 @@ export const TIER_2_ARMOR = {
 
 export const TIER_3_ARMOR = {
 	advanced_gambeson_armor: {
-		id: 'advanced_gambeson_armor',
+		compendium_id: 'advanced_gambeson_armor',
 		source_id: 'SRD',
 		title: 'Advanced Gambeson Armor',
 		description_html: '',
@@ -370,7 +370,7 @@ export const TIER_3_ARMOR = {
 		]
 	},
 	advanced_leather_armor: {
-		id: 'advanced_leather_armor',
+		compendium_id: 'advanced_leather_armor',
 		source_id: 'SRD',
 		title: 'Advanced Leather Armor',
 		description_html: '',
@@ -383,7 +383,7 @@ export const TIER_3_ARMOR = {
 		features: []
 	},
 	advanced_chainmail_armor: {
-		id: 'advanced_chainmail_armor',
+		compendium_id: 'advanced_chainmail_armor',
 		source_id: 'SRD',
 		title: 'Advanced Chainmail Armor',
 		description_html: '',
@@ -411,7 +411,7 @@ export const TIER_3_ARMOR = {
 		]
 	},
 	advanced_full_plate_armor: {
-		id: 'advanced_full_plate_armor',
+		compendium_id: 'advanced_full_plate_armor',
 		source_id: 'SRD',
 		title: 'Advanced Full Plate Armor',
 		description_html: '',
@@ -447,7 +447,7 @@ export const TIER_3_ARMOR = {
 		]
 	},
 	bellamoi_fine_armor: {
-		id: 'bellamoi_fine_armor',
+		compendium_id: 'bellamoi_fine_armor',
 		source_id: 'SRD',
 		title: 'Bellamoi Fine Armor',
 		description_html: '',
@@ -476,7 +476,7 @@ export const TIER_3_ARMOR = {
 		]
 	},
 	dragonscale_armor: {
-		id: 'dragonscale_armor',
+		compendium_id: 'dragonscale_armor',
 		source_id: 'SRD',
 		title: 'Dragonscale Armor',
 		description_html: '',
@@ -497,7 +497,7 @@ export const TIER_3_ARMOR = {
 		]
 	},
 	spiked_plate_armor: {
-		id: 'spiked_plate_armor',
+		compendium_id: 'spiked_plate_armor',
 		source_id: 'SRD',
 		title: 'Spiked Plate Armor',
 		description_html: '',
@@ -518,7 +518,7 @@ export const TIER_3_ARMOR = {
 		]
 	},
 	bladefare_armor: {
-		id: 'bladefare_armor',
+		compendium_id: 'bladefare_armor',
 		source_id: 'SRD',
 		title: 'Bladefare Armor',
 		description_html: '',
@@ -538,7 +538,7 @@ export const TIER_3_ARMOR = {
 		]
 	},
 	monetts_cloak: {
-		id: 'monetts_cloak',
+		compendium_id: 'monetts_cloak',
 		source_id: 'SRD',
 		title: 'Monett’s Cloak',
 		description_html: '',
@@ -558,7 +558,7 @@ export const TIER_3_ARMOR = {
 		]
 	},
 	runes_of_fortification: {
-		id: 'runes_of_fortification',
+		compendium_id: 'runes_of_fortification',
 		source_id: 'SRD',
 		title: 'Runes of Fortification',
 		description_html: '',
@@ -581,7 +581,7 @@ export const TIER_3_ARMOR = {
 
 export const TIER_4_ARMOR = {
 	legendary_gambeson_armor: {
-		id: 'legendary_gambeson_armor',
+		compendium_id: 'legendary_gambeson_armor',
 		source_id: 'SRD',
 		title: 'Legendary Gambeson Armor',
 		description_html: '',
@@ -609,7 +609,7 @@ export const TIER_4_ARMOR = {
 		]
 	},
 	legendary_leather_armor: {
-		id: 'legendary_leather_armor',
+		compendium_id: 'legendary_leather_armor',
 		source_id: 'SRD',
 		title: 'Legendary Leather Armor',
 		description_html: '',
@@ -622,7 +622,7 @@ export const TIER_4_ARMOR = {
 		features: []
 	},
 	legendary_chainmail_armor: {
-		id: 'legendary_chainmail_armor',
+		compendium_id: 'legendary_chainmail_armor',
 		source_id: 'SRD',
 		title: 'Legendary Chainmail Armor',
 		description_html: '',
@@ -650,7 +650,7 @@ export const TIER_4_ARMOR = {
 		]
 	},
 	legendary_full_plate_armor: {
-		id: 'legendary_full_plate_armor',
+		compendium_id: 'legendary_full_plate_armor',
 		source_id: 'SRD',
 		title: 'Legendary Full Plate Armor',
 		description_html: '',
@@ -686,7 +686,7 @@ export const TIER_4_ARMOR = {
 		]
 	},
 	dunamis_silkchain: {
-		id: 'dunamis_silkchain',
+		compendium_id: 'dunamis_silkchain',
 		source_id: 'SRD',
 		title: 'Dunamis Silkchain',
 		description_html: '',
@@ -707,7 +707,7 @@ export const TIER_4_ARMOR = {
 		]
 	},
 	channeling_armor: {
-		id: 'channeling_armor',
+		compendium_id: 'channeling_armor',
 		source_id: 'SRD',
 		title: 'Channeling Armor',
 		description_html: '',
@@ -735,7 +735,7 @@ export const TIER_4_ARMOR = {
 		]
 	},
 	emberwoven_armor: {
-		id: 'emberwoven_armor',
+		compendium_id: 'emberwoven_armor',
 		source_id: 'SRD',
 		title: 'Emberwoven Armor',
 		description_html: '',
@@ -756,7 +756,7 @@ export const TIER_4_ARMOR = {
 		]
 	},
 	full_fortified_armor: {
-		id: 'full_fortified_armor',
+		compendium_id: 'full_fortified_armor',
 		source_id: 'SRD',
 		title: 'Full Fortified Armor',
 		description_html: '',
@@ -777,7 +777,7 @@ export const TIER_4_ARMOR = {
 		]
 	},
 	veritas_opal_armor: {
-		id: 'veritas_opal_armor',
+		compendium_id: 'veritas_opal_armor',
 		source_id: 'SRD',
 		title: 'Veritas Opal Armor',
 		description_html: '',
@@ -798,7 +798,7 @@ export const TIER_4_ARMOR = {
 		]
 	},
 	savior_chainmail: {
-		id: 'savior_chainmail',
+		compendium_id: 'savior_chainmail',
 		source_id: 'SRD',
 		title: 'Savior Chainmail',
 		description_html: '',

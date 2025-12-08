@@ -12,32 +12,30 @@
 </script>
 
 {#if character}
-	<div class={cn('relative', className)}>
-		<div class="flex items-center gap-4">
-			<button
-				onclick={() => {
-					character.marked_hp = 0;
-				}}
-				class="text-sm font-medium">HP</button
-			>
-			<div class="flex flex-wrap gap-2">
-				{#each Array(context.max_hp) as _, index}
-					<button
-						aria-label="hp-slot"
-						class="h-3 w-6 rounded-md border border-muted-foreground {index < character.marked_hp
-							? 'bg-muted-foreground'
-							: 'bg-transparent'} transition-colors"
-						onclick={() => {
-							if (index + 1 === character.marked_hp) {
-								character.marked_hp = Math.max(0, character.marked_hp - 1);
-							} else {
-								character.marked_hp = index + 1;
-							}
-						}}
-						type="button"
-					></button>
-				{/each}
-			</div>
+	<div class={cn('relative flex items-center gap-4', className)}>
+		<button
+			onclick={() => {
+				character.marked_hp = 0;
+			}}
+			class="text-sm font-medium">HP</button
+		>
+		<div class="flex flex-wrap gap-2">
+			{#each Array(context.max_hp) as _, index}
+				<button
+					aria-label="hp-slot"
+					class="h-3 w-6 rounded-md border border-muted-foreground {index < character.marked_hp
+						? 'bg-muted-foreground'
+						: 'bg-transparent'} transition-colors"
+					onclick={() => {
+						if (index + 1 === character.marked_hp) {
+							character.marked_hp = Math.max(0, character.marked_hp - 1);
+						} else {
+							character.marked_hp = index + 1;
+						}
+					}}
+					type="button"
+				></button>
+			{/each}
 		</div>
 		{#if context.max_hp === character.marked_hp}
 			<Button

@@ -5,11 +5,11 @@ import type {
 	ConnectionAnswer,
 	CharacterSettings,
 	DerivedDescriptors,
-	CharacterInventory,
 	LevelUpDomainCardIds,
 	LevelUpChoices,
 	DomainCardId,
-	CharacterDescriptions
+	CharacterDescriptions,
+	Inventory
 } from '../../types/character-types';
 import type {
 	CharacterModifier,
@@ -77,7 +77,7 @@ export const characters_table = sqliteTable('characters_table', {
 	inventory: text('inventory', { mode: 'json' })
 		.notNull()
 		.default(CHARACTER_DEFAULTS.inventory)
-		.$type<CharacterInventory>(),
+		.$type<Inventory>(),
 
 	// the void / other
 	active_conditions: text('active_conditions', { mode: 'json' })

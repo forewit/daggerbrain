@@ -2,7 +2,7 @@ import type { CommunityCard } from '$lib/types/compendium-types';
 
 export const COMMUNITY_CARDS = {
 	warborne: {
-		id: 'warborne',
+		compendium_id: 'warborne',
 		source_id: 'Void 1.5',
 		card_type: 'community',
 		artist_name: '',
@@ -22,7 +22,7 @@ export const COMMUNITY_CARDS = {
 		]
 	},
 	highborne: {
-		id: 'highborne',
+		compendium_id: 'highborne',
 		source_id: 'SRD',
 		card_type: 'community',
 		artist_name: 'Julia Metzger',
@@ -42,7 +42,7 @@ export const COMMUNITY_CARDS = {
 		]
 	},
 	loreborne: {
-		id: 'loreborne',
+		compendium_id: 'loreborne',
 		source_id: 'SRD',
 		card_type: 'community',
 		artist_name: '',
@@ -62,7 +62,7 @@ export const COMMUNITY_CARDS = {
 		]
 	},
 	orderborne: {
-		id: 'orderborne',
+		compendium_id: 'orderborne',
 		source_id: 'SRD',
 		card_type: 'community',
 		artist_name: 'Rafater',
@@ -82,7 +82,7 @@ export const COMMUNITY_CARDS = {
 		]
 	},
 	ridgeborne: {
-		id: 'ridgeborne',
+		compendium_id: 'ridgeborne',
 		source_id: 'SRD',
 		card_type: 'community',
 		artist_name: 'Daarken',
@@ -102,7 +102,7 @@ export const COMMUNITY_CARDS = {
 		]
 	},
 	seaborne: {
-		id: 'seaborne',
+		compendium_id: 'seaborne',
 		source_id: 'SRD',
 		card_type: 'community',
 		artist_name: 'Sam Key',
@@ -122,7 +122,7 @@ export const COMMUNITY_CARDS = {
 		]
 	},
 	slyborne: {
-		id: 'slyborne',
+		compendium_id: 'slyborne',
 		source_id: 'SRD',
 		card_type: 'community',
 		artist_name: 'Paul Scott Canavan',
@@ -142,7 +142,7 @@ export const COMMUNITY_CARDS = {
 		]
 	},
 	underborne: {
-		id: 'underborne',
+		compendium_id: 'underborne',
 		source_id: 'SRD',
 		card_type: 'community',
 		artist_name: 'Irina Nordsol',
@@ -162,7 +162,7 @@ export const COMMUNITY_CARDS = {
 		]
 	},
 	wanderborne: {
-		id: 'wanderborne',
+		compendium_id: 'wanderborne',
 		source_id: 'SRD',
 		card_type: 'community',
 		artist_name: 'Paul Scott Canavan',
@@ -182,7 +182,7 @@ export const COMMUNITY_CARDS = {
 		]
 	},
 	wildborne: {
-		id: 'wildborne',
+		compendium_id: 'wildborne',
 		source_id: 'SRD',
 		card_type: 'community',
 		artist_name: 'Andreas Rocha',

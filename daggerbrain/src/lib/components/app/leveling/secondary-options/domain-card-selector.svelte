@@ -31,7 +31,7 @@
 
 	// Helper function to get DomainCardId from a card
 	function getDomainCardId(card: DomainCard): DomainCardId {
-		return { domainId: card.domain_id, cardId: card.id };
+		return { domainId: card.domain_id, cardId: card.compendium_id };
 	}
 
 	// Helper function to get card from available_cards using DomainCardId

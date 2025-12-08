@@ -42,7 +42,7 @@ function createCharacter(id: string) {
 	let ancestry_card: AncestryCard | null = $derived.by(() => {
 		if (!character) return null;
 
-		if (character.ancestry_card_id === BASE_MIXED_ANCESTRY_CARD.id) {
+		if (character.ancestry_card_id === BASE_MIXED_ANCESTRY_CARD.compendium_id) {
 			const custom_top_ancestry = character.custom_top_ancestry
 				? compendium.ancestry_cards[character.custom_top_ancestry]
 				: null;
@@ -115,43 +115,84 @@ function createCharacter(id: string) {
 	);
 
 	// Equipment
+	let inventory_primary_weapons = $derived.by(() => {
+		return Object.entries(character?.inventory.primary_weapons || {})
+			.map(([uniqueId, item]) => {
+				const compendiumItem = compendium.primary_weapons[item.compendium_id];
+				if (!compendiumItem) return null;
+				const weapon = { ...compendiumItem, id: uniqueId };
+				// Apply customizations
+				if (item.custom_title) weapon.title = item.custom_title;
+				if (item.custom_level_requirement !== null) {
+					weapon.level_requirement = item.custom_level_requirement;
+				}
+				return weapon;
+			})
+			.filter((w): w is NonNullable<typeof w> => !!w);
+	});
+	let inventory_secondary_weapons = $derived.by(() => {
+		return Object.entries(character?.inventory.secondary_weapons || {})
+			.map(([uniqueId, item]) => {
+				const compendiumItem = compendium.secondary_weapons[item.compendium_id];
+				if (!compendiumItem) return null;
+				const weapon = { ...compendiumItem, id: uniqueId };
+				// Apply customizations
+				if (item.custom_title) weapon.title = item.custom_title;
+				if (item.custom_level_requirement !== null) {
+					weapon.level_requirement = item.custom_level_requirement;
+				}
+				return weapon;
+			})
+			.filter((w): w is NonNullable<typeof w> => !!w);
+	});
+	let inventory_armor = $derived.by(() => {
+		return Object.entries(character?.inventory.armor || {})
+			.map(([uniqueId, item]) => {
+				const compendiumItem = compendium.armor[item.compendium_id];
+				if (!compendiumItem) return null;
+				const armor = { ...compendiumItem, id: uniqueId };
+				// Apply customizations
+				if (item.custom_title) armor.title = item.custom_title;
+				if (item.custom_level_requirement !== null) {
+					armor.level_requirement = item.custom_level_requirement;
+				}
+				return armor;
+			})
+			.filter((a): a is NonNullable<typeof a> => !!a);
+	});
+	let inventory_loot = $derived.by(() => {
+		return Object.entries(character?.inventory.loot || {})
+			.map(([uniqueId, item]) => {
+				const compendiumItem = compendium.loot[item.compendium_id];
+				if (!compendiumItem) return null;
+				const loot = { ...compendiumItem, id: uniqueId };
+				// Apply customizations
+				if (item.custom_title) loot.title = item.custom_title;
+				return loot;
+			})
+			.filter((l): l is NonNullable<typeof l> => !!l);
+	});
+	let inventory_consumables = $derived.by(() => {
+		return Object.entries(character?.inventory.consumables || {})
+			.map(([uniqueId, item]) => {
+				const compendiumItem = compendium.consumables[item.compendium_id];
+				if (!compendiumItem) return null;
+				const consumable = { ...compendiumItem, id: uniqueId };
+				// Apply customizations
+				if (item.custom_title) consumable.title = item.custom_title;
+				return consumable;
+			})
+			.filter((c): c is NonNullable<typeof c> => !!c);
+	});
+
 	let active_primary_weapon = $derived(
-		character?.active_primary_weapon_id
-			? compendium.primary_weapons[character.active_primary_weapon_id]
-			: null
+		inventory_primary_weapons.find((w) => w.id === character?.active_primary_weapon_id) || null
 	);
 	let active_secondary_weapon = $derived(
-		character?.active_secondary_weapon_id
-			? compendium.secondary_weapons[character.active_secondary_weapon_id]
-			: null
+		inventory_secondary_weapons.find((w) => w.id === character?.active_secondary_weapon_id) || null
 	);
 	let active_armor = $derived(
-		character?.active_armor_id ? compendium.armor[character.active_armor_id] : null
-	);
-	let inventory_primary_weapons = $derived(
-		Object.keys(character?.inventory.primary_weapons || {})
-			.map((id) => compendium.primary_weapons[id])
-			.filter((w) => !!w) || []
-	);
-	let inventory_secondary_weapons = $derived(
-		Object.keys(character?.inventory.secondary_weapons || {})
-			.map((id) => compendium.secondary_weapons[id])
-			.filter((w) => !!w) || []
-	);
-	let inventory_armor = $derived(
-		Object.keys(character?.inventory.armor || {})
-			.map((id) => compendium.armor[id])
-			.filter((a) => !!a) || []
-	);
-	let inventory_loot = $derived(
-		Object.keys(character?.inventory.loot || {})
-			.map((id) => compendium.loot[id])
-			.filter((l) => !!l) || []
-	);
-	let inventory_consumables = $derived(
-		Object.keys(character?.inventory.consumables || {})
-			.map((id) => compendium.consumables[id])
-			.filter((c) => !!c) || []
+		inventory_armor.find((a) => a.id === character?.active_armor_id) || null
 	);
 
 	// other
@@ -252,10 +293,10 @@ function createCharacter(id: string) {
 	// ================================================
 	// DERIVED STATS
 	// ================================================
-	let derived_primary_weapon: Weapon | null = $state(null);
-	let derived_secondary_weapon: Weapon | null = $state(null);
-	let derived_unarmed_attack: Weapon | null = $state(null);
-	let derived_armor: Armor | null = $state(null);
+	let derived_primary_weapon: (Weapon & { id: string }) | null = $state(null);
+	let derived_secondary_weapon: (Weapon & { id: string }) | null = $state(null);
+	let derived_unarmed_attack: (Weapon & { id: string }) | null = $state(null);
+	let derived_armor: (Armor & { id: string }) | null = $state(null);
 	let domain_card_vault: DomainCard[] = $state([]);
 	let domain_card_loadout: DomainCard[] = $state([]);
 	let traits: Traits = $state({ ...BASE_STATS.traits });
@@ -272,10 +313,7 @@ function createCharacter(id: string) {
 	let max_consumables: number = $state(BASE_STATS.max_consumables);
 	let consumable_count = $derived.by(() => {
 		if (!character) return 0;
-		return Object.values(character.inventory.consumables || {}).reduce(
-			(total, item) => total + (item.quantity || 0),
-			0
-		);
+		return Object.keys(character.inventory.consumables || {}).length;
 	});
 	let evasion: number = $state(BASE_STATS.evasion);
 	let damage_thresholds: DamageThresholds = $state({ ...BASE_STATS.damage_thresholds });
@@ -294,7 +332,7 @@ function createCharacter(id: string) {
 	// ! clear invalid mixed-ancestry
 	$effect(() => {
 		if (!character) return;
-		if (character.ancestry_card_id !== BASE_MIXED_ANCESTRY_CARD.id) {
+		if (character.ancestry_card_id !== BASE_MIXED_ANCESTRY_CARD.compendium_id) {
 			character.custom_top_ancestry = null;
 			character.custom_bottom_ancestry = null;
 		}
@@ -312,17 +350,12 @@ function createCharacter(id: string) {
 		const excess = currentCount - max;
 		let removed = 0;
 
-		// Iterate through consumables and remove excess quantities
-		for (const [id, item] of Object.entries(character.inventory.consumables)) {
+		// Iterate through consumables and remove excess items
+		for (const id of Object.keys(character.inventory.consumables)) {
 			if (removed >= excess) break;
 
-			const toRemove = Math.min(item.quantity, excess - removed);
-			item.quantity -= toRemove;
-			removed += toRemove;
-
-			if (item.quantity <= 0) {
-				delete character.inventory.consumables[id];
-			}
+			delete character.inventory.consumables[id];
+			removed++;
 		}
 
 		if (removed > 0) {
@@ -1063,7 +1096,7 @@ function createCharacter(id: string) {
 
 		// ! clear invalid domain_card_tokens
 		for (const domainCardId of Object.keys(character.domain_card_tokens)) {
-			if (!new_domain_card_vault.some((card) => card.id === domainCardId)) {
+			if (!new_domain_card_vault.some((card) => card.compendium_id === domainCardId)) {
 				delete character.domain_card_tokens[domainCardId];
 			}
 		}
@@ -1075,16 +1108,16 @@ function createCharacter(id: string) {
 
 		// initialize choices
 		for (const card of new_domain_card_vault) {
-			if (!new_domain_card_choices[card.id]) {
-				console.warn(`Creating arbitrary_choice slot for ${card.id}`);
-				new_domain_card_choices[card.id] = Object.fromEntries(
+			if (!new_domain_card_choices[card.compendium_id]) {
+				console.warn(`Creating arbitrary_choice slot for ${card.compendium_id}`);
+				new_domain_card_choices[card.compendium_id] = Object.fromEntries(
 					card.choices.map((choice) => [choice.choice_id, []])
 				);
 			}
 		}
 
 		// clear invalid choices
-		const valid_keys = new_domain_card_vault.map((card) => card.id);
+		const valid_keys = new_domain_card_vault.map((card) => card.compendium_id);
 		for (const domain_card_id of Object.keys(new_domain_card_choices)) {
 			if (!valid_keys.includes(domain_card_id)) delete new_domain_card_choices[domain_card_id];
 		}
@@ -1165,14 +1198,17 @@ function createCharacter(id: string) {
 			domainCardIdEqual
 		).filter((id) =>
 			domain_card_vault.some(
-				(card) => card.id === id.cardId && card.domain_id === id.domainId && !card.forced_in_vault
+				(card) =>
+					card.compendium_id === id.cardId &&
+					card.domain_id === id.domainId &&
+					!card.forced_in_vault
 			)
 		);
 
 		// check if any cards are forced in the loadout
 		const ids_forced_in_loadout: DomainCardId[] = domain_card_vault
 			.filter((card) => card.forced_in_loadout)
-			.map((card) => ({ domainId: card.domain_id, cardId: card.id }));
+			.map((card) => ({ domainId: card.domain_id, cardId: card.compendium_id }));
 
 		// add any missing cards that were forced in the loadout
 		for (const id of ids_forced_in_loadout) {
@@ -1189,7 +1225,9 @@ function createCharacter(id: string) {
 
 		domain_card_loadout = new_loadout_domain_card_ids
 			.map((id) =>
-				domain_card_vault.find((card) => card.id === id.cardId && card.domain_id === id.domainId)
+				domain_card_vault.find(
+					(card) => card.compendium_id === id.cardId && card.domain_id === id.domainId
+				)
 			)
 			.filter((card): card is DomainCard => card !== undefined);
 
@@ -1357,7 +1395,9 @@ function createCharacter(id: string) {
 		vault.forEach((card, i) => {
 			if (
 				card.applies_in_vault ||
-				loadout_card_ids.some((id) => id.cardId === card.id && id.domainId === card.domain_id)
+				loadout_card_ids.some(
+					(id) => id.cardId === card.compendium_id && id.domainId === card.domain_id
+				)
 			) {
 				card.features.forEach((f) => {
 					push_character_modifiers(f.character_modifiers);
@@ -1422,7 +1462,7 @@ function createCharacter(id: string) {
 	$effect(() => {
 		if (!character) return;
 
-		let new_armor: Armor = BASE_STATS.unarmored;
+		let new_armor: Armor & { id: string } = BASE_STATS.unarmored;
 
 		if (active_armor !== null && active_armor.level_requirement < character.level) {
 			console.warn(`Removing invalid armor ${active_armor.id}. level requirement not met`);
@@ -1431,9 +1471,12 @@ function createCharacter(id: string) {
 			new_armor = active_armor;
 		}
 
-		function equivalent_armor(a: Armor | null, b: Armor | null) {
-			if (a === null && b === null) return true;
-			if (a === null || b === null) return false;
+		function equivalent_armor(
+			a: (Armor & { id: string }) | null | undefined,
+			b: (Armor & { id: string }) | null | undefined
+		) {
+			if ((a === null || a === undefined) && (b === null || b === undefined)) return true;
+			if (a === null || a === undefined || b === null || b === undefined) return false;
 			return a.id === b.id;
 		}
 
@@ -1599,9 +1642,12 @@ function createCharacter(id: string) {
 			}
 		}
 
-		function equivalent_weapons(a: Weapon | null, b: Weapon | null) {
-			if (a === null && b === null) return true;
-			if (a === null || b === null) return false;
+		function equivalent_weapons(
+			a: (Weapon & { id: string }) | null | undefined,
+			b: (Weapon & { id: string }) | null | undefined
+		) {
+			if ((a === null || a === undefined) && (b === null || b === undefined)) return true;
+			if (a === null || a === undefined || b === null || b === undefined) return false;
 			return a.id === b.id;
 		}
 
@@ -1759,32 +1805,32 @@ function createCharacter(id: string) {
 		// start from base + marked trait bonuses
 		let new_traits = {
 			agility:
-				(base_traits.agility || 0) +
+				(base_traits.agility === null ? 0 : base_traits.agility) +
 				(tier_2_marked_traits.agility ? 1 : 0) +
 				(tier_3_marked_traits.agility ? 1 : 0) +
 				(tier_4_marked_traits.agility ? 1 : 0),
 			strength:
-				(base_traits.strength || 0) +
+				(base_traits.strength === null ? 0 : base_traits.strength) +
 				(tier_2_marked_traits.strength ? 1 : 0) +
 				(tier_3_marked_traits.strength ? 1 : 0) +
 				(tier_4_marked_traits.strength ? 1 : 0),
 			finesse:
-				(base_traits.finesse || 0) +
+				(base_traits.finesse === null ? 0 : base_traits.finesse) +
 				(tier_2_marked_traits.finesse ? 1 : 0) +
 				(tier_3_marked_traits.finesse ? 1 : 0) +
 				(tier_4_marked_traits.finesse ? 1 : 0),
 			instinct:
-				(base_traits.instinct || 0) +
+				(base_traits.instinct === null ? 0 : base_traits.instinct) +
 				(tier_2_marked_traits.instinct ? 1 : 0) +
 				(tier_3_marked_traits.instinct ? 1 : 0) +
 				(tier_4_marked_traits.instinct ? 1 : 0),
 			presence:
-				(base_traits.presence || 0) +
+				(base_traits.presence === null ? 0 : base_traits.presence) +
 				(tier_2_marked_traits.presence ? 1 : 0) +
 				(tier_3_marked_traits.presence ? 1 : 0) +
 				(tier_4_marked_traits.presence ? 1 : 0),
 			knowledge:
-				(base_traits.knowledge || 0) +
+				(base_traits.knowledge === null ? 0 : base_traits.knowledge) +
 				(tier_2_marked_traits.knowledge ? 1 : 0) +
 				(tier_3_marked_traits.knowledge ? 1 : 0) +
 				(tier_4_marked_traits.knowledge ? 1 : 0)
@@ -2358,7 +2404,7 @@ function createCharacter(id: string) {
 		};
 
 		// override with currently equiped armor
-		if (derived_armor !== null && derived_armor.id !== 'unarmored') {
+		if (derived_armor !== null && derived_armor.compendium_id !== 'unarmored') {
 			thresholds.major = derived_armor.damage_thresholds.major;
 			thresholds.severe = derived_armor.damage_thresholds.severe;
 		}
@@ -2481,11 +2527,19 @@ function createCharacter(id: string) {
 	});
 
 	// ! helper function to get tier from level
-	const get_tier_from_level = (level: number): '1' | '2' | '3' | '4' => {
-		if (level === 1) return '1';
-		if (level >= 2 && level <= 4) return '2';
-		if (level >= 5 && level <= 7) return '3';
-		return '4';
+	const level_to_tier = (level: number): 1 | 2 | 3 | 4 => {
+		if (level === 1) return 1;
+		if (level >= 2 && level <= 4) return 2;
+		if (level >= 5 && level <= 7) return 3;
+		return 4;
+	};
+
+	// ! helper function to get the first level of a tier
+	const tier_to_min_level = (tier: number): number => {
+		if (tier === 1) return 1;
+		if (tier === 2) return 2;
+		if (tier === 3) return 5;
+		return 8; // tier 4
 	};
 
 	// ! Auto-save character changes to database
@@ -2562,9 +2616,10 @@ function createCharacter(id: string) {
 
 	/**
 	 * Add an item to the character's inventory
+	 * @param item - The item to add, where item.id is the compendium_id
 	 */
 	function addToInventory(
-		item: { id: string; title?: string },
+		item: { compendium_id: string; title?: string },
 		type:
 			| 'primary_weapon'
 			| 'secondary_weapon'
@@ -2575,52 +2630,62 @@ function createCharacter(id: string) {
 	) {
 		if (!character) return;
 
+		const compendium_id = item.compendium_id;
+
 		if (type === 'primary_weapon') {
-			if (!(item.id in character.inventory.primary_weapons)) {
-				character.inventory.primary_weapons[item.id] = { quantity: 1, choices: {} };
-			} else {
-				character.inventory.primary_weapons[item.id].quantity++;
-			}
+			// Generate unique id for this inventory item
+			const uniqueId = crypto.randomUUID();
+			character.inventory.primary_weapons[uniqueId] = {
+				id: uniqueId,
+				compendium_id,
+				choices: {},
+				custom_title: null,
+				custom_level_requirement: null
+			};
 		} else if (type === 'secondary_weapon') {
-			if (!(item.id in character.inventory.secondary_weapons)) {
-				character.inventory.secondary_weapons[item.id] = { quantity: 1, choices: {} };
-			} else {
-				character.inventory.secondary_weapons[item.id].quantity++;
-			}
+			const uniqueId = crypto.randomUUID();
+			character.inventory.secondary_weapons[uniqueId] = {
+				id: uniqueId,
+				compendium_id,
+				choices: {},
+				custom_title: null,
+				custom_level_requirement: null
+			};
 		} else if (type === 'armor') {
-			if (!(item.id in character.inventory.armor)) {
-				character.inventory.armor[item.id] = { quantity: 1, choices: {} };
-			} else {
-				character.inventory.armor[item.id].quantity++;
-			}
+			const uniqueId = crypto.randomUUID();
+			character.inventory.armor[uniqueId] = {
+				id: uniqueId,
+				compendium_id,
+				choices: {},
+				custom_title: null,
+				custom_level_requirement: null
+			};
 		} else if (type === 'consumable') {
-			if (!(item.id in character.inventory.consumables)) {
-				character.inventory.consumables[item.id] = { quantity: 1, choices: {} };
-			} else {
-				character.inventory.consumables[item.id].quantity++;
-			}
+			const uniqueId = crypto.randomUUID();
+			character.inventory.consumables[uniqueId] = {
+				id: uniqueId,
+				compendium_id,
+				choices: {},
+				custom_title: null
+			};
 		} else if (type === 'loot') {
-			if (!(item.id in character.inventory.loot)) {
-				character.inventory.loot[item.id] = { quantity: 1, choices: {} };
-			} else {
-				character.inventory.loot[item.id].quantity++;
-			}
+			const uniqueId = crypto.randomUUID();
+			character.inventory.loot[uniqueId] = {
+				id: uniqueId,
+				compendium_id,
+				choices: {},
+				custom_title: null
+			};
 		} else if (type === 'adventuring_gear') {
-			const title = item.title || item.id;
-			const existingIndex = character.inventory.adventuring_gear.findIndex(
-				(gear) => gear.title === title
-			);
-			if (existingIndex !== -1) {
-				character.inventory.adventuring_gear[existingIndex].quantity++;
-			} else {
-				character.inventory.adventuring_gear.push({ title, quantity: 1 });
-			}
+			const title = item.title || item.compendium_id;
+			character.inventory.adventuring_gear.push({ title });
 		}
 	}
 
 	/**
 	 * Remove an item from the character's inventory
-	 * For adventuring_gear, pass the originalIndex parameter
+	 * @param item - The item to remove, where item.id is the unique inventory item id
+	 * @param originalIndex - For adventuring_gear, pass the originalIndex parameter
 	 */
 	function removeFromInventory(
 		item: { id: string },
@@ -2641,10 +2706,7 @@ function createCharacter(id: string) {
 				character.active_primary_weapon_id = null;
 			}
 			if (item.id in character.inventory.primary_weapons) {
-				character.inventory.primary_weapons[item.id].quantity--;
-				if (character.inventory.primary_weapons[item.id].quantity <= 0) {
-					delete character.inventory.primary_weapons[item.id];
-				}
+				delete character.inventory.primary_weapons[item.id];
 			}
 		} else if (type === 'secondary_weapon') {
 			// Unequip if currently equipped
@@ -2652,10 +2714,7 @@ function createCharacter(id: string) {
 				character.active_secondary_weapon_id = null;
 			}
 			if (item.id in character.inventory.secondary_weapons) {
-				character.inventory.secondary_weapons[item.id].quantity--;
-				if (character.inventory.secondary_weapons[item.id].quantity <= 0) {
-					delete character.inventory.secondary_weapons[item.id];
-				}
+				delete character.inventory.secondary_weapons[item.id];
 			}
 		} else if (type === 'armor') {
 			// Unequip if currently equipped
@@ -2663,32 +2722,18 @@ function createCharacter(id: string) {
 				character.active_armor_id = null;
 			}
 			if (item.id in character.inventory.armor) {
-				character.inventory.armor[item.id].quantity--;
-				if (character.inventory.armor[item.id].quantity <= 0) {
-					delete character.inventory.armor[item.id];
-				}
+				delete character.inventory.armor[item.id];
 			}
 		} else if (type === 'consumable') {
 			if (item.id in character.inventory.consumables) {
-				character.inventory.consumables[item.id].quantity--;
-				if (character.inventory.consumables[item.id].quantity <= 0) {
-					delete character.inventory.consumables[item.id];
-				}
+				delete character.inventory.consumables[item.id];
 			}
 		} else if (type === 'loot') {
 			if (item.id in character.inventory.loot) {
-				character.inventory.loot[item.id].quantity--;
-				if (character.inventory.loot[item.id].quantity <= 0) {
-					delete character.inventory.loot[item.id];
-				}
+				delete character.inventory.loot[item.id];
 			}
 		} else if (type === 'adventuring_gear' && originalIndex !== undefined) {
-			const gear = character.inventory.adventuring_gear[originalIndex];
-			if (gear && gear.quantity > 1) {
-				gear.quantity--;
-			} else {
-				character.inventory.adventuring_gear.splice(originalIndex, 1);
-			}
+			character.inventory.adventuring_gear.splice(originalIndex, 1);
 		}
 	}
 
@@ -2938,7 +2983,8 @@ function createCharacter(id: string) {
 
 		// helper functions
 		destroy,
-		get_tier_from_level,
+		level_to_tier,
+		tier_to_min_level,
 
 		// inventory helper functions
 		addToInventory,

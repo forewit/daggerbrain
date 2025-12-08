@@ -21,8 +21,8 @@
 	// Get weapon choices from inventory.secondary_weapons[weapon.id].choices
 	// Structure: inventory.secondary_weapons[weapon.id].choices[choice_id] = selection_id[]
 	let weaponChoices = $derived.by(() => {
-		if (!character || !character.inventory.secondary_weapons[weapon.id]) return null;
-		return character.inventory.secondary_weapons[weapon.id].choices;
+		if (!character || !character.inventory.secondary_weapons[weapon.compendium_id]) return null;
+		return character.inventory.secondary_weapons[weapon.compendium_id].choices;
 	});
 
 	// Get current damage type and trait values from inventory choices
@@ -66,16 +66,11 @@
 				value={currentDamageType || ''}
 				onValueChange={(value) => {
 					if (!character) return;
-					if (!character.inventory.secondary_weapons[weapon.id]) {
-						// Initialize weapon entry if not present
-						character.inventory.secondary_weapons[weapon.id] = {
-							quantity: 1,
-							choices: {}
-						};
+					const inventoryItem = character.inventory.secondary_weapons[weapon.compendium_id];
+					if (inventoryItem) {
+						// Update the damage_type choice (stored as array)
+						inventoryItem.choices['damage_type'] = value === '' ? [] : [value];
 					}
-					// Update the damage_type choice (stored as array)
-					character.inventory.secondary_weapons[weapon.id].choices['damage_type'] =
-						value === '' ? [] : [value];
 				}}
 			>
 				<Select.Trigger
@@ -104,16 +99,11 @@
 				value={currentTrait || ''}
 				onValueChange={(value) => {
 					if (!character) return;
-					if (!character.inventory.secondary_weapons[weapon.id]) {
-						// Initialize weapon entry if not present
-						character.inventory.secondary_weapons[weapon.id] = {
-							quantity: 1,
-							choices: {}
-						};
+					const inventoryItem = character.inventory.secondary_weapons[weapon.compendium_id];
+					if (inventoryItem) {
+						// Update the trait choice (stored as array)
+						inventoryItem.choices['trait'] = value === '' ? [] : [value];
 					}
-					// Update the trait choice (stored as array)
-					character.inventory.secondary_weapons[weapon.id].choices['trait'] =
-						value === '' ? [] : [value];
 				}}
 			>
 				<Select.Trigger

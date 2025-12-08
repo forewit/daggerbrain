@@ -2,14 +2,14 @@ import type { Subclass } from '$lib/types/compendium-types';
 
 export const SUBCLASSES = {
 	assassin_executioners_guild: {
-		id: 'assassin_executioners_guild',
+		compendium_id: 'assassin_executioners_guild',
 		source_id: 'Void 1.5',
 		class_id: 'assassin',
 		name: 'Executioners Guild',
 		description_html:
 			'<p>Skilled in the art of assassination, the Executioners Guild is known for their precision and efficiency.</p>',
 		foundation_card: {
-			id: 'executioners_guild_foundation',
+			compendium_id: 'executioners_guild_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: '',
 			image_url: '/images/wip.avif',
@@ -35,7 +35,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'executioners_guild_specialization',
+			compendium_id: 'executioners_guild_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: '',
 			image_url: '/images/wip.avif',
@@ -60,7 +60,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'executioners_guild_mastery',
+			compendium_id: 'executioners_guild_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: '',
 			image_url: '/images/wip.avif',
@@ -86,13 +86,13 @@ export const SUBCLASSES = {
 		}
 	},
 	brawler_juggernaut: {
-		id: 'brawler_juggernaut',
+		compendium_id: 'brawler_juggernaut',
 		source_id: 'Void 1.5',
 		class_id: 'brawler',
 		name: 'Juggernaut',
 		description_html: '<p></p>',
 		foundation_card: {
-			id: 'juggernaut_foundation',
+			compendium_id: 'juggernaut_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: '',
 			image_url: '/images/wip.avif',
@@ -124,7 +124,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'juggernaut_specialization',
+			compendium_id: 'juggernaut_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: '',
 			image_url: '/images/wip.avif',
@@ -155,7 +155,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'juggernaut_mastery',
+			compendium_id: 'juggernaut_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: '',
 			image_url: '/images/wip.avif',
@@ -180,14 +180,14 @@ export const SUBCLASSES = {
 	},
 
 	bard_troubadour: {
-		id: 'bard_troubadour',
+		compendium_id: 'bard_troubadour',
 		source_id: 'SRD',
 		class_id: 'bard',
 		name: 'Troubadour',
 		description_html:
 			'<p>Play the Troubadour if you want to play music to bolster your allies.</p>',
 		foundation_card: {
-			id: 'troubadour_foundation',
+			compendium_id: 'troubadour_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Bear Frymire',
 			image_url: '/api/images/card/art/subclasses/troubadour.webp',
@@ -210,7 +210,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'troubadour_specialization',
+			compendium_id: 'troubadour_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Bear Frymire',
 			image_url: '/api/images/card/art/subclasses/troubadour.webp',
@@ -228,7 +228,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'troubadour_mastery',
+			compendium_id: 'troubadour_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Bear Frymire',
 			image_url: '/api/images/card/art/subclasses/troubadour.webp',
@@ -248,14 +248,14 @@ export const SUBCLASSES = {
 	},
 
 	bard_wordsmith: {
-		id: 'bard_wordsmith',
+		compendium_id: 'bard_wordsmith',
 		source_id: 'SRD',
 		class_id: 'bard',
 		name: 'Wordsmith',
 		description_html:
 			'<p>Play the Wordsmith if you want to use clever wordplay and captivate crowds.</p>',
 		foundation_card: {
-			id: 'wordsmith_foundation',
+			compendium_id: 'wordsmith_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Nikki Dawes',
 			image_url: '/api/images/card/art/subclasses/wordsmith.webp',
@@ -281,7 +281,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'wordsmith_specialization',
+			compendium_id: 'wordsmith_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Nikki Dawes',
 			image_url: '/api/images/card/art/subclasses/wordsmith.webp',
@@ -303,7 +303,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'wordsmith_mastery',
+			compendium_id: 'wordsmith_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Nikki Dawes',
 			image_url: '/api/images/card/art/subclasses/wordsmith.webp',
@@ -323,14 +323,14 @@ export const SUBCLASSES = {
 	},
 
 	druid_warden_of_renewal: {
-		id: 'druid_warden_of_renewal',
+		compendium_id: 'druid_warden_of_renewal',
 		source_id: 'SRD',
 		class_id: 'druid',
 		name: 'Warden of Renewal',
 		description_html:
 			'<p>Play the Warden of Renewal if you want to focus on healing and protection.</p>',
 		foundation_card: {
-			id: 'warden_of_renewal_foundation',
+			compendium_id: 'warden_of_renewal_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Ilya Royz',
 			image_url: '/api/images/card/art/subclasses/warden-of-renewal.webp',
@@ -356,7 +356,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'warden_of_renewal_specialization',
+			compendium_id: 'warden_of_renewal_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Ilya Royz',
 			image_url: '/api/images/card/art/subclasses/warden-of-renewal.webp',
@@ -381,7 +381,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'warden_of_renewal_mastery',
+			compendium_id: 'warden_of_renewal_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Ilya Royz',
 			image_url: '/api/images/card/art/subclasses/warden-of-renewal.webp',
@@ -401,14 +401,14 @@ export const SUBCLASSES = {
 	},
 
 	druid_warden_of_the_elements: {
-		id: 'druid_warden_of_the_elements',
+		compendium_id: 'druid_warden_of_the_elements',
 		source_id: 'SRD',
 		class_id: 'druid',
 		name: 'Warden of the Elements',
 		description_html:
 			'<p>Play the Warden of the Elements if you want to channel elemental power.</p>',
 		foundation_card: {
-			id: 'warden_of_the_elements_foundation',
+			compendium_id: 'warden_of_the_elements_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Zoe Badini',
 			image_url: '/api/images/card/art/subclasses/warden-of-the-elements.webp',
@@ -432,7 +432,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'warden_of_the_elements_specialization',
+			compendium_id: 'warden_of_the_elements_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Zoe Badini',
 			image_url: '/api/images/card/art/subclasses/warden-of-the-elements.webp',
@@ -455,7 +455,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'warden_of_the_elements_mastery',
+			compendium_id: 'warden_of_the_elements_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Zoe Badini',
 			image_url: '/api/images/card/art/subclasses/warden-of-the-elements.webp',
@@ -480,13 +480,13 @@ export const SUBCLASSES = {
 	},
 
 	guardian_stalwart: {
-		id: 'guardian_stalwart',
+		compendium_id: 'guardian_stalwart',
 		source_id: 'SRD',
 		class_id: 'guardian',
 		name: 'Stalwart',
 		description_html: '<p>Play the Stalwart if you want to be an unbreakable defender.</p>',
 		foundation_card: {
-			id: 'guardian_stalwart_foundation',
+			compendium_id: 'guardian_stalwart_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Reiko Murakami',
 			image_url: '/api/images/card/art/subclasses/stalwart.webp',
@@ -511,7 +511,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'guardian_stalwart_specialization',
+			compendium_id: 'guardian_stalwart_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Reiko Murakami',
 			image_url: '/api/images/card/art/subclasses/stalwart.webp',
@@ -535,7 +535,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'guardian_stalwart_mastery',
+			compendium_id: 'guardian_stalwart_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Reiko Murakami',
 			image_url: '/api/images/card/art/subclasses/stalwart.webp',
@@ -561,13 +561,13 @@ export const SUBCLASSES = {
 	},
 
 	guardian_vengeance: {
-		id: 'guardian_vengeance',
+		compendium_id: 'guardian_vengeance',
 		source_id: 'SRD',
 		class_id: 'guardian',
 		name: 'Vengeance',
 		description_html: '<p>Play the Vengeance if you want to punish those who harm your allies.</p>',
 		foundation_card: {
-			id: 'guardian_vengeance_foundation',
+			compendium_id: 'guardian_vengeance_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Linda Lithén',
 			image_url: '/api/images/card/art/subclasses/vengeance.webp',
@@ -592,7 +592,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'guardian_vengeance_specialization',
+			compendium_id: 'guardian_vengeance_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Linda Lithén',
 			image_url: '/api/images/card/art/subclasses/vengeance.webp',
@@ -610,7 +610,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'guardian_vengeance_mastery',
+			compendium_id: 'guardian_vengeance_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Linda Lithén',
 			image_url: '/api/images/card/art/subclasses/vengeance.webp',
@@ -630,14 +630,14 @@ export const SUBCLASSES = {
 	},
 
 	ranger_wayfinder: {
-		id: 'ranger_wayfinder',
+		compendium_id: 'ranger_wayfinder',
 		source_id: 'SRD',
 		class_id: 'ranger',
 		name: 'Wayfinder',
 		description_html:
 			'<p>Play the Wayfinder if you want to be a relentless tracker and hunter.</p>',
 		foundation_card: {
-			id: 'ranger_wayfinder_foundation',
+			compendium_id: 'ranger_wayfinder_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Simon Pape',
 			image_url: '/api/images/card/art/subclasses/wayfinder.webp',
@@ -663,7 +663,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'ranger_wayfinder_specialization',
+			compendium_id: 'ranger_wayfinder_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Simon Pape',
 			image_url: '/api/images/card/art/subclasses/wayfinder.webp',
@@ -681,7 +681,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'ranger_wayfinder_mastery',
+			compendium_id: 'ranger_wayfinder_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Simon Pape',
 			image_url: '/api/images/card/art/subclasses/wayfinder.webp',
@@ -701,14 +701,14 @@ export const SUBCLASSES = {
 	},
 
 	ranger_beastbound: {
-		id: 'ranger_beastbound',
+		compendium_id: 'ranger_beastbound',
 		source_id: 'SRD',
 		class_id: 'ranger',
 		name: 'Beastbound',
 		description_html:
 			'<p>Play the Beastbound if you want to fight alongside an animal companion.</p>',
 		foundation_card: {
-			id: 'ranger_beastbound_foundation',
+			compendium_id: 'ranger_beastbound_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Jenny Tan',
 			image_url: '/api/images/card/art/subclasses/beastbound.webp',
@@ -727,7 +727,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'ranger_beastbound_specialization',
+			compendium_id: 'ranger_beastbound_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Jenny Tan',
 			image_url: '/api/images/card/art/subclasses/beastbound.webp',
@@ -751,7 +751,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'ranger_beastbound_mastery',
+			compendium_id: 'ranger_beastbound_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Jenny Tan',
 			image_url: '/api/images/card/art/subclasses/beastbound.webp',
@@ -777,13 +777,13 @@ export const SUBCLASSES = {
 	},
 
 	rogue_syndicate: {
-		id: 'rogue_syndicate',
+		compendium_id: 'rogue_syndicate',
 		source_id: 'SRD',
 		class_id: 'rogue',
 		name: 'Syndicate',
 		description_html: '<p>Play the Syndicate if you want to leverage your network of contacts.</p>',
 		foundation_card: {
-			id: 'rogue_syndicate_foundation',
+			compendium_id: 'rogue_syndicate_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Jenny Tan',
 			image_url: '/api/images/card/art/subclasses/syndicate.webp',
@@ -808,7 +808,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'rogue_syndicate_specialization',
+			compendium_id: 'rogue_syndicate_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Jenny Tan',
 			image_url: '/api/images/card/art/subclasses/syndicate.webp',
@@ -830,7 +830,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'rogue_syndicate_mastery',
+			compendium_id: 'rogue_syndicate_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Jenny Tan',
 			image_url: '/api/images/card/art/subclasses/syndicate.webp',
@@ -853,13 +853,13 @@ export const SUBCLASSES = {
 	},
 
 	rogue_nightwalker: {
-		id: 'rogue_nightwalker',
+		compendium_id: 'rogue_nightwalker',
 		source_id: 'SRD',
 		class_id: 'rogue',
 		name: 'Nightwalker',
 		description_html: '<p>Play the Nightwalker if you want to master shadow and darkness.</p>',
 		foundation_card: {
-			id: 'rogue_nightwalker_foundation',
+			compendium_id: 'rogue_nightwalker_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Juan S. Almencion',
 			image_url: '/api/images/card/art/subclasses/nightwalker.webp',
@@ -878,7 +878,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'rogue_nightwalker_specialization',
+			compendium_id: 'rogue_nightwalker_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Juan S. Almencion',
 			image_url: '/api/images/card/art/subclasses/nightwalker.webp',
@@ -903,7 +903,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'rogue_nightwalker_mastery',
+			compendium_id: 'rogue_nightwalker_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Juan S. Almencion',
 			image_url: '/api/images/card/art/subclasses/nightwalker.webp',
@@ -930,14 +930,14 @@ export const SUBCLASSES = {
 	},
 
 	seraph_divine_wielder: {
-		id: 'seraph_divine_wielder',
+		compendium_id: 'seraph_divine_wielder',
 		source_id: 'SRD',
 		class_id: 'seraph',
 		name: 'Divine Wielder',
 		description_html:
 			'<p>Play the Divine Wielder if you want to channel divine power through your weapon.</p>',
 		foundation_card: {
-			id: 'seraph_divine_wielder_foundation',
+			compendium_id: 'seraph_divine_wielder_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Jenny Tan',
 			image_url: '/api/images/card/art/subclasses/divine-wielder.webp',
@@ -963,7 +963,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'seraph_divine_wielder_specialization',
+			compendium_id: 'seraph_divine_wielder_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Jenny Tan',
 			image_url: '/api/images/card/art/subclasses/divine-wielder.webp',
@@ -981,7 +981,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'seraph_divine_wielder_mastery',
+			compendium_id: 'seraph_divine_wielder_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Jenny Tan',
 			image_url: '/api/images/card/art/subclasses/divine-wielder.webp',
@@ -1001,14 +1001,14 @@ export const SUBCLASSES = {
 	},
 
 	seraph_winged_sentinel: {
-		id: 'seraph_winged_sentinel',
+		compendium_id: 'seraph_winged_sentinel',
 		source_id: 'SRD',
 		class_id: 'seraph',
 		name: 'Winged Sentinel',
 		description_html:
 			'<p>Play the Winged Sentinel if you want to take flight and protect from above.</p>',
 		foundation_card: {
-			id: 'seraph_winged_sentinel_foundation',
+			compendium_id: 'seraph_winged_sentinel_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Stephanie Cost',
 			image_url: '/api/images/card/art/subclasses/winged-sentinel.webp',
@@ -1030,7 +1030,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'seraph_winged_sentinel_specialization',
+			compendium_id: 'seraph_winged_sentinel_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Stephanie Cost',
 			image_url: '/api/images/card/art/subclasses/winged-sentinel.webp',
@@ -1048,7 +1048,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'seraph_winged_sentinel_mastery',
+			compendium_id: 'seraph_winged_sentinel_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Stephanie Cost',
 			image_url: '/api/images/card/art/subclasses/winged-sentinel.webp',
@@ -1075,13 +1075,13 @@ export const SUBCLASSES = {
 	},
 
 	sorcerer_elemental_origin: {
-		id: 'sorcerer_elemental_origin',
+		compendium_id: 'sorcerer_elemental_origin',
 		source_id: 'SRD',
 		class_id: 'sorcerer',
 		name: 'Elemental Origin',
 		description_html: '<p>Play the Elemental Origin if you want to command the elements.</p>',
 		foundation_card: {
-			id: 'sorcerer_elemental_origin_foundation',
+			compendium_id: 'sorcerer_elemental_origin_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Bear Frymire',
 			image_url: '/api/images/card/art/subclasses/elemental-origin.webp',
@@ -1101,7 +1101,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'sorcerer_elemental_origin_specialization',
+			compendium_id: 'sorcerer_elemental_origin_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Bear Frymire',
 			image_url: '/api/images/card/art/subclasses/elemental-origin.webp',
@@ -1119,7 +1119,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'sorcerer_elemental_origin_mastery',
+			compendium_id: 'sorcerer_elemental_origin_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Bear Frymire',
 			image_url: '/api/images/card/art/subclasses/elemental-origin.webp',
@@ -1144,14 +1144,14 @@ export const SUBCLASSES = {
 	},
 
 	sorcerer_primal_origin: {
-		id: 'sorcerer_primal_origin',
+		compendium_id: 'sorcerer_primal_origin',
 		source_id: 'SRD',
 		class_id: 'sorcerer',
 		name: 'Primal Origin',
 		description_html:
 			'<p>Play the Primal Origin if you want to manipulate the essence of magic itself.</p>',
 		foundation_card: {
-			id: 'sorcerer_primal_origin_foundation',
+			compendium_id: 'sorcerer_primal_origin_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Laura Galli',
 			image_url: '/api/images/card/art/subclasses/primal-origin.webp',
@@ -1175,7 +1175,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'sorcerer_primal_origin_specialization',
+			compendium_id: 'sorcerer_primal_origin_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Laura Galli',
 			image_url: '/api/images/card/art/subclasses/primal-origin.webp',
@@ -1193,7 +1193,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'sorcerer_primal_origin_mastery',
+			compendium_id: 'sorcerer_primal_origin_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Laura Galli',
 			image_url: '/api/images/card/art/subclasses/primal-origin.webp',
@@ -1213,14 +1213,14 @@ export const SUBCLASSES = {
 	},
 
 	warrior_call_of_the_brave: {
-		id: 'warrior_call_of_the_brave',
+		compendium_id: 'warrior_call_of_the_brave',
 		source_id: 'SRD',
 		class_id: 'warrior',
 		name: 'Call of the Brave',
 		description_html:
 			'<p>Play Call of the Brave if you want to inspire courage and face danger head-on.</p>',
 		foundation_card: {
-			id: 'call_of_the_brave_foundation',
+			compendium_id: 'call_of_the_brave_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Mat Wilma',
 			image_url: '/images/wip.avif',
@@ -1245,7 +1245,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'call_of_the_brave_specialization',
+			compendium_id: 'call_of_the_brave_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Mat Wilma',
 			image_url: '/images/wip.avif',
@@ -1263,7 +1263,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'call_of_the_brave_mastery',
+			compendium_id: 'call_of_the_brave_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Mat Wilma',
 			image_url: '/images/wip.avif',
@@ -1283,14 +1283,14 @@ export const SUBCLASSES = {
 	},
 
 	warrior_call_of_the_slayer: {
-		id: 'warrior_call_of_the_slayer',
+		compendium_id: 'warrior_call_of_the_slayer',
 		source_id: 'SRD',
 		class_id: 'warrior',
 		name: 'Call of the Slayer',
 		description_html:
 			'<p>Play Call of the Slayer if you want to be a relentless combatant who builds power through battle.</p>',
 		foundation_card: {
-			id: 'call_of_the_slayer_foundation',
+			compendium_id: 'call_of_the_slayer_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Reiko Murakami',
 			image_url: '/images/wip.avif',
@@ -1308,7 +1308,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'call_of_the_slayer_specialization',
+			compendium_id: 'call_of_the_slayer_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Reiko Murakami',
 			image_url: '/images/wip.avif',
@@ -1326,7 +1326,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'call_of_the_slayer_mastery',
+			compendium_id: 'call_of_the_slayer_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Reiko Murakami',
 			image_url: '/images/wip.avif',
@@ -1346,14 +1346,14 @@ export const SUBCLASSES = {
 	},
 
 	wizard_school_of_knowledge: {
-		id: 'wizard_school_of_knowledge',
+		compendium_id: 'wizard_school_of_knowledge',
 		source_id: 'SRD',
 		class_id: 'wizard',
 		name: 'School of Knowledge',
 		description_html:
 			'<p>Play School of Knowledge if you want to master the arcane through study and preparation.</p>',
 		foundation_card: {
-			id: 'school_of_knowledge_foundation',
+			compendium_id: 'school_of_knowledge_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Bear Frymire',
 			image_url: '/images/wip.avif',
@@ -1379,7 +1379,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'school_of_knowledge_specialization',
+			compendium_id: 'school_of_knowledge_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Bear Frymire',
 			image_url: '/images/wip.avif',
@@ -1404,7 +1404,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'school_of_knowledge_mastery',
+			compendium_id: 'school_of_knowledge_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Bear Frymire',
 			image_url: '/images/wip.avif',
@@ -1431,14 +1431,14 @@ export const SUBCLASSES = {
 	},
 
 	wizard_school_of_war: {
-		id: 'wizard_school_of_war',
+		compendium_id: 'wizard_school_of_war',
 		source_id: 'SRD',
 		class_id: 'wizard',
 		name: 'School of War',
 		description_html:
 			'<p>Play School of War if you want to be a battle-focused wizard who thrives in combat.</p>',
 		foundation_card: {
-			id: 'school_of_war_foundation',
+			compendium_id: 'school_of_war_foundation',
 			card_type: 'subclass_foundation',
 			artist_name: 'Nikki Dawes',
 			image_url: '/images/wip.avif',
@@ -1472,7 +1472,7 @@ export const SUBCLASSES = {
 			]
 		},
 		specialization_card: {
-			id: 'school_of_war_specialization',
+			compendium_id: 'school_of_war_specialization',
 			card_type: 'subclass_specialization',
 			artist_name: 'Nikki Dawes',
 			image_url: '/images/wip.avif',
@@ -1497,7 +1497,7 @@ export const SUBCLASSES = {
 			]
 		},
 		mastery_card: {
-			id: 'school_of_war_mastery',
+			compendium_id: 'school_of_war_mastery',
 			card_type: 'subclass_mastery',
 			artist_name: 'Nikki Dawes',
 			image_url: '/images/wip.avif',

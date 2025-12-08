@@ -30,10 +30,10 @@
 
 	let width = $state(300);
 
-	let isMixedAncestry = $derived(card.id === BASE_MIXED_ANCESTRY_CARD.id);
+	let isMixedAncestry = $derived(card.compendium_id === BASE_MIXED_ANCESTRY_CARD.compendium_id);
 	let ancestryOptions = $derived(
 		Object.entries(compendium.ancestry_cards)
-			.filter(([id]) => id !== BASE_MIXED_ANCESTRY_CARD.id)
+			.filter(([id]) => id !== BASE_MIXED_ANCESTRY_CARD.compendium_id)
 			.map(([id, card]) => ({
 				value: id,
 				label: card.title

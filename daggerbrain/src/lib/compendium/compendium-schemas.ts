@@ -46,7 +46,7 @@ export const CardTypesSchema = z.enum([
 export const SourceIdsSchema = z.enum(['Void 1.5', 'SRD', 'Homebrew']);
 
 export const SourcesSchema = z.object({
-	id: z.string(),
+	source_id: SourceIdsSchema,
 	name: z.string(),
 	short_title: z.string()
 });
@@ -204,7 +204,7 @@ export const FeatureSchema = z.object({
 // ============================================================================
 
 export const SubclassFoundationCardSchema = z.object({
-	id: z.string(),
+	compendium_id: z.string(),
 	image_url: z.string(),
 	card_type: CardTypesSchema,
 	title: z.string(),
@@ -216,7 +216,7 @@ export const SubclassFoundationCardSchema = z.object({
 });
 
 export const SubclassSpecializationCardSchema = z.object({
-	id: z.string(),
+	compendium_id: z.string(),
 	image_url: z.string(),
 	card_type: CardTypesSchema,
 	title: z.string(),
@@ -227,7 +227,7 @@ export const SubclassSpecializationCardSchema = z.object({
 });
 
 export const SubclassMasteryCardSchema = z.object({
-	id: z.string(),
+	compendium_id: z.string(),
 	image_url: z.string(),
 	card_type: CardTypesSchema,
 	title: z.string(),
@@ -238,7 +238,7 @@ export const SubclassMasteryCardSchema = z.object({
 });
 
 export const SubclassSchema = z.object({
-	id: z.string(),
+	compendium_id: z.string(),
 	source_id: SourceIdsSchema,
 	class_id: z.string(),
 	name: z.string(),
@@ -249,7 +249,7 @@ export const SubclassSchema = z.object({
 });
 
 export const ClassSchema = z.object({
-	id: z.string(),
+	compendium_id: z.string(),
 	source_id: SourceIdsSchema,
 	name: z.string(),
 	image_url: z.string(),
@@ -288,7 +288,7 @@ export const ClassSchema = z.object({
 // ============================================================================
 
 export const DomainSchema = z.object({
-	id: DomainIdsSchema,
+	domain_id: DomainIdsSchema,
 	source_id: SourceIdsSchema,
 	name: z.string(),
 	description_html: z.string(),
@@ -327,7 +327,7 @@ export const DomainCardChoiceSchema = z
 	);
 
 export const DomainCardSchema = z.object({
-	id: z.string(),
+	compendium_id: z.string(),
 	source_id: SourceIdsSchema,
 	domain_id: DomainIdsSchema,
 	card_type: CardTypesSchema,
@@ -381,7 +381,7 @@ export const AncestryCardChoiceSchema = z
 	);
 
 export const AncestryCardSchema = z.object({
-	id: z.string(),
+	compendium_id: z.string(),
 	source_id: SourceIdsSchema,
 	card_type: CardTypesSchema,
 	image_url: z.string(),
@@ -393,7 +393,7 @@ export const AncestryCardSchema = z.object({
 });
 
 export const CommunityCardSchema = z.object({
-	id: z.string(),
+	compendium_id: z.string(),
 	source_id: SourceIdsSchema,
 	card_type: CardTypesSchema,
 	image_url: z.string(),
@@ -405,7 +405,7 @@ export const CommunityCardSchema = z.object({
 });
 
 export const TransformationCardSchema = z.object({
-	id: z.string(),
+	compendium_id: z.string(),
 	source_id: SourceIdsSchema,
 	card_type: CardTypesSchema,
 	image_url: z.string(),
@@ -426,7 +426,7 @@ export const WeaponCategoriesSchema = z.enum(['Primary', 'Secondary', 'Unarmed']
 export const DamageTypesSchema = z.enum(['phy', 'mag']);
 
 export const WeaponSchema = z.object({
-	id: z.string(),
+	compendium_id: z.string(),
 	source_id: SourceIdsSchema,
 	title: z.string(),
 	description_html: z.string(),
@@ -443,7 +443,7 @@ export const WeaponSchema = z.object({
 });
 
 export const ArmorSchema = z.object({
-	id: z.string(),
+	compendium_id: z.string(),
 	source_id: SourceIdsSchema,
 	level_requirement: z.number(),
 	title: z.string(),
@@ -457,7 +457,7 @@ export const ArmorSchema = z.object({
 });
 
 export const LootSchema = z.object({
-	id: z.string(),
+	compendium_id: z.string(),
 	source_id: SourceIdsSchema,
 	rarity_roll: z.number(),
 	title: z.string(),
@@ -467,7 +467,7 @@ export const LootSchema = z.object({
 });
 
 export const ConsumableSchema = z.object({
-	id: z.string(),
+	compendium_id: z.string(),
 	source_id: SourceIdsSchema,
 	rarity_roll: z.number(),
 	title: z.string(),

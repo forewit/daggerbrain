@@ -148,7 +148,10 @@
 		if (selectedSupplies) {
 			character.inventory.gold_coins += primary_class.starting_inventory.gold_coins;
 			primary_class.starting_inventory.free_gear.forEach((gear) => {
-				context.addToInventory({ id: gear.title, title: gear.title }, 'adventuring_gear');
+				context.addToInventory(
+					{ compendium_id: gear.title, title: gear.title },
+					'adventuring_gear'
+				);
 			});
 		}
 
@@ -157,7 +160,7 @@
 			const option = lootOptions.find((opt) => opt.id === selectedLootOption);
 			if (option) {
 				context.addToInventory(
-					{ id: selectedLootOption },
+					{ compendium_id: selectedLootOption },
 					option.type === 'loot' ? 'loot' : 'consumable'
 				);
 			}
@@ -167,14 +170,17 @@
 		if (selectedClassGearOption !== null) {
 			const gear = classGearOptions[selectedClassGearOption];
 			if (gear) {
-				context.addToInventory({ id: gear.title, title: gear.title }, 'adventuring_gear');
+				context.addToInventory(
+					{ compendium_id: gear.title, title: gear.title },
+					'adventuring_gear'
+				);
 			}
 		}
 
 		// Add spellbook item if input has content
 		if (spellbookInput.trim() !== '') {
 			context.addToInventory(
-				{ id: spellbookInput.trim(), title: spellbookInput.trim() },
+				{ compendium_id: spellbookInput.trim(), title: spellbookInput.trim() },
 				'adventuring_gear'
 			);
 		}

@@ -2,7 +2,7 @@ import type { Class } from '$lib/types/compendium-types';
 
 export const CLASSES = {
 	assassin: {
-		id: 'assassin',
+		compendium_id: 'assassin',
 		source_id: 'Void 1.5',
 		starting_evasion: 12,
 		starting_max_hp: 5,
@@ -84,7 +84,7 @@ export const CLASSES = {
 	},
 
 	brawler: {
-		id: 'brawler',
+		compendium_id: 'brawler',
 		source_id: 'Void 1.5',
 		starting_evasion: 10,
 		starting_max_hp: 6,
@@ -241,7 +241,7 @@ export const CLASSES = {
 	},
 
 	bard: {
-		id: 'bard',
+		compendium_id: 'bard',
 		source_id: 'SRD',
 		starting_evasion: 10,
 		starting_max_hp: 5,
@@ -305,7 +305,7 @@ export const CLASSES = {
 	},
 
 	druid: {
-		id: 'druid',
+		compendium_id: 'druid',
 		source_id: 'SRD',
 		starting_evasion: 10,
 		starting_max_hp: 6,
@@ -379,7 +379,7 @@ export const CLASSES = {
 	},
 
 	guardian: {
-		id: 'guardian',
+		compendium_id: 'guardian',
 		source_id: 'SRD',
 		starting_evasion: 9,
 		starting_max_hp: 7,
@@ -448,7 +448,7 @@ export const CLASSES = {
 	},
 
 	ranger: {
-		id: 'ranger',
+		compendium_id: 'ranger',
 		source_id: 'SRD',
 		starting_evasion: 12,
 		starting_max_hp: 6,
@@ -520,7 +520,7 @@ export const CLASSES = {
 	},
 
 	rogue: {
-		id: 'rogue',
+		compendium_id: 'rogue',
 		source_id: 'SRD',
 		starting_evasion: 12,
 		starting_max_hp: 6,
@@ -596,7 +596,7 @@ export const CLASSES = {
 	},
 
 	seraph: {
-		id: 'seraph',
+		compendium_id: 'seraph',
 		source_id: 'SRD',
 		starting_evasion: 9,
 		starting_max_hp: 7,
@@ -660,7 +660,7 @@ export const CLASSES = {
 	},
 
 	sorcerer: {
-		id: 'sorcerer',
+		compendium_id: 'sorcerer',
 		source_id: 'SRD',
 		starting_evasion: 10,
 		starting_max_hp: 6,
@@ -742,7 +742,7 @@ export const CLASSES = {
 	},
 
 	warrior: {
-		id: 'warrior',
+		compendium_id: 'warrior',
 		source_id: 'SRD',
 		starting_evasion: 11,
 		starting_max_hp: 6,
@@ -817,7 +817,7 @@ export const CLASSES = {
 	},
 
 	wizard: {
-		id: 'wizard',
+		compendium_id: 'wizard',
 		source_id: 'SRD',
 		starting_evasion: 11,
 		starting_max_hp: 5,

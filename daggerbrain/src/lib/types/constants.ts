@@ -1,13 +1,13 @@
 import type {
 	BackgroundQuestionAnswer,
-	CharacterInventory,
 	CharacterSettings,
 	ConnectionAnswer,
 	DerivedDescriptors,
 	DomainCardId,
 	CharacterDescriptions,
 	LevelUpChoices,
-	LevelUpDomainCardIds
+	LevelUpDomainCardIds,
+	Inventory
 } from '$lib/types/character-types';
 import type { ConditionIds, LevelUpChoice } from '$lib/types/rule-types';
 import type { CharacterModifier, WeaponModifier, Traits } from './compendium-types';
@@ -67,7 +67,7 @@ export const CHARACTER_DEFAULTS = {
 	active_armor_id: null,
 	active_primary_weapon_id: null,
 	active_secondary_weapon_id: null,
-	inventory: <CharacterInventory>{
+	inventory: <Inventory>{
 		primary_weapons: {},
 		secondary_weapons: {},
 		armor: {},

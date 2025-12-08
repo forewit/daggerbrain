@@ -7,7 +7,6 @@
 		Loot,
 		AdventuringGear
 	} from '$lib/types/compendium-types';
-	import { type ItemClickHandler } from '../content-sheet/content-sheet.svelte';
 	import WeaponCard from './equipment/weapon-row.svelte';
 	import ArmorCard from './equipment/armor-row.svelte';
 	import ConsumableCard from './equipment/consumable-row.svelte';
@@ -22,11 +21,13 @@
 	let {
 		class: className = '',
 		onAddItems = () => {},
-		onItemClick = (() => {}) as ItemClickHandler
+		onItemClick = () => {},
+		onAdventuringGearClick = () => {}
 	}: {
 		class?: string;
 		onAddItems?: () => void;
-		onItemClick?: ItemClickHandler;
+		onItemClick?: (type: 'weapon' | 'armor' | 'consumable' | 'loot', id: string) => void;
+		onAdventuringGearClick?: () => void;
 	} = $props();
 
 	const context = getCharacterContext();
@@ -56,30 +57,14 @@
 	);
 
 	// Filtered consumables
-	let filteredConsumables = $derived.by(() => {
-		if (!character) return [];
-		const consumables: (Consumable & { quantity: number })[] = [];
-		for (const [consumable_id, data] of Object.entries(character.inventory.consumables)) {
-			const consumable = compendium.consumables[consumable_id];
-			if (consumable && matchesSearch(consumable, searchQuery)) {
-				consumables.push({ ...consumable, quantity: data.quantity });
-			}
-		}
-		return consumables;
-	});
+	let filteredConsumables = $derived(
+		context.inventory_consumables.filter((consumable) => matchesSearch(consumable, searchQuery))
+	);
 
 	// Filtered loot
-	let filteredLoot = $derived.by(() => {
-		if (!character) return [];
-		const lootItems: (Loot & { quantity: number })[] = [];
-		for (const [loot_id, data] of Object.entries(character.inventory.loot)) {
-			const loot = compendium.loot[loot_id];
-			if (loot && matchesSearch(loot, searchQuery)) {
-				lootItems.push({ ...loot, quantity: data.quantity });
-			}
-		}
-		return lootItems;
-	});
+	let filteredLoot = $derived(
+		context.inventory_loot.filter((loot) => matchesSearch(loot, searchQuery))
+	);
 
 	// Filtered adventuring gear (with original index)
 	let filteredAdventuringGear = $derived.by(() => {
@@ -137,10 +122,9 @@
 						<tbody>
 							{#each filteredArmor as armor (armor.id)}
 								<ArmorCard
-									{armor}
+									id={armor.id}
 									showEquipButton={true}
-									quantity={character.inventory.armor[armor.id]?.quantity ?? 1}
-									onclick={() => onItemClick('armor', armor)}
+									onclick={() => onItemClick('armor', armor.id)}
 								/>
 							{/each}
 						</tbody>
@@ -170,16 +154,11 @@
 						</thead>
 						<tbody>
 							{#each filteredWeapons as weapon (weapon.id)}
-								{@const inventory =
-									weapon.category === 'Primary'
-										? character.inventory.primary_weapons
-										: character.inventory.secondary_weapons}
 								{@const weaponType = getWeaponType(weapon)}
 								<WeaponCard
-									{weapon}
+									id={weapon.id}
 									showEquipButton={true}
-									quantity={inventory[weapon.id]?.quantity ?? 1}
-									onclick={() => onItemClick('weapon', weapon)}
+									onclick={() => onItemClick('weapon', weapon.id)}
 								/>
 							{/each}
 						</tbody>
@@ -204,9 +183,8 @@
 						<tbody>
 							{#each filteredConsumables as consumable (consumable.id)}
 								<ConsumableCard
-									{consumable}
-									quantity={consumable.quantity}
-									onclick={() => onItemClick('consumable', consumable)}
+									id={consumable.id}
+									onclick={() => onItemClick('consumable', consumable.id)}
 								/>
 							{/each}
 						</tbody>
@@ -232,11 +210,7 @@
 						</thead>
 						<tbody>
 							{#each filteredLoot as loot (loot.id)}
-								<LootCard
-									{loot}
-									quantity={loot.quantity}
-									onclick={() => onItemClick('loot', loot)}
-								/>
+								<LootCard id={loot.id} onclick={() => onItemClick('loot', loot.id)} />
 							{/each}
 						</tbody>
 					</table>
@@ -254,16 +228,13 @@
 
 					<button
 						class="flex w-full items-center px-4 py-2 text-left text-xs"
-						onclick={() => onItemClick('adventuring_gear', null)}
+						onclick={() => onAdventuringGearClick()}
 					>
 						<ul class="w-full">
 							{#each filteredAdventuringGear as { gear, originalIndex } (originalIndex)}
 								<li class="flex items-center">
 									<span class="mr-3">•</span>
 									{gear.title}
-									{#if gear.quantity > 1}
-										<span class="ml-1 text-xs text-muted-foreground italic">×{gear.quantity}</span>
-									{/if}
 								</li>
 							{/each}
 						</ul>

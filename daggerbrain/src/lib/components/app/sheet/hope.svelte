@@ -39,11 +39,11 @@
 		</div>
 
 		{#if context.primary_class}
-			<p class="flex items-center justify-center text-xs text-muted-foreground">
-				<span class="mr-1 text-xs font-medium text-foreground"
+			<p class="flex justify-center px-4 text-xs text-muted-foreground">
+				<span class="mr-1 text-xs font-bold text-nowrap text-foreground"
 					>{context.primary_class.hope_feature.title}:</span
 				>
-				{@html context.primary_class.hope_feature.description_html}
+				<span class="text-left">{@html context.primary_class.hope_feature.description_html}</span>
 			</p>
 		{/if}
 	</div>

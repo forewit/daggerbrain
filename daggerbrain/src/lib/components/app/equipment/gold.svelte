@@ -87,30 +87,30 @@
 		gold_coins = composeGold(counts);
 	};
 
-	const handleAddGold = (unit: UnitKey) => {
-		const unitValue = UNIT_VALUES[unit];
-		const newValue = gold_coins + unitValue;
-		if (newValue <= MAX_GOLD) {
-			gold_coins = clampGoldValue(newValue);
-		}
-	};
+	// const handleAddGold = (unit: UnitKey) => {
+	// 	const unitValue = UNIT_VALUES[unit];
+	// 	const newValue = gold_coins + unitValue;
+	// 	if (newValue <= MAX_GOLD) {
+	// 		gold_coins = clampGoldValue(newValue);
+	// 	}
+	// };
 
-	const handleRemoveGold = (unit: UnitKey) => {
-		const unitValue = UNIT_VALUES[unit];
-		const newValue = gold_coins - unitValue;
-		if (newValue >= 0) {
-			gold_coins = clampGoldValue(newValue);
-		}
-	};
+	// const handleRemoveGold = (unit: UnitKey) => {
+	// 	const unitValue = UNIT_VALUES[unit];
+	// 	const newValue = gold_coins - unitValue;
+	// 	if (newValue >= 0) {
+	// 		gold_coins = clampGoldValue(newValue);
+	// 	}
+	// };
 
 	const context = getCharacterContext();
 	let character = $derived(context.character);
 	let isCoinMode = $derived(!!character?.settings.use_gold_coins);
 	let visibleUnitConfig = $derived(isCoinMode ? UNIT_CONFIG : UNIT_CONFIG_NO_COINS);
-	let totalDisplayValue = $derived(
-		isCoinMode ? totalGold : Math.floor(totalGold / UNIT_VALUES.handful)
-	);
-	let totalDisplayLabel = $derived(isCoinMode ? 'coins' : 'handfuls');
+	// let totalDisplayValue = $derived(
+	// 	isCoinMode ? totalGold : Math.floor(totalGold / UNIT_VALUES.handful)
+	// );
+	// let totalDisplayLabel = $derived(isCoinMode ? 'coins' : 'handfuls');
 
 	$effect(() => {
 		const clamped = clampGoldValue(gold_coins);

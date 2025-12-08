@@ -150,7 +150,7 @@
 					<AncestryCard card={BASE_MIXED_ANCESTRY_CARD}>
 						<Button
 							onclick={() => {
-								character.ancestry_card_id = BASE_MIXED_ANCESTRY_CARD.id;
+								character.ancestry_card_id = BASE_MIXED_ANCESTRY_CARD.compendium_id;
 								ancestryDialogOpen = false;
 							}}
 							class="mt-auto w-min">Select Mixed Ancestry</Button

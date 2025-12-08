@@ -39,17 +39,9 @@
 	);
 
 	// Filtered consumables
-	let filteredConsumables = $derived.by(() => {
-		if (!character) return [];
-		const consumables: (Consumable & { quantity: number })[] = [];
-		for (const [consumable_id, data] of Object.entries(character.inventory.consumables)) {
-			const consumable = compendium.consumables[consumable_id];
-			if (consumable && matchesSearch(consumable, searchQuery)) {
-				consumables.push({ ...consumable, quantity: data.quantity });
-			}
-		}
-		return consumables;
-	});
+	let filteredConsumables = $derived(
+		context.inventory_consumables.filter((consumable) => matchesSearch(consumable, searchQuery))
+	);
 
 	// Filtered adventuring gear (with original index)
 	let filteredAdventuringGear = $derived.by(() => {
@@ -113,20 +105,12 @@
 						{/snippet}
 
 						{#snippet title_snippet()}
-							{@const inventory =
-								weapon.category === 'Primary'
-									? character.inventory.primary_weapons
-									: character.inventory.secondary_weapons}
-							{@const quantity = inventory[weapon.id]?.quantity ?? 0}
 							<div class="gap-4 text-left">
 								<p class="text-md font-medium">
 									{weapon.title}
-									{#if quantity > 1}
-										<span class="ml-1 text-sm text-muted-foreground italic">x{quantity}</span>
-									{/if}
 								</p>
 								<p class="truncate text-[10px] leading-none text-muted-foreground italic">
-									Tier {context.get_tier_from_level(weapon.level_requirement)}
+									Tier {context.level_to_tier(weapon.level_requirement)}
 									{weapon.category} Weapon
 								</p>
 							</div>
@@ -186,16 +170,12 @@
 						{/snippet}
 
 						{#snippet title_snippet()}
-							{@const quantity = character.inventory.armor[armor.id]?.quantity ?? 0}
 							<div class="gap-4 text-left">
 								<p class="text-md font-medium">
 									{armor.title}
-									{#if quantity > 1}
-										<span class="ml-1 text-sm text-muted-foreground italic">x{quantity}</span>
-									{/if}
 								</p>
 								<p class="truncate text-[10px] leading-none text-muted-foreground italic">
-									Tier {context.get_tier_from_level(armor.level_requirement)} Armor
+									Tier {context.level_to_tier(armor.level_requirement)} Armor
 								</p>
 							</div>
 						{/snippet}
@@ -231,13 +211,9 @@
 
 					{#each filteredConsumables as consumable (consumable.id)}
 						{#snippet title_snippet()}
-							{@const quantity = character.inventory.consumables[consumable.id]?.quantity ?? 0}
 							<div class="gap-4 text-left">
 								<p class="text-md font-medium">
 									{consumable.title}
-									{#if quantity > 1}
-										<span class="ml-1 text-sm text-muted-foreground italic">x{quantity}</span>
-									{/if}
 								</p>
 							</div>
 						{/snippet}
@@ -269,10 +245,10 @@
 								{gear.title}
 								<Button
 									variant="link"
-									class="ml-auto h-auto text-foreground"
+									class="ml-auto h-auto py-1 text-foreground"
 									onclick={() =>
 										context.removeFromInventory(
-											{ id: gear.title },
+											{ compendium_id: gear.title },
 											'adventuring_gear',
 											originalIndex
 										)}

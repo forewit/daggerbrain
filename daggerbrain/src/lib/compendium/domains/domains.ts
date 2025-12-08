@@ -2,7 +2,7 @@ import type { DomainIds, Domain } from '$lib/types/compendium-types';
 
 export const DOMAINS = {
 	arcana: {
-		id: 'arcana',
+		domain_id: 'arcana',
 		source_id: 'Void 1.5',
 		name: 'Arcana',
 		description_html: '',
@@ -10,7 +10,7 @@ export const DOMAINS = {
 		foreground_color: '#ffffff'
 	},
 	blade: {
-		id: 'blade',
+		domain_id: 'blade',
 		source_id: 'Void 1.5',
 		name: 'Blade',
 		foreground_color: '#ffffff',
@@ -23,7 +23,7 @@ export const DOMAINS = {
 		color: '#af231c'
 	},
 	bone: {
-		id: 'bone',
+		domain_id: 'bone',
 		source_id: 'Void 1.5',
 		name: 'Bone',
 		color: '#a4a9a8',
@@ -36,7 +36,7 @@ export const DOMAINS = {
             domain can be accessed by the <b>Ranger</b> & <b>Warrior</b> classes.</p>`
 	},
 	codex: {
-		id: 'codex',
+		domain_id: 'codex',
 		source_id: 'Void 1.5',
 		name: 'Codex',
 		description_html: '',
@@ -44,7 +44,7 @@ export const DOMAINS = {
 		foreground_color: '#ffffff'
 	},
 	grace: {
-		id: 'grace',
+		domain_id: 'grace',
 		source_id: 'Void 1.5',
 		name: 'Grace',
 		description_html: '',
@@ -52,7 +52,7 @@ export const DOMAINS = {
 		foreground_color: '#ffffff'
 	},
 	midnight: {
-		id: 'midnight',
+		domain_id: 'midnight',
 		source_id: 'Void 1.5',
 		name: 'Midnight',
 		description_html: `<p>Midnight is the domain of <b>shadows and secrecy</b>. Whether
@@ -65,7 +65,7 @@ export const DOMAINS = {
 		foreground_color: '#ffffff'
 	},
 	sage: {
-		id: 'sage',
+		domain_id: 'sage',
 		source_id: 'Void 1.5',
 		name: 'Sage',
 		description_html: '',
@@ -73,7 +73,7 @@ export const DOMAINS = {
 		foreground_color: '#ffffff'
 	},
 	splendor: {
-		id: 'splendor',
+		domain_id: 'splendor',
 		source_id: 'Void 1.5',
 		name: 'Splendor',
 		description_html: '',
@@ -81,7 +81,7 @@ export const DOMAINS = {
 		foreground_color: '#000000'
 	},
 	valor: {
-		id: 'valor',
+		domain_id: 'valor',
 		source_id: 'Void 1.5',
 		name: 'Valor',
 		description_html: `<p>Valor is the domain of <b>protection</b>. Whether through attack or

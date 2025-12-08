@@ -22,7 +22,10 @@
 
 	let vault: DomainCard[] = $derived(
 		(context.domain_card_vault || []).filter(
-			(card) => !context.domain_card_loadout.some((loadoutCard) => loadoutCard.id === card.id)
+			(card) =>
+				!context.domain_card_loadout.some(
+					(loadoutCard) => loadoutCard.compendium_id === card.compendium_id
+				)
 		)
 	);
 
@@ -78,6 +81,8 @@
 								cards={vault}
 								bind:selectedIndex={selectedVaultIndex}
 								emptyMessage="Vault Empty"
+								bind_token_count
+								bind_choice_select
 							/>
 							{#if vault.length > 0}
 								{#if restMode}
@@ -90,7 +95,7 @@
 											) {
 												character.loadout_domain_card_ids.push({
 													domainId: selectedVaultCard.domain_id,
-													cardId: selectedVaultCard.id
+													cardId: selectedVaultCard.compendium_id
 												});
 											}
 										}}
@@ -122,7 +127,7 @@
 												character.marked_stress += selectedVaultCard.recall_cost;
 												character.loadout_domain_card_ids.push({
 													domainId: selectedVaultCard.domain_id,
-													cardId: selectedVaultCard.id
+													cardId: selectedVaultCard.compendium_id
 												});
 											}
 										}}
@@ -192,7 +197,7 @@
 							context.domain_card_loadout[selectedLoadoutIndex].forced_in_loadout)}
 					size="sm"
 					onclick={() => {
-						const selected_id = context.domain_card_loadout[selectedLoadoutIndex].id;
+						const selected_id = context.domain_card_loadout[selectedLoadoutIndex].compendium_id;
 						const selected_domain_id = context.domain_card_loadout[selectedLoadoutIndex].domain_id;
 						character.loadout_domain_card_ids = character.loadout_domain_card_ids.filter(
 							(id) => id.cardId !== selected_id || id.domainId !== selected_domain_id

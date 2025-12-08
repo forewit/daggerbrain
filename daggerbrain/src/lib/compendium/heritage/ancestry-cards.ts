@@ -3,7 +3,7 @@ import type { AncestryCard } from '$lib/types/compendium-types';
 export const ANCESTRY_CARDS = {
 	// todo: verify everything below
 	drakona: {
-		id: 'drakona',
+		compendium_id: 'drakona',
 		source_id: 'SRD',
 		card_type: 'ancestry',
 		image_url: '/api/images/card/art/ancestries/drakona.webp',
@@ -30,7 +30,7 @@ export const ANCESTRY_CARDS = {
 		]
 	},
 	clank: {
-		id: 'clank',
+		compendium_id: 'clank',
 		source_id: 'SRD',
 		card_type: 'ancestry',
 		image_url: '/api/images/card/art/ancestries/clank.webp',
@@ -74,7 +74,7 @@ export const ANCESTRY_CARDS = {
 		]
 	},
 	dwarf: {
-		id: 'dwarf',
+		compendium_id: 'dwarf',
 		source_id: 'SRD',
 		card_type: 'ancestry',
 		image_url: '/api/images/card/art/ancestries/dwarf.webp',
@@ -100,7 +100,7 @@ export const ANCESTRY_CARDS = {
 		]
 	},
 	elf: {
-		id: 'elf',
+		compendium_id: 'elf',
 		source_id: 'SRD',
 		card_type: 'ancestry',
 		image_url: '/api/images/card/art/ancestries/elf.webp',
@@ -141,7 +141,7 @@ export const ANCESTRY_CARDS = {
 		]
 	},
 	faerie: {
-		id: 'faerie',
+		compendium_id: 'faerie',
 		source_id: 'SRD',
 		card_type: 'ancestry',
 		image_url: '/api/images/card/art/ancestries/faerie.webp',
@@ -167,7 +167,7 @@ export const ANCESTRY_CARDS = {
 		]
 	},
 	faun: {
-		id: 'faun',
+		compendium_id: 'faun',
 		source_id: 'SRD',
 		card_type: 'ancestry',
 		image_url: '/api/images/card/art/ancestries/faun.webp',
@@ -194,7 +194,7 @@ export const ANCESTRY_CARDS = {
 		]
 	},
 	firbolg: {
-		id: 'firbolg',
+		compendium_id: 'firbolg',
 		source_id: 'SRD',
 		card_type: 'ancestry',
 		image_url: '/api/images/card/art/ancestries/firbolg.webp',
@@ -221,7 +221,7 @@ export const ANCESTRY_CARDS = {
 		]
 	},
 	fungril: {
-		id: 'fungril',
+		compendium_id: 'fungril',
 		source_id: 'SRD',
 		card_type: 'ancestry',
 		image_url: '/api/images/card/art/ancestries/fungril.webp',
@@ -247,7 +247,7 @@ export const ANCESTRY_CARDS = {
 		]
 	},
 	galapa: {
-		id: 'galapa',
+		compendium_id: 'galapa',
 		source_id: 'SRD',
 		card_type: 'ancestry',
 		image_url: '/api/images/card/art/ancestries/galapa.webp',
@@ -289,7 +289,7 @@ export const ANCESTRY_CARDS = {
 		]
 	},
 	giant: {
-		id: 'giant',
+		compendium_id: 'giant',
 		source_id: 'SRD',
 		card_type: 'ancestry',
 		image_url: '/api/images/card/art/ancestries/giant.webp',
@@ -323,7 +323,7 @@ export const ANCESTRY_CARDS = {
 		]
 	},
 	goblin: {
-		id: 'goblin',
+		compendium_id: 'goblin',
 		source_id: 'SRD',
 		card_type: 'ancestry',
 		image_url: '/api/images/card/art/ancestries/goblin.webp',
@@ -349,7 +349,7 @@ export const ANCESTRY_CARDS = {
 		]
 	},
 	halfling: {
-		id: 'halfling',
+		compendium_id: 'halfling',
 		source_id: 'SRD',
 		card_type: 'ancestry',
 		image_url: '/api/images/card/art/ancestries/halflings.webp',
@@ -375,7 +375,7 @@ export const ANCESTRY_CARDS = {
 		]
 	},
 	human: {
-		id: 'human',
+		compendium_id: 'human',
 		source_id: 'SRD',
 		card_type: 'ancestry',
 		image_url: '/api/images/card/art/ancestries/human.webp',
@@ -409,7 +409,7 @@ export const ANCESTRY_CARDS = {
 		]
 	},
 	infernis: {
-		id: 'infernis',
+		compendium_id: 'infernis',
 		source_id: 'SRD',
 		card_type: 'ancestry',
 		image_url: '/api/images/card/art/ancestries/infernis.webp',
@@ -436,7 +436,7 @@ export const ANCESTRY_CARDS = {
 		]
 	},
 	katari: {
-		id: 'katari',
+		compendium_id: 'katari',
 		source_id: 'SRD',
 		card_type: 'ancestry',
 		image_url: '/api/images/card/art/ancestries/katari.webp',
@@ -463,7 +463,7 @@ export const ANCESTRY_CARDS = {
 		]
 	},
 	orc: {
-		id: 'orc',
+		compendium_id: 'orc',
 		source_id: 'SRD',
 		card_type: 'ancestry',
 		image_url: '/api/images/card/art/ancestries/orcs.webp',
@@ -490,7 +490,7 @@ export const ANCESTRY_CARDS = {
 		]
 	},
 	ribbet: {
-		id: 'ribbet',
+		compendium_id: 'ribbet',
 		source_id: 'SRD',
 		card_type: 'ancestry',
 		image_url: '/api/images/card/art/ancestries/ribbet.webp',
@@ -516,7 +516,7 @@ export const ANCESTRY_CARDS = {
 		]
 	},
 	simiah: {
-		id: 'simiah',
+		compendium_id: 'simiah',
 		source_id: 'SRD',
 		card_type: 'ancestry',
 		image_url: '/api/images/card/art/ancestries/simiah.webp',

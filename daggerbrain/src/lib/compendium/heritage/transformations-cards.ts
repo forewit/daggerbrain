@@ -2,7 +2,7 @@ import type { TransformationCard } from '$lib/types/compendium-types';
 
 export const TRANSFORMATION_CARDS = {
 	werewolf: {
-		id: 'werewolf',
+		compendium_id: 'werewolf',
 		source_id: 'Void 1.5',
 		card_type: 'transformation',
 		artist_name: '',

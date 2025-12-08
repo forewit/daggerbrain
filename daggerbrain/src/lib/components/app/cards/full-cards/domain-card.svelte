@@ -35,15 +35,15 @@
 
 {#snippet token_count()}
 	{#if character && bind_token_count && card.tokens}
-		{@const current_count = character.domain_card_tokens[card.id] || 0}
+		{@const current_count = character.domain_card_tokens[card.compendium_id] || 0}
 		<div class="flex items-center justify-center gap-2">
 			<!-- Minus Button -->
 			<button
 				type="button"
 				onclick={() => {
 					if (!character) return;
-					const current = character.domain_card_tokens[card.id] || 0;
-					character.domain_card_tokens[card.id] = Math.max(0, current - 1);
+					const current = character.domain_card_tokens[card.compendium_id] || 0;
+					character.domain_card_tokens[card.compendium_id] = Math.max(0, current - 1);
 				}}
 				disabled={current_count === 0}
 				class="flex size-7 items-center justify-center rounded-full bg-red-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-gray-300"
@@ -82,8 +82,8 @@
 				type="button"
 				onclick={() => {
 					if (!character) return;
-					const current = character.domain_card_tokens[card.id] || 0;
-					character.domain_card_tokens[card.id] = Math.min(99, current + 1);
+					const current = character.domain_card_tokens[card.compendium_id] || 0;
+					character.domain_card_tokens[card.compendium_id] = Math.min(99, current + 1);
 				}}
 				disabled={current_count === 99}
 				class="flex size-7 items-center justify-center rounded-full bg-green-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-gray-300"
@@ -100,12 +100,12 @@
 		{@const conditional_choice_id = choice.conditional_choice?.choice_id || null}
 		{@const conditional_selection_id = choice.conditional_choice?.selection_id || null}
 
-		{#if character.domain_card_choices[card.id] && character.domain_card_choices[card.id][choice.choice_id]}
-			{#if choice.conditional_choice === null || (conditional_choice_id && conditional_selection_id && character.domain_card_choices[card.id][conditional_choice_id] && character.domain_card_choices[card.id][conditional_choice_id].includes(conditional_selection_id))}
+		{#if character.domain_card_choices[card.compendium_id] && character.domain_card_choices[card.compendium_id][choice.choice_id]}
+			{#if choice.conditional_choice === null || (conditional_choice_id && conditional_selection_id && character.domain_card_choices[card.compendium_id][conditional_choice_id] && character.domain_card_choices[card.compendium_id][conditional_choice_id].includes(conditional_selection_id))}
 				{#if choice.type === 'arbitrary'}
 					<ChoiceSelector
 						class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
-						bind:selected_ids={character.domain_card_choices[card.id][choice.choice_id]}
+						bind:selected_ids={character.domain_card_choices[card.compendium_id][choice.choice_id]}
 						max={choice.max}
 						options={choice.options}
 						{width}
@@ -113,7 +113,7 @@
 				{:else if choice.type === 'experience'}
 					<ChoiceSelector
 						class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
-						bind:selected_ids={character.domain_card_choices[card.id][choice.choice_id]}
+						bind:selected_ids={character.domain_card_choices[card.compendium_id][choice.choice_id]}
 						max={choice.max}
 						options={character.experiences.map((exp, i) => {
 							return {

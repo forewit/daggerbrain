@@ -3,7 +3,7 @@ import type { Loot } from '$lib/types/compendium-types';
 // todo: verify everything below
 export const LOOT = {
 	premium_bedroll: {
-		id: 'premium_bedroll',
+		compendium_id: 'premium_bedroll',
 		source_id: 'SRD',
 		rarity_roll: 1,
 		title: 'Premium Bedroll',
@@ -12,7 +12,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	piper_whistle: {
-		id: 'piper_whistle',
+		compendium_id: 'piper_whistle',
 		source_id: 'SRD',
 		rarity_roll: 2,
 		title: 'Piper Whistle',
@@ -22,7 +22,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	charging_quiver: {
-		id: 'charging_quiver',
+		compendium_id: 'charging_quiver',
 		source_id: 'SRD',
 		rarity_roll: 3,
 		title: 'Charging Quiver',
@@ -32,7 +32,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	alistairs_torch: {
-		id: 'alistairs_torch',
+		compendium_id: 'alistairs_torch',
 		source_id: 'SRD',
 		rarity_roll: 4,
 		title: "Alistair's Torch",
@@ -42,7 +42,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	speaking_orbs: {
-		id: 'speaking_orbs',
+		compendium_id: 'speaking_orbs',
 		source_id: 'SRD',
 		rarity_roll: 5,
 		title: 'Speaking Orbs',
@@ -52,7 +52,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	manacles: {
-		id: 'manacles',
+		compendium_id: 'manacles',
 		source_id: 'SRD',
 		rarity_roll: 6,
 		title: 'Manacles',
@@ -61,7 +61,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	arcane_cloak: {
-		id: 'arcane_cloak',
+		compendium_id: 'arcane_cloak',
 		source_id: 'SRD',
 		rarity_roll: 7,
 		title: 'Arcane Cloak',
@@ -71,7 +71,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	woven_net: {
-		id: 'woven_net',
+		compendium_id: 'woven_net',
 		source_id: 'SRD',
 		rarity_roll: 8,
 		title: 'Woven Net',
@@ -81,7 +81,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	fire_jar: {
-		id: 'fire_jar',
+		compendium_id: 'fire_jar',
 		source_id: 'SRD',
 		rarity_roll: 9,
 		title: 'Fire Jar',
@@ -91,7 +91,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	suspended_rod: {
-		id: 'suspended_rod',
+		compendium_id: 'suspended_rod',
 		source_id: 'SRD',
 		rarity_roll: 10,
 		title: 'Suspended Rod',
@@ -101,7 +101,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	glamour_stone: {
-		id: 'glamour_stone',
+		compendium_id: 'glamour_stone',
 		source_id: 'SRD',
 		rarity_roll: 11,
 		title: 'Glamour Stone',
@@ -111,7 +111,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	empty_chest: {
-		id: 'empty_chest',
+		compendium_id: 'empty_chest',
 		source_id: 'SRD',
 		rarity_roll: 12,
 		title: 'Empty Chest',
@@ -121,7 +121,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	companion_case: {
-		id: 'companion_case',
+		compendium_id: 'companion_case',
 		source_id: 'SRD',
 		rarity_roll: 13,
 		title: 'Companion Case',
@@ -131,7 +131,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	piercing_arrows: {
-		id: 'piercing_arrows',
+		compendium_id: 'piercing_arrows',
 		source_id: 'SRD',
 		rarity_roll: 14,
 		title: 'Piercing Arrows',
@@ -141,7 +141,7 @@ export const LOOT = {
 		weapon_modifiers: [] // Note: Proficiency-based damage bonus with "three times per rest" limitation requires manual tracking
 	},
 	valorstone: {
-		id: 'valorstone',
+		compendium_id: 'valorstone',
 		source_id: 'SRD',
 		rarity_roll: 15,
 		title: 'Valorstone',
@@ -151,7 +151,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	skeleton_key: {
-		id: 'skeleton_key',
+		compendium_id: 'skeleton_key',
 		source_id: 'SRD',
 		rarity_roll: 16,
 		title: 'Skeleton Key',
@@ -161,7 +161,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	arcane_prism: {
-		id: 'arcane_prism',
+		compendium_id: 'arcane_prism',
 		source_id: 'SRD',
 		rarity_roll: 17,
 		title: 'Arcane Prism',
@@ -171,7 +171,7 @@ export const LOOT = {
 		weapon_modifiers: [] // Note: Area effect for allies requires manual application by GM
 	},
 	minor_stamina_potion_recipe: {
-		id: 'minor_stamina_potion_recipe',
+		compendium_id: 'minor_stamina_potion_recipe',
 		source_id: 'SRD',
 		rarity_roll: 18,
 		title: 'Minor Stamina Potion Recipe',
@@ -181,7 +181,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	minor_health_potion_recipe: {
-		id: 'minor_health_potion_recipe',
+		compendium_id: 'minor_health_potion_recipe',
 		source_id: 'SRD',
 		rarity_roll: 19,
 		title: 'Minor Health Potion Recipe',
@@ -191,7 +191,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	homing_compasses: {
-		id: 'homing_compasses',
+		compendium_id: 'homing_compasses',
 		source_id: 'SRD',
 		rarity_roll: 20,
 		title: 'Homing Compasses',
@@ -201,7 +201,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	corrector_sprite: {
-		id: 'corrector_sprite',
+		compendium_id: 'corrector_sprite',
 		source_id: 'SRD',
 		rarity_roll: 21,
 		title: 'Corrector Sprite',
@@ -211,7 +211,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	gecko_gloves: {
-		id: 'gecko_gloves',
+		compendium_id: 'gecko_gloves',
 		source_id: 'SRD',
 		rarity_roll: 22,
 		title: 'Gecko Gloves',
@@ -220,7 +220,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	lorekeeper: {
-		id: 'lorekeeper',
+		compendium_id: 'lorekeeper',
 		source_id: 'SRD',
 		rarity_roll: 23,
 		title: 'Lorekeeper',
@@ -230,7 +230,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	vial_of_darksmoke_recipe: {
-		id: 'vial_of_darksmoke_recipe',
+		compendium_id: 'vial_of_darksmoke_recipe',
 		source_id: 'SRD',
 		rarity_roll: 24,
 		title: 'Vial of Darksmoke Recipe',
@@ -240,7 +240,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	bloodstone: {
-		id: 'bloodstone',
+		compendium_id: 'bloodstone',
 		source_id: 'SRD',
 		rarity_roll: 25,
 		title: 'Bloodstone',
@@ -250,7 +250,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	greatstone: {
-		id: 'greatstone',
+		compendium_id: 'greatstone',
 		source_id: 'SRD',
 		rarity_roll: 26,
 		title: 'Greatstone',
@@ -260,7 +260,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	glider: {
-		id: 'glider',
+		compendium_id: 'glider',
 		source_id: 'SRD',
 		rarity_roll: 27,
 		title: 'Glider',
@@ -270,7 +270,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	ring_of_silence: {
-		id: 'ring_of_silence',
+		compendium_id: 'ring_of_silence',
 		source_id: 'SRD',
 		rarity_roll: 28,
 		title: 'Ring of Silence',
@@ -280,7 +280,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	calming_pendant: {
-		id: 'calming_pendant',
+		compendium_id: 'calming_pendant',
 		source_id: 'SRD',
 		rarity_roll: 29,
 		title: 'Calming Pendant',
@@ -290,7 +290,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	dual_flask: {
-		id: 'dual_flask',
+		compendium_id: 'dual_flask',
 		source_id: 'SRD',
 		rarity_roll: 30,
 		title: 'Dual Flask',
@@ -300,7 +300,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	bag_of_ficklesand: {
-		id: 'bag_of_ficklesand',
+		compendium_id: 'bag_of_ficklesand',
 		source_id: 'SRD',
 		rarity_roll: 31,
 		title: 'Bag of Ficklesand',
@@ -310,7 +310,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	ring_of_resistance: {
-		id: 'ring_of_resistance',
+		compendium_id: 'ring_of_resistance',
 		source_id: 'SRD',
 		rarity_roll: 32,
 		title: 'Ring of Resistance',
@@ -320,7 +320,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	phoenix_feather: {
-		id: 'phoenix_feather',
+		compendium_id: 'phoenix_feather',
 		source_id: 'SRD',
 		rarity_roll: 33,
 		title: 'Phoenix Feather',
@@ -330,7 +330,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	box_of_many_goods: {
-		id: 'box_of_many_goods',
+		compendium_id: 'box_of_many_goods',
 		source_id: 'SRD',
 		rarity_roll: 34,
 		title: 'Box of Many Goods',
@@ -340,7 +340,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	airblade_charm: {
-		id: 'airblade_charm',
+		compendium_id: 'airblade_charm',
 		source_id: 'SRD',
 		rarity_roll: 35,
 		title: 'Airblade Charm',
@@ -350,7 +350,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	portal_seed: {
-		id: 'portal_seed',
+		compendium_id: 'portal_seed',
 		source_id: 'SRD',
 		rarity_roll: 36,
 		title: 'Portal Seed',
@@ -360,7 +360,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	paragons_chain: {
-		id: 'paragons_chain',
+		compendium_id: 'paragons_chain',
 		source_id: 'SRD',
 		rarity_roll: 37,
 		title: "Paragon's Chain",
@@ -370,7 +370,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	elusive_amulet: {
-		id: 'elusive_amulet',
+		compendium_id: 'elusive_amulet',
 		source_id: 'SRD',
 		rarity_roll: 38,
 		title: 'Elusive Amulet',
@@ -380,7 +380,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	hopekeeper_locket: {
-		id: 'hopekeeper_locket',
+		compendium_id: 'hopekeeper_locket',
 		source_id: 'SRD',
 		rarity_roll: 39,
 		title: 'Hopekeeper Locket',
@@ -390,7 +390,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	infinite_bag: {
-		id: 'infinite_bag',
+		compendium_id: 'infinite_bag',
 		source_id: 'SRD',
 		rarity_roll: 40,
 		title: 'Infinite Bag',
@@ -400,7 +400,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	stride_relic: {
-		id: 'stride_relic',
+		compendium_id: 'stride_relic',
 		source_id: 'SRD',
 		rarity_roll: 41,
 		title: 'Stride Relic',
@@ -418,7 +418,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	bolster_relic: {
-		id: 'bolster_relic',
+		compendium_id: 'bolster_relic',
 		source_id: 'SRD',
 		rarity_roll: 42,
 		title: 'Bolster Relic',
@@ -436,7 +436,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	control_relic: {
-		id: 'control_relic',
+		compendium_id: 'control_relic',
 		source_id: 'SRD',
 		rarity_roll: 43,
 		title: 'Control Relic',
@@ -454,7 +454,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	attune_relic: {
-		id: 'attune_relic',
+		compendium_id: 'attune_relic',
 		source_id: 'SRD',
 		rarity_roll: 44,
 		title: 'Attune Relic',
@@ -472,7 +472,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	charm_relic: {
-		id: 'charm_relic',
+		compendium_id: 'charm_relic',
 		source_id: 'SRD',
 		rarity_roll: 45,
 		title: 'Charm Relic',
@@ -490,7 +490,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	enlighten_relic: {
-		id: 'enlighten_relic',
+		compendium_id: 'enlighten_relic',
 		source_id: 'SRD',
 		rarity_roll: 46,
 		title: 'Enlighten Relic',
@@ -508,7 +508,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	honing_relic: {
-		id: 'honing_relic',
+		compendium_id: 'honing_relic',
 		source_id: 'SRD',
 		rarity_roll: 47,
 		title: 'Honing Relic',
@@ -518,7 +518,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	flickerfly_pendant: {
-		id: 'flickerfly_pendant',
+		compendium_id: 'flickerfly_pendant',
 		source_id: 'SRD',
 		rarity_roll: 48,
 		title: 'Flickerfly Pendant',
@@ -536,7 +536,7 @@ export const LOOT = {
 		]
 	},
 	lakestrider_boots: {
-		id: 'lakestrider_boots',
+		compendium_id: 'lakestrider_boots',
 		source_id: 'SRD',
 		rarity_roll: 49,
 		title: 'Lakestrider Boots',
@@ -545,7 +545,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	clay_companion: {
-		id: 'clay_companion',
+		compendium_id: 'clay_companion',
 		source_id: 'SRD',
 		rarity_roll: 50,
 		title: 'Clay Companion',
@@ -555,7 +555,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	mythic_dust_recipe: {
-		id: 'mythic_dust_recipe',
+		compendium_id: 'mythic_dust_recipe',
 		source_id: 'SRD',
 		rarity_roll: 51,
 		title: 'Mythic Dust Recipe',
@@ -565,7 +565,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	shard_of_memory: {
-		id: 'shard_of_memory',
+		compendium_id: 'shard_of_memory',
 		source_id: 'SRD',
 		rarity_roll: 52,
 		title: 'Shard of Memory',
@@ -575,7 +575,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	gem_of_alacrity: {
-		id: 'gem_of_alacrity',
+		compendium_id: 'gem_of_alacrity',
 		source_id: 'SRD',
 		rarity_roll: 53,
 		title: 'Gem of Alacrity',
@@ -593,7 +593,7 @@ export const LOOT = {
 		]
 	},
 	gem_of_might: {
-		id: 'gem_of_might',
+		compendium_id: 'gem_of_might',
 		source_id: 'SRD',
 		rarity_roll: 54,
 		title: 'Gem of Might',
@@ -611,7 +611,7 @@ export const LOOT = {
 		]
 	},
 	gem_of_precision: {
-		id: 'gem_of_precision',
+		compendium_id: 'gem_of_precision',
 		source_id: 'SRD',
 		rarity_roll: 55,
 		title: 'Gem of Precision',
@@ -629,7 +629,7 @@ export const LOOT = {
 		]
 	},
 	gem_of_insight: {
-		id: 'gem_of_insight',
+		compendium_id: 'gem_of_insight',
 		source_id: 'SRD',
 		rarity_roll: 56,
 		title: 'Gem of Insight',
@@ -647,7 +647,7 @@ export const LOOT = {
 		]
 	},
 	gem_of_audacity: {
-		id: 'gem_of_audacity',
+		compendium_id: 'gem_of_audacity',
 		source_id: 'SRD',
 		rarity_roll: 57,
 		title: 'Gem of Audacity',
@@ -665,7 +665,7 @@ export const LOOT = {
 		]
 	},
 	gem_of_sagacity: {
-		id: 'gem_of_sagacity',
+		compendium_id: 'gem_of_sagacity',
 		source_id: 'SRD',
 		rarity_roll: 58,
 		title: 'Gem of Sagacity',
@@ -683,7 +683,7 @@ export const LOOT = {
 		]
 	},
 	ring_of_unbreakable_resolve: {
-		id: 'ring_of_unbreakable_resolve',
+		compendium_id: 'ring_of_unbreakable_resolve',
 		source_id: 'SRD',
 		rarity_roll: 59,
 		title: 'Ring of Unbreakable Resolve',
@@ -693,7 +693,7 @@ export const LOOT = {
 		weapon_modifiers: []
 	},
 	belt_of_unity: {
-		id: 'belt_of_unity',
+		compendium_id: 'belt_of_unity',
 		source_id: 'SRD',
 		rarity_roll: 60,
 		title: 'Belt of Unity',

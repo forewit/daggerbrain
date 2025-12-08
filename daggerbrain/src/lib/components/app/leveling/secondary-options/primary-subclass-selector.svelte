@@ -63,7 +63,7 @@
 			<div class="grid grid-cols-1 gap-3 overflow-y-auto sm:grid-cols-2">
 				<!-- each class -->
 				{#if context.primary_class}
-					{#each Object.entries(compendium.subclasses).filter(([id, s]) => s.class_id === context.primary_class?.id) as [id, subclass]}
+					{#each Object.entries(compendium.subclasses).filter(([id, s]) => s.class_id === context.primary_class?.compendium_id) as [id, subclass]}
 						<div class="flex flex-col gap-3 rounded-md border-2 bg-primary-muted p-3">
 							<p class="text-lg font-medium">{subclass.name}</p>
 							<p class="-mt-2 text-xs text-muted-foreground italic">

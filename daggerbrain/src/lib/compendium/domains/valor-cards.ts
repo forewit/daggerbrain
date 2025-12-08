@@ -2,7 +2,7 @@ import type { DomainCard } from '$lib/types/compendium-types';
 
 export const VALOR_DOMAIN_CARDS = {
 	bare_bones: {
-		id: 'bare_bones',
+		compendium_id: 'bare_bones',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -390,7 +390,7 @@ export const VALOR_DOMAIN_CARDS = {
 		]
 	},
 	forceful_push: {
-		id: 'forceful_push',
+		compendium_id: 'forceful_push',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -417,7 +417,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 
 	i_am_your_shield: {
-		id: 'i_am_your_shield',
+		compendium_id: 'i_am_your_shield',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -444,7 +444,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 
 	body_basher: {
-		id: 'body_basher',
+		compendium_id: 'body_basher',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -470,7 +470,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 
 	bold_presence: {
-		id: 'bold_presence',
+		compendium_id: 'bold_presence',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -496,7 +496,7 @@ export const VALOR_DOMAIN_CARDS = {
 		]
 	},
 	critical_inspiration: {
-		id: 'critical_inspiration',
+		compendium_id: 'critical_inspiration',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -522,7 +522,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 
 	lean_on_me: {
-		id: 'lean_on_me',
+		compendium_id: 'lean_on_me',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -548,7 +548,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 
 	goad_them_on: {
-		id: 'goad_them_on',
+		compendium_id: 'goad_them_on',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -578,7 +578,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 
 	support_tank: {
-		id: 'support_tank',
+		compendium_id: 'support_tank',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -604,7 +604,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 
 	armorer: {
-		id: 'armorer',
+		compendium_id: 'armorer',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -644,7 +644,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 
 	rousing_strike: {
-		id: 'rousing_strike',
+		compendium_id: 'rousing_strike',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -669,7 +669,7 @@ export const VALOR_DOMAIN_CARDS = {
 		]
 	},
 	inevitable: {
-		id: 'inevitable',
+		compendium_id: 'inevitable',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -695,7 +695,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 
 	rise_up: {
-		id: 'rise_up',
+		compendium_id: 'rise_up',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -729,7 +729,7 @@ export const VALOR_DOMAIN_CARDS = {
 		]
 	},
 	shrug_it_off: {
-		id: 'shrug_it_off',
+		compendium_id: 'shrug_it_off',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -756,7 +756,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 
 	valor_touched: {
-		id: 'valor_touched',
+		compendium_id: 'valor_touched',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -799,7 +799,7 @@ export const VALOR_DOMAIN_CARDS = {
 		]
 	},
 	full_surge: {
-		id: 'full_surge',
+		compendium_id: 'full_surge',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -825,7 +825,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 
 	ground_pound: {
-		id: 'ground_pound',
+		compendium_id: 'ground_pound',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -856,7 +856,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 
 	hold_the_line: {
-		id: 'hold_the_line',
+		compendium_id: 'hold_the_line',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -883,7 +883,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 
 	lead_by_example: {
-		id: 'lead_by_example',
+		compendium_id: 'lead_by_example',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -910,7 +910,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 
 	unbreakable: {
-		id: 'unbreakable',
+		compendium_id: 'unbreakable',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',
@@ -936,7 +936,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 
 	unyielding_armor: {
-		id: 'unyielding_armor',
+		compendium_id: 'unyielding_armor',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'valor',

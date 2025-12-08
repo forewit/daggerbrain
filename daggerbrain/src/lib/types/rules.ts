@@ -74,7 +74,7 @@ export const TRAITS: Record<TraitIds, Trait> = {
 } as const;
 
 export const BASE_MIXED_ANCESTRY_CARD: AncestryCard = {
-	id: 'mixed-ancestry',
+	compendium_id: 'mixed-ancestry',
 	source_id: 'SRD',
 	card_type: 'ancestry',
 	image_url: '/images/wip.avif',
@@ -86,8 +86,9 @@ export const BASE_MIXED_ANCESTRY_CARD: AncestryCard = {
 	choices: []
 };
 
-export const BASE_UNARMED_ATTACK: Weapon = {
+export const BASE_UNARMED_ATTACK: Weapon & { id: string } = {
 	id: 'unarmed_attack',
+	compendium_id: 'unarmed_attack',
 	source_id: 'SRD',
 	title: 'Unarmed Attack',
 	description_html: '',
@@ -103,8 +104,9 @@ export const BASE_UNARMED_ATTACK: Weapon = {
 	burden: 0
 };
 
-export const BASE_ARMOR: Armor = {
+export const BASE_ARMOR: Armor & { id: string } = {
 	id: 'unarmored',
+	compendium_id: 'unarmored',
 	source_id: 'SRD',
 	title: 'Unarmored',
 	description_html: '',

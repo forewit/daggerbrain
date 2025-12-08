@@ -39,13 +39,43 @@ export type LevelUpChoices = Record<
 	{ A: LevelUpChoice; B: LevelUpChoice }
 >;
 
-export type CharacterInventory = {
-	primary_weapons: Record<string, { quantity: number; choices: Record<string, string[]> }>;
-	secondary_weapons: Record<string, { quantity: number; choices: Record<string, string[]> }>;
-	armor: Record<string, { quantity: number; choices: Record<string, string[]> }>;
-	loot: Record<string, { quantity: number; choices: Record<string, string[]> }>;
-	consumables: Record<string, { quantity: number; choices: Record<string, string[]> }>;
-	adventuring_gear: (AdventuringGear & { quantity: number })[];
+export type ArmorInventoryItem = {
+	id: string;
+	compendium_id: string;
+	choices: Record<string, string[]>;
+	custom_title: string | null;
+	custom_level_requirement: number | null;
+};
+
+export type WeaponInventoryItem = {
+	id: string;
+	compendium_id: string;
+	choices: Record<string, string[]>;
+	custom_title: string | null;
+	custom_level_requirement: number | null;
+};
+
+export type ConsumableInventoryItem = {
+	id: string;
+	compendium_id: string;
+	choices: Record<string, string[]>;
+	custom_title: string | null;
+};
+
+export type LootInventoryItem = {
+	id: string;
+	compendium_id: string;
+	choices: Record<string, string[]>;
+	custom_title: string | null;
+};
+
+export type Inventory = {
+	primary_weapons: Record<string, WeaponInventoryItem>;
+	secondary_weapons: Record<string, WeaponInventoryItem>;
+	armor: Record<string, ArmorInventoryItem>;
+	loot: Record<string, LootInventoryItem>;
+	consumables: Record<string, ConsumableInventoryItem>;
+	adventuring_gear: AdventuringGear[];
 	gold_coins: number;
 };
 

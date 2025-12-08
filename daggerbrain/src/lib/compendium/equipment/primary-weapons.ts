@@ -3,7 +3,7 @@ import type { Weapon } from '$lib/types/compendium-types';
 // todo: verify all below
 export const TIER_1_PRIMARY_WEAPONS = {
 	broadsword: {
-		id: 'broadsword',
+		compendium_id: 'broadsword',
 		source_id: 'SRD',
 		title: 'Broadsword',
 		description_html: '',
@@ -34,7 +34,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		]
 	},
 	longsword: {
-		id: 'longsword',
+		compendium_id: 'longsword',
 
 		source_id: 'SRD',
 		title: 'Longsword',
@@ -51,7 +51,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		features: []
 	},
 	battleaxe: {
-		id: 'battleaxe',
+		compendium_id: 'battleaxe',
 
 		source_id: 'SRD',
 		title: 'Battleaxe',
@@ -68,7 +68,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		features: []
 	},
 	greatsword: {
-		id: 'greatsword',
+		compendium_id: 'greatsword',
 
 		source_id: 'SRD',
 		title: 'Greatsword',
@@ -101,7 +101,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		]
 	},
 	mace: {
-		id: 'mace',
+		compendium_id: 'mace',
 
 		source_id: 'SRD',
 		title: 'Mace',
@@ -118,7 +118,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		features: []
 	},
 	warhammer: {
-		id: 'warhammer',
+		compendium_id: 'warhammer',
 
 		source_id: 'SRD',
 		title: 'Warhammer',
@@ -150,7 +150,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		]
 	},
 	dagger: {
-		id: 'dagger',
+		compendium_id: 'dagger',
 
 		source_id: 'SRD',
 		title: 'Dagger',
@@ -167,7 +167,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		features: []
 	},
 	quarterstaff: {
-		id: 'quarterstaff',
+		compendium_id: 'quarterstaff',
 
 		source_id: 'SRD',
 		title: 'Quarterstaff',
@@ -184,7 +184,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		features: []
 	},
 	cutlass: {
-		id: 'cutlass',
+		compendium_id: 'cutlass',
 
 		source_id: 'SRD',
 		title: 'Cutlass',
@@ -201,7 +201,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		features: []
 	},
 	rapier: {
-		id: 'rapier',
+		compendium_id: 'rapier',
 
 		source_id: 'SRD',
 		title: 'Rapier',
@@ -226,7 +226,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		]
 	},
 	halberd: {
-		id: 'halberd',
+		compendium_id: 'halberd',
 
 		source_id: 'SRD',
 		title: 'Halberd',
@@ -243,7 +243,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		features: []
 	},
 	spear: {
-		id: 'spear',
+		compendium_id: 'spear',
 
 		source_id: 'SRD',
 		title: 'Spear',
@@ -260,7 +260,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		features: []
 	},
 	shortbow: {
-		id: 'shortbow',
+		compendium_id: 'shortbow',
 
 		source_id: 'SRD',
 		title: 'Shortbow',
@@ -277,7 +277,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		features: []
 	},
 	crossbow: {
-		id: 'crossbow',
+		compendium_id: 'crossbow',
 
 		source_id: 'SRD',
 		title: 'Crossbow',
@@ -294,7 +294,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		features: []
 	},
 	longbow: {
-		id: 'longbow',
+		compendium_id: 'longbow',
 
 		source_id: 'SRD',
 		title: 'Longbow',
@@ -328,7 +328,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 	},
 	// MAGIC WEAPONS
 	arcane_gauntlets: {
-		id: 'arcane_gauntlets',
+		compendium_id: 'arcane_gauntlets',
 		source_id: 'SRD',
 		title: 'Arcane Gauntlets',
 		description_html: '',
@@ -344,7 +344,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		features: []
 	},
 	hallowed_axe: {
-		id: 'hallowed_axe',
+		compendium_id: 'hallowed_axe',
 		source_id: 'SRD',
 		title: 'Hallowed Axe',
 		description_html: '',
@@ -360,7 +360,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		features: []
 	},
 	glowing_rings: {
-		id: 'glowing_rings',
+		compendium_id: 'glowing_rings',
 		source_id: 'SRD',
 		title: 'Glowing Rings',
 		description_html: '',
@@ -376,7 +376,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		features: []
 	},
 	hand_runes: {
-		id: 'hand_runes',
+		compendium_id: 'hand_runes',
 		source_id: 'SRD',
 		title: 'Hand Runes',
 		description_html: '',
@@ -392,7 +392,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		features: []
 	},
 	returning_blade: {
-		id: 'returning_blade',
+		compendium_id: 'returning_blade',
 		source_id: 'SRD',
 		title: 'Returning Blade',
 		description_html: '',
@@ -416,7 +416,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		]
 	},
 	shortstaff: {
-		id: 'shortstaff',
+		compendium_id: 'shortstaff',
 		source_id: 'SRD',
 		title: 'Shortstaff',
 		description_html: '',
@@ -432,7 +432,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		features: []
 	},
 	dualstaff: {
-		id: 'dualstaff',
+		compendium_id: 'dualstaff',
 		source_id: 'SRD',
 		title: 'Dualstaff',
 		description_html: '',
@@ -448,7 +448,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		features: []
 	},
 	scepter: {
-		id: 'scepter',
+		compendium_id: 'scepter',
 		source_id: 'SRD',
 		title: 'Scepter',
 		description_html: '',
@@ -472,7 +472,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		]
 	},
 	wand: {
-		id: 'wand',
+		compendium_id: 'wand',
 		source_id: 'SRD',
 		title: 'Wand',
 		description_html: '',
@@ -488,7 +488,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		features: []
 	},
 	greatstaff: {
-		id: 'greatstaff',
+		compendium_id: 'greatstaff',
 		source_id: 'SRD',
 		title: 'Greatstaff',
 		description_html: '',
@@ -515,7 +515,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 
 export const TIER_2_PRIMARY_WEAPONS = {
 	improved_broadsword: {
-		id: 'improved_broadsword',
+		compendium_id: 'improved_broadsword',
 		source_id: 'SRD',
 		title: 'Improved Broadsword',
 		description_html: '',
@@ -546,7 +546,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	improved_longsword: {
-		id: 'improved_longsword',
+		compendium_id: 'improved_longsword',
 		source_id: 'SRD',
 		title: 'Improved Longsword',
 		description_html: '',
@@ -562,7 +562,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		features: []
 	},
 	improved_battleaxe: {
-		id: 'improved_battleaxe',
+		compendium_id: 'improved_battleaxe',
 		source_id: 'SRD',
 		title: 'Improved Battleaxe',
 		description_html: '',
@@ -578,7 +578,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		features: []
 	},
 	improved_greatsword: {
-		id: 'improved_greatsword',
+		compendium_id: 'improved_greatsword',
 		source_id: 'SRD',
 		title: 'Improved Greatsword',
 		description_html: '',
@@ -610,7 +610,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	improved_mace: {
-		id: 'improved_mace',
+		compendium_id: 'improved_mace',
 		source_id: 'SRD',
 		title: 'Improved Mace',
 		description_html: '',
@@ -626,7 +626,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		features: []
 	},
 	improved_warhammer: {
-		id: 'improved_warhammer',
+		compendium_id: 'improved_warhammer',
 		source_id: 'SRD',
 		title: 'Improved Warhammer',
 		description_html: '',
@@ -657,7 +657,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	improved_dagger: {
-		id: 'improved_dagger',
+		compendium_id: 'improved_dagger',
 		source_id: 'SRD',
 		title: 'Improved Dagger',
 		description_html: '',
@@ -673,7 +673,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		features: []
 	},
 	improved_quarterstaff: {
-		id: 'improved_quarterstaff',
+		compendium_id: 'improved_quarterstaff',
 		source_id: 'SRD',
 		title: 'Improved Quarterstaff',
 		description_html: '',
@@ -689,7 +689,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		features: []
 	},
 	improved_cutlass: {
-		id: 'improved_cutlass',
+		compendium_id: 'improved_cutlass',
 		source_id: 'SRD',
 		title: 'Improved Cutlass',
 		description_html: '',
@@ -705,7 +705,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		features: []
 	},
 	improved_rapier: {
-		id: 'improved_rapier',
+		compendium_id: 'improved_rapier',
 		source_id: 'SRD',
 		title: 'Improved Rapier',
 		description_html: '',
@@ -729,7 +729,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	improved_halberd: {
-		id: 'improved_halberd',
+		compendium_id: 'improved_halberd',
 		source_id: 'SRD',
 		title: 'Improved Halberd',
 		description_html: '',
@@ -761,7 +761,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	improved_spear: {
-		id: 'improved_spear',
+		compendium_id: 'improved_spear',
 		source_id: 'SRD',
 		title: 'Improved Spear',
 		description_html: '',
@@ -777,7 +777,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		features: []
 	},
 	improved_shortbow: {
-		id: 'improved_shortbow',
+		compendium_id: 'improved_shortbow',
 		source_id: 'SRD',
 		title: 'Improved Shortbow',
 		description_html: '',
@@ -793,7 +793,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		features: []
 	},
 	improved_crossbow: {
-		id: 'improved_crossbow',
+		compendium_id: 'improved_crossbow',
 		source_id: 'SRD',
 		title: 'Improved Crossbow',
 		description_html: '',
@@ -809,7 +809,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		features: []
 	},
 	improved_longbow: {
-		id: 'improved_longbow',
+		compendium_id: 'improved_longbow',
 		source_id: 'SRD',
 		title: 'Improved Longbow',
 		description_html: '',
@@ -841,7 +841,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	gilded_falchion: {
-		id: 'gilded_falchion',
+		compendium_id: 'gilded_falchion',
 		source_id: 'SRD',
 		title: 'Gilded Falchion',
 		description_html: '',
@@ -865,7 +865,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	knuckle_blades: {
-		id: 'knuckle_blades',
+		compendium_id: 'knuckle_blades',
 		source_id: 'SRD',
 		title: 'Knuckle Blades',
 		description_html: '',
@@ -889,7 +889,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	urok_broadsword: {
-		id: 'urok_broadsword',
+		compendium_id: 'urok_broadsword',
 		source_id: 'SRD',
 		title: 'Urok Broadsword',
 		description_html: '',
@@ -913,7 +913,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	bladed_whip: {
-		id: 'bladed_whip',
+		compendium_id: 'bladed_whip',
 		source_id: 'SRD',
 		title: 'Bladed Whip',
 		description_html: '',
@@ -937,7 +937,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	steelforged_halberd: {
-		id: 'steelforged_halberd',
+		compendium_id: 'steelforged_halberd',
 		source_id: 'SRD',
 		title: 'Steelforged Halberd',
 		description_html: '',
@@ -960,7 +960,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	war_scythe: {
-		id: 'war_scythe',
+		compendium_id: 'war_scythe',
 		source_id: 'SRD',
 		title: 'War Scythe',
 		description_html: '',
@@ -991,7 +991,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	blunderbuss: {
-		id: 'blunderbuss',
+		compendium_id: 'blunderbuss',
 		source_id: 'SRD',
 		title: 'Blunderbuss',
 		description_html: '',
@@ -1015,7 +1015,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	greatbow: {
-		id: 'greatbow',
+		compendium_id: 'greatbow',
 		source_id: 'SRD',
 		title: 'Greatbow',
 		description_html: '',
@@ -1039,7 +1039,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	finehair_bow: {
-		id: 'finehair_bow',
+		compendium_id: 'finehair_bow',
 		source_id: 'SRD',
 		title: 'Finehair Bow',
 		description_html: '',
@@ -1072,7 +1072,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 
 	// MAGIC WEAPONS
 	improved_arcane_gauntlets: {
-		id: 'improved_arcane_gauntlets',
+		compendium_id: 'improved_arcane_gauntlets',
 		source_id: 'SRD',
 		title: 'Improved Arcane Gauntlets',
 		description_html: '',
@@ -1088,7 +1088,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		features: []
 	},
 	improved_hallowed_axe: {
-		id: 'improved_hallowed_axe',
+		compendium_id: 'improved_hallowed_axe',
 		source_id: 'SRD',
 		title: 'Improved Hallowed Axe',
 		description_html: '',
@@ -1104,7 +1104,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		features: []
 	},
 	improved_glowing_rings: {
-		id: 'improved_glowing_rings',
+		compendium_id: 'improved_glowing_rings',
 		source_id: 'SRD',
 		title: 'Improved Glowing Rings',
 		description_html: '',
@@ -1120,7 +1120,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		features: []
 	},
 	improved_hand_runes: {
-		id: 'improved_hand_runes',
+		compendium_id: 'improved_hand_runes',
 		source_id: 'SRD',
 		title: 'Improved Hand Runes',
 		description_html: '',
@@ -1136,7 +1136,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		features: []
 	},
 	improved_returning_blade: {
-		id: 'improved_returning_blade',
+		compendium_id: 'improved_returning_blade',
 		source_id: 'SRD',
 		title: 'Improved Returning Blade',
 		description_html: '',
@@ -1160,7 +1160,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	improved_shortstaff: {
-		id: 'improved_shortstaff',
+		compendium_id: 'improved_shortstaff',
 		source_id: 'SRD',
 		title: 'Improved Shortstaff',
 		description_html: '',
@@ -1176,7 +1176,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		features: []
 	},
 	improved_dualstaff: {
-		id: 'improved_dualstaff',
+		compendium_id: 'improved_dualstaff',
 		source_id: 'SRD',
 		title: 'Improved Dualstaff',
 		description_html: '',
@@ -1192,7 +1192,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		features: []
 	},
 	improved_scepter: {
-		id: 'improved_scepter',
+		compendium_id: 'improved_scepter',
 		source_id: 'SRD',
 		title: 'Improved Scepter',
 		description_html: '',
@@ -1216,7 +1216,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	improved_wand: {
-		id: 'improved_wand',
+		compendium_id: 'improved_wand',
 		source_id: 'SRD',
 		title: 'Improved Wand',
 		description_html: '',
@@ -1232,7 +1232,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		features: []
 	},
 	improved_greatstaff: {
-		id: 'improved_greatstaff',
+		compendium_id: 'improved_greatstaff',
 		source_id: 'SRD',
 		title: 'Improved Greatstaff',
 		description_html: '',
@@ -1256,7 +1256,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	ego_blade: {
-		id: 'ego_blade',
+		compendium_id: 'ego_blade',
 		source_id: 'SRD',
 		title: 'Ego Blade',
 		description_html: '',
@@ -1279,7 +1279,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	casting_sword: {
-		id: 'casting_sword',
+		compendium_id: 'casting_sword',
 		source_id: 'SRD',
 		title: 'Casting Sword',
 		description_html: '',
@@ -1303,7 +1303,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	devouring_dagger: {
-		id: 'devouring_dagger',
+		compendium_id: 'devouring_dagger',
 		source_id: 'SRD',
 		title: 'Devouring Dagger',
 		description_html: '',
@@ -1326,7 +1326,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	hammer_of_exota: {
-		id: 'hammer_of_exota',
+		compendium_id: 'hammer_of_exota',
 		source_id: 'SRD',
 		title: 'Hammer of Exota',
 		description_html: '',
@@ -1350,7 +1350,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	yutari_bloodbow: {
-		id: 'yutari_bloodbow',
+		compendium_id: 'yutari_bloodbow',
 		source_id: 'SRD',
 		title: 'Yutari Bloodbow',
 		description_html: '',
@@ -1374,7 +1374,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	elder_bow: {
-		id: 'elder_bow',
+		compendium_id: 'elder_bow',
 		source_id: 'SRD',
 		title: 'Elder Bow',
 		description_html: '',
@@ -1398,7 +1398,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	scepter_of_elias: {
-		id: 'scepter_of_elias',
+		compendium_id: 'scepter_of_elias',
 		source_id: 'SRD',
 		title: 'Scepter of Elias',
 		description_html: '',
@@ -1422,7 +1422,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	wand_of_enthrallment: {
-		id: 'wand_of_enthrallment',
+		compendium_id: 'wand_of_enthrallment',
 		source_id: 'SRD',
 		title: 'Wand of Enthrallment',
 		description_html: '',
@@ -1446,7 +1446,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		]
 	},
 	keepers_staff: {
-		id: 'keepers_staff',
+		compendium_id: 'keepers_staff',
 		source_id: 'SRD',
 		title: "Keeper's Staff",
 		description_html: '',
@@ -1480,7 +1480,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 
 export const TIER_3_PRIMARY_WEAPONS = {
 	advanced_broadsword: {
-		id: 'advanced_broadsword',
+		compendium_id: 'advanced_broadsword',
 		source_id: 'SRD',
 		title: 'Advanced Broadsword',
 		description_html: '',
@@ -1511,7 +1511,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	advanced_longsword: {
-		id: 'advanced_longsword',
+		compendium_id: 'advanced_longsword',
 		source_id: 'SRD',
 		title: 'Advanced Longsword',
 		description_html: '',
@@ -1527,7 +1527,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		features: []
 	},
 	advanced_battleaxe: {
-		id: 'advanced_battleaxe',
+		compendium_id: 'advanced_battleaxe',
 		source_id: 'SRD',
 		title: 'Advanced Battleaxe',
 		description_html: '',
@@ -1543,7 +1543,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		features: []
 	},
 	advanced_greatsword: {
-		id: 'advanced_greatsword',
+		compendium_id: 'advanced_greatsword',
 		source_id: 'SRD',
 		title: 'Advanced Greatsword',
 		description_html: '',
@@ -1575,7 +1575,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	advanced_mace: {
-		id: 'advanced_mace',
+		compendium_id: 'advanced_mace',
 		source_id: 'SRD',
 		title: 'Advanced Mace',
 		description_html: '',
@@ -1591,7 +1591,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		features: []
 	},
 	advanced_warhammer: {
-		id: 'advanced_warhammer',
+		compendium_id: 'advanced_warhammer',
 		source_id: 'SRD',
 		title: 'Advanced Warhammer',
 		description_html: '',
@@ -1622,7 +1622,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	advanced_dagger: {
-		id: 'advanced_dagger',
+		compendium_id: 'advanced_dagger',
 		source_id: 'SRD',
 		title: 'Advanced Dagger',
 		description_html: '',
@@ -1638,7 +1638,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		features: []
 	},
 	advanced_quarterstaff: {
-		id: 'advanced_quarterstaff',
+		compendium_id: 'advanced_quarterstaff',
 		source_id: 'SRD',
 		title: 'Advanced Quarterstaff',
 		description_html: '',
@@ -1654,7 +1654,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		features: []
 	},
 	advanced_cutlass: {
-		id: 'advanced_cutlass',
+		compendium_id: 'advanced_cutlass',
 		source_id: 'SRD',
 		title: 'Advanced Cutlass',
 		description_html: '',
@@ -1670,7 +1670,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		features: []
 	},
 	advanced_rapier: {
-		id: 'advanced_rapier',
+		compendium_id: 'advanced_rapier',
 		source_id: 'SRD',
 		title: 'Advanced Rapier',
 		description_html: '',
@@ -1694,7 +1694,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	advanced_halberd: {
-		id: 'advanced_halberd',
+		compendium_id: 'advanced_halberd',
 		source_id: 'SRD',
 		title: 'Advanced Halberd',
 		description_html: '',
@@ -1726,7 +1726,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	advanced_spear: {
-		id: 'advanced_spear',
+		compendium_id: 'advanced_spear',
 		source_id: 'SRD',
 		title: 'Advanced Spear',
 		description_html: '',
@@ -1742,7 +1742,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		features: []
 	},
 	advanced_shortbow: {
-		id: 'advanced_shortbow',
+		compendium_id: 'advanced_shortbow',
 		source_id: 'SRD',
 		title: 'Advanced Shortbow',
 		description_html: '',
@@ -1758,7 +1758,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		features: []
 	},
 	advanced_crossbow: {
-		id: 'advanced_crossbow',
+		compendium_id: 'advanced_crossbow',
 		source_id: 'SRD',
 		title: 'Advanced Crossbow',
 		description_html: '',
@@ -1774,7 +1774,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		features: []
 	},
 	advanced_longbow: {
-		id: 'advanced_longbow',
+		compendium_id: 'advanced_longbow',
 		source_id: 'SRD',
 		title: 'Advanced Longbow',
 		description_html: '',
@@ -1806,7 +1806,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	flickerfly_blade: {
-		id: 'flickerfly_blade',
+		compendium_id: 'flickerfly_blade',
 		source_id: 'SRD',
 		title: 'Flickerfly Blade',
 		description_html: '',
@@ -1829,7 +1829,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	bravesword: {
-		id: 'bravesword',
+		compendium_id: 'bravesword',
 		source_id: 'SRD',
 		title: 'Bravesword',
 		description_html: '',
@@ -1867,7 +1867,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	hammer_of_wrath: {
-		id: 'hammer_of_wrath',
+		compendium_id: 'hammer_of_wrath',
 		source_id: 'SRD',
 		title: 'Hammer of Wrath',
 		description_html: '',
@@ -1891,7 +1891,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	labrys_axe: {
-		id: 'labrys_axe',
+		compendium_id: 'labrys_axe',
 		source_id: 'SRD',
 		title: 'Labrys Axe',
 		description_html: '',
@@ -1922,7 +1922,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	meridian_cutlass: {
-		id: 'meridian_cutlass',
+		compendium_id: 'meridian_cutlass',
 		source_id: 'SRD',
 		title: 'Meridian Cutlass',
 		description_html: '',
@@ -1946,7 +1946,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	retractable_saber: {
-		id: 'retractable_saber',
+		compendium_id: 'retractable_saber',
 		source_id: 'SRD',
 		title: 'Retractable Saber',
 		description_html: '',
@@ -1969,7 +1969,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	double_flail: {
-		id: 'double_flail',
+		compendium_id: 'double_flail',
 		source_id: 'SRD',
 		title: 'Double Flail',
 		description_html: '',
@@ -1993,7 +1993,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	talon_blades: {
-		id: 'talon_blades',
+		compendium_id: 'talon_blades',
 		source_id: 'SRD',
 		title: 'Talon Blades',
 		description_html: '',
@@ -2017,7 +2017,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	black_powder_revolver: {
-		id: 'black_powder_revolver',
+		compendium_id: 'black_powder_revolver',
 		source_id: 'SRD',
 		title: 'Black Powder Revolver',
 		description_html: '',
@@ -2041,7 +2041,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	spiked_bow: {
-		id: 'spiked_bow',
+		compendium_id: 'spiked_bow',
 		source_id: 'SRD',
 		title: 'Spiked Bow',
 		description_html: '',
@@ -2066,7 +2066,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 	},
 	// magic weapons
 	arcane_gauntlets: {
-		id: 'arcane_gauntlets',
+		compendium_id: 'arcane_gauntlets',
 		source_id: 'SRD',
 		title: 'Arcane Gauntlets',
 		description_html: '',
@@ -2082,7 +2082,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		features: []
 	},
 	hallowed_axe: {
-		id: 'hallowed_axe',
+		compendium_id: 'hallowed_axe',
 		source_id: 'SRD',
 		title: 'Hallowed Axe',
 		description_html: '',
@@ -2098,7 +2098,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		features: []
 	},
 	glowing_rings: {
-		id: 'glowing_rings',
+		compendium_id: 'glowing_rings',
 		source_id: 'SRD',
 		title: 'Glowing Rings',
 		description_html: '',
@@ -2114,7 +2114,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		features: []
 	},
 	hand_runes: {
-		id: 'hand_runes',
+		compendium_id: 'hand_runes',
 		source_id: 'SRD',
 		title: 'Hand Runes',
 		description_html: '',
@@ -2130,7 +2130,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		features: []
 	},
 	returning_blade: {
-		id: 'returning_blade',
+		compendium_id: 'returning_blade',
 		source_id: 'SRD',
 		title: 'Returning Blade',
 		description_html: '',
@@ -2154,7 +2154,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	shortstaff: {
-		id: 'shortstaff',
+		compendium_id: 'shortstaff',
 		source_id: 'SRD',
 		title: 'Shortstaff',
 		description_html: '',
@@ -2170,7 +2170,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		features: []
 	},
 	dualstaff: {
-		id: 'dualstaff',
+		compendium_id: 'dualstaff',
 		source_id: 'SRD',
 		title: 'Dualstaff',
 		description_html: '',
@@ -2186,7 +2186,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		features: []
 	},
 	scepter: {
-		id: 'scepter',
+		compendium_id: 'scepter',
 		source_id: 'SRD',
 		title: 'Scepter',
 		description_html: '',
@@ -2210,7 +2210,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	wand: {
-		id: 'wand',
+		compendium_id: 'wand',
 		source_id: 'SRD',
 		title: 'Wand',
 		description_html: '',
@@ -2226,7 +2226,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		features: []
 	},
 	greatstaff: {
-		id: 'greatstaff',
+		compendium_id: 'greatstaff',
 		source_id: 'SRD',
 		title: 'Greatstaff',
 		description_html: '',
@@ -2250,7 +2250,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	axe_of_fortunis: {
-		id: 'axe_of_fortunis',
+		compendium_id: 'axe_of_fortunis',
 		source_id: 'SRD',
 		title: 'Axe of Fortunis',
 		description_html: '',
@@ -2273,7 +2273,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	blessed_anlace: {
-		id: 'blessed_anlace',
+		compendium_id: 'blessed_anlace',
 		source_id: 'SRD',
 		title: 'Blessed Anlace',
 		description_html: '',
@@ -2296,7 +2296,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	ghostblade: {
-		id: 'ghostblade',
+		compendium_id: 'ghostblade',
 		source_id: 'SRD',
 		title: 'Ghostblade',
 		description_html: '',
@@ -2319,7 +2319,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	runes_of_ruination: {
-		id: 'runes_of_ruination',
+		compendium_id: 'runes_of_ruination',
 		source_id: 'SRD',
 		title: 'Runes of Ruination',
 		description_html: '',
@@ -2342,7 +2342,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	widogast_pendant: {
-		id: 'widogast_pendant',
+		compendium_id: 'widogast_pendant',
 		source_id: 'SRD',
 		title: 'Widogast Pendant',
 		description_html: '',
@@ -2366,7 +2366,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	gilded_bow: {
-		id: 'gilded_bow',
+		compendium_id: 'gilded_bow',
 		source_id: 'SRD',
 		title: 'Gilded Bow',
 		description_html: '',
@@ -2389,7 +2389,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	firestaff: {
-		id: 'firestaff',
+		compendium_id: 'firestaff',
 		source_id: 'SRD',
 		title: 'Firestaff',
 		description_html: '',
@@ -2413,7 +2413,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	mage_orb: {
-		id: 'mage_orb',
+		compendium_id: 'mage_orb',
 		source_id: 'SRD',
 		title: 'Mage Orb',
 		description_html: '',
@@ -2437,7 +2437,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		]
 	},
 	ilmari_rifle: {
-		id: 'ilmari_rifle',
+		compendium_id: 'ilmari_rifle',
 		source_id: 'SRD',
 		title: 'Ilmari’s Rifle',
 		description_html: '',
@@ -2464,7 +2464,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 
 export const TIER_4_PRIMARY_WEAPONS = {
 	legendary_broadsword: {
-		id: 'legendary_broadsword',
+		compendium_id: 'legendary_broadsword',
 		source_id: 'SRD',
 		title: 'Legendary Broadsword',
 		description_html: '',
@@ -2495,7 +2495,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	legendary_longsword: {
-		id: 'legendary_longsword',
+		compendium_id: 'legendary_longsword',
 		source_id: 'SRD',
 		title: 'Legendary Longsword',
 		description_html: '',
@@ -2511,7 +2511,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		features: []
 	},
 	legendary_battleaxe: {
-		id: 'legendary_battleaxe',
+		compendium_id: 'legendary_battleaxe',
 		source_id: 'SRD',
 		title: 'Legendary Battleaxe',
 		description_html: '',
@@ -2527,7 +2527,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		features: []
 	},
 	legendary_greatsword: {
-		id: 'legendary_greatsword',
+		compendium_id: 'legendary_greatsword',
 		source_id: 'SRD',
 		title: 'Legendary Greatsword',
 		description_html: '',
@@ -2559,7 +2559,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	legendary_mace: {
-		id: 'legendary_mace',
+		compendium_id: 'legendary_mace',
 		source_id: 'SRD',
 		title: 'Legendary Mace',
 		description_html: '',
@@ -2575,7 +2575,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		features: []
 	},
 	legendary_warhammer: {
-		id: 'legendary_warhammer',
+		compendium_id: 'legendary_warhammer',
 		source_id: 'SRD',
 		title: 'Legendary Warhammer',
 		description_html: '',
@@ -2606,7 +2606,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	legendary_dagger: {
-		id: 'legendary_dagger',
+		compendium_id: 'legendary_dagger',
 		source_id: 'SRD',
 		title: 'Legendary Dagger',
 		description_html: '',
@@ -2622,7 +2622,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		features: []
 	},
 	legendary_quarterstaff: {
-		id: 'legendary_quarterstaff',
+		compendium_id: 'legendary_quarterstaff',
 		source_id: 'SRD',
 		title: 'Legendary Quarterstaff',
 		description_html: '',
@@ -2638,7 +2638,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		features: []
 	},
 	legendary_cutlass: {
-		id: 'legendary_cutlass',
+		compendium_id: 'legendary_cutlass',
 		source_id: 'SRD',
 		title: 'Legendary Cutlass',
 		description_html: '',
@@ -2654,7 +2654,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		features: []
 	},
 	legendary_rapier: {
-		id: 'legendary_rapier',
+		compendium_id: 'legendary_rapier',
 		source_id: 'SRD',
 		title: 'Legendary Rapier',
 		description_html: '',
@@ -2678,7 +2678,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	legendary_halberd: {
-		id: 'legendary_halberd',
+		compendium_id: 'legendary_halberd',
 		source_id: 'SRD',
 		title: 'Legendary Halberd',
 		description_html: '',
@@ -2710,7 +2710,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	legendary_spear: {
-		id: 'legendary_spear',
+		compendium_id: 'legendary_spear',
 		source_id: 'SRD',
 		title: 'Legendary Spear',
 		description_html: '',
@@ -2726,7 +2726,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		features: []
 	},
 	legendary_shortbow: {
-		id: 'legendary_shortbow',
+		compendium_id: 'legendary_shortbow',
 		source_id: 'SRD',
 		title: 'Legendary Shortbow',
 		description_html: '',
@@ -2742,7 +2742,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		features: []
 	},
 	legendary_crossbow: {
-		id: 'legendary_crossbow',
+		compendium_id: 'legendary_crossbow',
 		source_id: 'SRD',
 		title: 'Legendary Crossbow',
 		description_html: '',
@@ -2758,7 +2758,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		features: []
 	},
 	legendary_longbow: {
-		id: 'legendary_longbow',
+		compendium_id: 'legendary_longbow',
 		source_id: 'SRD',
 		title: 'Legendary Longbow',
 		description_html: '',
@@ -2790,7 +2790,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	blade_of_the_valiant: {
-		id: 'blade_of_the_valiant',
+		compendium_id: 'blade_of_the_valiant',
 		source_id: 'SRD',
 		title: 'Blade of the Valiant',
 		description_html: '',
@@ -2814,7 +2814,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	soul_cleaver: {
-		id: 'soul_cleaver',
+		compendium_id: 'soul_cleaver',
 		source_id: 'SRD',
 		title: 'Soul Cleaver',
 		description_html: '',
@@ -2838,7 +2838,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	void_touched_blade: {
-		id: 'void_touched_blade',
+		compendium_id: 'void_touched_blade',
 		source_id: 'SRD',
 		title: 'Void-Touched Blade',
 		description_html: '',
@@ -2862,7 +2862,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	dragon_scale_whip: {
-		id: 'dragon_scale_whip',
+		compendium_id: 'dragon_scale_whip',
 		source_id: 'SRD',
 		title: 'Dragon-Scale Whip',
 		description_html: '',
@@ -2886,7 +2886,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	meteor_hammer: {
-		id: 'meteor_hammer',
+		compendium_id: 'meteor_hammer',
 		source_id: 'SRD',
 		title: 'Meteor Hammer',
 		description_html: '',
@@ -2910,7 +2910,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	sunken_anchor: {
-		id: 'sunken_anchor',
+		compendium_id: 'sunken_anchor',
 		source_id: 'SRD',
 		title: 'Sunken Anchor',
 		description_html: '',
@@ -2941,7 +2941,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	whirlwind_glaive: {
-		id: 'whirlwind_glaive',
+		compendium_id: 'whirlwind_glaive',
 		source_id: 'SRD',
 		title: 'Whirlwind Glaive',
 		description_html: '',
@@ -2965,7 +2965,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	repeating_crossbow: {
-		id: 'repeating_crossbow',
+		compendium_id: 'repeating_crossbow',
 		source_id: 'SRD',
 		title: 'Repeating Crossbow',
 		description_html: '',
@@ -2989,7 +2989,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	oathbow: {
-		id: 'oathbow',
+		compendium_id: 'oathbow',
 		source_id: 'SRD',
 		title: 'Oathbow',
 		description_html: '',
@@ -3014,7 +3014,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 	},
 	// magic
 	legendary_arcane_gauntlets: {
-		id: 'legendary_arcane_gauntlets',
+		compendium_id: 'legendary_arcane_gauntlets',
 		source_id: 'SRD',
 		title: 'Legendary Arcane Gauntlets',
 		description_html: '',
@@ -3030,7 +3030,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		features: []
 	},
 	legendary_hallowed_axe: {
-		id: 'legendary_hallowed_axe',
+		compendium_id: 'legendary_hallowed_axe',
 		source_id: 'SRD',
 		title: 'Legendary Hallowed Axe',
 		description_html: '',
@@ -3046,7 +3046,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		features: []
 	},
 	legendary_glowing_rings: {
-		id: 'legendary_glowing_rings',
+		compendium_id: 'legendary_glowing_rings',
 		source_id: 'SRD',
 		title: 'Legendary Glowing Rings',
 		description_html: '',
@@ -3062,7 +3062,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		features: []
 	},
 	legendary_hand_runes: {
-		id: 'legendary_hand_runes',
+		compendium_id: 'legendary_hand_runes',
 		source_id: 'SRD',
 		title: 'Legendary Hand Runes',
 		description_html: '',
@@ -3078,7 +3078,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		features: []
 	},
 	legendary_returning_blade: {
-		id: 'legendary_returning_blade',
+		compendium_id: 'legendary_returning_blade',
 		source_id: 'SRD',
 		title: 'Legendary Returning Blade',
 		description_html: '',
@@ -3102,7 +3102,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	legendary_shortstaff: {
-		id: 'legendary_shortstaff',
+		compendium_id: 'legendary_shortstaff',
 		source_id: 'SRD',
 		title: 'Legendary Shortstaff',
 		description_html: '',
@@ -3118,7 +3118,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		features: []
 	},
 	legendary_dualstaff: {
-		id: 'legendary_dualstaff',
+		compendium_id: 'legendary_dualstaff',
 		source_id: 'SRD',
 		title: 'Legendary Dualstaff',
 		description_html: '',
@@ -3134,7 +3134,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		features: []
 	},
 	legendary_scepter: {
-		id: 'legendary_scepter',
+		compendium_id: 'legendary_scepter',
 		source_id: 'SRD',
 		title: 'Legendary Scepter',
 		description_html: '',
@@ -3158,7 +3158,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	legendary_wand: {
-		id: 'legendary_wand',
+		compendium_id: 'legendary_wand',
 		source_id: 'SRD',
 		title: 'Legendary Wand',
 		description_html: '',
@@ -3174,7 +3174,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		features: []
 	},
 	legendary_greatstaff: {
-		id: 'legendary_greatstaff',
+		compendium_id: 'legendary_greatstaff',
 		source_id: 'SRD',
 		title: 'Legendary Greatstaff',
 		description_html: '',
@@ -3198,7 +3198,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	blade_of_the_ancients: {
-		id: 'blade_of_the_ancients',
+		compendium_id: 'blade_of_the_ancients',
 		source_id: 'SRD',
 		title: 'Blade of the Ancients',
 		description_html: '',
@@ -3222,7 +3222,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	staff_of_the_magi: {
-		id: 'staff_of_the_magi',
+		compendium_id: 'staff_of_the_magi',
 		source_id: 'SRD',
 		title: 'Staff of the Magi',
 		description_html: '',
@@ -3246,7 +3246,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	sunfire_tome: {
-		id: 'sunfire_tome',
+		compendium_id: 'sunfire_tome',
 		source_id: 'SRD',
 		title: 'Sunfire Tome',
 		description_html: '',
@@ -3270,7 +3270,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	frostwind_bow: {
-		id: 'frostwind_bow',
+		compendium_id: 'frostwind_bow',
 		source_id: 'SRD',
 		title: 'Frostwind Bow',
 		description_html: '',
@@ -3294,7 +3294,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	stormcaller_javelin: {
-		id: 'stormcaller_javelin',
+		compendium_id: 'stormcaller_javelin',
 		source_id: 'SRD',
 		title: 'Stormcaller Javelin',
 		description_html: '',
@@ -3318,7 +3318,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		]
 	},
 	earthshaker_maul: {
-		id: 'earthshaker_maul',
+		compendium_id: 'earthshaker_maul',
 		source_id: 'SRD',
 		title: 'Earthshaker Maul',
 		description_html: '',

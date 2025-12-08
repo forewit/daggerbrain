@@ -2,7 +2,7 @@ import type { DomainCard } from '$lib/types/compendium-types';
 
 export const CODEX_DOMAIN_CARDS = {
 	book_of_ava: {
-		id: 'book_of_ava',
+		compendium_id: 'book_of_ava',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -29,7 +29,7 @@ export const CODEX_DOMAIN_CARDS = {
 		]
 	},
 	book_of_illiat: {
-		id: 'book_of_illiat',
+		compendium_id: 'book_of_illiat',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -56,7 +56,7 @@ export const CODEX_DOMAIN_CARDS = {
 		]
 	},
 	book_of_tyfar: {
-		id: 'book_of_tyfar',
+		compendium_id: 'book_of_tyfar',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -83,7 +83,7 @@ export const CODEX_DOMAIN_CARDS = {
 		]
 	},
 	book_of_sitil: {
-		id: 'book_of_sitil',
+		compendium_id: 'book_of_sitil',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -110,7 +110,7 @@ export const CODEX_DOMAIN_CARDS = {
 		]
 	},
 	book_of_vagras: {
-		id: 'book_of_vagras',
+		compendium_id: 'book_of_vagras',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -138,7 +138,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	// todo: verify everything below
 	book_of_korvax: {
-		id: 'book_of_korvax',
+		compendium_id: 'book_of_korvax',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -165,7 +165,7 @@ export const CODEX_DOMAIN_CARDS = {
 		]
 	},
 	book_of_norai: {
-		id: 'book_of_norai',
+		compendium_id: 'book_of_norai',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -191,7 +191,7 @@ export const CODEX_DOMAIN_CARDS = {
 		]
 	},
 	book_of_exota: {
-		id: 'book_of_exota',
+		compendium_id: 'book_of_exota',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -217,7 +217,7 @@ export const CODEX_DOMAIN_CARDS = {
 		]
 	},
 	book_of_grynn: {
-		id: 'book_of_grynn',
+		compendium_id: 'book_of_grynn',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -244,7 +244,7 @@ export const CODEX_DOMAIN_CARDS = {
 		]
 	},
 	manifest_wall: {
-		id: 'manifest_wall',
+		compendium_id: 'manifest_wall',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -269,7 +269,7 @@ export const CODEX_DOMAIN_CARDS = {
 		]
 	},
 	teleport: {
-		id: 'teleport',
+		compendium_id: 'teleport',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -301,7 +301,7 @@ export const CODEX_DOMAIN_CARDS = {
 		]
 	},
 	banish: {
-		id: 'banish',
+		compendium_id: 'banish',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -327,7 +327,7 @@ export const CODEX_DOMAIN_CARDS = {
 		]
 	},
 	sigil_of_retribution: {
-		id: 'sigil_of_retribution',
+		compendium_id: 'sigil_of_retribution',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -353,7 +353,7 @@ export const CODEX_DOMAIN_CARDS = {
 		]
 	},
 	book_of_homet: {
-		id: 'book_of_homet',
+		compendium_id: 'book_of_homet',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -379,7 +379,7 @@ export const CODEX_DOMAIN_CARDS = {
 		]
 	},
 	codex_touched: {
-		id: 'codex_touched',
+		compendium_id: 'codex_touched',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -408,7 +408,7 @@ export const CODEX_DOMAIN_CARDS = {
 		]
 	},
 	book_of_vyola: {
-		id: 'book_of_vyola',
+		compendium_id: 'book_of_vyola',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -434,7 +434,7 @@ export const CODEX_DOMAIN_CARDS = {
 		]
 	},
 	safe_haven: {
-		id: 'safe_haven',
+		compendium_id: 'safe_haven',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -461,7 +461,7 @@ export const CODEX_DOMAIN_CARDS = {
 		]
 	},
 	book_of_ronin: {
-		id: 'book_of_ronin',
+		compendium_id: 'book_of_ronin',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -487,7 +487,7 @@ export const CODEX_DOMAIN_CARDS = {
 		]
 	},
 	disintegration_wave: {
-		id: 'disintegration_wave',
+		compendium_id: 'disintegration_wave',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -512,7 +512,7 @@ export const CODEX_DOMAIN_CARDS = {
 		]
 	},
 	book_of_yarrow: {
-		id: 'book_of_yarrow',
+		compendium_id: 'book_of_yarrow',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',
@@ -538,7 +538,7 @@ export const CODEX_DOMAIN_CARDS = {
 		]
 	},
 	transcendent_union: {
-		id: 'transcendent_union',
+		compendium_id: 'transcendent_union',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'codex',

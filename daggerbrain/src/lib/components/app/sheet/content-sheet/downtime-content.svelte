@@ -18,8 +18,7 @@
 	// Calculate tier from character level
 	let tier = $derived.by(() => {
 		if (!character) return 1;
-		const tierStr = context.get_tier_from_level(character.level);
-		return parseInt(tierStr);
+		return context.level_to_tier(character.level);
 	});
 
 	let moreInfoOpen = $state(false);

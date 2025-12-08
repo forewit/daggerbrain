@@ -2,7 +2,7 @@ import type { DomainCard } from '$lib/types/compendium-types';
 
 export const SPLENDOR_DOMAIN_CARDS = {
 	bolt_beacon: {
-		id: 'bolt_beacon',
+		compendium_id: 'bolt_beacon',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -28,7 +28,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 
 	mending_touch: {
-		id: 'mending_touch',
+		compendium_id: 'mending_touch',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -55,7 +55,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 
 	reassurance: {
-		id: 'reassurance',
+		compendium_id: 'reassurance',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -81,7 +81,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 
 	final_words: {
-		id: 'final_words',
+		compendium_id: 'final_words',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -112,7 +112,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 
 	healing_hands: {
-		id: 'healing_hands',
+		compendium_id: 'healing_hands',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -143,7 +143,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 
 	second_wind: {
-		id: 'second_wind',
+		compendium_id: 'second_wind',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -170,7 +170,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 
 	voice_of_reason: {
-		id: 'voice_of_reason',
+		compendium_id: 'voice_of_reason',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -196,7 +196,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 		]
 	},
 	divination: {
-		id: 'divination',
+		compendium_id: 'divination',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -222,7 +222,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 
 	life_ward: {
-		id: 'life_ward',
+		compendium_id: 'life_ward',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -249,7 +249,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 
 	shape_material: {
-		id: 'shape_material',
+		compendium_id: 'shape_material',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -276,7 +276,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 
 	smite: {
-		id: 'smite',
+		compendium_id: 'smite',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -302,7 +302,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 
 	restoration: {
-		id: 'restoration',
+		compendium_id: 'restoration',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -331,7 +331,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 
 	zone_of_protection: {
-		id: 'zone_of_protection',
+		compendium_id: 'zone_of_protection',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -357,7 +357,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 		]
 	},
 	healing_strike: {
-		id: 'healing_strike',
+		compendium_id: 'healing_strike',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -383,7 +383,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 
 	splendor_touched: {
-		id: 'splendor_touched',
+		compendium_id: 'splendor_touched',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -427,7 +427,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 
 	shield_aura: {
-		id: 'shield_aura',
+		compendium_id: 'shield_aura',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -454,7 +454,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 
 	stunning_sunlight: {
-		id: 'stunning_sunlight',
+		compendium_id: 'stunning_sunlight',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -485,7 +485,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 
 	overwhelming_aura: {
-		id: 'overwhelming_aura',
+		compendium_id: 'overwhelming_aura',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -512,7 +512,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 
 	salvation_beam: {
-		id: 'salvation_beam',
+		compendium_id: 'salvation_beam',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -539,7 +539,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 
 	invigoration: {
-		id: 'invigoration',
+		compendium_id: 'invigoration',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',
@@ -565,7 +565,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 
 	resurrection: {
-		id: 'resurrection',
+		compendium_id: 'resurrection',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'splendor',

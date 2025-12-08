@@ -8,16 +8,16 @@
 	import Background from './background.svelte';
 	import Notes from './notes.svelte';
 	import Experiences from './experiences.svelte';
-	import { type ItemClickHandler } from '../content-sheet/content-sheet.svelte';
-
 	let {
 		class: className = '',
-		onItemClick = (() => {}) as ItemClickHandler,
+		onItemClick = () => {},
+		onAdventuringGearClick = () => {},
 		onExperienceClick = () => {},
 		onAddItems = () => {}
 	}: {
 		class?: string;
-		onItemClick?: ItemClickHandler;
+		onItemClick?: (type: 'weapon' | 'armor' | 'consumable' | 'loot', id: string) => void;
+		onAdventuringGearClick?: () => void;
 		onExperienceClick?: () => void;
 		onAddItems?: () => void;
 	} = $props();
@@ -29,7 +29,7 @@
 	const context = getCharacterContext();
 </script>
 
-<div class={cn('relative rounded-2xl border-3 py-4 corner-bevel', className)}>
+<div class={cn('relative overflow-hidden rounded-2xl border-3 py-4 corner-bevel', className)}>
 	<Tabs.Root bind:value={tab}>
 		<Tabs.List class="mx-auto -mt-2 mb-1 flex h-auto flex-wrap gap-y-1 px-2">
 			<Tabs.Trigger value="weapons" class="flex-initial">Active Weapons & Armor</Tabs.Trigger>
@@ -41,7 +41,7 @@
 		</Tabs.List>
 
 		<Tabs.Content value="weapons">
-			<ActiveEquipment gotoInventory={() => (tab = 'inventory')} {onItemClick} />
+			<ActiveEquipment {onItemClick} />
 		</Tabs.Content>
 		<Tabs.Content value="features" class="px-4">
 			<ClassFeatures />
@@ -50,7 +50,7 @@
 			<Experiences {onExperienceClick} />
 		</Tabs.Content>
 		<Tabs.Content value="inventory">
-			<Inventory {onItemClick} {onAddItems} />
+			<Inventory {onItemClick} {onAdventuringGearClick} {onAddItems} />
 		</Tabs.Content>
 		<Tabs.Content value="background" class="px-4">
 			<Background />

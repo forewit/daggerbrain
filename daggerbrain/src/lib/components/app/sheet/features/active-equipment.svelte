@@ -4,16 +4,12 @@
 	import WeaponCard from './equipment/weapon-row.svelte';
 	import ArmorCard from './equipment/armor-row.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { type ItemClickHandler } from '../content-sheet/content-sheet.svelte';
-
 	let {
 		class: className = '',
-		gotoInventory = () => {},
-		onItemClick = (() => {}) as ItemClickHandler
+		onItemClick = () => {}
 	}: {
 		class?: string;
-		gotoInventory?: () => void;
-		onItemClick?: ItemClickHandler;
+		onItemClick?: (type: 'weapon' | 'armor' | 'consumable' | 'loot', id: string) => void;
 	} = $props();
 
 	const context = getCharacterContext();
@@ -81,10 +77,12 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#if context.derived_armor !== null}
+				{#if context.derived_armor}
 					<ArmorCard
-						armor={context.derived_armor}
-						onclick={() => onItemClick('armor', context.derived_armor!)}
+						id={context.derived_armor.id}
+						onclick={() => {
+							if (context.derived_armor) onItemClick('armor', context.derived_armor.id);
+						}}
 					/>
 				{/if}
 			</tbody>
@@ -110,22 +108,31 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#if context.derived_primary_weapon !== null}
+				{#if context.derived_primary_weapon}
 					<WeaponCard
-						weapon={context.derived_primary_weapon}
-						onclick={() => onItemClick('weapon', context.derived_primary_weapon!)}
+						id={context.derived_primary_weapon.id}
+						onclick={() => {
+							if (context.derived_primary_weapon)
+								onItemClick('weapon', context.derived_primary_weapon.id);
+						}}
 					/>
 				{/if}
-				{#if context.derived_secondary_weapon !== null}
+				{#if context.derived_secondary_weapon}
 					<WeaponCard
-						weapon={context.derived_secondary_weapon}
-						onclick={() => onItemClick('weapon', context.derived_secondary_weapon!)}
+						id={context.derived_secondary_weapon.id}
+						onclick={() => {
+							if (context.derived_secondary_weapon)
+								onItemClick('weapon', context.derived_secondary_weapon.id);
+						}}
 					/>
 				{/if}
-				{#if context.derived_unarmed_attack !== null}
+				{#if context.derived_unarmed_attack}
 					<WeaponCard
-						weapon={context.derived_unarmed_attack}
-						onclick={() => onItemClick('weapon', context.derived_unarmed_attack!)}
+						id={context.derived_unarmed_attack.id}
+						onclick={() => {
+							if (context.derived_unarmed_attack)
+								onItemClick('weapon', context.derived_unarmed_attack.id);
+						}}
 					/>
 				{/if}
 			</tbody>

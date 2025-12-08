@@ -9,14 +9,11 @@
 	import Stress from './stress.svelte';
 	import Hope from './hope.svelte';
 	import Conditions from './conditions.svelte';
-	import ClassFeatures from './features/class-features.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import { upload_user_image } from '$lib/remote/images.remote';
-	import Experiences from './features/experiences.svelte';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import Skull from '@lucide/svelte/icons/skull';
 	import CardCarousel from '../cards/card-carousel.svelte';
 	import Loadout from './loadout.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
@@ -30,23 +27,21 @@
 		SubclassMasteryCard
 	} from '$lib/types/compendium-types';
 	import Features from './features/features.svelte';
-	import ContentSheet, {
-		type SheetContent,
-		type ItemClickHandler
-	} from './content-sheet/content-sheet.svelte';
+	import ContentSheet, { type SheetContent } from './content-sheet/content-sheet.svelte';
 	import Tent from '@lucide/svelte/icons/tent';
 
 	let sheetOpen = $state(false);
 	let sheetContent = $state<SheetContent>(null);
 
-	const openItemSheet: ItemClickHandler = (type, item) => {
-		if (type === 'adventuring_gear') {
-			sheetContent = { type: 'adventuring_gear' } as SheetContent;
-		} else {
-			sheetContent = { type, data: item } as SheetContent;
-		}
+	function openItemSheet(type: 'weapon' | 'armor' | 'consumable' | 'loot', id: string) {
+		sheetContent = { type, id };
 		sheetOpen = true;
-	};
+	}
+
+	function openAdventuringGearSheet() {
+		sheetContent = { type: 'adventuring_gear' };
+		sheetOpen = true;
+	}
 
 	function openExperienceSheet() {
 		sheetContent = { type: 'experience' };
@@ -255,6 +250,7 @@
 			<Features
 				class="mx-2"
 				onItemClick={openItemSheet}
+				onAdventuringGearClick={openAdventuringGearSheet}
 				onExperienceClick={openExperienceSheet}
 				onAddItems={openCatalogSheet}
 			/>

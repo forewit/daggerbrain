@@ -2,7 +2,7 @@ import type { DomainCard } from '$lib/types/compendium-types';
 
 export const BONE_DOMAIN_CARDS = {
 	untouchable: {
-		id: 'untouchable',
+		compendium_id: 'untouchable',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -42,7 +42,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	deft_maneuvers: {
-		id: 'deft_maneuvers',
+		compendium_id: 'deft_maneuvers',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -68,7 +68,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	i_see_it_coming: {
-		id: 'i_see_it_coming',
+		compendium_id: 'i_see_it_coming',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -94,7 +94,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	ferocity: {
-		id: 'ferocity',
+		compendium_id: 'ferocity',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -120,7 +120,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	strategic_approach: {
-		id: 'strategic_approach',
+		compendium_id: 'strategic_approach',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -151,7 +151,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	brace: {
-		id: 'brace',
+		compendium_id: 'brace',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -177,7 +177,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	tactician: {
-		id: 'tactician',
+		compendium_id: 'tactician',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -203,7 +203,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	boost: {
-		id: 'boost',
+		compendium_id: 'boost',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -229,7 +229,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	redirect: {
-		id: 'redirect',
+		compendium_id: 'redirect',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -255,7 +255,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	know_thy_enemy: {
-		id: 'know_thy_enemy',
+		compendium_id: 'know_thy_enemy',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -287,7 +287,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	signature_move: {
-		id: 'signature_move',
+		compendium_id: 'signature_move',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -313,7 +313,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	rapid_riposte: {
-		id: 'rapid_riposte',
+		compendium_id: 'rapid_riposte',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -339,7 +339,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	recovery: {
-		id: 'recovery',
+		compendium_id: 'recovery',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -365,7 +365,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	bone_touched: {
-		id: 'bone_touched',
+		compendium_id: 'bone_touched',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -409,7 +409,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	cruel_precision: {
-		id: 'cruel_precision',
+		compendium_id: 'cruel_precision',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -435,7 +435,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	breaking_blow: {
-		id: 'breaking_blow',
+		compendium_id: 'breaking_blow',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -461,7 +461,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	wrangle: {
-		id: 'wrangle',
+		compendium_id: 'wrangle',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -487,7 +487,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	on_the_brink: {
-		id: 'on_the_brink',
+		compendium_id: 'on_the_brink',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -513,7 +513,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	splintering_strike: {
-		id: 'splintering_strike',
+		compendium_id: 'splintering_strike',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -539,7 +539,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	deathrun: {
-		id: 'deathrun',
+		compendium_id: 'deathrun',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',
@@ -565,7 +565,7 @@ export const BONE_DOMAIN_CARDS = {
 		]
 	},
 	swift_step: {
-		id: 'swift_step',
+		compendium_id: 'swift_step',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'bone',

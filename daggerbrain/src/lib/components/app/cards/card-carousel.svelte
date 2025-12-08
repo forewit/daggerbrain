@@ -23,8 +23,9 @@
 		selectedIndex = $bindable(0),
 		disabled_indices = new Set<number>(),
 		highlighted_indices = new Set<number>(),
-		emptyMessage = '',
-		scroll_to_index = -1
+		bind_token_count = false,
+		bind_choice_select = false,
+		emptyMessage = ''
 	}: {
 		class?: string;
 		cards: (
@@ -40,8 +41,9 @@
 		selectedIndex?: number;
 		disabled_indices?: Set<number>;
 		highlighted_indices?: Set<number>;
+		bind_token_count?: boolean;
+		bind_choice_select?: boolean;
 		emptyMessage?: string;
-		scroll_to_index?: number;
 	} = $props();
 
 	let scrollContainer: HTMLDivElement;
@@ -81,7 +83,7 @@
 		style="width: {(containerWidth - cardWidth) / 2}px;"
 	></div>
 
-	{#each cards as card, index (card.id)}
+	{#each cards as card, index (card.compendium_id)}
 		<button
 			class={cn(
 				'transition-scale relative scale-95 snap-center rounded-xl duration-200',
@@ -107,11 +109,16 @@
 				)}
 			></span>
 			{#if card.card_type === 'domain'}
-				<DomainCardComponent card={card as DomainCard} variant="card" />
+				<DomainCardComponent
+					card={card as DomainCard}
+					variant="card"
+					bind_choice_select
+					bind_token_count
+				/>
 			{:else if card.card_type === 'ancestry'}
-				<AncestryCardComponent card={card as AncestryCard} variant="card" />
+				<AncestryCardComponent card={card as AncestryCard} variant="card" bind_choice_select />
 			{:else if card.card_type === 'community'}
-				<CommunityCardComponent card={card as CommunityCard} variant="card" />
+				<CommunityCardComponent card={card as CommunityCard} variant="card" bind_token_count />
 			{:else if card.card_type === 'transformation'}
 				<TransformationCardComponent card={card as TransformationCard} variant="card" />
 			{:else if card.card_type === 'subclass_foundation' || card.card_type === 'subclass_specialization' || card.card_type === 'subclass_mastery'}

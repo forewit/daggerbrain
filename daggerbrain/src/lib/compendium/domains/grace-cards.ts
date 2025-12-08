@@ -3,7 +3,7 @@ import type { DomainCard } from '$lib/types/compendium-types';
 export const GRACE_DOMAIN_CARDS = {
 	// todo: verify everything below
 	deft_deceiver: {
-		id: 'deft_deceiver',
+		compendium_id: 'deft_deceiver',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',
@@ -28,7 +28,7 @@ export const GRACE_DOMAIN_CARDS = {
 		]
 	},
 	enrapture: {
-		id: 'enrapture',
+		compendium_id: 'enrapture',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',
@@ -54,7 +54,7 @@ export const GRACE_DOMAIN_CARDS = {
 		]
 	},
 	inspirational_words: {
-		id: 'inspirational_words',
+		compendium_id: 'inspirational_words',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',
@@ -85,7 +85,7 @@ export const GRACE_DOMAIN_CARDS = {
 		]
 	},
 	tell_no_lies: {
-		id: 'tell_no_lies',
+		compendium_id: 'tell_no_lies',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',
@@ -110,7 +110,7 @@ export const GRACE_DOMAIN_CARDS = {
 		]
 	},
 	troublemaker: {
-		id: 'troublemaker',
+		compendium_id: 'troublemaker',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',
@@ -135,7 +135,7 @@ export const GRACE_DOMAIN_CARDS = {
 		]
 	},
 	hypnotic_shimmer: {
-		id: 'hypnotic_shimmer',
+		compendium_id: 'hypnotic_shimmer',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',
@@ -161,7 +161,7 @@ export const GRACE_DOMAIN_CARDS = {
 		]
 	},
 	soothing_speech: {
-		id: 'soothing_speech',
+		compendium_id: 'soothing_speech',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',
@@ -186,7 +186,7 @@ export const GRACE_DOMAIN_CARDS = {
 		]
 	},
 	through_your_eyes: {
-		id: 'through_your_eyes',
+		compendium_id: 'through_your_eyes',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',
@@ -211,7 +211,7 @@ export const GRACE_DOMAIN_CARDS = {
 		]
 	},
 	thought_delver: {
-		id: 'thought_delver',
+		compendium_id: 'thought_delver',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',
@@ -237,7 +237,7 @@ export const GRACE_DOMAIN_CARDS = {
 		]
 	},
 	words_of_discord: {
-		id: 'words_of_discord',
+		compendium_id: 'words_of_discord',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',
@@ -263,7 +263,7 @@ export const GRACE_DOMAIN_CARDS = {
 		]
 	},
 	share_the_burden: {
-		id: 'share_the_burden',
+		compendium_id: 'share_the_burden',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',
@@ -288,7 +288,7 @@ export const GRACE_DOMAIN_CARDS = {
 		]
 	},
 	never_upstaged: {
-		id: 'never_upstaged',
+		compendium_id: 'never_upstaged',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',
@@ -313,7 +313,7 @@ export const GRACE_DOMAIN_CARDS = {
 		]
 	},
 	endless_charisma: {
-		id: 'endless_charisma',
+		compendium_id: 'endless_charisma',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',
@@ -338,7 +338,7 @@ export const GRACE_DOMAIN_CARDS = {
 		]
 	},
 	grace_touched: {
-		id: 'grace_touched',
+		compendium_id: 'grace_touched',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',
@@ -367,7 +367,7 @@ export const GRACE_DOMAIN_CARDS = {
 		]
 	},
 	astral_projection: {
-		id: 'astral_projection',
+		compendium_id: 'astral_projection',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',
@@ -393,7 +393,7 @@ export const GRACE_DOMAIN_CARDS = {
 		]
 	},
 	mass_enrapture: {
-		id: 'mass_enrapture',
+		compendium_id: 'mass_enrapture',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',
@@ -419,7 +419,7 @@ export const GRACE_DOMAIN_CARDS = {
 		]
 	},
 	copycat: {
-		id: 'copycat',
+		compendium_id: 'copycat',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',
@@ -444,7 +444,7 @@ export const GRACE_DOMAIN_CARDS = {
 		]
 	},
 	master_of_the_craft: {
-		id: 'master_of_the_craft',
+		compendium_id: 'master_of_the_craft',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',
@@ -539,7 +539,7 @@ export const GRACE_DOMAIN_CARDS = {
 		]
 	},
 	encore: {
-		id: 'encore',
+		compendium_id: 'encore',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',
@@ -565,7 +565,7 @@ export const GRACE_DOMAIN_CARDS = {
 		]
 	},
 	notorious: {
-		id: 'notorious',
+		compendium_id: 'notorious',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'grace',

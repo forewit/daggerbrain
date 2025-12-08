@@ -2,7 +2,7 @@ import type { DomainCard } from '$lib/types/compendium-types';
 
 export const MIDNIGHT_DOMAIN_CARDS = {
 	pick_and_pull: {
-		id: 'pick_and_pull',
+		compendium_id: 'pick_and_pull',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -28,7 +28,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	rain_of_blades: {
-		id: 'rain_of_blades',
+		compendium_id: 'rain_of_blades',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -54,7 +54,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	uncanny_disguise: {
-		id: 'uncanny_disguise',
+		compendium_id: 'uncanny_disguise',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -80,7 +80,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	midnight_spirit: {
-		id: 'midnight_spirit',
+		compendium_id: 'midnight_spirit',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -106,7 +106,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	shadowbind: {
-		id: 'shadowbind',
+		compendium_id: 'shadowbind',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -132,7 +132,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	chokehold: {
-		id: 'chokehold',
+		compendium_id: 'chokehold',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -158,7 +158,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	veil_of_night: {
-		id: 'veil_of_night',
+		compendium_id: 'veil_of_night',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -184,7 +184,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	glyph_of_nightfall: {
-		id: 'glyph_of_nightfall',
+		compendium_id: 'glyph_of_nightfall',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -210,7 +210,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	stealth_expertise: {
-		id: 'stealth_expertise',
+		compendium_id: 'stealth_expertise',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -236,7 +236,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	hush: {
-		id: 'hush',
+		compendium_id: 'hush',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -262,7 +262,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	phantom_retreat: {
-		id: 'phantom_retreat',
+		compendium_id: 'phantom_retreat',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -288,7 +288,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	dark_whispers: {
-		id: 'dark_whispers',
+		compendium_id: 'dark_whispers',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -319,7 +319,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	mass_disguise: {
-		id: 'mass_disguise',
+		compendium_id: 'mass_disguise',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -345,7 +345,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	midnight_touched: {
-		id: 'midnight_touched',
+		compendium_id: 'midnight_touched',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -374,7 +374,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	vanishing_dodge: {
-		id: 'vanishing_dodge',
+		compendium_id: 'vanishing_dodge',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -400,7 +400,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	shadowhunter: {
-		id: 'shadowhunter',
+		compendium_id: 'shadowhunter',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -426,7 +426,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	spellcharge: {
-		id: 'spellcharge',
+		compendium_id: 'spellcharge',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -452,7 +452,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	night_terror: {
-		id: 'night_terror',
+		compendium_id: 'night_terror',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -478,7 +478,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	twilight_toll: {
-		id: 'twilight_toll',
+		compendium_id: 'twilight_toll',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -504,7 +504,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	eclipse: {
-		id: 'eclipse',
+		compendium_id: 'eclipse',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
@@ -530,7 +530,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 		]
 	},
 	specter_of_the_dark: {
-		id: 'specter_of_the_dark',
+		compendium_id: 'specter_of_the_dark',
 		source_id: 'Void 1.5',
 		card_type: 'domain',
 		domain_id: 'midnight',
