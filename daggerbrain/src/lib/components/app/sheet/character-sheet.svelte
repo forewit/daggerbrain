@@ -68,6 +68,11 @@
 		sheetOpen = true;
 	}
 
+	function openDomainCardCatalog() {
+		sheetContent = { type: 'domain-card-catalog' };
+		sheetOpen = true;
+	}
+
 	let { class: className = '' }: { class?: string } = $props();
 
 	const context = getCharacterContext();
@@ -258,9 +263,10 @@
 
 		<!-- Character cards -->
 		<div class={cn(!character_cards_expanded && '-mb-4')}>
+			<div class="flex items-center justify-center gap-2 mb-4">
 			<button
 				onclick={() => (character_cards_expanded = !character_cards_expanded)}
-				class="z-20 mx-auto mb-4 flex items-center font-medium text-nowrap text-muted-foreground"
+				class="z-20 flex items-center font-medium text-nowrap text-muted-foreground"
 			>
 				{#if character_cards_expanded}
 					<ChevronDown class="w-k h-4" />
@@ -274,6 +280,8 @@
 					{character_cards.length}
 				</div>
 			</button>
+			<Button variant="ghost" size="sm" onclick={openDomainCardCatalog}><Pencil class="size-4" /></Button>
+			</div>
 			{#if character_cards_expanded}
 				<CardCarousel cards={character_cards} emptyMessage="None" />
 			{/if}

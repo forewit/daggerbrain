@@ -9,6 +9,7 @@
 					| 'adventuring_gear'
 					| 'experience'
 					| 'catalog'
+					| 'domain-card-catalog'
 					| 'conditions'
 					| 'death-move'
 					| 'downtime';
@@ -26,6 +27,7 @@
 	import ExperienceContent from './experience-content.svelte';
 	import ConditionsContent from './conditions-content.svelte';
 	import CatalogContent from './catalog-content.svelte';
+	import DomainCardContent from './domain-card-content.svelte';
 	import DeathMoveContent from './death-move-content.svelte';
 	import DowntimeContent from './downtime-content.svelte';
 
@@ -56,6 +58,8 @@
 			<ConditionsContent />
 		{:else if content?.type === 'catalog'}
 			<CatalogContent />
+		{:else if content?.type === 'domain-card-catalog'}
+			<DomainCardContent />
 		{:else if content?.type === 'death-move'}
 			<DeathMoveContent />
 		{:else if content?.type === 'downtime'}
