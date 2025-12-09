@@ -236,30 +236,32 @@
 		></div>
 	</div>
 
-<div class="absolute top-1/2 right-0 left-0 -translate-y-1/2 flex justify-center pointer-events-none">
-	<div class="flex px-4 grow max-w-3xl items-center justify-between">
-		<Button
-			class="size-10 rounded-full mr-auto pointer-events-auto"
-			hidden={!canScrollLeft}
-			onclick={(e) => scrollToPrevious(e)}
-		>
-			{#if isShiftPressed}
-				<ChevronFirst class="-ml-[1px] size-6" />
-			{:else}
-				<ChevronLeft class="-ml-[1px] size-6" />
-			{/if}
-		</Button>
-		<Button
-			class="size-10 rounded-full ml-auto pointer-events-auto"
-			hidden={!canScrollRight}
-			onclick={(e) => scrollToNext(e)}
-		>
-			{#if isShiftPressed}
-				<ChevronLast class="-mr-[1px] size-6" />
-			{:else}
-				<ChevronRight class="-mr-[1px] size-6" />
-			{/if}
-		</Button>
+	<div
+		class="pointer-events-none absolute top-1/2 right-0 left-0 flex -translate-y-1/2 justify-center"
+	>
+		<div class="flex max-w-3xl grow items-center justify-between px-4">
+			<Button
+				class="pointer-events-auto mr-auto size-10 rounded-full"
+				hidden={!canScrollLeft}
+				onclick={(e) => scrollToPrevious(e)}
+			>
+				{#if isShiftPressed}
+					<ChevronFirst class="-ml-[1px] size-6" />
+				{:else}
+					<ChevronLeft class="-ml-[1px] size-6" />
+				{/if}
+			</Button>
+			<Button
+				class="pointer-events-auto ml-auto size-10 rounded-full"
+				hidden={!canScrollRight}
+				onclick={(e) => scrollToNext(e)}
+			>
+				{#if isShiftPressed}
+					<ChevronLast class="-mr-[1px] size-6" />
+				{:else}
+					<ChevronRight class="-mr-[1px] size-6" />
+				{/if}
+			</Button>
+		</div>
 	</div>
-</div>
 </div>

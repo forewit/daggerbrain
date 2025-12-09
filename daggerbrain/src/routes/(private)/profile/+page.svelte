@@ -2,9 +2,6 @@
 	import { UserProfile } from 'svelte-clerk';
 </script>
 
-<div class="w-full p-4 flex justify-center">
-
-<UserProfile  />
+<div class="flex w-full justify-center p-4">
+	<UserProfile />
 </div>
-
-

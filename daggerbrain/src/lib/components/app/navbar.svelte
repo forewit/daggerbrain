@@ -7,9 +7,7 @@
 		Protect,
 		useClerkContext,
 		SignOutButton,
-
 		SignUpButton
-
 	} from 'svelte-clerk';
 	import { cn } from '$lib/utils';
 	import Menu from '@lucide/svelte/icons/menu';
@@ -52,38 +50,33 @@
 			<Sheet.Content class="max-w-[240px]">
 				<Sheet.Header>
 					<SignedIn>
-					<div class="flex">
-					<Button variant="ghost" href="/profile" class="w-min p-0 pl-2 grow justify-start">
-						<div class="size-6 overflow-hidden rounded-full border-2 border-accent">
-							<img src={'/images/portrait-placeholder.png'} alt={userName} class="size-full" />
+						<div class="flex">
+							<Button variant="ghost" href="/profile" class="w-min grow justify-start p-0 pl-2">
+								<div class="size-6 overflow-hidden rounded-full border-2 border-accent">
+									<img src={'/images/portrait-placeholder.png'} alt={userName} class="size-full" />
+								</div>
+								{userName}
+							</Button>
+							<Protect plan="adventurer">
+								{#snippet children()}{/snippet}
+								{#snippet fallback()}
+									<Button size="sm" onclick={() => (open = false)} href="/subscribe" class="w-min">
+										Subscribe
+									</Button>
+								{/snippet}
+							</Protect>
 						</div>
-						{userName}
-					</Button>
-					<Protect plan="adventurer">
-						{#snippet children()}{/snippet}
-						{#snippet fallback()}
-								<Button
-									size="sm"
-									onclick={() => (open = false)}
-									href="/subscribe"
-									class="w-min"
-									>
-									Subscribe
-								</Button>
-						{/snippet}
-					</Protect>
-					</div>
-				</SignedIn>
-				<SignedOut>
-					<div class="flex">
-					<SignInButton class={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'grow')}>
-						Sign In 
-					</SignInButton>
-					<SignUpButton class={cn(buttonVariants({ size: 'sm' }), 'grow')}>
-						Sign Up
-					</SignUpButton>
-				</div>
-				</SignedOut>
+					</SignedIn>
+					<SignedOut>
+						<div class="flex">
+							<SignInButton class={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'grow')}>
+								Sign In
+							</SignInButton>
+							<SignUpButton class={cn(buttonVariants({ size: 'sm' }), 'grow')}>
+								Sign Up
+							</SignUpButton>
+						</div>
+					</SignedOut>
 				</Sheet.Header>
 				<div class="flex flex-col overflow-y-auto px-4 pb-6">
 					<SignedOut>
@@ -92,31 +85,30 @@
 							size="sm"
 							onclick={() => (open = false)}
 							href="/"
-							class="w-full h-10 rounded-none justify-start border-b"
+							class="h-10 w-full justify-start rounded-none border-b"
 						>
 							Home
 						</Button>
 					</SignedOut>
 					<SignedIn>
-								<Button
-									variant="link"
-									size="sm"
-									onclick={() => (open = false)}
-									href="/characters"
-									class="w-full h-10 rounded-none justify-start border-b"
-								>
-									My Characters
-								</Button>
-								<Button
-									variant="link"
-									size="sm"
-									onclick={() => (open = false)}
-									href="/profile"
-									class="w-full h-10 rounded-none justify-start border-b"
-								>
-									Profile
-								</Button>
-							
+						<Button
+							variant="link"
+							size="sm"
+							onclick={() => (open = false)}
+							href="/characters"
+							class="h-10 w-full justify-start rounded-none border-b"
+						>
+							My Characters
+						</Button>
+						<Button
+							variant="link"
+							size="sm"
+							onclick={() => (open = false)}
+							href="/profile"
+							class="h-10 w-full justify-start rounded-none border-b"
+						>
+							Profile
+						</Button>
 					</SignedIn>
 				</div>
 				<Sheet.Footer>
