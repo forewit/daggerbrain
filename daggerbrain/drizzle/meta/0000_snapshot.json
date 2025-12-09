@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "476796b7-3213-4da8-88ef-669352c45e4b",
+  "id": "a90071c9-4cc3-46cc-bba8-5a96ddc62bc9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "characters_table": {
@@ -13,7 +13,7 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": false,
-          "default": "'ee7da842-4bdb-4924-8af0-0f8fbc3a9efc'"
+          "default": "'ec53a030-6562-47e4-a0ee-c876521e885b'"
         },
         "clerk_user_id": {
           "name": "clerk_user_id",
@@ -56,6 +56,20 @@
         },
         "ancestry_card_id": {
           "name": "ancestry_card_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "custom_top_ancestry": {
+          "name": "custom_top_ancestry",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "custom_bottom_ancestry": {
+          "name": "custom_bottom_ancestry",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -195,6 +209,30 @@
           "autoincrement": false,
           "default": "'[]'"
         },
+        "additional_ancestry_card_ids": {
+          "name": "additional_ancestry_card_ids",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'[]'"
+        },
+        "additional_community_card_ids": {
+          "name": "additional_community_card_ids",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'[]'"
+        },
+        "additional_transformation_card_ids": {
+          "name": "additional_transformation_card_ids",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'[]'"
+        },
         "additional_character_modifiers": {
           "name": "additional_character_modifiers",
           "type": "text",
@@ -218,6 +256,22 @@
           "notNull": true,
           "autoincrement": false,
           "default": "'{}'"
+        },
+        "ancestry_card_choices": {
+          "name": "ancestry_card_choices",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'{}'"
+        },
+        "community_card_tokens": {
+          "name": "community_card_tokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
         },
         "domain_card_choices": {
           "name": "domain_card_choices",
@@ -306,6 +360,52 @@
           "notNull": true,
           "autoincrement": false,
           "default": "'{\"2\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"3\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"4\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"5\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"6\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"7\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"8\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"9\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"10\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}}}'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "users_table": {
+      "name": "users_table",
+      "columns": {
+        "clerk_id": {
+          "name": "clerk_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "character_slot_1": {
+          "name": "character_slot_1",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "character_slot_2": {
+          "name": "character_slot_2",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "character_slot_3": {
+          "name": "character_slot_3",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "dismissed_popups": {
+          "name": "dismissed_popups",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'[]'"
         }
       },
       "indexes": {},

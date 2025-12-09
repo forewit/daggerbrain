@@ -53,11 +53,6 @@ function userContext() {
 		].filter((slot): slot is string => slot !== null);
 	};
 
-	const isCharacterActive = (characterId: string, hasUnlimitedSlots: boolean): boolean => {
-		if (hasUnlimitedSlots) return true;
-		return getActiveSlotIds().includes(characterId);
-	};
-
 	return {
 		get all_characters() {
 			return all_characters;
@@ -70,7 +65,6 @@ function userContext() {
 		},
 		isPopupDismissed,
 		getActiveSlotIds,
-		isCharacterActive,
 		create_character,
 		delete_character,
 		destroy

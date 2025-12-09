@@ -13,6 +13,7 @@
 	import { error } from '@sveltejs/kit';
 	import DomainCardCatalog from '$lib/components/app/cards/domain-card-catalog.svelte';
 	import { update_character_slots, dismiss_popup } from '$lib/remote/users.remote';
+	import { Protect } from 'svelte-clerk';
 
 	const CHARACTER_LIMIT_POPUP_ID = 'popup:characters:limit_reached';
 
@@ -163,27 +164,32 @@
 			</div>
 		</div>
 
-		{#if isAtLimit && !data.has_unlimited_slots && !user.isPopupDismissed(CHARACTER_LIMIT_POPUP_ID)}
-			<div
-				class="relative mb-4 rounded-md border border-accent/10 bg-accent/5 p-3 pr-8 text-sm text-accent"
-			>
-				<a href="/subscribe" class="text-accent underline">Subscribe</a> to unlock unlimited
-				character slots!
-				<button
-					onclick={async () => {
-						try {
-							await dismiss_popup(CHARACTER_LIMIT_POPUP_ID);
-						} catch (err) {
-							error(500, err instanceof Error ? err.message : 'Failed to dismiss notice');
-						}
-					}}
-					class="absolute top-2 right-2 rounded-sm opacity-70 hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none"
-					aria-label="Dismiss notice"
-				>
-					<X class="size-4" />
-				</button>
-			</div>
-		{/if}
+		<Protect feature="unlimited_slots">
+			{#snippet children()}{/snippet}
+			{#snippet fallback()}
+				{#if isAtLimit && !user.isPopupDismissed(CHARACTER_LIMIT_POPUP_ID)}
+					<div
+						class="relative mb-4 rounded-md border border-accent/10 bg-accent/5 p-3 pr-8 text-sm text-accent"
+					>
+						<a href="/subscribe" class="text-accent underline">Subscribe</a> to unlock unlimited
+						character slots!
+						<button
+							onclick={async () => {
+								try {
+									await dismiss_popup(CHARACTER_LIMIT_POPUP_ID);
+								} catch (err) {
+									error(500, err instanceof Error ? err.message : 'Failed to dismiss notice');
+								}
+							}}
+							class="absolute top-2 right-2 rounded-sm opacity-70 hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none"
+							aria-label="Dismiss notice"
+						>
+							<X class="size-4" />
+						</button>
+					</div>
+				{/if}
+			{/snippet}
+		</Protect>
 		<!-- Active Characters -->
 		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 			{#each activeCharacters as char}
@@ -240,78 +246,83 @@
 		</div>
 
 		<!-- Inactive Characters (Collapsible) -->
-		{#if !data.has_unlimited_slots && inactiveCharacters.length > 0}
-			<Collapsible.Root bind:open={inactiveCharactersOpen} class="mt-6">
-				<Collapsible.Trigger class="mb-4 flex items-center gap-2 text-muted-foreground">
-					<ChevronRight
-						class={cn('size-4 transition-transform', inactiveCharactersOpen && 'rotate-90')}
-					/>
-					<p class="text-lg font-medium">
-						Inactive Characters ({inactiveCharacters.length})
-					</p>
-				</Collapsible.Trigger>
-				<Collapsible.Content>
-					{#if activationError}
-						<div
-							class="relative mb-4 rounded-md border border-destructive/10 bg-destructive/5 p-3 pr-8 text-sm text-destructive"
-						>
-							{activationError}
-							<button
-								onclick={() => (activationError = null)}
-								class="absolute top-2 right-2 rounded-sm opacity-70 hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none"
-								aria-label="Dismiss error"
-							>
-								<X class="size-4" />
-							</button>
-						</div>
-					{/if}
-					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-						{#each inactiveCharacters as char}
-							{#if char.id !== redirecting_to_character}
-								<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
-									<div class="flex gap-2 border bg-primary-muted p-1 opacity-60">
-										<div class=" h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2">
-											<img
-												src={char.image_url || '/images/portrait-placeholder.png'}
-												alt={char.name.trim() || 'Unnamed Character'}
-												class="h-full w-full object-cover"
-											/>
-										</div>
-										<div class="truncate">
-											<p class="mt-1 truncate text-lg font-bold">
-												{char.name.trim() || 'Unnamed Character'}
-											</p>
-
-											<p class="mt-1 truncate text-xs text-muted-foreground">
-												{char.derived_descriptors.ancestry_name || 'No ancestry'}
-												&ensp;•&ensp;
-												{char.derived_descriptors.primary_class_name || 'No class'}
-												&ensp;•&ensp;
-												{char.derived_descriptors.primary_subclass_name || 'No subclass'}
-											</p>
-										</div>
-									</div>
-									<div class="flex bg-muted">
-										<Button
-											variant="ghost"
-											size="sm"
-											class="hover:text-text grow rounded-none border"
-											onclick={() => handleActivateCharacter(char.id)}>Activate</Button
-										>
-										<Button
-											variant="ghost"
-											size="sm"
-											class=" grow rounded-none border text-destructive hover:text-destructive"
-											onclick={() => handleDeleteCharacter(char.id, char.name)}>Delete</Button
-										>
-									</div>
+		<Protect feature="unlimited_slots">
+			{#snippet children()}{/snippet}
+			{#snippet fallback()}
+				{#if inactiveCharacters.length > 0}
+					<Collapsible.Root bind:open={inactiveCharactersOpen} class="mt-6">
+						<Collapsible.Trigger class="mb-4 flex items-center gap-2 text-muted-foreground">
+							<ChevronRight
+								class={cn('size-4 transition-transform', inactiveCharactersOpen && 'rotate-90')}
+							/>
+							<p class="text-lg font-medium">
+								Inactive Characters ({inactiveCharacters.length})
+							</p>
+						</Collapsible.Trigger>
+						<Collapsible.Content>
+							{#if activationError}
+								<div
+									class="relative mb-4 rounded-md border border-destructive/10 bg-destructive/5 p-3 pr-8 text-sm text-destructive"
+								>
+									{activationError}
+									<button
+										onclick={() => (activationError = null)}
+										class="absolute top-2 right-2 rounded-sm opacity-70 hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none"
+										aria-label="Dismiss error"
+									>
+										<X class="size-4" />
+									</button>
 								</div>
 							{/if}
-						{/each}
-					</div>
-				</Collapsible.Content>
-			</Collapsible.Root>
-		{/if}
+							<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+								{#each inactiveCharacters as char}
+									{#if char.id !== redirecting_to_character}
+										<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
+											<div class="flex gap-2 border bg-primary-muted p-1 opacity-60">
+												<div class=" h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2">
+													<img
+														src={char.image_url || '/images/portrait-placeholder.png'}
+														alt={char.name.trim() || 'Unnamed Character'}
+														class="h-full w-full object-cover"
+													/>
+												</div>
+												<div class="truncate">
+													<p class="mt-1 truncate text-lg font-bold">
+														{char.name.trim() || 'Unnamed Character'}
+													</p>
+
+													<p class="mt-1 truncate text-xs text-muted-foreground">
+														{char.derived_descriptors.ancestry_name || 'No ancestry'}
+														&ensp;•&ensp;
+														{char.derived_descriptors.primary_class_name || 'No class'}
+														&ensp;•&ensp;
+														{char.derived_descriptors.primary_subclass_name || 'No subclass'}
+													</p>
+												</div>
+											</div>
+											<div class="flex bg-muted">
+												<Button
+													variant="ghost"
+													size="sm"
+													class="hover:text-text grow rounded-none border"
+													onclick={() => handleActivateCharacter(char.id)}>Activate</Button
+												>
+												<Button
+													variant="ghost"
+													size="sm"
+													class=" grow rounded-none border text-destructive hover:text-destructive"
+													onclick={() => handleDeleteCharacter(char.id, char.name)}>Delete</Button
+												>
+											</div>
+										</div>
+									{/if}
+								{/each}
+							</div>
+						</Collapsible.Content>
+					</Collapsible.Root>
+				{/if}
+			{/snippet}
+		</Protect>
 	</div>
 {/if}
 
