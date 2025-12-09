@@ -241,10 +241,10 @@
 	></div>
 </div>
 
-<div class="absolute top-1/2 right-0 left-0 -translate-y-1/2 flex justify-center">
+<div class="absolute top-1/2 right-0 left-0 -translate-y-1/2 flex justify-center pointer-events-none">
 	<div class="flex px-4 grow max-w-3xl items-center justify-between">
 		<Button
-			class="size-10 rounded-full mr-auto"
+			class="size-10 rounded-full mr-auto pointer-events-auto"
 			hidden={!canScrollLeft}
 			onclick={(e) => scrollToPrevious(e)}
 		>
@@ -255,7 +255,7 @@
 			{/if}
 		</Button>
 		<Button
-			class="size-10 rounded-full ml-auto"
+			class="size-10 rounded-full ml-auto pointer-events-auto"
 			hidden={!canScrollRight}
 			onclick={(e) => scrollToNext(e)}
 		>
