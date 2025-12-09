@@ -18,7 +18,6 @@ export const get_auth = (event: RequestEvent) => {
 	return auth;
 };
 
-
 export const get_kv = (event: RequestEvent) => {
 	if (!event.platform?.env?.KV) {
 		throw new Error('KV not available');
