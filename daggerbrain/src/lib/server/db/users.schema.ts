@@ -6,10 +6,12 @@ export const users_table = sqliteTable('users_table', {
 	character_slot_1: text('character_slot_1'),
 	character_slot_2: text('character_slot_2'),
 	character_slot_3: text('character_slot_3'),
-	dismissed_popups: text('dismissed_popups') // JSON array of dismissed popup IDs
+	dismissed_popups: text('dismissed_popups', { mode: 'json' })
+		.notNull()
+		.default('[]')
+		.$type<string[]>() // JSON array of dismissed popup IDs
 });
 
 export const users_table_schema = createSelectSchema(users_table);
 export const users_table_insert_schema = createInsertSchema(users_table);
 export const users_table_update_schema = createUpdateSchema(users_table);
-

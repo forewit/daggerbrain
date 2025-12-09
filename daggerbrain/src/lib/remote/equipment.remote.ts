@@ -1,7 +1,7 @@
 import { query, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { z } from 'zod';
-import { get_kv, get_userId } from './utils';
+import { get_kv, get_auth } from './utils';
 import {
 	WeaponSchema,
 	ArmorSchema,
@@ -13,7 +13,7 @@ import type { Weapon, Armor, Consumable, Loot } from '$lib/types/compendium-type
 // Primary Weapons
 export const get_all_primary_weapons = query(async () => {
 	const event = getRequestEvent();
-	get_userId(event);
+	get_auth(event); // Validates authentication
 	const kv = get_kv(event);
 
 	const weaponsData = (await kv.get('primary-weapons', 'json')) as Record<string, Weapon> | null;
@@ -46,7 +46,7 @@ export const get_primary_weapon = query(z.string(), async (weaponId) => {
 // Secondary Weapons
 export const get_all_secondary_weapons = query(async () => {
 	const event = getRequestEvent();
-	get_userId(event);
+	get_auth(event); // Validates authentication
 	const kv = get_kv(event);
 
 	const weaponsData = (await kv.get('secondary-weapons', 'json')) as Record<string, Weapon> | null;
@@ -79,7 +79,7 @@ export const get_secondary_weapon = query(z.string(), async (weaponId) => {
 // Armor
 export const get_all_armor = query(async () => {
 	const event = getRequestEvent();
-	get_userId(event);
+	get_auth(event); // Validates authentication
 	const kv = get_kv(event);
 
 	const armorData = (await kv.get('armor', 'json')) as Record<string, Armor> | null;
@@ -112,7 +112,7 @@ export const get_armor = query(z.string(), async (armorId) => {
 // Consumables
 export const get_all_consumables = query(async () => {
 	const event = getRequestEvent();
-	get_userId(event);
+	get_auth(event); // Validates authentication
 	const kv = get_kv(event);
 
 	const consumablesData = (await kv.get('consumables', 'json')) as Record<
@@ -148,7 +148,7 @@ export const get_consumable = query(z.string(), async (consumableId) => {
 // Loot
 export const get_all_loot = query(async () => {
 	const event = getRequestEvent();
-	get_userId(event);
+	get_auth(event); // Validates authentication
 	const kv = get_kv(event);
 
 	const lootData = (await kv.get('loot', 'json')) as Record<string, Loot> | null;

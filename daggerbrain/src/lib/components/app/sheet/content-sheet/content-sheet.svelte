@@ -4,17 +4,17 @@
 				type: 'weapon' | 'armor' | 'consumable' | 'loot';
 				id: string;
 		  }
-	| {
-			type:
-				| 'adventuring_gear'
-				| 'experience'
-				| 'catalog'
-				| 'domain-card-catalog'
-				| 'heritage-card-catalog'
-				| 'conditions'
-				| 'death-move'
-				| 'downtime';
-	  }
+		| {
+				type:
+					| 'adventuring_gear'
+					| 'experience'
+					| 'catalog'
+					| 'domain-card-catalog'
+					| 'heritage-card-catalog'
+					| 'conditions'
+					| 'death-move'
+					| 'downtime';
+		  }
 		| null;
 </script>
 

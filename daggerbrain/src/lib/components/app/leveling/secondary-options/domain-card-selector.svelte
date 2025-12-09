@@ -109,7 +109,9 @@
 				<ChevronRight class="size-4 opacity-50" />
 			</Dialog.Trigger>
 
-			<Dialog.Content class="overflow-y-auto flex max-h-[90%] min-w-[calc(100%-1rem)] flex-col gap-4 md:min-w-3xl">
+			<Dialog.Content
+				class="flex max-h-[90%] min-w-[calc(100%-1rem)] flex-col gap-4 overflow-y-auto md:min-w-3xl"
+			>
 				<Dialog.Header>
 					<Dialog.Title>{title}</Dialog.Title>
 				</Dialog.Header>

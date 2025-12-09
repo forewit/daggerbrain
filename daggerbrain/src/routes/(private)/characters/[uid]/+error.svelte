@@ -20,4 +20,3 @@
 		<Button onclick={() => goto('/characters')}>Go to Characters List</Button>
 	</div>
 </div>
-

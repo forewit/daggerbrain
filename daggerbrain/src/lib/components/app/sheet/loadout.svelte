@@ -16,7 +16,10 @@
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import Pencil from '@lucide/svelte/icons/pencil';
 
-	let { class: className = '', openDomainCardCatalog = () => {} }: { class?: string, openDomainCardCatalog?: () => void } = $props();
+	let {
+		class: className = '',
+		openDomainCardCatalog = () => {}
+	}: { class?: string; openDomainCardCatalog?: () => void } = $props();
 
 	const context = getCharacterContext();
 	let character = $derived(context.character);
@@ -71,7 +74,9 @@
 						{vault.length}
 					</span>
 				</Dialog.Trigger>
-				<Dialog.Content class="overflow-y-auto flex max-h-[90%] min-w-[calc(100%-1rem)] flex-col px-0 md:min-w-3xl">
+				<Dialog.Content
+					class="flex max-h-[90%] min-w-[calc(100%-1rem)] flex-col overflow-y-auto px-0 md:min-w-3xl"
+				>
 					<Dialog.Header class="px-6">
 						<Dialog.Title>Vault</Dialog.Title>
 					</Dialog.Header>
@@ -157,7 +162,7 @@
 							{#if !restMode}
 								<Stress
 									class={cn(
-										'px-4 py-2 rounded-full bg-muted'
+										'rounded-full bg-muted px-4 py-2'
 										// character.ephemeral_stats.marked_stress >= character.derived_stats.max_stress &&
 										//"border-3 border-destructive"
 									)}
@@ -185,7 +190,12 @@
 				</Dialog.Content>
 			</Dialog.Root>
 
-			<Button variant="ghost" class="text-muted-foreground/50" size="sm" onclick={openDomainCardCatalog}><Pencil /></Button>
+			<Button
+				variant="ghost"
+				class="text-muted-foreground/50"
+				size="sm"
+				onclick={openDomainCardCatalog}><Pencil /></Button
+			>
 		</div>
 		{#if expanded}
 			<div class="relative">

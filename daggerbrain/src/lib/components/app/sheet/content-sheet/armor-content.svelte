@@ -83,7 +83,8 @@
 
 		// Compare max armor
 		const maxArmorStr = String(customMaxArmor ?? '').trim();
-		const formMaxArmor = maxArmorStr === '' ? null : (isNaN(Number(maxArmorStr)) ? null : Number(maxArmorStr));
+		const formMaxArmor =
+			maxArmorStr === '' ? null : isNaN(Number(maxArmorStr)) ? null : Number(maxArmorStr);
 		const savedMaxArmor = inventoryItem.custom_max_armor;
 		const maxArmorMatch =
 			(formMaxArmor === null && savedMaxArmor === null) ||
@@ -92,15 +93,19 @@
 		// Compare damage thresholds
 		const majorStr = String(customMajorThreshold ?? '').trim();
 		const severeStr = String(customSevereThreshold ?? '').trim();
-		const formMajor = majorStr === '' ? null : (isNaN(Number(majorStr)) ? null : Number(majorStr));
-		const formSevere = severeStr === '' ? null : (isNaN(Number(severeStr)) ? null : Number(severeStr));
+		const formMajor = majorStr === '' ? null : isNaN(Number(majorStr)) ? null : Number(majorStr);
+		const formSevere =
+			severeStr === '' ? null : isNaN(Number(severeStr)) ? null : Number(severeStr);
 		const savedMajor = inventoryItem.custom_damage_thresholds.major;
 		const savedSevere = inventoryItem.custom_damage_thresholds.severe;
 		const thresholdsMatch =
-			((formMajor === null && savedMajor === null) &&
-				(formSevere === null && savedSevere === null)) ||
-			((formMajor !== null && savedMajor !== null && formMajor === savedMajor) &&
-				(formSevere !== null && savedSevere !== null && formSevere === savedSevere));
+			(formMajor === null && savedMajor === null && formSevere === null && savedSevere === null) ||
+			(formMajor !== null &&
+				savedMajor !== null &&
+				formMajor === savedMajor &&
+				formSevere !== null &&
+				savedSevere !== null &&
+				formSevere === savedSevere);
 
 		return namesMatch && tiersMatch && maxArmorMatch && thresholdsMatch;
 	});
@@ -329,7 +334,7 @@
 					</div>
 					<div class="flex flex-col gap-2">
 						<div class="flex gap-2">
-							<div class="flex-1 flex flex-col gap-1">
+							<div class="flex flex-1 flex-col gap-1">
 								<label for="custom-major-threshold" class="text-xs text-muted-foreground"
 									>Major Threshold</label
 								>
@@ -342,7 +347,7 @@
 									step="1"
 								/>
 							</div>
-							<div class="flex-1 flex flex-col gap-1">
+							<div class="flex flex-1 flex-col gap-1">
 								<label for="custom-severe-threshold" class="text-xs text-muted-foreground"
 									>Severe Threshold</label
 								>

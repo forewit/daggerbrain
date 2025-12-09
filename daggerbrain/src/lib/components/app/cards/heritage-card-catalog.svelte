@@ -2,7 +2,11 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Select from '$lib/components/ui/select/';
-	import type { AncestryCard, CommunityCard, TransformationCard } from '$lib/types/compendium-types';
+	import type {
+		AncestryCard,
+		CommunityCard,
+		TransformationCard
+	} from '$lib/types/compendium-types';
 	import AncestryCardComponent from './full-cards/ancestry-card.svelte';
 	import CommunityCardComponent from './full-cards/community-card.svelte';
 	import TransformationCardComponent from './full-cards/transformation-card.svelte';
@@ -24,13 +28,11 @@
 	const compendium = getCompendiumContext();
 
 	// Get all heritage cards by combining ancestry, community, and transformation cards
-	let allHeritageCards = $derived(
-		[
-			...Object.values(compendium.ancestry_cards),
-			...Object.values(compendium.community_cards),
-			...Object.values(compendium.transformation_cards)
-		]
-	);
+	let allHeritageCards = $derived([
+		...Object.values(compendium.ancestry_cards),
+		...Object.values(compendium.community_cards),
+		...Object.values(compendium.transformation_cards)
+	]);
 
 	// Helper function to strip HTML tags for search
 	function stripHtml(html: string): string {
@@ -42,17 +44,17 @@
 		if (!query) return true;
 		const searchLower = query.toLowerCase();
 		const titleMatch = card.title.toLowerCase().includes(searchLower);
-		
+
 		// Search in description (if available)
 		const descriptionMatch = card.description_html
 			? stripHtml(card.description_html).toLowerCase().includes(searchLower)
 			: false;
-		
+
 		// Search in features
 		const featuresMatch = card.features.some((feature) =>
 			stripHtml(feature.description_html).toLowerCase().includes(searchLower)
 		);
-		
+
 		return titleMatch || descriptionMatch || featuresMatch;
 	}
 
@@ -70,9 +72,7 @@
 	);
 
 	// Check if user has applied any filter or search
-	let hasActiveFilter = $derived(
-		searchQuery.trim() !== '' || cardTypeFilter !== null
-	);
+	let hasActiveFilter = $derived(searchQuery.trim() !== '' || cardTypeFilter !== null);
 
 	const allCardTypes: HeritageCardType[] = ['ancestry', 'community', 'transformation'];
 
@@ -168,4 +168,3 @@
 		{/if}
 	</div>
 </div>
-

@@ -44,13 +44,17 @@
 
 	// Get domain name for display
 	function getDomainName(domainId: string): string {
-		return compendium.domains[domainId]?.name || domainId.charAt(0).toUpperCase() + domainId.slice(1);
+		return (
+			compendium.domains[domainId]?.name || domainId.charAt(0).toUpperCase() + domainId.slice(1)
+		);
 	}
 </script>
 
 <Sheet.Header>
 	<Sheet.Title>Customize Your Vault</Sheet.Title>
-	<Sheet.Description class="text-xs italic">Manually add domain cards to your vault. Cards added here ignore the level requirement.</Sheet.Description>
+	<Sheet.Description class="text-xs italic"
+		>Manually add domain cards to your vault. Cards added here ignore the level requirement.</Sheet.Description
+	>
 </Sheet.Header>
 
 <div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
@@ -70,12 +74,7 @@
 								</div>
 							</td>
 							<td class="py-2 text-right">
-								<Button
-									variant="ghost"
-									size="sm"
-									class="h-auto"
-									onclick={() => removeCard(card)}
-								>
+								<Button variant="ghost" size="sm" class="h-auto" onclick={() => removeCard(card)}>
 									<CircleMinus class="size-3.5" />
 								</Button>
 							</td>
@@ -92,4 +91,3 @@
 		<DomainCardCatalog onCardClick={handleCardClick} />
 	</div>
 </div>
-

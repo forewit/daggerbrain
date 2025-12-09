@@ -1,7 +1,7 @@
 import { query, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { z } from 'zod';
-import { get_kv, get_userId } from './utils';
+import { get_kv, get_auth } from './utils';
 import { ClassSchema, SubclassSchema } from '$lib/compendium/compendium-schemas';
 import type { Class, Subclass } from '$lib/types/compendium-types';
 
@@ -9,7 +9,7 @@ export const get_all_classes = query(async () => {
 	console.log('get_all_classes');
 
 	const event = getRequestEvent();
-	get_userId(event);
+	get_auth(event); // Validates authentication
 	const kv = get_kv(event);
 
 	const classesData = (await kv.get('classes', 'json')) as Record<string, Class> | null;
@@ -45,7 +45,7 @@ export const get_all_subclasses = query(async () => {
 	console.log('get_all_subclasses');
 
 	const event = getRequestEvent();
-	get_userId(event);
+	get_auth(event); // Validates authentication
 	const kv = get_kv(event);
 
 	const subclassesData = (await kv.get('subclasses', 'json')) as Record<string, Subclass> | null;

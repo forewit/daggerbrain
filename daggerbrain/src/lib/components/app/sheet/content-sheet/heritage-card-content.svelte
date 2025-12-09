@@ -2,7 +2,11 @@
 	import HeritageCardCatalog from '../../cards/heritage-card-catalog.svelte';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import type { AncestryCard, CommunityCard, TransformationCard } from '$lib/types/compendium-types';
+	import type {
+		AncestryCard,
+		CommunityCard,
+		TransformationCard
+	} from '$lib/types/compendium-types';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import CircleMinus from '@lucide/svelte/icons/circle-minus';
 
@@ -31,17 +35,26 @@
 		if (card.card_type === 'ancestry') {
 			alreadyExists = character.additional_ancestry_card_ids.includes(cardId);
 			if (!alreadyExists) {
-				character.additional_ancestry_card_ids = [...character.additional_ancestry_card_ids, cardId];
+				character.additional_ancestry_card_ids = [
+					...character.additional_ancestry_card_ids,
+					cardId
+				];
 			}
 		} else if (card.card_type === 'community') {
 			alreadyExists = character.additional_community_card_ids.includes(cardId);
 			if (!alreadyExists) {
-				character.additional_community_card_ids = [...character.additional_community_card_ids, cardId];
+				character.additional_community_card_ids = [
+					...character.additional_community_card_ids,
+					cardId
+				];
 			}
 		} else if (card.card_type === 'transformation') {
 			alreadyExists = character.additional_transformation_card_ids.includes(cardId);
 			if (!alreadyExists) {
-				character.additional_transformation_card_ids = [...character.additional_transformation_card_ids, cardId];
+				character.additional_transformation_card_ids = [
+					...character.additional_transformation_card_ids,
+					cardId
+				];
 			}
 		}
 	}
@@ -60,9 +73,8 @@
 				(id) => id !== cardId
 			);
 		} else if (card.card_type === 'transformation') {
-			character.additional_transformation_card_ids = character.additional_transformation_card_ids.filter(
-				(id) => id !== cardId
-			);
+			character.additional_transformation_card_ids =
+				character.additional_transformation_card_ids.filter((id) => id !== cardId);
 		}
 	}
 
@@ -73,7 +85,9 @@
 
 <Sheet.Header>
 	<Sheet.Title>Customize Your Heritage</Sheet.Title>
-	<Sheet.Description class="text-xs italic">Manually add heritage cards (Ancestry, Community, or Transformation) to your character.</Sheet.Description>
+	<Sheet.Description class="text-xs italic"
+		>Manually add heritage cards (Ancestry, Community, or Transformation) to your character.</Sheet.Description
+	>
 </Sheet.Header>
 
 <div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
@@ -93,12 +107,7 @@
 								</div>
 							</td>
 							<td class="py-2 text-right">
-								<Button
-									variant="ghost"
-									size="sm"
-									class="h-auto"
-									onclick={() => removeCard(card)}
-								>
+								<Button variant="ghost" size="sm" class="h-auto" onclick={() => removeCard(card)}>
 									<CircleMinus class="size-3.5" />
 								</Button>
 							</td>
@@ -115,4 +124,3 @@
 		<HeritageCardCatalog onCardClick={handleCardClick} />
 	</div>
 </div>
-

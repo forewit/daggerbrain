@@ -4,14 +4,14 @@ import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 import { characters_table, characters_table_update_schema } from '../server/db/characters.schema';
 import { users_table } from '../server/db/users.schema';
-import { get_db, get_userId, has_unlimited_slots } from './utils';
+import { get_db, get_auth } from './utils';
 import { get_user_slots } from './users.remote';
 
 export const get_all_characters = query(async () => {
 	console.log('get_all_characters');
 
 	const event = getRequestEvent();
-	const userId = get_userId(event);
+	const { userId } = get_auth(event);
 	const db = get_db(event);
 
 	const characters = await db
@@ -26,7 +26,7 @@ export const delete_character = command(z.string(), async (characterId) => {
 	console.log('delete_character');
 
 	const event = getRequestEvent();
-	const userId = get_userId(event);
+	const { userId } = get_auth(event);
 	const db = get_db(event);
 
 	// First, verify the character exists and belongs to the user
@@ -54,10 +54,7 @@ export const delete_character = command(z.string(), async (characterId) => {
 			character_slot_3: user.character_slot_3 === characterId ? null : user.character_slot_3
 		};
 
-		await db
-			.update(users_table)
-			.set(updatedSlots)
-			.where(eq(users_table.clerk_id, userId));
+		await db.update(users_table).set(updatedSlots).where(eq(users_table.clerk_id, userId));
 	}
 
 	// Delete the character
@@ -74,11 +71,13 @@ export const create_character = command(async () => {
 	console.log('create_character');
 
 	const event = getRequestEvent();
-	const userId = get_userId(event);
+	const auth = get_auth(event);
+	const { userId } = auth;
+	if (!userId) throw error(401, 'Unauthorized');
 	const db = get_db(event);
 
 	// Check for unlimited_slots feature flag
-	const hasUnlimited = await has_unlimited_slots(event);
+	const hasUnlimited = await auth.has({ feature: 'unlimited_slots' });
 
 	if (!hasUnlimited) {
 		// Check if user already has 3 active slots
@@ -158,7 +157,9 @@ export const update_character = command(characters_table_update_schema, async (c
 	console.log('update_character');
 
 	const event = getRequestEvent();
-	const userId = get_userId(event);
+	const auth = get_auth(event);
+	const { userId } = auth;
+	if (!userId) throw error(401, 'Unauthorized');
 	const db = get_db(event);
 
 	if (!character.id) {
@@ -166,7 +167,7 @@ export const update_character = command(characters_table_update_schema, async (c
 	}
 
 	// Check for unlimited_slots feature flag
-	const hasUnlimited = await has_unlimited_slots(event);
+	const hasUnlimited = await auth.has({ feature: 'unlimited_slots' });
 
 	if (!hasUnlimited) {
 		// Verify the character ID is in one of their active slots
@@ -177,11 +178,7 @@ export const update_character = command(characters_table_update_schema, async (c
 			.limit(1);
 
 		if (user) {
-			const activeSlots = [
-				user.character_slot_1,
-				user.character_slot_2,
-				user.character_slot_3
-			];
+			const activeSlots = [user.character_slot_1, user.character_slot_2, user.character_slot_3];
 
 			if (!activeSlots.includes(character.id)) {
 				throw error(

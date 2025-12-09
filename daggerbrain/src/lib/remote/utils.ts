@@ -9,24 +9,15 @@ export const get_db = (event: RequestEvent) => {
 	return drizzle(event.platform.env.DB);
 };
 
-export const get_userId = (event: RequestEvent) => {
-	const { userId } = event.locals.auth();
-
+export const get_auth = (event: RequestEvent) => {
+	const auth = event.locals.auth();
+	const { userId } = auth;
 	if (!userId) {
 		throw error(401, 'Unauthorized');
 	}
-
-	return userId;
+	return auth;
 };
 
-export const get_auth = (event: RequestEvent) => {
-	return event.locals.auth();
-};
-
-export const has_unlimited_slots = async (event: RequestEvent): Promise<boolean> => {
-	const auth = get_auth(event);
-	return await auth.has({ feature: 'unlimited_slots' });
-};
 
 export const get_kv = (event: RequestEvent) => {
 	if (!event.platform?.env?.KV) {

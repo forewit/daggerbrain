@@ -1,19 +1,20 @@
 import { error } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
-import { has_unlimited_slots } from '$lib/remote/utils';
 import { getRequestEvent } from '$app/server';
-import { get_db, get_userId } from '$lib/remote/utils';
+import { get_db, get_auth } from '$lib/remote/utils';
 import { eq } from 'drizzle-orm';
 import { users_table } from '$lib/server/db/users.schema';
 
-export const load: LayoutServerLoad = async ({ params }) => {
+export const load: LayoutServerLoad = async ({ params, locals }) => {
 	const event = getRequestEvent();
-	const userId = get_userId(event);
+	const auth = locals.auth();
+	const { userId } = auth;
+	if (!userId) throw error(401, 'Unauthorized');
 	const db = get_db(event);
 	const characterId = params.uid;
 
 	// Check for unlimited_slots feature flag
-	const hasUnlimited = await has_unlimited_slots(event);
+	const hasUnlimited = await auth.has({ feature: 'unlimited_slots' });
 
 	if (hasUnlimited) {
 		// User has unlimited slots, allow access
@@ -32,11 +33,7 @@ export const load: LayoutServerLoad = async ({ params }) => {
 		throw error(403, 'This character is not in your active slots.');
 	}
 
-	const activeSlots = [
-		user.character_slot_1,
-		user.character_slot_2,
-		user.character_slot_3
-	];
+	const activeSlots = [user.character_slot_1, user.character_slot_2, user.character_slot_3];
 
 	if (!activeSlots.includes(characterId)) {
 		throw error(403, 'This character is not in your active slots.');
@@ -45,4 +42,3 @@ export const load: LayoutServerLoad = async ({ params }) => {
 	// Character is in active slots, allow access
 	return {};
 };
-

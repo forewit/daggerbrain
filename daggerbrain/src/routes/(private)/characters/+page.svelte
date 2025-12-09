@@ -127,7 +127,11 @@
 		} catch (err) {
 			// Check if it's a limit error or a different error
 			const errorMessage = err instanceof Error ? err.message : 'Failed to activate character';
-			if (errorMessage.includes('limit') || errorMessage.includes('3') || errorMessage.includes('403')) {
+			if (
+				errorMessage.includes('limit') ||
+				errorMessage.includes('3') ||
+				errorMessage.includes('403')
+			) {
 				activationError =
 					'All 3 character slots are currently in use. To activate this character, please delete one of your active characters first to free up a slot.';
 			} else {
@@ -160,8 +164,11 @@
 		</div>
 
 		{#if isAtLimit && !data.has_unlimited_slots && !user.isPopupDismissed(CHARACTER_LIMIT_POPUP_ID)}
-			<div class="relative mb-4 rounded-md border p-3 pr-8 text-sm text-accent border-accent/10 bg-accent/5">
-				<a href="/subscribe" class="underline text-accent">Subscribe</a> to unlock unlimited character slots!
+			<div
+				class="relative mb-4 rounded-md border border-accent/10 bg-accent/5 p-3 pr-8 text-sm text-accent"
+			>
+				<a href="/subscribe" class="text-accent underline">Subscribe</a> to unlock unlimited
+				character slots!
 				<button
 					onclick={async () => {
 						try {
@@ -170,7 +177,7 @@
 							error(500, err instanceof Error ? err.message : 'Failed to dismiss notice');
 						}
 					}}
-					class="absolute top-2 right-2 rounded-sm opacity-70 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+					class="absolute top-2 right-2 rounded-sm opacity-70 hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none"
 					aria-label="Dismiss notice"
 				>
 					<X class="size-4" />
@@ -235,7 +242,7 @@
 		<!-- Inactive Characters (Collapsible) -->
 		{#if !data.has_unlimited_slots && inactiveCharacters.length > 0}
 			<Collapsible.Root bind:open={inactiveCharactersOpen} class="mt-6">
-				<Collapsible.Trigger class="flex items-center gap-2 mb-4 text-muted-foreground">
+				<Collapsible.Trigger class="mb-4 flex items-center gap-2 text-muted-foreground">
 					<ChevronRight
 						class={cn('size-4 transition-transform', inactiveCharactersOpen && 'rotate-90')}
 					/>
@@ -245,11 +252,13 @@
 				</Collapsible.Trigger>
 				<Collapsible.Content>
 					{#if activationError}
-						<div class="relative mb-4 rounded-md border border-destructive/10 bg-destructive/5 p-3 pr-8 text-sm text-destructive">
+						<div
+							class="relative mb-4 rounded-md border border-destructive/10 bg-destructive/5 p-3 pr-8 text-sm text-destructive"
+						>
 							{activationError}
 							<button
 								onclick={() => (activationError = null)}
-								class="absolute top-2 right-2 rounded-sm opacity-70 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+								class="absolute top-2 right-2 rounded-sm opacity-70 hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none"
 								aria-label="Dismiss error"
 							>
 								<X class="size-4" />
@@ -260,9 +269,7 @@
 						{#each inactiveCharacters as char}
 							{#if char.id !== redirecting_to_character}
 								<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
-									<div
-										class="flex gap-2 border bg-primary-muted p-1 opacity-60"
-									>
+									<div class="flex gap-2 border bg-primary-muted p-1 opacity-60">
 										<div class=" h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2">
 											<img
 												src={char.image_url || '/images/portrait-placeholder.png'}

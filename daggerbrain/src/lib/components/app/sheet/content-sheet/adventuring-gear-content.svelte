@@ -68,11 +68,7 @@
 								variant="ghost"
 								size="sm"
 								class="h-auto"
-								onclick={() =>
-									context.removeFromInventory(
-										{ id: gear.title },
-										'adventuring_gear'
-									)}
+								onclick={() => context.removeFromInventory({ id: gear.title }, 'adventuring_gear')}
 							>
 								<CircleMinus class="size-3.5" />
 							</Button>

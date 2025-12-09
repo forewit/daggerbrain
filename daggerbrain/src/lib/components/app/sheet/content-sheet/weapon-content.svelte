@@ -151,7 +151,10 @@
 				customTier = '';
 			}
 			customRange = inventoryItem.range === null ? '' : inventoryItem.range;
-			customDamageTypes = inventoryItem.available_damage_types === null ? [] : [...inventoryItem.available_damage_types];
+			customDamageTypes =
+				inventoryItem.available_damage_types === null
+					? []
+					: [...inventoryItem.available_damage_types];
 			customBurden = inventoryItem.burden === null ? '' : String(inventoryItem.burden);
 		} else {
 			customName = '';
@@ -336,7 +339,8 @@
 						{/if}
 					</div>
 					<div class="flex flex-col gap-2">
-						<label for="custom-range" class="text-xs font-medium text-muted-foreground">Range</label>
+						<label for="custom-range" class="text-xs font-medium text-muted-foreground">Range</label
+						>
 						<Select.Root type="single" bind:value={customRange}>
 							<Select.Trigger id="custom-range" class="w-full">
 								<p class="truncate">{customRange || 'Select a range'}</p>
@@ -365,7 +369,9 @@
 						</div>
 					</div>
 					<div class="flex flex-col gap-2">
-						<label for="custom-burden" class="text-xs font-medium text-muted-foreground">Burden</label>
+						<label for="custom-burden" class="text-xs font-medium text-muted-foreground"
+							>Burden</label
+						>
 						<Select.Root type="single" bind:value={customBurden}>
 							<Select.Trigger id="custom-burden" class="w-full">
 								<p class="truncate">{customBurden || 'Select a burden'}</p>
