@@ -8,7 +8,7 @@
 	import Search from '@lucide/svelte/icons/search';
 
 	let {
-		onCardClick = ()=>{}
+		onCardClick = () => {}
 	}: {
 		onCardClick?: (card: DomainCard) => void;
 	} = $props();
@@ -21,9 +21,7 @@
 
 	// Get all domain cards by flattening the nested structure
 	let allDomainCards = $derived(
-		Object.values(compendium.domain_cards).flatMap((domainCards) =>
-			Object.values(domainCards)
-		)
+		Object.values(compendium.domain_cards).flatMap((domainCards) => Object.values(domainCards))
 	);
 
 	// Helper function to strip HTML tags for search
@@ -37,12 +35,12 @@
 		const searchLower = query.toLowerCase();
 		const titleMatch = card.title.toLowerCase().includes(searchLower);
 		const categoryMatch = card.category.toLowerCase().includes(searchLower);
-		
+
 		// Search in features
 		const featuresMatch = card.features.some((feature) =>
 			stripHtml(feature.description_html).toLowerCase().includes(searchLower)
 		);
-		
+
 		return titleMatch || categoryMatch || featuresMatch;
 	}
 
@@ -69,7 +67,9 @@
 
 	// Get domain names from compendium, with fallback
 	function getDomainName(domainId: DomainIds): string {
-		return compendium.domains[domainId]?.name || domainId.charAt(0).toUpperCase() + domainId.slice(1);
+		return (
+			compendium.domains[domainId]?.name || domainId.charAt(0).toUpperCase() + domainId.slice(1)
+		);
 	}
 
 	const allDomains: DomainIds[] = [
@@ -160,7 +160,7 @@
 						disabled={levelFilter === null}
 						onclick={() => {
 							levelFilter = null;
-						//	levelSelectOpen = true;
+							//	levelSelectOpen = true;
 						}}
 						class="justify-center font-bold text-destructive hover:cursor-pointer"
 					>
@@ -196,11 +196,10 @@
 					</Button>
 				{/snippet}
 
-				<DomainCardComponent card={card} variant="responsive">
+				<DomainCardComponent {card} variant="responsive">
 					{@render selectButton()}
 				</DomainCardComponent>
 			{/each}
 		{/if}
 	</div>
 </div>
-

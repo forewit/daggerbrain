@@ -1,7 +1,7 @@
 import { query, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { z } from 'zod';
-import { get_kv, get_userId } from './utils';
+import { get_kv, get_auth } from './utils';
 import {
 	DomainIdsSchema,
 	DomainCardSchema,
@@ -11,7 +11,7 @@ import type { Domain, DomainCard, DomainIds } from '$lib/types/compendium-types'
 
 export const get_all_domains = query(async () => {
 	const event = getRequestEvent();
-	get_userId(event);
+	get_auth(event); // Validates authentication
 	const kv = get_kv(event);
 
 	const domainsData = (await kv.get('domains', 'json')) as Record<string, Domain> | null;
@@ -43,7 +43,7 @@ export const get_domain = query(z.string(), async (domainId) => {
 
 export const get_domain_cards = query(DomainIdsSchema, async (domainId) => {
 	const event = getRequestEvent();
-	get_userId(event);
+	get_auth(event); // Validates authentication
 	const kv = get_kv(event);
 
 	const kvKey = `${domainId}-cards`;

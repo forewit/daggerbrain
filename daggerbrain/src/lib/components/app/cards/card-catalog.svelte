@@ -74,20 +74,20 @@
 		if (!query) return true;
 		const searchLower = query.toLowerCase();
 		const titleMatch = card.title.toLowerCase().includes(searchLower);
-		
+
 		// Search in description (if available)
-		const descriptionMatch = 'description_html' in card && 
+		const descriptionMatch =
+			'description_html' in card &&
 			stripHtml(card.description_html).toLowerCase().includes(searchLower);
-		
+
 		// Search in features
 		const featuresMatch = card.features.some((feature) =>
 			stripHtml(feature.description_html).toLowerCase().includes(searchLower)
 		);
-		
+
 		// Search in category (for domain cards)
-		const categoryMatch = 'category' in card && 
-			card.category.toLowerCase().includes(searchLower);
-		
+		const categoryMatch = 'category' in card && card.category.toLowerCase().includes(searchLower);
+
 		return titleMatch || descriptionMatch || featuresMatch || categoryMatch;
 	}
 
@@ -99,7 +99,8 @@
 				if (cardTypeFilter === 'domain' && card.card_type !== 'domain') return false;
 				if (cardTypeFilter === 'ancestry' && card.card_type !== 'ancestry') return false;
 				if (cardTypeFilter === 'community' && card.card_type !== 'community') return false;
-				if (cardTypeFilter === 'transformation' && card.card_type !== 'transformation') return false;
+				if (cardTypeFilter === 'transformation' && card.card_type !== 'transformation')
+					return false;
 			}
 
 			// Search filter
@@ -114,7 +115,8 @@
 			// Level filter (only for domain cards)
 			if (card.card_type === 'domain') {
 				const domainCard = card as DomainCard;
-				if (levelFilter.length > 0 && !levelFilter.includes(domainCard.level_requirement)) return false;
+				if (levelFilter.length > 0 && !levelFilter.includes(domainCard.level_requirement))
+					return false;
 			}
 
 			return true;
@@ -123,7 +125,10 @@
 
 	// Check if user has applied any filter or search
 	let hasActiveFilter = $derived(
-		searchQuery.trim() !== '' || cardTypeFilter !== 'all' || domainFilter.length > 0 || levelFilter.length > 0
+		searchQuery.trim() !== '' ||
+			cardTypeFilter !== 'all' ||
+			domainFilter.length > 0 ||
+			levelFilter.length > 0
 	);
 
 	// Show domain-specific filters only when domain cards are selected
@@ -131,7 +136,9 @@
 
 	// Get domain names from compendium, with fallback
 	function getDomainName(domainId: DomainIds): string {
-		return compendium.domains[domainId]?.name || domainId.charAt(0).toUpperCase() + domainId.slice(1);
+		return (
+			compendium.domains[domainId]?.name || domainId.charAt(0).toUpperCase() + domainId.slice(1)
+		);
 	}
 
 	const allDomains: DomainIds[] = [
@@ -309,4 +316,3 @@
 		{/if}
 	</div>
 </div>
-

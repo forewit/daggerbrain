@@ -1,6 +1,6 @@
 import { command, getRequestEvent } from '$app/server';
 import { z } from 'zod';
-import { get_r2_usercontent, get_userId } from './utils';
+import { get_r2_usercontent, get_auth } from './utils';
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
 
@@ -28,7 +28,7 @@ export const upload_user_image = command(imageDataSchema, async ({ data, name, t
 	console.log('uploadImage');
 
 	const event = getRequestEvent();
-	const userId = get_userId(event);
+	const { userId } = get_auth(event);
 	const r2 = get_r2_usercontent(event);
 
 	// Decode base64 to ArrayBuffer

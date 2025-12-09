@@ -269,32 +269,37 @@
 
 		<!-- Character cards -->
 		<div class={cn(!character_cards_expanded && '-mb-4')}>
-			<div class="flex items-center justify-center gap-2 mb-4">
-			<button
-				onclick={() => (character_cards_expanded = !character_cards_expanded)}
-				class="z-20 flex items-center font-medium text-nowrap text-muted-foreground"
-			>
-				{#if character_cards_expanded}
-					<ChevronDown class="w-k h-4" />
-				{:else}
-					<ChevronRight class="w-k h-4" />
-				{/if}
-				Character Cards
-				<div
-					class="ml-2 grid h-4.5 place-items-center rounded-full bg-accent px-1.5 text-xs font-bold text-background"
+			<div class="mb-4 flex items-center justify-center gap-2">
+				<button
+					onclick={() => (character_cards_expanded = !character_cards_expanded)}
+					class="z-20 flex items-center font-medium text-nowrap text-muted-foreground"
 				>
-					{character_cards.length}
-				</div>
-			</button>
-			<Button variant="ghost" size="sm" class="text-muted-foreground/50 h-auto" onclick={openHeritageCardCatalog}><Pencil /></Button>
+					{#if character_cards_expanded}
+						<ChevronDown class="w-k h-4" />
+					{:else}
+						<ChevronRight class="w-k h-4" />
+					{/if}
+					Character Cards
+					<div
+						class="ml-2 grid h-4.5 place-items-center rounded-full bg-accent px-1.5 text-xs font-bold text-background"
+					>
+						{character_cards.length}
+					</div>
+				</button>
+				<Button
+					variant="ghost"
+					size="sm"
+					class="h-auto text-muted-foreground/50"
+					onclick={openHeritageCardCatalog}><Pencil /></Button
+				>
 			</div>
 			{#if character_cards_expanded}
-				<CardCarousel cards={character_cards} emptyMessage="None" bind_token_count/>
+				<CardCarousel cards={character_cards} emptyMessage="None" bind_token_count />
 			{/if}
 		</div>
 
 		<!-- domain card loadout -->
-		<Loadout {openDomainCardCatalog}/>
+		<Loadout {openDomainCardCatalog} />
 	</div>
 
 	<!-- Item/Experience detail sheet -->

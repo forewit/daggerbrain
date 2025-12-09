@@ -2,11 +2,11 @@ import { query, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { SourcesSchema } from '$lib/compendium/compendium-schemas';
 import type { Source } from '$lib/types/compendium-types';
-import { get_kv, get_userId } from './utils';
+import { get_kv, get_auth } from './utils';
 
 export const get_all_sources = query(async () => {
 	const event = getRequestEvent();
-	get_userId(event);
+	get_auth(event); // Validates authentication
 	const kv = get_kv(event);
 
 	const sourcesData = (await kv.get('sources', 'json')) as Record<string, Source> | null;

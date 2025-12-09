@@ -120,13 +120,13 @@ function createCharacter(id: string) {
 	);
 	let additional_community_cards = $derived(
 		character?.additional_community_card_ids
-		.map((id) => compendium.community_cards[id])
-		.filter((c) => !!c) || []
+			.map((id) => compendium.community_cards[id])
+			.filter((c) => !!c) || []
 	);
 	let additional_transformation_cards = $derived(
 		character?.additional_transformation_card_ids
-		.map((id) => compendium.transformation_cards[id])
-		.filter((c) => !!c) || []
+			.map((id) => compendium.transformation_cards[id])
+			.filter((c) => !!c) || []
 	);
 
 	// Equipment
@@ -192,7 +192,10 @@ function createCharacter(id: string) {
 				if (item.custom_max_armor !== null) {
 					armor.max_armor = item.custom_max_armor;
 				}
-				if (item.custom_damage_thresholds.major !== null || item.custom_damage_thresholds.severe !== null) {
+				if (
+					item.custom_damage_thresholds.major !== null ||
+					item.custom_damage_thresholds.severe !== null
+				) {
 					armor.damage_thresholds = {
 						major: item.custom_damage_thresholds.major ?? armor.damage_thresholds.major,
 						severe: item.custom_damage_thresholds.severe ?? armor.damage_thresholds.severe
@@ -1139,7 +1142,7 @@ function createCharacter(id: string) {
 
 		// ! add cards from additional_domain_Cards
 		new_domain_card_vault.push(...additional_domain_cards);
-		
+
 		// ! clear invalid domain_card_tokens
 		for (const domainCardId of Object.keys(character.domain_card_tokens)) {
 			if (!new_domain_card_vault.some((card) => card.compendium_id === domainCardId)) {
@@ -2807,7 +2810,9 @@ function createCharacter(id: string) {
 				delete character.inventory.loot[item.id];
 			}
 		} else if (type === 'adventuring_gear') {
-			const index = character.inventory.adventuring_gear.findIndex((gear) => gear.title === item.id);
+			const index = character.inventory.adventuring_gear.findIndex(
+				(gear) => gear.title === item.id
+			);
 			if (index !== -1) {
 				character.inventory.adventuring_gear.splice(index, 1);
 			}

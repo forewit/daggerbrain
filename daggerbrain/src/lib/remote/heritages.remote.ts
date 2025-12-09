@@ -1,7 +1,7 @@
 import { query, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { z } from 'zod';
-import { get_kv, get_userId } from './utils';
+import { get_kv, get_auth } from './utils';
 import {
 	AncestryCardSchema,
 	CommunityCardSchema,
@@ -12,7 +12,7 @@ import type { AncestryCard, CommunityCard, TransformationCard } from '$lib/types
 // Ancestry Cards
 export const get_all_ancestry_cards = query(async () => {
 	const event = getRequestEvent();
-	get_userId(event);
+	get_auth(event); // Validates authentication
 	const kv = get_kv(event);
 
 	const cardsData = (await kv.get('ancestry-cards', 'json')) as Record<string, AncestryCard> | null;
@@ -45,7 +45,7 @@ export const get_ancestry_card = query(z.string(), async (ancestryCardId) => {
 // Community Cards
 export const get_all_community_cards = query(async () => {
 	const event = getRequestEvent();
-	get_userId(event);
+	get_auth(event); // Validates authentication
 	const kv = get_kv(event);
 
 	const cardsData = (await kv.get('community-cards', 'json')) as Record<
@@ -81,7 +81,7 @@ export const get_community_card = query(z.string(), async (communityCardId) => {
 // Transformation Cards
 export const get_all_transformation_cards = query(async () => {
 	const event = getRequestEvent();
-	get_userId(event);
+	get_auth(event); // Validates authentication
 	const kv = get_kv(event);
 
 	const cardsData = (await kv.get('transformation-cards', 'json')) as Record<

@@ -9,14 +9,13 @@ export const get_db = (event: RequestEvent) => {
 	return drizzle(event.platform.env.DB);
 };
 
-export const get_userId = (event: RequestEvent) => {
-	const { userId } = event.locals.auth();
-
+export const get_auth = (event: RequestEvent) => {
+	const auth = event.locals.auth();
+	const { userId } = auth;
 	if (!userId) {
 		throw error(401, 'Unauthorized');
 	}
-
-	return userId;
+	return auth;
 };
 
 export const get_kv = (event: RequestEvent) => {

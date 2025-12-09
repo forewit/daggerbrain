@@ -244,10 +244,7 @@
 									variant="link"
 									class="ml-auto h-auto py-1 text-foreground"
 									onclick={() =>
-										context.removeFromInventory(
-											{ id: gear.title },
-											'adventuring_gear'
-										)}
+										context.removeFromInventory({ id: gear.title }, 'adventuring_gear')}
 								>
 									<CircleMinus class="size-4" />
 								</Button>
