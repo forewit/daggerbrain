@@ -49,8 +49,8 @@
 </script>
 
 <Sheet.Header>
-	<Sheet.Title>Customize Character Cards</Sheet.Title>
-	<Sheet.Description class="text-xs italic">Manually add cards to your character.</Sheet.Description>
+	<Sheet.Title>Customize Your Vault</Sheet.Title>
+	<Sheet.Description class="text-xs italic">Manually add domain cards to your vault. Cards added here ignore the level requirement.</Sheet.Description>
 </Sheet.Header>
 
 <div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">

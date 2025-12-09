@@ -4,16 +4,17 @@
 				type: 'weapon' | 'armor' | 'consumable' | 'loot';
 				id: string;
 		  }
-		| {
-				type:
-					| 'adventuring_gear'
-					| 'experience'
-					| 'catalog'
-					| 'domain-card-catalog'
-					| 'conditions'
-					| 'death-move'
-					| 'downtime';
-		  }
+	| {
+			type:
+				| 'adventuring_gear'
+				| 'experience'
+				| 'catalog'
+				| 'domain-card-catalog'
+				| 'heritage-card-catalog'
+				| 'conditions'
+				| 'death-move'
+				| 'downtime';
+	  }
 		| null;
 </script>
 
@@ -28,6 +29,7 @@
 	import ConditionsContent from './conditions-content.svelte';
 	import CatalogContent from './catalog-content.svelte';
 	import DomainCardContent from './domain-card-content.svelte';
+	import HeritageCardContent from './heritage-card-content.svelte';
 	import DeathMoveContent from './death-move-content.svelte';
 	import DowntimeContent from './downtime-content.svelte';
 
@@ -60,6 +62,8 @@
 			<CatalogContent />
 		{:else if content?.type === 'domain-card-catalog'}
 			<DomainCardContent />
+		{:else if content?.type === 'heritage-card-catalog'}
+			<HeritageCardContent />
 		{:else if content?.type === 'death-move'}
 			<DeathMoveContent />
 		{:else if content?.type === 'downtime'}

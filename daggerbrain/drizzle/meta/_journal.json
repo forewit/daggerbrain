@@ -36,6 +36,13 @@
       "when": 1764879893841,
       "tag": "0004_bored_tombstone",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1765284971634,
+      "tag": "0005_cool_surge",
+      "breakpoints": true
     }
   ]
 }

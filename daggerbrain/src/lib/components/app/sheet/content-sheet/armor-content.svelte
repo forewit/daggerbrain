@@ -37,6 +37,9 @@
 	// Form state - initialized from inventory item
 	let customName = $state('');
 	let customTier = $state('');
+	let customMaxArmor = $state('');
+	let customMajorThreshold = $state('');
+	let customSevereThreshold = $state('');
 
 	// Derived value for is save button disabled (if customizations match the existing armor)
 	let isSaveDisabled = $derived.by(() => {
@@ -78,13 +81,40 @@
 			tiersMatch = formTier === effectiveTier;
 		}
 
-		return namesMatch && tiersMatch;
+		// Compare max armor
+		const maxArmorStr = String(customMaxArmor ?? '').trim();
+		const formMaxArmor = maxArmorStr === '' ? null : (isNaN(Number(maxArmorStr)) ? null : Number(maxArmorStr));
+		const savedMaxArmor = inventoryItem.custom_max_armor;
+		const maxArmorMatch =
+			(formMaxArmor === null && savedMaxArmor === null) ||
+			(formMaxArmor !== null && savedMaxArmor !== null && formMaxArmor === savedMaxArmor);
+
+		// Compare damage thresholds
+		const majorStr = String(customMajorThreshold ?? '').trim();
+		const severeStr = String(customSevereThreshold ?? '').trim();
+		const formMajor = majorStr === '' ? null : (isNaN(Number(majorStr)) ? null : Number(majorStr));
+		const formSevere = severeStr === '' ? null : (isNaN(Number(severeStr)) ? null : Number(severeStr));
+		const savedMajor = inventoryItem.custom_damage_thresholds.major;
+		const savedSevere = inventoryItem.custom_damage_thresholds.severe;
+		const thresholdsMatch =
+			((formMajor === null && savedMajor === null) &&
+				(formSevere === null && savedSevere === null)) ||
+			((formMajor !== null && savedMajor !== null && formMajor === savedMajor) &&
+				(formSevere !== null && savedSevere !== null && formSevere === savedSevere));
+
+		return namesMatch && tiersMatch && maxArmorMatch && thresholdsMatch;
 	});
 
 	// Check if there are any customizations on the inventory item
 	let hasCustomizations = $derived.by(() => {
 		if (!inventoryItem) return false;
-		return inventoryItem.custom_title !== null || inventoryItem.custom_level_requirement !== null;
+		return (
+			inventoryItem.custom_title !== null ||
+			inventoryItem.custom_level_requirement !== null ||
+			inventoryItem.custom_max_armor !== null ||
+			inventoryItem.custom_damage_thresholds.major !== null ||
+			inventoryItem.custom_damage_thresholds.severe !== null
+		);
 	});
 
 	// Update form when inventory item changes
@@ -98,9 +128,22 @@
 				// Use the armor's current tier
 				customTier = '';
 			}
+			customMaxArmor =
+				inventoryItem.custom_max_armor !== null ? String(inventoryItem.custom_max_armor) : '';
+			customMajorThreshold =
+				inventoryItem.custom_damage_thresholds.major !== null
+					? String(inventoryItem.custom_damage_thresholds.major)
+					: '';
+			customSevereThreshold =
+				inventoryItem.custom_damage_thresholds.severe !== null
+					? String(inventoryItem.custom_damage_thresholds.severe)
+					: '';
 		} else {
 			customName = '';
 			customTier = '';
+			customMaxArmor = '';
+			customMajorThreshold = '';
+			customSevereThreshold = '';
 		}
 	});
 
@@ -136,11 +179,51 @@
 			// Empty tier means no custom level requirement
 			item.custom_level_requirement = null;
 		}
+
+		// Update max armor
+		const trimmedMaxArmor = String(customMaxArmor ?? '').trim();
+		if (trimmedMaxArmor) {
+			const maxArmorNum = Number(trimmedMaxArmor);
+			if (!isNaN(maxArmorNum) && maxArmorNum > 0) {
+				item.custom_max_armor = maxArmorNum;
+			} else {
+				item.custom_max_armor = null;
+			}
+		} else {
+			item.custom_max_armor = null;
+		}
+
+		// Update damage thresholds
+		const trimmedMajor = String(customMajorThreshold ?? '').trim();
+		const trimmedSevere = String(customSevereThreshold ?? '').trim();
+		if (trimmedMajor) {
+			const majorNum = Number(trimmedMajor);
+			if (!isNaN(majorNum) && majorNum > 0) {
+				item.custom_damage_thresholds.major = majorNum;
+			} else {
+				item.custom_damage_thresholds.major = null;
+			}
+		} else {
+			item.custom_damage_thresholds.major = null;
+		}
+		if (trimmedSevere) {
+			const severeNum = Number(trimmedSevere);
+			if (!isNaN(severeNum) && severeNum > 0) {
+				item.custom_damage_thresholds.severe = severeNum;
+			} else {
+				item.custom_damage_thresholds.severe = null;
+			}
+		} else {
+			item.custom_damage_thresholds.severe = null;
+		}
 	}
 
 	function handleClear() {
 		customName = '';
 		customTier = '';
+		customMaxArmor = '';
+		customMajorThreshold = '';
+		customSevereThreshold = '';
 		tierError = null;
 		handleSave();
 	}
@@ -213,13 +296,14 @@
 				<Collapsible.Content class="space-y-2 rounded-b-md border bg-card/50 p-2">
 					<div class="flex flex-col gap-2">
 						<label for="custom-name" class="text-xs font-medium text-muted-foreground">Name</label>
-						<Input id="custom-name" bind:value={customName} placeholder="Name" />
+						<Input id="custom-name" bind:value={customName} />
 					</div>
 					<div class="flex flex-col gap-2">
 						<label for="custom-tier" class="text-xs font-medium text-muted-foreground">Tier</label>
 						<Input
 							id="custom-tier"
 							type="number"
+							inputmode="numeric"
 							bind:value={customTier}
 							placeholder="Tier (1-4)"
 							min="1"
@@ -229,6 +313,49 @@
 						{#if tierError}
 							<p class="text-xs text-destructive">{tierError}</p>
 						{/if}
+					</div>
+					<div class="flex flex-col gap-2">
+						<label for="custom-max-armor" class="text-xs font-medium text-muted-foreground"
+							>Base Armor Score</label
+						>
+						<Input
+							id="custom-max-armor"
+							type="number"
+							inputmode="numeric"
+							bind:value={customMaxArmor}
+							min="0"
+							step="1"
+						/>
+					</div>
+					<div class="flex flex-col gap-2">
+						<div class="flex gap-2">
+							<div class="flex-1 flex flex-col gap-1">
+								<label for="custom-major-threshold" class="text-xs text-muted-foreground"
+									>Major Threshold</label
+								>
+								<Input
+									id="custom-major-threshold"
+									type="number"
+									inputmode="numeric"
+									bind:value={customMajorThreshold}
+									min="0"
+									step="1"
+								/>
+							</div>
+							<div class="flex-1 flex flex-col gap-1">
+								<label for="custom-severe-threshold" class="text-xs text-muted-foreground"
+									>Severe Threshold</label
+								>
+								<Input
+									id="custom-severe-threshold"
+									type="number"
+									inputmode="numeric"
+									bind:value={customSevereThreshold}
+									min="0"
+									step="1"
+								/>
+							</div>
+						</div>
 					</div>
 					<div class="flex gap-2">
 						<Button size="sm" onclick={handleSave} hidden={isSaveDisabled}>Save</Button>

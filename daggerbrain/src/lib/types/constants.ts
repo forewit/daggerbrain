@@ -80,7 +80,10 @@ export const CHARACTER_DEFAULTS = {
 	// the void / other
 	active_conditions: <ConditionIds[]>[],
 	transformation_card_id: null,
-	additional_domain_card_ids: <string[]>[],
+	additional_domain_card_ids: <DomainCardId[]>[],
+	additional_ancestry_card_ids: <string[]>[],
+	additional_community_card_ids: <string[]>[],
+	additional_transformation_card_ids: <string[]>[],
 	additional_character_modifiers: <CharacterModifier[]>[],
 	additional_weapon_modifiers: <WeaponModifier[]>[],
 

@@ -14,8 +14,8 @@
 	} = $props();
 
 	let searchQuery = $state('');
-	let domainFilter = $state<DomainIds[]>([]);
-	let levelFilter = $state<number[]>([]);
+	let domainFilter = $state<DomainIds | null>(null);
+	let levelFilter = $state<number | null>(null);
 
 	const compendium = getCompendiumContext();
 
@@ -53,10 +53,10 @@
 			if (!matchesSearch(card, searchQuery)) return false;
 
 			// Domain filter
-			if (domainFilter.length > 0 && !domainFilter.includes(card.domain_id)) return false;
+			if (domainFilter !== null && domainFilter !== card.domain_id) return false;
 
 			// Level filter
-			if (levelFilter.length > 0 && !levelFilter.includes(card.level_requirement)) return false;
+			if (levelFilter !== null && levelFilter !== card.level_requirement) return false;
 
 			return true;
 		})
@@ -64,7 +64,7 @@
 
 	// Check if user has applied any filter or search
 	let hasActiveFilter = $derived(
-		searchQuery.trim() !== '' || domainFilter.length > 0 || levelFilter.length > 0
+		searchQuery.trim() !== '' || domainFilter !== null || levelFilter !== null
 	);
 
 	// Get domain names from compendium, with fallback
@@ -103,33 +103,33 @@
 		<div class="flex flex-col gap-2 sm:flex-row">
 			<!-- Domain Filter Select -->
 			<Select.Root
-				type="multiple"
+				type="single"
 				bind:open={domainSelectOpen}
-				value={domainFilter}
+				value={domainFilter ?? undefined}
 				onValueChange={(value) => {
-					domainFilter = value.filter((v) => !!v) as DomainIds[];
+					domainFilter = (value as DomainIds) || null;
 				}}
 			>
 				<Select.Trigger class="w-full sm:w-[200px]">
-					{#if domainFilter.length === 0}
-						Select Domains
+					{#if domainFilter === null}
+						Select Domain
 					{:else}
-						{domainFilter.map((id) => getDomainName(id)).join(', ')}
+						{getDomainName(domainFilter)}
 					{/if}
 				</Select.Trigger>
 				<Select.Content class="rounded-md">
 					<Select.Item
 						value=""
-						disabled={domainFilter.length === 0}
+						disabled={domainFilter === null}
 						onclick={() => {
-							domainFilter = [];
-							domainSelectOpen = true;
+							domainFilter = null;
+							//domainSelectOpen = true;
 						}}
 						class="justify-center font-bold text-destructive hover:cursor-pointer"
 					>
 						-- Clear selection --
 					</Select.Item>
-					<Select.Label>Select Domains</Select.Label>
+					<Select.Label>Select Domain</Select.Label>
 					{#each allDomains as domainId}
 						<Select.Item value={domainId} class="hover:cursor-pointer">
 							{getDomainName(domainId)}
@@ -140,33 +140,33 @@
 
 			<!-- Level Filter Select -->
 			<Select.Root
-				type="multiple"
+				type="single"
 				bind:open={levelSelectOpen}
-				value={levelFilter.map((l) => l.toString())}
+				value={levelFilter !== null ? levelFilter.toString() : undefined}
 				onValueChange={(value) => {
-					levelFilter = value.filter((v) => !!v).map((v) => parseInt(v));
+					levelFilter = value ? parseInt(value) : null;
 				}}
 			>
 				<Select.Trigger class="w-full sm:w-[200px]">
-					{#if levelFilter.length === 0}
-						Select Levels
+					{#if levelFilter === null}
+						Select Level
 					{:else}
-						{levelFilter.map((l) => `Level ${l}`).join(', ')}
+						Level {levelFilter}
 					{/if}
 				</Select.Trigger>
 				<Select.Content class="rounded-md">
 					<Select.Item
 						value=""
-						disabled={levelFilter.length === 0}
+						disabled={levelFilter === null}
 						onclick={() => {
-							levelFilter = [];
-							levelSelectOpen = true;
+							levelFilter = null;
+						//	levelSelectOpen = true;
 						}}
 						class="justify-center font-bold text-destructive hover:cursor-pointer"
 					>
 						-- Clear selection --
 					</Select.Item>
-					<Select.Label>Select Levels</Select.Label>
+					<Select.Label>Select Level</Select.Label>
 					{#each allLevels as level}
 						<Select.Item value={level.toString()} class="hover:cursor-pointer">
 							Level {level}

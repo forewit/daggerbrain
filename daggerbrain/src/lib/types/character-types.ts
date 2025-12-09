@@ -1,4 +1,4 @@
-import type { AdventuringGear, DomainIds } from '$lib/types/compendium-types';
+import type { AdventuringGear, DamageTypes, DomainIds, Ranges } from '$lib/types/compendium-types';
 import { z } from 'zod';
 import { characters_table_schema } from '../server/db/characters.schema';
 import type { LevelUpChoice } from './rule-types';
@@ -45,6 +45,11 @@ export type ArmorInventoryItem = {
 	choices: Record<string, string[]>;
 	custom_title: string | null;
 	custom_level_requirement: number | null;
+	custom_max_armor: number | null;
+	custom_damage_thresholds: {
+		major: number | null;
+		severe: number | null;
+	};
 };
 
 export type WeaponInventoryItem = {
@@ -53,6 +58,9 @@ export type WeaponInventoryItem = {
 	choices: Record<string, string[]>;
 	custom_title: string | null;
 	custom_level_requirement: number | null;
+	range: Ranges | null;
+	available_damage_types: DamageTypes[] | null;
+	burden: 0 | 1 | 2 | null;
 };
 
 export type ConsumableInventoryItem = {

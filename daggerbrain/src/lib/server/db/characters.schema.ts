@@ -89,6 +89,18 @@ export const characters_table = sqliteTable('characters_table', {
 		.notNull()
 		.default(CHARACTER_DEFAULTS.additional_domain_card_ids)
 		.$type<DomainCardId[]>(),
+	additional_ancestry_card_ids: text('additional_ancestry_card_ids', { mode: 'json' })
+		.notNull()
+		.default(CHARACTER_DEFAULTS.additional_ancestry_card_ids)
+		.$type<string[]>(),
+	additional_community_card_ids: text('additional_community_card_ids', { mode: 'json' })
+		.notNull()
+		.default(CHARACTER_DEFAULTS.additional_community_card_ids)
+		.$type<string[]>(),
+	additional_transformation_card_ids: text('additional_transformation_card_ids', { mode: 'json' })
+		.notNull()
+		.default(CHARACTER_DEFAULTS.additional_transformation_card_ids)
+		.$type<string[]>(),
 	additional_character_modifiers: text('additional_character_modifiers', { mode: 'json' })
 		.notNull()
 		.default(CHARACTER_DEFAULTS.additional_character_modifiers)

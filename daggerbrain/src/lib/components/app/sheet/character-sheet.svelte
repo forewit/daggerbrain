@@ -73,13 +73,17 @@
 		sheetOpen = true;
 	}
 
+	function openHeritageCardCatalog() {
+		sheetContent = { type: 'heritage-card-catalog' };
+		sheetOpen = true;
+	}
+
 	let { class: className = '' }: { class?: string } = $props();
 
 	const context = getCharacterContext();
 	let character = $derived(context.character);
 
 	let character_cards: (
-		| DomainCard
 		| AncestryCard
 		| CommunityCard
 		| TransformationCard
@@ -97,7 +101,9 @@
 			context.ancestry_card,
 			context.community_card,
 			context.transformation_card,
-			...context.additional_domain_cards
+			...context.additional_ancestry_cards,
+			...context.additional_community_cards,
+			...context.additional_transformation_cards
 		].filter((c) => !!c)
 	);
 
@@ -280,15 +286,15 @@
 					{character_cards.length}
 				</div>
 			</button>
-			<Button variant="ghost" size="sm" onclick={openDomainCardCatalog}><Pencil class="size-4" /></Button>
+			<Button variant="ghost" size="sm" class="text-muted-foreground/50 h-auto" onclick={openHeritageCardCatalog}><Pencil /></Button>
 			</div>
 			{#if character_cards_expanded}
-				<CardCarousel cards={character_cards} emptyMessage="None" />
+				<CardCarousel cards={character_cards} emptyMessage="None" bind_token_count/>
 			{/if}
 		</div>
 
 		<!-- domain card loadout -->
-		<Loadout />
+		<Loadout {openDomainCardCatalog}/>
 	</div>
 
 	<!-- Item/Experience detail sheet -->

@@ -113,6 +113,21 @@ function createCharacter(id: string) {
 			.map((id) => compendium.domain_cards[id.domainId][id.cardId])
 			.filter((c) => !!c) || []
 	);
+	let additional_ancestry_cards = $derived(
+		character?.additional_ancestry_card_ids
+			.map((id) => compendium.ancestry_cards[id])
+			.filter((c) => !!c) || []
+	);
+	let additional_community_cards = $derived(
+		character?.additional_community_card_ids
+		.map((id) => compendium.community_cards[id])
+		.filter((c) => !!c) || []
+	);
+	let additional_transformation_cards = $derived(
+		character?.additional_transformation_card_ids
+		.map((id) => compendium.transformation_cards[id])
+		.filter((c) => !!c) || []
+	);
 
 	// Equipment
 	let inventory_primary_weapons = $derived.by(() => {
@@ -125,6 +140,15 @@ function createCharacter(id: string) {
 				if (item.custom_title) weapon.title = item.custom_title;
 				if (item.custom_level_requirement !== null) {
 					weapon.level_requirement = item.custom_level_requirement;
+				}
+				if (item.range !== null) {
+					weapon.range = item.range;
+				}
+				if (item.available_damage_types !== null) {
+					weapon.available_damage_types = item.available_damage_types;
+				}
+				if (item.burden !== null) {
+					weapon.burden = item.burden;
 				}
 				return weapon;
 			})
@@ -141,6 +165,15 @@ function createCharacter(id: string) {
 				if (item.custom_level_requirement !== null) {
 					weapon.level_requirement = item.custom_level_requirement;
 				}
+				if (item.range !== null) {
+					weapon.range = item.range;
+				}
+				if (item.available_damage_types !== null) {
+					weapon.available_damage_types = item.available_damage_types;
+				}
+				if (item.burden !== null) {
+					weapon.burden = item.burden;
+				}
 				return weapon;
 			})
 			.filter((w): w is NonNullable<typeof w> => !!w);
@@ -155,6 +188,15 @@ function createCharacter(id: string) {
 				if (item.custom_title) armor.title = item.custom_title;
 				if (item.custom_level_requirement !== null) {
 					armor.level_requirement = item.custom_level_requirement;
+				}
+				if (item.custom_max_armor !== null) {
+					armor.max_armor = item.custom_max_armor;
+				}
+				if (item.custom_damage_thresholds.major !== null || item.custom_damage_thresholds.severe !== null) {
+					armor.damage_thresholds = {
+						major: item.custom_damage_thresholds.major ?? armor.damage_thresholds.major,
+						severe: item.custom_damage_thresholds.severe ?? armor.damage_thresholds.severe
+					};
 				}
 				return armor;
 			})
@@ -937,6 +979,7 @@ function createCharacter(id: string) {
 
 		let multiclass_used = false;
 
+		// ! add cards from level up choices
 		for (let i = 2; i <= 10; i++) {
 			const level_up_domain_card =
 				level_up_domain_cards[i as keyof typeof character.level_up_domain_card_ids].A;
@@ -1094,6 +1137,9 @@ function createCharacter(id: string) {
 			//***** END domain card choices *****/
 		}
 
+		// ! add cards from additional_domain_Cards
+		new_domain_card_vault.push(...additional_domain_cards);
+		
 		// ! clear invalid domain_card_tokens
 		for (const domainCardId of Object.keys(character.domain_card_tokens)) {
 			if (!new_domain_card_vault.some((card) => card.compendium_id === domainCardId)) {
@@ -1433,7 +1479,26 @@ function createCharacter(id: string) {
 		}
 
 		// additional cards
-		additional_domain_cards.forEach((card) => {
+		// // todo: remove and update the vault with these cards instead of here
+		// additional_domain_cards.forEach((card) => {
+		// 	card.features.forEach((f) => {
+		// 		push_character_modifiers(f.character_modifiers);
+		// 		push_weapon_modifiers(f.weapon_modifiers);
+		// 	});
+		// });
+		additional_ancestry_cards.forEach((card) => {
+			card.features.forEach((f) => {
+				push_character_modifiers(f.character_modifiers);
+				push_weapon_modifiers(f.weapon_modifiers);
+			});
+		});
+		additional_community_cards.forEach((card) => {
+			card.features.forEach((f) => {
+				push_character_modifiers(f.character_modifiers);
+				push_weapon_modifiers(f.weapon_modifiers);
+			});
+		});
+		additional_transformation_cards.forEach((card) => {
 			card.features.forEach((f) => {
 				push_character_modifiers(f.character_modifiers);
 				push_weapon_modifiers(f.weapon_modifiers);
@@ -2640,7 +2705,10 @@ function createCharacter(id: string) {
 				compendium_id,
 				choices: {},
 				custom_title: null,
-				custom_level_requirement: null
+				custom_level_requirement: null,
+				range: null,
+				available_damage_types: null,
+				burden: null
 			};
 		} else if (type === 'secondary_weapon') {
 			const uniqueId = crypto.randomUUID();
@@ -2649,7 +2717,10 @@ function createCharacter(id: string) {
 				compendium_id,
 				choices: {},
 				custom_title: null,
-				custom_level_requirement: null
+				custom_level_requirement: null,
+				range: null,
+				available_damage_types: null,
+				burden: null
 			};
 		} else if (type === 'armor') {
 			const uniqueId = crypto.randomUUID();
@@ -2658,7 +2729,12 @@ function createCharacter(id: string) {
 				compendium_id,
 				choices: {},
 				custom_title: null,
-				custom_level_requirement: null
+				custom_level_requirement: null,
+				custom_max_armor: null,
+				custom_damage_thresholds: {
+					major: null,
+					severe: null
+				}
 			};
 		} else if (type === 'consumable') {
 			const uniqueId = crypto.randomUUID();
@@ -2875,6 +2951,15 @@ function createCharacter(id: string) {
 		},
 		get additional_domain_cards() {
 			return additional_domain_cards;
+		},
+		get additional_ancestry_cards() {
+			return additional_ancestry_cards;
+		},
+		get additional_community_cards() {
+			return additional_community_cards;
+		},
+		get additional_transformation_cards() {
+			return additional_transformation_cards;
 		},
 
 		// derived equipment

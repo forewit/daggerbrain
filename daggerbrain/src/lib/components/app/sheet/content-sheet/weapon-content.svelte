@@ -1,7 +1,8 @@
 <script lang="ts">
-	import type { DamageTypes } from '$lib/types/compendium-types';
+	import type { DamageTypes, Ranges } from '$lib/types/compendium-types';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import * as Collapsible from '$lib/components/ui/collapsible';
+	import * as Select from '$lib/components/ui/select';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { cn, capitalize } from '$lib/utils';
@@ -50,6 +51,12 @@
 	// Form state - initialized from inventory item
 	let customName = $state('');
 	let customTier = $state('');
+	let customRange = $state<string>('');
+	let customDamageTypes = $state<DamageTypes[]>([]);
+	let customBurden = $state<string>('');
+
+	const rangeOptions: Ranges[] = ['Melee', 'Very Close', 'Close', 'Far', 'Very Far'];
+	const damageTypeOptions: DamageTypes[] = ['phy', 'mag'];
 
 	// Derived value for is save button disabled (if customizations match the existing weapon)
 	let isSaveDisabled = $derived.by(() => {
@@ -91,13 +98,45 @@
 			tiersMatch = formTier === effectiveTier;
 		}
 
-		return namesMatch && tiersMatch;
+		// Compare range
+		const formRange = customRange === '' ? null : (customRange as Ranges);
+		const savedRange = inventoryItem.range;
+		const rangeMatch =
+			(formRange === null && savedRange === null) ||
+			(formRange !== null && savedRange !== null && formRange === savedRange);
+
+		// Compare damage types
+		const formDamageTypes = customDamageTypes.length === 0 ? null : [...customDamageTypes].sort();
+		const savedDamageTypes =
+			inventoryItem.available_damage_types === null
+				? null
+				: [...inventoryItem.available_damage_types].sort();
+		const damageTypesMatch =
+			(formDamageTypes === null && savedDamageTypes === null) ||
+			(formDamageTypes !== null &&
+				savedDamageTypes !== null &&
+				JSON.stringify(formDamageTypes) === JSON.stringify(savedDamageTypes));
+
+		// Compare burden
+		const formBurden = customBurden === '' ? null : Number(customBurden);
+		const savedBurden = inventoryItem.burden;
+		const burdenMatch =
+			(formBurden === null && savedBurden === null) ||
+			(formBurden !== null && savedBurden !== null && formBurden === savedBurden);
+
+		return namesMatch && tiersMatch && rangeMatch && damageTypesMatch && burdenMatch;
 	});
 
 	// Check if there are any customizations on the inventory item
 	let hasCustomizations = $derived.by(() => {
 		if (!inventoryItem) return false;
-		return inventoryItem.custom_title !== null || inventoryItem.custom_level_requirement !== null;
+		return (
+			inventoryItem.custom_title !== null ||
+			inventoryItem.custom_level_requirement !== null ||
+			inventoryItem.range !== null ||
+			inventoryItem.available_damage_types !== null ||
+			inventoryItem.burden !== null
+		);
 	});
 
 	// Update form when inventory item changes
@@ -111,9 +150,15 @@
 				// Use the weapon's current tier
 				customTier = '';
 			}
+			customRange = inventoryItem.range === null ? '' : inventoryItem.range;
+			customDamageTypes = inventoryItem.available_damage_types === null ? [] : [...inventoryItem.available_damage_types];
+			customBurden = inventoryItem.burden === null ? '' : String(inventoryItem.burden);
 		} else {
 			customName = '';
 			customTier = '';
+			customRange = '';
+			customDamageTypes = [];
+			customBurden = '';
 		}
 	});
 
@@ -152,13 +197,42 @@
 			// Empty tier means no custom level requirement
 			item.custom_level_requirement = null;
 		}
+
+		// Update range
+		item.range = customRange === '' ? null : (customRange as Ranges);
+
+		// Update damage types
+		item.available_damage_types = customDamageTypes.length === 0 ? null : [...customDamageTypes];
+
+		// Update burden
+		if (customBurden === '') {
+			item.burden = null;
+		} else {
+			const burdenNum = Number(customBurden);
+			if (!isNaN(burdenNum) && (burdenNum === 0 || burdenNum === 1 || burdenNum === 2)) {
+				item.burden = burdenNum as 0 | 1 | 2;
+			} else {
+				item.burden = null;
+			}
+		}
 	}
 
 	function handleClear() {
 		customName = '';
 		customTier = '';
+		customRange = '';
+		customDamageTypes = [];
+		customBurden = '';
 		tierError = null;
 		handleSave();
+	}
+
+	function toggleDamageType(type: DamageTypes) {
+		if (customDamageTypes.includes(type)) {
+			customDamageTypes = customDamageTypes.filter((t) => t !== type);
+		} else {
+			customDamageTypes = [...customDamageTypes, type];
+		}
 	}
 </script>
 
@@ -243,13 +317,14 @@
 				<Collapsible.Content class="space-y-2 rounded-b-md border bg-card/50 p-2">
 					<div class="flex flex-col gap-2">
 						<label for="custom-name" class="text-xs font-medium text-muted-foreground">Name</label>
-						<Input id="custom-name" bind:value={customName} placeholder="Name" />
+						<Input id="custom-name" bind:value={customName} />
 					</div>
 					<div class="flex flex-col gap-2">
 						<label for="custom-tier" class="text-xs font-medium text-muted-foreground">Tier</label>
 						<Input
 							id="custom-tier"
 							type="number"
+							inputmode="numeric"
 							bind:value={customTier}
 							placeholder="Tier (1-4)"
 							min="1"
@@ -259,6 +334,49 @@
 						{#if tierError}
 							<p class="text-xs text-destructive">{tierError}</p>
 						{/if}
+					</div>
+					<div class="flex flex-col gap-2">
+						<label for="custom-range" class="text-xs font-medium text-muted-foreground">Range</label>
+						<Select.Root type="single" bind:value={customRange}>
+							<Select.Trigger id="custom-range" class="w-full">
+								<p class="truncate">{customRange || 'Select a range'}</p>
+							</Select.Trigger>
+							<Select.Content>
+								<Select.Item value="">None (use default)</Select.Item>
+								{#each rangeOptions as range}
+									<Select.Item value={range}>{range}</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+					</div>
+					<div class="flex flex-col gap-2">
+						<p class="text-xs font-medium text-muted-foreground">Damage Types</p>
+						<div class="flex gap-4">
+							{#each damageTypeOptions as type}
+								<label class="flex items-center gap-2 text-xs">
+									<input
+										type="checkbox"
+										checked={customDamageTypes.includes(type)}
+										onchange={() => toggleDamageType(type)}
+									/>
+									{damageTypeMap[type]}
+								</label>
+							{/each}
+						</div>
+					</div>
+					<div class="flex flex-col gap-2">
+						<label for="custom-burden" class="text-xs font-medium text-muted-foreground">Burden</label>
+						<Select.Root type="single" bind:value={customBurden}>
+							<Select.Trigger id="custom-burden" class="w-full">
+								<p class="truncate">{customBurden || 'Select a burden'}</p>
+							</Select.Trigger>
+							<Select.Content>
+								<Select.Item value="">None (use default)</Select.Item>
+								<Select.Item value="0">0</Select.Item>
+								<Select.Item value="1">1</Select.Item>
+								<Select.Item value="2">2</Select.Item>
+							</Select.Content>
+						</Select.Root>
 					</div>
 					<div class="flex gap-2">
 						<Button size="sm" onclick={handleSave} hidden={isSaveDisabled}>Save</Button>

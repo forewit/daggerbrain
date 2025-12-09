@@ -14,8 +14,9 @@
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import ArrowLeftRight from '@lucide/svelte/icons/arrow-left-right';
 	import { getCharacterContext } from '$lib/state/character.svelte';
+	import Pencil from '@lucide/svelte/icons/pencil';
 
-	let { class: className = '' }: { class?: string } = $props();
+	let { class: className = '', openDomainCardCatalog = () => {} }: { class?: string, openDomainCardCatalog?: () => void } = $props();
 
 	const context = getCharacterContext();
 	let character = $derived(context.character);
@@ -183,6 +184,8 @@
 					</Dialog.Footer>
 				</Dialog.Content>
 			</Dialog.Root>
+
+			<Button variant="ghost" class="text-muted-foreground/50" size="sm" onclick={openDomainCardCatalog}><Pencil /></Button>
 		</div>
 		{#if expanded}
 			<div class="relative">
