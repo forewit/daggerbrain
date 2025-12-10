@@ -27,9 +27,7 @@
 	const context = getCharacterContext();
 
 	// Get all beastforms from compendium
-	let allBeastforms = $derived(
-		Object.values(compendium.beastforms)
-	);
+	let allBeastforms = $derived(Object.values(compendium.beastforms));
 
 	// Helper function to strip HTML tags for search
 	function stripHtml(html: string): string {
@@ -76,10 +74,7 @@
 	);
 
 	// Check if user has applied any filter or search
-	let hasActiveFilter = $derived(
-		searchQuery.trim() !== '' || tierFilter !== 'all'
-	);
-
+	let hasActiveFilter = $derived(searchQuery.trim() !== '' || tierFilter !== 'all');
 </script>
 
 <div class="flex flex-col gap-4">
@@ -137,7 +132,7 @@
 			{#each filteredBeastforms as beastform (beastform.compendium_id)}
 				{@const isDisabled = maxLevel !== undefined && beastform.level_requirement > maxLevel}
 				{@const tier = context ? context.level_to_tier(beastform.level_requirement) : 1}
-				
+
 				{#snippet subtitle_snippet()}
 					<Button
 						size="sm"
@@ -163,10 +158,9 @@
 				{/snippet}
 
 				<Dropdown {title_snippet} {subtitle_snippet} class="border-2">
-					<BeastformComponent beastform={beastform} />
+					<BeastformComponent {beastform} />
 				</Dropdown>
 			{/each}
 		{/if}
 	</div>
 </div>
-

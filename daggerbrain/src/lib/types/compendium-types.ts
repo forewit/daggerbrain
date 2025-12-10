@@ -61,7 +61,6 @@ export type SubclassMasteryCard = z.infer<typeof SubclassMasteryCardSchema>;
 export type Subclass = z.infer<typeof SubclassSchema>;
 export type CharacterClass = z.infer<typeof ClassSchema>;
 
-
 // ============================================================================
 // Beastforms
 // ============================================================================

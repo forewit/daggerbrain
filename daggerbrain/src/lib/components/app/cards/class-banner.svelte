@@ -3,8 +3,10 @@
 	import type { CharacterClass, DomainIds } from '$lib/types/compendium-types';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 
-	let { class: className = '', character_class }: { class?: string; character_class: CharacterClass } =
-		$props();
+	let {
+		class: className = '',
+		character_class
+	}: { class?: string; character_class: CharacterClass } = $props();
 
 	const compendium = getCompendiumContext();
 

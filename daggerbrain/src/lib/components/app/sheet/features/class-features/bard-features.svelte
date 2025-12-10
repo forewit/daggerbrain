@@ -28,7 +28,7 @@
 
 		<p class="text-xs text-muted-foreground">Add to a roll or clear stress</p>
 
-		<Label class="ml-auto mr-2 cursor-pointer text-xs font-normal text-muted-foreground">
+		<Label class="mr-2 ml-auto cursor-pointer text-xs font-normal text-muted-foreground">
 			<Checkbox
 				checked={character.class_choices['bard']?.['given_out_this_session']?.[0] === 'yes'}
 				onCheckedChange={(checked) => {

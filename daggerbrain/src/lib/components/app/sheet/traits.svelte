@@ -7,7 +7,7 @@
 
 	let { class: className = '', traits = $bindable() }: { class?: string; traits: Traits } =
 		$props();
-	
+
 	const context = getCharacterContext();
 	let derivedBeastform = $derived(context.derived_beastform);
 	let character = $derived(context.character);
@@ -15,9 +15,16 @@
 
 {#snippet trait(trait: keyof Traits)}
 	{@const applyBonuses = character?.chosen_beastform?.apply_beastform_bonuses === true}
-	{@const beastformBonus = applyBonuses && derivedBeastform && derivedBeastform.character_trait.trait === trait ? derivedBeastform.character_trait.bonus : 0}
-	{@const displayValue = traits[trait] !== null ? (traits[trait]! + beastformBonus) : null}
-	{@const hasBonus = applyBonuses && derivedBeastform !== null && derivedBeastform.character_trait.trait === trait && beastformBonus !== 0}
+	{@const beastformBonus =
+		applyBonuses && derivedBeastform && derivedBeastform.character_trait.trait === trait
+			? derivedBeastform.character_trait.bonus
+			: 0}
+	{@const displayValue = traits[trait] !== null ? traits[trait]! + beastformBonus : null}
+	{@const hasBonus =
+		applyBonuses &&
+		derivedBeastform !== null &&
+		derivedBeastform.character_trait.trait === trait &&
+		beastformBonus !== 0}
 	<div>
 		<div class="relative">
 			<svg
@@ -63,12 +70,20 @@
 			</svg>
 
 			<p
-				class={cn("absolute top-[9.5px] left-1/2 -translate-x-1/2 text-[11px] leading-none font-medium uppercase", hasBonus && "text-accent")}
+				class={cn(
+					'absolute top-[9.5px] left-1/2 -translate-x-1/2 text-[11px] leading-none font-medium uppercase',
+					hasBonus && 'text-accent'
+				)}
 			>
 				{TRAITS[trait].name}
 			</p>
 
-			<p class={cn("absolute top-7.5 left-1/2 -translate-x-1/2 text-2xl font-bold", hasBonus && "text-accent")}>
+			<p
+				class={cn(
+					'absolute top-7.5 left-1/2 -translate-x-1/2 text-2xl font-bold',
+					hasBonus && 'text-accent'
+				)}
+			>
 				{displayValue !== null && displayValue > 0 ? '+' + displayValue : displayValue}
 			</p>
 		</div>

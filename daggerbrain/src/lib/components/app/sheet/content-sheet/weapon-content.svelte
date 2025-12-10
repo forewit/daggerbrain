@@ -155,7 +155,8 @@
 				inventoryItem.custom_available_damage_types === null
 					? []
 					: [...inventoryItem.custom_available_damage_types];
-			customBurden = inventoryItem.custom_burden === null ? '' : String(inventoryItem.custom_burden);
+			customBurden =
+				inventoryItem.custom_burden === null ? '' : String(inventoryItem.custom_burden);
 		} else {
 			customName = '';
 			customTier = '';
@@ -205,7 +206,8 @@
 		item.custom_range = customRange === '' ? null : (customRange as Ranges);
 
 		// Update damage types
-		item.custom_available_damage_types = customDamageTypes.length === 0 ? null : [...customDamageTypes];
+		item.custom_available_damage_types =
+			customDamageTypes.length === 0 ? null : [...customDamageTypes];
 
 		// Update burden
 		if (customBurden === '') {

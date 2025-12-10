@@ -12,10 +12,7 @@ import type {
 	Inventory,
 	ChosenBeastform
 } from '../../types/character-types';
-import type {
-	DomainIds,
-	Traits
-} from '../../types/compendium-types';
+import type { DomainIds, Traits } from '../../types/compendium-types';
 import { CHARACTER_DEFAULTS } from '../../types/constants';
 import { DomainIdsSchema } from '../../compendium/compendium-schemas';
 import type { ConditionIds } from '$lib/types/rule-types';

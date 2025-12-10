@@ -378,10 +378,18 @@ function createCharacter(id: string) {
 	// ================================================
 
 	// Helper function to get available beastforms filtered by level and excluding special cases
-	const get_available_beastforms = (character_level: number, exclude_ids: string[]): Beastform[] => {
-		const special_case_ids = ['legendary_beast', 'legendary_hybrid', 'mythic_beast', 'mythic_hybrid'];
+	const get_available_beastforms = (
+		character_level: number,
+		exclude_ids: string[]
+	): Beastform[] => {
+		const special_case_ids = [
+			'legendary_beast',
+			'legendary_hybrid',
+			'mythic_beast',
+			'mythic_hybrid'
+		];
 		const all_exclude_ids = [...exclude_ids, ...special_case_ids];
-		
+
 		return Object.values(compendium.beastforms).filter(
 			(beastform) =>
 				beastform.level_requirement <= character_level &&
@@ -400,7 +408,7 @@ function createCharacter(id: string) {
 
 		const chosen_beastform = character.chosen_beastform;
 		const base_compendium_id = chosen_beastform.compendium_id;
-		
+
 		// Initialize choices object if it doesn't exist
 		if (!chosen_beastform.choices) {
 			chosen_beastform.choices = {};
@@ -414,7 +422,7 @@ function createCharacter(id: string) {
 		): boolean {
 			if ((a === null || a === undefined) && (b === null || b === undefined)) return true;
 			if (a === null || a === undefined || b === null || b === undefined) return false;
-			
+
 			return JSON.stringify(a) === JSON.stringify(b);
 		}
 
@@ -483,7 +491,6 @@ function createCharacter(id: string) {
 			if (!equivalent_beastform(derived_beastform, new_beastform)) {
 				derived_beastform = new_beastform;
 			}
-
 		} else if (base_compendium_id === 'legendary_hybrid') {
 			// Legendary Hybrid: Tier 3, level 5
 			// Requires 2 beastforms from Tiers 1-2 (level_requirement <= 4)
@@ -612,7 +619,6 @@ function createCharacter(id: string) {
 			if (!equivalent_beastform(derived_beastform, new_beastform)) {
 				derived_beastform = new_beastform;
 			}
-
 		} else if (base_compendium_id === 'mythic_beast') {
 			// Mythic Beast: Tier 4, level 8
 			// Requires 1 beastform from Tiers 1-2 (level_requirement <= 4)
@@ -678,7 +684,6 @@ function createCharacter(id: string) {
 			if (!equivalent_beastform(derived_beastform, new_beastform)) {
 				derived_beastform = new_beastform;
 			}
-
 		} else if (base_compendium_id === 'mythic_hybrid') {
 			// Mythic Hybrid: Tier 4, level 8
 			// Requires 3 beastforms from Tiers 1-3 (level_requirement <= 7)
@@ -755,7 +760,11 @@ function createCharacter(id: string) {
 			const features_2_indexes = choices.mythic_hybrid_base_forms_2_features || [];
 
 			// Validate advantage indexes (must total 5)
-			const all_advantage_indexes = [...advantages_0_indexes, ...advantages_1_indexes, ...advantages_2_indexes];
+			const all_advantage_indexes = [
+				...advantages_0_indexes,
+				...advantages_1_indexes,
+				...advantages_2_indexes
+			];
 			if (all_advantage_indexes.length !== 5) {
 				// Return template when choices aren't complete
 				if (!equivalent_beastform(derived_beastform, mythic_hybrid_template)) {
@@ -765,7 +774,11 @@ function createCharacter(id: string) {
 			}
 
 			// Validate feature indexes (must total 3)
-			const all_feature_indexes = [...features_0_indexes, ...features_1_indexes, ...features_2_indexes];
+			const all_feature_indexes = [
+				...features_0_indexes,
+				...features_1_indexes,
+				...features_2_indexes
+			];
 			if (all_feature_indexes.length !== 3) {
 				// Return template when choices aren't complete
 				if (!equivalent_beastform(derived_beastform, mythic_hybrid_template)) {
@@ -829,7 +842,6 @@ function createCharacter(id: string) {
 			if (!equivalent_beastform(derived_beastform, new_beastform)) {
 				derived_beastform = new_beastform;
 			}
-
 		} else {
 			// Normal case: use compendium directly
 			const beastform = compendium.beastforms[base_compendium_id];
@@ -853,10 +865,10 @@ function createCharacter(id: string) {
 				derived_beastform = new_beastform;
 			}
 		}
-	})
+	});
 
 	// ! clear invalid class choices
-	$effect(()=>{
+	$effect(() => {
 		if (!character) return;
 
 		for (const class_id of Object.keys(character.class_choices)) {
@@ -864,7 +876,7 @@ function createCharacter(id: string) {
 				delete character.class_choices[class_id];
 			}
 		}
-	})
+	});
 
 	// ! clear invalid mixed-ancestry
 	$effect(() => {

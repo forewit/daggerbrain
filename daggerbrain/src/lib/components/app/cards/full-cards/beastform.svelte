@@ -55,20 +55,25 @@
 				<tr class="border-b">
 					<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Bonus</th>
 					<td class="py-2 text-right">
-						<label class={cn("flex items-center gap-1 justify-end cursor-pointer",character?.chosen_beastform?.apply_beastform_bonuses && "text-accent")}>
-						<span class="capitalize">{beastform.character_trait.trait}</span>
-						<span
-							>{beastform.character_trait.bonus < 0 ? '' : '+'}{beastform.character_trait
-								.bonus},</span
+						<label
+							class={cn(
+								'flex cursor-pointer items-center justify-end gap-1',
+								character?.chosen_beastform?.apply_beastform_bonuses && 'text-accent'
+							)}
 						>
-						Evasion
-						<span>{beastform.evasion_bonus < 0 ? '' : '+'}{beastform.evasion_bonus}</span>
-						{#if character?.chosen_beastform?.compendium_id === beastform.compendium_id}
-							<span class="ml-2 inline-flex items-center">
-								<Switch bind:checked={character.chosen_beastform.apply_beastform_bonuses} />
-							</span>
-						{/if}
-					</label>
+							<span class="capitalize">{beastform.character_trait.trait}</span>
+							<span
+								>{beastform.character_trait.bonus < 0 ? '' : '+'}{beastform.character_trait
+									.bonus},</span
+							>
+							Evasion
+							<span>{beastform.evasion_bonus < 0 ? '' : '+'}{beastform.evasion_bonus}</span>
+							{#if character?.chosen_beastform?.compendium_id === beastform.compendium_id}
+								<span class="ml-2 inline-flex items-center">
+									<Switch bind:checked={character.chosen_beastform.apply_beastform_bonuses} />
+								</span>
+							{/if}
+						</label>
 					</td>
 				</tr>
 				<tr class="border-b">

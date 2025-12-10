@@ -34,7 +34,8 @@
 <Sheet.Header>
 	<Sheet.Title>Choose Beastform</Sheet.Title>
 	<Sheet.Description class="text-xs italic"
-		>Select a beastform for your character. Special beastforms (Legendary, Mythic) require additional choices.</Sheet.Description
+		>Select a beastform for your character. Special beastforms (Legendary, Mythic) require
+		additional choices.</Sheet.Description
 	>
 </Sheet.Header>
 
@@ -42,7 +43,6 @@
 	<!-- Current Beastform -->
 	{#if chosenBeastform && derivedBeastform}
 		<div class="flex flex-col gap-2">
-
 			<BeastformComponent beastform={derivedBeastform} bind_choice_select={true} />
 			<Button variant="link" size="sm" class="text-destructive" onclick={removeBeastform}>
 				Remove
@@ -56,4 +56,3 @@
 		<BeastformsCatalog onBeastformClick={handleBeastformClick} maxLevel={character?.level} />
 	</div>
 </div>
-

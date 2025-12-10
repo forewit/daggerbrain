@@ -85,27 +85,27 @@
 							size="sm"
 							onclick={() => (open = false)}
 							href="/"
-							class="pl-0 h-10 w-full justify-start rounded-none border-b"
+							class="h-10 w-full justify-start rounded-none border-b pl-0"
 						>
 							Home
 						</Button>
 					</SignedOut>
 					<SignedIn>
 						<Button
-						variant="link"
-						size="sm"
-						onclick={() => (open = false)}
-						href="/"
-						class="pl-0 h-10 w-full justify-start rounded-none border-b"
-					>
-						Home
-					</Button>
+							variant="link"
+							size="sm"
+							onclick={() => (open = false)}
+							href="/"
+							class="h-10 w-full justify-start rounded-none border-b pl-0"
+						>
+							Home
+						</Button>
 						<Button
 							variant="link"
 							size="sm"
 							onclick={() => (open = false)}
 							href="/characters"
-							class="pl-0 h-10 w-full justify-start rounded-none border-b"
+							class="h-10 w-full justify-start rounded-none border-b pl-0"
 						>
 							My Characters
 						</Button>
