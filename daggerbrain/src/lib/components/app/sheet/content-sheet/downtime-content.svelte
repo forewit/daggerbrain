@@ -99,7 +99,7 @@
 
 <Sheet.Header>
 	<Sheet.Title class="flex  gap-2">
-		<Tent class="size-5" />
+		<!-- <Tent class="size-5" /> -->
 		Downtime
 	</Sheet.Title>
 </Sheet.Header>

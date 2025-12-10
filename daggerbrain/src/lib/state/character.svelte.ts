@@ -7,7 +7,7 @@ import {
 	TRAIT_OPTIONS
 } from '../types/rules';
 import { getContext, setContext } from 'svelte';
-import type { Character, DomainCardId } from '$lib/types/character-types';
+import type { Character, DomainCardId, ChosenBeastform } from '$lib/types/character-types';
 import type { AllTierOptionIds, ConditionIds, LevelUpChoice } from '$lib/types/rule-types';
 import type {
 	DamageThresholds,
@@ -25,6 +25,7 @@ import type {
 import { BLANK_LEVEL_UP_CHOICE } from '$lib/types/constants';
 import { update_character } from '$lib/remote/characters.remote';
 import { getCompendiumContext } from './compendium.svelte';
+import { increaseDie } from '$lib/utils';
 
 function createCharacter(id: string) {
 	const user = getUserContext();
@@ -376,19 +377,482 @@ function createCharacter(id: string) {
 	// CHARACTER VALIDATION EFFECTS
 	// ================================================
 
-	// todo: derive beastform from character.chosen_beastform
+	// Helper function to get available beastforms filtered by level and excluding special cases
+	const get_available_beastforms = (character_level: number, exclude_ids: string[]): Beastform[] => {
+		const special_case_ids = ['legendary_beast', 'legendary_hybrid', 'mythic_beast', 'mythic_hybrid'];
+		const all_exclude_ids = [...exclude_ids, ...special_case_ids];
+		
+		return Object.values(compendium.beastforms).filter(
+			(beastform) =>
+				beastform.level_requirement <= character_level &&
+				!all_exclude_ids.includes(beastform.compendium_id)
+		);
+	};
+
 	// ! derive beastform
-	$effect(()=>{
-		if (!character || !character.chosen_beastform) return;
+	$effect(() => {
+		if (!character || !character.chosen_beastform) {
+			if (derived_beastform !== null) {
+				derived_beastform = null;
+			}
+			return;
+		}
 
-		// -- SPECIAL CASES --
-		// "legendary_beast"
-		// "legendary_hybrid"
-		// "mythic_beast"
-		// "mythic_hybrid"
+		const chosen_beastform = character.chosen_beastform;
+		const base_compendium_id = chosen_beastform.compendium_id;
+		
+		// Initialize choices object if it doesn't exist
+		if (!chosen_beastform.choices) {
+			chosen_beastform.choices = {};
+		}
+		const choices = chosen_beastform.choices;
 
-		// otherwise use the compendium
+		// Helper function to check if two beastforms are equivalent
+		function equivalent_beastform(
+			a: Beastform | null | undefined,
+			b: Beastform | null | undefined
+		): boolean {
+			if ((a === null || a === undefined) && (b === null || b === undefined)) return true;
+			if (a === null || a === undefined || b === null || b === undefined) return false;
+			
+			return JSON.stringify(a) === JSON.stringify(b);
+		}
 
+		// Handle special cases
+		if (base_compendium_id === 'legendary_beast') {
+			// Legendary Beast: Tier 3, level 5
+			// Requires 1 Tier 1 beastform (level_requirement === 1)
+			const legendary_beast_template = compendium.beastforms['legendary_beast'];
+			if (!legendary_beast_template) {
+				if (derived_beastform !== null) {
+					derived_beastform = null;
+				}
+				return;
+			}
+
+			if (character.level < 5) {
+				// Return template even if level is too low, so UI can show it
+				if (!equivalent_beastform(derived_beastform, legendary_beast_template)) {
+					derived_beastform = legendary_beast_template;
+				}
+				return;
+			}
+
+			// Initialize choice array if it doesn't exist
+			if (!choices.legendary_beast_base_form) {
+				choices.legendary_beast_base_form = [];
+			}
+
+			const base_form_choice = choices.legendary_beast_base_form;
+			if (base_form_choice.length !== 1) {
+				// Return template when choices aren't complete
+				if (!equivalent_beastform(derived_beastform, legendary_beast_template)) {
+					derived_beastform = legendary_beast_template;
+				}
+				return;
+			}
+
+			const base_form_id = base_form_choice[0];
+			const base_form = compendium.beastforms[base_form_id];
+			if (!base_form) {
+				// Return template if base form doesn't exist
+				if (!equivalent_beastform(derived_beastform, legendary_beast_template)) {
+					derived_beastform = legendary_beast_template;
+				}
+				return;
+			}
+
+			// Merge: Start with base form, apply bonuses, retain all original traits/features, use template's category
+			const new_beastform: Beastform = {
+				...base_form,
+				compendium_id: legendary_beast_template.compendium_id,
+				name: legendary_beast_template.name,
+				category: legendary_beast_template.category,
+				level_requirement: legendary_beast_template.level_requirement,
+				attack: {
+					...base_form.attack,
+					damage_bonus: base_form.attack.damage_bonus + 6
+				},
+				character_trait: {
+					...base_form.character_trait,
+					bonus: base_form.character_trait.bonus + 1
+				},
+				evasion_bonus: base_form.evasion_bonus + 2
+			};
+
+			if (!equivalent_beastform(derived_beastform, new_beastform)) {
+				derived_beastform = new_beastform;
+			}
+
+		} else if (base_compendium_id === 'legendary_hybrid') {
+			// Legendary Hybrid: Tier 3, level 5
+			// Requires 2 beastforms from Tiers 1-2 (level_requirement <= 4)
+			// User selects 4 advantages and 2 features total
+			const legendary_hybrid_template = compendium.beastforms['legendary_hybrid'];
+			if (!legendary_hybrid_template) {
+				if (derived_beastform !== null) {
+					derived_beastform = null;
+				}
+				return;
+			}
+
+			if (character.level < 5) {
+				// Return template even if level is too low
+				if (!equivalent_beastform(derived_beastform, legendary_hybrid_template)) {
+					derived_beastform = legendary_hybrid_template;
+				}
+				return;
+			}
+
+			// Initialize choice arrays if they don't exist
+			if (!choices.legendary_hybrid_base_forms) {
+				choices.legendary_hybrid_base_forms = [];
+			}
+			if (!choices.legendary_hybrid_base_forms_0_advantages) {
+				choices.legendary_hybrid_base_forms_0_advantages = [];
+			}
+			if (!choices.legendary_hybrid_base_forms_1_advantages) {
+				choices.legendary_hybrid_base_forms_1_advantages = [];
+			}
+			if (!choices.legendary_hybrid_base_forms_0_features) {
+				choices.legendary_hybrid_base_forms_0_features = [];
+			}
+			if (!choices.legendary_hybrid_base_forms_1_features) {
+				choices.legendary_hybrid_base_forms_1_features = [];
+			}
+
+			const base_forms_choice = choices.legendary_hybrid_base_forms;
+			if (base_forms_choice.length !== 2) {
+				// Return template when choices aren't complete
+				if (!equivalent_beastform(derived_beastform, legendary_hybrid_template)) {
+					derived_beastform = legendary_hybrid_template;
+				}
+				return;
+			}
+
+			const base_form_0_id = base_forms_choice[0];
+			const base_form_1_id = base_forms_choice[1];
+			const base_form_0 = compendium.beastforms[base_form_0_id];
+			const base_form_1 = compendium.beastforms[base_form_1_id];
+
+			if (!base_form_0 || !base_form_1) {
+				// Return template if base forms don't exist
+				if (!equivalent_beastform(derived_beastform, legendary_hybrid_template)) {
+					derived_beastform = legendary_hybrid_template;
+				}
+				return;
+			}
+
+			// Get selected advantages and features
+			const advantages_0_indexes = choices.legendary_hybrid_base_forms_0_advantages || [];
+			const advantages_1_indexes = choices.legendary_hybrid_base_forms_1_advantages || [];
+			const features_0_indexes = choices.legendary_hybrid_base_forms_0_features || [];
+			const features_1_indexes = choices.legendary_hybrid_base_forms_1_features || [];
+
+			// Validate advantage indexes (must total 4)
+			const all_advantage_indexes = [...advantages_0_indexes, ...advantages_1_indexes];
+			if (all_advantage_indexes.length !== 4) {
+				// Return template when choices aren't complete
+				if (!equivalent_beastform(derived_beastform, legendary_hybrid_template)) {
+					derived_beastform = legendary_hybrid_template;
+				}
+				return;
+			}
+
+			// Validate feature indexes (must total 2)
+			const all_feature_indexes = [...features_0_indexes, ...features_1_indexes];
+			if (all_feature_indexes.length !== 2) {
+				// Return template when choices aren't complete
+				if (!equivalent_beastform(derived_beastform, legendary_hybrid_template)) {
+					derived_beastform = legendary_hybrid_template;
+				}
+				return;
+			}
+
+			// Collect selected advantages
+			const selected_advantages: string[] = [];
+			for (const idxStr of advantages_0_indexes) {
+				const idx = parseInt(idxStr, 10);
+				if (idx >= 0 && idx < base_form_0.advantages.length) {
+					selected_advantages.push(base_form_0.advantages[idx]);
+				}
+			}
+			for (const idxStr of advantages_1_indexes) {
+				const idx = parseInt(idxStr, 10);
+				if (idx >= 0 && idx < base_form_1.advantages.length) {
+					selected_advantages.push(base_form_1.advantages[idx]);
+				}
+			}
+
+			// Collect selected features
+			const selected_features = [];
+			for (const idxStr of features_0_indexes) {
+				const idx = parseInt(idxStr, 10);
+				if (idx >= 0 && idx < base_form_0.features.length) {
+					selected_features.push(base_form_0.features[idx]);
+				}
+			}
+			for (const idxStr of features_1_indexes) {
+				const idx = parseInt(idxStr, 10);
+				if (idx >= 0 && idx < base_form_1.features.length) {
+					selected_features.push(base_form_1.features[idx]);
+				}
+			}
+
+			// Remove duplicate advantages
+			const unique_advantages = [...new Set(selected_advantages)];
+
+			// Merge: use legendary_hybrid's base stats, merge unique advantages, merge all selected features
+			const new_beastform: Beastform = {
+				...legendary_hybrid_template,
+				advantages: unique_advantages,
+				features: selected_features
+			};
+
+			if (!equivalent_beastform(derived_beastform, new_beastform)) {
+				derived_beastform = new_beastform;
+			}
+
+		} else if (base_compendium_id === 'mythic_beast') {
+			// Mythic Beast: Tier 4, level 8
+			// Requires 1 beastform from Tiers 1-2 (level_requirement <= 4)
+			const mythic_beast_template = compendium.beastforms['mythic_beast'];
+			if (!mythic_beast_template) {
+				if (derived_beastform !== null) {
+					derived_beastform = null;
+				}
+				return;
+			}
+
+			if (character.level < 8) {
+				// Return template even if level is too low
+				if (!equivalent_beastform(derived_beastform, mythic_beast_template)) {
+					derived_beastform = mythic_beast_template;
+				}
+				return;
+			}
+
+			// Initialize choice array if it doesn't exist
+			if (!choices.mythic_beast_base_form) {
+				choices.mythic_beast_base_form = [];
+			}
+
+			const base_form_choice = choices.mythic_beast_base_form;
+			if (base_form_choice.length !== 1) {
+				// Return template when choices aren't complete
+				if (!equivalent_beastform(derived_beastform, mythic_beast_template)) {
+					derived_beastform = mythic_beast_template;
+				}
+				return;
+			}
+
+			const base_form_id = base_form_choice[0];
+			const base_form = compendium.beastforms[base_form_id];
+			if (!base_form) {
+				// Return template if base form doesn't exist
+				if (!equivalent_beastform(derived_beastform, mythic_beast_template)) {
+					derived_beastform = mythic_beast_template;
+				}
+				return;
+			}
+
+			// Merge: Start with base form, apply bonuses, increase damage die, retain all original traits/features, use template's category
+			const new_beastform: Beastform = {
+				...base_form,
+				compendium_id: mythic_beast_template.compendium_id,
+				name: mythic_beast_template.name,
+				category: mythic_beast_template.category,
+				level_requirement: mythic_beast_template.level_requirement,
+				attack: {
+					...base_form.attack,
+					damage_dice: increaseDie(base_form.attack.damage_dice),
+					damage_bonus: base_form.attack.damage_bonus + 9
+				},
+				character_trait: {
+					...base_form.character_trait,
+					bonus: base_form.character_trait.bonus + 2
+				},
+				evasion_bonus: base_form.evasion_bonus + 3
+			};
+
+			if (!equivalent_beastform(derived_beastform, new_beastform)) {
+				derived_beastform = new_beastform;
+			}
+
+		} else if (base_compendium_id === 'mythic_hybrid') {
+			// Mythic Hybrid: Tier 4, level 8
+			// Requires 3 beastforms from Tiers 1-3 (level_requirement <= 7)
+			// User selects 5 advantages and 3 features total
+			const mythic_hybrid_template = compendium.beastforms['mythic_hybrid'];
+			if (!mythic_hybrid_template) {
+				if (derived_beastform !== null) {
+					derived_beastform = null;
+				}
+				return;
+			}
+
+			if (character.level < 8) {
+				// Return template even if level is too low
+				if (!equivalent_beastform(derived_beastform, mythic_hybrid_template)) {
+					derived_beastform = mythic_hybrid_template;
+				}
+				return;
+			}
+
+			// Initialize choice arrays if they don't exist
+			if (!choices.mythic_hybrid_base_forms) {
+				choices.mythic_hybrid_base_forms = [];
+			}
+			if (!choices.mythic_hybrid_base_forms_0_advantages) {
+				choices.mythic_hybrid_base_forms_0_advantages = [];
+			}
+			if (!choices.mythic_hybrid_base_forms_1_advantages) {
+				choices.mythic_hybrid_base_forms_1_advantages = [];
+			}
+			if (!choices.mythic_hybrid_base_forms_2_advantages) {
+				choices.mythic_hybrid_base_forms_2_advantages = [];
+			}
+			if (!choices.mythic_hybrid_base_forms_0_features) {
+				choices.mythic_hybrid_base_forms_0_features = [];
+			}
+			if (!choices.mythic_hybrid_base_forms_1_features) {
+				choices.mythic_hybrid_base_forms_1_features = [];
+			}
+			if (!choices.mythic_hybrid_base_forms_2_features) {
+				choices.mythic_hybrid_base_forms_2_features = [];
+			}
+
+			const base_forms_choice = choices.mythic_hybrid_base_forms;
+			if (base_forms_choice.length !== 3) {
+				// Return template when choices aren't complete
+				if (!equivalent_beastform(derived_beastform, mythic_hybrid_template)) {
+					derived_beastform = mythic_hybrid_template;
+				}
+				return;
+			}
+
+			const base_form_0_id = base_forms_choice[0];
+			const base_form_1_id = base_forms_choice[1];
+			const base_form_2_id = base_forms_choice[2];
+			const base_form_0 = compendium.beastforms[base_form_0_id];
+			const base_form_1 = compendium.beastforms[base_form_1_id];
+			const base_form_2 = compendium.beastforms[base_form_2_id];
+
+			if (!base_form_0 || !base_form_1 || !base_form_2) {
+				// Return template if base forms don't exist
+				if (!equivalent_beastform(derived_beastform, mythic_hybrid_template)) {
+					derived_beastform = mythic_hybrid_template;
+				}
+				return;
+			}
+
+			// Get selected advantages and features
+			const advantages_0_indexes = choices.mythic_hybrid_base_forms_0_advantages || [];
+			const advantages_1_indexes = choices.mythic_hybrid_base_forms_1_advantages || [];
+			const advantages_2_indexes = choices.mythic_hybrid_base_forms_2_advantages || [];
+			const features_0_indexes = choices.mythic_hybrid_base_forms_0_features || [];
+			const features_1_indexes = choices.mythic_hybrid_base_forms_1_features || [];
+			const features_2_indexes = choices.mythic_hybrid_base_forms_2_features || [];
+
+			// Validate advantage indexes (must total 5)
+			const all_advantage_indexes = [...advantages_0_indexes, ...advantages_1_indexes, ...advantages_2_indexes];
+			if (all_advantage_indexes.length !== 5) {
+				// Return template when choices aren't complete
+				if (!equivalent_beastform(derived_beastform, mythic_hybrid_template)) {
+					derived_beastform = mythic_hybrid_template;
+				}
+				return;
+			}
+
+			// Validate feature indexes (must total 3)
+			const all_feature_indexes = [...features_0_indexes, ...features_1_indexes, ...features_2_indexes];
+			if (all_feature_indexes.length !== 3) {
+				// Return template when choices aren't complete
+				if (!equivalent_beastform(derived_beastform, mythic_hybrid_template)) {
+					derived_beastform = mythic_hybrid_template;
+				}
+				return;
+			}
+
+			// Collect selected advantages
+			const selected_advantages: string[] = [];
+			for (const idxStr of advantages_0_indexes) {
+				const idx = parseInt(idxStr, 10);
+				if (idx >= 0 && idx < base_form_0.advantages.length) {
+					selected_advantages.push(base_form_0.advantages[idx]);
+				}
+			}
+			for (const idxStr of advantages_1_indexes) {
+				const idx = parseInt(idxStr, 10);
+				if (idx >= 0 && idx < base_form_1.advantages.length) {
+					selected_advantages.push(base_form_1.advantages[idx]);
+				}
+			}
+			for (const idxStr of advantages_2_indexes) {
+				const idx = parseInt(idxStr, 10);
+				if (idx >= 0 && idx < base_form_2.advantages.length) {
+					selected_advantages.push(base_form_2.advantages[idx]);
+				}
+			}
+
+			// Collect selected features
+			const selected_features = [];
+			for (const idxStr of features_0_indexes) {
+				const idx = parseInt(idxStr, 10);
+				if (idx >= 0 && idx < base_form_0.features.length) {
+					selected_features.push(base_form_0.features[idx]);
+				}
+			}
+			for (const idxStr of features_1_indexes) {
+				const idx = parseInt(idxStr, 10);
+				if (idx >= 0 && idx < base_form_1.features.length) {
+					selected_features.push(base_form_1.features[idx]);
+				}
+			}
+			for (const idxStr of features_2_indexes) {
+				const idx = parseInt(idxStr, 10);
+				if (idx >= 0 && idx < base_form_2.features.length) {
+					selected_features.push(base_form_2.features[idx]);
+				}
+			}
+
+			// Remove duplicate advantages
+			const unique_advantages = [...new Set(selected_advantages)];
+
+			// Merge: use mythic_hybrid's base stats, merge unique advantages, merge all selected features
+			const new_beastform: Beastform = {
+				...mythic_hybrid_template,
+				advantages: unique_advantages,
+				features: selected_features
+			};
+
+			if (!equivalent_beastform(derived_beastform, new_beastform)) {
+				derived_beastform = new_beastform;
+			}
+
+		} else {
+			// Normal case: use compendium directly
+			const beastform = compendium.beastforms[base_compendium_id];
+			if (!beastform) {
+				if (derived_beastform !== null) {
+					derived_beastform = null;
+				}
+				return;
+			}
+
+			// Validate level requirement for regular beastforms
+			if (character.level < beastform.level_requirement) {
+				if (derived_beastform !== null) {
+					derived_beastform = null;
+				}
+				return;
+			}
+
+			const new_beastform = beastform;
+			if (!equivalent_beastform(derived_beastform, new_beastform)) {
+				derived_beastform = new_beastform;
+			}
+		}
 	})
 
 	// ! clear invalid class choices
@@ -3019,6 +3483,9 @@ function createCharacter(id: string) {
 		get inventory_consumables() {
 			return inventory_consumables;
 		},
+		get derived_beastform() {
+			return derived_beastform;
+		},
 
 		// derived stats
 		get domain_card_vault() {
@@ -3100,6 +3567,7 @@ function createCharacter(id: string) {
 		destroy,
 		level_to_tier,
 		tier_to_min_level,
+		get_available_beastforms,
 
 		// inventory helper functions
 		addToInventory,

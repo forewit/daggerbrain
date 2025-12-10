@@ -1,6 +1,6 @@
 import type { AdventuringGear, DamageTypes, DomainIds, Ranges } from '$lib/types/compendium-types';
 import { z } from 'zod';
-import { characters_table_schema } from '../server/db/characters.schema';
+import { characters_table_schema, ChosenBeastformSchema } from '../server/db/characters.schema';
 import type { LevelUpChoice } from './rule-types';
 
 // ============================================================================
@@ -87,13 +87,7 @@ export type Inventory = {
 	gold_coins: number;
 };
 
-export type ChosenBeastform = {
-	compendium_id: string;
-	choices: Record<string, string[]>;
-	// customizations
-	custom_title: string | null;
-	custom_level_requirement: number | null;
-}
+export type ChosenBeastform = z.infer<typeof ChosenBeastformSchema>;
 
 export type DerivedDescriptors = {
 	ancestry_name: string;

@@ -6,6 +6,21 @@
 
 	const context = getCharacterContext();
 	let evasion = $derived(context.evasion);
+	let derivedBeastform = $derived(context.derived_beastform);
+	let character = $derived(context.character);
+	
+	let displayEvasion = $derived.by(() => {
+		if (derivedBeastform && derivedBeastform.evasion_bonus !== 0 && character?.chosen_beastform?.apply_beastform_bonuses) {
+			return evasion + derivedBeastform.evasion_bonus;
+		}
+		return evasion;
+	});
+	
+	let hasBeastformBonus = $derived(
+		derivedBeastform !== null && 
+		derivedBeastform.evasion_bonus !== 0 && 
+		character?.chosen_beastform?.apply_beastform_bonuses === true
+	);
 </script>
 
 <div class={cn('relative text-center', className)}>
@@ -60,10 +75,10 @@
 			style="stroke-width: 0.1;"
 		/>
 	</svg>
-	<p class="absolute top-5 left-1/2 -translate-x-1/2 text-2xl font-bold">
-		{evasion}
+	<p class={cn("absolute top-5 left-1/2 -translate-x-1/2 text-2xl font-bold", hasBeastformBonus && "text-accent")}>
+		{displayEvasion}
 	</p>
-	<p class="absolute bottom-[9.5px] left-1/2 -translate-x-1/2 text-[11px] leading-none font-medium">
+	<p class={cn("absolute bottom-[9.5px] left-1/2 -translate-x-1/2 text-[11px] leading-none font-medium", hasBeastformBonus && "text-accent")}>
 		EVASION
 	</p>
 </div>

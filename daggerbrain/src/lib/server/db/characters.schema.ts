@@ -19,6 +19,7 @@ import type {
 import { CHARACTER_DEFAULTS } from '../../types/constants';
 import { DomainIdsSchema } from '../../compendium/compendium-schemas';
 import type { ConditionIds } from '$lib/types/rule-types';
+import { z } from 'zod';
 
 export const characters_table = sqliteTable('characters_table', {
 	// core
@@ -155,12 +156,23 @@ export const characters_table = sqliteTable('characters_table', {
 		.$type<LevelUpChoices>()
 });
 
+export const ChosenBeastformSchema = z.object({
+	apply_beastform_bonuses: z.boolean(),
+	compendium_id: z.string(),
+	choices: z.record(z.string(), z.array(z.string())),
+	custom_title: z.string().nullable(),
+	custom_level_requirement: z.number().nullable()
+});
+
 export const characters_table_schema = createSelectSchema(characters_table, {
-	secondary_class_domain_id_choice: DomainIdsSchema.nullable()
+	secondary_class_domain_id_choice: DomainIdsSchema.nullable(),
+	chosen_beastform: ChosenBeastformSchema.nullable()
 });
 export const characters_table_insert_schema = createInsertSchema(characters_table, {
-	secondary_class_domain_id_choice: DomainIdsSchema.nullable()
+	secondary_class_domain_id_choice: DomainIdsSchema.nullable(),
+	chosen_beastform: ChosenBeastformSchema.nullable()
 });
 export const characters_table_update_schema = createUpdateSchema(characters_table, {
-	secondary_class_domain_id_choice: DomainIdsSchema.nullable()
+	secondary_class_domain_id_choice: DomainIdsSchema.nullable(),
+	chosen_beastform: ChosenBeastformSchema.nullable()
 });

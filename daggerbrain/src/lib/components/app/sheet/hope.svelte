@@ -14,7 +14,7 @@
 			onclick={() => {
 				character.marked_hope = 0;
 			}}
-			class="text-sm font-medium text-accent">HOPE</button
+			class="w-min mx-auto text-sm font-medium text-accent">HOPE</button
 		>
 		<div class="mb-2 flex flex-wrap justify-center gap-4">
 			{#each Array(context.max_hope) as _, index}

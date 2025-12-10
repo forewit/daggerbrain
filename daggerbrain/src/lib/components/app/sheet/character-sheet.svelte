@@ -78,6 +78,11 @@
 		sheetOpen = true;
 	}
 
+	function openBeastformCatalog() {
+		sheetContent = { type: 'beastform-catalog' };
+		sheetOpen = true;
+	}
+
 	let { class: className = '' }: { class?: string } = $props();
 
 	const context = getCharacterContext();
@@ -264,6 +269,7 @@
 				onAdventuringGearClick={openAdventuringGearSheet}
 				onExperienceClick={openExperienceSheet}
 				onAddItems={openCatalogSheet}
+				onBeastformCatalogClick={openBeastformCatalog}
 			/>
 		</div>
 

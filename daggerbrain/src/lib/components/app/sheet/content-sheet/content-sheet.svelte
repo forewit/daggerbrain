@@ -11,6 +11,7 @@
 					| 'catalog'
 					| 'domain-card-catalog'
 					| 'heritage-card-catalog'
+					| 'beastform-catalog'
 					| 'conditions'
 					| 'death-move'
 					| 'downtime';
@@ -30,6 +31,7 @@
 	import CatalogContent from './catalog-content.svelte';
 	import DomainCardContent from './domain-card-content.svelte';
 	import HeritageCardContent from './heritage-card-content.svelte';
+	import BeastformContent from './beastform-content.svelte';
 	import DeathMoveContent from './death-move-content.svelte';
 	import DowntimeContent from './downtime-content.svelte';
 
@@ -64,6 +66,8 @@
 			<DomainCardContent />
 		{:else if content?.type === 'heritage-card-catalog'}
 			<HeritageCardContent />
+		{:else if content?.type === 'beastform-catalog'}
+			<BeastformContent />
 		{:else if content?.type === 'death-move'}
 			<DeathMoveContent />
 		{:else if content?.type === 'downtime'}

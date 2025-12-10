@@ -13,13 +13,15 @@
 		onItemClick = () => {},
 		onAdventuringGearClick = () => {},
 		onExperienceClick = () => {},
-		onAddItems = () => {}
+		onAddItems = () => {},
+		onBeastformCatalogClick = () => {}
 	}: {
 		class?: string;
 		onItemClick?: (type: 'weapon' | 'armor' | 'consumable' | 'loot', id: string) => void;
 		onAdventuringGearClick?: () => void;
 		onExperienceClick?: () => void;
 		onAddItems?: () => void;
+		onBeastformCatalogClick?: () => void;
 	} = $props();
 
 	let tab = $state<'weapons' | 'features' | 'experiences' | 'inventory' | 'background' | 'notes'>(
@@ -44,7 +46,7 @@
 			<ActiveEquipment {onItemClick} />
 		</Tabs.Content>
 		<Tabs.Content value="features" class="px-4">
-			<ClassFeatures />
+			<ClassFeatures {onBeastformCatalogClick} />
 		</Tabs.Content>
 		<Tabs.Content value="experiences">
 			<Experiences {onExperienceClick} />
