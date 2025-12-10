@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import type { Class, DomainIds } from '$lib/types/compendium-types';
+	import type { CharacterClass, DomainIds } from '$lib/types/compendium-types';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 
-	let { class: className = '', character_class }: { class?: string; character_class: Class } =
+	let { class: className = '', character_class }: { class?: string; character_class: CharacterClass } =
 		$props();
 
 	const compendium = getCompendiumContext();

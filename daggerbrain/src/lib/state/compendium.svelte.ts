@@ -1,7 +1,8 @@
 import type {
 	AncestryCard,
 	Armor,
-	Class,
+	Beastform,
+	CharacterClass,
 	CommunityCard,
 	Consumable,
 	Domain,
@@ -20,6 +21,7 @@ import {
 	get_all_transformation_cards
 } from '$lib/remote/heritages.remote';
 import { get_all_classes, get_all_subclasses } from '$lib/remote/classes.remote';
+import { get_all_beastforms } from '$lib/remote/beastforms.remote';
 import { get_all_domains, get_domain_cards } from '$lib/remote/domains.remote';
 import {
 	get_all_armor,
@@ -34,7 +36,8 @@ function createCompendium() {
 	let ancestry_cards: Record<string, AncestryCard> = $state({});
 	let community_cards: Record<string, CommunityCard> = $state({});
 	let transformation_cards: Record<string, TransformationCard> = $state({});
-	let classes: Record<string, Class> = $state({});
+	let beastforms: Record<string, Beastform> = $state({});
+	let classes: Record<string, CharacterClass> = $state({});
 	let subclasses: Record<string, Subclass> = $state({});
 	let domains: Record<string, Domain> = $state({});
 	let domain_cards: Record<DomainIds, Record<string, DomainCard>> = $state({
@@ -86,6 +89,9 @@ function createCompendium() {
 	});
 	fetchWithRetry(get_all_transformation_cards, (r) => {
 		transformation_cards = r;
+	});
+	fetchWithRetry(get_all_beastforms, (r) => {
+		beastforms = r;
 	});
 	fetchWithRetry(get_all_classes, (r) => {
 		classes = r;
@@ -146,6 +152,9 @@ function createCompendium() {
 		},
 		get transformation_cards() {
 			return transformation_cards;
+		},
+		get beastforms() {
+			return beastforms;
 		},
 		get classes() {
 			return classes;

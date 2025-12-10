@@ -27,7 +27,8 @@ import type {
 	LootSchema,
 	ConsumableSchema,
 	SourcesSchema,
-	AncestryCardChoiceSchema
+	AncestryCardChoiceSchema,
+	BeastformSchema
 } from '$lib/compendium/compendium-schemas';
 import type { z } from 'zod';
 
@@ -58,7 +59,14 @@ export type SubclassFoundationCard = z.infer<typeof SubclassFoundationCardSchema
 export type SubclassSpecializationCard = z.infer<typeof SubclassSpecializationCardSchema>;
 export type SubclassMasteryCard = z.infer<typeof SubclassMasteryCardSchema>;
 export type Subclass = z.infer<typeof SubclassSchema>;
-export type Class = z.infer<typeof ClassSchema>;
+export type CharacterClass = z.infer<typeof ClassSchema>;
+
+
+// ============================================================================
+// Beastforms
+// ============================================================================
+
+export type Beastform = z.infer<typeof BeastformSchema>;
 
 // ============================================================================
 // Domains

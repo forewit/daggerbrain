@@ -51,6 +51,12 @@ export const SourcesSchema = z.object({
 	short_title: z.string()
 });
 
+export const RangesSchema = z.enum(['Melee', 'Very Close', 'Close', 'Far', 'Very Far']);
+
+export const WeaponCategoriesSchema = z.enum(['Primary', 'Secondary', 'Unarmed']);
+
+export const DamageTypesSchema = z.enum(['phy', 'mag']);
+
 export const AdventuringGearSchema = z.object({
 	title: z.string()
 });
@@ -284,6 +290,32 @@ export const ClassSchema = z.object({
 });
 
 // ============================================================================
+// Beastforms
+// ============================================================================
+
+export const BeastformSchema = z.object({
+	compendium_id: z.string(),
+	source_id: SourceIdsSchema,
+	level_requirement: z.number(),
+	name: z.string(),
+	category: z.string(),
+	character_trait: z.object({
+		trait: TraitIdsSchema,
+		bonus: z.number()
+	}),
+	attack: z.object({
+		range: RangesSchema,
+		trait: TraitIdsSchema,
+		damage_dice: z.string(),
+		damage_bonus: z.number(),
+		damage_type: DamageTypesSchema
+	}),
+	advantages: z.array(z.string()),
+	evasion_bonus: z.number(),
+	features: z.array(FeatureSchema),
+});
+
+// ============================================================================
 // Domains
 // ============================================================================
 
@@ -418,12 +450,6 @@ export const TransformationCardSchema = z.object({
 // ============================================================================
 // Equipment (Weapons, Armor, Loot, Consumables, Adventuring Gear)
 // ============================================================================
-
-export const RangesSchema = z.enum(['Melee', 'Very Close', 'Close', 'Far', 'Very Far']);
-
-export const WeaponCategoriesSchema = z.enum(['Primary', 'Secondary', 'Unarmed']);
-
-export const DamageTypesSchema = z.enum(['phy', 'mag']);
 
 export const WeaponSchema = z.object({
 	compendium_id: z.string(),

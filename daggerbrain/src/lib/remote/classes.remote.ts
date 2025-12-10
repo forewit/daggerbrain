@@ -3,7 +3,7 @@ import { error } from '@sveltejs/kit';
 import { z } from 'zod';
 import { get_kv, get_auth } from './utils';
 import { ClassSchema, SubclassSchema } from '$lib/compendium/compendium-schemas';
-import type { Class, Subclass } from '$lib/types/compendium-types';
+import type { CharacterClass, Subclass } from '$lib/types/compendium-types';
 
 export const get_all_classes = query(async () => {
 	console.log('get_all_classes');
@@ -12,7 +12,7 @@ export const get_all_classes = query(async () => {
 	get_auth(event); // Validates authentication
 	const kv = get_kv(event);
 
-	const classesData = (await kv.get('classes', 'json')) as Record<string, Class> | null;
+	const classesData = (await kv.get('classes', 'json')) as Record<string, CharacterClass> | null;
 
 	if (!classesData) {
 		throw error(404, 'Classes not found in KV');
@@ -24,7 +24,7 @@ export const get_all_classes = query(async () => {
 			acc[key] = ClassSchema.parse(classData);
 			return acc;
 		},
-		{} as Record<string, Class>
+		{} as Record<string, CharacterClass>
 	);
 
 	return validatedClasses;

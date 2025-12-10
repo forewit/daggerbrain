@@ -1,4 +1,4 @@
-import type { Class } from '$lib/types/compendium-types';
+import type { CharacterClass } from '$lib/types/compendium-types';
 
 export const CLASSES = {
 	assassin: {
@@ -889,4 +889,4 @@ export const CLASSES = {
 			attitude: 'an eccentric, a librarian, a lit fuse, a philosopher, a professor'
 		}
 	}
-} as const satisfies Record<string, Class>;
+} as const satisfies Record<string, CharacterClass>;

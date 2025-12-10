@@ -7,10 +7,11 @@ import type {
 	CharacterDescriptions,
 	LevelUpChoices,
 	LevelUpDomainCardIds,
-	Inventory
+	Inventory,
+	ChosenBeastform
 } from '$lib/types/character-types';
 import type { ConditionIds, LevelUpChoice } from '$lib/types/rule-types';
-import type { CharacterModifier, WeaponModifier, Traits } from './compendium-types';
+import type { Traits } from './compendium-types';
 
 export const BLANK_LEVEL_UP_CHOICE = {
 	option_id: null,
@@ -44,11 +45,15 @@ export const CHARACTER_DEFAULTS = {
 	experiences: <string[]>['', ''],
 
 	// classes
+	class_choices: <Record<string, Record<string, string[]>>>{},
 	primary_class_id: null,
 	primary_subclass_id: null,
 	secondary_class_id: null,
 	secondary_subclass_id: null,
 	secondary_class_domain_id_choice: null,
+
+	// beastform
+	chosen_beastform: <ChosenBeastform | null>null,
 
 	// notes / descriptions
 	background_question_answers: <BackgroundQuestionAnswer[]>[],
@@ -84,8 +89,6 @@ export const CHARACTER_DEFAULTS = {
 	additional_ancestry_card_ids: <string[]>[],
 	additional_community_card_ids: <string[]>[],
 	additional_transformation_card_ids: <string[]>[],
-	additional_character_modifiers: <CharacterModifier[]>[],
-	additional_weapon_modifiers: <WeaponModifier[]>[],
 
 	// ephemeral stats set by the player
 	ancestry_card_choices: <Record<string, string[]>>{},

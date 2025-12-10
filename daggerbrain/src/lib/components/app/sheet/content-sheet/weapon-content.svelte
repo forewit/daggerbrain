@@ -100,7 +100,7 @@
 
 		// Compare range
 		const formRange = customRange === '' ? null : (customRange as Ranges);
-		const savedRange = inventoryItem.range;
+		const savedRange = inventoryItem.custom_range;
 		const rangeMatch =
 			(formRange === null && savedRange === null) ||
 			(formRange !== null && savedRange !== null && formRange === savedRange);
@@ -108,9 +108,9 @@
 		// Compare damage types
 		const formDamageTypes = customDamageTypes.length === 0 ? null : [...customDamageTypes].sort();
 		const savedDamageTypes =
-			inventoryItem.available_damage_types === null
+			inventoryItem.custom_available_damage_types === null
 				? null
-				: [...inventoryItem.available_damage_types].sort();
+				: [...inventoryItem.custom_available_damage_types].sort();
 		const damageTypesMatch =
 			(formDamageTypes === null && savedDamageTypes === null) ||
 			(formDamageTypes !== null &&
@@ -119,7 +119,7 @@
 
 		// Compare burden
 		const formBurden = customBurden === '' ? null : Number(customBurden);
-		const savedBurden = inventoryItem.burden;
+		const savedBurden = inventoryItem.custom_burden;
 		const burdenMatch =
 			(formBurden === null && savedBurden === null) ||
 			(formBurden !== null && savedBurden !== null && formBurden === savedBurden);
@@ -133,9 +133,9 @@
 		return (
 			inventoryItem.custom_title !== null ||
 			inventoryItem.custom_level_requirement !== null ||
-			inventoryItem.range !== null ||
-			inventoryItem.available_damage_types !== null ||
-			inventoryItem.burden !== null
+			inventoryItem.custom_range !== null ||
+			inventoryItem.custom_available_damage_types !== null ||
+			inventoryItem.custom_burden !== null
 		);
 	});
 
@@ -150,12 +150,12 @@
 				// Use the weapon's current tier
 				customTier = '';
 			}
-			customRange = inventoryItem.range === null ? '' : inventoryItem.range;
+			customRange = inventoryItem.custom_range === null ? '' : inventoryItem.custom_range;
 			customDamageTypes =
-				inventoryItem.available_damage_types === null
+				inventoryItem.custom_available_damage_types === null
 					? []
-					: [...inventoryItem.available_damage_types];
-			customBurden = inventoryItem.burden === null ? '' : String(inventoryItem.burden);
+					: [...inventoryItem.custom_available_damage_types];
+			customBurden = inventoryItem.custom_burden === null ? '' : String(inventoryItem.custom_burden);
 		} else {
 			customName = '';
 			customTier = '';
@@ -202,20 +202,20 @@
 		}
 
 		// Update range
-		item.range = customRange === '' ? null : (customRange as Ranges);
+		item.custom_range = customRange === '' ? null : (customRange as Ranges);
 
 		// Update damage types
-		item.available_damage_types = customDamageTypes.length === 0 ? null : [...customDamageTypes];
+		item.custom_available_damage_types = customDamageTypes.length === 0 ? null : [...customDamageTypes];
 
 		// Update burden
 		if (customBurden === '') {
-			item.burden = null;
+			item.custom_burden = null;
 		} else {
 			const burdenNum = Number(customBurden);
 			if (!isNaN(burdenNum) && (burdenNum === 0 || burdenNum === 1 || burdenNum === 2)) {
-				item.burden = burdenNum as 0 | 1 | 2;
+				item.custom_burden = burdenNum as 0 | 1 | 2;
 			} else {
-				item.burden = null;
+				item.custom_burden = null;
 			}
 		}
 	}

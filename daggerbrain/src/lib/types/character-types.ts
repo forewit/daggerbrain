@@ -58,9 +58,9 @@ export type WeaponInventoryItem = {
 	choices: Record<string, string[]>;
 	custom_title: string | null;
 	custom_level_requirement: number | null;
-	range: Ranges | null;
-	available_damage_types: DamageTypes[] | null;
-	burden: 0 | 1 | 2 | null;
+	custom_range: Ranges | null;
+	custom_available_damage_types: DamageTypes[] | null;
+	custom_burden: 0 | 1 | 2 | null;
 };
 
 export type ConsumableInventoryItem = {
@@ -86,6 +86,14 @@ export type Inventory = {
 	adventuring_gear: AdventuringGear[];
 	gold_coins: number;
 };
+
+export type ChosenBeastform = {
+	compendium_id: string;
+	choices: Record<string, string[]>;
+	// customizations
+	custom_title: string | null;
+	custom_level_requirement: number | null;
+}
 
 export type DerivedDescriptors = {
 	ancestry_name: string;

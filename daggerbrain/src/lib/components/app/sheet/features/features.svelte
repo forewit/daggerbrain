@@ -2,7 +2,7 @@
 	import { cn } from '$lib/utils';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { getCharacterContext } from '$lib/state/character.svelte';
-	import ClassFeatures from './class-features.svelte';
+	import ClassFeatures from './class-features/class-features.svelte';
 	import Inventory from './inventory.svelte';
 	import ActiveEquipment from './active-equipment.svelte';
 	import Background from './background.svelte';

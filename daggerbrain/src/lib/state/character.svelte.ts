@@ -19,7 +19,8 @@ import type {
 	DomainCard,
 	Armor,
 	CommunityCard,
-	AncestryCard
+	AncestryCard,
+	Beastform
 } from '$lib/types/compendium-types';
 import { BLANK_LEVEL_UP_CHOICE } from '$lib/types/constants';
 import { update_character } from '$lib/remote/characters.remote';
@@ -141,14 +142,14 @@ function createCharacter(id: string) {
 				if (item.custom_level_requirement !== null) {
 					weapon.level_requirement = item.custom_level_requirement;
 				}
-				if (item.range !== null) {
-					weapon.range = item.range;
+				if (item.custom_range !== null) {
+					weapon.range = item.custom_range;
 				}
-				if (item.available_damage_types !== null) {
-					weapon.available_damage_types = item.available_damage_types;
+				if (item.custom_available_damage_types !== null) {
+					weapon.available_damage_types = item.custom_available_damage_types;
 				}
-				if (item.burden !== null) {
-					weapon.burden = item.burden;
+				if (item.custom_burden !== null) {
+					weapon.burden = item.custom_burden;
 				}
 				return weapon;
 			})
@@ -165,14 +166,14 @@ function createCharacter(id: string) {
 				if (item.custom_level_requirement !== null) {
 					weapon.level_requirement = item.custom_level_requirement;
 				}
-				if (item.range !== null) {
-					weapon.range = item.range;
+				if (item.custom_range !== null) {
+					weapon.range = item.custom_range;
 				}
-				if (item.available_damage_types !== null) {
-					weapon.available_damage_types = item.available_damage_types;
+				if (item.custom_available_damage_types !== null) {
+					weapon.available_damage_types = item.custom_available_damage_types;
 				}
-				if (item.burden !== null) {
-					weapon.burden = item.burden;
+				if (item.custom_burden !== null) {
+					weapon.burden = item.custom_burden;
 				}
 				return weapon;
 			})
@@ -369,10 +370,37 @@ function createCharacter(id: string) {
 	);
 	let spellcast_trait: keyof Traits | null = $state(BASE_STATS.spellcast_trait);
 	let spellcast_roll_bonus: number = $state(BASE_STATS.spellcast_roll_bonus);
+	let derived_beastform: Beastform | null = $state(null);
 
 	// ================================================
 	// CHARACTER VALIDATION EFFECTS
 	// ================================================
+
+	// todo: derive beastform from character.chosen_beastform
+	// ! derive beastform
+	$effect(()=>{
+		if (!character || !character.chosen_beastform) return;
+
+		// -- SPECIAL CASES --
+		// "legendary_beast"
+		// "legendary_hybrid"
+		// "mythic_beast"
+		// "mythic_hybrid"
+
+		// otherwise use the compendium
+
+	})
+
+	// ! clear invalid class choices
+	$effect(()=>{
+		if (!character) return;
+
+		for (const class_id of Object.keys(character.class_choices)) {
+			if (class_id !== character.primary_class_id && class_id !== character.secondary_class_id) {
+				delete character.class_choices[class_id];
+			}
+		}
+	})
 
 	// ! clear invalid mixed-ancestry
 	$effect(() => {
@@ -1507,10 +1535,6 @@ function createCharacter(id: string) {
 				push_weapon_modifiers(f.weapon_modifiers);
 			});
 		});
-
-		// additional modifiers
-		push_character_modifiers(character.additional_character_modifiers);
-		push_weapon_modifiers(character.additional_weapon_modifiers);
 
 		// categorize by behavior
 		base_character_modifiers = all_character_modifiers.filter((m) => m.behaviour === 'base');
@@ -2709,9 +2733,9 @@ function createCharacter(id: string) {
 				choices: {},
 				custom_title: null,
 				custom_level_requirement: null,
-				range: null,
-				available_damage_types: null,
-				burden: null
+				custom_range: null,
+				custom_available_damage_types: null,
+				custom_burden: null
 			};
 		} else if (type === 'secondary_weapon') {
 			const uniqueId = crypto.randomUUID();
@@ -2721,9 +2745,9 @@ function createCharacter(id: string) {
 				choices: {},
 				custom_title: null,
 				custom_level_requirement: null,
-				range: null,
-				available_damage_types: null,
-				burden: null
+				custom_range: null,
+				custom_available_damage_types: null,
+				custom_burden: null
 			};
 		} else if (type === 'armor') {
 			const uniqueId = crypto.randomUUID();

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Banner from '$lib/components/app/cards/class-banner.svelte';
-	import type { Class, DomainIds } from '$lib/types/compendium-types';
+	import type { CharacterClass, DomainIds } from '$lib/types/compendium-types';
 	import { cn } from '$lib/utils';
 	import type { Snippet } from 'svelte';
 	import * as Select from '$lib/components/ui/select/';
@@ -16,7 +16,7 @@
 		domain_id_selection = $bindable(null),
 		hide_starting_stats = false
 	}: {
-		character_class: Class;
+		character_class: CharacterClass;
 		class?: string;
 		bannerClasses?: string;
 		children?: Snippet;

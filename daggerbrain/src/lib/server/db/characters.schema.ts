@@ -9,13 +9,12 @@ import type {
 	LevelUpChoices,
 	DomainCardId,
 	CharacterDescriptions,
-	Inventory
+	Inventory,
+	ChosenBeastform
 } from '../../types/character-types';
 import type {
-	CharacterModifier,
 	DomainIds,
-	Traits,
-	WeaponModifier
+	Traits
 } from '../../types/compendium-types';
 import { CHARACTER_DEFAULTS } from '../../types/constants';
 import { DomainIdsSchema } from '../../compendium/compendium-schemas';
@@ -49,11 +48,20 @@ export const characters_table = sqliteTable('characters_table', {
 		.$type<string[]>(),
 
 	// classes
+	class_choices: text('class_choices', { mode: 'json' })
+		.notNull()
+		.default(CHARACTER_DEFAULTS.class_choices)
+		.$type<Record<string, Record<string, string[]>>>(),
 	primary_class_id: text('primary_class_id'),
 	primary_subclass_id: text('primary_subclass_id'),
 	secondary_class_id: text('secondary_class_id'),
 	secondary_subclass_id: text('secondary_subclass_id'),
 	secondary_class_domain_id_choice: text('secondary_class_domain_id_choice').$type<DomainIds>(),
+
+	// beastforms
+	chosen_beastform: text('chosen_beastform', { mode: 'json' })
+		.default(CHARACTER_DEFAULTS.chosen_beastform)
+		.$type<ChosenBeastform | null>(),
 
 	// notes / descriptions
 	background_question_answers: text('background_questions', { mode: 'json' })
@@ -101,14 +109,6 @@ export const characters_table = sqliteTable('characters_table', {
 		.notNull()
 		.default(CHARACTER_DEFAULTS.additional_transformation_card_ids)
 		.$type<string[]>(),
-	additional_character_modifiers: text('additional_character_modifiers', { mode: 'json' })
-		.notNull()
-		.default(CHARACTER_DEFAULTS.additional_character_modifiers)
-		.$type<CharacterModifier[]>(),
-	additional_weapon_modifiers: text('additional_weapon_modifiers', { mode: 'json' })
-		.notNull()
-		.default(CHARACTER_DEFAULTS.additional_weapon_modifiers)
-		.$type<WeaponModifier[]>(),
 
 	// ephemeral stats set by the player
 	unarmed_attack_choices: text('unarmed_attack_choices', { mode: 'json' })

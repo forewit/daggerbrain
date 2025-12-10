@@ -84,9 +84,9 @@
 </script>
 
 <Sheet.Header>
-	<Sheet.Title>Customize Your Heritage</Sheet.Title>
+	<Sheet.Title>Customize Your Character Cards</Sheet.Title>
 	<Sheet.Description class="text-xs italic"
-		>Manually add heritage cards (Ancestry, Community, or Transformation) to your character.</Sheet.Description
+		>Manually add Ancestry, Community, or Transformation to your character.</Sheet.Description
 	>
 </Sheet.Header>
 
@@ -120,7 +120,7 @@
 
 	<!-- Heritage Card Catalog -->
 	<div class="flex flex-col gap-2">
-		<h3 class="text-sm font-medium">Browse Heritage Cards</h3>
+		<h3 class="text-sm font-medium">Browse Character Cards</h3>
 		<HeritageCardCatalog onCardClick={handleCardClick} />
 	</div>
 </div>

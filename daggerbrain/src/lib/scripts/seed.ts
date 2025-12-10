@@ -19,6 +19,7 @@ import { tmpdir } from 'node:os';
 // Import all compendium data for KV seeding
 import { CLASSES } from '../compendium/classes/classes.js';
 import { SUBCLASSES } from '../compendium/classes/subclasses.js';
+import { BEASTFORMS } from '../compendium/beastforms/beastforms.js';
 import { DOMAINS } from '../compendium/domains/domains.js';
 import { ARCANA_DOMAIN_CARDS } from '../compendium/domains/arcana-cards.js';
 import { BLADE_DOMAIN_CARDS } from '../compendium/domains/blade-cards.js';
@@ -85,6 +86,7 @@ const DOMAIN_CARDS_MAP: Record<string, unknown> = {
 const DATA_MAP: Record<string, unknown> = {
 	classes: CLASSES,
 	subclasses: SUBCLASSES,
+	beastforms: BEASTFORMS,
 	domains: DOMAINS,
 	armor: ALL_ARMOR,
 	consumables: ALL_CONSUMABLES,
