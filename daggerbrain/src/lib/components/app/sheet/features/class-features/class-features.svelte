@@ -4,18 +4,28 @@
 	import BardFeatures from './bard-features.svelte';
 	import type { CharacterClass } from '$lib/types/compendium-types';
 	import GuardianFeatures from './guardian-features.svelte';
+	import SeraphFeatures from './seraph-features.svelte';
+	import WizardFeatures from './wizard-features.svelte';
+	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 
+	const compendium = getCompendiumContext();
 	const context = getCharacterContext();
 	const primary_class = $derived(context.primary_class);
 	const secondary_class = $derived(context.secondary_class);
 </script>
 
 {#snippet class_features(character_class: CharacterClass | null)}
-	{#if character_class?.compendium_id === 'bard'}
+	{#if character_class?.compendium_id === compendium.classes.bard.compendium_id}
 		<BardFeatures />
 	{/if}
-	{#if character_class?.compendium_id === 'guardian'}
+	{#if character_class?.compendium_id === compendium.classes.guardian.compendium_id}
 		<GuardianFeatures />
+	{/if}
+	{#if character_class?.compendium_id === compendium.classes.seraph.compendium_id}
+		<SeraphFeatures />
+	{/if}
+	{#if character_class?.compendium_id === compendium.classes.wizard.compendium_id}
+		<WizardFeatures />
 	{/if}
 	{#each character_class?.class_features as feature}
 		<div class="relative text-sm">

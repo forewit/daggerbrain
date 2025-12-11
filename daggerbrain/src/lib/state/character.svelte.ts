@@ -371,7 +371,6 @@ function createCharacter(id: string) {
 	let experience_modifiers: number[] = $state(
 		Array.from({ length: BASE_STATS.max_experiences }, () => BASE_STATS.experience_modifier)
 	);
-	let spellcast_trait: keyof Traits | null = $state(BASE_STATS.spellcast_trait);
 	let spellcast_roll_bonus: number = $state(BASE_STATS.spellcast_roll_bonus);
 	let derived_beastform: Beastform | null = $state(null);
 	let derived_companion: Companion | null = $state(null);
@@ -3686,9 +3685,6 @@ function createCharacter(id: string) {
 		},
 		get secondary_class_mastery_level() {
 			return secondary_class_mastery_level;
-		},
-		get spellcast_trait() {
-			return spellcast_trait;
 		},
 		get spellcast_roll_bonus() {
 			return spellcast_roll_bonus;
