@@ -65,8 +65,8 @@
 					</td>
 				</tr>
 				<tr class="border-b">
-					<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Attack</th>
-					<td class="py-2 text-right text-nowrap">
+					<th class="py-3 pr-4 text-left font-normal text-muted-foreground">Attack</th>
+					<td class="py-3 text-right text-nowrap">
 						<span class="capitalize">{beastform.attack.trait}</span>
 						<span> {beastform.attack.range}</span>
 						<span class="ml-1 rounded-full border bg-foreground/5 px-2 py-1 text-xs text-nowrap">

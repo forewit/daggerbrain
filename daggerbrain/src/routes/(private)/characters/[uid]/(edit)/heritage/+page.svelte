@@ -11,6 +11,7 @@
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import { BASE_MIXED_ANCESTRY_CARD } from '$lib/types/rules.js';
+	import { SOURCES } from '$lib/compendium/sources/sources.js';
 
 	let { data } = $props();
 
@@ -89,11 +90,12 @@
 				</div>
 			</Dropdown>
 
+			{#if character.settings.void_enabled}
 			<Dropdown
 				highlighted={!character.transformation_card_id}
 				title="Transformation"
 				subtitle={context.transformation_card?.title
-					? context.transformation_card?.title + ' • Void 1.5'
+					? context.transformation_card?.title + ' • ' + SOURCES[context.transformation_card?.source_id].short_title
 					: ''}
 			>
 				<div class="flex flex-col gap-4">
@@ -124,6 +126,7 @@
 					</div>
 				</div>
 			</Dropdown>
+			{/if}
 		</div>
 	</div>
 

@@ -3,7 +3,7 @@
 
 	let { children, data } = $props();
 
-	setCharacterContext(data.uid);
+	const context = setCharacterContext(data.uid);
 </script>
 
 {@render children?.()}
