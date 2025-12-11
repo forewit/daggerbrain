@@ -4,7 +4,6 @@
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import * as Select from '$lib/components/ui/select/';
-	import Switch from '$lib/components/ui/switch/switch.svelte';
 	import { capitalize, cn, applyProficiencyToDice } from '$lib/utils';
 
 	let {
@@ -38,7 +37,9 @@
 	);
 </script>
 
-<div class={cn('flex max-w-[calc(min(100%,400px))] flex-col gap-4 rounded bg-card/50 p-2', className)}>
+<div
+	class={cn('flex max-w-[calc(min(100%,400px))] flex-col gap-4 rounded bg-card/50 p-3', className)}
+>
 	<div class="flex flex-wrap gap-2">
 		<!-- Header with Name and Category -->
 		<div class=" flex grow items-center justify-between gap-1">
@@ -52,12 +53,7 @@
 				<tr class="border-b">
 					<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Bonus</th>
 					<td class="py-2 text-right">
-						<label
-							class={cn(
-								'flex cursor-pointer items-center justify-end gap-1',
-								character?.chosen_beastform?.apply_beastform_bonuses && 'text-accent'
-							)}
-						>
+						<div class="flex items-center justify-end gap-1">
 							<span class="capitalize">{beastform.character_trait.trait}</span>
 							<span
 								>{beastform.character_trait.bonus < 0 ? '' : '+'}{beastform.character_trait
@@ -65,12 +61,7 @@
 							>
 							Evasion
 							<span>{beastform.evasion_bonus < 0 ? '' : '+'}{beastform.evasion_bonus}</span>
-							{#if character?.chosen_beastform?.compendium_id === beastform.compendium_id}
-								<span class="ml-2 inline-flex items-center">
-									<Switch bind:checked={character.chosen_beastform.apply_beastform_bonuses} />
-								</span>
-							{/if}
-						</label>
+						</div>
 					</td>
 				</tr>
 				<tr class="border-b">
@@ -79,10 +70,9 @@
 						<span class="capitalize">{beastform.attack.trait}</span>
 						<span> {beastform.attack.range}</span>
 						<span class="ml-1 rounded-full border bg-foreground/5 px-2 py-1 text-xs text-nowrap">
-							{damageDiceWithProficiency}
-							{#if beastform.attack.damage_bonus > 0}
-								{beastform.attack.damage_bonus < 0 ? '' : '+'}{beastform.attack.damage_bonus}
-							{/if}
+							{damageDiceWithProficiency +
+								(beastform.attack.damage_bonus < 0 ? '' : '+' + beastform.attack.damage_bonus)}
+
 							<span class="lowercase">{beastform.attack.damage_type}</span>
 						</span>
 					</td>
@@ -98,7 +88,7 @@
 		<!-- Features -->
 		{#if beastform.features.length > 0}
 			{#each beastform.features as feature}
-				<p class="mb-2 text-xs text-muted-foreground">
+				<p class="text-xs text-muted-foreground">
 					<span class="font-medium text-foreground">{feature.title}:</span>
 					{@html feature.description_html}
 				</p>
@@ -181,7 +171,9 @@
 							{base_forms.length === 0
 								? 'Select base forms (2 max)'
 								: base_forms
-										.map((id) => available_forms.find((f) => f.compendium_id === id)?.name || 'Unknown')
+										.map(
+											(id) => available_forms.find((f) => f.compendium_id === id)?.name || 'Unknown'
+										)
 										.join(', ')}
 							{#if base_forms.length < 2}
 								<span class="text-muted-foreground">
@@ -244,8 +236,10 @@
 					{@const ids = advantage_name_to_ids.get(adv.label) || []}
 					{@const _unused = advantage_name_to_ids.set(adv.label, [...ids, adv.id])}
 				{/each}
-				{@const selected_advantages_0 = character.chosen_beastform.choices.legendary_hybrid_base_forms_0_advantages || []}
-				{@const selected_advantages_1 = character.chosen_beastform.choices.legendary_hybrid_base_forms_1_advantages || []}
+				{@const selected_advantages_0 =
+					character.chosen_beastform.choices.legendary_hybrid_base_forms_0_advantages || []}
+				{@const selected_advantages_1 =
+					character.chosen_beastform.choices.legendary_hybrid_base_forms_1_advantages || []}
 				{@const combined_advantage_selections = [
 					...selected_advantages_0.map((i) => `0_${i}`),
 					...selected_advantages_1.map((i) => `1_${i}`)
@@ -264,8 +258,10 @@
 						label: feat.title
 					}))
 				]}
-				{@const selected_features_0 = character.chosen_beastform.choices.legendary_hybrid_base_forms_0_features || []}
-				{@const selected_features_1 = character.chosen_beastform.choices.legendary_hybrid_base_forms_1_features || []}
+				{@const selected_features_0 =
+					character.chosen_beastform.choices.legendary_hybrid_base_forms_0_features || []}
+				{@const selected_features_1 =
+					character.chosen_beastform.choices.legendary_hybrid_base_forms_1_features || []}
 				{@const combined_feature_selections = [
 					...selected_features_0.map((i) => `0_${i}`),
 					...selected_features_1.map((i) => `1_${i}`)
@@ -314,8 +310,10 @@
 									class="justify-center text-destructive"
 									onclick={() => {
 										if (character?.chosen_beastform) {
-											character.chosen_beastform.choices.legendary_hybrid_base_forms_0_advantages = [];
-											character.chosen_beastform.choices.legendary_hybrid_base_forms_1_advantages = [];
+											character.chosen_beastform.choices.legendary_hybrid_base_forms_0_advantages =
+												[];
+											character.chosen_beastform.choices.legendary_hybrid_base_forms_1_advantages =
+												[];
 										}
 									}}
 								>
@@ -323,7 +321,9 @@
 								</Select.Item>
 								{#each all_advantages as adv}
 									{@const ids_for_advantage = advantage_name_to_ids.get(adv.label) || []}
-									{@const is_selected = ids_for_advantage.some((id) => combined_advantage_selections.includes(id))}
+									{@const is_selected = ids_for_advantage.some((id) =>
+										combined_advantage_selections.includes(id)
+									)}
 									<Select.Item
 										value={adv.id}
 										disabled={combined_advantage_selections.length >= 4 && !is_selected}
@@ -378,8 +378,10 @@
 									class="justify-center text-destructive"
 									onclick={() => {
 										if (character?.chosen_beastform) {
-											character.chosen_beastform.choices.legendary_hybrid_base_forms_0_features = [];
-											character.chosen_beastform.choices.legendary_hybrid_base_forms_1_features = [];
+											character.chosen_beastform.choices.legendary_hybrid_base_forms_0_features =
+												[];
+											character.chosen_beastform.choices.legendary_hybrid_base_forms_1_features =
+												[];
 										}
 									}}
 								>
@@ -390,7 +392,8 @@
 									{#each base_form_0.features as feat, i}
 										<Select.Item
 											value={`0_${i}`}
-											disabled={combined_feature_selections.length >= 2 && !combined_feature_selections.includes(`0_${i}`)}
+											disabled={combined_feature_selections.length >= 2 &&
+												!combined_feature_selections.includes(`0_${i}`)}
 										>
 											{feat.title}
 										</Select.Item>
@@ -401,7 +404,8 @@
 									{#each base_form_1.features as feat, i}
 										<Select.Item
 											value={`1_${i}`}
-											disabled={combined_feature_selections.length >= 2 && !combined_feature_selections.includes(`1_${i}`)}
+											disabled={combined_feature_selections.length >= 2 &&
+												!combined_feature_selections.includes(`1_${i}`)}
 										>
 											{feat.title}
 										</Select.Item>
@@ -481,7 +485,9 @@
 							{base_forms.length === 0
 								? 'Select base forms (3 max)'
 								: base_forms
-										.map((id) => available_forms.find((f) => f.compendium_id === id)?.name || 'Unknown')
+										.map(
+											(id) => available_forms.find((f) => f.compendium_id === id)?.name || 'Unknown'
+										)
 										.join(', ')}
 							{#if base_forms.length < 3}
 								<span class="text-muted-foreground">
@@ -550,9 +556,12 @@
 					{@const ids = advantage_name_to_ids.get(adv.label) || []}
 					{@const _unused = advantage_name_to_ids.set(adv.label, [...ids, adv.id])}
 				{/each}
-				{@const selected_advantages_0 = character.chosen_beastform.choices.mythic_hybrid_base_forms_0_advantages || []}
-				{@const selected_advantages_1 = character.chosen_beastform.choices.mythic_hybrid_base_forms_1_advantages || []}
-				{@const selected_advantages_2 = character.chosen_beastform.choices.mythic_hybrid_base_forms_2_advantages || []}
+				{@const selected_advantages_0 =
+					character.chosen_beastform.choices.mythic_hybrid_base_forms_0_advantages || []}
+				{@const selected_advantages_1 =
+					character.chosen_beastform.choices.mythic_hybrid_base_forms_1_advantages || []}
+				{@const selected_advantages_2 =
+					character.chosen_beastform.choices.mythic_hybrid_base_forms_2_advantages || []}
 				{@const combined_advantage_selections = [
 					...selected_advantages_0.map((i) => `0_${i}`),
 					...selected_advantages_1.map((i) => `1_${i}`),
@@ -578,9 +587,12 @@
 						label: feat.title
 					}))
 				]}
-				{@const selected_features_0 = character.chosen_beastform.choices.mythic_hybrid_base_forms_0_features || []}
-				{@const selected_features_1 = character.chosen_beastform.choices.mythic_hybrid_base_forms_1_features || []}
-				{@const selected_features_2 = character.chosen_beastform.choices.mythic_hybrid_base_forms_2_features || []}
+				{@const selected_features_0 =
+					character.chosen_beastform.choices.mythic_hybrid_base_forms_0_features || []}
+				{@const selected_features_1 =
+					character.chosen_beastform.choices.mythic_hybrid_base_forms_1_features || []}
+				{@const selected_features_2 =
+					character.chosen_beastform.choices.mythic_hybrid_base_forms_2_features || []}
 				{@const combined_feature_selections = [
 					...selected_features_0.map((i) => `0_${i}`),
 					...selected_features_1.map((i) => `1_${i}`),
@@ -645,7 +657,9 @@
 								</Select.Item>
 								{#each all_advantages as adv}
 									{@const ids_for_advantage = advantage_name_to_ids.get(adv.label) || []}
-									{@const is_selected = ids_for_advantage.some((id) => combined_advantage_selections.includes(id))}
+									{@const is_selected = ids_for_advantage.some((id) =>
+										combined_advantage_selections.includes(id)
+									)}
 									<Select.Item
 										value={adv.id}
 										disabled={combined_advantage_selections.length >= 5 && !is_selected}
@@ -718,7 +732,8 @@
 									{#each base_form_0.features as feat, i}
 										<Select.Item
 											value={`0_${i}`}
-											disabled={combined_feature_selections.length >= 3 && !combined_feature_selections.includes(`0_${i}`)}
+											disabled={combined_feature_selections.length >= 3 &&
+												!combined_feature_selections.includes(`0_${i}`)}
 										>
 											{feat.title}
 										</Select.Item>
@@ -729,7 +744,8 @@
 									{#each base_form_1.features as feat, i}
 										<Select.Item
 											value={`1_${i}`}
-											disabled={combined_feature_selections.length >= 3 && !combined_feature_selections.includes(`1_${i}`)}
+											disabled={combined_feature_selections.length >= 3 &&
+												!combined_feature_selections.includes(`1_${i}`)}
 										>
 											{feat.title}
 										</Select.Item>
@@ -740,7 +756,8 @@
 									{#each base_form_2.features as feat, i}
 										<Select.Item
 											value={`2_${i}`}
-											disabled={combined_feature_selections.length >= 3 && !combined_feature_selections.includes(`2_${i}`)}
+											disabled={combined_feature_selections.length >= 3 &&
+												!combined_feature_selections.includes(`2_${i}`)}
 										>
 											{feat.title}
 										</Select.Item>

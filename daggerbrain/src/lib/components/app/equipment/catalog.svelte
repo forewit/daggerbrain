@@ -272,19 +272,6 @@
 		{:else}
 			{#each filteredItems as entry (entry.item.compendium_id)}
 				{#if entry.type === 'weapon'}
-					{#snippet subtitle_snippet()}
-						<Button
-							size="sm"
-							onclick={(e) => {
-								e.stopPropagation();
-								context.addToInventory(
-									entry.item,
-									entry.item.category === 'Primary' ? 'primary_weapon' : 'secondary_weapon'
-								);
-							}}>Add</Button
-						>
-					{/snippet}
-
 					{#snippet title_snippet()}
 						<div class="gap-4 text-left">
 							<p class="text-md font-medium">{entry.item.title}</p>
@@ -295,20 +282,21 @@
 						</div>
 					{/snippet}
 
-					<Dropdown {title_snippet} {subtitle_snippet} class="border-2">
-						<WeaponDetails weapon={entry.item} />
+					<Dropdown {title_snippet} class="border-2">
+						<div class="flex flex-col gap-3">
+							<WeaponDetails weapon={entry.item} />
+							<Button
+								size="sm"
+								onclick={() => {
+									context.addToInventory(
+										entry.item,
+										entry.item.category === 'Primary' ? 'primary_weapon' : 'secondary_weapon'
+									);
+								}}>Add</Button
+							>
+						</div>
 					</Dropdown>
 				{:else if entry.type === 'armor'}
-					{#snippet subtitle_snippet()}
-						<Button
-							size="sm"
-							onclick={(e) => {
-								e.stopPropagation();
-								context.addToInventory(entry.item, 'armor');
-							}}>Add</Button
-						>
-					{/snippet}
-
 					{#snippet title_snippet()}
 						<div class="gap-4 text-left">
 							<p class="text-md font-medium">{entry.item.title}</p>
@@ -318,29 +306,35 @@
 						</div>
 					{/snippet}
 
-					<Dropdown {title_snippet} {subtitle_snippet} class="border-2">
-						<ArmorDetails armor={entry.item} />
+					<Dropdown {title_snippet} class="border-2">
+						<div class="flex flex-col gap-3">
+							<ArmorDetails armor={entry.item} />
+							<Button
+								size="sm"
+								onclick={() => {
+									context.addToInventory(entry.item, 'armor');
+								}}>Add</Button
+							>
+						</div>
 					</Dropdown>
 				{:else if entry.type === 'consumable'}
-					{#snippet subtitle_snippet()}
-						<Button
-							size="sm"
-							disabled={context.consumable_count >= context.max_consumables}
-							onclick={(e) => {
-								e.stopPropagation();
-								context.addToInventory(entry.item, 'consumable');
-							}}>Add</Button
-						>
-					{/snippet}
-
 					{#snippet title_snippet()}
 						<div class="gap-4 text-left">
 							<p class="text-md font-medium">{entry.item.title}</p>
 						</div>
 					{/snippet}
 
-					<Dropdown {title_snippet} {subtitle_snippet} class="border-2">
-						<ConsumableDetails consumable={entry.item} />
+					<Dropdown {title_snippet} class="border-2">
+						<div class="flex flex-col gap-3">
+							<ConsumableDetails consumable={entry.item} />
+							<Button
+								size="sm"
+								disabled={context.consumable_count >= context.max_consumables}
+								onclick={() => {
+									context.addToInventory(entry.item, 'consumable');
+								}}>Add</Button
+							>
+						</div>
 					</Dropdown>
 				{/if}
 			{/each}

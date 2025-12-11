@@ -1,9 +1,10 @@
 <script lang="ts">
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { cn } from '$lib/utils';
-	import type { Traits } from '$lib/types/compendium-types';
+	import type { Traits, TraitIds } from '$lib/types/compendium-types';
 	import { TRAITS } from '$lib/types/rules';
 	import { getCharacterContext } from '$lib/state/character.svelte';
+	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 
 	let { class: className = '', traits = $bindable() }: { class?: string; traits: Traits } =
 		$props();
@@ -11,6 +12,15 @@
 	const context = getCharacterContext();
 	let derivedBeastform = $derived(context.derived_beastform);
 	let character = $derived(context.character);
+
+	const compendium = getCompendiumContext();
+	let druid_class_id = $derived(compendium.classes.druid.compendium_id);
+
+	let evolution_trait = $derived(
+		character
+			? (character.class_choices[druid_class_id]?.['evolution_trait']?.[0] || '') as TraitIds | ''
+			: ('' as TraitIds | '')
+	);
 </script>
 
 {#snippet trait(trait: keyof Traits)}
@@ -19,12 +29,15 @@
 		applyBonuses && derivedBeastform && derivedBeastform.character_trait.trait === trait
 			? derivedBeastform.character_trait.bonus
 			: 0}
-	{@const displayValue = traits[trait] !== null ? traits[trait]! + beastformBonus : null}
+	{@const evolutionBonus = evolution_trait === trait ? 1 : 0}
+	{@const totalBonus = beastformBonus + evolutionBonus}
+	{@const displayValue = traits[trait] !== null ? traits[trait]! + totalBonus : null}
 	{@const hasBonus =
-		applyBonuses &&
-		derivedBeastform !== null &&
-		derivedBeastform.character_trait.trait === trait &&
-		beastformBonus !== 0}
+		(applyBonuses &&
+			derivedBeastform !== null &&
+			derivedBeastform.character_trait.trait === trait &&
+			beastformBonus !== 0) ||
+		evolutionBonus !== 0}
 	<div>
 		<div class="relative">
 			<svg

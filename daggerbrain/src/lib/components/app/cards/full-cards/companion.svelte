@@ -223,7 +223,7 @@
 </script>
 
 {#if character && companion}
-	<div class={cn('flex flex-col max-w-[calc(min(100%,400px))] rounded bg-card/50 p-2', className)}>
+	<div class={cn('flex flex-col max-w-[calc(min(100%,400px))] rounded bg-card/50 p-3', className)}>
 		<!-- Hidden file input for image upload (available in both modes) -->
 		<input
 			bind:this={fileInput}

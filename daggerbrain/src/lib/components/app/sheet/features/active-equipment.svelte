@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { cn } from '$lib/utils';
+	import { cn, applyProficiencyToDice } from '$lib/utils';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import WeaponCard from './equipment/weapon-row.svelte';
 	import ArmorCard from './equipment/armor-row.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
+	import { TRAITS } from '$lib/types/rules';
 	let {
 		class: className = '',
 		onItemClick = () => {}
@@ -19,6 +20,58 @@
 	// is rogue class
 	const rogue_class_id = $derived(compendium.classes.rogue.compendium_id);
 	const isRogueClass = $derived(context.character?.primary_class_id === rogue_class_id || context.character?.secondary_class_id === rogue_class_id);
+
+	// is druid class and transformed
+	const druid_class_id = $derived(compendium.classes.druid.compendium_id);
+	const isDruidClass = $derived(
+		context.character?.primary_class_id === druid_class_id ||
+			context.character?.secondary_class_id === druid_class_id
+	);
+	const isTransformed = $derived(
+		context.character?.chosen_beastform?.apply_beastform_bonuses === true
+	);
+	const derivedBeastform = $derived(context.derived_beastform);
+	const showBeastformAttack = $derived(isDruidClass && isTransformed && derivedBeastform !== null);
+
+	// Beastform attack calculations
+	const beastformToHit = $derived.by(() => {
+		if (!derivedBeastform || !context.traits || !context.character) return 0;
+		const traitValue = context.traits[derivedBeastform.attack.trait] || 0;
+		let total = traitValue;
+		
+		// Add beastform trait bonus if transformed and attack trait matches character trait
+		if (isTransformed && derivedBeastform.character_trait.trait === derivedBeastform.attack.trait) {
+			total += derivedBeastform.character_trait.bonus;
+		}
+		
+		// Add evolution bonus if evolution trait matches attack trait
+		const evolutionTrait = context.character.class_choices[druid_class_id]?.['evolution_trait']?.[0];
+		if (evolutionTrait && evolutionTrait === derivedBeastform.attack.trait) {
+			total += 1;
+		}
+		
+		return total;
+	});
+
+	const formattedBeastformToHit = $derived(
+		beastformToHit >= 0 ? `+${beastformToHit}` : `${beastformToHit}`
+	);
+
+	const beastformDamage = $derived.by(() => {
+		if (!derivedBeastform) return '';
+		const diceWithProficiency = applyProficiencyToDice(
+			derivedBeastform.attack.damage_dice,
+			context.proficiency
+		);
+		let damageStr = diceWithProficiency;
+		if (derivedBeastform.attack.damage_bonus > 0) {
+			damageStr += `+${derivedBeastform.attack.damage_bonus}`;
+		} else if (derivedBeastform.attack.damage_bonus < 0) {
+			damageStr += `${derivedBeastform.attack.damage_bonus}`;
+		}
+		damageStr += ` ${derivedBeastform.attack.damage_type}`;
+		return damageStr;
+	});
 </script>
 
 <div class={cn(className)}>
@@ -140,6 +193,35 @@
 								onItemClick('weapon', context.derived_unarmed_attack.id);
 						}}
 					/>
+				{/if}
+				{#if showBeastformAttack && derivedBeastform}
+					<tr class="text-xs text-accent bg-accent/3">
+						<td class="px-4 py-2">
+							<div class="flex items-center gap-1">
+								<div class="-mb-1">
+									<p>{derivedBeastform.name}</p>
+									<p class="text-[10px] opacity-50">Beastform</p>
+								</div>
+							</div>
+						</td>
+						<td class="py-2 pr-4 text-center whitespace-nowrap">{derivedBeastform.attack.range}</td>
+						<td class="py-2 pr-4 whitespace-nowrap">
+							<div class="mx-auto w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs">
+								{formattedBeastformToHit}
+								<span class="text-xs">{TRAITS[derivedBeastform.attack.trait].short_name}</span>
+							</div>
+						</td>
+						<td class="py-2 pr-4 text-right whitespace-nowrap sm:text-center">
+							<div class="ml-auto w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs sm:mx-auto">
+								{beastformDamage}
+							</div>
+						</td>
+						<td class="hidden py-2 pr-4 text-right text-xs sm:table-cell">
+							<div class="ml-auto w-min text-right">
+								{derivedBeastform.features.map((f) => f.title).join(', ') || '—'}
+							</div>
+						</td>
+					</tr>
 				{/if}
 			</tbody>
 		</table>

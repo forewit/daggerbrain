@@ -133,21 +133,6 @@
 				{@const isDisabled = maxLevel !== undefined && beastform.level_requirement > maxLevel}
 				{@const tier = context ? context.level_to_tier(beastform.level_requirement) : 1}
 
-				{#snippet subtitle_snippet()}
-					<Button
-						size="sm"
-						disabled={isDisabled}
-						onclick={(e) => {
-							e.stopPropagation();
-							if (!isDisabled) {
-								onBeastformClick(beastform);
-							}
-						}}
-					>
-						Select
-					</Button>
-				{/snippet}
-
 				{#snippet title_snippet()}
 					<div class="gap-4 text-left">
 						<p class="text-md font-medium">{beastform.name}</p>
@@ -157,8 +142,21 @@
 					</div>
 				{/snippet}
 
-				<Dropdown {title_snippet} {subtitle_snippet} class="border-2">
-					<BeastformComponent {beastform} />
+				<Dropdown {title_snippet} class="border-2">
+					<div class="flex flex-col gap-3">
+						<BeastformComponent {beastform} />
+						<Button
+							size="sm"
+							disabled={isDisabled}
+							onclick={() => {
+								if (!isDisabled) {
+									onBeastformClick(beastform);
+								}
+							}}
+						>
+							Select
+						</Button>
+					</div>
 				</Dropdown>
 			{/each}
 		{/if}

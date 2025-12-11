@@ -1,5 +1,10 @@
 <script lang="ts">
-	import Button from '$lib/components/ui/button/button.svelte';
+
+import Switch from '$lib/components/ui/switch/switch.svelte';
+import Label from '$lib/components/ui/label/label.svelte';
+import { cn } from '$lib/utils';
+import Button from '$lib/components/ui/button/button.svelte';
+import { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import BeastformComponent from '../../cards/full-cards/beastform.svelte';
@@ -21,11 +26,38 @@
 		if (!character) return;
 		character.chosen_beastform = null;
 	}
+
+	let apply_beastform_bonuses = $derived(
+		character?.chosen_beastform?.apply_beastform_bonuses ?? false
+	);
+
+	function handleTransformedChange(checked: boolean) {
+		if (!character?.chosen_beastform) return;
+		character.chosen_beastform.apply_beastform_bonuses = checked;
+		if (!checked) {
+			// Clear evolution_trait when transformed is turned off
+			if (character.class_choices[druid_class_id]) {
+				character.class_choices[druid_class_id]['evolution_trait'] = [''];
+			}
+		}
+	}
 </script>
 
 {#if character && (character.primary_class_id === druid_class_id || character.secondary_class_id === druid_class_id)}
 	<div class="flex flex-col items-center gap-2">
 		{#if derivedBeastform}
+			<label class={cn(
+                buttonVariants({ variant: 'outline', size: 'sm' }),
+                "cursor-pointer rounded-full px-4 gap-3",
+                apply_beastform_bonuses && 'border-accent/10 bg-accent/5 hover:bg-accent/10 text-accent hover:text-accent',
+                )}>
+				Transformed
+				<Switch
+                    class="data-[state=checked]:bg-accent/50"
+					checked={apply_beastform_bonuses}
+					onCheckedChange={handleTransformedChange}
+				/>
+            </label>
 			<BeastformComponent beastform={derivedBeastform} bind_choice_select={true} />
 			<div class="flex justify-center gap-2">
 				<Button variant="outline" size="sm" onclick={onBeastformCatalogClick}>
