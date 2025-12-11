@@ -12,7 +12,6 @@
 	import { cn } from '$lib/utils';
 	import Menu from '@lucide/svelte/icons/menu';
 	import * as Sheet from '$lib/components/ui/sheet';
-	import ExternalLink from '@lucide/svelte/icons/external-link';
 
 	let open = $state(false);
 

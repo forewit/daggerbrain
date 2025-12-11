@@ -205,5 +205,27 @@
 	</div>
 
 	{@render children?.()}
-	<div class="h-36"></div>
+	
+	<div class="h-20"></div>
+
+	<div class="border-t-1 border-accent/10 grid auto-cols-fr grid-flow-col fixed md:hidden bottom-0 left-0 right-0 h-14 bg-card z-40">
+		{#if tabs[tabs.indexOf(activeTab) - 1]}
+		<Button class="rounded-none capitalize h-full border-r " href={`/characters/${character.id}/${tabs[tabs.indexOf(activeTab) - 1]}`} variant="ghost" >
+			<ChevronLeft class="size-4" />
+			{tabs[tabs.indexOf(activeTab) - 1]}
+			</Button>
+			{/if}
+
+			{#if tabs[tabs.indexOf(activeTab) + 1]}
+			<Button class="rounded-none capitalize h-full border-l " href={`/characters/${character.id}/${tabs[tabs.indexOf(activeTab) + 1]}`} variant="ghost" >
+					{tabs[tabs.indexOf(activeTab) + 1]}
+					<ChevronRight class="size-4" />
+					</Button>
+				{:else}
+				<Button class="rounded-none capitalize h-full border-l border-t" href={`/characters/${character.id}/`} variant="ghost" >
+					Sheet
+					<ExternalLink class="size-4" />
+					</Button>
+				{/if}
+	</div>
 {/if}

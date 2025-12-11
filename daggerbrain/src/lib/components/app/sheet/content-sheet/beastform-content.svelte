@@ -17,7 +17,7 @@
 
 		// Set the chosen beastform
 		character.chosen_beastform = {
-			apply_beastform_bonuses: true,
+			apply_beastform_bonuses: false,
 			compendium_id: beastform.compendium_id,
 			choices: {},
 			custom_title: null,

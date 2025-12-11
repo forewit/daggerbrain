@@ -1,13 +1,15 @@
 import { getUserContext } from './user.svelte';
 import {
 	ALL_LEVEL_UP_OPTIONS,
+	BASE_COMPANION,
 	BASE_MIXED_ANCESTRY_CARD,
 	BASE_STATS,
+	COMPANION_BASE_EXPERIENCE_MODIFIER,
 	CONDITIONS,
 	TRAIT_OPTIONS
 } from '../types/rules';
 import { getContext, setContext } from 'svelte';
-import type { Character, DomainCardId, ChosenBeastform } from '$lib/types/character-types';
+import type { Character, DomainCardId, ChosenBeastform, Companion } from '$lib/types/character-types';
 import type { AllTierOptionIds, ConditionIds, LevelUpChoice } from '$lib/types/rule-types';
 import type {
 	DamageThresholds,
@@ -25,7 +27,7 @@ import type {
 import { BLANK_LEVEL_UP_CHOICE } from '$lib/types/constants';
 import { update_character } from '$lib/remote/characters.remote';
 import { getCompendiumContext } from './compendium.svelte';
-import { increaseDie } from '$lib/utils';
+import { increaseDie, increase_range } from '$lib/utils';
 
 function createCharacter(id: string) {
 	const user = getUserContext();
@@ -372,6 +374,7 @@ function createCharacter(id: string) {
 	let spellcast_trait: keyof Traits | null = $state(BASE_STATS.spellcast_trait);
 	let spellcast_roll_bonus: number = $state(BASE_STATS.spellcast_roll_bonus);
 	let derived_beastform: Beastform | null = $state(null);
+	let derived_companion: Companion | null = $state(null);
 
 	// ================================================
 	// CHARACTER VALIDATION EFFECTS
@@ -396,6 +399,124 @@ function createCharacter(id: string) {
 				!all_exclude_ids.includes(beastform.compendium_id)
 		);
 	};
+
+	// ! initialize companion if subclass is ranger_beastbound
+	$effect(() => {
+		if (!character) return;
+		if (
+			character.primary_subclass_id !== compendium.subclasses.ranger_beastbound.compendium_id &&
+			character.secondary_subclass_id !== compendium.subclasses.ranger_beastbound.compendium_id
+		) {
+			character.companion = null;
+		} else {
+			// Only initialize if companion doesn't exist, otherwise preserve existing companion data
+			if (!character.companion) {
+				character.companion = { ...BASE_COMPANION };
+			}
+		}
+	});
+
+	// ! derived companion
+	$effect(() => {
+		if (!character) return;
+		if (!character.companion) {
+			if (derived_companion !== null) {
+				derived_companion = null;
+			}
+			return;
+		}
+		
+		// Start with a deep copy of the companion
+		const base_companion = character.companion as Companion;
+		const new_derived_companion: Companion = {
+			name: base_companion.name,
+			image_url: base_companion.image_url,
+			attack: base_companion.attack ? { ...base_companion.attack } : null,
+			max_stress: base_companion.max_stress,
+			marked_stress: base_companion.marked_stress,
+			max_hope: base_companion.max_hope,
+			marked_hope: base_companion.marked_hope,
+			evasion: base_companion.evasion,
+			level_up_choices: [...base_companion.level_up_choices],
+			experiences: [...base_companion.experiences],
+			experience_modifiers: [...base_companion.experience_modifiers],
+			choices: { ...base_companion.choices }
+		};
+
+		// Limit level_up_choices array to character.level - 1
+		// Index 0 = level 2 choice, index 1 = level 3 choice, etc.
+		const maxChoicesLength = Math.max(0, character.level - 1);
+		if (new_derived_companion.level_up_choices.length > maxChoicesLength) {
+			new_derived_companion.level_up_choices = new_derived_companion.level_up_choices.slice(0, maxChoicesLength);
+		}
+
+		// Keep the companion's experiences and experience_modifiers array locked to the same size as the character's experiences array
+		const targetSize = character.experiences.length;
+		while (new_derived_companion.experiences.length < targetSize) {
+			new_derived_companion.experiences.push('');
+		}
+		while (new_derived_companion.experiences.length > targetSize) {
+			new_derived_companion.experiences.pop();
+		}
+
+		// Initialize experience_modifiers to base value and resize to match experiences
+		new_derived_companion.experience_modifiers = Array(targetSize).fill(COMPANION_BASE_EXPERIENCE_MODIFIER);
+
+		// Apply "intelligent" bonuses: +1 to chosen experience modifiers
+		const intelligentChoices = new_derived_companion.choices["intelligent"] || [];
+		for (const experienceIndexStr of intelligentChoices) {
+			const experienceIndex = parseInt(experienceIndexStr, 10);
+			if (!isNaN(experienceIndex) && experienceIndex >= 0 && experienceIndex < targetSize) {
+				new_derived_companion.experience_modifiers[experienceIndex] += 1;
+			}
+		}
+
+		// Apply "vicious" bonuses: increase damage dice or range by one step
+		if (new_derived_companion.attack) {
+			const viciousChoices = new_derived_companion.choices["vicious"] || [];
+			for (const choice of viciousChoices) {
+				if (choice === "damage_dice" && new_derived_companion.attack) {
+					new_derived_companion.attack.damage_dice = increaseDie(new_derived_companion.attack.damage_dice);
+				} else if (choice === "range" && new_derived_companion.attack) {
+					new_derived_companion.attack.range = increase_range(new_derived_companion.attack.range);
+				}
+			}
+		}
+
+		// Apply "resilient" bonuses: +1 to max_stress per choice
+		const resilientCount = new_derived_companion.level_up_choices.filter((id) => id === 'resilient').length;
+		new_derived_companion.max_stress += resilientCount;
+
+		// Apply "light-in-the-dark" bonuses: +1 to max_hope per choice
+		const lightInTheDarkCount = new_derived_companion.level_up_choices.filter((id) => id === 'light-in-the-dark').length;
+		new_derived_companion.max_hope += lightInTheDarkCount;
+
+		// Apply "aware" bonuses: +2 to evasion per choice
+		const awareCount = new_derived_companion.level_up_choices.filter((id) => id === 'aware').length;
+		new_derived_companion.evasion += awareCount * 2;
+
+		// Cap marked_stress between 0 and max_stress
+		new_derived_companion.marked_stress = Math.max(0, Math.min(new_derived_companion.marked_stress, new_derived_companion.max_stress));
+	
+	// Cap marked_hope between 0 and max_hope
+	new_derived_companion.marked_hope = Math.max(0, Math.min(new_derived_companion.marked_hope, new_derived_companion.max_hope));
+
+		if (JSON.stringify(new_derived_companion) !== JSON.stringify(derived_companion)) {
+			derived_companion = new_derived_companion;
+		}
+	});
+
+	// ! clear beastform if class isn't druid
+	$effect(() => {
+		if (!character || !character.chosen_beastform) return;
+
+		if (
+			character.primary_class_id !== compendium.classes.druid.compendium_id &&
+			character.secondary_class_id !== compendium.classes.druid.compendium_id
+		) {
+			character.chosen_beastform = null;
+		}
+	});
 
 	// ! derive beastform
 	$effect(() => {
@@ -3143,6 +3264,7 @@ function createCharacter(id: string) {
 		// Debounce: wait 300ms before triggering save
 		debounceTimer = setTimeout(() => {
 			debounceTimer = null;
+			if (!character) return; // Guard against null character
 
 			// Don't start a new save if one is already in flight
 			if (inFlightSave) {
@@ -3153,10 +3275,12 @@ function createCharacter(id: string) {
 			const cloned = JSON.parse(JSON.stringify(character));
 			const savePromise = update_character(cloned)
 				.then(() => {
+					if (!character) return; // Guard against null character
 					// Only update lastSavedCharacter after successful save
 					lastSavedCharacter = JSON.stringify(character);
 				})
 				.catch((error) => {
+					if (!character) return; // Guard against null character
 					console.error('Failed to auto-save character:', error);
 					// Leave lastSavedCharacter unchanged so the next debounced change will retry
 				})
@@ -3497,6 +3621,9 @@ function createCharacter(id: string) {
 		},
 		get derived_beastform() {
 			return derived_beastform;
+		},
+		get derived_companion() {
+			return derived_companion;
 		},
 
 		// derived stats

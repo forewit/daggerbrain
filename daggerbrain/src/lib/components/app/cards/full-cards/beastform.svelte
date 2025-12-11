@@ -3,7 +3,6 @@
 	import type { Snippet } from 'svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
-	import ChoiceSelector from '$lib/components/app/leveling/secondary-options/choice-selector.svelte';
 	import * as Select from '$lib/components/ui/select/';
 	import Switch from '$lib/components/ui/switch/switch.svelte';
 	import { capitalize, cn, applyProficiencyToDice } from '$lib/utils';
@@ -25,8 +24,6 @@
 	let proficiency = $derived(context?.proficiency);
 	const compendium = getCompendiumContext();
 
-	let width = $state(300);
-
 	// Apply proficiency to damage dice
 	let damageDiceWithProficiency = $derived.by(() => {
 		if (!proficiency) return beastform.attack.damage_dice;
@@ -41,10 +38,10 @@
 	);
 </script>
 
-<div class={cn('flex max-w-[400px] flex-col gap-4 rounded bg-card/50 px-3 py-1', className)}>
+<div class={cn('flex max-w-[calc(min(100%,400px))] flex-col gap-4 rounded bg-card/50 p-2', className)}>
 	<div class="flex flex-wrap gap-2">
 		<!-- Header with Name and Category -->
-		<div class="mt-1 flex grow items-center justify-between gap-1">
+		<div class=" flex grow items-center justify-between gap-1">
 			<h3 class="text-sm font-semibold text-foreground">{beastform.name}</h3>
 			<p class="text-right text-xs text-muted-foreground italic">{beastform.category}</p>
 		</div>
@@ -169,71 +166,48 @@
 		{@const base_form_1 = compendium.beastforms[base_forms[1] || '']}
 
 		<div class="flex flex-col gap-2">
-			<span class="text-xs font-medium">Base Forms (Tiers 1-2):</span>
-
-			<!-- Base Form 0 -->
 			<div class="flex flex-col gap-1">
-				<span class="text-xs font-medium">First Base Form:</span>
+				<span class="text-xs font-medium">Base Forms (Tiers 1-2):</span>
 				<Select.Root
-					type="single"
-					value={base_forms[0] || ''}
-					onValueChange={(value: string) => {
+					type="multiple"
+					value={base_forms.filter(Boolean)}
+					onValueChange={(value: string[]) => {
 						if (!character?.chosen_beastform) return;
-						const current = character.chosen_beastform.choices.legendary_hybrid_base_forms || [];
-						character.chosen_beastform.choices.legendary_hybrid_base_forms = [
-							value,
-							current[1] || ''
-						].filter(Boolean);
+						character.chosen_beastform.choices.legendary_hybrid_base_forms = value.filter(Boolean);
 					}}
 				>
-					<Select.Trigger class="w-full">
+					<Select.Trigger class="w-full text-muted-foreground">
 						<p class="truncate">
-							{base_forms[0]
-								? available_forms.find((f) => f.compendium_id === base_forms[0])?.name || 'Unknown'
-								: 'Select first base form'}
+							{base_forms.length === 0
+								? 'Select base forms (2 max)'
+								: base_forms
+										.map((id) => available_forms.find((f) => f.compendium_id === id)?.name || 'Unknown')
+										.join(', ')}
+							{#if base_forms.length < 2}
+								<span class="text-muted-foreground">
+									({2 - base_forms.length} more)
+								</span>
+							{/if}
 						</p>
 					</Select.Trigger>
 					<Select.Content>
-						<Select.Item value="" class="justify-center text-muted-foreground"
-							>-- Select none --</Select.Item
+						<Select.Item
+							value=""
+							disabled={base_forms.length === 0}
+							class="justify-center text-destructive"
+							onclick={() => {
+								if (character?.chosen_beastform) {
+									character.chosen_beastform.choices.legendary_hybrid_base_forms = [];
+								}
+							}}
 						>
+							-- Clear selection --
+						</Select.Item>
 						{#each available_forms as form}
-							<Select.Item value={form.compendium_id}>
-								{form.name} ({form.category})
-							</Select.Item>
-						{/each}
-					</Select.Content>
-				</Select.Root>
-			</div>
-
-			<!-- Base Form 1 -->
-			<div class="flex flex-col gap-1">
-				<span class="text-xs font-medium">Second Base Form:</span>
-				<Select.Root
-					type="single"
-					value={base_forms[1] || ''}
-					onValueChange={(value: string) => {
-						if (!character?.chosen_beastform) return;
-						const current = character.chosen_beastform.choices.legendary_hybrid_base_forms || [];
-						character.chosen_beastform.choices.legendary_hybrid_base_forms = [
-							current[0] || '',
-							value
-						].filter(Boolean);
-					}}
-				>
-					<Select.Trigger class="w-full">
-						<p class="truncate">
-							{base_forms[1]
-								? available_forms.find((f) => f.compendium_id === base_forms[1])?.name || 'Unknown'
-								: 'Select second base form'}
-						</p>
-					</Select.Trigger>
-					<Select.Content>
-						<Select.Item value="" class="justify-center text-muted-foreground"
-							>-- Select none --</Select.Item
-						>
-						{#each available_forms as form}
-							<Select.Item value={form.compendium_id}>
+							<Select.Item
+								value={form.compendium_id}
+								disabled={base_forms.length >= 2 && !base_forms.includes(form.compendium_id)}
+							>
 								{form.name} ({form.category})
 							</Select.Item>
 						{/each}
@@ -243,96 +217,199 @@
 
 			<!-- Advantages and Features Selection -->
 			{#if base_form_0 && base_form_1}
+				{@const all_advantages_raw = [
+					...base_form_0.advantages.map((adv, i) => ({
+						id: `0_${i}`,
+						form_index: 0,
+						advantage_index: i,
+						label: adv
+					})),
+					...base_form_1.advantages.map((adv, i) => ({
+						id: `1_${i}`,
+						form_index: 1,
+						advantage_index: i,
+						label: adv
+					}))
+				]}
+				{@const seen_labels = new Set<string>()}
+				{@const all_advantages = all_advantages_raw.filter((adv) => {
+					if (seen_labels.has(adv.label)) {
+						return false;
+					}
+					seen_labels.add(adv.label);
+					return true;
+				})}
+				{@const advantage_name_to_ids = new Map<string, string[]>()}
+				{#each all_advantages_raw as adv}
+					{@const ids = advantage_name_to_ids.get(adv.label) || []}
+					{@const _unused = advantage_name_to_ids.set(adv.label, [...ids, adv.id])}
+				{/each}
+				{@const selected_advantages_0 = character.chosen_beastform.choices.legendary_hybrid_base_forms_0_advantages || []}
+				{@const selected_advantages_1 = character.chosen_beastform.choices.legendary_hybrid_base_forms_1_advantages || []}
+				{@const combined_advantage_selections = [
+					...selected_advantages_0.map((i) => `0_${i}`),
+					...selected_advantages_1.map((i) => `1_${i}`)
+				]}
+				{@const all_features = [
+					...base_form_0.features.map((feat, i) => ({
+						id: `0_${i}`,
+						form_index: 0,
+						feature_index: i,
+						label: feat.title
+					})),
+					...base_form_1.features.map((feat, i) => ({
+						id: `1_${i}`,
+						form_index: 1,
+						feature_index: i,
+						label: feat.title
+					}))
+				]}
+				{@const selected_features_0 = character.chosen_beastform.choices.legendary_hybrid_base_forms_0_features || []}
+				{@const selected_features_1 = character.chosen_beastform.choices.legendary_hybrid_base_forms_1_features || []}
+				{@const combined_feature_selections = [
+					...selected_features_0.map((i) => `0_${i}`),
+					...selected_features_1.map((i) => `1_${i}`)
+				]}
 				<div class="mt-2 flex flex-col gap-2">
-					<span class="text-xs font-medium">Select 4 Advantages and 2 Features:</span>
-
-					<!-- Advantages from Base Form 0 -->
-					{#if base_form_0.advantages.length > 0}
-						<div class="flex flex-col gap-1">
-							<span class="text-xs font-medium">Advantages from {base_form_0.name}:</span>
-							<ChoiceSelector
-								class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
-								bind:selected_ids={
-									character.chosen_beastform.choices.legendary_hybrid_base_forms_0_advantages
+					<div class="flex flex-col gap-1">
+						<span class="text-xs font-medium">Advantages (Select 4):</span>
+						<Select.Root
+							type="multiple"
+							value={combined_advantage_selections}
+							onValueChange={(value: string[]) => {
+								if (!character?.chosen_beastform) return;
+								const form_0_selections: string[] = [];
+								const form_1_selections: string[] = [];
+								for (const val of value) {
+									if (val.startsWith('0_')) {
+										form_0_selections.push(val.replace('0_', ''));
+									} else if (val.startsWith('1_')) {
+										form_1_selections.push(val.replace('1_', ''));
+									}
 								}
-								max={4}
-								options={base_form_0.advantages.map((adv, i) => ({
-									selection_id: i.toString(),
-									title: adv,
-									short_title: adv
-								}))}
-								term="Advantage"
-								term_plural="Advantages"
-								{width}
-							/>
-						</div>
-					{/if}
+								character.chosen_beastform.choices.legendary_hybrid_base_forms_0_advantages =
+									form_0_selections;
+								character.chosen_beastform.choices.legendary_hybrid_base_forms_1_advantages =
+									form_1_selections;
+							}}
+						>
+							<Select.Trigger class="w-full text-muted-foreground">
+								<p class="truncate">
+									{combined_advantage_selections.length === 0
+										? 'Select 4 advantages'
+										: combined_advantage_selections
+												.map((id) => all_advantages.find((a) => a.id === id)?.label || 'Unknown')
+												.join(', ')}
+									{#if combined_advantage_selections.length < 4}
+										<span class="text-muted-foreground">
+											({4 - combined_advantage_selections.length} more)
+										</span>
+									{/if}
+								</p>
+							</Select.Trigger>
+							<Select.Content>
+								<Select.Item
+									value=""
+									disabled={combined_advantage_selections.length === 0}
+									class="justify-center text-destructive"
+									onclick={() => {
+										if (character?.chosen_beastform) {
+											character.chosen_beastform.choices.legendary_hybrid_base_forms_0_advantages = [];
+											character.chosen_beastform.choices.legendary_hybrid_base_forms_1_advantages = [];
+										}
+									}}
+								>
+									-- Clear selection --
+								</Select.Item>
+								{#each all_advantages as adv}
+									{@const ids_for_advantage = advantage_name_to_ids.get(adv.label) || []}
+									{@const is_selected = ids_for_advantage.some((id) => combined_advantage_selections.includes(id))}
+									<Select.Item
+										value={adv.id}
+										disabled={combined_advantage_selections.length >= 4 && !is_selected}
+									>
+										<span class="capitalize">{adv.label}</span>
+									</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+					</div>
 
-					<!-- Advantages from Base Form 1 -->
-					{#if base_form_1.advantages.length > 0}
-						<div class="flex flex-col gap-1">
-							<span class="text-xs font-medium">Advantages from {base_form_1.name}:</span>
-							<ChoiceSelector
-								class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
-								bind:selected_ids={
-									character.chosen_beastform.choices.legendary_hybrid_base_forms_1_advantages
+					<div class="flex flex-col gap-1">
+						<span class="text-xs font-medium">Features (Select 2):</span>
+						<Select.Root
+							type="multiple"
+							value={combined_feature_selections}
+							onValueChange={(value: string[]) => {
+								if (!character?.chosen_beastform) return;
+								const form_0_selections: string[] = [];
+								const form_1_selections: string[] = [];
+								for (const val of value) {
+									if (val.startsWith('0_')) {
+										form_0_selections.push(val.replace('0_', ''));
+									} else if (val.startsWith('1_')) {
+										form_1_selections.push(val.replace('1_', ''));
+									}
 								}
-								max={4}
-								options={base_form_1.advantages.map((adv, i) => ({
-									selection_id: i.toString(),
-									title: adv,
-									short_title: adv
-								}))}
-								term="Advantage"
-								term_plural="Advantages"
-								{width}
-							/>
-						</div>
-					{/if}
-
-					<!-- Features from Base Form 0 -->
-					{#if base_form_0.features.length > 0}
-						<div class="flex flex-col gap-1">
-							<span class="text-xs font-medium">Features from {base_form_0.name}:</span>
-							<ChoiceSelector
-								class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
-								bind:selected_ids={
-									character.chosen_beastform.choices.legendary_hybrid_base_forms_0_features
-								}
-								max={2}
-								options={base_form_0.features.map((feat, i) => ({
-									selection_id: i.toString(),
-									title: feat.title,
-									short_title: feat.title
-								}))}
-								term="Feature"
-								term_plural="Features"
-								{width}
-							/>
-						</div>
-					{/if}
-
-					<!-- Features from Base Form 1 -->
-					{#if base_form_1.features.length > 0}
-						<div class="flex flex-col gap-1">
-							<span class="text-xs font-medium">Features from {base_form_1.name}:</span>
-							<ChoiceSelector
-								class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
-								bind:selected_ids={
-									character.chosen_beastform.choices.legendary_hybrid_base_forms_1_features
-								}
-								max={2}
-								options={base_form_1.features.map((feat, i) => ({
-									selection_id: i.toString(),
-									title: feat.title,
-									short_title: feat.title
-								}))}
-								term="Feature"
-								term_plural="Features"
-								{width}
-							/>
-						</div>
-					{/if}
+								character.chosen_beastform.choices.legendary_hybrid_base_forms_0_features =
+									form_0_selections;
+								character.chosen_beastform.choices.legendary_hybrid_base_forms_1_features =
+									form_1_selections;
+							}}
+						>
+							<Select.Trigger class="w-full text-muted-foreground">
+								<p class="truncate">
+									{combined_feature_selections.length === 0
+										? 'Select 2 features'
+										: combined_feature_selections
+												.map((id) => all_features.find((f) => f.id === id)?.label || 'Unknown')
+												.join(', ')}
+									{#if combined_feature_selections.length < 2}
+										<span class="text-muted-foreground">
+											({2 - combined_feature_selections.length} more)
+										</span>
+									{/if}
+								</p>
+							</Select.Trigger>
+							<Select.Content>
+								<Select.Item
+									value=""
+									disabled={combined_feature_selections.length === 0}
+									class="justify-center text-destructive"
+									onclick={() => {
+										if (character?.chosen_beastform) {
+											character.chosen_beastform.choices.legendary_hybrid_base_forms_0_features = [];
+											character.chosen_beastform.choices.legendary_hybrid_base_forms_1_features = [];
+										}
+									}}
+								>
+									-- Clear selection --
+								</Select.Item>
+								{#if base_form_0.features.length > 0}
+									<Select.Label>{base_form_0.name}</Select.Label>
+									{#each base_form_0.features as feat, i}
+										<Select.Item
+											value={`0_${i}`}
+											disabled={combined_feature_selections.length >= 2 && !combined_feature_selections.includes(`0_${i}`)}
+										>
+											{feat.title}
+										</Select.Item>
+									{/each}
+								{/if}
+								{#if base_form_1.features.length > 0}
+									<Select.Label>{base_form_1.name}</Select.Label>
+									{#each base_form_1.features as feat, i}
+										<Select.Item
+											value={`1_${i}`}
+											disabled={combined_feature_selections.length >= 2 && !combined_feature_selections.includes(`1_${i}`)}
+										>
+											{feat.title}
+										</Select.Item>
+									{/each}
+								{/if}
+							</Select.Content>
+						</Select.Root>
+					</div>
 				</div>
 			{/if}
 		</div>
@@ -389,109 +466,48 @@
 		{@const base_form_2 = compendium.beastforms[base_forms[2] || '']}
 
 		<div class="flex flex-col gap-2">
-			<span class="text-xs font-medium">Base Forms (Tiers 1-3):</span>
-
-			<!-- Base Form 0 -->
 			<div class="flex flex-col gap-1">
-				<span class="text-xs font-medium">First Base Form:</span>
+				<span class="text-xs font-medium">Base Forms (Tiers 1-3):</span>
 				<Select.Root
-					type="single"
-					value={base_forms[0] || ''}
-					onValueChange={(value: string) => {
+					type="multiple"
+					value={base_forms.filter(Boolean)}
+					onValueChange={(value: string[]) => {
 						if (!character?.chosen_beastform) return;
-						const current = character.chosen_beastform.choices.mythic_hybrid_base_forms || [];
-						character.chosen_beastform.choices.mythic_hybrid_base_forms = [
-							value,
-							current[1] || '',
-							current[2] || ''
-						].filter(Boolean);
+						character.chosen_beastform.choices.mythic_hybrid_base_forms = value.filter(Boolean);
 					}}
 				>
-					<Select.Trigger class="w-full">
+					<Select.Trigger class="w-full text-muted-foreground">
 						<p class="truncate">
-							{base_forms[0]
-								? available_forms.find((f) => f.compendium_id === base_forms[0])?.name || 'Unknown'
-								: 'Select first base form'}
+							{base_forms.length === 0
+								? 'Select base forms (3 max)'
+								: base_forms
+										.map((id) => available_forms.find((f) => f.compendium_id === id)?.name || 'Unknown')
+										.join(', ')}
+							{#if base_forms.length < 3}
+								<span class="text-muted-foreground">
+									({3 - base_forms.length} more)
+								</span>
+							{/if}
 						</p>
 					</Select.Trigger>
 					<Select.Content>
-						<Select.Item value="" class="justify-center text-muted-foreground"
-							>-- Select none --</Select.Item
+						<Select.Item
+							value=""
+							disabled={base_forms.length === 0}
+							class="justify-center text-destructive"
+							onclick={() => {
+								if (character?.chosen_beastform) {
+									character.chosen_beastform.choices.mythic_hybrid_base_forms = [];
+								}
+							}}
 						>
+							-- Clear selection --
+						</Select.Item>
 						{#each available_forms as form}
-							<Select.Item value={form.compendium_id}>
-								{form.name} ({form.category})
-							</Select.Item>
-						{/each}
-					</Select.Content>
-				</Select.Root>
-			</div>
-
-			<!-- Base Form 1 -->
-			<div class="flex flex-col gap-1">
-				<span class="text-xs font-medium">Second Base Form:</span>
-				<Select.Root
-					type="single"
-					value={base_forms[1] || ''}
-					onValueChange={(value: string) => {
-						if (!character?.chosen_beastform) return;
-						const current = character.chosen_beastform.choices.mythic_hybrid_base_forms || [];
-						character.chosen_beastform.choices.mythic_hybrid_base_forms = [
-							current[0] || '',
-							value,
-							current[2] || ''
-						].filter(Boolean);
-					}}
-				>
-					<Select.Trigger class="w-full">
-						<p class="truncate">
-							{base_forms[1]
-								? available_forms.find((f) => f.compendium_id === base_forms[1])?.name || 'Unknown'
-								: 'Select second base form'}
-						</p>
-					</Select.Trigger>
-					<Select.Content>
-						<Select.Item value="" class="justify-center text-muted-foreground"
-							>-- Select none --</Select.Item
-						>
-						{#each available_forms as form}
-							<Select.Item value={form.compendium_id}>
-								{form.name} ({form.category})
-							</Select.Item>
-						{/each}
-					</Select.Content>
-				</Select.Root>
-			</div>
-
-			<!-- Base Form 2 -->
-			<div class="flex flex-col gap-1">
-				<span class="text-xs font-medium">Third Base Form:</span>
-				<Select.Root
-					type="single"
-					value={base_forms[2] || ''}
-					onValueChange={(value: string) => {
-						if (!character?.chosen_beastform) return;
-						const current = character.chosen_beastform.choices.mythic_hybrid_base_forms || [];
-						character.chosen_beastform.choices.mythic_hybrid_base_forms = [
-							current[0] || '',
-							current[1] || '',
-							value
-						].filter(Boolean);
-					}}
-				>
-					<Select.Trigger class="w-full">
-						<p class="truncate">
-							{base_forms[2]
-								? available_forms.find((f) => f.compendium_id === base_forms[2])?.name || 'Unknown'
-								: 'Select third base form'}
-						</p>
-					</Select.Trigger>
-					<Select.Content>
-						<Select.Item value="" class="justify-center text-muted-foreground"
-							>-- Select none --</Select.Item
-						>
-						{#each available_forms as form}
-							<Select.Item value={form.compendium_id}>
+							<Select.Item
+								value={form.compendium_id}
+								disabled={base_forms.length >= 3 && !base_forms.includes(form.compendium_id)}
+							>
 								{form.name} ({form.category})
 							</Select.Item>
 						{/each}
@@ -501,140 +517,238 @@
 
 			<!-- Advantages and Features Selection -->
 			{#if base_form_0 && base_form_1 && base_form_2}
+				{@const all_advantages_raw = [
+					...base_form_0.advantages.map((adv, i) => ({
+						id: `0_${i}`,
+						form_index: 0,
+						advantage_index: i,
+						label: adv
+					})),
+					...base_form_1.advantages.map((adv, i) => ({
+						id: `1_${i}`,
+						form_index: 1,
+						advantage_index: i,
+						label: adv
+					})),
+					...base_form_2.advantages.map((adv, i) => ({
+						id: `2_${i}`,
+						form_index: 2,
+						advantage_index: i,
+						label: adv
+					}))
+				]}
+				{@const seen_labels = new Set<string>()}
+				{@const all_advantages = all_advantages_raw.filter((adv) => {
+					if (seen_labels.has(adv.label)) {
+						return false;
+					}
+					seen_labels.add(adv.label);
+					return true;
+				})}
+				{@const advantage_name_to_ids = new Map<string, string[]>()}
+				{#each all_advantages_raw as adv}
+					{@const ids = advantage_name_to_ids.get(adv.label) || []}
+					{@const _unused = advantage_name_to_ids.set(adv.label, [...ids, adv.id])}
+				{/each}
+				{@const selected_advantages_0 = character.chosen_beastform.choices.mythic_hybrid_base_forms_0_advantages || []}
+				{@const selected_advantages_1 = character.chosen_beastform.choices.mythic_hybrid_base_forms_1_advantages || []}
+				{@const selected_advantages_2 = character.chosen_beastform.choices.mythic_hybrid_base_forms_2_advantages || []}
+				{@const combined_advantage_selections = [
+					...selected_advantages_0.map((i) => `0_${i}`),
+					...selected_advantages_1.map((i) => `1_${i}`),
+					...selected_advantages_2.map((i) => `2_${i}`)
+				]}
+				{@const all_features = [
+					...base_form_0.features.map((feat, i) => ({
+						id: `0_${i}`,
+						form_index: 0,
+						feature_index: i,
+						label: feat.title
+					})),
+					...base_form_1.features.map((feat, i) => ({
+						id: `1_${i}`,
+						form_index: 1,
+						feature_index: i,
+						label: feat.title
+					})),
+					...base_form_2.features.map((feat, i) => ({
+						id: `2_${i}`,
+						form_index: 2,
+						feature_index: i,
+						label: feat.title
+					}))
+				]}
+				{@const selected_features_0 = character.chosen_beastform.choices.mythic_hybrid_base_forms_0_features || []}
+				{@const selected_features_1 = character.chosen_beastform.choices.mythic_hybrid_base_forms_1_features || []}
+				{@const selected_features_2 = character.chosen_beastform.choices.mythic_hybrid_base_forms_2_features || []}
+				{@const combined_feature_selections = [
+					...selected_features_0.map((i) => `0_${i}`),
+					...selected_features_1.map((i) => `1_${i}`),
+					...selected_features_2.map((i) => `2_${i}`)
+				]}
 				<div class="mt-2 flex flex-col gap-2">
-					<span class="text-xs font-medium">Select 5 Advantages and 3 Features:</span>
-
-					<!-- Advantages from Base Form 0 -->
-					{#if base_form_0.advantages.length > 0}
-						<div class="flex flex-col gap-1">
-							<span class="text-xs font-medium">Advantages from {base_form_0.name}:</span>
-							<ChoiceSelector
-								class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
-								bind:selected_ids={
-									character.chosen_beastform.choices.mythic_hybrid_base_forms_0_advantages
+					<div class="flex flex-col gap-1">
+						<span class="text-xs font-medium">Advantages (Select 5):</span>
+						<Select.Root
+							type="multiple"
+							value={combined_advantage_selections}
+							onValueChange={(value: string[]) => {
+								if (!character?.chosen_beastform) return;
+								const form_0_selections: string[] = [];
+								const form_1_selections: string[] = [];
+								const form_2_selections: string[] = [];
+								for (const val of value) {
+									if (val.startsWith('0_')) {
+										form_0_selections.push(val.replace('0_', ''));
+									} else if (val.startsWith('1_')) {
+										form_1_selections.push(val.replace('1_', ''));
+									} else if (val.startsWith('2_')) {
+										form_2_selections.push(val.replace('2_', ''));
+									}
 								}
-								max={5}
-								options={base_form_0.advantages.map((adv, i) => ({
-									selection_id: i.toString(),
-									title: adv,
-									short_title: adv
-								}))}
-								term="Advantage"
-								term_plural="Advantages"
-								{width}
-							/>
-						</div>
-					{/if}
+								character.chosen_beastform.choices.mythic_hybrid_base_forms_0_advantages =
+									form_0_selections;
+								character.chosen_beastform.choices.mythic_hybrid_base_forms_1_advantages =
+									form_1_selections;
+								character.chosen_beastform.choices.mythic_hybrid_base_forms_2_advantages =
+									form_2_selections;
+							}}
+						>
+							<Select.Trigger class="w-full text-muted-foreground">
+								<p class="truncate">
+									{combined_advantage_selections.length === 0
+										? 'Select 5 advantages'
+										: combined_advantage_selections
+												.map((id) => all_advantages.find((a) => a.id === id)?.label || 'Unknown')
+												.join(', ')}
+									{#if combined_advantage_selections.length < 5}
+										<span class="text-muted-foreground">
+											({5 - combined_advantage_selections.length} more)
+										</span>
+									{/if}
+								</p>
+							</Select.Trigger>
+							<Select.Content>
+								<Select.Item
+									value=""
+									disabled={combined_advantage_selections.length === 0}
+									class="justify-center text-destructive"
+									onclick={() => {
+										if (character?.chosen_beastform) {
+											character.chosen_beastform.choices.mythic_hybrid_base_forms_0_advantages = [];
+											character.chosen_beastform.choices.mythic_hybrid_base_forms_1_advantages = [];
+											character.chosen_beastform.choices.mythic_hybrid_base_forms_2_advantages = [];
+										}
+									}}
+								>
+									-- Clear selection --
+								</Select.Item>
+								{#each all_advantages as adv}
+									{@const ids_for_advantage = advantage_name_to_ids.get(adv.label) || []}
+									{@const is_selected = ids_for_advantage.some((id) => combined_advantage_selections.includes(id))}
+									<Select.Item
+										value={adv.id}
+										disabled={combined_advantage_selections.length >= 5 && !is_selected}
+									>
+										<span class="capitalize">{adv.label}</span>
+									</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+					</div>
 
-					<!-- Advantages from Base Form 1 -->
-					{#if base_form_1.advantages.length > 0}
-						<div class="flex flex-col gap-1">
-							<span class="text-xs font-medium">Advantages from {base_form_1.name}:</span>
-							<ChoiceSelector
-								class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
-								bind:selected_ids={
-									character.chosen_beastform.choices.mythic_hybrid_base_forms_1_advantages
+					<div class="flex flex-col gap-1">
+						<span class="text-xs font-medium">Features (Select 3):</span>
+						<Select.Root
+							type="multiple"
+							value={combined_feature_selections}
+							onValueChange={(value: string[]) => {
+								if (!character?.chosen_beastform) return;
+								const form_0_selections: string[] = [];
+								const form_1_selections: string[] = [];
+								const form_2_selections: string[] = [];
+								for (const val of value) {
+									if (val.startsWith('0_')) {
+										form_0_selections.push(val.replace('0_', ''));
+									} else if (val.startsWith('1_')) {
+										form_1_selections.push(val.replace('1_', ''));
+									} else if (val.startsWith('2_')) {
+										form_2_selections.push(val.replace('2_', ''));
+									}
 								}
-								max={5}
-								options={base_form_1.advantages.map((adv, i) => ({
-									selection_id: i.toString(),
-									title: adv,
-									short_title: adv
-								}))}
-								term="Advantage"
-								term_plural="Advantages"
-								{width}
-							/>
-						</div>
-					{/if}
-
-					<!-- Advantages from Base Form 2 -->
-					{#if base_form_2.advantages.length > 0}
-						<div class="flex flex-col gap-1">
-							<span class="text-xs font-medium">Advantages from {base_form_2.name}:</span>
-							<ChoiceSelector
-								class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
-								bind:selected_ids={
-									character.chosen_beastform.choices.mythic_hybrid_base_forms_2_advantages
-								}
-								max={5}
-								options={base_form_2.advantages.map((adv, i) => ({
-									selection_id: i.toString(),
-									title: adv,
-									short_title: adv
-								}))}
-								term="Advantage"
-								term_plural="Advantages"
-								{width}
-							/>
-						</div>
-					{/if}
-
-					<!-- Features from Base Form 0 -->
-					{#if base_form_0.features.length > 0}
-						<div class="flex flex-col gap-1">
-							<span class="text-xs font-medium">Features from {base_form_0.name}:</span>
-							<ChoiceSelector
-								class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
-								bind:selected_ids={
-									character.chosen_beastform.choices.mythic_hybrid_base_forms_0_features
-								}
-								max={3}
-								options={base_form_0.features.map((feat, i) => ({
-									selection_id: i.toString(),
-									title: feat.title,
-									short_title: feat.title
-								}))}
-								term="Feature"
-								term_plural="Features"
-								{width}
-							/>
-						</div>
-					{/if}
-
-					<!-- Features from Base Form 1 -->
-					{#if base_form_1.features.length > 0}
-						<div class="flex flex-col gap-1">
-							<span class="text-xs font-medium">Features from {base_form_1.name}:</span>
-							<ChoiceSelector
-								class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
-								bind:selected_ids={
-									character.chosen_beastform.choices.mythic_hybrid_base_forms_1_features
-								}
-								max={3}
-								options={base_form_1.features.map((feat, i) => ({
-									selection_id: i.toString(),
-									title: feat.title,
-									short_title: feat.title
-								}))}
-								term="Feature"
-								term_plural="Features"
-								{width}
-							/>
-						</div>
-					{/if}
-
-					<!-- Features from Base Form 2 -->
-					{#if base_form_2.features.length > 0}
-						<div class="flex flex-col gap-1">
-							<span class="text-xs font-medium">Features from {base_form_2.name}:</span>
-							<ChoiceSelector
-								class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
-								bind:selected_ids={
-									character.chosen_beastform.choices.mythic_hybrid_base_forms_2_features
-								}
-								max={3}
-								options={base_form_2.features.map((feat, i) => ({
-									selection_id: i.toString(),
-									title: feat.title,
-									short_title: feat.title
-								}))}
-								term="Feature"
-								term_plural="Features"
-								{width}
-							/>
-						</div>
-					{/if}
+								character.chosen_beastform.choices.mythic_hybrid_base_forms_0_features =
+									form_0_selections;
+								character.chosen_beastform.choices.mythic_hybrid_base_forms_1_features =
+									form_1_selections;
+								character.chosen_beastform.choices.mythic_hybrid_base_forms_2_features =
+									form_2_selections;
+							}}
+						>
+							<Select.Trigger class="w-full text-muted-foreground">
+								<p class="truncate">
+									{combined_feature_selections.length === 0
+										? 'Select 3 features'
+										: combined_feature_selections
+												.map((id) => all_features.find((f) => f.id === id)?.label || 'Unknown')
+												.join(', ')}
+									{#if combined_feature_selections.length < 3}
+										<span class="text-muted-foreground">
+											({3 - combined_feature_selections.length} more)
+										</span>
+									{/if}
+								</p>
+							</Select.Trigger>
+							<Select.Content>
+								<Select.Item
+									value=""
+									disabled={combined_feature_selections.length === 0}
+									class="justify-center text-destructive"
+									onclick={() => {
+										if (character?.chosen_beastform) {
+											character.chosen_beastform.choices.mythic_hybrid_base_forms_0_features = [];
+											character.chosen_beastform.choices.mythic_hybrid_base_forms_1_features = [];
+											character.chosen_beastform.choices.mythic_hybrid_base_forms_2_features = [];
+										}
+									}}
+								>
+									-- Clear selection --
+								</Select.Item>
+								{#if base_form_0.features.length > 0}
+									<Select.Label>{base_form_0.name}</Select.Label>
+									{#each base_form_0.features as feat, i}
+										<Select.Item
+											value={`0_${i}`}
+											disabled={combined_feature_selections.length >= 3 && !combined_feature_selections.includes(`0_${i}`)}
+										>
+											{feat.title}
+										</Select.Item>
+									{/each}
+								{/if}
+								{#if base_form_1.features.length > 0}
+									<Select.Label>{base_form_1.name}</Select.Label>
+									{#each base_form_1.features as feat, i}
+										<Select.Item
+											value={`1_${i}`}
+											disabled={combined_feature_selections.length >= 3 && !combined_feature_selections.includes(`1_${i}`)}
+										>
+											{feat.title}
+										</Select.Item>
+									{/each}
+								{/if}
+								{#if base_form_2.features.length > 0}
+									<Select.Label>{base_form_2.name}</Select.Label>
+									{#each base_form_2.features as feat, i}
+										<Select.Item
+											value={`2_${i}`}
+											disabled={combined_feature_selections.length >= 3 && !combined_feature_selections.includes(`2_${i}`)}
+										>
+											{feat.title}
+										</Select.Item>
+									{/each}
+								{/if}
+							</Select.Content>
+						</Select.Root>
+					</div>
 				</div>
 			{/if}
 		</div>

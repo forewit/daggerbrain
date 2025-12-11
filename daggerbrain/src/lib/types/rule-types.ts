@@ -1,6 +1,7 @@
 import type { CharacterModifier, TraitIds as TraitIds } from '$lib/types/compendium-types';
 import type { DomainCardId } from './character-types';
 
+export type CompanionLevelUpOptionIds = 'intelligent' | 'light-in-the-dark' | 'creature-comfort' | 'armored' | 'vicious' | 'resilient' | 'bonded' | 'aware';
 export type Tier1OptionIds = 'tier_1_domain_cards';
 export type Tier2OptionIds =
 	| 'tier_2_domain_card'

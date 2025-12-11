@@ -30,10 +30,10 @@
 
 		<Label class="mr-2 ml-auto cursor-pointer text-xs font-normal text-muted-foreground">
 			<Checkbox
-				checked={character.class_choices['bard']?.['given_out_this_session']?.[0] === 'yes'}
+				checked={character.class_choices[bard_class_id]?.['given_out_this_session']?.[0] === 'yes'}
 				onCheckedChange={(checked) => {
-					if (!character.class_choices['bard']) character.class_choices['bard'] = {};
-					character.class_choices['bard']['given_out_this_session'] = [checked ? 'yes' : 'no'];
+					if (!character.class_choices[bard_class_id]) character.class_choices[bard_class_id] = {};
+					character.class_choices[bard_class_id]['given_out_this_session'] = [checked ? 'yes' : 'no'];
 				}}
 			/> Given out this session
 		</Label>

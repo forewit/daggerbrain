@@ -2,7 +2,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
-	import BeastformComponent from '../../../cards/full-cards/beastform.svelte';
+	import BeastformComponent from '../../cards/full-cards/beastform.svelte';
 
 	let {
 		onBeastformCatalogClick = () => {}
@@ -24,7 +24,7 @@
 </script>
 
 {#if character && (character.primary_class_id === druid_class_id || character.secondary_class_id === druid_class_id)}
-	<div class="-mb-2 flex flex-col items-center gap-2 border-y py-2">
+	<div class="flex flex-col items-center gap-2">
 		{#if derivedBeastform}
 			<BeastformComponent beastform={derivedBeastform} bind_choice_select={true} />
 			<div class="flex justify-center gap-2">
@@ -53,3 +53,4 @@
 		{/if}
 	</div>
 {/if}
+

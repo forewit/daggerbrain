@@ -1,5 +1,6 @@
 import type {
 	AllTierOptionIds,
+	CompanionLevelUpOptionIds,
 	Condition,
 	ConditionIds,
 	LevelUpOption,
@@ -10,6 +11,7 @@ import type {
 	Trait
 } from '$lib/types/rule-types';
 import type { AncestryCard, Armor, TraitIds, Weapon } from '$lib/types/compendium-types';
+import type { Companion } from './character-types';
 
 export const CONDITIONS: Record<ConditionIds, Condition> = {
 	hidden: {
@@ -151,6 +153,39 @@ export const BASE_STATS = {
 	primary_class_mastery_level: 0,
 	secondary_class_mastery_level: 0,
 	unarmed_attack: BASE_UNARMED_ATTACK
+} as const;
+
+export const COMPANION_LEVEL_UP_OPTION_MAXES = {
+	intelligent: 3,
+	'light-in-the-dark': 1,
+	'creature-comfort': 1,
+	armored: 1,
+	vicious: 3,
+	resilient: 3,
+	bonded: 1,
+	aware: 3
+} as const satisfies Record<CompanionLevelUpOptionIds, number>;
+
+export const COMPANION_BASE_EXPERIENCE_MODIFIER = 2;
+export const BASE_COMPANION: Companion = {
+	name: 'Companion',
+	image_url: '/images/companion-placeholder.png',
+	attack: {
+		name: '',
+		range: 'Melee',
+		damage_dice: 'd6',
+		damage_bonus: 0,
+		damage_type: 'phy'
+	},
+	max_stress: 3,
+	marked_stress: 0,
+	max_hope: 0,
+	marked_hope: 0,
+	evasion: 10,
+	level_up_choices:[],
+	experiences: ['', ''],
+	experience_modifiers: [COMPANION_BASE_EXPERIENCE_MODIFIER, COMPANION_BASE_EXPERIENCE_MODIFIER],
+	choices: {}
 } as const;
 
 export const TIER_1_BASE_OPTIONS = {

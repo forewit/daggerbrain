@@ -3,12 +3,26 @@
 	import CharacterSheet from '$lib/components/app/sheet/character-sheet.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
+	import { getUserContext } from '$lib/state/user.svelte';
+	import { page } from '$app/stores';
 
 	const context = getCharacterContext();
 	let character = $derived(context.character);
+	const user = getUserContext();
+	const characterId = $derived($page.params.uid);
+	
+	let characterNotFound = $derived.by(() => {
+		if (user.loading) return false;
+		return !user.all_characters.some((c) => c.id === characterId);
+	});
 </script>
 
-{#if character}
+{#if characterNotFound}
+	<div class="flex flex-col items-center justify-center gap-4 px-4 py-12">
+		<p class="text-sm text-muted-foreground italic">Character not found</p>
+		<Button href="/characters">Back to Characters</Button>
+	</div>
+{:else if character}
 	{#if Object.values(character.selected_traits).includes(null) || !character.primary_class_id}
 		<div class="flex flex-col items-center justify-center gap-4 px-4 py-12">
 			<p class="text-sm text-muted-foreground italic">Ready to finish setting up your character?</p>

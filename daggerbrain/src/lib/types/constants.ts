@@ -8,7 +8,8 @@ import type {
 	LevelUpChoices,
 	LevelUpDomainCardIds,
 	Inventory,
-	ChosenBeastform
+	ChosenBeastform,
+	Companion
 } from '$lib/types/character-types';
 import type { ConditionIds, LevelUpChoice } from '$lib/types/rule-types';
 import type { Traits } from './compendium-types';
@@ -54,6 +55,7 @@ export const CHARACTER_DEFAULTS = {
 
 	// beastform
 	chosen_beastform: <ChosenBeastform | null>null,
+	companion: <Companion | null>null,
 
 	// notes / descriptions
 	background_question_answers: <BackgroundQuestionAnswer[]>[],

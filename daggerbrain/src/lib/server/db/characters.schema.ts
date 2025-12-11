@@ -10,11 +10,12 @@ import type {
 	DomainCardId,
 	CharacterDescriptions,
 	Inventory,
-	ChosenBeastform
+	ChosenBeastform,
+	Companion
 } from '../../types/character-types';
 import type { DomainIds, Traits } from '../../types/compendium-types';
 import { CHARACTER_DEFAULTS } from '../../types/constants';
-import { DomainIdsSchema } from '../../compendium/compendium-schemas';
+import {  RangesSchema, DomainIdsSchema, TraitIdsSchema, DamageTypesSchema } from '../../compendium/compendium-schemas';
 import type { ConditionIds } from '$lib/types/rule-types';
 import { z } from 'zod';
 
@@ -60,6 +61,9 @@ export const characters_table = sqliteTable('characters_table', {
 	chosen_beastform: text('chosen_beastform', { mode: 'json' })
 		.default(CHARACTER_DEFAULTS.chosen_beastform)
 		.$type<ChosenBeastform | null>(),
+	companion: text('companion', { mode: 'json' })
+		.default(CHARACTER_DEFAULTS.companion)
+		.$type<Companion | null>(),
 
 	// notes / descriptions
 	background_question_answers: text('background_questions', { mode: 'json' })
@@ -161,15 +165,40 @@ export const ChosenBeastformSchema = z.object({
 	custom_level_requirement: z.number().nullable()
 });
 
+export const CompanionSchema = z.object({
+	name: z.string(),
+	image_url: z.string(),
+	attack: z.object({
+		name: z.string(),
+		range: RangesSchema,
+		damage_dice: z.string(),
+		damage_bonus: z.number(),
+		damage_type: DamageTypesSchema
+	}).nullable(),
+	max_stress: z.number(),
+	marked_stress: z.number(),
+	max_hope: z.number(),
+	marked_hope: z.number(),
+	evasion: z.number(),
+	level_up_choices: z.array(z.string()),
+	experiences: z.array(z.string()),
+	experience_modifiers: z.array(z.number()),
+	choices: z.record(z.string(), z.array(z.string()))
+});
+
+
 export const characters_table_schema = createSelectSchema(characters_table, {
 	secondary_class_domain_id_choice: DomainIdsSchema.nullable(),
-	chosen_beastform: ChosenBeastformSchema.nullable()
+	chosen_beastform: ChosenBeastformSchema.nullable(),
+	companion: CompanionSchema.nullable()
 });
 export const characters_table_insert_schema = createInsertSchema(characters_table, {
 	secondary_class_domain_id_choice: DomainIdsSchema.nullable(),
-	chosen_beastform: ChosenBeastformSchema.nullable()
+	chosen_beastform: ChosenBeastformSchema.nullable(),
+	companion: CompanionSchema.nullable()
 });
 export const characters_table_update_schema = createUpdateSchema(characters_table, {
 	secondary_class_domain_id_choice: DomainIdsSchema.nullable(),
-	chosen_beastform: ChosenBeastformSchema.nullable()
+	chosen_beastform: ChosenBeastformSchema.nullable(),
+	companion: CompanionSchema.nullable()
 });

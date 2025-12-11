@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import type { Ranges } from '$lib/types/compendium-types';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -67,4 +68,36 @@ export function increaseDie(damage_dice: string): string {
 		// d12 and d20 stay the same
 		return match;
 	});
+}
+
+/**
+ * Increases a range value by one step.
+ * 'Melee' -> 'Very Close' -> 'Close' -> 'Far' -> 'Very Far'
+ * 'Very Far' remains 'Very Far' (maximum range).
+ *
+ * @param range - The current range value
+ * @returns The next range value in the progression
+ *
+ * @example
+ * increase_range('Melee') // 'Very Close'
+ * increase_range('Very Close') // 'Close'
+ * increase_range('Close') // 'Far'
+ * increase_range('Far') // 'Very Far'
+ * increase_range('Very Far') // 'Very Far'
+ */
+export function increase_range(range: Ranges): Ranges {
+	switch (range) {
+		case 'Melee':
+			return 'Very Close';
+		case 'Very Close':
+			return 'Close';
+		case 'Close':
+			return 'Far';
+		case 'Far':
+			return 'Very Far';
+		case 'Very Far':
+			return 'Very Far';
+		default:
+			return range;
+	}
 }

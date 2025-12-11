@@ -63,8 +63,7 @@
 	// Calculate title with active character count
 	let titleText = $derived.by(() => {
 		if (data.has_unlimited_slots) {
-			const activeCount = user.all_characters.length;
-			return `Characters (${activeCount}/∞)`;
+			return `Characters`;
 		} else {
 			if (!user.user_slots) {
 				return 'Characters';

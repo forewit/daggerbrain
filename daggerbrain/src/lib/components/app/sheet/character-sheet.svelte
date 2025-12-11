@@ -185,7 +185,7 @@
 						<Button
 							href={`/characters/${character.id}/class/`}
 							class={cn(
-								'h-full grow justify-start gap-2 truncate  rounded-l-none rounded-r-full',
+								'h-full  justify-start gap-2 truncate  rounded-l-none rounded-r-full',
 								'border-0 border-b'
 							)}
 							variant="outline"
@@ -214,11 +214,12 @@
 						</button>
 
 						<!-- name and heritage -->
-						<div class="flex grow flex-col gap-2 truncate">
+						<div class="flex grow flex-col gap-1 truncate">
 							<p class="truncate text-2xl font-bold">{character.name}</p>
-							<p class="truncate text-xs text-muted-foreground">
+							<p class="mt-1 truncate text-xs text-muted-foreground">
 								{context.ancestry_card?.title || 'No ancestry'}
-								&ensp;•&ensp;
+							</p>
+							<p class="truncate text-xs text-muted-foreground">
 								{context.community_card?.title || 'No community'}
 							</p>
 						</div>
