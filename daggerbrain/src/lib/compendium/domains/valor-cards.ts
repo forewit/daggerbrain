@@ -3,7 +3,7 @@ import type { DomainCard } from '$lib/types/compendium-types';
 export const VALOR_DOMAIN_CARDS = {
 	bare_bones: {
 		compendium_id: 'bare_bones',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Simon Pape',
@@ -391,7 +391,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 	forceful_push: {
 		compendium_id: 'forceful_push',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Mat Wilma',
@@ -418,7 +418,7 @@ export const VALOR_DOMAIN_CARDS = {
 
 	i_am_your_shield: {
 		compendium_id: 'i_am_your_shield',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Juan S. Almenicon',
@@ -445,7 +445,7 @@ export const VALOR_DOMAIN_CARDS = {
 
 	body_basher: {
 		compendium_id: 'body_basher',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Ilya Royz',
@@ -471,7 +471,7 @@ export const VALOR_DOMAIN_CARDS = {
 
 	bold_presence: {
 		compendium_id: 'bold_presence',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Bear Frymire',
@@ -497,7 +497,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 	critical_inspiration: {
 		compendium_id: 'critical_inspiration',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Suzanne Helmigh',
@@ -523,7 +523,7 @@ export const VALOR_DOMAIN_CARDS = {
 
 	lean_on_me: {
 		compendium_id: 'lean_on_me',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Jenny Tan',
@@ -549,7 +549,7 @@ export const VALOR_DOMAIN_CARDS = {
 
 	goad_them_on: {
 		compendium_id: 'goad_them_on',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Anthony Jones',
@@ -579,7 +579,7 @@ export const VALOR_DOMAIN_CARDS = {
 
 	support_tank: {
 		compendium_id: 'support_tank',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'James Green',
@@ -605,7 +605,7 @@ export const VALOR_DOMAIN_CARDS = {
 
 	armorer: {
 		compendium_id: 'armorer',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Unknown',
@@ -645,7 +645,7 @@ export const VALOR_DOMAIN_CARDS = {
 
 	rousing_strike: {
 		compendium_id: 'rousing_strike',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Ilya Royz',
@@ -670,7 +670,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 	inevitable: {
 		compendium_id: 'inevitable',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Ivan Koltovich',
@@ -696,7 +696,7 @@ export const VALOR_DOMAIN_CARDS = {
 
 	rise_up: {
 		compendium_id: 'rise_up',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Ana Amaral',
@@ -730,7 +730,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 	shrug_it_off: {
 		compendium_id: 'shrug_it_off',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Rafater',
@@ -757,7 +757,7 @@ export const VALOR_DOMAIN_CARDS = {
 
 	valor_touched: {
 		compendium_id: 'valor_touched',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Daarken',
@@ -800,7 +800,7 @@ export const VALOR_DOMAIN_CARDS = {
 	},
 	full_surge: {
 		compendium_id: 'full_surge',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Mike Azevedo',
@@ -826,7 +826,7 @@ export const VALOR_DOMAIN_CARDS = {
 
 	ground_pound: {
 		compendium_id: 'ground_pound',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Rafater',
@@ -857,7 +857,7 @@ export const VALOR_DOMAIN_CARDS = {
 
 	hold_the_line: {
 		compendium_id: 'hold_the_line',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Laura Galli',
@@ -884,7 +884,7 @@ export const VALOR_DOMAIN_CARDS = {
 
 	lead_by_example: {
 		compendium_id: 'lead_by_example',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Jenny Tan',
@@ -911,7 +911,7 @@ export const VALOR_DOMAIN_CARDS = {
 
 	unbreakable: {
 		compendium_id: 'unbreakable',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Luísa Costa',
@@ -937,7 +937,7 @@ export const VALOR_DOMAIN_CARDS = {
 
 	unyielding_armor: {
 		compendium_id: 'unyielding_armor',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'valor',
 		artist_name: 'Samantha Kung',

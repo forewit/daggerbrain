@@ -9,7 +9,12 @@ import {
 	TRAIT_OPTIONS
 } from '../types/rules';
 import { getContext, setContext } from 'svelte';
-import type { Character, DomainCardId, ChosenBeastform, Companion } from '$lib/types/character-types';
+import type {
+	Character,
+	DomainCardId,
+	ChosenBeastform,
+	Companion
+} from '$lib/types/character-types';
 import type { AllTierOptionIds, ConditionIds, LevelUpChoice } from '$lib/types/rule-types';
 import type {
 	DamageThresholds,
@@ -31,12 +36,28 @@ import { increaseDie, increase_range } from '$lib/utils';
 
 function createCharacter(id: string) {
 	const user = getUserContext();
-	const compendium = getCompendiumContext();
-
 	let character = <Character | null>$state(null);
 	$effect(() => {
 		character = user.all_characters.find((c) => c.id === id) || null;
 	});
+
+	const compendium = getCompendiumContext();
+	$effect(() => {
+		if (!character) return;
+
+		if (!compendium.source_whitelist.has('SRD')) {
+			compendium.source_whitelist.add('SRD');
+		}
+
+		if (character.settings.void_enabled) {
+			compendium.source_whitelist.add('Void 1.5');
+		} else {
+			compendium.source_whitelist.delete('Void 1.5');
+		}
+	});
+
+	// ! clear ids that are not in the compendium
+	
 
 	// ================================================
 	// DERIVED COMPENDIUM REFERENCES
@@ -48,10 +69,10 @@ function createCharacter(id: string) {
 
 		if (character.ancestry_card_id === BASE_MIXED_ANCESTRY_CARD.compendium_id) {
 			const custom_top_ancestry = character.custom_top_ancestry
-				? compendium.ancestry_cards[character.custom_top_ancestry]
+				? compendium.ancestry_cards[character.custom_top_ancestry] || null
 				: null;
 			const custom_bottom_ancestry = character.custom_bottom_ancestry
-				? compendium.ancestry_cards[character.custom_bottom_ancestry]
+				? compendium.ancestry_cards[character.custom_bottom_ancestry] || null
 				: null;
 
 			return {
@@ -66,55 +87,60 @@ function createCharacter(id: string) {
 			};
 		} else {
 			return character?.ancestry_card_id
-				? compendium.ancestry_cards[character.ancestry_card_id]
+				? compendium.ancestry_cards[character.ancestry_card_id] || null
 				: null;
 		}
 	});
 	let community_card = $derived(
-		character?.community_card_id ? compendium.community_cards[character.community_card_id] : null
+		character?.community_card_id ? compendium.community_cards[character.community_card_id] || null : null
 	);
 	let transformation_card = $derived(
 		character?.transformation_card_id
-			? compendium.transformation_cards[character.transformation_card_id]
+			? compendium.transformation_cards[character.transformation_card_id] || null
 			: null
 	);
 
 	// Class and subclass
 	let primary_class = $derived(
-		character?.primary_class_id ? compendium.classes[character.primary_class_id] : null
+		character?.primary_class_id ? compendium.classes[character.primary_class_id] || null : null
 	);
 	let primary_subclass = $derived(
 		character?.primary_subclass_id ? compendium.subclasses[character.primary_subclass_id] : null
 	);
 	let secondary_class = $derived(
-		character?.secondary_class_id ? compendium.classes[character.secondary_class_id] : null
+		character?.secondary_class_id ? compendium.classes[character.secondary_class_id] || null : null
 	);
 	let secondary_subclass = $derived(
-		character?.secondary_subclass_id ? compendium.subclasses[character.secondary_subclass_id] : null
+		character?.secondary_subclass_id ? compendium.subclasses[character.secondary_subclass_id] || null : null
 	);
 
 	// domain cards
 	let level_up_domain_cards = $derived.by(() => {
 		const ids = character?.level_up_domain_card_ids;
+		const getDomainCard = (id: DomainCardId | null) => {
+			if (!id) return null;
+			const domainCards = compendium.domain_cards[id.domainId];
+			return domainCards?.[id.cardId] || null;
+		};
 		return {
 			1: {
-				A: ids?.[1]?.A ? compendium.domain_cards[ids[1].A.domainId][ids[1].A.cardId] : null,
-				B: ids?.[1]?.B ? compendium.domain_cards[ids[1].B.domainId][ids[1].B.cardId] : null
+				A: getDomainCard(ids?.[1]?.A || null),
+				B: getDomainCard(ids?.[1]?.B || null)
 			},
-			2: { A: ids?.[2]?.A ? compendium.domain_cards[ids[2].A.domainId][ids[2].A.cardId] : null },
-			3: { A: ids?.[3]?.A ? compendium.domain_cards[ids[3].A.domainId][ids[3].A.cardId] : null },
-			4: { A: ids?.[4]?.A ? compendium.domain_cards[ids[4].A.domainId][ids[4].A.cardId] : null },
-			5: { A: ids?.[5]?.A ? compendium.domain_cards[ids[5].A.domainId][ids[5].A.cardId] : null },
-			6: { A: ids?.[6]?.A ? compendium.domain_cards[ids[6].A.domainId][ids[6].A.cardId] : null },
-			7: { A: ids?.[7]?.A ? compendium.domain_cards[ids[7].A.domainId][ids[7].A.cardId] : null },
-			8: { A: ids?.[8]?.A ? compendium.domain_cards[ids[8].A.domainId][ids[8].A.cardId] : null },
-			9: { A: ids?.[9]?.A ? compendium.domain_cards[ids[9].A.domainId][ids[9].A.cardId] : null },
-			10: { A: ids?.[10]?.A ? compendium.domain_cards[ids[10].A.domainId][ids[10].A.cardId] : null }
+			2: { A: getDomainCard(ids?.[2]?.A || null) },
+			3: { A: getDomainCard(ids?.[3]?.A || null) },
+			4: { A: getDomainCard(ids?.[4]?.A || null) },
+			5: { A: getDomainCard(ids?.[5]?.A || null) },
+			6: { A: getDomainCard(ids?.[6]?.A || null) },
+			7: { A: getDomainCard(ids?.[7]?.A || null) },
+			8: { A: getDomainCard(ids?.[8]?.A || null) },
+			9: { A: getDomainCard(ids?.[9]?.A || null) },
+			10: { A: getDomainCard(ids?.[10]?.A || null) }
 		};
 	});
 	let additional_domain_cards = $derived(
 		character?.additional_domain_card_ids
-			.map((id) => compendium.domain_cards[id.domainId][id.cardId])
+			.map((id) => compendium.domain_cards[id.domainId]?.[id.cardId])
 			.filter((c) => !!c) || []
 	);
 	let additional_ancestry_cards = $derived(
@@ -402,9 +428,11 @@ function createCharacter(id: string) {
 	// ! initialize companion if subclass is ranger_beastbound
 	$effect(() => {
 		if (!character) return;
+		const rangerBeastbound = compendium.subclasses.ranger_beastbound;
+		if (!rangerBeastbound) return;
 		if (
-			character.primary_subclass_id !== compendium.subclasses.ranger_beastbound.compendium_id &&
-			character.secondary_subclass_id !== compendium.subclasses.ranger_beastbound.compendium_id
+			character.primary_subclass_id !== rangerBeastbound.compendium_id &&
+			character.secondary_subclass_id !== rangerBeastbound.compendium_id
 		) {
 			character.companion = null;
 		} else {
@@ -424,7 +452,7 @@ function createCharacter(id: string) {
 			}
 			return;
 		}
-		
+
 		// Start with a deep copy of the companion
 		const base_companion = character.companion as Companion;
 		const new_derived_companion: Companion = {
@@ -446,7 +474,10 @@ function createCharacter(id: string) {
 		// Index 0 = level 2 choice, index 1 = level 3 choice, etc.
 		const maxChoicesLength = Math.max(0, character.level - 1);
 		if (new_derived_companion.level_up_choices.length > maxChoicesLength) {
-			new_derived_companion.level_up_choices = new_derived_companion.level_up_choices.slice(0, maxChoicesLength);
+			new_derived_companion.level_up_choices = new_derived_companion.level_up_choices.slice(
+				0,
+				maxChoicesLength
+			);
 		}
 
 		// Keep the companion's experiences and experience_modifiers array locked to the same size as the character's experiences array
@@ -459,10 +490,12 @@ function createCharacter(id: string) {
 		}
 
 		// Initialize experience_modifiers to base value and resize to match experiences
-		new_derived_companion.experience_modifiers = Array(targetSize).fill(COMPANION_BASE_EXPERIENCE_MODIFIER);
+		new_derived_companion.experience_modifiers = Array(targetSize).fill(
+			COMPANION_BASE_EXPERIENCE_MODIFIER
+		);
 
 		// Apply "intelligent" bonuses: +1 to chosen experience modifiers
-		const intelligentChoices = new_derived_companion.choices["intelligent"] || [];
+		const intelligentChoices = new_derived_companion.choices['intelligent'] || [];
 		for (const experienceIndexStr of intelligentChoices) {
 			const experienceIndex = parseInt(experienceIndexStr, 10);
 			if (!isNaN(experienceIndex) && experienceIndex >= 0 && experienceIndex < targetSize) {
@@ -472,22 +505,28 @@ function createCharacter(id: string) {
 
 		// Apply "vicious" bonuses: increase damage dice or range by one step
 		if (new_derived_companion.attack) {
-			const viciousChoices = new_derived_companion.choices["vicious"] || [];
+			const viciousChoices = new_derived_companion.choices['vicious'] || [];
 			for (const choice of viciousChoices) {
-				if (choice === "damage_dice" && new_derived_companion.attack) {
-					new_derived_companion.attack.damage_dice = increaseDie(new_derived_companion.attack.damage_dice);
-				} else if (choice === "range" && new_derived_companion.attack) {
+				if (choice === 'damage_dice' && new_derived_companion.attack) {
+					new_derived_companion.attack.damage_dice = increaseDie(
+						new_derived_companion.attack.damage_dice
+					);
+				} else if (choice === 'range' && new_derived_companion.attack) {
 					new_derived_companion.attack.range = increase_range(new_derived_companion.attack.range);
 				}
 			}
 		}
 
 		// Apply "resilient" bonuses: +1 to max_stress per choice
-		const resilientCount = new_derived_companion.level_up_choices.filter((id) => id === 'resilient').length;
+		const resilientCount = new_derived_companion.level_up_choices.filter(
+			(id) => id === 'resilient'
+		).length;
 		new_derived_companion.max_stress += resilientCount;
 
 		// Apply "light-in-the-dark" bonuses: +1 to max_hope per choice
-		const lightInTheDarkCount = new_derived_companion.level_up_choices.filter((id) => id === 'light-in-the-dark').length;
+		const lightInTheDarkCount = new_derived_companion.level_up_choices.filter(
+			(id) => id === 'light-in-the-dark'
+		).length;
 		new_derived_companion.max_hope += lightInTheDarkCount;
 
 		// Apply "aware" bonuses: +2 to evasion per choice
@@ -495,10 +534,16 @@ function createCharacter(id: string) {
 		new_derived_companion.evasion += awareCount * 2;
 
 		// Cap marked_stress between 0 and max_stress
-		new_derived_companion.marked_stress = Math.max(0, Math.min(new_derived_companion.marked_stress, new_derived_companion.max_stress));
-	
-	// Cap marked_hope between 0 and max_hope
-	new_derived_companion.marked_hope = Math.max(0, Math.min(new_derived_companion.marked_hope, new_derived_companion.max_hope));
+		new_derived_companion.marked_stress = Math.max(
+			0,
+			Math.min(new_derived_companion.marked_stress, new_derived_companion.max_stress)
+		);
+
+		// Cap marked_hope between 0 and max_hope
+		new_derived_companion.marked_hope = Math.max(
+			0,
+			Math.min(new_derived_companion.marked_hope, new_derived_companion.max_hope)
+		);
 
 		if (JSON.stringify(new_derived_companion) !== JSON.stringify(derived_companion)) {
 			derived_companion = new_derived_companion;
@@ -1691,14 +1736,14 @@ function createCharacter(id: string) {
 			}
 
 			const choice_A_selected_domain_card = choice_A.selected_domain_card_id
-				? compendium.domain_cards[choice_A.selected_domain_card_id.domainId][
+				? compendium.domain_cards[choice_A.selected_domain_card_id.domainId]?.[
 						choice_A.selected_domain_card_id.cardId
-					]
+					] || null
 				: null;
 			const choice_B_selected_domain_card = choice_B.selected_domain_card_id
-				? compendium.domain_cards[choice_B.selected_domain_card_id.domainId][
+				? compendium.domain_cards[choice_B.selected_domain_card_id.domainId]?.[
 						choice_B.selected_domain_card_id.cardId
-					]
+					] || null
 				: null;
 
 			// filter domain card choices that are not valid for the current level

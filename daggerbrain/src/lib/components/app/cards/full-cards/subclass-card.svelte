@@ -27,7 +27,7 @@
 
 	const compendium = getCompendiumContext();
 
-	const character_class = compendium.classes[card.class_id as keyof typeof compendium.classes];
+	const character_class = compendium.classes[card.class_id] || null;
 </script>
 
 {#if variant === 'responsive'}
@@ -97,19 +97,23 @@
 					alt="divider"
 					class="absolute bottom-0 left-0 z-4 w-full object-cover"
 				/>
-				<ClassBanner {character_class} class="absolute -top-[2px] left-[14px] w-[75px]" />
+				{#if character_class}
+					<ClassBanner {character_class} class="absolute -top-[2px] left-[14px] w-[75px]" />
 
-				<div
-					style="background: linear-gradient(to right, {compendium.domains[
-						character_class.primary_domain_id
-					].color}, {compendium.domains[character_class.secondary_domain_id].color});"
-					class="clip-card-type absolute bottom-[5px] left-[110px] h-[21px] w-[129px]"
-				></div>
-				<p
-					class="absolute bottom-[9px] left-[175px] z-5 -translate-x-1/2 text-[12px] leading-none font-bold text-white uppercase"
-				>
-					{character_class.name}
-				</p>
+					{#if compendium.domains[character_class.primary_domain_id] && compendium.domains[character_class.secondary_domain_id]}
+						{@const primaryDomain = compendium.domains[character_class.primary_domain_id]}
+						{@const secondaryDomain = compendium.domains[character_class.secondary_domain_id]}
+						<div
+							style="background: linear-gradient(to right, {primaryDomain.color}, {secondaryDomain.color});"
+							class="clip-card-type absolute bottom-[5px] left-[110px] h-[21px] w-[129px]"
+						></div>
+					{/if}
+					<p
+						class="absolute bottom-[9px] left-[175px] z-5 -translate-x-1/2 text-[12px] leading-none font-bold text-white uppercase"
+					>
+						{character_class.name}
+					</p>
+				{/if}
 			</div>
 
 			<!-- content -->

@@ -3,7 +3,7 @@ import type { DomainCard } from '$lib/types/compendium-types';
 export const SPLENDOR_DOMAIN_CARDS = {
 	bolt_beacon: {
 		compendium_id: 'bolt_beacon',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Anthony Jones',
@@ -29,7 +29,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 
 	mending_touch: {
 		compendium_id: 'mending_touch',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Suzanne Helmigh',
@@ -56,7 +56,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 
 	reassurance: {
 		compendium_id: 'reassurance',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Sam Key',
@@ -82,7 +82,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 
 	final_words: {
 		compendium_id: 'final_words',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Bear Frymire',
@@ -113,7 +113,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 
 	healing_hands: {
 		compendium_id: 'healing_hands',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Samantha Kung',
@@ -144,7 +144,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 
 	second_wind: {
 		compendium_id: 'second_wind',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Mauro Alocci',
@@ -171,7 +171,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 
 	voice_of_reason: {
 		compendium_id: 'voice_of_reason',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Stanislav Sherbakov',
@@ -197,7 +197,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 	divination: {
 		compendium_id: 'divination',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Diana Bakieva',
@@ -223,7 +223,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 
 	life_ward: {
 		compendium_id: 'life_ward',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Simon Pape',
@@ -250,7 +250,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 
 	shape_material: {
 		compendium_id: 'shape_material',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Ilya Royz',
@@ -277,7 +277,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 
 	smite: {
 		compendium_id: 'smite',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Geoffrey Ernault',
@@ -303,7 +303,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 
 	restoration: {
 		compendium_id: 'restoration',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Mat Wilma',
@@ -332,7 +332,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 
 	zone_of_protection: {
 		compendium_id: 'zone_of_protection',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Anthony Jones',
@@ -358,7 +358,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 	},
 	healing_strike: {
 		compendium_id: 'healing_strike',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Juan S. Almenicon',
@@ -384,7 +384,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 
 	splendor_touched: {
 		compendium_id: 'splendor_touched',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Daarken',
@@ -428,7 +428,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 
 	shield_aura: {
 		compendium_id: 'shield_aura',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Danil Luzin',
@@ -455,7 +455,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 
 	stunning_sunlight: {
 		compendium_id: 'stunning_sunlight',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Anthony Jones',
@@ -486,7 +486,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 
 	overwhelming_aura: {
 		compendium_id: 'overwhelming_aura',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Eliot Baum',
@@ -513,7 +513,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 
 	salvation_beam: {
 		compendium_id: 'salvation_beam',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Daarken',
@@ -540,7 +540,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 
 	invigoration: {
 		compendium_id: 'invigoration',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Jenny Tan',
@@ -566,7 +566,7 @@ export const SPLENDOR_DOMAIN_CARDS = {
 
 	resurrection: {
 		compendium_id: 'resurrection',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'splendor',
 		artist_name: 'Dominik Mayer',

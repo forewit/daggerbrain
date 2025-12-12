@@ -3,7 +3,7 @@ import type { DomainIds, Domain } from '$lib/types/compendium-types';
 export const DOMAINS = {
 	arcana: {
 		domain_id: 'arcana',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		name: 'Arcana',
 		description_html: '',
 		color: '#4e345b',
@@ -11,7 +11,7 @@ export const DOMAINS = {
 	},
 	blade: {
 		domain_id: 'blade',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		name: 'Blade',
 		foreground_color: '#ffffff',
 		description_html: `<p>Blade is the domain of <b>weapon mastery</b>. Whether by steel,
@@ -24,7 +24,7 @@ export const DOMAINS = {
 	},
 	bone: {
 		domain_id: 'bone',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		name: 'Bone',
 		color: '#a4a9a8',
 		foreground_color: '#000000',
@@ -37,7 +37,7 @@ export const DOMAINS = {
 	},
 	codex: {
 		domain_id: 'codex',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		name: 'Codex',
 		description_html: '',
 		color: '#24395d',
@@ -45,7 +45,7 @@ export const DOMAINS = {
 	},
 	grace: {
 		domain_id: 'grace',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		name: 'Grace',
 		description_html: '',
 		color: '#8d3965',
@@ -53,7 +53,7 @@ export const DOMAINS = {
 	},
 	midnight: {
 		domain_id: 'midnight',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		name: 'Midnight',
 		description_html: `<p>Midnight is the domain of <b>shadows and secrecy</b>. Whether
             by clever tricks, deft magic, or the cloak of night, those who
@@ -66,7 +66,7 @@ export const DOMAINS = {
 	},
 	sage: {
 		domain_id: 'sage',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		name: 'Sage',
 		description_html: '',
 		color: '#244e30',
@@ -74,7 +74,7 @@ export const DOMAINS = {
 	},
 	splendor: {
 		domain_id: 'splendor',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		name: 'Splendor',
 		description_html: '',
 		color: '#b8a342',
@@ -82,7 +82,7 @@ export const DOMAINS = {
 	},
 	valor: {
 		domain_id: 'valor',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		name: 'Valor',
 		description_html: `<p>Valor is the domain of <b>protection</b>. Whether through attack or
             defense, those who choose this discipline channel formidable

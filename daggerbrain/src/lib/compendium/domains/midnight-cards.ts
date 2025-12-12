@@ -3,7 +3,7 @@ import type { DomainCard } from '$lib/types/compendium-types';
 export const MIDNIGHT_DOMAIN_CARDS = {
 	pick_and_pull: {
 		compendium_id: 'pick_and_pull',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Benjamin Ee',
@@ -29,7 +29,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	rain_of_blades: {
 		compendium_id: 'rain_of_blades',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Linda Lithén',
@@ -55,7 +55,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	uncanny_disguise: {
 		compendium_id: 'uncanny_disguise',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Linda Lithén',
@@ -81,7 +81,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	midnight_spirit: {
 		compendium_id: 'midnight_spirit',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Reiko Murakami',
@@ -107,7 +107,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	shadowbind: {
 		compendium_id: 'shadowbind',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Adam Barker',
@@ -133,7 +133,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	chokehold: {
 		compendium_id: 'chokehold',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Anthony Jones',
@@ -159,7 +159,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	veil_of_night: {
 		compendium_id: 'veil_of_night',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Joshua Rodriguez',
@@ -185,7 +185,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	glyph_of_nightfall: {
 		compendium_id: 'glyph_of_nightfall',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Anthony Jones',
@@ -211,7 +211,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	stealth_expertise: {
 		compendium_id: 'stealth_expertise',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Carlos C Díaz',
@@ -237,7 +237,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	hush: {
 		compendium_id: 'hush',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Laura Galli',
@@ -263,7 +263,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	phantom_retreat: {
 		compendium_id: 'phantom_retreat',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'José Muñoz',
@@ -289,7 +289,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	dark_whispers: {
 		compendium_id: 'dark_whispers',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Jenny Tan',
@@ -320,7 +320,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	mass_disguise: {
 		compendium_id: 'mass_disguise',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Anthony Jones',
@@ -346,7 +346,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	midnight_touched: {
 		compendium_id: 'midnight_touched',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Joshua Rodriguez',
@@ -375,7 +375,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	vanishing_dodge: {
 		compendium_id: 'vanishing_dodge',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Arturo G. González',
@@ -401,7 +401,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	shadowhunter: {
 		compendium_id: 'shadowhunter',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Samantha Kung',
@@ -427,7 +427,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	spellcharge: {
 		compendium_id: 'spellcharge',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Geoffrey Ernault',
@@ -453,7 +453,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	night_terror: {
 		compendium_id: 'night_terror',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Anthony Jones',
@@ -479,7 +479,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	twilight_toll: {
 		compendium_id: 'twilight_toll',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Rafater',
@@ -505,7 +505,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	eclipse: {
 		compendium_id: 'eclipse',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Arturo G. González',
@@ -531,7 +531,7 @@ export const MIDNIGHT_DOMAIN_CARDS = {
 	},
 	specter_of_the_dark: {
 		compendium_id: 'specter_of_the_dark',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'midnight',
 		artist_name: 'Alex Konstad',

@@ -55,9 +55,9 @@
 							class="w-full truncate bg-muted-foreground/8 hover:bg-muted-foreground/5"
 						>
 							<p class="truncate">
-								{domain_id_selection
-									? compendium.domains[domain_id_selection].name
-									: 'Select a domain'}
+							{domain_id_selection
+								? compendium.domains[domain_id_selection]?.name || 'Domain not available'
+								: 'Select a domain'}
 							</p>
 						</Select.Trigger>
 						<Select.Content class="rounded-md " align="start">
@@ -66,20 +66,30 @@
 							>
 							<Select.Label>Domains</Select.Label>
 							<!-- primary domain -->
-							<Select.Item value={character_class.primary_domain_id}
-								>{compendium.domains[character_class.primary_domain_id].name}</Select.Item
-							>
+							{#if compendium.domains[character_class.primary_domain_id]}
+								<Select.Item value={character_class.primary_domain_id}
+									>{compendium.domains[character_class.primary_domain_id].name}</Select.Item
+								>
+							{/if}
 							<!-- secondary domain -->
-							<Select.Item value={character_class.secondary_domain_id}
-								>{compendium.domains[character_class.secondary_domain_id].name}</Select.Item
-							>
+							{#if compendium.domains[character_class.secondary_domain_id]}
+								<Select.Item value={character_class.secondary_domain_id}
+									>{compendium.domains[character_class.secondary_domain_id].name}</Select.Item
+								>
+							{/if}
 						</Select.Content>
 					</Select.Root>
 				{:else}
 					<p class="text-xs text-muted-foreground">
 						<b class="text-foreground"><i>Domains:</i></b>
-						{compendium.domains[character_class.primary_domain_id].name} /
-						{compendium.domains[character_class.secondary_domain_id].name}
+						{(() => {
+							const primaryDomain = compendium.domains[character_class.primary_domain_id];
+							const secondaryDomain = compendium.domains[character_class.secondary_domain_id];
+							if (!primaryDomain || !secondaryDomain) {
+								return 'Domain not available';
+							}
+							return `${primaryDomain.name} / ${secondaryDomain.name}`;
+						})()}
 					</p>
 
 					{#if !hide_starting_stats}

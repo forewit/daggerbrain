@@ -3,7 +3,7 @@ import type { DomainCard } from '$lib/types/compendium-types';
 export const BLADE_DOMAIN_CARDS = {
 	get_back_up: {
 		compendium_id: 'get_back_up',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Jenny Tan',
@@ -29,7 +29,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	whirlwind: {
 		compendium_id: 'whirlwind',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Mike Pape',
@@ -55,7 +55,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	not_good_enough: {
 		compendium_id: 'not_good_enough',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Juan S. Almencion',
@@ -80,7 +80,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	reckless: {
 		compendium_id: 'reckless',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Jenny Tan',
@@ -105,7 +105,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	a_soldiers_bond: {
 		compendium_id: 'a_soldiers_bond',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Mila Pesic',
@@ -131,7 +131,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	scramble: {
 		compendium_id: 'scramble',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Ilya Royz',
@@ -157,7 +157,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	versatile_fighter: {
 		compendium_id: 'versatile_fighter',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'KarrahE',
@@ -183,7 +183,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	deadly_focus: {
 		compendium_id: 'deadly_focus',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Rafater',
@@ -209,7 +209,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	fortified_armor: {
 		compendium_id: 'fortified_armor',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Henrik Rosenborg',
@@ -270,7 +270,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	champions_edge: {
 		compendium_id: 'champions_edge',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Samantha B. Lucas',
@@ -301,7 +301,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	vitality: {
 		compendium_id: 'vitality',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Juan S. Almencion',
@@ -413,7 +413,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	battle_hardened: {
 		compendium_id: 'battle_hardened',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Arturo G. González',
@@ -439,7 +439,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	rage_up: {
 		compendium_id: 'rage_up',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Ivan Koltovich',
@@ -465,7 +465,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	blade_touched: {
 		compendium_id: 'blade_touched',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Simon Pape',
@@ -523,7 +523,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	glancing_blow: {
 		compendium_id: 'glancing_blow',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Maxime Minard',
@@ -549,7 +549,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	battle_cry: {
 		compendium_id: 'battle_cry',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Daarken',
@@ -575,7 +575,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	frenzy: {
 		compendium_id: 'frenzy',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Edgar Cardona',
@@ -601,7 +601,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	gore_and_glory: {
 		compendium_id: 'gore_and_glory',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Simon Pape',
@@ -627,7 +627,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	reapers_strike: {
 		compendium_id: 'reapers_strike',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Ilya Royz',
@@ -653,7 +653,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	battle_monster: {
 		compendium_id: 'battle_monster',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Geoffrey Ernault',
@@ -679,7 +679,7 @@ export const BLADE_DOMAIN_CARDS = {
 	},
 	onslaught: {
 		compendium_id: 'onslaught',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'blade',
 		artist_name: 'Maciej Wojtala',

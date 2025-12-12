@@ -4,7 +4,7 @@ export const SAGE_DOMAIN_CARDS = {
 	// todo: verify everything below
 	gifted_tracker: {
 		compendium_id: 'gifted_tracker',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Ernanda Souza',
@@ -36,7 +36,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	natures_tongue: {
 		compendium_id: 'natures_tongue',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Simon Pape',
@@ -62,7 +62,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	vicious_entangle: {
 		compendium_id: 'vicious_entangle',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Leesha Hannigan',
@@ -88,7 +88,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	conjure_swarm: {
 		compendium_id: 'conjure_swarm',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Jen Estridain Pattison',
@@ -114,7 +114,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	natural_familiar: {
 		compendium_id: 'natural_familiar',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Leesha Hannigan',
@@ -141,7 +141,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	corrosive_projectile: {
 		compendium_id: 'corrosive_projectile',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Anthony Jones',
@@ -167,7 +167,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	towering_stalk: {
 		compendium_id: 'towering_stalk',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Anthony Avon',
@@ -193,7 +193,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	death_grip: {
 		compendium_id: 'death_grip',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Arturo G. González',
@@ -224,7 +224,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	healing_field: {
 		compendium_id: 'healing_field',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Bear Frymire',
@@ -250,7 +250,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	thorn_skin: {
 		compendium_id: 'thorn_skin',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Jack Jones',
@@ -277,7 +277,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	wild_fortress: {
 		compendium_id: 'wild_fortress',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Bear Frymire',
@@ -304,7 +304,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	conjured_steeds: {
 		compendium_id: 'conjured_steeds',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Juan S. Almencion',
@@ -330,7 +330,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	forager: {
 		compendium_id: 'forager',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Anthony Jones',
@@ -363,7 +363,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	sage_touched: {
 		compendium_id: 'sage_touched',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Juan S. Almenicon',
@@ -392,7 +392,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	wild_surge: {
 		compendium_id: 'wild_surge',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Ryan Christian Rodero',
@@ -419,7 +419,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	forest_sprites: {
 		compendium_id: 'forest_sprites',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Ilya Royz',
@@ -449,7 +449,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	rejuvenation_barrier: {
 		compendium_id: 'rejuvenation_barrier',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Bear Frymire',
@@ -475,7 +475,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	fane_of_the_wilds: {
 		compendium_id: 'fane_of_the_wilds',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Anthony Avon',
@@ -503,7 +503,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	plant_dominion: {
 		compendium_id: 'plant_dominion',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Anthony Jones',
@@ -529,7 +529,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	force_of_nature: {
 		compendium_id: 'force_of_nature',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Carlos C Díaz',
@@ -560,7 +560,7 @@ export const SAGE_DOMAIN_CARDS = {
 	},
 	tempest: {
 		compendium_id: 'tempest',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'sage',
 		artist_name: 'Samantha Kung',

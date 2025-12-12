@@ -31,17 +31,17 @@
 	// Get suggested items
 	let suggestedPrimaryWeapon = $derived.by(() => {
 		if (!primary_class?.suggested_primary_weapon_id) return null;
-		return compendium.primary_weapons[primary_class.suggested_primary_weapon_id];
+		return compendium.primary_weapons[primary_class.suggested_primary_weapon_id] || null;
 	});
 
 	let suggestedSecondaryWeapon = $derived.by(() => {
 		if (!primary_class?.suggested_secondary_weapon_id) return null;
-		return compendium.secondary_weapons[primary_class.suggested_secondary_weapon_id];
+		return compendium.secondary_weapons[primary_class.suggested_secondary_weapon_id] || null;
 	});
 
 	let suggestedArmor = $derived.by(() => {
 		if (!primary_class?.suggested_armor_id) return null;
-		return compendium.armor[primary_class.suggested_armor_id];
+		return compendium.armor[primary_class.suggested_armor_id] || null;
 	});
 
 	// Get loot options (can be either loot or consumables)

@@ -3,7 +3,7 @@ import type { DomainCard } from '$lib/types/compendium-types';
 export const BONE_DOMAIN_CARDS = {
 	untouchable: {
 		compendium_id: 'untouchable',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Henry Peters',
@@ -43,7 +43,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	deft_maneuvers: {
 		compendium_id: 'deft_maneuvers',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Tamara Osborn',
@@ -69,7 +69,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	i_see_it_coming: {
 		compendium_id: 'i_see_it_coming',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Mat Wilma',
@@ -95,7 +95,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	ferocity: {
 		compendium_id: 'ferocity',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Mat Wilma',
@@ -121,7 +121,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	strategic_approach: {
 		compendium_id: 'strategic_approach',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Julia Metzger',
@@ -152,7 +152,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	brace: {
 		compendium_id: 'brace',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Rick Hefner',
@@ -178,7 +178,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	tactician: {
 		compendium_id: 'tactician',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Kristina Gehrmann',
@@ -204,7 +204,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	boost: {
 		compendium_id: 'boost',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Bear Frymire',
@@ -230,7 +230,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	redirect: {
 		compendium_id: 'redirect',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Jenny Tan',
@@ -256,7 +256,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	know_thy_enemy: {
 		compendium_id: 'know_thy_enemy',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Grant Griffin',
@@ -288,7 +288,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	signature_move: {
 		compendium_id: 'signature_move',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Bear Frymire',
@@ -314,7 +314,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	rapid_riposte: {
 		compendium_id: 'rapid_riposte',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Rafater',
@@ -340,7 +340,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	recovery: {
 		compendium_id: 'recovery',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Juan S. Almencion',
@@ -366,7 +366,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	bone_touched: {
 		compendium_id: 'bone_touched',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Samantha Kung',
@@ -410,7 +410,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	cruel_precision: {
 		compendium_id: 'cruel_precision',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Maxime Minard',
@@ -436,7 +436,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	breaking_blow: {
 		compendium_id: 'breaking_blow',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Mat Wilma',
@@ -462,7 +462,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	wrangle: {
 		compendium_id: 'wrangle',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Samantha Kung',
@@ -488,7 +488,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	on_the_brink: {
 		compendium_id: 'on_the_brink',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Juan S. Almencion',
@@ -514,7 +514,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	splintering_strike: {
 		compendium_id: 'splintering_strike',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Gaboleps',
@@ -540,7 +540,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	deathrun: {
 		compendium_id: 'deathrun',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Letícia Freitas',
@@ -566,7 +566,7 @@ export const BONE_DOMAIN_CARDS = {
 	},
 	swift_step: {
 		compendium_id: 'swift_step',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'bone',
 		artist_name: 'Allan Santos',

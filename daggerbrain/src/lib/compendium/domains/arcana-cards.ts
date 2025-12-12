@@ -3,7 +3,7 @@ import type { DomainCard } from '$lib/types/compendium-types';
 export const ARCANA_DOMAIN_CARDS = {
 	rune_ward: {
 		compendium_id: 'rune_ward',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Laura Marie Neal',
@@ -29,7 +29,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	unleash_chaos: {
 		compendium_id: 'unleash_chaos',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Ernanda Souza',
@@ -55,7 +55,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	wall_walk: {
 		compendium_id: 'wall_walk',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Julia Metzger',
@@ -81,7 +81,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	cinder_grasp: {
 		compendium_id: 'cinder_grasp',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Jenny Tan',
@@ -107,7 +107,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	floating_eye: {
 		compendium_id: 'floating_eye',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Anthony Jones',
@@ -133,7 +133,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	counterspell: {
 		compendium_id: 'counterspell',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Dominik Mayer',
@@ -159,7 +159,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	flight: {
 		compendium_id: 'flight',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Samantha Kung',
@@ -185,7 +185,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	blink_out: {
 		compendium_id: 'blink_out',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Dominik Mayer',
@@ -211,7 +211,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	preservation_blast: {
 		compendium_id: 'preservation_blast',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Daarken',
@@ -237,7 +237,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	chain_lightning: {
 		compendium_id: 'chain_lightning',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Bear Frymire',
@@ -263,7 +263,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	premonition: {
 		compendium_id: 'premonition',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Ivan Koltovich',
@@ -289,7 +289,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	rift_walker: {
 		compendium_id: 'rift_walker',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Samantha B. Lucas',
@@ -315,7 +315,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	telekinesis: {
 		compendium_id: 'telekinesis',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Simon Pape',
@@ -341,7 +341,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	arcana_touched: {
 		compendium_id: 'arcana_touched',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Cybercatbug',
@@ -384,7 +384,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	cloaking_blast: {
 		compendium_id: 'cloaking_blast',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Henry Peters',
@@ -410,7 +410,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	arcane_reflection: {
 		compendium_id: 'arcane_reflection',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Carlos Cardona',
@@ -436,7 +436,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	confusing_aura: {
 		compendium_id: 'confusing_aura',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Simon Pape',
@@ -462,7 +462,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	earthquake: {
 		compendium_id: 'earthquake',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Eliot Baum',
@@ -488,7 +488,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	sensory_projection: {
 		compendium_id: 'sensory_projection',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Anthony Jones',
@@ -514,7 +514,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	adjust_reality: {
 		compendium_id: 'adjust_reality',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Geoffrey Ernault',
@@ -540,7 +540,7 @@ export const ARCANA_DOMAIN_CARDS = {
 	},
 	falling_sky: {
 		compendium_id: 'falling_sky',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'arcana',
 		artist_name: 'Katya Cyan',

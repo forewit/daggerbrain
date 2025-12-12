@@ -261,16 +261,19 @@
 						>
 					</div>
 				</div>
-				<div
-					style="background: {compendium.domains[card.domain_id].color};"
-					class="clip-card-type absolute bottom-[3px] left-[111px] h-[23px] w-[135px]"
-				></div>
-				<p
-					style="color: {compendium.domains[card.domain_id].foreground_color};"
-					class="absolute bottom-[8px] left-[180px] z-5 -translate-x-1/2 text-[12px] leading-none font-bold uppercase"
-				>
-					{card.category}
-				</p>
+				{#if compendium.domains[card.domain_id]}
+					{@const domain = compendium.domains[card.domain_id]}
+					<div
+						style="background: {domain.color};"
+						class="clip-card-type absolute bottom-[3px] left-[111px] h-[23px] w-[135px]"
+					></div>
+					<p
+						style="color: {domain.foreground_color};"
+						class="absolute bottom-[8px] left-[180px] z-5 -translate-x-1/2 text-[12px] leading-none font-bold uppercase"
+					>
+						{card.category}
+					</p>
+				{/if}
 			</div>
 
 			<!-- content -->

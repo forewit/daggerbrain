@@ -4,7 +4,7 @@ export const GRACE_DOMAIN_CARDS = {
 	// todo: verify everything below
 	deft_deceiver: {
 		compendium_id: 'deft_deceiver',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Simon Pape',
@@ -29,7 +29,7 @@ export const GRACE_DOMAIN_CARDS = {
 	},
 	enrapture: {
 		compendium_id: 'enrapture',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Letícia Freitas',
@@ -55,7 +55,7 @@ export const GRACE_DOMAIN_CARDS = {
 	},
 	inspirational_words: {
 		compendium_id: 'inspirational_words',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Mat Wilma',
@@ -86,7 +86,7 @@ export const GRACE_DOMAIN_CARDS = {
 	},
 	tell_no_lies: {
 		compendium_id: 'tell_no_lies',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Arturo G. González',
@@ -111,7 +111,7 @@ export const GRACE_DOMAIN_CARDS = {
 	},
 	troublemaker: {
 		compendium_id: 'troublemaker',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Anthony Jones',
@@ -136,7 +136,7 @@ export const GRACE_DOMAIN_CARDS = {
 	},
 	hypnotic_shimmer: {
 		compendium_id: 'hypnotic_shimmer',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Edgar Cardona',
@@ -160,9 +160,35 @@ export const GRACE_DOMAIN_CARDS = {
 			}
 		]
 	},
+	invisibility: {
+		compendium_id: 'invisibility',
+		source_id: 'SRD',
+		card_type: 'domain',
+		domain_id: 'grace',
+		artist_name: 'Bear Frymire',
+		image_url: '/api/images/card/art/domains/grace/invisibility.webp',
+		category: 'spell',
+		title: 'Invisibility',
+		level_requirement: 3,
+		recall_cost: 1,
+		applies_in_vault: false,
+		forced_in_loadout: false,
+		forced_in_vault: false,
+		choices: [],
+		tokens: true,
+		features: [
+			{
+				weapon_modifiers: [],
+				title: '',
+				description_html: `<p>Make a <b>Spellcast Roll (10)</b>. On a success, <b>mark a Stress</b> and choose yourself or an ally within Melee range to become <em>Invisible</em>. An <em>Invisible</em> creature can't be seen except through magical means and attack rolls against them are made with disadvantage. Place a number of tokens on this card equal to your Spellcast trait. When the <em>Invisible</em> creature takes an action, spend a token from this card. After the action that spends the last token is resolved, the effect ends.</p>
+                     <p>You can only hold Invisibility on one creature at a time.</p>`,
+				character_modifiers: []
+			}
+		]
+	},
 	soothing_speech: {
 		compendium_id: 'soothing_speech',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Anthony Jones',
@@ -187,7 +213,7 @@ export const GRACE_DOMAIN_CARDS = {
 	},
 	through_your_eyes: {
 		compendium_id: 'through_your_eyes',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Edgar Cardona',
@@ -212,7 +238,7 @@ export const GRACE_DOMAIN_CARDS = {
 	},
 	thought_delver: {
 		compendium_id: 'thought_delver',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Cybercatbug',
@@ -238,7 +264,7 @@ export const GRACE_DOMAIN_CARDS = {
 	},
 	words_of_discord: {
 		compendium_id: 'words_of_discord',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Anthony Jones',
@@ -264,7 +290,7 @@ export const GRACE_DOMAIN_CARDS = {
 	},
 	share_the_burden: {
 		compendium_id: 'share_the_burden',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Eliot Baum',
@@ -289,7 +315,7 @@ export const GRACE_DOMAIN_CARDS = {
 	},
 	never_upstaged: {
 		compendium_id: 'never_upstaged',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Andrea T Montalto',
@@ -314,7 +340,7 @@ export const GRACE_DOMAIN_CARDS = {
 	},
 	endless_charisma: {
 		compendium_id: 'endless_charisma',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Samantha B. Lucas',
@@ -339,7 +365,7 @@ export const GRACE_DOMAIN_CARDS = {
 	},
 	grace_touched: {
 		compendium_id: 'grace_touched',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Juan S. Almenicon',
@@ -368,7 +394,7 @@ export const GRACE_DOMAIN_CARDS = {
 	},
 	astral_projection: {
 		compendium_id: 'astral_projection',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Dominik Mayer',
@@ -394,7 +420,7 @@ export const GRACE_DOMAIN_CARDS = {
 	},
 	mass_enrapture: {
 		compendium_id: 'mass_enrapture',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Daarken',
@@ -420,7 +446,7 @@ export const GRACE_DOMAIN_CARDS = {
 	},
 	copycat: {
 		compendium_id: 'copycat',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Cybercatbug',
@@ -445,7 +471,7 @@ export const GRACE_DOMAIN_CARDS = {
 	},
 	master_of_the_craft: {
 		compendium_id: 'master_of_the_craft',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Anthony Jones',
@@ -540,7 +566,7 @@ export const GRACE_DOMAIN_CARDS = {
 	},
 	encore: {
 		compendium_id: 'encore',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Mat Wilma',
@@ -566,7 +592,7 @@ export const GRACE_DOMAIN_CARDS = {
 	},
 	notorious: {
 		compendium_id: 'notorious',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'grace',
 		artist_name: 'Arturo G. González',

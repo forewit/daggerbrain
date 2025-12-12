@@ -3,7 +3,7 @@ import type { DomainCard } from '$lib/types/compendium-types';
 export const CODEX_DOMAIN_CARDS = {
 	book_of_ava: {
 		compendium_id: 'book_of_ava',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Laura Galli',
@@ -30,7 +30,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	book_of_illiat: {
 		compendium_id: 'book_of_illiat',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Ernanda Souza',
@@ -57,7 +57,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	book_of_tyfar: {
 		compendium_id: 'book_of_tyfar',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Kristina Carroll',
@@ -84,7 +84,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	book_of_sitil: {
 		compendium_id: 'book_of_sitil',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Laura Galli',
@@ -111,7 +111,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	book_of_vagras: {
 		compendium_id: 'book_of_vagras',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Mike Pape',
@@ -139,7 +139,7 @@ export const CODEX_DOMAIN_CARDS = {
 	// todo: verify everything below
 	book_of_korvax: {
 		compendium_id: 'book_of_korvax',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Rick Hefner',
@@ -166,7 +166,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	book_of_norai: {
 		compendium_id: 'book_of_norai',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Simon Pape',
@@ -192,7 +192,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	book_of_exota: {
 		compendium_id: 'book_of_exota',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Laura Galli',
@@ -218,7 +218,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	book_of_grynn: {
 		compendium_id: 'book_of_grynn',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Cybercatbug',
@@ -245,7 +245,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	manifest_wall: {
 		compendium_id: 'manifest_wall',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Ilya Royz',
@@ -270,7 +270,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	teleport: {
 		compendium_id: 'teleport',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Henry Peters',
@@ -302,7 +302,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	banish: {
 		compendium_id: 'banish',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Bear Frymire',
@@ -328,7 +328,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	sigil_of_retribution: {
 		compendium_id: 'sigil_of_retribution',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Rick Hefner',
@@ -354,7 +354,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	book_of_homet: {
 		compendium_id: 'book_of_homet',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Geoffrey Ernault',
@@ -380,7 +380,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	codex_touched: {
 		compendium_id: 'codex_touched',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Cybercatbug',
@@ -409,7 +409,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	book_of_vyola: {
 		compendium_id: 'book_of_vyola',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Eliot Baum',
@@ -435,7 +435,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	safe_haven: {
 		compendium_id: 'safe_haven',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Dominik Mayer',
@@ -462,7 +462,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	book_of_ronin: {
 		compendium_id: 'book_of_ronin',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Jenny Tan',
@@ -488,7 +488,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	disintegration_wave: {
 		compendium_id: 'disintegration_wave',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Nick Acuna',
@@ -513,7 +513,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	book_of_yarrow: {
 		compendium_id: 'book_of_yarrow',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Daarken',
@@ -539,7 +539,7 @@ export const CODEX_DOMAIN_CARDS = {
 	},
 	transcendent_union: {
 		compendium_id: 'transcendent_union',
-		source_id: 'Void 1.5',
+		source_id: 'SRD',
 		card_type: 'domain',
 		domain_id: 'codex',
 		artist_name: 'Bear Frymire',
