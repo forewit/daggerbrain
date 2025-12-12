@@ -2,6 +2,7 @@
 	import * as Sheet from '$lib/components/ui/sheet';
 	import * as Collapsible from '$lib/components/ui/collapsible';
 	import Input from '$lib/components/ui/input/input.svelte';
+	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { cn } from '$lib/utils';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
@@ -29,6 +30,7 @@
 
 	// Form state - initialized from inventory item
 	let customName = $state('');
+	let customDescription = $state('');
 
 	// Derived value for is save button disabled (if customizations match the existing consumable)
 	let isSaveDisabled = $derived.by(() => {
@@ -36,21 +38,25 @@
 
 		const formName = customName.trim();
 		const savedName = (inventoryItem.custom_title ?? '').trim();
-		return formName === savedName;
+		const formDescription = customDescription.trim();
+		const savedDescription = (inventoryItem.custom_description ?? '').trim();
+		return formName === savedName && formDescription === savedDescription;
 	});
 
 	// Check if there are any customizations on the inventory item
 	let hasCustomizations = $derived.by(() => {
 		if (!inventoryItem) return false;
-		return inventoryItem.custom_title !== null;
+		return inventoryItem.custom_title !== null || inventoryItem.custom_description !== null;
 	});
 
 	// Update form when inventory item changes
 	$effect(() => {
 		if (inventoryItem) {
 			customName = inventoryItem.custom_title === null ? '' : inventoryItem.custom_title;
+			customDescription = inventoryItem.custom_description === null ? '' : inventoryItem.custom_description;
 		} else {
 			customName = '';
+			customDescription = '';
 		}
 	});
 
@@ -63,10 +69,14 @@
 		// Update name (always valid - empty becomes null)
 		const trimmedName = customName.trim();
 		item.custom_title = trimmedName || null;
+		// Update description (always valid - empty becomes null)
+		const trimmedDescription = customDescription.trim();
+		item.custom_description = trimmedDescription || null;
 	}
 
 	function handleClear() {
 		customName = '';
+		customDescription = '';
 		handleSave();
 	}
 </script>
@@ -81,7 +91,7 @@
 		<!-- Description -->
 		<div class="rounded-lg border bg-primary/5 px-4 py-3">
 			<p class="text-sm">Description</p>
-			{#if consumable.description_html.trim().length > 0}
+			{#if (consumable.description_html || '').trim().length > 0}
 				<div class="mt-3">
 					<div class="border-l-2 border-accent/30 pl-3">
 						<p class="text-xs text-muted-foreground">{@html consumable.description_html}</p>
@@ -103,10 +113,14 @@
 					<span>Customize</span>
 					<ChevronLeft class={cn('size-4 transition-transform', customizeOpen && '-rotate-90')} />
 				</Collapsible.Trigger>
-				<Collapsible.Content class="space-y-2 rounded-b-md border bg-card/50 p-2">
-					<div class="flex flex-col gap-2">
+				<Collapsible.Content class="flex flex-col gap-3 rounded-b-md border bg-card/50 p-2">
+					<div class="flex flex-col gap-1">
 						<label for="custom-name" class="text-xs font-medium text-muted-foreground">Name</label>
 						<Input id="custom-name" bind:value={customName} placeholder="Name" />
+					</div>
+					<div class="flex flex-col gap-1">
+						<label for="custom-description" class="text-xs font-medium text-muted-foreground">Description</label>
+						<Textarea id="custom-description" bind:value={customDescription} placeholder="Description" class="min-h-24" />
 					</div>
 					<div class="flex gap-2">
 						<Button size="sm" onclick={handleSave} hidden={isSaveDisabled}>Save</Button>

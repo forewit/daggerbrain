@@ -139,20 +139,6 @@
 		window.addEventListener('keydown', handleKeyDown);
 		window.addEventListener('keyup', handleKeyUp);
 
-		// Initialize scroll position to match selectedIndex
-		if (scrollContainer && cards.length > 0 && selectedIndex >= 0 && selectedIndex < cards.length) {
-			// Use instant scroll for initial positioning to avoid animation
-			const cardButtons = scrollContainer.querySelectorAll('button.snap-center');
-			const targetButton = cardButtons[selectedIndex] as HTMLButtonElement | undefined;
-			if (targetButton) {
-				targetButton.scrollIntoView({
-					behavior: 'instant',
-					block: 'center',
-					inline: 'center'
-				});
-			}
-		}
-
 		return () => {
 			scrollContainer?.removeEventListener('scroll', handleScroll);
 			window.removeEventListener('keydown', handleKeyDown);

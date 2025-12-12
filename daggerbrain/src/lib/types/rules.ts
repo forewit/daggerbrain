@@ -134,7 +134,7 @@ export const BASE_STATS = {
 	proficiency: 1,
 	experience_modifier: 2,
 	max_experiences: 2,
-	max_domain_card_loadout: 5,
+	max_loadout: 5,
 	max_hope: 6,
 	max_armor: 0,
 	max_hp: 0,

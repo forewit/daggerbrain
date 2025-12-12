@@ -110,6 +110,7 @@ export const CHARACTER_DEFAULTS = {
 	marked_hope: 0,
 	marked_armor: 0,
 	loadout_domain_card_ids: <DomainCardId[]>[],
+	bonus_max_loadout: 0,
 
 	// Level up choices
 	level: 1,

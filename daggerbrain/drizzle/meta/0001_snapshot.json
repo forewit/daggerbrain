@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "423fe0a4-4628-4399-a6ce-7ee87c9e101a",
-  "prevId": "a90071c9-4cc3-46cc-bba8-5a96ddc62bc9",
+  "id": "3410f2db-0991-4811-88b7-fceeed62d3c1",
+  "prevId": "cc2a4fd4-e808-47a3-b758-749cba9641f0",
   "tables": {
     "characters_table": {
       "name": "characters_table",
@@ -13,7 +13,7 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": false,
-          "default": "'d9d14bbe-2b18-47da-9a71-ba4649e2820a'"
+          "default": "'3c309184-fb1b-466e-a779-2f58bfb5b58c'"
         },
         "clerk_user_id": {
           "name": "clerk_user_id",
@@ -133,6 +133,22 @@
           "notNull": false,
           "autoincrement": false
         },
+        "chosen_beastform": {
+          "name": "chosen_beastform",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'null'"
+        },
+        "companion": {
+          "name": "companion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'null'"
+        },
         "background_questions": {
           "name": "background_questions",
           "type": "text",
@@ -235,22 +251,6 @@
         },
         "additional_transformation_card_ids": {
           "name": "additional_transformation_card_ids",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'[]'"
-        },
-        "additional_character_modifiers": {
-          "name": "additional_character_modifiers",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'[]'"
-        },
-        "additional_weapon_modifiers": {
-          "name": "additional_weapon_modifiers",
           "type": "text",
           "primaryKey": false,
           "notNull": true,

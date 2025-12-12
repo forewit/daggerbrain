@@ -60,7 +60,7 @@
 				<div
 					class="ml-2 grid h-4.5 place-items-center rounded-full bg-accent px-1.5 text-xs font-bold text-background"
 				>
-					{context.domain_card_loadout.length} / {context.max_domain_card_loadout}
+					{context.domain_card_loadout.length} / {context.max_loadout}
 				</div>
 			</button>
 
@@ -97,7 +97,7 @@
 										onclick={() => {
 											if (!character) return;
 											if (
-												character.loadout_domain_card_ids.length < context.max_domain_card_loadout
+												character.loadout_domain_card_ids.length < context.max_loadout
 											) {
 												character.loadout_domain_card_ids.push({
 													domainId: selectedVaultCard.domain_id,
@@ -107,12 +107,12 @@
 										}}
 										class={cn(
 											'absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full',
-											context.domain_card_loadout.length >= context.max_domain_card_loadout &&
+											context.domain_card_loadout.length >= context.max_loadout &&
 												'cursor-default border-3 border-destructive bg-muted hover:bg-muted'
 										)}
 										size="sm"
 									>
-										{#if context.domain_card_loadout.length >= context.max_domain_card_loadout}
+										{#if context.domain_card_loadout.length >= context.max_loadout}
 											Loadout is full
 										{:else}
 											<ArrowUp class="size-4" />
@@ -127,7 +127,7 @@
 											if (!character) return;
 											if (
 												character.loadout_domain_card_ids.length <
-													context.max_domain_card_loadout &&
+													context.max_loadout &&
 												selectedVaultCard?.recall_cost <= remainingStress
 											) {
 												character.marked_stress += selectedVaultCard.recall_cost;
@@ -140,11 +140,11 @@
 										class={cn(
 											'absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full',
 											(selectedVaultCard?.recall_cost > remainingStress ||
-												context.domain_card_loadout.length >= context.max_domain_card_loadout) &&
+												context.domain_card_loadout.length >= context.max_loadout) &&
 												'cursor-default border-3 border-destructive bg-muted hover:bg-muted'
 										)}
 									>
-										{#if context.domain_card_loadout.length >= context.max_domain_card_loadout}
+										{#if context.domain_card_loadout.length >= context.max_loadout}
 											Loadout is full
 										{:else if selectedVaultCard?.recall_cost > remainingStress}
 											Not enough stress slots

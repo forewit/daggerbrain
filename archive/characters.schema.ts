@@ -111,6 +111,14 @@ export const characters_table = sqliteTable('characters_table', {
 		.notNull()
 		.default(CHARACTER_DEFAULTS.additional_transformation_card_ids)
 		.$type<string[]>(),
+	additional_character_modifier_ids: text('additional_character_modifier_ids', { mode: 'json' })
+		.notNull()
+		.default(CHARACTER_DEFAULTS.additional_character_modifier_ids)
+		.$type<string[]>(),
+	additional_weapon_modifier_ids: text('additional_weapon_modifier_ids', { mode: 'json' })
+		.notNull()
+		.default(CHARACTER_DEFAULTS.additional_weapon_modifier_ids)
+		.$type<string[]>(),
 
 	// ephemeral stats set by the player
 	unarmed_attack_choices: text('unarmed_attack_choices', { mode: 'json' })
@@ -144,7 +152,6 @@ export const characters_table = sqliteTable('characters_table', {
 		.notNull()
 		.default(CHARACTER_DEFAULTS.loadout_domain_card_ids)
 		.$type<DomainCardId[]>(),
-	bonus_max_loadout: integer('bonus_max_loadout').notNull().default(CHARACTER_DEFAULTS.bonus_max_loadout),
 
 	// Level up choices
 	level: integer('level').notNull().default(CHARACTER_DEFAULTS.level),

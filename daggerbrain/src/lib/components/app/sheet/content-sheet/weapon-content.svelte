@@ -9,8 +9,10 @@
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import Hand from '@lucide/svelte/icons/hand';
+	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import WeaponsRules from '../../rules/weapons-rules.svelte';
+	import DicePicker from '../../dice/dice-picker.svelte';
 	import { z } from 'zod';
 
 	let { weaponId }: { weaponId: string } = $props();
@@ -54,6 +56,9 @@
 	let customRange = $state<string>('');
 	let customDamageTypes = $state<DamageTypes[]>([]);
 	let customBurden = $state<string>('');
+	let customDamageDice = $state('');
+	let customDamageBonus = $state('');
+	let customAttackRollBonus = $state('');
 
 	const rangeOptions: Ranges[] = ['Melee', 'Very Close', 'Close', 'Far', 'Very Far'];
 	const damageTypeOptions: DamageTypes[] = ['phy', 'mag'];
@@ -124,7 +129,41 @@
 			(formBurden === null && savedBurden === null) ||
 			(formBurden !== null && savedBurden !== null && formBurden === savedBurden);
 
-		return namesMatch && tiersMatch && rangeMatch && damageTypesMatch && burdenMatch;
+		// Compare damage dice
+		const formDamageDice = customDamageDice === '' ? null : customDamageDice.trim();
+		const savedDamageDice = inventoryItem.custom_damage_dice;
+		const damageDiceMatch =
+			(formDamageDice === null && savedDamageDice === null) ||
+			(formDamageDice !== null && savedDamageDice !== null && formDamageDice === savedDamageDice);
+
+		// Compare damage bonus
+		const formDamageBonus = customDamageBonus === '' ? null : Number(customDamageBonus);
+		const savedDamageBonus = inventoryItem.custom_damage_bonus;
+		const damageBonusMatch =
+			(formDamageBonus === null && savedDamageBonus === null) ||
+			(formDamageBonus !== null &&
+				savedDamageBonus !== null &&
+				formDamageBonus === savedDamageBonus);
+
+		// Compare attack roll bonus
+		const formAttackRollBonus = customAttackRollBonus === '' ? null : Number(customAttackRollBonus);
+		const savedAttackRollBonus = inventoryItem.custom_attack_roll_bonus;
+		const attackRollBonusMatch =
+			(formAttackRollBonus === null && savedAttackRollBonus === null) ||
+			(formAttackRollBonus !== null &&
+				savedAttackRollBonus !== null &&
+				formAttackRollBonus === savedAttackRollBonus);
+
+		return (
+			namesMatch &&
+			tiersMatch &&
+			rangeMatch &&
+			damageTypesMatch &&
+			burdenMatch &&
+			damageDiceMatch &&
+			damageBonusMatch &&
+			attackRollBonusMatch
+		);
 	});
 
 	// Check if there are any customizations on the inventory item
@@ -135,7 +174,10 @@
 			inventoryItem.custom_level_requirement !== null ||
 			inventoryItem.custom_range !== null ||
 			inventoryItem.custom_available_damage_types !== null ||
-			inventoryItem.custom_burden !== null
+			inventoryItem.custom_burden !== null ||
+			inventoryItem.custom_damage_dice !== null ||
+			inventoryItem.custom_damage_bonus !== null ||
+			inventoryItem.custom_attack_roll_bonus !== null
 		);
 	});
 
@@ -157,12 +199,22 @@
 					: [...inventoryItem.custom_available_damage_types];
 			customBurden =
 				inventoryItem.custom_burden === null ? '' : String(inventoryItem.custom_burden);
+			customDamageDice = inventoryItem.custom_damage_dice === null ? '' : inventoryItem.custom_damage_dice;
+			customDamageBonus =
+				inventoryItem.custom_damage_bonus === null ? '' : String(inventoryItem.custom_damage_bonus);
+			customAttackRollBonus =
+				inventoryItem.custom_attack_roll_bonus === null
+					? ''
+					: String(inventoryItem.custom_attack_roll_bonus);
 		} else {
 			customName = '';
 			customTier = '';
 			customRange = '';
 			customDamageTypes = [];
 			customBurden = '';
+			customDamageDice = '';
+			customDamageBonus = '';
+			customAttackRollBonus = '';
 		}
 	});
 
@@ -220,6 +272,33 @@
 				item.custom_burden = null;
 			}
 		}
+
+		// Update damage dice
+		item.custom_damage_dice = customDamageDice.trim() === '' ? null : customDamageDice.trim();
+
+		// Update damage bonus
+		if (customDamageBonus === '') {
+			item.custom_damage_bonus = null;
+		} else {
+			const damageBonusNum = Number(customDamageBonus);
+			if (!isNaN(damageBonusNum)) {
+				item.custom_damage_bonus = damageBonusNum;
+			} else {
+				item.custom_damage_bonus = null;
+			}
+		}
+
+		// Update attack roll bonus
+		if (customAttackRollBonus === '') {
+			item.custom_attack_roll_bonus = null;
+		} else {
+			const attackRollBonusNum = Number(customAttackRollBonus);
+			if (!isNaN(attackRollBonusNum)) {
+				item.custom_attack_roll_bonus = attackRollBonusNum;
+			} else {
+				item.custom_attack_roll_bonus = null;
+			}
+		}
 	}
 
 	function handleClear() {
@@ -228,6 +307,9 @@
 		customRange = '';
 		customDamageTypes = [];
 		customBurden = '';
+		customDamageDice = '';
+		customDamageBonus = '';
+		customAttackRollBonus = '';
 		tierError = null;
 		handleSave();
 	}
@@ -319,12 +401,12 @@
 					<span>Customize</span>
 					<ChevronLeft class={cn('size-4 transition-transform', customizeOpen && '-rotate-90')} />
 				</Collapsible.Trigger>
-				<Collapsible.Content class="space-y-2 rounded-b-md border bg-card/50 p-2">
-					<div class="flex flex-col gap-2">
+				<Collapsible.Content class="flex flex-col gap-3 rounded-b-md border bg-card/50 p-2">
+					<div class="flex flex-col gap-1">
 						<label for="custom-name" class="text-xs font-medium text-muted-foreground">Name</label>
 						<Input id="custom-name" bind:value={customName} />
 					</div>
-					<div class="flex flex-col gap-2">
+					<div class="flex flex-col gap-1">
 						<label for="custom-tier" class="text-xs font-medium text-muted-foreground">Tier</label>
 						<Input
 							id="custom-tier"
@@ -340,7 +422,7 @@
 							<p class="text-xs text-destructive">{tierError}</p>
 						{/if}
 					</div>
-					<div class="flex flex-col gap-2">
+					<div class="flex flex-col gap-1">
 						<label for="custom-range" class="text-xs font-medium text-muted-foreground">Range</label
 						>
 						<Select.Root type="single" bind:value={customRange}>
@@ -370,7 +452,7 @@
 							{/each}
 						</div>
 					</div>
-					<div class="flex flex-col gap-2">
+					<div class="flex flex-col gap-1">
 						<label for="custom-burden" class="text-xs font-medium text-muted-foreground"
 							>Burden</label
 						>
@@ -385,6 +467,49 @@
 								<Select.Item value="2">2</Select.Item>
 							</Select.Content>
 						</Select.Root>
+					</div>
+					<div class="flex flex-col gap-2">
+						<div class="flex items-center justify-between">
+							<label for="custom-damage-dice" class="text-xs font-medium text-muted-foreground"
+								>Damage Dice</label
+							>
+							<button
+								type="button"
+								disabled={customDamageDice === ''}
+								class="disabled:hidden text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+								onclick={() => (customDamageDice = '')}
+								title="Reset damage dice"
+							>
+							Reset
+								<RotateCcw class="size-3.5" />
+								
+							</button>
+						</div>
+						<DicePicker value={customDamageDice} onChange={(v) => (customDamageDice = v)} />
+					</div>
+					<div class="flex flex-col gap-1">
+						<label for="custom-damage-bonus" class="text-xs font-medium text-muted-foreground"
+							>Damage Bonus</label
+						>
+						<Input
+							id="custom-damage-bonus"
+							type="number"
+							inputmode="numeric"
+							bind:value={customDamageBonus}
+							placeholder="0"
+						/>
+					</div>
+					<div class="flex flex-col gap-1">
+						<label for="custom-attack-roll-bonus" class="text-xs font-medium text-muted-foreground"
+							>Attack Roll Bonus</label
+						>
+						<Input
+							id="custom-attack-roll-bonus"
+							type="number"
+							inputmode="numeric"
+							bind:value={customAttackRollBonus}
+							placeholder="0"
+						/>
 					</div>
 					<div class="flex gap-2">
 						<Button size="sm" onclick={handleSave} hidden={isSaveDisabled}>Save</Button>

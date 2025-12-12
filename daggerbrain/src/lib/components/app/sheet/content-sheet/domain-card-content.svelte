@@ -1,17 +1,22 @@
 <script lang="ts">
 	import DomainCardCatalog from '../../cards/domain-card-catalog.svelte';
 	import * as Sheet from '$lib/components/ui/sheet';
+	import * as Collapsible from '$lib/components/ui/collapsible';
+	import Input from '$lib/components/ui/input/input.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import { cn } from '$lib/utils';
 	import type { DomainCard } from '$lib/types/compendium-types';
 	import type { DomainCardId } from '$lib/types/character-types';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import CircleMinus from '@lucide/svelte/icons/circle-minus';
+	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 
 	const context = getCharacterContext();
 	const compendium = getCompendiumContext();
 	let character = $derived(context.character);
 	let additionalDomainCards = $derived(context.additional_domain_cards);
+	let customizeOpen = $state(false);
 
 	// Helper function to get DomainCardId from a card
 	function getDomainCardId(card: DomainCard): DomainCardId {
@@ -47,7 +52,7 @@
 		return (
 			compendium.domains[domainId]?.name || domainId.charAt(0).toUpperCase() + domainId.slice(1)
 		);
-	}
+	}		
 </script>
 
 <Sheet.Header>
@@ -58,6 +63,41 @@
 </Sheet.Header>
 
 <div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
+	{#if character}
+		<Collapsible.Root bind:open={customizeOpen}>
+			<Collapsible.Trigger
+				class={cn(
+					'flex w-full items-center justify-between rounded-md border bg-card px-3 py-2 text-sm',
+					customizeOpen && 'rounded-b-none'
+				)}
+			>
+				<span>Customize</span>
+				<ChevronLeft class={cn('size-4 transition-transform', customizeOpen && '-rotate-90')} />
+			</Collapsible.Trigger>
+			<Collapsible.Content class="space-y-2 rounded-b-md border bg-card/50 p-2">
+				<div class="flex flex-col gap-2">
+					<label for="bonus-max-loadout" class="text-xs font-medium text-muted-foreground"
+						>Increase Loadout card limit</label
+					>
+					<Input
+						id="bonus-max-loadout"
+						type="number"
+						inputmode="numeric"
+						value={character.bonus_max_loadout.toString()}
+						onchange={(e) => {
+							if (!character) return;
+							// Convert to number, defaulting to 0 for empty/invalid values
+							const numValue = (e.target as HTMLInputElement).value === '' ? 0 : Number((e.target as HTMLInputElement).value);
+							// Ensure we always set a valid number (never NaN or string)
+							character.bonus_max_loadout = isNaN(numValue) ? 0 : Math.floor(numValue);
+						}}
+						placeholder="0"
+					/>
+				</div>
+			</Collapsible.Content>
+		</Collapsible.Root>
+	{/if}
+
 	<!-- Added Domain Cards Table -->
 	{#if additionalDomainCards.length > 0}
 		<div class="flex flex-col gap-2">

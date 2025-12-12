@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "19ec616a-54c4-4efc-b0f2-0f6fcb41a5ca",
-  "prevId": "423fe0a4-4628-4399-a6ce-7ee87c9e101a",
+  "id": "a7f2e092-e229-4201-abd2-0d58693520ef",
+  "prevId": "3410f2db-0991-4811-88b7-fceeed62d3c1",
   "tables": {
     "characters_table": {
       "name": "characters_table",
@@ -13,7 +13,7 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": false,
-          "default": "'7e56b3d2-6eda-479c-99a7-e1e5ef0af94e'"
+          "default": "'9e135d19-8285-4d2a-b1da-01d1adf054e4'"
         },
         "clerk_user_id": {
           "name": "clerk_user_id",
@@ -344,6 +344,14 @@
           "notNull": true,
           "autoincrement": false,
           "default": "'[]'"
+        },
+        "bonus_max_loadout": {
+          "name": "bonus_max_loadout",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
         },
         "level": {
           "name": "level",

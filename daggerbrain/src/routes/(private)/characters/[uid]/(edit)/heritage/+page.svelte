@@ -92,7 +92,6 @@
 
 			{#if character.settings.void_enabled}
 			<Dropdown
-				highlighted={!character.transformation_card_id}
 				title="Transformation"
 				subtitle={context.transformation_card?.title
 					? context.transformation_card?.title + ' • ' + SOURCES[context.transformation_card?.source_id].short_title

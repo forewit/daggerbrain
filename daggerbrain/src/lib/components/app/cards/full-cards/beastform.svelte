@@ -71,7 +71,7 @@
 						<span> {beastform.attack.range}</span>
 						<span class="ml-1 rounded-full border bg-foreground/5 px-2 py-1 text-xs text-nowrap">
 							{damageDiceWithProficiency +
-								(beastform.attack.damage_bonus < 0 ? '' : '+' + beastform.attack.damage_bonus)}
+								(beastform.attack.damage_bonus <= 0 ? '' : '+' + beastform.attack.damage_bonus)}
 
 							<span class="lowercase">{beastform.attack.damage_type}</span>
 						</span>

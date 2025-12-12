@@ -618,7 +618,7 @@ export const GRACE_DOMAIN_CARDS = {
 						behaviour: 'bonus',
 						type: 'flat',
 						value: 1,
-						target: 'max_domain_card_loadout',
+						target: 'max_loadout',
 						character_conditions: []
 					}
 				]

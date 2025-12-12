@@ -180,6 +180,15 @@ function createCharacter(id: string) {
 				if (item.custom_burden !== null) {
 					weapon.burden = item.custom_burden;
 				}
+				if (item.custom_damage_dice !== null) {
+					weapon.damage_dice = item.custom_damage_dice;
+				}
+				if (item.custom_damage_bonus !== null) {
+					weapon.damage_bonus += item.custom_damage_bonus;
+				}
+				if (item.custom_attack_roll_bonus !== null) {
+					weapon.attack_roll_bonus += item.custom_attack_roll_bonus;
+				}
 				return weapon;
 			})
 			.filter((w): w is NonNullable<typeof w> => !!w);
@@ -203,6 +212,15 @@ function createCharacter(id: string) {
 				}
 				if (item.custom_burden !== null) {
 					weapon.burden = item.custom_burden;
+				}
+				if (item.custom_damage_dice !== null) {
+					weapon.damage_dice = item.custom_damage_dice;
+				}
+				if (item.custom_damage_bonus !== null) {
+					weapon.damage_bonus = item.custom_damage_bonus;
+				}
+				if (item.custom_attack_roll_bonus !== null) {
+					weapon.attack_roll_bonus = item.custom_attack_roll_bonus;
 				}
 				return weapon;
 			})
@@ -243,6 +261,7 @@ function createCharacter(id: string) {
 				const loot = { ...compendiumItem, id: uniqueId };
 				// Apply customizations
 				if (item.custom_title) loot.title = item.custom_title;
+				if (item.custom_description) loot.description_html = item.custom_description;
 				return loot;
 			})
 			.filter((l): l is NonNullable<typeof l> => !!l);
@@ -255,6 +274,7 @@ function createCharacter(id: string) {
 				const consumable = { ...compendiumItem, id: uniqueId };
 				// Apply customizations
 				if (item.custom_title) consumable.title = item.custom_title;
+				if (item.custom_description) consumable.description_html = item.custom_description;
 				return consumable;
 			})
 			.filter((c): c is NonNullable<typeof c> => !!c);
@@ -377,7 +397,7 @@ function createCharacter(id: string) {
 	let traits: Traits = $state({ ...BASE_STATS.traits });
 	let proficiency: number = $state(BASE_STATS.proficiency);
 	let max_experiences: number = $state(BASE_STATS.max_experiences);
-	let max_domain_card_loadout: number = $state(BASE_STATS.max_domain_card_loadout);
+	let max_loadout: number = $state(BASE_STATS.max_loadout);
 	let max_hope: number = $state(BASE_STATS.max_hope);
 	let max_armor: number = $state(BASE_STATS.max_armor);
 	let max_hp: number = $state(BASE_STATS.max_hp);
@@ -1936,9 +1956,9 @@ function createCharacter(id: string) {
 			}
 		}
 
-		if (new_loadout_domain_card_ids.length > max_domain_card_loadout) {
+		if (new_loadout_domain_card_ids.length > max_loadout) {
 			console.warn(`Loadout exceeded the max. Removing extra cards`);
-			new_loadout_domain_card_ids = new_loadout_domain_card_ids.slice(0, max_domain_card_loadout);
+			new_loadout_domain_card_ids = new_loadout_domain_card_ids.slice(0, max_loadout);
 		}
 
 		domain_card_loadout = new_loadout_domain_card_ids
@@ -2197,7 +2217,7 @@ function createCharacter(id: string) {
 
 		let new_armor: Armor & { id: string } = BASE_STATS.unarmored;
 
-		if (active_armor !== null && active_armor.level_requirement < character.level) {
+		if (active_armor !== null && active_armor.level_requirement > character.level) {
 			console.warn(`Removing invalid armor ${active_armor.id}. level requirement not met`);
 			character.active_armor_id = null;
 		} else if (active_armor !== null) {
@@ -3232,31 +3252,35 @@ function createCharacter(id: string) {
 		max_experiences = new_max_experiences;
 	});
 
-	// * derived max_domain_card_loadout
+	// * derived max_loadout
 	$effect(() => {
 		if (!character) return;
-		let new_max_domain_card_loadout: number = BASE_STATS.max_domain_card_loadout;
+		let new_max_loadout: number = BASE_STATS.max_loadout;
 
-		new_max_domain_card_loadout = apply_modifiers(
+		new_max_loadout = apply_modifiers(
 			base_character_modifiers,
-			'max_domain_card_loadout',
-			new_max_domain_card_loadout,
+			'max_loadout',
+			new_max_loadout,
 			'base'
 		);
-		new_max_domain_card_loadout = apply_modifiers(
+
+		// apply customizations
+		new_max_loadout += character.bonus_max_loadout;
+
+		new_max_loadout = apply_modifiers(
 			bonus_character_modifiers,
-			'max_domain_card_loadout',
-			new_max_domain_card_loadout,
+			'max_loadout',
+			new_max_loadout,
 			'bonus'
 		);
-		new_max_domain_card_loadout = apply_modifiers(
+		new_max_loadout = apply_modifiers(
 			override_character_modifiers,
-			'max_domain_card_loadout',
-			new_max_domain_card_loadout,
+			'max_loadout',
+			new_max_loadout,
 			'override'
 		);
 
-		max_domain_card_loadout = new_max_domain_card_loadout;
+		max_loadout = new_max_loadout;
 	});
 
 	// ! helper function to get tier from level
@@ -3379,7 +3403,10 @@ function createCharacter(id: string) {
 				custom_level_requirement: null,
 				custom_range: null,
 				custom_available_damage_types: null,
-				custom_burden: null
+				custom_burden: null,
+				custom_damage_bonus: null,
+				custom_damage_dice: null,
+				custom_attack_roll_bonus: null
 			};
 		} else if (type === 'secondary_weapon') {
 			const uniqueId = crypto.randomUUID();
@@ -3391,7 +3418,10 @@ function createCharacter(id: string) {
 				custom_level_requirement: null,
 				custom_range: null,
 				custom_available_damage_types: null,
-				custom_burden: null
+				custom_burden: null,
+				custom_damage_bonus: null,
+				custom_damage_dice: null,
+				custom_attack_roll_bonus: null
 			};
 		} else if (type === 'armor') {
 			const uniqueId = crypto.randomUUID();
@@ -3413,7 +3443,8 @@ function createCharacter(id: string) {
 				id: uniqueId,
 				compendium_id,
 				choices: {},
-				custom_title: null
+				custom_title: null,
+				custom_description: null
 			};
 		} else if (type === 'loot') {
 			const uniqueId = crypto.randomUUID();
@@ -3421,7 +3452,8 @@ function createCharacter(id: string) {
 				id: uniqueId,
 				compendium_id,
 				choices: {},
-				custom_title: null
+				custom_title: null,
+				custom_description: null
 			};
 		} else if (type === 'adventuring_gear') {
 			const title = item.title || item.compendium_id;
@@ -3689,8 +3721,8 @@ function createCharacter(id: string) {
 		get max_experiences() {
 			return max_experiences;
 		},
-		get max_domain_card_loadout() {
-			return max_domain_card_loadout;
+		get max_loadout() {
+			return max_loadout;
 		},
 		get max_hope() {
 			return max_hope;

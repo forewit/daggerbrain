@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "cc2a4fd4-e808-47a3-b758-749cba9641f0",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "8f6a6f4d-aa81-4bef-91aa-75fbf1b3a3b0",
+  "prevId": "a7f2e092-e229-4201-abd2-0d58693520ef",
   "tables": {
     "characters_table": {
       "name": "characters_table",
@@ -13,7 +13,7 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": false,
-          "default": "'fade6da8-00e2-4016-8e00-6adf59af50f2'"
+          "default": "'32aa354a-daed-4a42-8397-7d23e2d667cc'"
         },
         "clerk_user_id": {
           "name": "clerk_user_id",
@@ -257,22 +257,6 @@
           "autoincrement": false,
           "default": "'[]'"
         },
-        "additional_character_modifier_ids": {
-          "name": "additional_character_modifier_ids",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'[]'"
-        },
-        "additional_weapon_modifier_ids": {
-          "name": "additional_weapon_modifier_ids",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'[]'"
-        },
         "unarmed_attack_choices": {
           "name": "unarmed_attack_choices",
           "type": "text",
@@ -360,6 +344,14 @@
           "notNull": true,
           "autoincrement": false,
           "default": "'[]'"
+        },
+        "bonus_max_loadout": {
+          "name": "bonus_max_loadout",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
         },
         "level": {
           "name": "level",

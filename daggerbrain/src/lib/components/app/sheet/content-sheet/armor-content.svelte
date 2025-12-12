@@ -298,12 +298,12 @@
 					<span>Customize</span>
 					<ChevronLeft class={cn('size-4 transition-transform', customizeOpen && '-rotate-90')} />
 				</Collapsible.Trigger>
-				<Collapsible.Content class="space-y-2 rounded-b-md border bg-card/50 p-2">
-					<div class="flex flex-col gap-2">
+				<Collapsible.Content class="flex flex-col gap-3 rounded-b-md border bg-card/50 p-2">
+					<div class="flex flex-col gap-1">
 						<label for="custom-name" class="text-xs font-medium text-muted-foreground">Name</label>
 						<Input id="custom-name" bind:value={customName} />
 					</div>
-					<div class="flex flex-col gap-2">
+					<div class="flex flex-col gap-1">
 						<label for="custom-tier" class="text-xs font-medium text-muted-foreground">Tier</label>
 						<Input
 							id="custom-tier"
@@ -319,7 +319,7 @@
 							<p class="text-xs text-destructive">{tierError}</p>
 						{/if}
 					</div>
-					<div class="flex flex-col gap-2">
+					<div class="flex flex-col gap-1">
 						<label for="custom-max-armor" class="text-xs font-medium text-muted-foreground"
 							>Base Armor Score</label
 						>
@@ -332,7 +332,7 @@
 							step="1"
 						/>
 					</div>
-					<div class="flex flex-col gap-2">
+					<div class="flex flex-col gap-1">
 						<div class="flex gap-2">
 							<div class="flex flex-1 flex-col gap-1">
 								<label for="custom-major-threshold" class="text-xs text-muted-foreground"

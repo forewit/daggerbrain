@@ -15,37 +15,45 @@
 	{/if}
 
 	<!-- Stats Badges -->
-	<div class="grid gap-4">
-		<div class="flex justify-around gap-4 sm:justify-start">
-			<div class="flex flex-wrap items-center justify-center gap-1">
+	<div class="-mt-1 mb-1 grid gap-3">
+		<div class="flex flex-wrap justify-center sm:justify-start gap-x-4 gap-y-3">
+
+			<!-- Pair 1 -->
+			<div class="flex flex-nowrap gap-4">
+			  <div class="flex flex-col items-center justify-center gap-1">
 				<span class="text-xs font-medium text-muted-foreground">Burden</span>
-				<div
-					class="flex items-center gap-1 rounded-full border bg-foreground/5 px-2 py-1 text-xs text-nowrap"
-				>
-					{weapon.burden}<Hand class="size-3.5" />
+				<div class="flex items-center gap-1 rounded-full border bg-foreground/5 px-2 py-1 text-xs text-nowrap">
+				  {weapon.burden}<Hand class="size-3.5" />
 				</div>
-			</div>
-			<div class="flex flex-wrap items-center justify-center gap-1">
+			  </div>
+		  
+			  <div class="flex flex-col items-center justify-center gap-1">
 				<span class="text-xs font-medium text-muted-foreground">Damage</span>
 				<div class="rounded-full border bg-foreground/5 px-2 py-1 text-xs text-nowrap">
-					{weapon.damage_dice}
-					{weapon.available_damage_types.map(capitalize).join('/')}
+				  {weapon.damage_dice + (weapon.damage_bonus > 0 ? `+${weapon.damage_bonus}` : '')}
+				  {weapon.available_damage_types.map(capitalize).join('/')}
 				</div>
+			  </div>
 			</div>
-			<div class="flex flex-wrap items-center justify-center gap-1">
+		  
+			<!-- Pair 2 -->
+			<div class="flex flex-nowrap gap-4">
+			  <div class="flex flex-col items-center justify-center gap-1">
 				<span class=" text-xs font-medium text-muted-foreground">Range</span>
 				<div class="rounded-full border bg-foreground/5 px-2 py-1 text-xs text-nowrap">
-					{weapon.range}
+				  {weapon.range}
 				</div>
-			</div>
-
-			<div class="flex flex-wrap items-center justify-center gap-1">
+			  </div>
+		  
+			  <div class="flex flex-col items-center justify-center gap-1">
 				<span class="text-xs font-medium text-muted-foreground">Trait</span>
 				<div class="rounded-full border bg-foreground/5 px-2 py-1 text-xs text-nowrap">
-					{weapon.available_traits.map(capitalize).join(', ')}
+				  {weapon.available_traits.map(capitalize).join(', ')}
 				</div>
+			  </div>
 			</div>
-		</div>
+		  
+		  </div>
 
 		<!-- Features -->
 		{#if weapon.features.length > 0}

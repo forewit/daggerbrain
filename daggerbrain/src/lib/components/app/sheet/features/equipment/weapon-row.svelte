@@ -106,7 +106,7 @@
 	let formattedDamage = $derived.by(() => {
 		if (!weapon) return '';
 		const diceWithProficiency = applyProficiencyToDice(weapon.damage_dice, proficiency);
-		return `${diceWithProficiency}${currentDamageType ? ' ' + currentDamageType : ''}`;
+		return `${diceWithProficiency}${weapon.damage_bonus > 0 ? '+' + weapon.damage_bonus : ''}${currentDamageType ? ' ' + currentDamageType : ''}`;
 	});
 </script>
 

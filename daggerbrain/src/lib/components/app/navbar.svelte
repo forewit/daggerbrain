@@ -50,9 +50,9 @@
 				<Sheet.Header>
 					<SignedIn>
 						<div class="flex">
-							<Button variant="ghost" href="/profile" class="w-min grow justify-start p-0 pl-2">
+							<Button variant="ghost" href="/profile" class="w-min grow gap-2.5 justify-start p-0 pl-2">
 								<div class="size-6 overflow-hidden rounded-full border-2 border-accent">
-									<img src={'/images/portrait-placeholder.png'} alt={userName} class="size-full" />
+									<img src={userImageUrl} alt={userName} class="size-full" />
 								</div>
 								{userName}
 							</Button>
@@ -78,30 +78,17 @@
 					</SignedOut>
 				</Sheet.Header>
 				<div class="flex flex-col overflow-y-auto px-4 pb-6">
-					<SignedOut>
-						<Button
+					<Button
 							variant="link"
-							size="sm"
 							onclick={() => (open = false)}
 							href="/"
 							class="h-10 w-full justify-start rounded-none border-b pl-0"
 						>
 							Home
 						</Button>
-					</SignedOut>
 					<SignedIn>
 						<Button
 							variant="link"
-							size="sm"
-							onclick={() => (open = false)}
-							href="/"
-							class="h-10 w-full justify-start rounded-none border-b pl-0"
-						>
-							Home
-						</Button>
-						<Button
-							variant="link"
-							size="sm"
 							onclick={() => (open = false)}
 							href="/characters"
 							class="h-10 w-full justify-start rounded-none border-b pl-0"

@@ -61,6 +61,9 @@ export type WeaponInventoryItem = {
 	custom_range: Ranges | null;
 	custom_available_damage_types: DamageTypes[] | null;
 	custom_burden: 0 | 1 | 2 | null;
+	custom_damage_bonus: number | null;
+	custom_damage_dice: string | null;
+	custom_attack_roll_bonus: number | null;
 };
 
 export type ConsumableInventoryItem = {
@@ -68,6 +71,7 @@ export type ConsumableInventoryItem = {
 	compendium_id: string;
 	choices: Record<string, string[]>;
 	custom_title: string | null;
+	custom_description: string | null;
 };
 
 export type LootInventoryItem = {
@@ -75,6 +79,7 @@ export type LootInventoryItem = {
 	compendium_id: string;
 	choices: Record<string, string[]>;
 	custom_title: string | null;
+	custom_description: string | null;
 };
 
 export type Inventory = {

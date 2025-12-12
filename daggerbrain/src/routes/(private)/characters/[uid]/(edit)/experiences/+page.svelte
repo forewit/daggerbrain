@@ -12,27 +12,6 @@
 
 	// Check if experiences dropdown should be highlighted
 	let experiencesHighlighted = $derived(character?.experiences.some((exp) => !exp.trim()) ?? false);
-
-	// Check if background questions dropdown should be highlighted
-	let backgroundQuestionsHighlighted = $derived(
-		character?.background_question_answers.some((item) => !item.answer.trim()) ?? false
-	);
-
-	// Check if connections dropdown should be highlighted
-	let connectionsHighlighted = $derived(
-		character?.connection_answers.some((item) => !item.answer.trim()) ?? false
-	);
-
-	// Check if description dropdown should be highlighted (all fields are blank)
-	let descriptionsHighlighted = $derived(
-		character
-			? !character.character_descriptions.clothes.trim() &&
-					!character.character_descriptions.eyes.trim() &&
-					!character.character_descriptions.body.trim() &&
-					!character.character_descriptions.skin.trim() &&
-					!character.character_descriptions.attitude.trim()
-			: false
-	);
 </script>
 
 {#if character}
@@ -70,7 +49,7 @@
 				{/each}
 			</Dropdown>
 
-			<Dropdown title="Background Questions" highlighted={backgroundQuestionsHighlighted}>
+			<Dropdown title="Background Questions" >
 				<div class="flex flex-col gap-4">
 					<p class="text-sm text-muted-foreground italic">
 						Answer any of the following background questions. You can also create your own
@@ -80,7 +59,7 @@
 				</div>
 			</Dropdown>
 
-			<Dropdown title="Connections" highlighted={connectionsHighlighted}>
+			<Dropdown title="Connections" >
 				<div class="flex flex-col gap-4">
 					<p class="text-sm text-muted-foreground italic">
 						Ask your fellow players one of the following questions for their character to answer, or
@@ -90,7 +69,7 @@
 				</div>
 			</Dropdown>
 
-			<Dropdown title="Description" highlighted={descriptionsHighlighted}>
+			<Dropdown title="Description">
 				<div class="flex flex-col gap-4">
 					<p class="text-sm text-muted-foreground italic">
 						Describe your character's appearance and demeanor.

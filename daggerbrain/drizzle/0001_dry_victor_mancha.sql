@@ -1,5 +1,6 @@
-CREATE TABLE `characters_table` (
-	`id` text PRIMARY KEY DEFAULT 'ec53a030-6562-47e4-a0ee-c876521e885b' NOT NULL,
+PRAGMA foreign_keys=OFF;--> statement-breakpoint
+CREATE TABLE `__new_characters_table` (
+	`id` text PRIMARY KEY DEFAULT '3c309184-fb1b-466e-a779-2f58bfb5b58c' NOT NULL,
 	`clerk_user_id` text NOT NULL,
 	`name` text DEFAULT 'New Character' NOT NULL,
 	`image_url` text DEFAULT '/images/portrait-placeholder.png' NOT NULL,
@@ -10,11 +11,14 @@ CREATE TABLE `characters_table` (
 	`custom_bottom_ancestry` text,
 	`community_card_id` text,
 	`experiences` text DEFAULT '["",""]' NOT NULL,
+	`class_choices` text DEFAULT '{}' NOT NULL,
 	`primary_class_id` text,
 	`primary_subclass_id` text,
 	`secondary_class_id` text,
 	`secondary_subclass_id` text,
 	`secondary_class_domain_id_choice` text,
+	`chosen_beastform` text DEFAULT 'null',
+	`companion` text DEFAULT 'null',
 	`background_questions` text DEFAULT '[]' NOT NULL,
 	`connections` text DEFAULT '[]' NOT NULL,
 	`character_descriptions` text DEFAULT '{"clothes":"","eyes":"","body":"","skin":"","attitude":""}' NOT NULL,
@@ -29,8 +33,6 @@ CREATE TABLE `characters_table` (
 	`additional_ancestry_card_ids` text DEFAULT '[]' NOT NULL,
 	`additional_community_card_ids` text DEFAULT '[]' NOT NULL,
 	`additional_transformation_card_ids` text DEFAULT '[]' NOT NULL,
-	`additional_character_modifiers` text DEFAULT '[]' NOT NULL,
-	`additional_weapon_modifiers` text DEFAULT '[]' NOT NULL,
 	`unarmed_attack_choices` text DEFAULT '{}' NOT NULL,
 	`ancestry_card_choices` text DEFAULT '{}' NOT NULL,
 	`community_card_tokens` integer DEFAULT 0 NOT NULL,
@@ -47,10 +49,7 @@ CREATE TABLE `characters_table` (
 	`level_up_choices` text DEFAULT '{"2":{"A":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null},"B":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null}},"3":{"A":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null},"B":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null}},"4":{"A":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null},"B":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null}},"5":{"A":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null},"B":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null}},"6":{"A":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null},"B":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null}},"7":{"A":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null},"B":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null}},"8":{"A":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null},"B":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null}},"9":{"A":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null},"B":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null}},"10":{"A":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null},"B":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null}}}' NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE `users_table` (
-	`clerk_id` text PRIMARY KEY NOT NULL,
-	`character_slot_1` text,
-	`character_slot_2` text,
-	`character_slot_3` text,
-	`dismissed_popups` text DEFAULT '[]' NOT NULL
-);
+INSERT INTO `__new_characters_table`("id", "clerk_user_id", "name", "image_url", "settings", "derived_descriptors", "ancestry_card_id", "custom_top_ancestry", "custom_bottom_ancestry", "community_card_id", "experiences", "class_choices", "primary_class_id", "primary_subclass_id", "secondary_class_id", "secondary_subclass_id", "secondary_class_domain_id_choice", "chosen_beastform", "companion", "background_questions", "connections", "character_descriptions", "notes", "active_armor_id", "active_primary_weapon_id", "active_secondary_weapon_id", "inventory", "active_conditions", "transformation_card_id", "additional_domain_card_ids", "additional_ancestry_card_ids", "additional_community_card_ids", "additional_transformation_card_ids", "unarmed_attack_choices", "ancestry_card_choices", "community_card_tokens", "domain_card_choices", "domain_card_tokens", "selected_traits", "marked_hp", "marked_stress", "marked_hope", "marked_armor", "loadout_domain_card_ids", "level", "level_up_domain_card_ids", "level_up_choices") SELECT "id", "clerk_user_id", "name", "image_url", "settings", "derived_descriptors", "ancestry_card_id", "custom_top_ancestry", "custom_bottom_ancestry", "community_card_id", "experiences", "class_choices", "primary_class_id", "primary_subclass_id", "secondary_class_id", "secondary_subclass_id", "secondary_class_domain_id_choice", "chosen_beastform", "companion", "background_questions", "connections", "character_descriptions", "notes", "active_armor_id", "active_primary_weapon_id", "active_secondary_weapon_id", "inventory", "active_conditions", "transformation_card_id", "additional_domain_card_ids", "additional_ancestry_card_ids", "additional_community_card_ids", "additional_transformation_card_ids", "unarmed_attack_choices", "ancestry_card_choices", "community_card_tokens", "domain_card_choices", "domain_card_tokens", "selected_traits", "marked_hp", "marked_stress", "marked_hope", "marked_armor", "loadout_domain_card_ids", "level", "level_up_domain_card_ids", "level_up_choices" FROM `characters_table`;--> statement-breakpoint
+DROP TABLE `characters_table`;--> statement-breakpoint
+ALTER TABLE `__new_characters_table` RENAME TO `characters_table`;--> statement-breakpoint
+PRAGMA foreign_keys=ON;

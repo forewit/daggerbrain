@@ -138,7 +138,7 @@ export const CharacterModifierSchema = z
 					'severe_damage_threshold',
 					'primary_class_mastery_level',
 					'secondary_class_mastery_level',
-					'max_domain_card_loadout',
+					'max_loadout',
 					'max_hope',
 					'proficiency',
 					'max_armor',
