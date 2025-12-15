@@ -14,6 +14,7 @@
 	import DomainCardCatalog from '$lib/components/app/cards/domain-card-catalog.svelte';
 	import { update_character_slots, dismiss_popup } from '$lib/remote/users.remote';
 	import { Protect } from 'svelte-clerk';
+	import Footer from '$lib/components/app/footer.svelte';
 
 	const CHARACTER_LIMIT_POPUP_ID = 'popup:characters:limit_reached';
 
@@ -141,29 +142,33 @@
 	}
 </script>
 
-{#if isLoading}
-	<div class="fixed inset-0 flex items-center justify-center">
-		<LoaderCircle class="h-8 w-8 animate-spin text-muted-foreground" />
-	</div>
-{:else}
-	<div
-		class={cn(
-			'pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]',
-			'mx-auto max-w-6xl px-4 py-2'
-		)}
-	>
-		<!-- Header -->
-		<div class="mb-2 flex justify-between gap-2 py-2">
-			<p class="text-2xl font-bold">{titleText}</p>
-
-			<div class="flex gap-2">
-				<Button variant="outline" onclick={handleCreateCharacter} disabled={isAtLimit}>
-					<Plus /> New Character
-				</Button>
-			</div>
+<div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
+	{#if isLoading}
+		<!-- Keep the page height so the footer doesn't jump while loading -->
+		<div class="absolute inset-0 flex items-center justify-center">
+			<LoaderCircle class="h-8 w-8 animate-spin text-muted-foreground" />
 		</div>
+	{:else}
+		<div
+			class={cn(
+				'relative z-10 flex h-full w-full flex-col items-center justify-start ',
+				'pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]'
+			)}
+		>
+			<div class="w-full max-w-6xl space-y-4 px-4 py-4">
+				<!-- Header -->
+				<div class="flex justify-between gap-2">
+					<p class="text-2xl font-bold">{titleText}</p>
 
-		<Protect feature="unlimited_slots">
+					<div class="flex gap-2">
+						<Button variant="outline" onclick={handleCreateCharacter} disabled={isAtLimit}>
+							<Plus /> New Character
+						</Button>
+					</div>
+				</div>
+
+				<!-- todo: uncomment before enabling subscriptions -->
+		<!-- <Protect feature="unlimited_slots">
 			{#snippet children()}{/snippet}
 			{#snippet fallback()}
 				{#if isAtLimit && !user.isPopupDismissed(CHARACTER_LIMIT_POPUP_ID)}
@@ -188,7 +193,7 @@
 					</div>
 				{/if}
 			{/snippet}
-		</Protect>
+		</Protect> -->
 		<!-- Active Characters -->
 		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 			{#each activeCharacters as char}
@@ -322,8 +327,12 @@
 				{/if}
 			{/snippet}
 		</Protect>
-	</div>
-{/if}
+			</div>
+		</div>
+	{/if}
+</div>
+
+<Footer />
 
 <!-- Delete Confirmation Dialog -->
 <Dialog.Root bind:open={showDeleteDialog}>

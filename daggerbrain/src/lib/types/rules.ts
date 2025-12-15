@@ -79,7 +79,7 @@ export const BASE_MIXED_ANCESTRY_CARD: AncestryCard = {
 	compendium_id: 'mixed-ancestry',
 	source_id: 'SRD',
 	card_type: 'ancestry',
-	image_url: '/images/wip.avif',
+	image_url: '/images/art/placeholder-art.webp',
 	title: 'Mixed Ancestry',
 	artist_name: '',
 	description_html:

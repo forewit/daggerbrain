@@ -15,7 +15,7 @@ export const CLASSES = {
 			knowledge: 1
 		},
 		name: 'Assassin',
-		image_url: '/images/wip.avif',
+		image_url: '/images/art/placeholder-art.webp',
 		description_html:
 			'<p>As an assassin, you utilize unmatched stealth and precision to ambush the unwary.</p>',
 		hope_feature: {
@@ -97,7 +97,7 @@ export const CLASSES = {
 			knowledge: -1
 		},
 		name: 'Brawler',
-		image_url: '/images/wip.avif',
+		image_url: '/images/art/placeholder-art.webp',
 		description_html:
 			'<p>As a brawler, you can use your fists just as well as any weapon to fight off the threats that get in your way.</p>',
 		hope_feature: {
@@ -254,7 +254,7 @@ export const CLASSES = {
 			knowledge: 1
 		},
 		name: 'Bard',
-		image_url: '/images/wip.avif',
+		image_url: '/images/art/placeholder-art.webp',
 		description_html:
 			'<p>As a bard, you know how to get people to talk, bring attention to yourself, and use words or music to influence the world around you.</p>',
 		hope_feature: {
@@ -318,7 +318,7 @@ export const CLASSES = {
 			knowledge: 0
 		},
 		name: 'Druid',
-		image_url: '/images/wip.avif',
+		image_url: '/images/art/placeholder-art.webp',
 		description_html:
 			'<p>As a druid, you are a force of nature, preserving the balance of life and death by channeling the wilds themselves through you.</p>',
 		hope_feature: {
@@ -392,7 +392,7 @@ export const CLASSES = {
 			knowledge: 0
 		},
 		name: 'Guardian',
-		image_url: '/images/wip.avif',
+		image_url: '/images/art/placeholder-art.webp',
 		description_html:
 			'<p>As a guardian, you run into danger to protect your party, keeping watch over those who might not survive without you there.</p>',
 		hope_feature: {
@@ -461,7 +461,7 @@ export const CLASSES = {
 			knowledge: 0
 		},
 		name: 'Ranger',
-		image_url: '/images/wip.avif',
+		image_url: '/images/art/placeholder-art.webp',
 		description_html:
 			'<p>As a ranger, your keen eyes and graceful haste make you indispensable when tracking down enemies and navigating the wilds.</p>',
 		hope_feature: {
@@ -533,7 +533,7 @@ export const CLASSES = {
 			knowledge: 0
 		},
 		name: 'Rogue',
-		image_url: '/images/wip.avif',
+		image_url: '/images/art/placeholder-art.webp',
 		description_html:
 			'<p>As a rogue, you have experience fighting with your blade as well as your wit, preferring to move quickly and fight quietly.</p>',
 		hope_feature: {
@@ -609,7 +609,7 @@ export const CLASSES = {
 			knowledge: -1
 		},
 		name: 'Seraph',
-		image_url: '/images/wip.avif',
+		image_url: '/images/art/placeholder-art.webp',
 		description_html:
 			"<p>As a seraph, you've taken a vow to a god who helps you channel sacred arcane power to keep your party on their feet.</p>",
 		hope_feature: {
@@ -673,7 +673,7 @@ export const CLASSES = {
 			knowledge: 0
 		},
 		name: 'Sorcerer',
-		image_url: '/images/wip.avif',
+		image_url: '/images/art/placeholder-art.webp',
 		description_html:
 			"<p>As a sorcerer, you were born with innate magical power, and you've learned how to wield that power to get what you want.</p>",
 		hope_feature: {
@@ -755,7 +755,7 @@ export const CLASSES = {
 			knowledge: 0
 		},
 		name: 'Warrior',
-		image_url: '/images/wip.avif',
+		image_url: '/images/art/placeholder-art.webp',
 		description_html:
 			'<p>As a warrior, you have trained your body and mind to face any challenge that comes your way.</p>',
 		hope_feature: {
@@ -830,7 +830,7 @@ export const CLASSES = {
 			knowledge: 2
 		},
 		name: 'Wizard',
-		image_url: '/images/wip.avif',
+		image_url: '/images/art/placeholder-art.webp',
 		description_html:
 			"<p>As a wizard, you've become familiar with the arcane through the relentless study of grimoires and other tools of magic.</p>",
 		hope_feature: {

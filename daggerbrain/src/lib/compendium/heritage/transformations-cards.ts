@@ -6,7 +6,7 @@ export const TRANSFORMATION_CARDS = {
 		source_id: 'Void 1.5',
 		card_type: 'transformation',
 		artist_name: '',
-		image_url: '/images/wip.avif',
+		image_url: '/images/art/placeholder-art.webp',
 		title: 'Werewolf',
 		description_html: '<p>Werewolves are creatures who transform into supernatural wolves.</p>',
 		features: [

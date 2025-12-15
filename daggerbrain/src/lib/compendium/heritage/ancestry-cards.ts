@@ -6,11 +6,11 @@ export const ANCESTRY_CARDS = {
 		compendium_id: 'drakona',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/drakona.webp',
+		image_url: '/images/art/placeholder-art.webp',
 		title: 'Drakona',
 		description_html:
 			'<p>Drakona resemble wingless dragons in humanoid form and possess a powerful elemental breath.</p>',
-		artist_name: 'Mat Wilma',
+		artist_name: '',
 		choices: [],
 		features: [
 			{
@@ -33,11 +33,11 @@ export const ANCESTRY_CARDS = {
 		compendium_id: 'clank',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/clank.webp',
+		image_url: '/images/art/placeholder-art.webp',
 		title: 'Clank',
 		description_html:
 			'<p>Clanks are sentient mechanical beings built from a variety of materials, including metal, wood, and stone.</p>',
-		artist_name: 'Mat Wilma',
+		artist_name: '',
 		choices: [
 			{
 				choice_id: 'choose_experience',
@@ -77,11 +77,11 @@ export const ANCESTRY_CARDS = {
 		compendium_id: 'dwarf',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/dwarf.webp',
+		image_url: '/images/art/placeholder-art.webp',
 		title: 'Dwarf',
 		description_html:
 			'<p>Dwarves are most easily recognized as short humanoids with square frames, dense musculature, and thick hair.</p>',
-		artist_name: 'Mat Wilma',
+		artist_name: '',
 		choices: [],
 		features: [
 			{
@@ -103,11 +103,11 @@ export const ANCESTRY_CARDS = {
 		compendium_id: 'elf',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/elf.webp',
+		image_url: '/images/art/placeholder-art.webp',
 		title: 'Elf',
 		description_html:
 			'<p>Elves are typically tall humanoids with pointed ears and acutely attuned senses.</p>',
-		artist_name: 'Mat Wilma',
+		artist_name: '',
 		choices: [],
 		features: [
 			{
@@ -144,10 +144,10 @@ export const ANCESTRY_CARDS = {
 		compendium_id: 'faerie',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/faerie.webp',
+		image_url: '/images/art/placeholder-art.webp',
 		title: 'Faerie',
 		description_html: '<p>Faeries are winged humanoid creatures with insectile features.</p>',
-		artist_name: 'Anthony Jones',
+		artist_name: '',
 		choices: [],
 		features: [
 			{
@@ -170,11 +170,11 @@ export const ANCESTRY_CARDS = {
 		compendium_id: 'faun',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/faun.webp',
+		image_url: '/images/art/placeholder-art.webp',
 		title: 'Faun',
 		description_html:
 			'<p>Fauns resemble humanoid goats with curving horns, square pupils, and cloven hooves.</p>',
-		artist_name: 'Jessketchin',
+		artist_name: '',
 		choices: [],
 		features: [
 			{
@@ -197,11 +197,11 @@ export const ANCESTRY_CARDS = {
 		compendium_id: 'firbolg',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/firbolg.webp',
+		image_url: '/images/art/placeholder-art.webp',
 		title: 'Firbolg',
 		description_html:
 			'<p>Firbolgs are bovine humanoids typically recognized by their broad noses and long, drooping ears.</p>',
-		artist_name: 'Anthony Jones',
+		artist_name: '',
 		choices: [],
 		features: [
 			{
@@ -224,10 +224,10 @@ export const ANCESTRY_CARDS = {
 		compendium_id: 'fungril',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/fungril.webp',
+		image_url: '/images/art/placeholder-art.webp',
 		title: 'Fungril',
 		description_html: '<p>Fungril resemble humanoid mushrooms.</p>',
-		artist_name: 'Anthony Jones',
+		artist_name: '',
 		choices: [],
 		features: [
 			{
@@ -250,11 +250,11 @@ export const ANCESTRY_CARDS = {
 		compendium_id: 'galapa',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/galapa.webp',
+		image_url: '/images/art/placeholder-art.webp',
 		title: 'Galapa',
 		description_html:
 			'<p>Galapa resemble anthropomorphic turtles with large, domed shells into which they can retract.</p>',
-		artist_name: 'Jessketchin',
+		artist_name: '',
 		choices: [],
 		features: [
 			{
@@ -292,11 +292,11 @@ export const ANCESTRY_CARDS = {
 		compendium_id: 'giant',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/giant.webp',
+		image_url: '/images/art/placeholder-art.webp',
 		title: 'Giant',
 		description_html:
 			'<p>Giants are towering humanoids with broad shoulders, long arms, and one to three eyes.</p>',
-		artist_name: 'Juan S. Almencion',
+		artist_name: '',
 		choices: [],
 		features: [
 			{
@@ -326,11 +326,11 @@ export const ANCESTRY_CARDS = {
 		compendium_id: 'goblin',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/goblin.webp',
+		image_url: '/images/art/placeholder-art.webp',
 		title: 'Goblin',
 		description_html:
 			'<p>Goblins are small humanoids easily recognizable by their large eyes and massive membranous ears.</p>',
-		artist_name: 'Anthony Jones',
+		artist_name: '',
 		choices: [],
 		features: [
 			{
@@ -352,11 +352,11 @@ export const ANCESTRY_CARDS = {
 		compendium_id: 'halfling',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/halflings.webp',
+		image_url: '/images/art/placeholder-art.webp',
 		title: 'Halfling',
 		description_html:
 			'<p>Halflings are small humanoids with large hairy feet and prominent rounded ears.</p>',
-		artist_name: 'Anthony Jones',
+		artist_name: '',
 		choices: [],
 		features: [
 			{
@@ -378,11 +378,11 @@ export const ANCESTRY_CARDS = {
 		compendium_id: 'human',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/human.webp',
+		image_url: '/images/art/placeholder-art.webp',
 		title: 'Human',
 		description_html:
 			'<p>Humans are most easily recognized by their dexterous hands, rounded ears, and bodies built for endurance.</p>',
-		artist_name: 'Fernanda Suarez',
+		artist_name: '',
 		choices: [],
 		features: [
 			{
@@ -412,11 +412,11 @@ export const ANCESTRY_CARDS = {
 		compendium_id: 'infernis',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/infernis.webp',
+		image_url: '/images/art/placeholder-art.webp',
 		title: 'Infernis',
 		description_html:
 			'<p>Infernis are humanoids who possess sharp canine teeth, pointed ears, and horns. They are the descendants of demons from the Circles Below.</p>',
-		artist_name: 'Mat Wilma',
+		artist_name: '',
 		choices: [],
 		features: [
 			{
@@ -439,11 +439,11 @@ export const ANCESTRY_CARDS = {
 		compendium_id: 'katari',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/katari.webp',
+		image_url: '/images/art/placeholder-art.webp',
 		title: 'Katari',
 		description_html:
 			'<p>Katari are feline humanoids with retractable claws, vertically slit pupils, and high, triangular ears.</p>',
-		artist_name: 'Hendry Iwanaga',
+		artist_name: '',
 		choices: [],
 		features: [
 			{
@@ -466,11 +466,11 @@ export const ANCESTRY_CARDS = {
 		compendium_id: 'orc',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/orcs.webp',
+		image_url: '/images/art/placeholder-art.webp',
 		title: 'Orc',
 		description_html:
 			'<p>Orcs are humanoids most easily recognized by their square features and boar-like tusks that protrude from their lower jaw.</p>',
-		artist_name: 'Simon Pape',
+		artist_name: '',
 		choices: [],
 		features: [
 			{
@@ -493,11 +493,11 @@ export const ANCESTRY_CARDS = {
 		compendium_id: 'ribbet',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/ribbet.webp',
+		image_url: '/images/art/placeholder-art.webp',
 		title: 'Ribbet',
 		description_html:
 			'<p>Ribbets resemble anthropomorphic frogs with protruding eyes and webbed hands and feet.</p>',
-		artist_name: 'Leesha Hannigan',
+		artist_name: '',
 		choices: [],
 		features: [
 			{
@@ -519,11 +519,11 @@ export const ANCESTRY_CARDS = {
 		compendium_id: 'simiah',
 		source_id: 'SRD',
 		card_type: 'ancestry',
-		image_url: '/api/images/card/art/ancestries/simiah.webp',
+		image_url: '/images/art/placeholder-art.webp',
 		title: 'Simiah',
 		description_html:
 			'<p>Simiah resemble anthropomorphic monkeys and apes with long limbs and prehensile feet.</p>',
-		artist_name: 'Jessketchin',
+		artist_name: '',
 		choices: [],
 		features: [
 			{

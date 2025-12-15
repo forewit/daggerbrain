@@ -58,14 +58,15 @@
 		<div class="m-4 flex flex-col gap-4">
 			<p class="border-b pb-2 text-2xl font-medium">Settings</p>
 
+			<!-- todo: uncomment before adding void content -->
 			<!-- The Void -->
-			<Label class="cursor-pointer">
+			<!-- <Label class="cursor-pointer">
 				The Void:
 				<Checkbox
 					bind:checked={voidCheckboxState}
 					onCheckedChange={(checked) => handleVoidCheckboxChange(checked ?? false)}
 				/>
-			</Label>
+			</Label> -->
 
 			<!-- Use Gold Coins -->
 			<Label class="cursor-pointer">
