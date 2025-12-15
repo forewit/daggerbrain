@@ -70,7 +70,7 @@
 				return 'Characters';
 			}
 			const activeCount = user.getActiveSlotIds().length;
-			return `Characters (${activeCount}/3)`;
+			return `${activeCount}/3`;
 		}
 	});
 
@@ -157,8 +157,8 @@
 		>
 			<div class="w-full max-w-6xl space-y-4 px-4 py-4">
 				<!-- Header -->
-				<div class="flex justify-between gap-2">
-					<p class="text-2xl font-bold">{titleText}</p>
+				<div class="flex items-center justify-between gap-2">
+					<p class="text-2xl font-bold flex gap-2 items-center">Characters <span class="text-muted-foreground text-base py-0.5 tracking-widest px-2 rounded-full bg-card border">{titleText}</span></p>
 
 					<div class="flex gap-2">
 						<Button variant="outline" onclick={handleCreateCharacter} disabled={isAtLimit}>

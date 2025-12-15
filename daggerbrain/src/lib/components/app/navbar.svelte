@@ -59,12 +59,11 @@
 		<Button
 			variant="ghost"
 			href="/"
-			class="flex shrink-0 px-2 items-center gap-2 text-base font-semibold"
+			class="flex shrink-0 items-center gap-2 px-2 text-base font-semibold"
 		>
 			<img src="/images/daggerbrain.svg" alt="Daggerbrain" class="size-6" />
 			<span class="hidden inline">Daggerbrain</span>
 		</Button>
-
 
 		<Sheet.Root bind:open>
 			<Sheet.Trigger
@@ -81,7 +80,7 @@
 								href={env.PUBLIC_PROFILE_URL}
 								class="w-min grow justify-start gap-2.5 p-0 pl-2"
 							>
-								<div class="size-7 overflow-hidden rounded-full border-2 border-accent">
+								<div class="size-8 overflow-hidden rounded-full border-2 border-accent">
 									<img src={userImageUrl} alt={userName} class="size-full" />
 								</div>
 								{userName}
@@ -98,7 +97,6 @@
 						</div>
 					</SignedIn>
 
-					
 					<SignedOut>
 						<SignInButton class={cn(buttonVariants({ size: 'sm' }), 'grow')}>Sign In</SignInButton>
 					</SignedOut>
@@ -112,16 +110,16 @@
 					>
 						Home
 					</Button>
-					
-						<Button
-							variant="link"
-							onclick={() => (open = false)}
-							href="/roadmap"
-							class="h-10 w-full justify-start rounded-none border-b pl-0"
-						>
-							Roadmap
-						</Button>
-						<Button
+
+					<Button
+						variant="link"
+						onclick={() => (open = false)}
+						href="/roadmap"
+						class="h-10 w-full justify-start rounded-none border-b pl-0"
+					>
+						Roadmap
+					</Button>
+					<Button
 						variant="link"
 						onclick={() => (open = false)}
 						href="/characters"
@@ -129,7 +127,6 @@
 					>
 						My Characters
 					</Button>
-						
 				</div>
 				<Sheet.Footer>
 					<SignedIn>
@@ -139,17 +136,16 @@
 			</Sheet.Content>
 		</Sheet.Root>
 
-		<div class="hidden items-center sm:flex gap-2 ">
+		<div class="hidden items-center gap-2 sm:flex">
 			<Button variant="ghost" class="px-2" href="/roadmap">Roadmap</Button>
 			<Button variant="ghost" class="px-2" href="/characters">My Characters</Button>
 
-			
 			<SignedOut>
 				<SignInButton class={buttonVariants({ size: 'sm' })}>Sign In</SignInButton>
 			</SignedOut>
 
-				<!-- todo: uncomment before enabling subscriptions -->
-				<!-- <Protect plan="adventurer">
+			<!-- todo: uncomment before enabling subscriptions -->
+			<!-- <Protect plan="adventurer">
 					{#snippet children()}{/snippet}
 					{#snippet fallback()}
 						<Button variant="default" size="sm" class="mr-2 ml-4" href="/subscribe"
@@ -158,7 +154,11 @@
 					{/snippet}
 				</Protect> -->
 
+				<SignedIn>
+			<div class="size-8 flex items-center justify-center rounded-full border-2 mx-2 border-accent">
 				<UserButton />
+			</div>
+		</SignedIn>
 		</div>
 	</nav>
 </header>

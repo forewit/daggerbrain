@@ -4,6 +4,7 @@
 	import { ClerkProvider } from 'svelte-clerk';
 	import Navbar from '$lib/components/app/navbar.svelte';
 	import { dark } from '@clerk/themes';
+	import { env } from '$env/dynamic/public';
 
 	let { children } = $props();
 
