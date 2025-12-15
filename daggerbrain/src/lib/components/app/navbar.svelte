@@ -14,7 +14,7 @@
 	import Menu from '@lucide/svelte/icons/menu';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import { onMount } from 'svelte';
-	import { PUBLIC_PROFILE_URL } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
 
 	let open = $state(false);
 	let headerElement: HTMLElement | undefined = $state();
@@ -78,7 +78,7 @@
 						<div class="flex">
 							<Button
 								variant="ghost"
-								href={PUBLIC_PROFILE_URL}
+								href={env.PUBLIC_PROFILE_URL}
 								class="w-min grow justify-start gap-2.5 p-0 pl-2"
 							>
 								<div class="size-7 overflow-hidden rounded-full border-2 border-accent">
