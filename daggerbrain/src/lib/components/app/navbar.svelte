@@ -54,7 +54,7 @@
 >
 	<nav
 		style="scrollbar-width: none;"
-		class="px- flex h-14 w-full max-w-6xl items-center justify-between"
+		class="px-1 flex h-14 w-full max-w-6xl items-center justify-between"
 	>
 		<Button
 			variant="ghost"
