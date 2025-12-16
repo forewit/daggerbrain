@@ -3,6 +3,14 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 </script>
 
+<svelte:head>
+	<title>Roadmap | Daggerbrain</title>
+	<meta
+		name="description"
+		content="See what's coming next to Daggerbrain. Check out our development roadmap and upcoming features for the Daggerheart character builder."
+	/>
+</svelte:head>
+
 <div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
 	<!-- Forest footer image with fade effect - background -->
 	<div

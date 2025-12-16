@@ -6,6 +6,14 @@
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 </script>
 
+<svelte:head>
+	<title>Daggerbrain - Digital Character Builder for Daggerheart</title>
+	<meta
+		name="description"
+		content="Create and manage your Daggerheart characters with Daggerbrain. Build character sheets, track abilities, inventory, and everything you need for your tabletop adventures."
+	/>
+</svelte:head>
+
 <div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
 	<!-- Dragon banner image with fade effect - background -->
 	<div
@@ -33,6 +41,7 @@
 					<img
 						src="/images/art/epic-monk.webp"
 						alt=""
+						fetchpriority="high"
 						class="absolute inset-0 h-full w-full object-cover opacity-40 transition-all duration-600 group-hover:scale-103 group-hover:opacity-50"
 					/>
 					<!-- Top linear gradient -->

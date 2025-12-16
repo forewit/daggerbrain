@@ -16,6 +16,14 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Contact | Daggerbrain</title>
+	<meta
+		name="description"
+		content="Have questions, feedback, or want to help? I'd love to hear from you."
+	/>
+</svelte:head>
+
 <div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
 	<!-- Forest footer image with fade effect - background -->
 	<div class="forest-fade-container absolute bottom-0 left-0 right-0 h-64 w-full overflow-hidden pointer-events-none z-0">

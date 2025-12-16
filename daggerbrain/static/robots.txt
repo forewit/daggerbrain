@@ -1,3 +1,6 @@
 # allow crawling everything by default
 User-agent: *
 Disallow:
+
+# Update the sitemap URL below to match your PUBLIC_ORIGIN environment variable
+Sitemap: https://yourdomain.com/sitemap.xml
