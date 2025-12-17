@@ -18,7 +18,7 @@
 
 	let evolution_trait = $derived(
 		character
-			? (character.class_choices[druid_class_id]?.['evolution_trait']?.[0] || '') as TraitIds | ''
+			? ((character.class_choices[druid_class_id]?.['evolution_trait']?.[0] || '') as TraitIds | '')
 			: ('' as TraitIds | '')
 	);
 </script>

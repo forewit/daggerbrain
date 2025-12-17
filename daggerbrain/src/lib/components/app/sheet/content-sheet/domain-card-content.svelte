@@ -52,7 +52,7 @@
 		return (
 			compendium.domains[domainId]?.name || domainId.charAt(0).toUpperCase() + domainId.slice(1)
 		);
-	}		
+	}
 </script>
 
 <Sheet.Header>
@@ -87,7 +87,10 @@
 						onchange={(e) => {
 							if (!character) return;
 							// Convert to number, defaulting to 0 for empty/invalid values
-							const numValue = (e.target as HTMLInputElement).value === '' ? 0 : Number((e.target as HTMLInputElement).value);
+							const numValue =
+								(e.target as HTMLInputElement).value === ''
+									? 0
+									: Number((e.target as HTMLInputElement).value);
 							// Ensure we always set a valid number (never NaN or string)
 							character.bonus_max_loadout = isNaN(numValue) ? 0 : Math.floor(numValue);
 						}}

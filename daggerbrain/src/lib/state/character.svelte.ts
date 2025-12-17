@@ -57,7 +57,6 @@ function createCharacter(id: string) {
 	});
 
 	// ! clear ids that are not in the compendium
-	
 
 	// ================================================
 	// DERIVED COMPENDIUM REFERENCES
@@ -92,7 +91,9 @@ function createCharacter(id: string) {
 		}
 	});
 	let community_card = $derived(
-		character?.community_card_id ? compendium.community_cards[character.community_card_id] || null : null
+		character?.community_card_id
+			? compendium.community_cards[character.community_card_id] || null
+			: null
 	);
 	let transformation_card = $derived(
 		character?.transformation_card_id
@@ -111,7 +112,9 @@ function createCharacter(id: string) {
 		character?.secondary_class_id ? compendium.classes[character.secondary_class_id] || null : null
 	);
 	let secondary_subclass = $derived(
-		character?.secondary_subclass_id ? compendium.subclasses[character.secondary_subclass_id] || null : null
+		character?.secondary_subclass_id
+			? compendium.subclasses[character.secondary_subclass_id] || null
+			: null
 	);
 
 	// domain cards

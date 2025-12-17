@@ -35,9 +35,9 @@
 				target="_blank"
 				variant="link"
 				size="lg"
-				class="mt-14 -mb-6 text-lg mx-auto z-10"
+				class="z-10 mx-auto mt-14 -mb-6 text-lg"
 			>
-				Read the launch announcement! <ExternalLink/></Button
+				Read the launch announcement! <ExternalLink /></Button
 			>
 			<!-- Hero section-->
 			<section

@@ -16,7 +16,7 @@ import type {
 	Weapon
 } from '$lib/types/compendium-types';
 import { getContext, setContext } from 'svelte';
-import { SvelteSet } from 'svelte/reactivity'
+import { SvelteSet } from 'svelte/reactivity';
 import {
 	get_all_ancestry_cards,
 	get_all_community_cards,
@@ -158,7 +158,9 @@ function createCompendium() {
 	);
 	let transformation_cards: Record<string, TransformationCard> = $derived(
 		Object.fromEntries(
-			Object.entries(all_transformation_cards).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries(all_transformation_cards).filter(([, card]) =>
+				source_whitelist.has(card.source_id)
+			)
 		)
 	);
 	let beastforms: Record<string, Beastform> = $derived(
@@ -183,31 +185,49 @@ function createCompendium() {
 	);
 	let domain_cards: Record<DomainIds, Record<string, DomainCard>> = $derived({
 		arcana: Object.fromEntries(
-			Object.entries(all_domain_cards.arcana).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries(all_domain_cards.arcana).filter(([, card]) =>
+				source_whitelist.has(card.source_id)
+			)
 		),
 		blade: Object.fromEntries(
-			Object.entries(all_domain_cards.blade).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries(all_domain_cards.blade).filter(([, card]) =>
+				source_whitelist.has(card.source_id)
+			)
 		),
 		bone: Object.fromEntries(
-			Object.entries(all_domain_cards.bone).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries(all_domain_cards.bone).filter(([, card]) =>
+				source_whitelist.has(card.source_id)
+			)
 		),
 		codex: Object.fromEntries(
-			Object.entries(all_domain_cards.codex).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries(all_domain_cards.codex).filter(([, card]) =>
+				source_whitelist.has(card.source_id)
+			)
 		),
 		grace: Object.fromEntries(
-			Object.entries(all_domain_cards.grace).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries(all_domain_cards.grace).filter(([, card]) =>
+				source_whitelist.has(card.source_id)
+			)
 		),
 		midnight: Object.fromEntries(
-			Object.entries(all_domain_cards.midnight).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries(all_domain_cards.midnight).filter(([, card]) =>
+				source_whitelist.has(card.source_id)
+			)
 		),
 		sage: Object.fromEntries(
-			Object.entries(all_domain_cards.sage).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries(all_domain_cards.sage).filter(([, card]) =>
+				source_whitelist.has(card.source_id)
+			)
 		),
 		splendor: Object.fromEntries(
-			Object.entries(all_domain_cards.splendor).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries(all_domain_cards.splendor).filter(([, card]) =>
+				source_whitelist.has(card.source_id)
+			)
 		),
 		valor: Object.fromEntries(
-			Object.entries(all_domain_cards.valor).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries(all_domain_cards.valor).filter(([, card]) =>
+				source_whitelist.has(card.source_id)
+			)
 		)
 	});
 	let primary_weapons: Record<string, Weapon> = $derived(
@@ -217,7 +237,9 @@ function createCompendium() {
 	);
 	let secondary_weapons: Record<string, Weapon> = $derived(
 		Object.fromEntries(
-			Object.entries(all_secondary_weapons).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries(all_secondary_weapons).filter(([, card]) =>
+				source_whitelist.has(card.source_id)
+			)
 		)
 	);
 	let armor: Record<string, Armor> = $derived(

@@ -32,15 +32,27 @@
 	const character = $derived(context.character);
 	const druid_class_id = $derived(compendium.classes.druid.compendium_id);
 	const beastbound_subclass_id = $derived(compendium.subclasses.ranger_beastbound.compendium_id);
-	
+
 	const hasDruid = $derived(
-		character && (character.primary_class_id === druid_class_id || character.secondary_class_id === druid_class_id)
+		character &&
+			(character.primary_class_id === druid_class_id ||
+				character.secondary_class_id === druid_class_id)
 	);
 	const hasBeastbound = $derived(
-		character && (character.primary_subclass_id === beastbound_subclass_id || character.secondary_subclass_id === beastbound_subclass_id)
+		character &&
+			(character.primary_subclass_id === beastbound_subclass_id ||
+				character.secondary_subclass_id === beastbound_subclass_id)
 	);
 
-	type TabValue = 'weapons' | 'features' | 'experiences' | 'inventory' | 'background' | 'notes' | 'beastform' | 'companion';
+	type TabValue =
+		| 'weapons'
+		| 'features'
+		| 'experiences'
+		| 'inventory'
+		| 'background'
+		| 'notes'
+		| 'beastform'
+		| 'companion';
 	let tab = $state<TabValue>('weapons');
 </script>
 

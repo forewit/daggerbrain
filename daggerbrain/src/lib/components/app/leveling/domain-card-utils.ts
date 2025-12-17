@@ -73,7 +73,8 @@ export function get_available_domain_cards(
 		secondary_class_domain_id_choice !== primary_domain_id &&
 		secondary_class_domain_id_choice !== secondary_domain_id
 	) {
-		const secondaryDomainCards = compendium.domain_cards[secondary_class_domain_id_choice as DomainIds] || {};
+		const secondaryDomainCards =
+			compendium.domain_cards[secondary_class_domain_id_choice as DomainIds] || {};
 		domain_cards = {
 			...domain_cards,
 			...secondaryDomainCards

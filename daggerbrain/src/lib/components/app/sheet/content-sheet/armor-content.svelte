@@ -389,16 +389,15 @@
 	</div>
 
 	{#if inventoryItem}
-
-	<Sheet.Footer>
-		<Sheet.Close
-			class={cn(buttonVariants({ size: 'sm', variant: 'link' }), 'text-destructive')}
-			onclick={() => {
-				context.removeFromInventory({ id: armorId }, 'armor');
-			}}
-		>
-			Remove
-		</Sheet.Close>
-	</Sheet.Footer>
+		<Sheet.Footer>
+			<Sheet.Close
+				class={cn(buttonVariants({ size: 'sm', variant: 'link' }), 'text-destructive')}
+				onclick={() => {
+					context.removeFromInventory({ id: armorId }, 'armor');
+				}}
+			>
+				Remove
+			</Sheet.Close>
+		</Sheet.Footer>
 	{/if}
 {/if}

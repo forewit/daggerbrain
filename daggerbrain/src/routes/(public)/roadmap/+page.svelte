@@ -3,7 +3,6 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 </script>
 
-
 <svelte:head>
 	<title>Roadmap | Daggerbrain</title>
 	<meta
@@ -75,7 +74,8 @@
 								I am working on getting Daggerbrain added to the official <a
 									href="https://darringtonpress.com/license/"
 									class="underline hover:text-accent">Daggerheart VTT whitelist</a
-								>. If you can help with this, <a href="/contact" class="underline hover:text-accent">lets talk!</a>
+								>. If you can help with this,
+								<a href="/contact" class="underline hover:text-accent">lets talk!</a>
 							</div>
 						</div>
 					</li>
@@ -105,7 +105,7 @@
 										adversary manager / encounter builder, campaigns w/ player and fear tracking
 									</li>
 									<li><span class="text-foreground">PDF export</span></li>
-									
+
 									<li><span class="text-foreground">Searchable rules compendium</span></li>
 									<li>
 										<span class="text-foreground">The Void content</span>
@@ -118,9 +118,14 @@
 					</li>
 				</ol>
 
-				<div class="flex gap-4 mt-10">
+				<div class="mt-10 flex gap-4">
 					<Button href="/contact">Got an opinion?</Button>
-					<Button class="whitespace-normal" variant="link" href="https://trello.com/b/EU4j0FnA/daggerbrain-roadmap" target="_blank">See more details on the public trello board</Button>
+					<Button
+						class="whitespace-normal"
+						variant="link"
+						href="https://trello.com/b/EU4j0FnA/daggerbrain-roadmap"
+						target="_blank">See more details on the public trello board</Button
+					>
 				</div>
 			</section>
 		</div>

@@ -53,7 +53,8 @@
 	$effect(() => {
 		if (inventoryItem) {
 			customName = inventoryItem.custom_title === null ? '' : inventoryItem.custom_title;
-			customDescription = inventoryItem.custom_description === null ? '' : inventoryItem.custom_description;
+			customDescription =
+				inventoryItem.custom_description === null ? '' : inventoryItem.custom_description;
 		} else {
 			customName = '';
 			customDescription = '';
@@ -119,8 +120,15 @@
 						<Input id="custom-name" bind:value={customName} placeholder="Name" />
 					</div>
 					<div class="flex flex-col gap-1">
-						<label for="custom-description" class="text-xs font-medium text-muted-foreground">Description</label>
-						<Textarea id="custom-description" bind:value={customDescription} placeholder="Description" class="min-h-24" />
+						<label for="custom-description" class="text-xs font-medium text-muted-foreground"
+							>Description</label
+						>
+						<Textarea
+							id="custom-description"
+							bind:value={customDescription}
+							placeholder="Description"
+							class="min-h-24"
+						/>
 					</div>
 					<div class="flex gap-2">
 						<Button size="sm" onclick={handleSave} hidden={isSaveDisabled}>Save</Button>

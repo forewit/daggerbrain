@@ -14,7 +14,7 @@
 	<!-- Armor Slot -->
 	<p class="px-1 pt-1 pb-2 text-sm font-medium">Active Armor</p>
 	<div class="flex items-center justify-end gap-1">
-		{#if context.derived_armor && context.derived_armor.id !== "unarmored"}
+		{#if context.derived_armor && context.derived_armor.id !== 'unarmored'}
 			<div class="grow">
 				<ArmorCard armor={context.derived_armor} />
 			</div>

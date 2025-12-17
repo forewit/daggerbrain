@@ -54,7 +54,7 @@
 >
 	<nav
 		style="scrollbar-width: none;"
-		class="px-1 flex h-14 w-full max-w-6xl items-center justify-between"
+		class="flex h-14 w-full max-w-6xl items-center justify-between px-1"
 	>
 		<Button
 			variant="ghost"
@@ -154,11 +154,13 @@
 					{/snippet}
 				</Protect> -->
 
-				<SignedIn>
-			<div class="size-8 flex items-center justify-center rounded-full border-2 mx-2 border-accent">
-				<UserButton />
-			</div>
-		</SignedIn>
+			<SignedIn>
+				<div
+					class="mx-2 flex size-8 items-center justify-center rounded-full border-2 border-accent"
+				>
+					<UserButton />
+				</div>
+			</SignedIn>
 		</div>
 	</nav>
 </header>

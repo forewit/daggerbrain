@@ -30,28 +30,26 @@
 				];
 			}
 		}
-	})
+	});
 </script>
 
 {#if character && (character.primary_class_id === guardian_class_id || character.secondary_class_id === guardian_class_id)}
 	<div class="-mb-2 flex items-center gap-2 border-y py-2">
-		
-		<div class="ml-2 h-8 flex items-center">
-		<Switch
+		<div class="ml-2 flex h-8 items-center">
+			<Switch
 				id="unstoppable-switch"
-					checked={character.class_choices[guardian_class_id]?.['unstoppable_active']?.[0] ===
-						'yes'}
-					onCheckedChange={(checked) => {
-						if (!character.class_choices[guardian_class_id])
-							character.class_choices[guardian_class_id] = {};
-						if (checked) {
-							character.class_choices[guardian_class_id]['unstoppable_active'] = ['yes', '1'];
-						} else {
-							character.class_choices[guardian_class_id]['unstoppable_active'] = ['no', '-1'];
-						}
-					}}
-				/>
-			</div>
+				checked={character.class_choices[guardian_class_id]?.['unstoppable_active']?.[0] === 'yes'}
+				onCheckedChange={(checked) => {
+					if (!character.class_choices[guardian_class_id])
+						character.class_choices[guardian_class_id] = {};
+					if (checked) {
+						character.class_choices[guardian_class_id]['unstoppable_active'] = ['yes', '1'];
+					} else {
+						character.class_choices[guardian_class_id]['unstoppable_active'] = ['no', '-1'];
+					}
+				}}
+			/>
+		</div>
 
 		{#if character.class_choices[guardian_class_id]?.['unstoppable_active']?.[0] === 'yes'}
 			<div class="flex items-center gap-2">
@@ -193,7 +191,7 @@
 			</div>
 		{:else}
 			<Label for="unstoppable-switch" class="cursor-pointer text-xs font-normal">
-				 Become Unstoppable
+				Become Unstoppable
 			</Label>
 		{/if}
 	</div>

@@ -97,7 +97,7 @@
 	>
 		{#if counts.d4 > 0}
 			<span
-				class="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-muted text-[10px] font-medium"
+				class="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-muted text-[10px] font-medium"
 				>{counts.d4}</span
 			>
 		{/if}
@@ -149,7 +149,7 @@
 	>
 		{#if counts.d6 > 0}
 			<span
-				class="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-muted text-[10px] font-medium"
+				class="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-muted text-[10px] font-medium"
 				>{counts.d6}</span
 			>
 		{/if}
@@ -212,7 +212,7 @@
 	>
 		{#if counts.d8 > 0}
 			<span
-				class="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-muted text-[10px] font-medium"
+				class="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-muted text-[10px] font-medium"
 				>{counts.d8}</span
 			>
 		{/if}
@@ -275,7 +275,7 @@
 	>
 		{#if counts.d10 > 0}
 			<span
-				class="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-muted text-[10px] font-medium"
+				class="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-muted text-[10px] font-medium"
 				>{counts.d10}</span
 			>
 		{/if}
@@ -349,7 +349,7 @@
 	>
 		{#if counts.d12 > 0}
 			<span
-				class="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-muted text-[10px] font-medium"
+				class="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-muted text-[10px] font-medium"
 				>{counts.d12}</span
 			>
 		{/if}
@@ -423,7 +423,7 @@
 	>
 		{#if counts.d20 > 0}
 			<span
-				class="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-muted text-[10px] font-medium"
+				class="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-muted text-[10px] font-medium"
 				>{counts.d20}</span
 			>
 		{/if}

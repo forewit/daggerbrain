@@ -182,7 +182,7 @@ export const BASE_COMPANION: Companion = {
 	max_hope: 0,
 	marked_hope: 0,
 	evasion: 10,
-	level_up_choices:[],
+	level_up_choices: [],
 	experiences: ['', ''],
 	experience_modifiers: [COMPANION_BASE_EXPERIENCE_MODIFIER, COMPANION_BASE_EXPERIENCE_MODIFIER],
 	choices: {}

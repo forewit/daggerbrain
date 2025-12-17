@@ -96,9 +96,7 @@
 										hidden={vault.length === 0 || selectedVaultCard.forced_in_vault}
 										onclick={() => {
 											if (!character) return;
-											if (
-												character.loadout_domain_card_ids.length < context.max_loadout
-											) {
+											if (character.loadout_domain_card_ids.length < context.max_loadout) {
 												character.loadout_domain_card_ids.push({
 													domainId: selectedVaultCard.domain_id,
 													cardId: selectedVaultCard.compendium_id
@@ -126,8 +124,7 @@
 										onclick={() => {
 											if (!character) return;
 											if (
-												character.loadout_domain_card_ids.length <
-													context.max_loadout &&
+												character.loadout_domain_card_ids.length < context.max_loadout &&
 												selectedVaultCard?.recall_cost <= remainingStress
 											) {
 												character.marked_stress += selectedVaultCard.recall_cost;

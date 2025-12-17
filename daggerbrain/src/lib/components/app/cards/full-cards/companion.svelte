@@ -41,7 +41,8 @@
 	> = {
 		intelligent: {
 			name: 'Intelligent',
-			description: 'Your companion gains a permanent +1 bonus to a Companion Experience of your choice.'
+			description:
+				'Your companion gains a permanent +1 bonus to a Companion Experience of your choice.'
 		},
 		'light-in-the-dark': {
 			name: 'Light in the Dark',
@@ -59,7 +60,8 @@
 		},
 		vicious: {
 			name: 'Vicious',
-			description: 'Increase your companion\'s damage dice or range by one step (d6 to d8, Close to Far, etc.).'
+			description:
+				"Increase your companion's damage dice or range by one step (d6 to d8, Close to Far, etc.)."
 		},
 		resilient: {
 			name: 'Resilient',
@@ -77,16 +79,14 @@
 	};
 
 	// Get available level up choices count (character.level - 1)
-	const max_level_up_choices = $derived(
-		character ? Math.max(0, character.level - 1) : 0
-	);
+	const max_level_up_choices = $derived(character ? Math.max(0, character.level - 1) : 0);
 
 	// Current level up choices
 	const level_up_choices = $derived(companion?.level_up_choices || []);
-	
+
 	// Intelligent choices (experience indices)
 	const intelligent_choices = $derived(companion?.choices?.['intelligent'] || []);
-	
+
 	// Vicious choices (damage_dice or range)
 	const vicious_choices = $derived(companion?.choices?.['vicious'] || []);
 
@@ -128,16 +128,16 @@
 		if (!companion) return;
 		const usageCount = getOptionUsageCount(optionId);
 		const max = COMPANION_LEVEL_UP_OPTION_MAXES[optionId];
-		
+
 		// If we can add more of this option and haven't reached total max
 		if (usageCount < max && level_up_choices.length < max_level_up_choices) {
 			companion.level_up_choices = [...level_up_choices, optionId];
-			
+
 			// Initialize choices object if it doesn't exist
 			if (!companion.choices) {
 				companion.choices = {};
 			}
-			
+
 			// If this is "Intelligent", add an empty entry to the choices array
 			if (optionId === 'intelligent') {
 				if (!companion.choices['intelligent']) {
@@ -146,7 +146,7 @@
 				// Add an empty string for the new selection (user will select the experience)
 				companion.choices['intelligent'] = [...companion.choices['intelligent'], ''];
 			}
-			
+
 			// If this is "Vicious", add an empty entry to the choices array
 			if (optionId === 'vicious') {
 				if (!companion.choices['vicious']) {
@@ -162,13 +162,13 @@
 		event.preventDefault();
 		if (!companion) return;
 		const usageCount = getOptionUsageCount(optionId);
-		
+
 		// If there are any instances of this option, remove one
 		if (usageCount > 0) {
 			const index = level_up_choices.findIndex((id) => id === optionId);
 			if (index !== -1) {
 				companion.level_up_choices = level_up_choices.filter((_, i) => i !== index);
-				
+
 				// If this is "Intelligent", also remove the corresponding choice entry
 				if (optionId === 'intelligent' && companion.choices?.['intelligent']) {
 					// Find the index in the intelligent choices array that corresponds to this selection
@@ -186,7 +186,7 @@
 						);
 					}
 				}
-				
+
 				// If this is "Vicious", also remove the corresponding choice entry
 				if (optionId === 'vicious' && companion.choices?.['vicious']) {
 					// Find the index in the vicious choices array that corresponds to this selection
@@ -215,15 +215,12 @@
 	function isOptionDisabled(optionId: CompanionLevelUpOptionIds): boolean {
 		const usageCount = getOptionUsageCount(optionId);
 		const max = COMPANION_LEVEL_UP_OPTION_MAXES[optionId];
-		return (
-			usageCount >= max ||
-			level_up_choices.length >= max_level_up_choices
-		);
+		return usageCount >= max || level_up_choices.length >= max_level_up_choices;
 	}
 </script>
 
 {#if character && companion}
-	<div class={cn('flex flex-col max-w-[calc(min(100%,400px))] rounded bg-card/50 p-3', className)}>
+	<div class={cn('flex max-w-[calc(min(100%,400px))] flex-col rounded bg-card/50 p-3', className)}>
 		<!-- Hidden file input for image upload (available in both modes) -->
 		<input
 			bind:this={fileInput}
@@ -236,34 +233,32 @@
 		{#if edit_mode}
 			<!-- Edit Mode -->
 			<div class="flex flex-col gap-4">
-                <Button size="sm" onclick={() => (edit_mode = false)} class="-mb-2 h-6">
-					Done
-				</Button>
+				<Button size="sm" onclick={() => (edit_mode = false)} class="-mb-2 h-6">Done</Button>
 				<div class="flex gap-2">
-                
+					<!-- Image Upload -->
+					<div class="flex flex-col gap-1">
+						<button
+							type="button"
+							class="group aspect-square h-[90px] w-[90px] shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 p-1 transition-colors hover:border-primary/50"
+							onclick={triggerImageUpload}
+						>
+							<img
+								class="h-full w-full rounded-md object-cover"
+								src={companion.image_url}
+								alt={companion.name || 'Companion'}
+							/>
+						</button>
+					</div>
+					<!-- Name -->
+					<div class="flex grow flex-col gap-1">
+						<!-- Save Button -->
 
-				<!-- Image Upload -->
-				<div class="flex flex-col gap-1">
-					<button
-						type="button"
-						class="group aspect-square h-[90px] w-[90px] shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 p-1 transition-colors hover:border-primary/50"
-						onclick={triggerImageUpload}
-					>
-						<img
-							class="h-full w-full rounded-md object-cover"
-							src={companion.image_url}
-							alt={companion.name || 'Companion'}
-						/>
-					</button>
+						<label for="companion-name" class="text-xs font-medium text-muted-foreground"
+							>Name</label
+						>
+						<Input id="companion-name" bind:value={companion.name} placeholder="Companion name" />
+					</div>
 				</div>
-                <!-- Name -->
-				<div class="flex grow flex-col gap-1">
-					<!-- Save Button -->
-				
-                    <label for="companion-name" class="text-xs font-medium text-muted-foreground">Name</label>
-					<Input id="companion-name" bind:value={companion.name} placeholder="Companion name" />
-				</div>
-            </div>
 
 				<!-- Experiences -->
 				<div class="flex flex-col gap-1">
@@ -325,10 +320,7 @@
 						<div class="text-xs font-medium text-muted-foreground">
 							Level Up Choices ({level_up_choices.length}/{max_level_up_choices})
 						</div>
-						<Select.Root
-							type="single"
-							bind:open={select_open}
-						>
+						<Select.Root type="single" bind:open={select_open}>
 							<Select.Trigger
 								highlighted={level_up_choices.length < max_level_up_choices}
 								class="w-full truncate bg-muted/80 hover:bg-muted/50"
@@ -351,31 +343,35 @@
 									<button
 										disabled={level_up_choices.length === 0}
 										class="mb-2 flex w-full items-center justify-center gap-2 rounded-sm px-2 py-1.5 text-sm font-bold text-destructive select-none hover:cursor-pointer hover:bg-muted disabled:pointer-events-none disabled:cursor-default disabled:opacity-50"
-									onclick={() => {
-										if (companion) {
-											companion.level_up_choices = [];
-											// Also clear intelligent and vicious choices
-											if (companion.choices?.['intelligent']) {
-												companion.choices['intelligent'] = [];
+										onclick={() => {
+											if (companion) {
+												companion.level_up_choices = [];
+												// Also clear intelligent and vicious choices
+												if (companion.choices?.['intelligent']) {
+													companion.choices['intelligent'] = [];
+												}
+												if (companion.choices?.['vicious']) {
+													companion.choices['vicious'] = [];
+												}
 											}
-											if (companion.choices?.['vicious']) {
-												companion.choices['vicious'] = [];
-											}
-										}
-									}}
+										}}
 									>
 										-- Clear selection --
 									</button>
 									<div class="flex flex-col gap-1">
 										{#each Object.entries(COMPANION_OPTIONS) as [optionId, option]}
-											{@const usageCount = getOptionUsageCount(optionId as CompanionLevelUpOptionIds)}
-											{@const max = COMPANION_LEVEL_UP_OPTION_MAXES[optionId as CompanionLevelUpOptionIds]}
+											{@const usageCount = getOptionUsageCount(
+												optionId as CompanionLevelUpOptionIds
+											)}
+											{@const max =
+												COMPANION_LEVEL_UP_OPTION_MAXES[optionId as CompanionLevelUpOptionIds]}
 											{@const disabled = isOptionDisabled(optionId as CompanionLevelUpOptionIds)}
 											<button
 												{disabled}
 												class="flex w-full items-start gap-2 rounded-sm px-2 py-1.5 text-left text-sm select-none hover:cursor-pointer hover:bg-muted disabled:pointer-events-none disabled:cursor-default disabled:opacity-50"
 												onclick={() => handleOptionClick(optionId as CompanionLevelUpOptionIds)}
-												oncontextmenu={(e) => handleOptionRightClick(optionId as CompanionLevelUpOptionIds, e)}
+												oncontextmenu={(e) =>
+													handleOptionRightClick(optionId as CompanionLevelUpOptionIds, e)}
 											>
 												<div class="flex w-14 shrink-0 justify-end pt-0.5">
 													<div class="flex w-min gap-1">
@@ -396,7 +392,7 @@
 							</Select.Content>
 						</Select.Root>
 					</div>
-					
+
 					<!-- Intelligent Experience Selections -->
 					{#if getOptionUsageCount('intelligent') > 0}
 						<div class="flex flex-col gap-2">
@@ -453,7 +449,7 @@
 							{/each}
 						</div>
 					{/if}
-					
+
 					<!-- Vicious Upgrade Selections -->
 					{#if getOptionUsageCount('vicious') > 0}
 						<div class="flex flex-col gap-2">
@@ -525,20 +521,20 @@
 						</button>
 
 						<!-- Name and Attack Info -->
-						<div class="flex flex-col gap-2 flex-1 min-w-0">
+						<div class="flex min-w-0 flex-1 flex-col gap-2">
 							<!-- Name -->
 							<div class="flex items-center justify-between gap-1">
-								<p class="text-sm font-medium text-foreground truncate">
+								<p class="truncate text-sm font-medium text-foreground">
 									{derived_companion.name || companion.name}
 								</p>
-                                <Button variant="ghost" class="h-auto py-0 px-2" onclick={() => (edit_mode = true)}>
-                                    <Pencil class="size-3.5" />
-                                </Button>
+								<Button variant="ghost" class="h-auto px-2 py-0" onclick={() => (edit_mode = true)}>
+									<Pencil class="size-3.5" />
+								</Button>
 							</div>
 
 							<!-- Attack -->
 							{#if derived_companion.attack}
-								<div class="flex items-center gap-2 mt-2 text-xs flex-wrap">
+								<div class="mt-2 flex flex-wrap items-center gap-2 text-xs">
 									<span>{derived_companion.attack.name || 'Attack'}</span>
 									<span>{derived_companion.attack.range}</span>
 									<div class="rounded-full border bg-foreground/5 px-2 py-1 text-xs">
@@ -559,9 +555,9 @@
 						<CompanionEvasion evasion={derived_companion.evasion} />
 
 						<!-- Stress and Hope (stacked on the right) -->
-						<div class="flex flex-wrap gap-4 items-center justify-around flex-1 mr-2">
+						<div class="mr-2 flex flex-1 flex-wrap items-center justify-around gap-4">
 							<CompanionStress max_stress={derived_companion.max_stress} />
-							
+
 							<!-- Hope (only if max_hope > 0) -->
 							{#if derived_companion.max_hope > 0}
 								<CompanionHope />
@@ -570,10 +566,10 @@
 					</div>
 
 					<!-- Features from 'creature-comfort', 'armored', and 'bonded' level up choices -->
-					{#if derived_companion.level_up_choices.some((id) => ['creature-comfort', 'armored', 'bonded'].includes(id))}
+					{#if derived_companion.level_up_choices.some( (id) => ['creature-comfort', 'armored', 'bonded'].includes(id) )}
 						{@const feature_options = ['creature-comfort', 'armored', 'bonded'] as const}
-						{@const active_features = feature_options.filter(
-							(optionId) => derived_companion.level_up_choices.includes(optionId)
+						{@const active_features = feature_options.filter((optionId) =>
+							derived_companion.level_up_choices.includes(optionId)
 						)}
 						{#each active_features as optionId}
 							{@const option = COMPANION_OPTIONS[optionId]}

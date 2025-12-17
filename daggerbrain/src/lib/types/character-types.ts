@@ -1,6 +1,10 @@
 import type { AdventuringGear, DamageTypes, DomainIds, Ranges } from '$lib/types/compendium-types';
 import { z } from 'zod';
-import { characters_table_schema, ChosenBeastformSchema, CompanionSchema } from '../server/db/characters.schema';
+import {
+	characters_table_schema,
+	ChosenBeastformSchema,
+	CompanionSchema
+} from '../server/db/characters.schema';
 import type { LevelUpChoice } from './rule-types';
 
 // ============================================================================

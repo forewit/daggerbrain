@@ -33,7 +33,9 @@
 				checked={character.class_choices[bard_class_id]?.['given_out_this_session']?.[0] === 'yes'}
 				onCheckedChange={(checked) => {
 					if (!character.class_choices[bard_class_id]) character.class_choices[bard_class_id] = {};
-					character.class_choices[bard_class_id]['given_out_this_session'] = [checked ? 'yes' : 'no'];
+					character.class_choices[bard_class_id]['given_out_this_session'] = [
+						checked ? 'yes' : 'no'
+					];
 				}}
 			/> Given out this session
 		</Label>

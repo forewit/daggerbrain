@@ -91,40 +91,42 @@
 			</Dropdown>
 
 			{#if character.settings.void_enabled}
-			<Dropdown
-				title="Transformation"
-				subtitle={context.transformation_card?.title
-					? context.transformation_card?.title + ' • ' + SOURCES[context.transformation_card?.source_id].short_title
-					: ''}
-			>
-				<div class="flex flex-col gap-4">
-					<p class="text-sm text-muted-foreground italic">
-						Transformations represent changes or augmentations to characters in Daggerheart. These
-						are optional aspects of a character's identity that may be given out by the GM during a
-						campaign for narrative purposes. GMs may also present transformations as an option at
-						character creation, at their discretion.
-					</p>
-					{#if context.transformation_card}
-						<TransformationCard card={context.transformation_card} />
-					{/if}
-
-					<div class="flex justify-between gap-2">
-						{#if !character.transformation_card_id}
-							<Button onclick={() => (transformationDialogOpen = true)}>
-								Choose a transformation
-							</Button>
-						{:else}
-							<div class="flex w-full justify-center sm:justify-end">
-								<Button
-									variant="link"
-									class={cn('text-destructive', !character.transformation_card_id && 'hidden')}
-									onclick={() => (character.transformation_card_id = null)}>Remove</Button
-								>
-							</div>
+				<Dropdown
+					title="Transformation"
+					subtitle={context.transformation_card?.title
+						? context.transformation_card?.title +
+							' • ' +
+							SOURCES[context.transformation_card?.source_id].short_title
+						: ''}
+				>
+					<div class="flex flex-col gap-4">
+						<p class="text-sm text-muted-foreground italic">
+							Transformations represent changes or augmentations to characters in Daggerheart. These
+							are optional aspects of a character's identity that may be given out by the GM during
+							a campaign for narrative purposes. GMs may also present transformations as an option
+							at character creation, at their discretion.
+						</p>
+						{#if context.transformation_card}
+							<TransformationCard card={context.transformation_card} />
 						{/if}
+
+						<div class="flex justify-between gap-2">
+							{#if !character.transformation_card_id}
+								<Button onclick={() => (transformationDialogOpen = true)}>
+									Choose a transformation
+								</Button>
+							{:else}
+								<div class="flex w-full justify-center sm:justify-end">
+									<Button
+										variant="link"
+										class={cn('text-destructive', !character.transformation_card_id && 'hidden')}
+										onclick={() => (character.transformation_card_id = null)}>Remove</Button
+									>
+								</div>
+							{/if}
+						</div>
 					</div>
-				</div>
-			</Dropdown>
+				</Dropdown>
 			{/if}
 		</div>
 	</div>

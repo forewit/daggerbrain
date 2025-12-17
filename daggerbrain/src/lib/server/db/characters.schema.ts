@@ -15,7 +15,12 @@ import type {
 } from '../../types/character-types';
 import type { DomainIds, Traits } from '../../types/compendium-types';
 import { CHARACTER_DEFAULTS } from '../../types/constants';
-import {  RangesSchema, DomainIdsSchema, TraitIdsSchema, DamageTypesSchema } from '../../compendium/compendium-schemas';
+import {
+	RangesSchema,
+	DomainIdsSchema,
+	TraitIdsSchema,
+	DamageTypesSchema
+} from '../../compendium/compendium-schemas';
 import type { ConditionIds } from '$lib/types/rule-types';
 import { z } from 'zod';
 
@@ -144,7 +149,9 @@ export const characters_table = sqliteTable('characters_table', {
 		.notNull()
 		.default(CHARACTER_DEFAULTS.loadout_domain_card_ids)
 		.$type<DomainCardId[]>(),
-	bonus_max_loadout: integer('bonus_max_loadout').notNull().default(CHARACTER_DEFAULTS.bonus_max_loadout),
+	bonus_max_loadout: integer('bonus_max_loadout')
+		.notNull()
+		.default(CHARACTER_DEFAULTS.bonus_max_loadout),
 
 	// Level up choices
 	level: integer('level').notNull().default(CHARACTER_DEFAULTS.level),
@@ -169,13 +176,15 @@ export const ChosenBeastformSchema = z.object({
 export const CompanionSchema = z.object({
 	name: z.string(),
 	image_url: z.string(),
-	attack: z.object({
-		name: z.string(),
-		range: RangesSchema,
-		damage_dice: z.string(),
-		damage_bonus: z.number(),
-		damage_type: DamageTypesSchema
-	}).nullable(),
+	attack: z
+		.object({
+			name: z.string(),
+			range: RangesSchema,
+			damage_dice: z.string(),
+			damage_bonus: z.number(),
+			damage_type: DamageTypesSchema
+		})
+		.nullable(),
 	max_stress: z.number(),
 	marked_stress: z.number(),
 	max_hope: z.number(),
@@ -186,7 +195,6 @@ export const CompanionSchema = z.object({
 	experience_modifiers: z.array(z.number()),
 	choices: z.record(z.string(), z.array(z.string()))
 });
-
 
 export const characters_table_schema = createSelectSchema(characters_table, {
 	secondary_class_domain_id_choice: DomainIdsSchema.nullable(),

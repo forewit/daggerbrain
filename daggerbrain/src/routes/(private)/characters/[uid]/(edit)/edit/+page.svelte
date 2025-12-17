@@ -74,12 +74,12 @@
 
 				<div class="space-y-1">
 					<p class="whitespace-nowrap">Use Gold Coins</p>
-					<p class="font-normal text-xs text-muted-foreground">If your group wants to track gold with more granularity,
-						you can add coins as your lowest denomination. 10 coins equal 1 handful.</p>
+					<p class="text-xs font-normal text-muted-foreground">
+						If your group wants to track gold with more granularity, you can add coins as your
+						lowest denomination. 10 coins equal 1 handful.
+					</p>
 				</div>
-				
 			</Label>
-			
 
 			<Dialog.Root>
 				<Dialog.Trigger
@@ -122,19 +122,16 @@
 		<Dialog.Header>
 			<Dialog.Title>Disable The Void</Dialog.Title>
 			<Dialog.Description>
-				Are you sure you want to disable The Void? This will remove any void content on this character.
-				This action cannot be undone.
+				Are you sure you want to disable The Void? This will remove any void content on this
+				character. This action cannot be undone.
 			</Dialog.Description>
 		</Dialog.Header>
 		<Dialog.Footer class="flex gap-3 pt-4">
 			<Dialog.Close
 				class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
-				onclick={cancelDisableVoid}
-				>Cancel</Dialog.Close
+				onclick={cancelDisableVoid}>Cancel</Dialog.Close
 			>
-			<Dialog.Close
-				class={buttonVariants({ variant: 'destructive' })}
-				onclick={confirmDisableVoid}
+			<Dialog.Close class={buttonVariants({ variant: 'destructive' })} onclick={confirmDisableVoid}
 				>Disable</Dialog.Close
 			>
 		</Dialog.Footer>

@@ -62,13 +62,14 @@
 			{#if context.primary_class !== null}
 				{@const primaryDomain = compendium.domains[context.primary_class.primary_domain_id]}
 				{@const secondaryDomain = compendium.domains[context.primary_class.secondary_domain_id]}
-				{@const description_html = primaryDomain && secondaryDomain
-					? `<p>Choose up to 2 level 1 domain cards from the
+				{@const description_html =
+					primaryDomain && secondaryDomain
+						? `<p>Choose up to 2 level 1 domain cards from the
             <b>${primaryDomain.name}</b>
             and
             <b>${secondaryDomain.name}</b>
             domains.</p>`
-					: `<p>Choose up to 2 level 1 domain cards.</p>`}
+						: `<p>Choose up to 2 level 1 domain cards.</p>`}
 				<div class="flex flex-col gap-3 rounded-md bg-primary/50 p-2">
 					<p class="px-2 pt-1 text-xs text-muted-foreground italic">
 						{@html description_html}

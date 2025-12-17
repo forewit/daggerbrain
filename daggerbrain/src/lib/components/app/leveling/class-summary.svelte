@@ -55,9 +55,9 @@
 							class="w-full truncate bg-muted-foreground/8 hover:bg-muted-foreground/5"
 						>
 							<p class="truncate">
-							{domain_id_selection
-								? compendium.domains[domain_id_selection]?.name || 'Domain not available'
-								: 'Select a domain'}
+								{domain_id_selection
+									? compendium.domains[domain_id_selection]?.name || 'Domain not available'
+									: 'Select a domain'}
 							</p>
 						</Select.Trigger>
 						<Select.Content class="rounded-md " align="start">

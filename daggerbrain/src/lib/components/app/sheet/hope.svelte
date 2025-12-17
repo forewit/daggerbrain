@@ -58,7 +58,7 @@
 		</div>
 
 		{#if context.primary_class}
-			<div class=" px-4 justify-center flex">
+			<div class=" flex justify-center px-4">
 				<p class="mr-1 text-xs font-bold text-nowrap text-foreground">
 					{context.primary_class.hope_feature.title}:
 				</p>
@@ -81,7 +81,10 @@
 							}}
 						>
 							<Select.Trigger
-								class={cn('w-min max-w-xs text-xs', evolution_trait && 'border border-accent/50 text-accent')}
+								class={cn(
+									'w-min max-w-xs text-xs',
+									evolution_trait && 'border border-accent/50 text-accent'
+								)}
 							>
 								<p class="truncate">
 									{evolution_trait ? TRAITS[evolution_trait as TraitIds].name : 'None'}

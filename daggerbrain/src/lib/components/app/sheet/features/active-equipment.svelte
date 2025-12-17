@@ -19,7 +19,10 @@
 
 	// is rogue class
 	const rogue_class_id = $derived(compendium.classes.rogue.compendium_id);
-	const isRogueClass = $derived(context.character?.primary_class_id === rogue_class_id || context.character?.secondary_class_id === rogue_class_id);
+	const isRogueClass = $derived(
+		context.character?.primary_class_id === rogue_class_id ||
+			context.character?.secondary_class_id === rogue_class_id
+	);
 
 	// is druid class and transformed
 	const druid_class_id = $derived(compendium.classes.druid.compendium_id);
@@ -38,18 +41,19 @@
 		if (!derivedBeastform || !context.traits || !context.character) return 0;
 		const traitValue = context.traits[derivedBeastform.attack.trait] || 0;
 		let total = traitValue;
-		
+
 		// Add beastform trait bonus if transformed and attack trait matches character trait
 		if (isTransformed && derivedBeastform.character_trait.trait === derivedBeastform.attack.trait) {
 			total += derivedBeastform.character_trait.bonus;
 		}
-		
+
 		// Add evolution bonus if evolution trait matches attack trait
-		const evolutionTrait = context.character.class_choices[druid_class_id]?.['evolution_trait']?.[0];
+		const evolutionTrait =
+			context.character.class_choices[druid_class_id]?.['evolution_trait']?.[0];
 		if (evolutionTrait && evolutionTrait === derivedBeastform.attack.trait) {
 			total += 1;
 		}
-		
+
 		return total;
 	});
 
@@ -195,7 +199,7 @@
 					/>
 				{/if}
 				{#if showBeastformAttack && derivedBeastform}
-					<tr class="text-xs text-accent bg-accent/3">
+					<tr class="bg-accent/3 text-xs text-accent">
 						<td class="px-4 py-2">
 							<div class="flex items-center gap-1">
 								<div class="-mb-1">
@@ -212,7 +216,9 @@
 							</div>
 						</td>
 						<td class="py-2 pr-4 text-right whitespace-nowrap sm:text-center">
-							<div class="ml-auto w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs sm:mx-auto">
+							<div
+								class="ml-auto w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs sm:mx-auto"
+							>
 								{beastformDamage}
 							</div>
 						</td>
@@ -228,12 +234,14 @@
 	</div>
 
 	{#if isRogueClass}
-	<div class="pt- pl-4 flex items-center gap-2">
-		<div class="w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs">
-			{context.level_to_tier(context.character?.level ?? 0)}d6
+		<div class="pt- flex items-center gap-2 pl-4">
+			<div class="w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs">
+				{context.level_to_tier(context.character?.level ?? 0)}d6
+			</div>
+			<p class="text-xs">Sneak Attack Damage</p>
+			<p class="text-xs text-muted-foreground italic">
+				On successful attack while cloaked and in Melee range
+			</p>
 		</div>
-		<p class="text-xs">Sneak Attack Damage</p>
-		<p class="text-xs text-muted-foreground italic">On successful attack while cloaked and in Melee range</p>
-	</div>
 	{/if}
-	</div>
+</div>

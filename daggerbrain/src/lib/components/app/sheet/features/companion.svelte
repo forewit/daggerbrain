@@ -12,17 +12,6 @@
 
 {#if character && (character.primary_subclass_id === beastbound_subclass_id || character.secondary_subclass_id === beastbound_subclass_id)}
 	<div class="flex flex-col items-center gap-2">
-		<Companion/>
+		<Companion />
 	</div>
 {/if}
-
-
-
-
-
-
-
-
-
-
-

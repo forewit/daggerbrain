@@ -10,7 +10,7 @@
 	let character = $derived(context.character);
 	const user = getUserContext();
 	const characterId = $derived($page.params.uid);
-	
+
 	let characterNotFound = $derived.by(() => {
 		if (user.loading) return false;
 		return !user.all_characters.some((c) => c.id === characterId);

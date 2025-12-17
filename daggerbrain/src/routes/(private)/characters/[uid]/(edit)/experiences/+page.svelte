@@ -49,7 +49,7 @@
 				{/each}
 			</Dropdown>
 
-			<Dropdown title="Background Questions" >
+			<Dropdown title="Background Questions">
 				<div class="flex flex-col gap-4">
 					<p class="text-sm text-muted-foreground italic">
 						Answer any of the following background questions. You can also create your own
@@ -59,7 +59,7 @@
 				</div>
 			</Dropdown>
 
-			<Dropdown title="Connections" >
+			<Dropdown title="Connections">
 				<div class="flex flex-col gap-4">
 					<p class="text-sm text-muted-foreground italic">
 						Ask your fellow players one of the following questions for their character to answer, or

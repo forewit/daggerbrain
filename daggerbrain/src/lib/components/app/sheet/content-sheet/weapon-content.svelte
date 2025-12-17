@@ -199,7 +199,8 @@
 					: [...inventoryItem.custom_available_damage_types];
 			customBurden =
 				inventoryItem.custom_burden === null ? '' : String(inventoryItem.custom_burden);
-			customDamageDice = inventoryItem.custom_damage_dice === null ? '' : inventoryItem.custom_damage_dice;
+			customDamageDice =
+				inventoryItem.custom_damage_dice === null ? '' : inventoryItem.custom_damage_dice;
 			customDamageBonus =
 				inventoryItem.custom_damage_bonus === null ? '' : String(inventoryItem.custom_damage_bonus);
 			customAttackRollBonus =
@@ -476,13 +477,12 @@
 							<button
 								type="button"
 								disabled={customDamageDice === ''}
-								class="disabled:hidden text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+								class="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground disabled:hidden"
 								onclick={() => (customDamageDice = '')}
 								title="Reset damage dice"
 							>
-							Reset
+								Reset
 								<RotateCcw class="size-3.5" />
-								
 							</button>
 						</div>
 						<DicePicker value={customDamageDice} onChange={(v) => (customDamageDice = v)} />
@@ -538,22 +538,21 @@
 	</div>
 
 	{#if inventoryItem}
-
-	<Sheet.Footer>
-		<Sheet.Close
-			class={cn(buttonVariants({ size: 'sm', variant: 'link' }), 'text-destructive')}
-			onclick={() => {
-				if (!character) return;
-				// Determine weapon type based on which inventory it's in
-				const weaponType =
-					character.inventory.primary_weapons[weaponId] !== undefined
-						? 'primary_weapon'
-						: 'secondary_weapon';
-				context.removeFromInventory({ id: weaponId }, weaponType);
-			}}
-		>
-			Remove
-		</Sheet.Close>
-	</Sheet.Footer>
+		<Sheet.Footer>
+			<Sheet.Close
+				class={cn(buttonVariants({ size: 'sm', variant: 'link' }), 'text-destructive')}
+				onclick={() => {
+					if (!character) return;
+					// Determine weapon type based on which inventory it's in
+					const weaponType =
+						character.inventory.primary_weapons[weaponId] !== undefined
+							? 'primary_weapon'
+							: 'secondary_weapon';
+					context.removeFromInventory({ id: weaponId }, weaponType);
+				}}
+			>
+				Remove
+			</Sheet.Close>
+		</Sheet.Footer>
 	{/if}
 {/if}
