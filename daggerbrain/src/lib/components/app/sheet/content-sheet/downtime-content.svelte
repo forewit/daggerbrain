@@ -66,12 +66,12 @@
 
 	function takeShortRest() {
 		// TODO: Implement short rest logic
-		console.log('Taking short rest with:', {
-			tendToWounds: shortRestTendToWounds,
-			clearStress: shortRestClearStress,
-			repairArmor: shortRestRepairArmor,
-			prepare: shortRestPrepare
-		});
+		// console.log('Taking short rest with:', {
+		// 	tendToWounds: shortRestTendToWounds,
+		// 	clearStress: shortRestClearStress,
+		// 	repairArmor: shortRestRepairArmor,
+		// 	prepare: shortRestPrepare
+		// });
 		// Reset checkboxes after taking rest
 		shortRestTendToWounds = false;
 		shortRestClearStress = false;

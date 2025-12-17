@@ -8,8 +8,6 @@ import { get_db, get_auth } from './utils';
 import { get_user_slots } from './users.remote';
 
 export const get_all_characters = query(async () => {
-	console.log('get_all_characters');
-
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -23,8 +21,6 @@ export const get_all_characters = query(async () => {
 });
 
 export const delete_character = command(z.string(), async (characterId) => {
-	console.log('delete_character');
-
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -68,8 +64,6 @@ export const delete_character = command(z.string(), async (characterId) => {
 });
 
 export const create_character = command(async () => {
-	console.log('create_character');
-
 	const event = getRequestEvent();
 	const auth = get_auth(event);
 	const { userId } = auth;
@@ -154,8 +148,6 @@ export const create_character = command(async () => {
 });
 
 export const update_character = command(characters_table_update_schema, async (character) => {
-	console.log('update_character');
-
 	const event = getRequestEvent();
 	const auth = get_auth(event);
 	const { userId } = auth;

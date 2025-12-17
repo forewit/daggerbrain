@@ -3,6 +3,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 </script>
 
+
 <svelte:head>
 	<title>Roadmap | Daggerbrain</title>
 	<meta
@@ -97,25 +98,30 @@
 							</div>
 							<div class="px-5 pt-3 pb-5 text-sm text-muted-foreground">
 								<ul class="list-disc space-y-1 pl-5">
-									<li><span class="text-foreground">Integrated dice roller</span></li>
-									<li>
-										<span class="text-foreground">The Void content</span>
-										playtest material
-									</li>
-									<li><span class="text-foreground">Searchable rules compendium</span></li>
 									<li><span class="text-foreground">Homebrew support</span></li>
 
 									<li>
 										<span class="text-foreground">DM tools</span>
-										adversary manager, campaigns, and more!
+										adversary manager / encounter builder, campaigns w/ player and fear tracking
 									</li>
+									<li><span class="text-foreground">PDF export</span></li>
+									
+									<li><span class="text-foreground">Searchable rules compendium</span></li>
+									<li>
+										<span class="text-foreground">The Void content</span>
+										playtest material
+									</li>
+									<li><span class="text-foreground">Integrated dice roller</span></li>
 								</ul>
 							</div>
 						</div>
 					</li>
 				</ol>
 
-				<Button class="mt-10" href="/contact">Got an opinion?</Button>
+				<div class="flex gap-4 mt-10">
+					<Button href="/contact">Got an opinion?</Button>
+					<Button class="whitespace-normal" variant="link" href="https://trello.com/b/EU4j0FnA/daggerbrain-roadmap" target="_blank">See more details on the public trello board</Button>
+				</div>
 			</section>
 		</div>
 	</div>

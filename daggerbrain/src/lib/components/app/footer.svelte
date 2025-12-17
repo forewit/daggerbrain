@@ -8,10 +8,14 @@
 			<!-- Legal Section -->
 			<div class="flex-1 pl-6 pr-6 sm:pr-0 sm:pt-4">
 				<h3 class="mb-2 font-semibold text-foreground">Legal</h3>
-				<p class="text-muted-foreground">
+				<p class="mb-2 text-muted-foreground">
+					© 2025 Daggerbrain, LLC. All rights reserved.
+				</p>
+				<p class=" text-muted-foreground">
 					Daggerbrain includes materials from the Daggerheart System Reference Document 1.0, © Critical Role, LLC. under the terms of the Darrington Press Community Gaming (DPCGL) License. More information can be found at
 					<a href="https://www.daggerheart.com" target="_blank" rel="noopener noreferrer" class="underline hover:text-accent">https://www.daggerheart.com</a>. There are no previous modifications by others.
 				</p>
+				
 			</div>
 
 			<!-- Contact Us Section -->

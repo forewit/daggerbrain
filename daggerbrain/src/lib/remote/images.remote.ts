@@ -25,8 +25,6 @@ const imageDataSchema = z
 	});
 
 export const upload_user_image = command(imageDataSchema, async ({ data, name, type }) => {
-	console.log('uploadImage');
-
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const r2 = get_r2_usercontent(event);

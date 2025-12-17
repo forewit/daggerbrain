@@ -9,8 +9,6 @@ import { get_db, get_auth } from './utils';
 const dismissed_popups_schema = z.array(z.string());
 
 export const get_user_slots = query(async () => {
-	console.log('get_user_slots');
-
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -54,8 +52,6 @@ const update_character_slots_schema = z.array(z.string()).max(3);
 export const update_character_slots = command(
 	update_character_slots_schema,
 	async (characterIds) => {
-		console.log('update_character_slots');
-
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		if (!userId) throw error(401, 'Unauthorized');
@@ -113,8 +109,6 @@ export const update_character_slots = command(
 );
 
 export const dismiss_popup = command(z.string(), async (popupId) => {
-	console.log('dismiss_popup', popupId);
-
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);

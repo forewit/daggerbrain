@@ -3,7 +3,7 @@
 	import * as Collapsible from '$lib/components/ui/collapsible';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
+	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { cn } from '$lib/utils';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
@@ -149,4 +149,15 @@
 			</Collapsible.Content>
 		</Collapsible.Root>
 	</div>
+
+	<Sheet.Footer>
+		<Sheet.Close
+			class={cn(buttonVariants({ size: 'sm', variant: 'link' }), 'text-destructive')}
+			onclick={() => {
+				context.removeFromInventory({ id: consumableId }, 'consumable');
+			}}
+		>
+			Remove
+		</Sheet.Close>
+	</Sheet.Footer>
 {/if}

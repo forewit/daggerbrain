@@ -21,7 +21,7 @@
 		if (!selectedDeathMove) return;
 
 		// TODO: Implement death move logic
-		console.log('Making death move:', selectedDeathMove);
+		// console.log('Making death move:', selectedDeathMove);
 
 		// Reset selection after making death move
 		selectedDeathMove = null;

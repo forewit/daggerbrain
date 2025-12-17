@@ -3,12 +3,13 @@
 	import * as Collapsible from '$lib/components/ui/collapsible';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
+	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { cn } from '$lib/utils';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import LootRules from '../../rules/loot-rules.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
+	import CircleMinus from '@lucide/svelte/icons/circle-minus';
 
 	let { lootId }: { lootId: string } = $props();
 
@@ -82,9 +83,11 @@
 </script>
 
 {#if loot}
-	<Sheet.Header>
-		<Sheet.Title>{loot.title}</Sheet.Title>
+	<Sheet.Header >
+		<Sheet.Title>{loot.title}
+		</Sheet.Title>
 		<p class="text-xs text-muted-foreground italic">Loot</p>
+		
 	</Sheet.Header>
 
 	<div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
@@ -147,4 +150,15 @@
 			</Collapsible.Content>
 		</Collapsible.Root>
 	</div>
+
+	<Sheet.Footer>
+		<Sheet.Close
+				class={cn(buttonVariants({size: "sm", variant: "link"}), "text-destructive")}
+				onclick={() => {
+					context.removeFromInventory({ id: lootId }, 'loot');
+				}}
+			>
+				Remove
+			</Sheet.Close>
+	</Sheet.Footer>
 {/if}

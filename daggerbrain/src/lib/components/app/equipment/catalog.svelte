@@ -2,10 +2,12 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Collapsible from '$lib/components/ui/collapsible';
-	import type { Weapon, Armor, Consumable } from '$lib/types/compendium-types';
+	import * as Select from '$lib/components/ui/select';
+	import type { Weapon, Armor, Consumable, Loot } from '$lib/types/compendium-types';
 	import WeaponDetails from './weapon-details.svelte';
 	import ArmorDetails from './armor-details.svelte';
 	import ConsumableDetails from './consumable-details.svelte';
+	import LootDetails from './loot-details.svelte';
 	import Dropdown from '../leveling/dropdown.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
@@ -14,15 +16,19 @@
 	import { cn } from '$lib/utils';
 
 	let searchQuery = $state('');
-	let typeFilter = $state<'Primary' | 'Secondary' | 'Armor' | 'Consumables' | null>(null);
-	let tierFilter = $state<1 | 2 | 3 | 4 | null>(null);
+	let typeFilter = $state<'Weapons' | 'Armor' | 'Consumables' | 'Loot' | null>(null);
+	let tierFilter = $state<'1' | '2' | '3' | '4' | ''>('');
+	let weaponTypeFilter = $state<'Magical' | 'Physical' | ''>('');
 	let customItemOpen = $state(false);
 	let customItemTitle = $state('');
 
-	// Clear tier filter when consumables filter is selected (consumables don't have tiers)
+	// Clear subfilters when main filter changes
 	$effect(() => {
-		if (typeFilter === 'Consumables' && tierFilter !== null) {
-			tierFilter = null;
+		if (typeFilter !== 'Weapons' && typeFilter !== 'Armor') {
+			tierFilter = '';
+		}
+		if (typeFilter !== 'Weapons') {
+			weaponTypeFilter = '';
 		}
 	});
 
@@ -35,12 +41,17 @@
 	}
 
 	// Helper function to check if item matches search
-	function matchesSearch(item: Weapon | Armor | Consumable, query: string): boolean {
+	function matchesSearch(item: Weapon | Armor | Consumable | Loot, query: string): boolean {
 		if (!query) return true;
 		const searchLower = query.toLowerCase();
 		const titleMatch = item.title.toLowerCase().includes(searchLower);
 		const descMatch = stripHtml(item.description_html).toLowerCase().includes(searchLower);
 		return titleMatch || descMatch;
+	}
+
+	// Helper to convert tier string to number
+	function getTierNumber(tier: '1' | '2' | '3' | '4'): number {
+		return parseInt(tier);
 	}
 
 	// Filter primary weapons
@@ -49,13 +60,15 @@
 			// Search filter
 			if (!matchesSearch(weapon, searchQuery)) return false;
 
-			// Type filter - only show if Primary filter is selected or no type filter
-			if (typeFilter === 'Secondary') return false;
-
 			// Tier filter
-			if (tierFilter !== null) {
+			if (tierFilter !== '') {
 				const weaponTier = context.level_to_tier(weapon.level_requirement);
-				if (weaponTier !== tierFilter) return false;
+				if (weaponTier !== getTierNumber(tierFilter)) return false;
+			}
+
+			// Weapon type filter (Magical/Physical)
+			if (weaponTypeFilter !== '') {
+				if (weapon.type !== weaponTypeFilter) return false;
 			}
 
 			return true;
@@ -68,13 +81,15 @@
 			// Search filter
 			if (!matchesSearch(weapon, searchQuery)) return false;
 
-			// Type filter - only show if Secondary filter is selected or no type filter
-			if (typeFilter === 'Primary') return false;
-
 			// Tier filter
-			if (tierFilter !== null) {
+			if (tierFilter !== '') {
 				const weaponTier = context.level_to_tier(weapon.level_requirement);
-				if (weaponTier !== tierFilter) return false;
+				if (weaponTier !== getTierNumber(tierFilter)) return false;
+			}
+
+			// Weapon type filter (Magical/Physical)
+			if (weaponTypeFilter !== '') {
+				if (weapon.type !== weaponTypeFilter) return false;
 			}
 
 			return true;
@@ -88,9 +103,9 @@
 			if (!matchesSearch(armor, searchQuery)) return false;
 
 			// Tier filter
-			if (tierFilter !== null) {
+			if (tierFilter !== '') {
 				const armorTier = context.level_to_tier(armor.level_requirement);
-				if (armorTier !== tierFilter) return false;
+				if (armorTier !== getTierNumber(tierFilter)) return false;
 			}
 
 			return true;
@@ -106,9 +121,18 @@
 		})
 	);
 
+	// Filter loot (loot doesn't have tier/level requirements)
+	let filteredLoot = $derived(
+		Object.values(compendium.loot).filter((loot) => {
+			// Search filter
+			if (!matchesSearch(loot, searchQuery)) return false;
+			return true;
+		})
+	);
+
 	// Check if user has applied any filter or search
 	let hasActiveFilter = $derived(
-		searchQuery.trim() !== '' || typeFilter !== null || tierFilter !== null
+		searchQuery.trim() !== '' || typeFilter !== null || tierFilter !== ''
 	);
 
 	// Combined filtered items based on type filter
@@ -119,21 +143,25 @@
 			return [];
 		}
 
-		if (typeFilter === 'Primary') {
-			return filteredPrimaryWeapons.map((w) => ({ type: 'weapon' as const, item: w }));
-		} else if (typeFilter === 'Secondary') {
-			return filteredSecondaryWeapons.map((w) => ({ type: 'weapon' as const, item: w }));
+		if (typeFilter === 'Weapons') {
+			return [
+				...filteredPrimaryWeapons.map((w) => ({ type: 'weapon' as const, item: w })),
+				...filteredSecondaryWeapons.map((w) => ({ type: 'weapon' as const, item: w }))
+			];
 		} else if (typeFilter === 'Armor') {
 			return filteredArmor.map((a) => ({ type: 'armor' as const, item: a }));
 		} else if (typeFilter === 'Consumables') {
 			return filteredConsumables.map((c) => ({ type: 'consumable' as const, item: c }));
+		} else if (typeFilter === 'Loot') {
+			return filteredLoot.map((l) => ({ type: 'loot' as const, item: l }));
 		} else {
 			// No type filter - combine all
 			return [
 				...filteredPrimaryWeapons.map((w) => ({ type: 'weapon' as const, item: w })),
 				...filteredSecondaryWeapons.map((w) => ({ type: 'weapon' as const, item: w })),
 				...filteredArmor.map((a) => ({ type: 'armor' as const, item: a })),
-				...filteredConsumables.map((c) => ({ type: 'consumable' as const, item: c }))
+				...filteredConsumables.map((c) => ({ type: 'consumable' as const, item: c })),
+				...filteredLoot.map((l) => ({ type: 'loot' as const, item: l }))
 			];
 		}
 	});
@@ -192,75 +220,99 @@
 			<Input bind:value={searchQuery} placeholder="Search items..." class="pl-9" />
 		</div>
 
-		<div class="flex grow flex-wrap justify-center gap-x-0.5 gap-y-2">
-			<!-- Type Filter Buttons -->
-			<div class="flex flex-wrap justify-center gap-1">
-				<Button
-					size="sm"
-					variant={typeFilter === 'Primary' ? 'default' : 'outline'}
-					onclick={() => (typeFilter = typeFilter === 'Primary' ? null : 'Primary')}
-				>
-					Primary Weapons
-				</Button>
-				<Button
-					size="sm"
-					variant={typeFilter === 'Secondary' ? 'default' : 'outline'}
-					onclick={() => (typeFilter = typeFilter === 'Secondary' ? null : 'Secondary')}
-				>
-					Secondary Weapons
-				</Button>
-				<Button
-					size="sm"
-					variant={typeFilter === 'Armor' ? 'default' : 'outline'}
-					onclick={() => (typeFilter = typeFilter === 'Armor' ? null : 'Armor')}
-				>
-					Armor
-				</Button>
-				<Button
-					size="sm"
-					variant={typeFilter === 'Consumables' ? 'default' : 'outline'}
-					onclick={() => (typeFilter = typeFilter === 'Consumables' ? null : 'Consumables')}
-				>
-					Consumables
-				</Button>
-			</div>
-
-			<!-- Tier Filter Buttons -->
-			<div class="flex grow flex-wrap justify-center gap-1">
-				<Button
-					size="sm"
-					variant={tierFilter === 1 ? 'default' : 'outline'}
-					disabled={typeFilter === 'Consumables'}
-					onclick={() => (tierFilter = tierFilter === 1 ? null : 1)}
-				>
-					Tier 1
-				</Button>
-				<Button
-					size="sm"
-					variant={tierFilter === 2 ? 'default' : 'outline'}
-					disabled={typeFilter === 'Consumables'}
-					onclick={() => (tierFilter = tierFilter === 2 ? null : 2)}
-				>
-					Tier 2
-				</Button>
-				<Button
-					size="sm"
-					variant={tierFilter === 3 ? 'default' : 'outline'}
-					disabled={typeFilter === 'Consumables'}
-					onclick={() => (tierFilter = tierFilter === 3 ? null : 3)}
-				>
-					Tier 3
-				</Button>
-				<Button
-					size="sm"
-					variant={tierFilter === 4 ? 'default' : 'outline'}
-					disabled={typeFilter === 'Consumables'}
-					onclick={() => (tierFilter = tierFilter === 4 ? null : 4)}
-				>
-					Tier 4
-				</Button>
-			</div>
+		<!-- Type Filter Buttons -->
+		<div class="flex flex-wrap justify-center gap-1">
+			<Button
+				size="sm"
+				variant={typeFilter === 'Weapons' ? 'default' : 'outline'}
+				onclick={() => (typeFilter = typeFilter === 'Weapons' ? null : 'Weapons')}
+			>
+				Weapons
+			</Button>
+			<Button
+				size="sm"
+				variant={typeFilter === 'Armor' ? 'default' : 'outline'}
+				onclick={() => (typeFilter = typeFilter === 'Armor' ? null : 'Armor')}
+			>
+				Armor
+			</Button>
+			<Button
+				size="sm"
+				variant={typeFilter === 'Consumables' ? 'default' : 'outline'}
+				onclick={() => (typeFilter = typeFilter === 'Consumables' ? null : 'Consumables')}
+			>
+				Consumables
+			</Button>
+			<Button
+				size="sm"
+				variant={typeFilter === 'Loot' ? 'default' : 'outline'}
+				onclick={() => (typeFilter = typeFilter === 'Loot' ? null : 'Loot')}
+			>
+				Loot
+			</Button>
 		</div>
+
+		<!-- Subfilters for Weapons -->
+		{#if typeFilter === 'Weapons'}
+			<div class="flex flex-wrap justify-center gap-2">
+				<!-- Tier Select -->
+				<Select.Root
+					type="single"
+					value={tierFilter}
+					onValueChange={(v) => (tierFilter = v as '1' | '2' | '3' | '4' | '')}
+				>
+					<Select.Trigger class="w-28">
+						{tierFilter ? `Tier ${tierFilter}` : 'All Tiers'}
+					</Select.Trigger>
+					<Select.Content>
+						<Select.Item value="">All Tiers</Select.Item>
+						<Select.Item value="1">Tier 1</Select.Item>
+						<Select.Item value="2">Tier 2</Select.Item>
+						<Select.Item value="3">Tier 3</Select.Item>
+						<Select.Item value="4">Tier 4</Select.Item>
+					</Select.Content>
+				</Select.Root>
+
+				<!-- Type Select (Magical/Physical) -->
+				<Select.Root
+					type="single"
+					value={weaponTypeFilter}
+					onValueChange={(v) => (weaponTypeFilter = v as 'Magical' | 'Physical' | '')}
+				>
+					<Select.Trigger class="w-28">
+						{weaponTypeFilter || 'All Types'}
+					</Select.Trigger>
+					<Select.Content>
+						<Select.Item value="">All Types</Select.Item>
+						<Select.Item value="Physical">Physical</Select.Item>
+						<Select.Item value="Magical">Magical</Select.Item>
+					</Select.Content>
+				</Select.Root>
+			</div>
+		{/if}
+
+		<!-- Subfilters for Armor -->
+		{#if typeFilter === 'Armor'}
+			<div class="flex flex-wrap justify-center gap-2">
+				<!-- Tier Select -->
+				<Select.Root
+					type="single"
+					value={tierFilter}
+					onValueChange={(v) => (tierFilter = v as '1' | '2' | '3' | '4' | '')}
+				>
+					<Select.Trigger class="w-28">
+						{tierFilter ? `Tier ${tierFilter}` : 'All Tiers'}
+					</Select.Trigger>
+					<Select.Content>
+						<Select.Item value="">All Tiers</Select.Item>
+						<Select.Item value="1">Tier 1</Select.Item>
+						<Select.Item value="2">Tier 2</Select.Item>
+						<Select.Item value="3">Tier 3</Select.Item>
+						<Select.Item value="4">Tier 4</Select.Item>
+					</Select.Content>
+				</Select.Root>
+			</div>
+		{/if}
 	</div>
 
 	<!-- Results -->
@@ -332,6 +384,24 @@
 								disabled={context.consumable_count >= context.max_consumables}
 								onclick={() => {
 									context.addToInventory(entry.item, 'consumable');
+								}}>Add</Button
+							>
+						</div>
+					</Dropdown>
+				{:else if entry.type === 'loot'}
+					{#snippet title_snippet()}
+						<div class="gap-4 text-left">
+							<p class="text-md font-medium">{entry.item.title}</p>
+						</div>
+					{/snippet}
+
+					<Dropdown {title_snippet} class="border-2">
+						<div class="flex flex-col gap-3">
+							<LootDetails loot={entry.item} />
+							<Button
+								size="sm"
+								onclick={() => {
+									context.addToInventory(entry.item, 'loot');
 								}}>Add</Button
 							>
 						</div>

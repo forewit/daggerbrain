@@ -12,11 +12,6 @@
 
 	// Look up the loot from inventory
 	let loot = $derived(context.inventory_loot.find((l) => l.id === id));
-
-	// Format modifiers for display
-	let hasModifiers = $derived(
-		loot ? loot.character_modifiers.length > 0 || loot.weapon_modifiers.length > 0 : false
-	);
 </script>
 
 {#if loot}
@@ -43,20 +38,11 @@
 		<td class="px-4 py-2">
 			{loot.title}
 		</td>
-		<td class="hidden py-2 pr-4 text-right sm:table-cell md:text-left">
+		<td class="py-2 pr-4 text-right">
 			{#if loot.description_html}
 				<div class="line-clamp-1 text-muted-foreground">
 					{@html loot.description_html}
 				</div>
-			{:else}
-				<span class="text-muted-foreground">—</span>
-			{/if}
-		</td>
-		<td class="hidden py-2 pr-4 text-right md:table-cell">
-			{#if hasModifiers}
-				<span class="text-muted-foreground">
-					{loot.character_modifiers.length + loot.weapon_modifiers.length}
-				</span>
 			{:else}
 				<span class="text-muted-foreground">—</span>
 			{/if}

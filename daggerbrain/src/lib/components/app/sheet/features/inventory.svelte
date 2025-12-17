@@ -198,14 +198,12 @@
 					<table class="w-full border-collapse">
 						<colgroup>
 							<col />
-							<col class="hidden sm:table-column" />
-							<col class="hidden w-20 md:table-column" />
+							<col />
 						</colgroup>
 						<thead>
 							<tr class="border-b bg-primary-muted/50 text-xs text-muted-foreground">
-								<th class="px-4 py-2 text-left sm:text-left">Loot</th>
-								<th class="hidden py-2 pr-4 text-right sm:table-cell md:text-left">Description</th>
-								<th class="hidden py-2 pr-4 text-right md:table-cell">Modifiers</th>
+								<th class="px-4 py-2 text-left">Loot</th>
+								<th class="py-2 pr-4 text-right">Description</th>
 							</tr>
 						</thead>
 						<tbody>

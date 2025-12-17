@@ -55,6 +55,8 @@ export const RangesSchema = z.enum(['Melee', 'Very Close', 'Close', 'Far', 'Very
 
 export const WeaponCategoriesSchema = z.enum(['Primary', 'Secondary', 'Unarmed']);
 
+export const WeaponTypeSchema = z.enum(['Physical', 'Magical']);
+
 export const DamageTypesSchema = z.enum(['phy', 'mag']);
 
 export const AdventuringGearSchema = z.object({
@@ -458,6 +460,7 @@ export const WeaponSchema = z.object({
 	description_html: z.string(),
 	level_requirement: z.number(),
 	category: WeaponCategoriesSchema,
+	type: WeaponTypeSchema,
 	available_traits: z.array(TraitIdsSchema),
 	range: RangesSchema,
 	features: z.array(FeatureSchema),

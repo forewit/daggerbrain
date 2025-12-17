@@ -2661,7 +2661,7 @@ function createCharacter(id: string) {
 						parseInt(str)
 					);
 				}
-				console.log(experience_indices);
+				// console.log(experience_indices);
 
 				if (!experience_indices || experience_indices.length === 0) continue;
 

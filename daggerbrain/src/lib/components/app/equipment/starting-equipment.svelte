@@ -228,7 +228,7 @@
 					)}
 				>
 					<Checkbox bind:checked={selectedPrimaryWeapon} />
-					<span class="font-bold">Primary weapon:</span>
+					<span class="font-bold">Suggested Primary weapon:</span>
 					{suggestedPrimaryWeapon.title}
 				</Label>
 			{/if}
@@ -242,7 +242,7 @@
 					)}
 				>
 					<Checkbox bind:checked={selectedSecondaryWeapon} />
-					<span class="font-bold">Secondary weapon:</span>
+					<span class="font-bold">Suggested Secondary weapon:</span>
 					{suggestedSecondaryWeapon.title}
 				</Label>
 			{/if}
@@ -256,7 +256,7 @@
 					)}
 				>
 					<Checkbox bind:checked={selectedArmor} />
-					<span class="font-bold">Armor:</span>
+					<span class="font-bold">Suggested Armor:</span>
 					{suggestedArmor.title}
 				</Label>
 			{/if}
