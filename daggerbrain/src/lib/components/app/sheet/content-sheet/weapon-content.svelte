@@ -537,6 +537,8 @@
 		</Collapsible.Root>
 	</div>
 
+	{#if inventoryItem}
+
 	<Sheet.Footer>
 		<Sheet.Close
 			class={cn(buttonVariants({ size: 'sm', variant: 'link' }), 'text-destructive')}
@@ -553,4 +555,5 @@
 			Remove
 		</Sheet.Close>
 	</Sheet.Footer>
+	{/if}
 {/if}

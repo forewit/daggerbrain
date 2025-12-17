@@ -69,10 +69,17 @@
 			</Label> -->
 
 			<!-- Use Gold Coins -->
-			<Label class="cursor-pointer">
-				Use Gold Coins:
+			<Label class="cursor-pointer items-start">
 				<Checkbox bind:checked={character.settings.use_gold_coins} />
+
+				<div class="space-y-1">
+					<p class="whitespace-nowrap">Use Gold Coins</p>
+					<p class="font-normal text-xs text-muted-foreground">If your group wants to track gold with more granularity,
+						you can add coins as your lowest denomination. 10 coins equal 1 handful.</p>
+				</div>
+				
 			</Label>
+			
 
 			<Dialog.Root>
 				<Dialog.Trigger
