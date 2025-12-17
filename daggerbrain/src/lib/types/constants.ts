@@ -28,7 +28,8 @@ export const CHARACTER_DEFAULTS = {
 	image_url: '/images/portrait-placeholder.png',
 	settings: <CharacterSettings>{
 		void_enabled: false,
-		use_gold_coins: false
+		use_gold_coins: false,
+		homebrew_enabled: false
 	},
 
 	// derived

@@ -16,10 +16,18 @@
 	let showVoidDisableDialog = $state(false);
 	let voidCheckboxState = $state(false);
 
-	// Sync checkbox state with character's void_enabled
+	let showHomebrewDisableDialog = $state(false);
+	let homebrewCheckboxState = $state(false);
+
+	// Sync checkbox state with character's void_enabled and homebrew_enabled
 	$effect(() => {
 		if (character) {
 			voidCheckboxState = character.settings.void_enabled;
+		}
+	});
+	$effect(() => {
+		if (character) {
+			homebrewCheckboxState = character.settings.homebrew_enabled;
 		}
 	});
 
@@ -46,6 +54,30 @@
 		voidCheckboxState = character?.settings.void_enabled ?? false;
 		showVoidDisableDialog = false;
 	}
+
+	function handleHomebrewCheckboxChange(checked: boolean) {
+		if (!checked && character?.settings.homebrew_enabled) {
+			// User is trying to disable void - show warning and prevent change
+			homebrewCheckboxState = true; // Keep it checked until confirmed
+			showHomebrewDisableDialog = true;
+		} else if (character) {
+			// User is enabling homebrew - allow it directly
+			character.settings.homebrew_enabled = checked;
+		}
+	}
+
+	function confirmDisableHomebrew() {
+		if (character) {
+			character.settings.homebrew_enabled = false;
+		}
+		showHomebrewDisableDialog = false;
+	}
+
+	function cancelDisableHomebrew() {
+		// Reset checkbox to previous state
+		homebrewCheckboxState = character?.settings.homebrew_enabled ?? false;
+		showHomebrewDisableDialog = false;
+	}
 </script>
 
 {#if character}
@@ -61,11 +93,11 @@
 			<!-- todo: uncomment before adding void content -->
 			<!-- The Void -->
 			<!-- <Label class="cursor-pointer">
-				The Void:
 				<Checkbox
 					bind:checked={voidCheckboxState}
 					onCheckedChange={(checked) => handleVoidCheckboxChange(checked ?? false)}
 				/>
+								The Void:
 			</Label> -->
 
 			<!-- Use Gold Coins -->
@@ -79,6 +111,14 @@
 						lowest denomination. 10 coins equal 1 handful.
 					</p>
 				</div>
+			</Label>
+			
+			<Label class="cursor-pointer">
+				<Checkbox
+					bind:checked={homebrewCheckboxState}
+					onCheckedChange={(checked) => handleHomebrewCheckboxChange(checked ?? false)}
+				/>
+					Enable Homebrew
 			</Label>
 
 			<Dialog.Root>
@@ -132,7 +172,29 @@
 				onclick={cancelDisableVoid}>Cancel</Dialog.Close
 			>
 			<Dialog.Close class={buttonVariants({ variant: 'destructive' })} onclick={confirmDisableVoid}
-				>Disable</Dialog.Close
+				>Disable The Void</Dialog.Close
+			>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
+
+<!-- Homebrew Disable Confirmation Dialog -->
+<Dialog.Root bind:open={showHomebrewDisableDialog}>
+	<Dialog.Content class="sm:max-w-md">
+		<Dialog.Header>
+			<Dialog.Title>Disable Homebrew</Dialog.Title>
+			<Dialog.Description>
+				Are you sure you want to disable Homebrew? This will remove any homebrew content on this
+				character. This action cannot be undone.
+			</Dialog.Description>
+		</Dialog.Header>
+		<Dialog.Footer class="flex gap-3 pt-4">
+			<Dialog.Close
+				class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
+				onclick={cancelDisableHomebrew}>Cancel</Dialog.Close
+			>
+			<Dialog.Close class={buttonVariants({ variant: 'destructive' })} onclick={confirmDisableHomebrew}
+				>Disable Homebrew</Dialog.Close
 			>
 		</Dialog.Footer>
 	</Dialog.Content>

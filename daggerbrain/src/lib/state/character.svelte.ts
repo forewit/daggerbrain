@@ -42,6 +42,7 @@ function createCharacter(id: string) {
 	});
 
 	const compendium = getCompendiumContext();
+	// ! void and homebrew source whitelists
 	$effect(() => {
 		if (!character) return;
 
@@ -49,14 +50,21 @@ function createCharacter(id: string) {
 			compendium.source_whitelist.add('SRD');
 		}
 
+		// void content
 		if (character.settings.void_enabled) {
 			compendium.source_whitelist.add('Void 1.5');
 		} else {
 			compendium.source_whitelist.delete('Void 1.5');
 		}
+
+		// homebrew content
+		if (character.settings.homebrew_enabled) {
+			compendium.source_whitelist.add('Homebrew');
+		} else {
+			compendium.source_whitelist.delete('Homebrew');
+		}
 	});
 
-	// ! clear ids that are not in the compendium
 
 	// ================================================
 	// DERIVED COMPENDIUM REFERENCES

@@ -16,6 +16,7 @@ export type Character = z.infer<typeof characters_table_schema>;
 export type CharacterSettings = {
 	void_enabled: boolean;
 	use_gold_coins: boolean;
+	homebrew_enabled: boolean;
 };
 
 export type DomainCardId = {

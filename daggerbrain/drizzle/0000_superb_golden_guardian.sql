@@ -1,10 +1,114 @@
+CREATE TABLE `homebrew_ancestry_cards` (
+	`id` text PRIMARY KEY NOT NULL,
+	`clerk_user_id` text NOT NULL,
+	`data` text NOT NULL,
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `homebrew_armor` (
+	`id` text PRIMARY KEY NOT NULL,
+	`clerk_user_id` text NOT NULL,
+	`data` text NOT NULL,
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `homebrew_beastforms` (
+	`id` text PRIMARY KEY NOT NULL,
+	`clerk_user_id` text NOT NULL,
+	`data` text NOT NULL,
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `homebrew_classes` (
+	`id` text PRIMARY KEY NOT NULL,
+	`clerk_user_id` text NOT NULL,
+	`data` text NOT NULL,
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `homebrew_community_cards` (
+	`id` text PRIMARY KEY NOT NULL,
+	`clerk_user_id` text NOT NULL,
+	`data` text NOT NULL,
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `homebrew_consumables` (
+	`id` text PRIMARY KEY NOT NULL,
+	`clerk_user_id` text NOT NULL,
+	`data` text NOT NULL,
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `homebrew_domain_cards` (
+	`id` text PRIMARY KEY NOT NULL,
+	`clerk_user_id` text NOT NULL,
+	`data` text NOT NULL,
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `homebrew_domains` (
+	`id` text PRIMARY KEY NOT NULL,
+	`clerk_user_id` text NOT NULL,
+	`data` text NOT NULL,
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `homebrew_loot` (
+	`id` text PRIMARY KEY NOT NULL,
+	`clerk_user_id` text NOT NULL,
+	`data` text NOT NULL,
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `homebrew_primary_weapons` (
+	`id` text PRIMARY KEY NOT NULL,
+	`clerk_user_id` text NOT NULL,
+	`data` text NOT NULL,
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `homebrew_secondary_weapons` (
+	`id` text PRIMARY KEY NOT NULL,
+	`clerk_user_id` text NOT NULL,
+	`data` text NOT NULL,
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `homebrew_subclasses` (
+	`id` text PRIMARY KEY NOT NULL,
+	`clerk_user_id` text NOT NULL,
+	`data` text NOT NULL,
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `homebrew_transformation_cards` (
+	`id` text PRIMARY KEY NOT NULL,
+	`clerk_user_id` text NOT NULL,
+	`data` text NOT NULL,
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL
+);
+--> statement-breakpoint
 PRAGMA foreign_keys=OFF;--> statement-breakpoint
 CREATE TABLE `__new_characters_table` (
-	`id` text PRIMARY KEY DEFAULT '3c309184-fb1b-466e-a779-2f58bfb5b58c' NOT NULL,
+	`id` text PRIMARY KEY DEFAULT '3e49ddd8-1a3b-43f3-a9f0-b9110306e25a' NOT NULL,
 	`clerk_user_id` text NOT NULL,
 	`name` text DEFAULT 'New Character' NOT NULL,
 	`image_url` text DEFAULT '/images/portrait-placeholder.png' NOT NULL,
-	`settings` text DEFAULT '{"void_enabled":false,"use_gold_coins":false}' NOT NULL,
+	`settings` text DEFAULT '{"void_enabled":false,"use_gold_coins":false,"homebrew_enabled":false}' NOT NULL,
 	`derived_descriptors` text DEFAULT '{"ancestry_name":"","primary_class_name":"","primary_subclass_name":"","secondary_class_name":"","secondary_subclass_name":""}' NOT NULL,
 	`ancestry_card_id` text,
 	`custom_top_ancestry` text,
@@ -44,12 +148,13 @@ CREATE TABLE `__new_characters_table` (
 	`marked_hope` integer DEFAULT 0 NOT NULL,
 	`marked_armor` integer DEFAULT 0 NOT NULL,
 	`loadout_domain_card_ids` text DEFAULT '[]' NOT NULL,
+	`bonus_max_loadout` integer DEFAULT 0 NOT NULL,
 	`level` integer DEFAULT 1 NOT NULL,
 	`level_up_domain_card_ids` text DEFAULT '{"1":{"A":null,"B":null},"2":{"A":null},"3":{"A":null},"4":{"A":null},"5":{"A":null},"6":{"A":null},"7":{"A":null},"8":{"A":null},"9":{"A":null},"10":{"A":null}}' NOT NULL,
 	`level_up_choices` text DEFAULT '{"2":{"A":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null},"B":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null}},"3":{"A":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null},"B":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null}},"4":{"A":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null},"B":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null}},"5":{"A":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null},"B":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null}},"6":{"A":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null},"B":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null}},"7":{"A":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null},"B":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null}},"8":{"A":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null},"B":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null}},"9":{"A":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null},"B":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null}},"10":{"A":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null},"B":{"option_id":null,"marked_traits":{"A":null,"B":null},"selected_experiences":[],"selected_domain_card_id":null,"selected_subclass_upgrade":null}}}' NOT NULL
 );
 --> statement-breakpoint
-INSERT INTO `__new_characters_table`("id", "clerk_user_id", "name", "image_url", "settings", "derived_descriptors", "ancestry_card_id", "custom_top_ancestry", "custom_bottom_ancestry", "community_card_id", "experiences", "class_choices", "primary_class_id", "primary_subclass_id", "secondary_class_id", "secondary_subclass_id", "secondary_class_domain_id_choice", "chosen_beastform", "companion", "background_questions", "connections", "character_descriptions", "notes", "active_armor_id", "active_primary_weapon_id", "active_secondary_weapon_id", "inventory", "active_conditions", "transformation_card_id", "additional_domain_card_ids", "additional_ancestry_card_ids", "additional_community_card_ids", "additional_transformation_card_ids", "unarmed_attack_choices", "ancestry_card_choices", "community_card_tokens", "domain_card_choices", "domain_card_tokens", "selected_traits", "marked_hp", "marked_stress", "marked_hope", "marked_armor", "loadout_domain_card_ids", "level", "level_up_domain_card_ids", "level_up_choices") SELECT "id", "clerk_user_id", "name", "image_url", "settings", "derived_descriptors", "ancestry_card_id", "custom_top_ancestry", "custom_bottom_ancestry", "community_card_id", "experiences", "class_choices", "primary_class_id", "primary_subclass_id", "secondary_class_id", "secondary_subclass_id", "secondary_class_domain_id_choice", "chosen_beastform", "companion", "background_questions", "connections", "character_descriptions", "notes", "active_armor_id", "active_primary_weapon_id", "active_secondary_weapon_id", "inventory", "active_conditions", "transformation_card_id", "additional_domain_card_ids", "additional_ancestry_card_ids", "additional_community_card_ids", "additional_transformation_card_ids", "unarmed_attack_choices", "ancestry_card_choices", "community_card_tokens", "domain_card_choices", "domain_card_tokens", "selected_traits", "marked_hp", "marked_stress", "marked_hope", "marked_armor", "loadout_domain_card_ids", "level", "level_up_domain_card_ids", "level_up_choices" FROM `characters_table`;--> statement-breakpoint
+INSERT INTO `__new_characters_table`("id", "clerk_user_id", "name", "image_url", "settings", "derived_descriptors", "ancestry_card_id", "custom_top_ancestry", "custom_bottom_ancestry", "community_card_id", "experiences", "class_choices", "primary_class_id", "primary_subclass_id", "secondary_class_id", "secondary_subclass_id", "secondary_class_domain_id_choice", "chosen_beastform", "companion", "background_questions", "connections", "character_descriptions", "notes", "active_armor_id", "active_primary_weapon_id", "active_secondary_weapon_id", "inventory", "active_conditions", "transformation_card_id", "additional_domain_card_ids", "additional_ancestry_card_ids", "additional_community_card_ids", "additional_transformation_card_ids", "unarmed_attack_choices", "ancestry_card_choices", "community_card_tokens", "domain_card_choices", "domain_card_tokens", "selected_traits", "marked_hp", "marked_stress", "marked_hope", "marked_armor", "loadout_domain_card_ids", "bonus_max_loadout", "level", "level_up_domain_card_ids", "level_up_choices") SELECT "id", "clerk_user_id", "name", "image_url", "settings", "derived_descriptors", "ancestry_card_id", "custom_top_ancestry", "custom_bottom_ancestry", "community_card_id", "experiences", "class_choices", "primary_class_id", "primary_subclass_id", "secondary_class_id", "secondary_subclass_id", "secondary_class_domain_id_choice", "chosen_beastform", "companion", "background_questions", "connections", "character_descriptions", "notes", "active_armor_id", "active_primary_weapon_id", "active_secondary_weapon_id", "inventory", "active_conditions", "transformation_card_id", "additional_domain_card_ids", "additional_ancestry_card_ids", "additional_community_card_ids", "additional_transformation_card_ids", "unarmed_attack_choices", "ancestry_card_choices", "community_card_tokens", "domain_card_choices", "domain_card_tokens", "selected_traits", "marked_hp", "marked_stress", "marked_hope", "marked_armor", "loadout_domain_card_ids", "bonus_max_loadout", "level", "level_up_domain_card_ids", "level_up_choices" FROM `characters_table`;--> statement-breakpoint
 DROP TABLE `characters_table`;--> statement-breakpoint
 ALTER TABLE `__new_characters_table` RENAME TO `characters_table`;--> statement-breakpoint
 PRAGMA foreign_keys=ON;
