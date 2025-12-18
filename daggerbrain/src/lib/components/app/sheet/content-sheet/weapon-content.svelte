@@ -471,9 +471,14 @@
 					</div>
 					<div class="flex flex-col gap-2">
 						<div class="flex items-center justify-between">
-							<label for="custom-damage-dice" class="text-xs font-medium text-muted-foreground"
-								>Damage Dice</label
-							>
+							<div class="flex items-center gap-2">
+								<label for="custom-damage-dice" class="text-xs font-medium text-muted-foreground"
+									>Damage Dice</label
+								>
+								{#if customDamageDice}
+									<span class="text-xs text-muted-foreground">({customDamageDice})</span>
+								{/if}
+							</div>
 							<button
 								type="button"
 								disabled={customDamageDice === ''}

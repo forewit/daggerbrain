@@ -3,12 +3,17 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import HomebrewCharacterModifierEditor from './homebrew-character-modifier-editor.svelte';
-	import HomebrewWeaponModifierEditor from './homebrew-weapon-modifier-editor.svelte';
+	import HomebrewCharacterModifierEditor from './character-modifier-editor.svelte';
+	import HomebrewWeaponModifierEditor from './weapon-modifier-editor.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
-	import X from '@lucide/svelte/icons/x';
 
-	let { feature = $bindable() }: { feature: Feature } = $props();
+	let {
+		feature = $bindable(),
+		onRemove
+	}: {
+		feature: Feature;
+		onRemove?: (() => void) | undefined;
+	} = $props();
 
 	// Form state - initialized from feature prop
 	let formTitle = $state('');
@@ -97,7 +102,7 @@
 	}
 </script>
 
-<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-3">
 	<!-- Title -->
 	<div class="flex flex-col gap-1">
 		<label for="hb-feature-title" class="text-xs font-medium text-muted-foreground">Title</label>
@@ -112,76 +117,65 @@
 		<Textarea
 			id="hb-feature-description"
 			bind:value={formDescriptionHtml}
-			placeholder="Feature description (supports HTML)"
+			placeholder="Feature description"
 			rows={4}
 		/>
 	</div>
 
 	<!-- Character Modifiers -->
 	<div class="flex flex-col gap-2">
-		<div class="flex items-center justify-between">
-			<label class="text-xs font-medium text-muted-foreground">Character Modifiers</label>
-			<Button size="sm" variant="outline" onclick={addCharacterModifier}>
+			<Button size="sm" variant="outline" onclick={addCharacterModifier} class="w-min">
 				<Plus class="size-3.5" />
-				Add Modifier
+				Add Character Modifier
 			</Button>
-		</div>
+		{#if formCharacterModifiers.length > 0}
 		<div class="flex flex-col gap-2">
 			{#each formCharacterModifiers as modifier, index}
-				<div class="flex items-start gap-2">
-					<div class="flex-1">
-						<HomebrewCharacterModifierEditor bind:modifier={modifier} />
-					</div>
-					<Button
-						size="sm"
-						variant="ghost"
-						onclick={() => removeCharacterModifier(index)}
-						class="mt-1"
-					>
-						<X class="size-4" />
-					</Button>
-				</div>
-			{:else}
-				<p class="text-xs text-muted-foreground italic">No character modifiers added</p>
+				<HomebrewCharacterModifierEditor
+					bind:modifier={formCharacterModifiers[index]}
+					onRemove={() => removeCharacterModifier(index)}
+				/>
 			{/each}
 		</div>
+		{/if}
 	</div>
 
 	<!-- Weapon Modifiers -->
 	<div class="flex flex-col gap-2">
-		<div class="flex items-center justify-between">
-			<label class="text-xs font-medium text-muted-foreground">Weapon Modifiers</label>
-			<Button size="sm" variant="outline" onclick={addWeaponModifier}>
+			<Button size="sm" variant="outline" onclick={addWeaponModifier} class="w-min">
 				<Plus class="size-3.5" />
-				Add Modifier
+				Add Weapon Modifier
 			</Button>
-		</div>
+		{#if formWeaponModifiers.length > 0}
 		<div class="flex flex-col gap-2">
 			{#each formWeaponModifiers as modifier, index}
-				<div class="flex items-start gap-2">
-					<div class="flex-1">
-						<HomebrewWeaponModifierEditor bind:modifier={modifier} />
-					</div>
-					<Button
-						size="sm"
-						variant="ghost"
-						onclick={() => removeWeaponModifier(index)}
-						class="mt-1"
-					>
-						<X class="size-4" />
-					</Button>
-				</div>
-			{:else}
-				<p class="text-xs text-muted-foreground italic">No weapon modifiers added</p>
+				<HomebrewWeaponModifierEditor
+					bind:modifier={formWeaponModifiers[index]}
+					onRemove={() => removeWeaponModifier(index)}
+				/>
 			{/each}
 		</div>
+		{/if}
 	</div>
 
 	<!-- Actions -->
-	<div class="flex gap-2 pt-2">
-		<Button size="sm" onclick={handleSave} disabled={!hasChanges}>Save</Button>
-		{#if hasChanges}
-			<Button size="sm" variant="outline" onclick={handleReset}>Reset</Button>
+	<div class="flex items-center justify-between gap-2 pt-2">
+		<div class="flex gap-2">
+			<Button size="sm" onclick={handleSave} disabled={!hasChanges}>Save</Button>
+			{#if hasChanges}
+				<Button size="sm" variant="link" onclick={handleReset}>Discard changes</Button>
+			{/if}
+		</div>
+		{#if onRemove}
+			<Button
+				size="sm"
+				variant="link"
+				onclick={onRemove}
+				class="text-destructive"
+				title="Remove feature"
+			>
+				Delete Feature
+			</Button>
 		{/if}
 	</div>
 </div>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type {
 		DamageTypes,
+		Feature,
 		Ranges,
 		TraitIds,
 		Weapon,
@@ -12,7 +13,11 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { cn, capitalize } from '$lib/utils';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
-	import DicePicker from '../dice/dice-picker.svelte';
+	import Plus from '@lucide/svelte/icons/plus';
+	import DicePicker from '$lib/components/app/dice/dice-picker.svelte';
+	import HomebrewFeatureForm from './features/feature-form.svelte';
+	import Dropdown from '../leveling/dropdown.svelte';
+	import Hand from '@lucide/svelte/icons/hand';
 
 	let { weapon = $bindable() }: { weapon: Weapon } = $props();
 
@@ -29,6 +34,7 @@
 	let formDamageDice = $state('');
 	let formDamageBonus = $state('');
 	let formAttackRollBonus = $state('');
+	let formFeatures = $state<Feature[]>([]);
 
 	const rangeOptions: Ranges[] = ['Melee', 'Very Close', 'Close', 'Far', 'Very Far'];
 	const damageTypeOptions: DamageTypes[] = ['phy', 'mag'];
@@ -101,6 +107,10 @@
 		const formAttackRollBonusNum = formAttackRollBonus === '' ? 0 : Number(formAttackRollBonus);
 		const attackRollBonusMatch = formAttackRollBonusNum === weapon.attack_roll_bonus;
 
+		// Compare features (deep comparison)
+		const featuresMatch =
+			JSON.stringify(formFeatures) === JSON.stringify(weapon.features);
+
 		return !(
 			titleMatch &&
 			descriptionMatch &&
@@ -113,7 +123,8 @@
 			burdenMatch &&
 			damageDiceMatch &&
 			damageBonusMatch &&
-			attackRollBonusMatch
+			attackRollBonusMatch &&
+			featuresMatch
 		);
 	});
 
@@ -132,6 +143,7 @@
 			formDamageDice = weapon.damage_dice;
 			formDamageBonus = weapon.damage_bonus === 0 ? '' : String(weapon.damage_bonus);
 			formAttackRollBonus = weapon.attack_roll_bonus === 0 ? '' : String(weapon.attack_roll_bonus);
+			formFeatures = JSON.parse(JSON.stringify(weapon.features));
 		}
 	});
 
@@ -152,7 +164,8 @@
 			burden: Number(formBurden) as 0 | 1 | 2,
 			damage_dice: formDamageDice,
 			damage_bonus: formDamageBonus === '' ? 0 : Number(formDamageBonus),
-			attack_roll_bonus: formAttackRollBonus === '' ? 0 : Number(formAttackRollBonus)
+			attack_roll_bonus: formAttackRollBonus === '' ? 0 : Number(formAttackRollBonus),
+			features: JSON.parse(JSON.stringify(formFeatures))
 		};
 	}
 
@@ -171,6 +184,7 @@
 		formDamageDice = weapon.damage_dice;
 		formDamageBonus = weapon.damage_bonus === 0 ? '' : String(weapon.damage_bonus);
 		formAttackRollBonus = weapon.attack_roll_bonus === 0 ? '' : String(weapon.attack_roll_bonus);
+		formFeatures = JSON.parse(JSON.stringify(weapon.features));
 	}
 
 	function toggleTrait(trait: TraitIds) {
@@ -187,6 +201,20 @@
 		} else {
 			formDamageTypes = [...formDamageTypes, type];
 		}
+	}
+
+	function addFeature() {
+		const newFeature: Feature = {
+			title: '',
+			description_html: '',
+			character_modifiers: [],
+			weapon_modifiers: []
+		};
+		formFeatures = [...formFeatures, newFeature];
+	}
+
+	function removeFeature(index: number) {
+		formFeatures = formFeatures.filter((_, i) => i !== index);
 	}
 </script>
 
@@ -205,12 +233,12 @@
 		<Textarea
 			id="hb-weapon-description"
 			bind:value={formDescriptionHtml}
-			placeholder="Weapon description (supports HTML)"
+			placeholder="Weapon description"
 			rows={3}
 		/>
 	</div>
 
-	<!-- Category & Type Row -->
+	<!-- Category & Tier Row -->
 	<div class="grid grid-cols-2 gap-3">
 		<div class="flex flex-col gap-1">
 			<label for="hb-weapon-category" class="text-xs font-medium text-muted-foreground"
@@ -228,23 +256,6 @@
 			</Select.Root>
 		</div>
 		<div class="flex flex-col gap-1">
-			<label for="hb-weapon-type" class="text-xs font-medium text-muted-foreground">Type</label>
-			<Select.Root type="single" bind:value={formType}>
-				<Select.Trigger id="hb-weapon-type" class="w-full">
-					<p class="truncate">{formType}</p>
-				</Select.Trigger>
-				<Select.Content>
-					{#each typeOptions as type}
-						<Select.Item value={type}>{type}</Select.Item>
-					{/each}
-				</Select.Content>
-			</Select.Root>
-		</div>
-	</div>
-
-	<!-- Tier & Range Row -->
-	<div class="grid grid-cols-2 gap-3">
-		<div class="flex flex-col gap-1">
 			<label for="hb-weapon-tier" class="text-xs font-medium text-muted-foreground">Tier</label>
 			<Select.Root type="single" bind:value={formTier}>
 				<Select.Trigger id="hb-weapon-tier" class="w-full">
@@ -255,6 +266,24 @@
 					<Select.Item value="2">2</Select.Item>
 					<Select.Item value="3">3</Select.Item>
 					<Select.Item value="4">4</Select.Item>
+				</Select.Content>
+			</Select.Root>
+		</div>
+	</div>
+
+	<!-- Burden & Range Row -->
+	<div class="grid grid-cols-2 gap-3">
+		<div class="flex flex-col gap-1">
+			<label for="hb-weapon-burden" class="text-xs font-medium text-muted-foreground">Burden</label>
+			<Select.Root type="single" bind:value={formBurden}>
+				<Select.Trigger id="hb-weapon-burden" class="w-full ">
+					<p class="truncate">{formBurden}</p>
+					<Hand class="mr-auto"/>
+				</Select.Trigger>
+				<Select.Content>
+					{#each burdenOptions as burden}
+						<Select.Item value={burden}>{burden}</Select.Item>
+					{/each}
 				</Select.Content>
 			</Select.Root>
 		</div>
@@ -275,7 +304,7 @@
 
 	<!-- Available Traits -->
 	<div class="flex flex-col gap-2">
-		<p class="text-xs font-medium text-muted-foreground">Available Traits</p>
+		<p class="text-xs font-medium text-muted-foreground">Weapon Trait</p>
 		<div class="flex flex-wrap gap-3">
 			{#each traitOptions as trait}
 				<label class="flex items-center gap-2 text-xs">
@@ -291,45 +320,50 @@
 		</div>
 	</div>
 
-	<!-- Damage Types -->
-	<div class="flex flex-col gap-2">
-		<p class="text-xs font-medium text-muted-foreground">Damage Types</p>
-		<div class="flex gap-4">
-			{#each damageTypeOptions as type}
-				<label class="flex items-center gap-2 text-xs">
-					<input
-						type="checkbox"
-						checked={formDamageTypes.includes(type)}
-						onchange={() => toggleDamageType(type)}
-						class="accent-accent"
-					/>
-					{damageTypeMap[type]}
-				</label>
-			{/each}
-		</div>
-	</div>
-
-	<!-- Burden -->
-	<div class="flex flex-col gap-1">
-		<label for="hb-weapon-burden" class="text-xs font-medium text-muted-foreground">Burden</label>
-		<Select.Root type="single" bind:value={formBurden}>
-			<Select.Trigger id="hb-weapon-burden" class="w-full">
-				<p class="truncate">{formBurden}</p>
-			</Select.Trigger>
-			<Select.Content>
-				{#each burdenOptions as burden}
-					<Select.Item value={burden}>{burden}</Select.Item>
+	<!-- Damage Type & Weapon Type Row -->
+	<div class="grid grid-cols-2 gap-3">
+		<div class="flex flex-col gap-2">
+			<p class="text-xs font-medium text-muted-foreground">Damage Type</p>
+			<div class="flex gap-4">
+				{#each damageTypeOptions as type}
+					<label class="flex items-center gap-2 text-xs">
+						<input
+							type="checkbox"
+							checked={formDamageTypes.includes(type)}
+							onchange={() => toggleDamageType(type)}
+							class="accent-accent"
+						/>
+						{damageTypeMap[type]}
+					</label>
 				{/each}
-			</Select.Content>
-		</Select.Root>
+			</div>
+		</div>
+		<div class="flex flex-col gap-1">
+			<label for="hb-weapon-type" class="text-xs font-medium text-muted-foreground">Weapon Type</label>
+			<Select.Root type="single" bind:value={formType}>
+				<Select.Trigger id="hb-weapon-type" class="w-full">
+					<p class="truncate">{formType}</p>
+				</Select.Trigger>
+				<Select.Content>
+					{#each typeOptions as type}
+						<Select.Item value={type}>{type}</Select.Item>
+					{/each}
+				</Select.Content>
+			</Select.Root>
+		</div>
 	</div>
 
 	<!-- Damage Dice -->
 	<div class="flex flex-col gap-2">
 		<div class="flex items-center justify-between">
-			<label for="hb-weapon-damage-dice" class="text-xs font-medium text-muted-foreground"
-				>Damage Dice</label
-			>
+			<div class="flex items-center gap-2">
+				<label for="hb-weapon-damage-dice" class="text-xs font-medium text-muted-foreground"
+					>Damage Dice</label
+				>
+				{#if formDamageDice}
+					<span class="text-xs text-muted-foreground">({formDamageDice})</span>
+				{/if}
+			</div>
 			<button
 				type="button"
 				disabled={formDamageDice === ''}
@@ -342,9 +376,6 @@
 			</button>
 		</div>
 		<DicePicker value={formDamageDice} onChange={(v) => (formDamageDice = v)} />
-		{#if formDamageDice}
-			<p class="text-xs text-muted-foreground text-center">{formDamageDice}</p>
-		{/if}
 	</div>
 
 	<!-- Damage Bonus & Attack Roll Bonus Row -->
@@ -375,11 +406,36 @@
 		</div>
 	</div>
 
+	<!-- Features -->
+	<div class="flex flex-col gap-2">
+		<div class="flex items-center justify-between">
+			<p class="text-xs font-medium text-muted-foreground">Features</p>
+			<Button size="sm" variant="outline" onclick={addFeature}>
+				<Plus class="size-3.5" />
+				Add Feature
+			</Button>
+		</div>
+		<div class="flex flex-col gap-2">
+			{#each formFeatures as feature, index}
+				<Dropdown
+					title={feature.title || `Unnamed feature`}
+				>
+					<HomebrewFeatureForm
+						bind:feature={formFeatures[index]}
+						onRemove={() => removeFeature(index)}
+					/>
+				</Dropdown>
+			{:else}
+				<p class="text-xs text-muted-foreground italic">No features added</p>
+			{/each}
+		</div>
+	</div>
+
 	<!-- Actions -->
 	<div class="flex gap-2 pt-2">
 		<Button size="sm" onclick={handleSave} disabled={!hasChanges}>Save</Button>
 		{#if hasChanges}
-			<Button size="sm" variant="outline" onclick={handleReset}>Reset</Button>
+			<Button size="sm" variant="link" onclick={handleReset}>Discard changes</Button>
 		{/if}
 	</div>
 </div>

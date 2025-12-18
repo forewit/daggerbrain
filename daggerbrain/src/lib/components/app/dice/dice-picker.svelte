@@ -14,10 +14,12 @@
 
 	let {
 		value = '',
-		onChange = () => {}
+		onChange = () => {},
+		label
 	}: {
 		value?: string;
 		onChange?: (value: string) => void;
+		label?: string;
 	} = $props();
 
 	// Parse the dice string into counts
@@ -82,7 +84,19 @@
 		e.preventDefault();
 		updateCount(dieType, -1);
 	}
+
+	// Get the current dice string
+	let diceString = $derived(countsToDiceString(counts));
 </script>
+
+{#if label}
+	<div class="flex items-center justify-between mb-2">
+		<p class="text-xs font-medium text-muted-foreground">{label}</p>
+		{#if diceString}
+			<span class="text-xs text-muted-foreground">{diceString}</span>
+		{/if}
+	</div>
+{/if}
 
 <div class="flex items-center justify-around gap-2">
 	<!-- d4 -->
