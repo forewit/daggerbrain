@@ -26,6 +26,7 @@ export const get_all_beastforms = query(async () => {
 		{} as Record<string, Beastform>
 	);
 
+	console.log('fetched beastforms from KV');
 	return validatedBeastforms;
 });
 
@@ -35,5 +36,6 @@ export const get_beastform = query(z.string(), async (beastformId) => {
 	if (!beastform) {
 		throw error(404, 'Beastform not found');
 	}
+	console.log('fetched beastform from KV');
 	return beastform;
 });

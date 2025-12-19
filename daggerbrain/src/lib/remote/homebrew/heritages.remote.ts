@@ -35,6 +35,7 @@ export const get_homebrew_ancestry_cards = query(async () => {
 		const validated = AncestryCardSchema.parse(entry.data);
 		result[entry.id] = validated;
 	}
+	console.log('fetched homebrew ancestry cards from D1');
 	return result;
 });
 
@@ -42,6 +43,16 @@ export const create_homebrew_ancestry_card = command(AncestryCardSchema, async (
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
+
+	// Check if user has reached the limit of 1 ancestry card
+	const existing = await db
+		.select()
+		.from(homebrew_ancestry_cards)
+		.where(eq(homebrew_ancestry_cards.clerk_user_id, userId));
+
+	if (existing.length >= 1) {
+		throw error(403, 'Homebrew limit reached. You can only have 1 custom ancestry card.');
+	}
 
 	const validatedData = AncestryCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
@@ -58,6 +69,7 @@ export const create_homebrew_ancestry_card = command(AncestryCardSchema, async (
 	// refresh the ancestry cards query
 	get_homebrew_ancestry_cards().refresh();
 
+	console.log('created homebrew ancestry card in D1');
 	return id;
 });
 
@@ -84,6 +96,8 @@ export const update_homebrew_ancestry_card = command(
 					eq(homebrew_ancestry_cards.clerk_user_id, userId)
 				)
 			);
+
+		console.log('updated homebrew ancestry card in D1');
 	}
 );
 
@@ -107,6 +121,7 @@ export const delete_homebrew_ancestry_card = command(z.string(), async (id) => {
 
 	// refresh the ancestry cards query
 	get_homebrew_ancestry_cards().refresh();
+	console.log('deleted homebrew ancestry card from D1');
 });
 
 // ============================================================================
@@ -128,6 +143,7 @@ export const get_homebrew_community_cards = query(async () => {
 		const validated = CommunityCardSchema.parse(entry.data);
 		result[entry.id] = validated;
 	}
+	console.log('fetched homebrew community cards from D1');
 	return result;
 });
 
@@ -135,6 +151,16 @@ export const create_homebrew_community_card = command(CommunityCardSchema, async
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
+
+	// Check if user has reached the limit of 1 community card
+	const existing = await db
+		.select()
+		.from(homebrew_community_cards)
+		.where(eq(homebrew_community_cards.clerk_user_id, userId));
+
+	if (existing.length >= 1) {
+		throw error(403, 'Homebrew limit reached. You can only have 1 custom community card.');
+	}
 
 	const validatedData = CommunityCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
@@ -151,6 +177,7 @@ export const create_homebrew_community_card = command(CommunityCardSchema, async
 	// refresh the community cards query
 	get_homebrew_community_cards().refresh();
 
+	console.log('created homebrew community card in D1');
 	return id;
 });
 
@@ -177,6 +204,8 @@ export const update_homebrew_community_card = command(
 					eq(homebrew_community_cards.clerk_user_id, userId)
 				)
 			);
+
+		console.log('updated homebrew community card in D1');
 	}
 );
 
@@ -200,6 +229,7 @@ export const delete_homebrew_community_card = command(z.string(), async (id) => 
 
 	// refresh the community cards query
 	get_homebrew_community_cards().refresh();
+	console.log('deleted homebrew community card from D1');
 });
 
 // ============================================================================
@@ -221,6 +251,7 @@ export const get_homebrew_transformation_cards = query(async () => {
 		const validated = TransformationCardSchema.parse(entry.data);
 		result[entry.id] = validated;
 	}
+	console.log('fetched homebrew transformation cards from D1');
 	return result;
 });
 
@@ -230,6 +261,16 @@ export const create_homebrew_transformation_card = command(
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
+
+		// Check if user has reached the limit of 1 transformation card
+		const existing = await db
+			.select()
+			.from(homebrew_transformation_cards)
+			.where(eq(homebrew_transformation_cards.clerk_user_id, userId));
+
+		if (existing.length >= 1) {
+			throw error(403, 'Homebrew limit reached. You can only have 1 custom transformation card.');
+		}
 
 		const validatedData = TransformationCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
 		const id = crypto.randomUUID();
@@ -246,6 +287,7 @@ export const create_homebrew_transformation_card = command(
 		// refresh the transformation cards query
 		get_homebrew_transformation_cards().refresh();
 
+		console.log('created homebrew transformation card in D1');
 		return id;
 	}
 );
@@ -273,6 +315,8 @@ export const update_homebrew_transformation_card = command(
 					eq(homebrew_transformation_cards.clerk_user_id, userId)
 				)
 			);
+
+		console.log('updated homebrew transformation card in D1');
 	}
 );
 
@@ -296,4 +340,5 @@ export const delete_homebrew_transformation_card = command(z.string(), async (id
 
 	// refresh the transformation cards query
 	get_homebrew_transformation_cards().refresh();
+	console.log('deleted homebrew transformation card from D1');
 });

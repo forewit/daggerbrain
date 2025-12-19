@@ -3829,9 +3829,9 @@ function createCharacter(id: string) {
 		get character() {
 			return character;
 		},
-		set character(value) {
-			character = value;
-		},
+		// set character(value) {
+		// 	character = value;
+		// },
 
 		// helper functions
 		destroy,

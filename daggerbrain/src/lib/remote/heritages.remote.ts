@@ -30,6 +30,7 @@ export const get_all_ancestry_cards = query(async () => {
 		{} as Record<string, AncestryCard>
 	);
 
+	console.log('fetched ancestry cards from KV');
 	return validatedCards;
 });
 
@@ -39,6 +40,7 @@ export const get_ancestry_card = query(z.string(), async (ancestryCardId) => {
 	if (!card) {
 		throw error(404, 'Ancestry card not found');
 	}
+	console.log('fetched ancestry card from KV');
 	return card;
 });
 
@@ -66,6 +68,7 @@ export const get_all_community_cards = query(async () => {
 		{} as Record<string, CommunityCard>
 	);
 
+	console.log('fetched community cards from KV');
 	return validatedCards;
 });
 
@@ -75,6 +78,7 @@ export const get_community_card = query(z.string(), async (communityCardId) => {
 	if (!card) {
 		throw error(404, 'Community card not found');
 	}
+	console.log('fetched community card from KV');
 	return card;
 });
 
@@ -102,6 +106,7 @@ export const get_all_transformation_cards = query(async () => {
 		{} as Record<string, TransformationCard>
 	);
 
+	console.log('fetched transformation cards from KV');
 	return validatedCards;
 });
 
@@ -111,5 +116,6 @@ export const get_transformation_card = query(z.string(), async (transformationCa
 	if (!card) {
 		throw error(404, 'Transformation card not found');
 	}
+	console.log('fetched transformation card from KV');
 	return card;
 });

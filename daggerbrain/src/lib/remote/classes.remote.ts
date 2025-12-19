@@ -25,6 +25,7 @@ export const get_all_classes = query(async () => {
 		{} as Record<string, CharacterClass>
 	);
 
+	console.log('fetched classes from KV');
 	return validatedClasses;
 });
 
@@ -34,6 +35,7 @@ export const get_class = query(z.string(), async (classId) => {
 	if (!clazz) {
 		throw error(404, 'Class not found');
 	}
+	console.log('fetched class from KV');
 	return clazz;
 });
 
@@ -57,6 +59,7 @@ export const get_all_subclasses = query(async () => {
 		{} as Record<string, Subclass>
 	);
 
+	console.log('fetched subclasses from KV');
 	return validatedSubclasses;
 });
 
@@ -66,5 +69,6 @@ export const get_subclass = query(z.string(), async (subclassId) => {
 	if (!subclass) {
 		throw error(404, 'Subclass not found');
 	}
+	console.log('fetched subclass from KV');
 	return subclass;
 });

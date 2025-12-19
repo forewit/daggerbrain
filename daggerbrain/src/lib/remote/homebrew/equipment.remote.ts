@@ -33,6 +33,7 @@ export const get_homebrew_primary_weapons = query(async () => {
 		const validated = WeaponSchema.parse(entry.data);
 		result[entry.id] = validated;
 	}
+	console.log('fetched homebrew primary weapons from D1');
 	return result;
 });
 
@@ -40,6 +41,16 @@ export const create_homebrew_primary_weapon = command(WeaponSchema, async (data)
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
+
+	// Check if user has reached the limit of 1 primary weapon
+	const existing = await db
+		.select()
+		.from(homebrew_primary_weapons)
+		.where(eq(homebrew_primary_weapons.clerk_user_id, userId));
+
+	if (existing.length >= 1) {
+		throw error(403, 'Homebrew limit reached. You can only have 1 custom primary weapon.');
+	}
 
 	const validatedData = WeaponSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
@@ -56,6 +67,7 @@ export const create_homebrew_primary_weapon = command(WeaponSchema, async (data)
 	// refresh the primary weapons query
 	get_homebrew_primary_weapons().refresh();
 
+	console.log('created homebrew primary weapon in D1');
 	return id;
 });
 
@@ -82,6 +94,8 @@ export const update_homebrew_primary_weapon = command(
 					eq(homebrew_primary_weapons.clerk_user_id, userId)
 				)
 			);
+
+		console.log('updated homebrew primary weapon in D1');
 	}
 );
 
@@ -105,6 +119,7 @@ export const delete_homebrew_primary_weapon = command(z.string(), async (id) => 
 
 	// refresh the primary weapons query
 	get_homebrew_primary_weapons().refresh();
+	console.log('deleted homebrew primary weapon from D1');
 });
 
 // ============================================================================
@@ -126,6 +141,7 @@ export const get_homebrew_secondary_weapons = query(async () => {
 		const validated = WeaponSchema.parse(entry.data);
 		result[entry.id] = validated;
 	}
+	console.log('fetched homebrew secondary weapons from D1');
 	return result;
 });
 
@@ -133,6 +149,16 @@ export const create_homebrew_secondary_weapon = command(WeaponSchema, async (dat
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
+
+	// Check if user has reached the limit of 1 secondary weapon
+	const existing = await db
+		.select()
+		.from(homebrew_secondary_weapons)
+		.where(eq(homebrew_secondary_weapons.clerk_user_id, userId));
+
+	if (existing.length >= 1) {
+		throw error(403, 'Homebrew limit reached. You can only have 1 custom secondary weapon.');
+	}
 
 	const validatedData = WeaponSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
@@ -149,6 +175,7 @@ export const create_homebrew_secondary_weapon = command(WeaponSchema, async (dat
 	// refresh the secondary weapons query
 	get_homebrew_secondary_weapons().refresh();
 
+	console.log('created homebrew secondary weapon in D1');
 	return id;
 });
 
@@ -175,6 +202,8 @@ export const update_homebrew_secondary_weapon = command(
 					eq(homebrew_secondary_weapons.clerk_user_id, userId)
 				)
 			);
+
+		console.log('updated homebrew secondary weapon in D1');
 	}
 );
 
@@ -198,6 +227,7 @@ export const delete_homebrew_secondary_weapon = command(z.string(), async (id) =
 
 	// refresh the secondary weapons query
 	get_homebrew_secondary_weapons().refresh();
+	console.log('deleted homebrew secondary weapon from D1');
 });
 
 // ============================================================================
@@ -219,6 +249,7 @@ export const get_homebrew_armor = query(async () => {
 		const validated = ArmorSchema.parse(entry.data);
 		result[entry.id] = validated;
 	}
+	console.log('fetched homebrew armor from D1');
 	return result;
 });
 
@@ -226,6 +257,16 @@ export const create_homebrew_armor = command(ArmorSchema, async (data) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
+
+	// Check if user has reached the limit of 1 armor
+	const existing = await db
+		.select()
+		.from(homebrew_armor)
+		.where(eq(homebrew_armor.clerk_user_id, userId));
+
+	if (existing.length >= 1) {
+		throw error(403, 'Homebrew limit reached. You can only have 1 custom armor.');
+	}
 
 	const validatedData = ArmorSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
@@ -242,6 +283,7 @@ export const create_homebrew_armor = command(ArmorSchema, async (data) => {
 	// refresh the armor query
 	get_homebrew_armor().refresh();
 
+	console.log('created homebrew armor in D1');
 	return id;
 });
 
@@ -263,6 +305,8 @@ export const update_homebrew_armor = command(
 			.update(homebrew_armor)
 			.set({ data: validatedData, updated_at: now })
 			.where(and(eq(homebrew_armor.id, id), eq(homebrew_armor.clerk_user_id, userId)));
+
+		console.log('updated homebrew armor in D1');
 	}
 );
 
@@ -281,6 +325,7 @@ export const delete_homebrew_armor = command(z.string(), async (id) => {
 
 	// refresh the armor query
 	get_homebrew_armor().refresh();
+	console.log('deleted homebrew armor from D1');
 });
 
 // ============================================================================
@@ -302,6 +347,7 @@ export const get_homebrew_loot = query(async () => {
 		const validated = LootSchema.parse(entry.data);
 		result[entry.id] = validated;
 	}
+	console.log('fetched homebrew loot from D1');
 	return result;
 });
 
@@ -309,6 +355,16 @@ export const create_homebrew_loot = command(LootSchema, async (data) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
+
+	// Check if user has reached the limit of 1 loot item
+	const existing = await db
+		.select()
+		.from(homebrew_loot)
+		.where(eq(homebrew_loot.clerk_user_id, userId));
+
+	if (existing.length >= 1) {
+		throw error(403, 'Homebrew limit reached. You can only have 1 custom loot item.');
+	}
 
 	const validatedData = LootSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
@@ -325,6 +381,7 @@ export const create_homebrew_loot = command(LootSchema, async (data) => {
 	// refresh the loot query
 	get_homebrew_loot().refresh();
 
+	console.log('created homebrew loot in D1');
 	return id;
 });
 
@@ -346,6 +403,8 @@ export const update_homebrew_loot = command(
 			.update(homebrew_loot)
 			.set({ data: validatedData, updated_at: now })
 			.where(and(eq(homebrew_loot.id, id), eq(homebrew_loot.clerk_user_id, userId)));
+
+		console.log('updated homebrew loot');
 	}
 );
 
@@ -364,6 +423,7 @@ export const delete_homebrew_loot = command(z.string(), async (id) => {
 
 	// refresh the loot query
 	get_homebrew_loot().refresh();
+	console.log('deleted homebrew loot');
 });
 
 // ============================================================================
@@ -385,6 +445,7 @@ export const get_homebrew_consumables = query(async () => {
 		const validated = ConsumableSchema.parse(entry.data);
 		result[entry.id] = validated;
 	}
+	console.log('fetched homebrew consumables');
 	return result;
 });
 
@@ -392,6 +453,16 @@ export const create_homebrew_consumable = command(ConsumableSchema, async (data)
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
+
+	// Check if user has reached the limit of 1 consumable
+	const existing = await db
+		.select()
+		.from(homebrew_consumables)
+		.where(eq(homebrew_consumables.clerk_user_id, userId));
+
+	if (existing.length >= 1) {
+		throw error(403, 'Homebrew limit reached. You can only have 1 custom consumable.');
+	}
 
 	const validatedData = ConsumableSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
@@ -408,6 +479,7 @@ export const create_homebrew_consumable = command(ConsumableSchema, async (data)
 	// refresh the consumables query
 	get_homebrew_consumables().refresh();
 
+	console.log('created homebrew consumable');
 	return id;
 });
 
@@ -431,6 +503,8 @@ export const update_homebrew_consumable = command(
 			.where(
 				and(eq(homebrew_consumables.id, id), eq(homebrew_consumables.clerk_user_id, userId))
 			);
+
+		console.log('updated homebrew consumable');
 	}
 );
 
@@ -451,4 +525,5 @@ export const delete_homebrew_consumable = command(z.string(), async (id) => {
 
 	// refresh the consumables query
 	get_homebrew_consumables().refresh();
+	console.log('deleted homebrew consumable');
 });

@@ -3,9 +3,6 @@ import { createInsertSchema, createSelectSchema, createUpdateSchema } from 'driz
 
 export const users_table = sqliteTable('users_table', {
 	clerk_id: text('clerk_id').primaryKey().notNull(),
-	character_slot_1: text('character_slot_1'),
-	character_slot_2: text('character_slot_2'),
-	character_slot_3: text('character_slot_3'),
 	dismissed_popups: text('dismissed_popups', { mode: 'json' })
 		.notNull()
 		.default('[]')

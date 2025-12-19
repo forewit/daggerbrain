@@ -24,5 +24,6 @@ export const get_all_sources = query(async () => {
 		{} as Record<string, Source>
 	);
 
+	console.log('fetched sources from KV');
 	return validatedSources;
 });

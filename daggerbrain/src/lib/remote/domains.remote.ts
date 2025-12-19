@@ -29,6 +29,7 @@ export const get_all_domains = query(async () => {
 		{} as Record<string, Domain>
 	);
 
+	console.log('fetched domains from KV');
 	return validatedDomains;
 });
 
@@ -38,6 +39,7 @@ export const get_domain = query(z.string(), async (domainId) => {
 	if (!domain) {
 		throw error(404, 'Domain not found');
 	}
+	console.log('fetched domain from KV');
 	return domain;
 });
 
@@ -62,6 +64,7 @@ export const get_domain_cards = query(DomainIdsSchema, async (domainId) => {
 		{} as Record<string, DomainCard>
 	);
 
+	console.log(`fetched ${domainId} domain cards from KV`);
 	return validatedCards;
 });
 
@@ -72,6 +75,7 @@ export const get_domain_card = query(
 		if (!cards || !cards[cardId]) {
 			throw error(404, 'Domain card not found');
 		}
+		console.log('fetched domain card from KV');
 		return cards[cardId];
 	}
 );

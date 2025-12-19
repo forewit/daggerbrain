@@ -27,6 +27,7 @@ export const get_homebrew_domains = query(async () => {
 		const validated = DomainSchema.parse(entry.data);
 		result[entry.id] = validated;
 	}
+	console.log('fetched homebrew domains from D1');
 	return result;
 });
 
@@ -34,6 +35,16 @@ export const create_homebrew_domain = command(DomainSchema, async (data) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
+
+	// Check if user has reached the limit of 1 domain
+	const existing = await db
+		.select()
+		.from(homebrew_domains)
+		.where(eq(homebrew_domains.clerk_user_id, userId));
+
+	if (existing.length >= 1) {
+		throw error(403, 'Homebrew limit reached. You can only have 1 custom domain.');
+	}
 
 	const validatedData = DomainSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
@@ -50,6 +61,7 @@ export const create_homebrew_domain = command(DomainSchema, async (data) => {
 	// refresh the domains query
 	get_homebrew_domains().refresh();
 
+	console.log('created homebrew domain in D1');
 	return id;
 });
 
@@ -71,6 +83,8 @@ export const update_homebrew_domain = command(
 			.update(homebrew_domains)
 			.set({ data: validatedData, updated_at: now })
 			.where(and(eq(homebrew_domains.id, id), eq(homebrew_domains.clerk_user_id, userId)));
+
+		console.log('updated homebrew domain in D1');
 	}
 );
 
@@ -89,6 +103,7 @@ export const delete_homebrew_domain = command(z.string(), async (id) => {
 
 	// refresh the domains query
 	get_homebrew_domains().refresh();
+	console.log('deleted homebrew domain from D1');
 });
 
 // ============================================================================
@@ -122,6 +137,7 @@ export const get_homebrew_domain_cards = query(async () => {
 		const domainId = validated.domain_id;
 		result[domainId][entry.id] = validated;
 	}
+	console.log('fetched homebrew domain cards from D1');
 	return result;
 });
 
@@ -129,6 +145,16 @@ export const create_homebrew_domain_card = command(DomainCardSchema, async (data
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
+
+	// Check if user has reached the limit of 1 domain card
+	const existing = await db
+		.select()
+		.from(homebrew_domain_cards)
+		.where(eq(homebrew_domain_cards.clerk_user_id, userId));
+
+	if (existing.length >= 1) {
+		throw error(403, 'Homebrew limit reached. You can only have 1 custom domain card.');
+	}
 
 	const validatedData = DomainCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
@@ -145,6 +171,7 @@ export const create_homebrew_domain_card = command(DomainCardSchema, async (data
 	// refresh the domain cards query
 	get_homebrew_domain_cards().refresh();
 
+	console.log('created homebrew domain card in D1');
 	return id;
 });
 
@@ -168,6 +195,8 @@ export const update_homebrew_domain_card = command(
 			.where(
 				and(eq(homebrew_domain_cards.id, id), eq(homebrew_domain_cards.clerk_user_id, userId))
 			);
+
+		console.log('updated homebrew domain card in D1');
 	}
 );
 
@@ -195,4 +224,5 @@ export const delete_homebrew_domain_card = command(z.string(), async (id) => {
 
 	// refresh the domain cards query
 	get_homebrew_domain_cards().refresh();
+	console.log('deleted homebrew domain card from D1');
 });

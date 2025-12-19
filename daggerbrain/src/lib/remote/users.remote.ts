@@ -1,12 +1,14 @@
 import { query, command, getRequestEvent } from '$app/server';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
-import { users_table } from '../server/db/users.schema';
+import {
+	users_table,
+	users_table_schema,
+	users_table_update_schema
+} from '../server/db/users.schema';
 import { get_db, get_auth } from './utils';
 
-const dismissed_popups_schema = z.array(z.string());
-
-export const get_user_preferences = query(async () => {
+export const get_user = query(async () => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -18,24 +20,17 @@ export const get_user_preferences = query(async () => {
 		.limit(1);
 
 	if (!user) {
-		return {
+		// Return default user shape
+		console.log('fetched user from D1');
+		return users_table_schema.parse({
+			clerk_id: userId,
 			dismissed_popups: []
-		};
+		});
 	}
 
-	// Validate dismissed_popups with Zod (Drizzle already parsed it from JSON)
-	let dismissed_popups: string[] = [];
-	if (user.dismissed_popups) {
-		try {
-			dismissed_popups = dismissed_popups_schema.parse(user.dismissed_popups);
-		} catch {
-			dismissed_popups = [];
-		}
-	}
-
-	return {
-		dismissed_popups
-	};
+	// Validate with schema
+	console.log('fetched user from D1');
+	return users_table_schema.parse(user);
 });
 
 export const dismiss_popup = command(z.string(), async (popupId) => {
@@ -50,15 +45,8 @@ export const dismiss_popup = command(z.string(), async (popupId) => {
 		.where(eq(users_table.clerk_id, userId))
 		.limit(1);
 
-	// Parse existing dismissed_popups or start with empty array (Drizzle already parsed it from JSON)
-	let dismissed_popups: string[] = [];
-	if (existingUser?.dismissed_popups) {
-		try {
-			dismissed_popups = dismissed_popups_schema.parse(existingUser.dismissed_popups);
-		} catch {
-			dismissed_popups = [];
-		}
-	}
+	// Use existing dismissed_popups or start with empty array
+	const dismissed_popups = [...(existingUser?.dismissed_popups ?? [])];
 
 	// Add popup ID if not already present
 	if (!dismissed_popups.includes(popupId)) {
@@ -66,23 +54,47 @@ export const dismiss_popup = command(z.string(), async (popupId) => {
 	}
 
 	if (existingUser) {
-		// Update existing user (Drizzle will stringify the array to JSON)
 		await db
 			.update(users_table)
-			.set({
-				dismissed_popups
-			})
+			.set({ dismissed_popups })
 			.where(eq(users_table.clerk_id, userId));
 	} else {
-		// Create new user record (Drizzle will stringify the array to JSON)
 		await db.insert(users_table).values({
 			clerk_id: userId,
 			dismissed_popups
 		});
 	}
 
-	// Refresh the user preferences query
-	get_user_preferences().refresh();
+	get_user().refresh();
+	console.log('dismissed popup in D1');
+	return { success: true };
+});
 
+export const update_user = command(users_table_update_schema, async (updates) => {
+	const event = getRequestEvent();
+	const { userId } = get_auth(event);
+	const db = get_db(event);
+
+	// Get or create user record
+	const [existingUser] = await db
+		.select()
+		.from(users_table)
+		.where(eq(users_table.clerk_id, userId))
+		.limit(1);
+
+	if (existingUser) {
+		await db
+			.update(users_table)
+			.set(updates)
+			.where(eq(users_table.clerk_id, userId));
+	} else {
+		await db.insert(users_table).values({
+			clerk_id: userId,
+			...updates
+		});
+	}
+
+	get_user().refresh();
+	console.log('updated user in D1');
 	return { success: true };
 });

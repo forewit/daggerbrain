@@ -50,5 +50,6 @@ export const upload_user_image = command(imageDataSchema, async ({ data, name, t
 	// Generate the URL for the image
 	const url = new URL(`/api/usercontent/images/${imageKey}`, event.url.origin);
 
+	console.log('uploaded user image to R2');
 	return url.toString();
 });

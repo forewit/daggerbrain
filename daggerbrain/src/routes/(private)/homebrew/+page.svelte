@@ -14,6 +14,7 @@
 	import Footer from '$lib/components/app/footer.svelte';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import Plus from '@lucide/svelte/icons/plus';
+	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import Label from '$lib/components/ui/label/label.svelte';
 
 	const homebrew = getHomebrewContext();
@@ -259,12 +260,35 @@
 	});
 
 	// Count items by type for display
-	let weaponCount = $derived(
-		Object.keys(homebrew.primary_weapons).length + Object.keys(homebrew.secondary_weapons).length
-	);
+	let primaryWeaponCount = $derived(Object.keys(homebrew.primary_weapons).length);
+	let secondaryWeaponCount = $derived(Object.keys(homebrew.secondary_weapons).length);
+	let weaponCount = $derived(primaryWeaponCount + secondaryWeaponCount);
 	let armorCount = $derived(Object.keys(homebrew.armor).length);
 	let beastformCount = $derived(Object.keys(homebrew.beastforms).length);
 	let totalCount = $derived(weaponCount + armorCount + beastformCount);
+
+	// Check if at limit for each type (limit of 1 per type)
+	let isWeaponAtLimit = $derived(primaryWeaponCount >= 1);
+	let isArmorAtLimit = $derived(armorCount >= 1);
+	let isBeastformAtLimit = $derived(beastformCount >= 1);
+
+	// Check if the selected type in the create dialog is at limit
+	let isSelectedTypeAtLimit = $derived.by(() => {
+		if (!newItemType) return false;
+		switch (newItemType) {
+			case 'weapon':
+				return isWeaponAtLimit;
+			case 'armor':
+				return isArmorAtLimit;
+			case 'beastform':
+				return isBeastformAtLimit;
+			default:
+				return false;
+		}
+	});
+
+	// Check if all types are at limit
+	let allTypesAtLimit = $derived(isWeaponAtLimit && isArmorAtLimit && isBeastformAtLimit);
 
 	// Handle delete
 	function openDeleteDialog(
@@ -329,15 +353,34 @@
 		}
 	}
 
+	// Get item href helper
+	function getItemHref(entry: FilteredItem): string {
+		switch (entry.type) {
+			case 'primary_weapon':
+			case 'secondary_weapon':
+				return `/homebrew/weapons/${entry.id}`;
+			case 'armor':
+				return `/homebrew/armor/${entry.id}`;
+			case 'beastform':
+				return `/homebrew/beastforms/${entry.id}`;
+		}
+	}
+
 </script>
 
 <div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
-	<div
-		class={cn(
-			'relative z-10 flex h-full w-full flex-col items-center justify-start',
-			'pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]'
-		)}
-	>
+	{#if homebrew.loading}
+		<!-- Keep the page height so the footer doesn't jump while loading -->
+		<div class="absolute inset-0 flex items-center justify-center">
+			<LoaderCircle class="h-8 w-8 animate-spin text-muted-foreground" />
+		</div>
+	{:else}
+		<div
+			class={cn(
+				'relative z-10 flex h-full w-full flex-col items-center justify-start',
+				'pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]'
+			)}
+		>
 		<div class="w-full max-w-6xl space-y-4 px-4 py-4">
 			<!-- Header -->
 			<div class="flex items-center justify-between gap-2">
@@ -351,7 +394,7 @@
 				</p>
 
 				<div class="flex gap-2">
-					<Button variant="outline" onclick={() => (showCreateDialog = true)}>
+					<Button variant="outline" onclick={() => (showCreateDialog = true)} disabled={allTypesAtLimit}>
 						<Plus /> New Homebrew
 					</Button>
 				</div>
@@ -546,7 +589,7 @@
 						<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
 							<!-- Card Header -->
 							<a
-								href={`/homebrew/${entry.id}`}
+								href={getItemHref(entry)}
 								class="flex gap-2 border bg-primary-muted p-3 hover:bg-primary-muted/80"
 							>
 								<div class="flex size-12 shrink-0 items-center justify-center rounded-lg border-2 bg-card">
@@ -574,7 +617,7 @@
 									variant="ghost"
 									size="sm"
 									class="hover:text-text grow rounded-none border"
-									href={`/homebrew/${entry.id}`}
+									href={getItemHref(entry)}
 								>
 									Edit
 								</Button>
@@ -593,6 +636,7 @@
 			{/if}
 		</div>
 	</div>
+	{/if}
 </div>
 
 <Footer />
@@ -657,26 +701,26 @@
 							<span class="text-muted-foreground">Select a type...</span>
 						{/if}
 					</Select.Trigger>
-					<Select.Content>
-						<Select.Item value="weapon">
-							<div class="flex items-center gap-2">
-								<Swords class="size-4" />
-								Weapon
-							</div>
-						</Select.Item>
-						<Select.Item value="armor">
-							<div class="flex items-center gap-2">
-								<Shield class="size-4" />
-								Armor
-							</div>
-						</Select.Item>
-						<Select.Item value="beastform">
-							<div class="flex items-center gap-2">
-								<PawPrint class="size-4" />
-								Beastform
-							</div>
-						</Select.Item>
-					</Select.Content>
+				<Select.Content>
+					<Select.Item value="weapon" disabled={isWeaponAtLimit}>
+						<div class="flex items-center gap-2">
+							<Swords class="size-4" />
+							Weapon {isWeaponAtLimit ? '(1/1)' : '(0/1)'}
+						</div>
+					</Select.Item>
+					<Select.Item value="armor" disabled={isArmorAtLimit}>
+						<div class="flex items-center gap-2">
+							<Shield class="size-4" />
+							Armor {isArmorAtLimit ? '(1/1)' : '(0/1)'}
+						</div>
+					</Select.Item>
+					<Select.Item value="beastform" disabled={isBeastformAtLimit}>
+						<div class="flex items-center gap-2">
+							<PawPrint class="size-4" />
+							Beastform {isBeastformAtLimit ? '(1/1)' : '(0/1)'}
+						</div>
+					</Select.Item>
+				</Select.Content>
 				</Select.Root>
 			</div>
 
@@ -701,7 +745,7 @@
 			</Dialog.Close>
 			<Button
 				onclick={handleCreateHomebrew}
-				disabled={!newItemName.trim() || !newItemType || isCreating}
+				disabled={!newItemName.trim() || !newItemType || isCreating || isSelectedTypeAtLimit}
 			>
 				{isCreating ? 'Creating...' : 'Create'}
 			</Button>

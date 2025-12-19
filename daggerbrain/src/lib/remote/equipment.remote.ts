@@ -31,6 +31,7 @@ export const get_all_primary_weapons = query(async () => {
 		{} as Record<string, Weapon>
 	);
 
+	console.log('fetched primary weapons from KV');
 	return validatedWeapons;
 });
 
@@ -40,6 +41,7 @@ export const get_primary_weapon = query(z.string(), async (weaponId) => {
 	if (!weapon) {
 		throw error(404, 'Primary weapon not found');
 	}
+	console.log('fetched primary weapon from KV');
 	return weapon;
 });
 
@@ -64,6 +66,7 @@ export const get_all_secondary_weapons = query(async () => {
 		{} as Record<string, Weapon>
 	);
 
+	console.log('fetched secondary weapons from KV');
 	return validatedWeapons;
 });
 
@@ -73,6 +76,7 @@ export const get_secondary_weapon = query(z.string(), async (weaponId) => {
 	if (!weapon) {
 		throw error(404, 'Secondary weapon not found');
 	}
+	console.log('fetched secondary weapon from KV');
 	return weapon;
 });
 
@@ -97,6 +101,7 @@ export const get_all_armor = query(async () => {
 		{} as Record<string, Armor>
 	);
 
+	console.log('fetched armor from KV');
 	return validatedArmor;
 });
 
@@ -106,6 +111,7 @@ export const get_armor = query(z.string(), async (armorId) => {
 	if (!armorItem) {
 		throw error(404, 'Armor not found');
 	}
+	console.log('fetched armor from KV');
 	return armorItem;
 });
 
@@ -133,6 +139,7 @@ export const get_all_consumables = query(async () => {
 		{} as Record<string, Consumable>
 	);
 
+	console.log('fetched consumables from KV');
 	return validatedConsumables;
 });
 
@@ -142,6 +149,7 @@ export const get_consumable = query(z.string(), async (consumableId) => {
 	if (!consumable) {
 		throw error(404, 'Consumable not found');
 	}
+	console.log('fetched consumable from KV');
 	return consumable;
 });
 
@@ -166,6 +174,7 @@ export const get_all_loot = query(async () => {
 		{} as Record<string, Loot>
 	);
 
+	console.log('fetched loot from KV');
 	return validatedLoot;
 });
 
@@ -175,5 +184,6 @@ export const get_loot = query(z.string(), async (lootId) => {
 	if (!lootItem) {
 		throw error(404, 'Loot not found');
 	}
+	console.log('fetched loot from KV');
 	return lootItem;
 });

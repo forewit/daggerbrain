@@ -27,6 +27,7 @@ export const get_homebrew_beastforms = query(async () => {
 		const validated = BeastformSchema.parse(entry.data);
 		result[entry.id] = validated;
 	}
+	console.log('fetched homebrew beastforms from D1');
 	return result;
 });
 
@@ -34,6 +35,16 @@ export const create_homebrew_beastform = command(BeastformSchema, async (data) =
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
+
+	// Check if user has reached the limit of 1 beastform
+	const existing = await db
+		.select()
+		.from(homebrew_beastforms)
+		.where(eq(homebrew_beastforms.clerk_user_id, userId));
+
+	if (existing.length >= 1) {
+		throw error(403, 'Homebrew limit reached. You can only have 1 custom beastform.');
+	}
 
 	const validatedData = BeastformSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
@@ -50,6 +61,7 @@ export const create_homebrew_beastform = command(BeastformSchema, async (data) =
 	// refresh the beastforms query
 	get_homebrew_beastforms().refresh();
 
+	console.log('created homebrew beastform in D1');
 	return id;
 });
 
@@ -71,6 +83,8 @@ export const update_homebrew_beastform = command(
 			.update(homebrew_beastforms)
 			.set({ data: validatedData, updated_at: now })
 			.where(and(eq(homebrew_beastforms.id, id), eq(homebrew_beastforms.clerk_user_id, userId)));
+
+		console.log('updated homebrew beastform in D1');
 	}
 );
 
@@ -89,4 +103,5 @@ export const delete_homebrew_beastform = command(z.string(), async (id) => {
 
 	// refresh the beastforms query
 	get_homebrew_beastforms().refresh();
+	console.log('deleted homebrew beastform from D1');
 });

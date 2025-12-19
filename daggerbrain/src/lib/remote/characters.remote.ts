@@ -16,6 +16,7 @@ export const get_all_characters = query(async () => {
 		.where(eq(characters_table.clerk_user_id, userId))
 		.limit(3);
 
+	console.log('fetched characters from D1');
 	return characters;
 });
 
@@ -42,6 +43,7 @@ export const delete_character = command(z.string(), async (characterId) => {
 
 	// Refresh the characters list
 	get_all_characters().refresh();
+	console.log('deleted character from D1');
 });
 
 export const create_character = command(async () => {
@@ -70,6 +72,7 @@ export const create_character = command(async () => {
 	// Refresh the characters list
 	get_all_characters().refresh();
 
+	console.log('created character in D1');
 	return characterId;
 });
 
@@ -88,5 +91,6 @@ export const update_character = command(characters_table_update_schema, async (c
 		.set(character)
 		.where(and(eq(characters_table.id, character.id), eq(characters_table.clerk_user_id, userId)));
 
+	console.log('updated character in D1');
 	return character.id;
 });

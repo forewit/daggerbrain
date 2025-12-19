@@ -27,6 +27,7 @@ export const get_homebrew_classes = query(async () => {
 		const validated = ClassSchema.parse(entry.data);
 		result[entry.id] = validated;
 	}
+	console.log('fetched homebrew classes from D1');
 	return result;
 });
 
@@ -34,6 +35,16 @@ export const create_homebrew_class = command(ClassSchema, async (data) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
+
+	// Check if user has reached the limit of 1 class
+	const existing = await db
+		.select()
+		.from(homebrew_classes)
+		.where(eq(homebrew_classes.clerk_user_id, userId));
+
+	if (existing.length >= 1) {
+		throw error(403, 'Homebrew limit reached. You can only have 1 custom class.');
+	}
 
 	// Ensure source_id is Homebrew and validate
 	const validatedData = ClassSchema.parse({ ...data, source_id: 'Homebrew' as const });
@@ -51,6 +62,7 @@ export const create_homebrew_class = command(ClassSchema, async (data) => {
 	// refresh the classes query
 	get_homebrew_classes().refresh();
 
+	console.log('created homebrew class in D1');
 	return id;
 });
 
@@ -72,6 +84,8 @@ export const update_homebrew_class = command(
 			.update(homebrew_classes)
 			.set({ data: validatedData, updated_at: now })
 			.where(and(eq(homebrew_classes.id, id), eq(homebrew_classes.clerk_user_id, userId)));
+
+		console.log('updated homebrew class in D1');
 	}
 );
 
@@ -90,6 +104,7 @@ export const delete_homebrew_class = command(z.string(), async (id) => {
 
 	// refresh the classes query
 	get_homebrew_classes().refresh();
+	console.log('deleted homebrew class from D1');
 });
 
 // ============================================================================
@@ -111,6 +126,7 @@ export const get_homebrew_subclasses = query(async () => {
 		const validated = SubclassSchema.parse(entry.data);
 		result[entry.id] = validated;
 	}
+	console.log('fetched homebrew subclasses from D1');
 	return result;
 });
 
@@ -118,6 +134,16 @@ export const create_homebrew_subclass = command(SubclassSchema, async (data) => 
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
+
+	// Check if user has reached the limit of 1 subclass
+	const existing = await db
+		.select()
+		.from(homebrew_subclasses)
+		.where(eq(homebrew_subclasses.clerk_user_id, userId));
+
+	if (existing.length >= 1) {
+		throw error(403, 'Homebrew limit reached. You can only have 1 custom subclass.');
+	}
 
 	const validatedData = SubclassSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
@@ -134,6 +160,7 @@ export const create_homebrew_subclass = command(SubclassSchema, async (data) => 
 	// refresh the subclasses query
 	get_homebrew_subclasses().refresh();
 
+	console.log('created homebrew subclass in D1');
 	return id;
 });
 
@@ -157,6 +184,8 @@ export const update_homebrew_subclass = command(
 			.where(
 				and(eq(homebrew_subclasses.id, id), eq(homebrew_subclasses.clerk_user_id, userId))
 			);
+
+		console.log('updated homebrew subclass in D1');
 	}
 );
 
@@ -175,4 +204,5 @@ export const delete_homebrew_subclass = command(z.string(), async (id) => {
 
 	// refresh the subclasses query
 	get_homebrew_subclasses().refresh();
+	console.log('deleted homebrew subclass from D1');
 });

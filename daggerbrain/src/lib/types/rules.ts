@@ -96,7 +96,6 @@ export const BASE_UNARMED_ATTACK: Weapon & { id: string } = {
 	type: 'Physical',
 	description_html: '',
 	category: 'Unarmed',
-	type: 'Physical',
 	level_requirement: 1,
 	available_traits: ['strength'],
 	range: 'Melee',
