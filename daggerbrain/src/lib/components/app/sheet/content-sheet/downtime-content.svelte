@@ -126,10 +126,10 @@
 						: 'cursor-not-allowed opacity-50'
 				)}
 			>
-				<Checkbox
+				<!-- <Checkbox
 					bind:checked={shortRestTendToWounds}
 					disabled={shortRestMaxReached && !shortRestTendToWounds}
-				/>
+				/> -->
 				<p>
 					<span class="font-semibold">Tend to Wounds:</span>
 					Clear 1d4+{tier} HP
@@ -145,10 +145,10 @@
 						: 'cursor-not-allowed opacity-50'
 				)}
 			>
-				<Checkbox
+				<!-- <Checkbox
 					bind:checked={shortRestClearStress}
 					disabled={shortRestMaxReached && !shortRestClearStress}
-				/>
+				/> -->
 				<p>
 					<span class="font-semibold">Clear Stress:</span>
 					Clear 1d4+{tier} Stress
@@ -164,10 +164,10 @@
 						: 'cursor-not-allowed opacity-50'
 				)}
 			>
-				<Checkbox
+				<!-- <Checkbox
 					bind:checked={shortRestRepairArmor}
 					disabled={shortRestMaxReached && !shortRestRepairArmor}
-				/>
+				/> -->
 				<p>
 					<span class="font-semibold">Repair Armor:</span>
 					Clear 1d4+{tier} Armor Slots
@@ -183,10 +183,10 @@
 						: 'cursor-not-allowed opacity-50'
 				)}
 			>
-				<Checkbox
+				<!-- <Checkbox
 					bind:checked={shortRestPrepare}
 					disabled={shortRestMaxReached && !shortRestPrepare}
-				/>
+				/> -->
 				<p>
 					<span class="font-semibold">Prepare:</span>
 					Gain 1 Hope (2 if with party)
@@ -226,10 +226,10 @@
 						: 'cursor-not-allowed opacity-50'
 				)}
 			>
-				<Checkbox
+				<!-- <Checkbox
 					bind:checked={longRestTendToAllWounds}
 					disabled={longRestMaxReached && !longRestTendToAllWounds}
-				/>
+				/> -->
 				<p>
 					<span class="font-semibold">Tend to All Wounds:</span>
 					Clear all HP
@@ -245,10 +245,10 @@
 						: 'cursor-not-allowed opacity-50'
 				)}
 			>
-				<Checkbox
+				<!-- <Checkbox
 					bind:checked={longRestClearAllStress}
 					disabled={longRestMaxReached && !longRestClearAllStress}
-				/>
+				/> -->
 				<p>
 					<span class="font-semibold">Clear All Stress:</span>
 					Clear all Stress
@@ -264,10 +264,10 @@
 						: 'cursor-not-allowed opacity-50'
 				)}
 			>
-				<Checkbox
+				<!-- <Checkbox
 					bind:checked={longRestRepairAllArmor}
 					disabled={longRestMaxReached && !longRestRepairAllArmor}
-				/>
+				/> -->
 				<p>
 					<span class="font-semibold">Repair All Armor:</span>
 					Clear all Armor Slots
@@ -283,10 +283,10 @@
 						: 'cursor-not-allowed opacity-50'
 				)}
 			>
-				<Checkbox
+				<!-- <Checkbox
 					bind:checked={longRestPrepare}
 					disabled={longRestMaxReached && !longRestPrepare}
-				/>
+				/> -->
 
 				<p>
 					<span class="font-semibold">Prepare:</span>
@@ -303,10 +303,10 @@
 						: 'cursor-not-allowed opacity-50'
 				)}
 			>
-				<Checkbox
+				<!-- <Checkbox
 					bind:checked={longRestWorkOnProject}
 					disabled={longRestMaxReached && !longRestWorkOnProject}
-				/>
+				/> -->
 				<p>
 					<span class="font-semibold">Work on a Project:</span>
 					Advance a long-term project

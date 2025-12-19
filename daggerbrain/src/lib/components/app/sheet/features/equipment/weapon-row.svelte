@@ -23,12 +23,17 @@
 	let traits = $derived(context.traits);
 	let proficiency = $derived(context.proficiency);
 
-	// Look up the weapon from inventory
+	// Look up the weapon from inventory or derived weapons (for equipped weapons with modifiers)
 	let weapon = $derived.by(() => {
+		// Check derived weapons first (for equipped weapons with modifiers applied)
+		if (context.derived_primary_weapon?.id === id) return context.derived_primary_weapon;
+		if (context.derived_secondary_weapon?.id === id) return context.derived_secondary_weapon;
+		if (context.derived_unarmed_attack?.id === id) return context.derived_unarmed_attack;
+		// Fall back to inventory weapons (for unequipped weapons)
 		return (
 			context.inventory_primary_weapons.find((w) => w.id === id) ||
 			context.inventory_secondary_weapons.find((w) => w.id === id) ||
-			(context.derived_unarmed_attack?.id === id ? context.derived_unarmed_attack : null)
+			null
 		);
 	});
 
