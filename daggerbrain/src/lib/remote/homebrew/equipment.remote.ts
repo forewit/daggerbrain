@@ -2,7 +2,7 @@ import { query, command, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
-import { get_db, get_auth, get_kv } from '../utils';
+import { get_db, get_auth } from '../utils';
 import { WeaponSchema, ArmorSchema, LootSchema, ConsumableSchema } from '$lib/compendium/compendium-schemas';
 import type { Weapon, Armor, Loot, Consumable } from '$lib/types/compendium-types';
 import {
@@ -12,7 +12,7 @@ import {
 	homebrew_loot,
 	homebrew_consumables
 } from '$lib/server/db/homebrew.schema';
-import { getOrRefreshCache, updateCache, verifyOwnership, invalidateCache } from './utils';
+import { verifyOwnership } from './utils';
 
 // ============================================================================
 // Primary Weapons
@@ -22,28 +22,24 @@ export const get_homebrew_primary_weapons = query(async () => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
-	return getOrRefreshCache<Record<string, Weapon>>(kv, userId, 'primary-weapons', async () => {
-		const entries = await db
-			.select()
-			.from(homebrew_primary_weapons)
-			.where(eq(homebrew_primary_weapons.clerk_user_id, userId));
+	const entries = await db
+		.select()
+		.from(homebrew_primary_weapons)
+		.where(eq(homebrew_primary_weapons.clerk_user_id, userId));
 
-		const result: Record<string, Weapon> = {};
-		for (const entry of entries) {
-			const validated = WeaponSchema.parse(entry.data);
-			result[entry.id] = validated;
-		}
-		return result;
-	});
+	const result: Record<string, Weapon> = {};
+	for (const entry of entries) {
+		const validated = WeaponSchema.parse(entry.data);
+		result[entry.id] = validated;
+	}
+	return result;
 });
 
 export const create_homebrew_primary_weapon = command(WeaponSchema, async (data) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
 	const validatedData = WeaponSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
@@ -57,8 +53,8 @@ export const create_homebrew_primary_weapon = command(WeaponSchema, async (data)
 		updated_at: now
 	});
 
-	// Invalidate cache - it will be refreshed on next read
-	await invalidateCache(kv, userId, 'primary-weapons');
+	// refresh the primary weapons query
+	get_homebrew_primary_weapons().refresh();
 
 	return id;
 });
@@ -69,7 +65,6 @@ export const update_homebrew_primary_weapon = command(
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
 		if (!(await verifyOwnership(db, homebrew_primary_weapons, id, userId))) {
 			throw error(403, 'Not authorized to update this weapon');
@@ -87,9 +82,6 @@ export const update_homebrew_primary_weapon = command(
 					eq(homebrew_primary_weapons.clerk_user_id, userId)
 				)
 			);
-
-		// Invalidate cache - it will be refreshed on next read
-		await invalidateCache(kv, userId, 'primary-weapons');
 	}
 );
 
@@ -97,7 +89,6 @@ export const delete_homebrew_primary_weapon = command(z.string(), async (id) => 
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
 	if (!(await verifyOwnership(db, homebrew_primary_weapons, id, userId))) {
 		throw error(403, 'Not authorized to delete this weapon');
@@ -112,8 +103,8 @@ export const delete_homebrew_primary_weapon = command(z.string(), async (id) => 
 			)
 		);
 
-	// Invalidate cache - it will be refreshed on next read
-	await invalidateCache(kv, userId, 'primary-weapons');
+	// refresh the primary weapons query
+	get_homebrew_primary_weapons().refresh();
 });
 
 // ============================================================================
@@ -124,28 +115,24 @@ export const get_homebrew_secondary_weapons = query(async () => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
-	return getOrRefreshCache<Record<string, Weapon>>(kv, userId, 'secondary-weapons', async () => {
-		const entries = await db
-			.select()
-			.from(homebrew_secondary_weapons)
-			.where(eq(homebrew_secondary_weapons.clerk_user_id, userId));
+	const entries = await db
+		.select()
+		.from(homebrew_secondary_weapons)
+		.where(eq(homebrew_secondary_weapons.clerk_user_id, userId));
 
-		const result: Record<string, Weapon> = {};
-		for (const entry of entries) {
-			const validated = WeaponSchema.parse(entry.data);
-			result[entry.id] = validated;
-		}
-		return result;
-	});
+	const result: Record<string, Weapon> = {};
+	for (const entry of entries) {
+		const validated = WeaponSchema.parse(entry.data);
+		result[entry.id] = validated;
+	}
+	return result;
 });
 
 export const create_homebrew_secondary_weapon = command(WeaponSchema, async (data) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
 	const validatedData = WeaponSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
@@ -159,8 +146,8 @@ export const create_homebrew_secondary_weapon = command(WeaponSchema, async (dat
 		updated_at: now
 	});
 
-	// Invalidate cache - it will be refreshed on next read
-	await invalidateCache(kv, userId, 'secondary-weapons');
+	// refresh the secondary weapons query
+	get_homebrew_secondary_weapons().refresh();
 
 	return id;
 });
@@ -171,7 +158,6 @@ export const update_homebrew_secondary_weapon = command(
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
 		if (!(await verifyOwnership(db, homebrew_secondary_weapons, id, userId))) {
 			throw error(403, 'Not authorized to update this weapon');
@@ -189,9 +175,6 @@ export const update_homebrew_secondary_weapon = command(
 					eq(homebrew_secondary_weapons.clerk_user_id, userId)
 				)
 			);
-
-		// Invalidate cache - it will be refreshed on next read
-		await invalidateCache(kv, userId, 'secondary-weapons');
 	}
 );
 
@@ -199,7 +182,6 @@ export const delete_homebrew_secondary_weapon = command(z.string(), async (id) =
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
 	if (!(await verifyOwnership(db, homebrew_secondary_weapons, id, userId))) {
 		throw error(403, 'Not authorized to delete this weapon');
@@ -214,8 +196,8 @@ export const delete_homebrew_secondary_weapon = command(z.string(), async (id) =
 			)
 		);
 
-	// Invalidate cache - it will be refreshed on next read
-	await invalidateCache(kv, userId, 'secondary-weapons');
+	// refresh the secondary weapons query
+	get_homebrew_secondary_weapons().refresh();
 });
 
 // ============================================================================
@@ -226,28 +208,24 @@ export const get_homebrew_armor = query(async () => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
-	return getOrRefreshCache<Record<string, Armor>>(kv, userId, 'armor', async () => {
-		const entries = await db
-			.select()
-			.from(homebrew_armor)
-			.where(eq(homebrew_armor.clerk_user_id, userId));
+	const entries = await db
+		.select()
+		.from(homebrew_armor)
+		.where(eq(homebrew_armor.clerk_user_id, userId));
 
-		const result: Record<string, Armor> = {};
-		for (const entry of entries) {
-			const validated = ArmorSchema.parse(entry.data);
-			result[entry.id] = validated;
-		}
-		return result;
-	});
+	const result: Record<string, Armor> = {};
+	for (const entry of entries) {
+		const validated = ArmorSchema.parse(entry.data);
+		result[entry.id] = validated;
+	}
+	return result;
 });
 
 export const create_homebrew_armor = command(ArmorSchema, async (data) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
 	const validatedData = ArmorSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
@@ -261,8 +239,8 @@ export const create_homebrew_armor = command(ArmorSchema, async (data) => {
 		updated_at: now
 	});
 
-	// Invalidate cache - it will be refreshed on next read
-	await invalidateCache(kv, userId, 'armor');
+	// refresh the armor query
+	get_homebrew_armor().refresh();
 
 	return id;
 });
@@ -273,7 +251,6 @@ export const update_homebrew_armor = command(
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
 		if (!(await verifyOwnership(db, homebrew_armor, id, userId))) {
 			throw error(403, 'Not authorized to update this armor');
@@ -286,9 +263,6 @@ export const update_homebrew_armor = command(
 			.update(homebrew_armor)
 			.set({ data: validatedData, updated_at: now })
 			.where(and(eq(homebrew_armor.id, id), eq(homebrew_armor.clerk_user_id, userId)));
-
-		// Invalidate cache - it will be refreshed on next read
-		await invalidateCache(kv, userId, 'armor');
 	}
 );
 
@@ -296,7 +270,6 @@ export const delete_homebrew_armor = command(z.string(), async (id) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
 	if (!(await verifyOwnership(db, homebrew_armor, id, userId))) {
 		throw error(403, 'Not authorized to delete this armor');
@@ -306,8 +279,8 @@ export const delete_homebrew_armor = command(z.string(), async (id) => {
 		.delete(homebrew_armor)
 		.where(and(eq(homebrew_armor.id, id), eq(homebrew_armor.clerk_user_id, userId)));
 
-	// Invalidate cache - it will be refreshed on next read
-	await invalidateCache(kv, userId, 'armor');
+	// refresh the armor query
+	get_homebrew_armor().refresh();
 });
 
 // ============================================================================
@@ -318,28 +291,24 @@ export const get_homebrew_loot = query(async () => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
-	return getOrRefreshCache<Record<string, Loot>>(kv, userId, 'loot', async () => {
-		const entries = await db
-			.select()
-			.from(homebrew_loot)
-			.where(eq(homebrew_loot.clerk_user_id, userId));
+	const entries = await db
+		.select()
+		.from(homebrew_loot)
+		.where(eq(homebrew_loot.clerk_user_id, userId));
 
-		const result: Record<string, Loot> = {};
-		for (const entry of entries) {
-			const validated = LootSchema.parse(entry.data);
-			result[entry.id] = validated;
-		}
-		return result;
-	});
+	const result: Record<string, Loot> = {};
+	for (const entry of entries) {
+		const validated = LootSchema.parse(entry.data);
+		result[entry.id] = validated;
+	}
+	return result;
 });
 
 export const create_homebrew_loot = command(LootSchema, async (data) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
 	const validatedData = LootSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
@@ -353,8 +322,8 @@ export const create_homebrew_loot = command(LootSchema, async (data) => {
 		updated_at: now
 	});
 
-	// Invalidate cache - it will be refreshed on next read
-	await invalidateCache(kv, userId, 'loot');
+	// refresh the loot query
+	get_homebrew_loot().refresh();
 
 	return id;
 });
@@ -365,7 +334,6 @@ export const update_homebrew_loot = command(
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
 		if (!(await verifyOwnership(db, homebrew_loot, id, userId))) {
 			throw error(403, 'Not authorized to update this loot');
@@ -378,9 +346,6 @@ export const update_homebrew_loot = command(
 			.update(homebrew_loot)
 			.set({ data: validatedData, updated_at: now })
 			.where(and(eq(homebrew_loot.id, id), eq(homebrew_loot.clerk_user_id, userId)));
-
-		// Invalidate cache - it will be refreshed on next read
-		await invalidateCache(kv, userId, 'loot');
 	}
 );
 
@@ -388,7 +353,6 @@ export const delete_homebrew_loot = command(z.string(), async (id) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
 	if (!(await verifyOwnership(db, homebrew_loot, id, userId))) {
 		throw error(403, 'Not authorized to delete this loot');
@@ -398,8 +362,8 @@ export const delete_homebrew_loot = command(z.string(), async (id) => {
 		.delete(homebrew_loot)
 		.where(and(eq(homebrew_loot.id, id), eq(homebrew_loot.clerk_user_id, userId)));
 
-	// Invalidate cache - it will be refreshed on next read
-	await invalidateCache(kv, userId, 'loot');
+	// refresh the loot query
+	get_homebrew_loot().refresh();
 });
 
 // ============================================================================
@@ -410,28 +374,24 @@ export const get_homebrew_consumables = query(async () => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
-	return getOrRefreshCache<Record<string, Consumable>>(kv, userId, 'consumables', async () => {
-		const entries = await db
-			.select()
-			.from(homebrew_consumables)
-			.where(eq(homebrew_consumables.clerk_user_id, userId));
+	const entries = await db
+		.select()
+		.from(homebrew_consumables)
+		.where(eq(homebrew_consumables.clerk_user_id, userId));
 
-		const result: Record<string, Consumable> = {};
-		for (const entry of entries) {
-			const validated = ConsumableSchema.parse(entry.data);
-			result[entry.id] = validated;
-		}
-		return result;
-	});
+	const result: Record<string, Consumable> = {};
+	for (const entry of entries) {
+		const validated = ConsumableSchema.parse(entry.data);
+		result[entry.id] = validated;
+	}
+	return result;
 });
 
 export const create_homebrew_consumable = command(ConsumableSchema, async (data) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
 	const validatedData = ConsumableSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
@@ -445,8 +405,8 @@ export const create_homebrew_consumable = command(ConsumableSchema, async (data)
 		updated_at: now
 	});
 
-	// Invalidate cache - it will be refreshed on next read
-	await invalidateCache(kv, userId, 'consumables');
+	// refresh the consumables query
+	get_homebrew_consumables().refresh();
 
 	return id;
 });
@@ -457,7 +417,6 @@ export const update_homebrew_consumable = command(
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
 		if (!(await verifyOwnership(db, homebrew_consumables, id, userId))) {
 			throw error(403, 'Not authorized to update this consumable');
@@ -472,9 +431,6 @@ export const update_homebrew_consumable = command(
 			.where(
 				and(eq(homebrew_consumables.id, id), eq(homebrew_consumables.clerk_user_id, userId))
 			);
-
-		// Invalidate cache - it will be refreshed on next read
-		await invalidateCache(kv, userId, 'consumables');
 	}
 );
 
@@ -482,7 +438,6 @@ export const delete_homebrew_consumable = command(z.string(), async (id) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
 	if (!(await verifyOwnership(db, homebrew_consumables, id, userId))) {
 		throw error(403, 'Not authorized to delete this consumable');
@@ -494,6 +449,6 @@ export const delete_homebrew_consumable = command(z.string(), async (id) => {
 			and(eq(homebrew_consumables.id, id), eq(homebrew_consumables.clerk_user_id, userId))
 		);
 
-	// Invalidate cache - it will be refreshed on next read
-	await invalidateCache(kv, userId, 'consumables');
+	// refresh the consumables query
+	get_homebrew_consumables().refresh();
 });

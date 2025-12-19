@@ -2,7 +2,7 @@ import { query, command, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
-import { get_db, get_auth, get_kv } from '../utils';
+import { get_db, get_auth } from '../utils';
 import {
 	AncestryCardSchema,
 	CommunityCardSchema,
@@ -14,7 +14,7 @@ import {
 	homebrew_community_cards,
 	homebrew_transformation_cards
 } from '$lib/server/db/homebrew.schema';
-import { getOrRefreshCache, updateCache, verifyOwnership, invalidateCache } from './utils';
+import { verifyOwnership } from './utils';
 
 // ============================================================================
 // Ancestry Cards
@@ -24,28 +24,24 @@ export const get_homebrew_ancestry_cards = query(async () => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
-	return getOrRefreshCache<Record<string, AncestryCard>>(kv, userId, 'ancestry-cards', async () => {
-		const entries = await db
-			.select()
-			.from(homebrew_ancestry_cards)
-			.where(eq(homebrew_ancestry_cards.clerk_user_id, userId));
+	const entries = await db
+		.select()
+		.from(homebrew_ancestry_cards)
+		.where(eq(homebrew_ancestry_cards.clerk_user_id, userId));
 
-		const result: Record<string, AncestryCard> = {};
-		for (const entry of entries) {
-			const validated = AncestryCardSchema.parse(entry.data);
-			result[entry.id] = validated;
-		}
-		return result;
-	});
+	const result: Record<string, AncestryCard> = {};
+	for (const entry of entries) {
+		const validated = AncestryCardSchema.parse(entry.data);
+		result[entry.id] = validated;
+	}
+	return result;
 });
 
 export const create_homebrew_ancestry_card = command(AncestryCardSchema, async (data) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
 	const validatedData = AncestryCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
@@ -59,8 +55,8 @@ export const create_homebrew_ancestry_card = command(AncestryCardSchema, async (
 		updated_at: now
 	});
 
-	// Invalidate cache - it will be refreshed on next read
-	await invalidateCache(kv, userId, 'ancestry-cards');
+	// refresh the ancestry cards query
+	get_homebrew_ancestry_cards().refresh();
 
 	return id;
 });
@@ -71,7 +67,6 @@ export const update_homebrew_ancestry_card = command(
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
 		if (!(await verifyOwnership(db, homebrew_ancestry_cards, id, userId))) {
 			throw error(403, 'Not authorized to update this ancestry card');
@@ -89,9 +84,6 @@ export const update_homebrew_ancestry_card = command(
 					eq(homebrew_ancestry_cards.clerk_user_id, userId)
 				)
 			);
-
-		// Invalidate cache - it will be refreshed on next read
-		await invalidateCache(kv, userId, 'ancestry-cards');
 	}
 );
 
@@ -99,7 +91,6 @@ export const delete_homebrew_ancestry_card = command(z.string(), async (id) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
 	if (!(await verifyOwnership(db, homebrew_ancestry_cards, id, userId))) {
 		throw error(403, 'Not authorized to delete this ancestry card');
@@ -114,8 +105,8 @@ export const delete_homebrew_ancestry_card = command(z.string(), async (id) => {
 			)
 		);
 
-	// Invalidate cache - it will be refreshed on next read
-	await invalidateCache(kv, userId, 'ancestry-cards');
+	// refresh the ancestry cards query
+	get_homebrew_ancestry_cards().refresh();
 });
 
 // ============================================================================
@@ -126,28 +117,24 @@ export const get_homebrew_community_cards = query(async () => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
-	return getOrRefreshCache<Record<string, CommunityCard>>(kv, userId, 'community-cards', async () => {
-		const entries = await db
-			.select()
-			.from(homebrew_community_cards)
-			.where(eq(homebrew_community_cards.clerk_user_id, userId));
+	const entries = await db
+		.select()
+		.from(homebrew_community_cards)
+		.where(eq(homebrew_community_cards.clerk_user_id, userId));
 
-		const result: Record<string, CommunityCard> = {};
-		for (const entry of entries) {
-			const validated = CommunityCardSchema.parse(entry.data);
-			result[entry.id] = validated;
-		}
-		return result;
-	});
+	const result: Record<string, CommunityCard> = {};
+	for (const entry of entries) {
+		const validated = CommunityCardSchema.parse(entry.data);
+		result[entry.id] = validated;
+	}
+	return result;
 });
 
 export const create_homebrew_community_card = command(CommunityCardSchema, async (data) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
 	const validatedData = CommunityCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
@@ -161,8 +148,8 @@ export const create_homebrew_community_card = command(CommunityCardSchema, async
 		updated_at: now
 	});
 
-	// Invalidate cache - it will be refreshed on next read
-	await invalidateCache(kv, userId, 'community-cards');
+	// refresh the community cards query
+	get_homebrew_community_cards().refresh();
 
 	return id;
 });
@@ -173,7 +160,6 @@ export const update_homebrew_community_card = command(
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
 		if (!(await verifyOwnership(db, homebrew_community_cards, id, userId))) {
 			throw error(403, 'Not authorized to update this community card');
@@ -191,9 +177,6 @@ export const update_homebrew_community_card = command(
 					eq(homebrew_community_cards.clerk_user_id, userId)
 				)
 			);
-
-		// Invalidate cache - it will be refreshed on next read
-		await invalidateCache(kv, userId, 'community-cards');
 	}
 );
 
@@ -201,7 +184,6 @@ export const delete_homebrew_community_card = command(z.string(), async (id) => 
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
 	if (!(await verifyOwnership(db, homebrew_community_cards, id, userId))) {
 		throw error(403, 'Not authorized to delete this community card');
@@ -216,8 +198,8 @@ export const delete_homebrew_community_card = command(z.string(), async (id) => 
 			)
 		);
 
-	// Invalidate cache - it will be refreshed on next read
-	await invalidateCache(kv, userId, 'community-cards');
+	// refresh the community cards query
+	get_homebrew_community_cards().refresh();
 });
 
 // ============================================================================
@@ -228,21 +210,18 @@ export const get_homebrew_transformation_cards = query(async () => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
-	return getOrRefreshCache<Record<string, TransformationCard>>(kv, userId, 'transformation-cards', async () => {
-		const entries = await db
-			.select()
-			.from(homebrew_transformation_cards)
-			.where(eq(homebrew_transformation_cards.clerk_user_id, userId));
+	const entries = await db
+		.select()
+		.from(homebrew_transformation_cards)
+		.where(eq(homebrew_transformation_cards.clerk_user_id, userId));
 
-		const result: Record<string, TransformationCard> = {};
-		for (const entry of entries) {
-			const validated = TransformationCardSchema.parse(entry.data);
-			result[entry.id] = validated;
-		}
-		return result;
-	});
+	const result: Record<string, TransformationCard> = {};
+	for (const entry of entries) {
+		const validated = TransformationCardSchema.parse(entry.data);
+		result[entry.id] = validated;
+	}
+	return result;
 });
 
 export const create_homebrew_transformation_card = command(
@@ -251,7 +230,6 @@ export const create_homebrew_transformation_card = command(
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
 		const validatedData = TransformationCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
 		const id = crypto.randomUUID();
@@ -265,8 +243,8 @@ export const create_homebrew_transformation_card = command(
 			updated_at: now
 		});
 
-		// Invalidate cache - it will be refreshed on next read
-		await invalidateCache(kv, userId, 'transformation-cards');
+		// refresh the transformation cards query
+		get_homebrew_transformation_cards().refresh();
 
 		return id;
 	}
@@ -278,7 +256,6 @@ export const update_homebrew_transformation_card = command(
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
 		if (!(await verifyOwnership(db, homebrew_transformation_cards, id, userId))) {
 			throw error(403, 'Not authorized to update this transformation card');
@@ -296,9 +273,6 @@ export const update_homebrew_transformation_card = command(
 					eq(homebrew_transformation_cards.clerk_user_id, userId)
 				)
 			);
-
-		// Invalidate cache - it will be refreshed on next read
-		await invalidateCache(kv, userId, 'transformation-cards');
 	}
 );
 
@@ -306,7 +280,6 @@ export const delete_homebrew_transformation_card = command(z.string(), async (id
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
 	if (!(await verifyOwnership(db, homebrew_transformation_cards, id, userId))) {
 		throw error(403, 'Not authorized to delete this transformation card');
@@ -321,6 +294,6 @@ export const delete_homebrew_transformation_card = command(z.string(), async (id
 			)
 		);
 
-	// Invalidate cache - it will be refreshed on next read
-	await invalidateCache(kv, userId, 'transformation-cards');
+	// refresh the transformation cards query
+	get_homebrew_transformation_cards().refresh();
 });
