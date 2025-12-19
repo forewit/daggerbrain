@@ -200,6 +200,8 @@
 					cards={context.domain_card_loadout}
 					bind:selectedIndex={selectedLoadoutIndex}
 					emptyMessage="Loadout Empty"
+					bind_token_count
+					bind_choice_select
 				/>
 				<Button
 					hidden={context.domain_card_loadout.length === 0 ||

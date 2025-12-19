@@ -1209,22 +1209,53 @@ function createCharacter(id: string) {
 	$effect(() => {
 		if (!character) return;
 
-		// Only reset if the primary class actually changed
 		const current_class_id = character.primary_class_id;
+
+		// If class hasn't changed, don't reset (preserves saved answers on page load)
 		if (current_class_id === last_primary_class_id_for_background) return;
+
+		// Track the class change
+		const classChanged = last_primary_class_id_for_background !== null;
 		last_primary_class_id_for_background = current_class_id;
 
 		if (!primary_class) {
 			character.background_question_answers = [];
 			character.connection_answers = [];
 		} else {
-			character.background_question_answers = primary_class.background_questions.map(
-				(question) => ({ question, answer: '' })
-			);
-			character.connection_answers = primary_class.connection_questions.map((question) => ({
-				question,
-				answer: ''
-			}));
+			// Only reset if class actually changed; preserve existing answers on initial load
+			if (classChanged) {
+				// Class changed: preserve answers where questions match
+				const existingAnswers = new Map(
+					character.background_question_answers.map((item) => [item.question, item.answer])
+				);
+				character.background_question_answers = primary_class.background_questions.map(
+					(question) => ({
+						question,
+						answer: existingAnswers.get(question) || ''
+					})
+				);
+
+				const existingConnections = new Map(
+					character.connection_answers.map((item) => [item.question, item.answer])
+				);
+				character.connection_answers = primary_class.connection_questions.map((question) => ({
+					question,
+					answer: existingConnections.get(question) || ''
+				}));
+			} else {
+				// Initial load: only initialize if character has no answers
+				if (character.background_question_answers.length === 0) {
+					character.background_question_answers = primary_class.background_questions.map(
+						(question) => ({ question, answer: '' })
+					);
+				}
+				if (character.connection_answers.length === 0) {
+					character.connection_answers = primary_class.connection_questions.map((question) => ({
+						question,
+						answer: ''
+					}));
+				}
+			}
 		}
 	});
 
@@ -2244,8 +2275,14 @@ function createCharacter(id: string) {
 	// ! derive weapons and apply weapon modifiers
 	$effect(() => {
 		if (!character) return;
-		let new_primary_weapon = active_primary_weapon;
-		let new_secondary_weapon = active_secondary_weapon;
+		// Create deep copies of weapons to avoid mutating the original inventory weapons
+		let new_primary_weapon = active_primary_weapon
+			? JSON.parse(JSON.stringify(active_primary_weapon))
+			: null;
+		let new_secondary_weapon = active_secondary_weapon
+			? JSON.parse(JSON.stringify(active_secondary_weapon))
+			: null;
+
 		let new_unarmed_attack = BASE_STATS.unarmed_attack;
 
 		// apply base weapon modifiers
@@ -2300,6 +2337,15 @@ function createCharacter(id: string) {
 				evaluate_character_condition(condition)
 			);
 			if (!conditions_met) continue;
+			
+			// Additional check: if modifier targets primary weapon but comes from secondary weapon features,
+			// ensure secondary weapon is actually equipped (not just in derived_secondary_weapon)
+			// This handles race conditions where derived_secondary_weapon hasn't updated yet
+			// BUT: only skip if primary weapon is NOT equipped (to avoid blocking modifiers from primary weapon itself)
+			if (modifier.target_weapon === 'primary' && new_primary_weapon === null && new_secondary_weapon === null && active_secondary_weapon === null) {
+				// Modifier targets primary but neither primary nor secondary weapon is equipped - skip it
+				continue;
+			}
 
 			const for_primary =
 				new_primary_weapon &&
@@ -2404,7 +2450,8 @@ function createCharacter(id: string) {
 		) {
 			if ((a === null || a === undefined) && (b === null || b === undefined)) return true;
 			if (a === null || a === undefined || b === null || b === undefined) return false;
-			return a.id === b.id;
+			// Use JSON.stringify to compare all properties - simpler and more reliable
+			return JSON.stringify(a) === JSON.stringify(b);
 		}
 
 		if (!equivalent_weapons(derived_primary_weapon, new_primary_weapon)) {

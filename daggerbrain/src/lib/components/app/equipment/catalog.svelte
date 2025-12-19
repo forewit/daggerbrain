@@ -19,6 +19,7 @@
 	let typeFilter = $state<'Weapons' | 'Armor' | 'Consumables' | 'Loot' | null>(null);
 	let tierFilter = $state<'1' | '2' | '3' | '4' | ''>('');
 	let weaponTypeFilter = $state<'Magical' | 'Physical' | ''>('');
+	let weaponCategoryFilter = $state<'Primary' | 'Secondary' | ''>('');
 	let customItemOpen = $state(false);
 	let customItemTitle = $state('');
 
@@ -29,6 +30,7 @@
 		}
 		if (typeFilter !== 'Weapons') {
 			weaponTypeFilter = '';
+			weaponCategoryFilter = '';
 		}
 	});
 
@@ -144,10 +146,14 @@
 		}
 
 		if (typeFilter === 'Weapons') {
-			return [
-				...filteredPrimaryWeapons.map((w) => ({ type: 'weapon' as const, item: w })),
-				...filteredSecondaryWeapons.map((w) => ({ type: 'weapon' as const, item: w }))
-			];
+			const items: Array<{ type: 'weapon'; item: Weapon }> = [];
+			if (weaponCategoryFilter === '' || weaponCategoryFilter === 'Primary') {
+				items.push(...filteredPrimaryWeapons.map((w) => ({ type: 'weapon' as const, item: w })));
+			}
+			if (weaponCategoryFilter === '' || weaponCategoryFilter === 'Secondary') {
+				items.push(...filteredSecondaryWeapons.map((w) => ({ type: 'weapon' as const, item: w })));
+			}
+			return items;
 		} else if (typeFilter === 'Armor') {
 			return filteredArmor.map((a) => ({ type: 'armor' as const, item: a }));
 		} else if (typeFilter === 'Consumables') {
@@ -156,13 +162,25 @@
 			return filteredLoot.map((l) => ({ type: 'loot' as const, item: l }));
 		} else {
 			// No type filter - combine all
-			return [
-				...filteredPrimaryWeapons.map((w) => ({ type: 'weapon' as const, item: w })),
-				...filteredSecondaryWeapons.map((w) => ({ type: 'weapon' as const, item: w })),
+			const items: Array<
+				| { type: 'weapon'; item: Weapon }
+				| { type: 'armor'; item: Armor }
+				| { type: 'consumable'; item: Consumable }
+				| { type: 'loot'; item: Loot }
+			> = [];
+			// Only apply weapon category filter when weapons are included
+			if (weaponCategoryFilter === '' || weaponCategoryFilter === 'Primary') {
+				items.push(...filteredPrimaryWeapons.map((w) => ({ type: 'weapon' as const, item: w })));
+			}
+			if (weaponCategoryFilter === '' || weaponCategoryFilter === 'Secondary') {
+				items.push(...filteredSecondaryWeapons.map((w) => ({ type: 'weapon' as const, item: w })));
+			}
+			items.push(
 				...filteredArmor.map((a) => ({ type: 'armor' as const, item: a })),
 				...filteredConsumables.map((c) => ({ type: 'consumable' as const, item: c })),
 				...filteredLoot.map((l) => ({ type: 'loot' as const, item: l }))
-			];
+			);
+			return items;
 		}
 	});
 </script>
@@ -255,6 +273,22 @@
 		<!-- Subfilters for Weapons -->
 		{#if typeFilter === 'Weapons'}
 			<div class="flex flex-wrap justify-center gap-2">
+				<!-- Category Select (Primary/Secondary) -->
+				<Select.Root
+					type="single"
+					value={weaponCategoryFilter}
+					onValueChange={(v) => (weaponCategoryFilter = v as 'Primary' | 'Secondary' | '')}
+				>
+					<Select.Trigger class="w-32">
+						{weaponCategoryFilter || 'All Categories'}
+					</Select.Trigger>
+					<Select.Content>
+						<Select.Item value="">All Categories</Select.Item>
+						<Select.Item value="Primary">Primary</Select.Item>
+						<Select.Item value="Secondary">Secondary</Select.Item>
+					</Select.Content>
+				</Select.Root>
+				
 				<!-- Tier Select -->
 				<Select.Root
 					type="single"

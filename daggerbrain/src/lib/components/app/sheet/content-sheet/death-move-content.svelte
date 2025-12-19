@@ -45,12 +45,12 @@
 					selectedDeathMove === 'blaze_of_glory' ? 'cursor-pointer' : 'cursor-pointer'
 				)}
 			>
-				<Checkbox
+				<!-- <Checkbox
 					checked={selectedDeathMove === 'blaze_of_glory'}
 					onCheckedChange={() => {
 						selectedDeathMove = selectedDeathMove === 'blaze_of_glory' ? null : 'blaze_of_glory';
 					}}
-				/>
+				/> -->
 				<p>
 					<span class="font-semibold">Blaze of Glory:</span>
 					Take one final action that automatically critically succeeds, then cross through the veil of
@@ -65,12 +65,12 @@
 					selectedDeathMove === 'avoid_death' ? 'cursor-pointer' : 'cursor-pointer'
 				)}
 			>
-				<Checkbox
+				<!-- <Checkbox
 					checked={selectedDeathMove === 'avoid_death'}
 					onCheckedChange={() => {
 						selectedDeathMove = selectedDeathMove === 'avoid_death' ? null : 'avoid_death';
 					}}
-				/>
+				/> -->
 				<p>
 					<span class="font-semibold">Avoid Death:</span>
 					Drop unconscious temporarily. Roll Hope Die; if ≤ level, gain a scar (permanently cross out
@@ -85,12 +85,12 @@
 					selectedDeathMove === 'risk_it_all' ? 'cursor-pointer' : 'cursor-pointer'
 				)}
 			>
-				<Checkbox
+				<!-- <Checkbox
 					checked={selectedDeathMove === 'risk_it_all'}
 					onCheckedChange={() => {
 						selectedDeathMove = selectedDeathMove === 'risk_it_all' ? null : 'risk_it_all';
 					}}
-				/>
+				/> -->
 				<p>
 					<span class="font-semibold">Risk It All:</span>
 					Roll Duality Dice. Hope higher: clear HP/Stress equal to Hope Die. Fear higher: death. Matching:

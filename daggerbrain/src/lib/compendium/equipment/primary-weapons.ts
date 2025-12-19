@@ -13,21 +13,13 @@ export const TIER_1_PRIMARY_WEAPONS = {
 		burden: 1,
 		available_traits: ['agility'],
 		range: 'Melee',
-		attack_roll_bonus: 0,
+		attack_roll_bonus: 1,
 		damage_bonus: 0,
 		damage_dice: '1d8',
 		available_damage_types: ['phy'],
 		features: [
 			{
-				weapon_modifiers: [
-					{
-						behaviour: 'bonus',
-						target_weapon: 'primary',
-						target_stat: 'attack_roll',
-						character_conditions: [],
-						value: 1
-					}
-				],
+				weapon_modifiers: [],
 				title: 'Reliable',
 				description_html: '<p>+1 to attack rolls</p>',
 				character_modifiers: []
@@ -549,21 +541,13 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		burden: 1,
 		available_traits: ['agility'],
 		range: 'Melee',
-		attack_roll_bonus: 0,
+		attack_roll_bonus: 1,
 		damage_bonus: 3,
 		damage_dice: '1d8',
 		available_damage_types: ['phy'],
 		features: [
 			{
-				weapon_modifiers: [
-					{
-						behaviour: 'bonus',
-						target_weapon: 'primary',
-						target_stat: 'attack_roll',
-						character_conditions: [],
-						value: 1
-					}
-				],
+				weapon_modifiers: [],
 				title: 'Reliable',
 				description_html: '<p>+1 to attack rolls</p>',
 				character_modifiers: []
@@ -1014,21 +998,13 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		burden: 2,
 		available_traits: ['finesse'],
 		range: 'Very Close',
-		attack_roll_bonus: 0,
+		attack_roll_bonus: 1,
 		damage_bonus: 5,
 		damage_dice: '1d8',
 		available_damage_types: ['phy'],
 		features: [
 			{
-				weapon_modifiers: [
-					{
-						behaviour: 'bonus',
-						target_weapon: 'primary',
-						target_stat: 'attack_roll',
-						character_conditions: [],
-						value: 1
-					}
-				],
+				weapon_modifiers: [],
 				title: 'Reliable',
 				description_html: '<p>+1 to attack rolls</p>',
 				character_modifiers: []
@@ -1096,21 +1072,13 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		burden: 2,
 		available_traits: ['agility'],
 		range: 'Very Far',
-		attack_roll_bonus: 0,
+		attack_roll_bonus: 1,
 		damage_bonus: 5,
 		damage_dice: '1d6',
 		available_damage_types: ['phy'],
 		features: [
 			{
-				weapon_modifiers: [
-					{
-						behaviour: 'bonus',
-						target_weapon: 'primary',
-						target_stat: 'attack_roll',
-						character_conditions: [],
-						value: 1
-					}
-				],
+				weapon_modifiers: [],
 				title: 'Reliable',
 				description_html: '<p>+1 to attack rolls</p>',
 				character_modifiers: []
@@ -1522,21 +1490,13 @@ export const TIER_2_PRIMARY_WEAPONS = {
 		burden: 2,
 		available_traits: ['knowledge'],
 		range: 'Far',
-		attack_roll_bonus: 0,
+		attack_roll_bonus: 1,
 		damage_bonus: 4,
 		damage_dice: '1d6',
 		available_damage_types: ['mag'],
 		features: [
 			{
-				weapon_modifiers: [
-					{
-						behaviour: 'bonus',
-						target_weapon: 'primary',
-						target_stat: 'attack_roll',
-						character_conditions: [],
-						value: 1
-					}
-				],
+				weapon_modifiers: [],
 				title: 'Reliable',
 				description_html: '<p>+1 to attack rolls</p>',
 				character_modifiers: []
@@ -1557,21 +1517,13 @@ export const TIER_3_PRIMARY_WEAPONS = {
 		burden: 1,
 		available_traits: ['agility'],
 		range: 'Melee',
-		attack_roll_bonus: 0,
+		attack_roll_bonus: 1,
 		damage_bonus: 6,
 		damage_dice: '1d8',
 		available_damage_types: ['phy'],
 		features: [
 			{
-				weapon_modifiers: [
-					{
-						behaviour: 'bonus',
-						target_weapon: 'primary',
-						target_stat: 'attack_roll',
-						character_conditions: [],
-						value: 1
-					}
-				],
+				weapon_modifiers: [],
 				title: 'Reliable',
 				description_html: '<p>+1 to attack rolls</p>',
 				character_modifiers: []
@@ -2585,21 +2537,13 @@ export const TIER_4_PRIMARY_WEAPONS = {
 		burden: 1,
 		available_traits: ['agility'],
 		range: 'Melee',
-		attack_roll_bonus: 0,
+		attack_roll_bonus: 1,
 		damage_bonus: 9,
 		damage_dice: '1d8',
 		available_damage_types: ['phy'],
 		features: [
 			{
-				weapon_modifiers: [
-					{
-						behaviour: 'bonus',
-						target_weapon: 'primary',
-						target_stat: 'attack_roll',
-						character_conditions: [],
-						value: 1
-					}
-				],
+				weapon_modifiers: [],
 				title: 'Reliable',
 				description_html: '<p>+1 to attack rolls</p>',
 				character_modifiers: []

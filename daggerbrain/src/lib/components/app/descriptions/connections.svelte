@@ -4,34 +4,27 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
 	import SquarePen from '@lucide/svelte/icons/square-pen';
+	import Check from '@lucide/svelte/icons/check';
 
 	const context = getCharacterContext();
 	let character = $derived(context.character);
 	let primary_class = $derived(context.primary_class);
-	let editingQuestionIndex = $state<number | null>(null);
-	let questionTextareaRef = $state<HTMLTextAreaElement | null>(null);
+	let editingIndex = $state<number | null>(null);
 
 	function addConnection() {
 		if (character) {
 			character.connection_answers.push({ question: '', answer: '' });
-			// Start editing the new connection
-			editingQuestionIndex = character.connection_answers.length - 1;
-			// Focus the textarea after it's rendered
-			setTimeout(() => {
-				if (questionTextareaRef) {
-					questionTextareaRef.focus();
-				}
-			}, 0);
+			editingIndex = character.connection_answers.length - 1;
 		}
 	}
 
 	function removeConnection(index: number) {
 		if (character) {
 			character.connection_answers.splice(index, 1);
-			if (editingQuestionIndex === index) {
-				editingQuestionIndex = null;
-			} else if (editingQuestionIndex !== null && editingQuestionIndex > index) {
-				editingQuestionIndex--;
+			if (editingIndex === index) {
+				editingIndex = null;
+			} else if (editingIndex !== null && editingIndex > index) {
+				editingIndex--;
 			}
 		}
 	}
@@ -42,23 +35,8 @@
 				question,
 				answer: ''
 			}));
-			editingQuestionIndex = null;
+			editingIndex = null;
 		}
-	}
-
-	function startEditing(index: number) {
-		editingQuestionIndex = index;
-		// Focus the textarea after it's rendered
-		// setTimeout(() => {
-		//   if (questionTextareaRef) {
-		//     questionTextareaRef.focus();
-		//     questionTextareaRef.select();
-		//   }
-		// }, 0);
-	}
-
-	function stopEditing() {
-		editingQuestionIndex = null;
 	}
 </script>
 
@@ -66,23 +44,20 @@
 	{#each character.connection_answers as item, i}
 		<div class="flex flex-col gap-3 rounded-md bg-primary/50 p-3">
 			<div class="flex items-start justify-between gap-2">
-				{#if editingQuestionIndex === i}
+				{#if editingIndex === i}
 					<Textarea
-						bind:ref={questionTextareaRef}
 						bind:value={item.question}
 						placeholder="Enter your connection question..."
 						class="min-h-16 grow"
-						onblur={(e: FocusEvent) => {
-							setTimeout(() => {
-								if (editingQuestionIndex === i) stopEditing();
-							}, 1000);
-						}}
 					/>
+					<Button onclick={() => (editingIndex = null)} size="icon" variant="ghost">
+						<Check class="size-4" />
+					</Button>
 				{:else}
 					<Button
 						class="h-auto grow items-start p-0 text-left whitespace-normal"
 						variant="link"
-						onclick={() => startEditing(i)}
+						onclick={() => (editingIndex = i)}
 					>
 						<p class="grow text-sm">{item.question || 'Untitled question'}</p>
 						<SquarePen class="mx-1 mt-1 size-4" />
@@ -90,7 +65,7 @@
 				{/if}
 			</div>
 			<Textarea bind:value={item.answer} placeholder="Your answer..." class="min-h-24" />
-			{#if editingQuestionIndex === i}
+			{#if editingIndex === i}
 				<div class="flex justify-center sm:justify-end">
 					<Button
 						variant="link"
