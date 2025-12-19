@@ -3,34 +3,31 @@ import {
 	create_character,
 	delete_character
 } from '$lib/remote/characters.remote';
-import { get_user_slots } from '$lib/remote/users.remote';
+import { get_user_preferences } from '$lib/remote/users.remote';
 import type { Character } from '$lib/types/character-types';
 import { getContext, setContext } from 'svelte';
 import { error } from '@sveltejs/kit';
 
-type UserSlots = {
-	character_slot_1: string | null;
-	character_slot_2: string | null;
-	character_slot_3: string | null;
-	dismissed_popups: string[]; // Array of dismissed popup IDs
+type UserPreferences = {
+	dismissed_popups: string[];
 };
 
 function userContext() {
 	let all_characters = $state<Character[]>([]);
 	let loading = $state(true);
-	let user_slots = $state<UserSlots | null>(null);
+	let user_preferences = $state<UserPreferences | null>(null);
 
 	const isPopupDismissed = (popupId: string): boolean => {
-		if (!user_slots) return false;
-		return user_slots.dismissed_popups.includes(popupId);
+		if (!user_preferences) return false;
+		return user_preferences.dismissed_popups.includes(popupId);
 	};
 
 	$effect(() => {
 		loading = true;
-		Promise.all([get_all_characters(), get_user_slots()])
-			.then(([chars, slots]) => {
+		Promise.all([get_all_characters(), get_user_preferences()])
+			.then(([chars, prefs]) => {
 				all_characters = chars;
-				user_slots = slots;
+				user_preferences = prefs;
 			})
 			.catch((err) => {
 				error(500, err.message);
@@ -44,15 +41,6 @@ function userContext() {
 		// noop for now
 	};
 
-	const getActiveSlotIds = (): string[] => {
-		if (!user_slots) return [];
-		return [
-			user_slots.character_slot_1,
-			user_slots.character_slot_2,
-			user_slots.character_slot_3
-		].filter((slot): slot is string => slot !== null);
-	};
-
 	return {
 		get all_characters() {
 			return all_characters;
@@ -60,11 +48,10 @@ function userContext() {
 		get loading() {
 			return loading;
 		},
-		get user_slots() {
-			return user_slots;
+		get user_preferences() {
+			return user_preferences;
 		},
 		isPopupDismissed,
-		getActiveSlotIds,
 		create_character,
 		delete_character,
 		destroy
