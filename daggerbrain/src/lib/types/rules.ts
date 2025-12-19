@@ -93,6 +93,7 @@ export const BASE_UNARMED_ATTACK: Weapon & { id: string } = {
 	compendium_id: 'unarmed_attack',
 	source_id: 'SRD',
 	title: 'Unarmed Attack',
+	type: 'Physical',
 	description_html: '',
 	category: 'Unarmed',
 	level_requirement: 1,
