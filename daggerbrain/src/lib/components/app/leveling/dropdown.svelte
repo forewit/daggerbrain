@@ -28,15 +28,16 @@
 
 <div
 	class={cn(
-		'relative',
-		highlighted && !disabled && 'rounded-lg outline-2 outline-offset-2 outline-primary'
+		'relative rounded-lg',
+		highlighted && !disabled && 'outline-2 outline-offset-2 outline-primary',
+		className
 	)}
 >
 	<button
+		type="button"
 		class={cn(
 			'relative z-10 flex h-14 w-full items-center truncate rounded-lg border-b bg-primary-muted px-4',
-			disabled && 'pointer-events-none opacity-50',
-			className
+			disabled && 'pointer-events-none opacity-50'
 		)}
 		onclick={() => (open = !open)}
 		{disabled}

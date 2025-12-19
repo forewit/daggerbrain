@@ -15,62 +15,6 @@
 		onRemove?: (() => void) | undefined;
 	} = $props();
 
-	// Form state - initialized from feature prop
-	let formTitle = $state('');
-	let formDescriptionHtml = $state('');
-	let formCharacterModifiers = $state<CharacterModifier[]>([]);
-	let formWeaponModifiers = $state<WeaponModifier[]>([]);
-
-	// Check if form has changes compared to the feature prop
-	let hasChanges = $derived.by(() => {
-		if (!feature) return false;
-
-		const titleMatch = formTitle.trim() === feature.title;
-		const descriptionMatch = formDescriptionHtml === feature.description_html;
-
-		// Compare character modifiers (deep comparison)
-		const charModsMatch =
-			JSON.stringify(formCharacterModifiers) === JSON.stringify(feature.character_modifiers);
-
-		// Compare weapon modifiers (deep comparison)
-		const weaponModsMatch =
-			JSON.stringify(formWeaponModifiers) === JSON.stringify(feature.weapon_modifiers);
-
-		return !(titleMatch && descriptionMatch && charModsMatch && weaponModsMatch);
-	});
-
-	// Sync form state when feature prop changes
-	$effect(() => {
-		if (feature) {
-			formTitle = feature.title;
-			formDescriptionHtml = feature.description_html;
-			formCharacterModifiers = JSON.parse(JSON.stringify(feature.character_modifiers));
-			formWeaponModifiers = JSON.parse(JSON.stringify(feature.weapon_modifiers));
-		}
-	});
-
-	function handleSave() {
-		if (!feature) return;
-
-		// Update the feature prop with form values
-		feature = {
-			...feature,
-			title: formTitle.trim(),
-			description_html: formDescriptionHtml,
-			character_modifiers: JSON.parse(JSON.stringify(formCharacterModifiers)),
-			weapon_modifiers: JSON.parse(JSON.stringify(formWeaponModifiers))
-		};
-	}
-
-	function handleReset() {
-		if (!feature) return;
-		// Re-sync form from feature prop
-		formTitle = feature.title;
-		formDescriptionHtml = feature.description_html;
-		formCharacterModifiers = JSON.parse(JSON.stringify(feature.character_modifiers));
-		formWeaponModifiers = JSON.parse(JSON.stringify(feature.weapon_modifiers));
-	}
-
 	function addCharacterModifier() {
 		const newModifier: CharacterModifier = {
 			behaviour: 'bonus',
@@ -79,11 +23,17 @@
 			value: 0,
 			target: 'evasion'
 		};
-		formCharacterModifiers = [...formCharacterModifiers, newModifier];
+		feature = {
+			...feature,
+			character_modifiers: [...feature.character_modifiers, newModifier]
+		};
 	}
 
 	function removeCharacterModifier(index: number) {
-		formCharacterModifiers = formCharacterModifiers.filter((_, i) => i !== index);
+		feature = {
+			...feature,
+			character_modifiers: feature.character_modifiers.filter((_, i) => i !== index)
+		};
 	}
 
 	function addWeaponModifier() {
@@ -94,11 +44,25 @@
 			target_stat: 'attack_roll',
 			value: 0
 		};
-		formWeaponModifiers = [...formWeaponModifiers, newModifier];
+		feature = {
+			...feature,
+			weapon_modifiers: [...feature.weapon_modifiers, newModifier]
+		};
 	}
 
 	function removeWeaponModifier(index: number) {
-		formWeaponModifiers = formWeaponModifiers.filter((_, i) => i !== index);
+		feature = {
+			...feature,
+			weapon_modifiers: feature.weapon_modifiers.filter((_, i) => i !== index)
+		};
+	}
+
+	function updateTitle(value: string) {
+		feature = { ...feature, title: value };
+	}
+
+	function updateDescription(value: string) {
+		feature = { ...feature, description_html: value };
 	}
 </script>
 
@@ -106,7 +70,12 @@
 	<!-- Title -->
 	<div class="flex flex-col gap-1">
 		<label for="hb-feature-title" class="text-xs font-medium text-muted-foreground">Title</label>
-		<Input id="hb-feature-title" bind:value={formTitle} placeholder="Feature title" />
+		<Input
+			id="hb-feature-title"
+			value={feature.title}
+			oninput={(e) => updateTitle(e.currentTarget.value)}
+			placeholder="Feature title"
+		/>
 	</div>
 
 	<!-- Description -->
@@ -116,7 +85,8 @@
 		>
 		<Textarea
 			id="hb-feature-description"
-			bind:value={formDescriptionHtml}
+			value={feature.description_html}
+			oninput={(e) => updateDescription(e.currentTarget.value)}
 			placeholder="Feature description"
 			rows={4}
 		/>
@@ -124,50 +94,45 @@
 
 	<!-- Character Modifiers -->
 	<div class="flex flex-col gap-2">
-			<Button size="sm" variant="outline" onclick={addCharacterModifier} class="w-min">
-				<Plus class="size-3.5" />
-				Add Character Modifier
-			</Button>
-		{#if formCharacterModifiers.length > 0}
-		<div class="flex flex-col gap-2">
-			{#each formCharacterModifiers as modifier, index}
-				<HomebrewCharacterModifierEditor
-					bind:modifier={formCharacterModifiers[index]}
-					onRemove={() => removeCharacterModifier(index)}
-				/>
-			{/each}
-		</div>
+		<Button type="button" size="sm" variant="outline" onclick={addCharacterModifier} class="w-min">
+			<Plus class="size-3.5" />
+			Add Character Modifier
+		</Button>
+		{#if feature.character_modifiers.length > 0}
+			<div class="flex flex-col gap-2">
+				{#each feature.character_modifiers as modifier, index (index)}
+					<HomebrewCharacterModifierEditor
+						bind:modifier={feature.character_modifiers[index]}
+						onRemove={() => removeCharacterModifier(index)}
+					/>
+				{/each}
+			</div>
 		{/if}
 	</div>
 
 	<!-- Weapon Modifiers -->
 	<div class="flex flex-col gap-2">
-			<Button size="sm" variant="outline" onclick={addWeaponModifier} class="w-min">
-				<Plus class="size-3.5" />
-				Add Weapon Modifier
-			</Button>
-		{#if formWeaponModifiers.length > 0}
-		<div class="flex flex-col gap-2">
-			{#each formWeaponModifiers as modifier, index}
-				<HomebrewWeaponModifierEditor
-					bind:modifier={formWeaponModifiers[index]}
-					onRemove={() => removeWeaponModifier(index)}
-				/>
-			{/each}
-		</div>
+		<Button type="button" size="sm" variant="outline" onclick={addWeaponModifier} class="w-min">
+			<Plus class="size-3.5" />
+			Add Weapon Modifier
+		</Button>
+		{#if feature.weapon_modifiers.length > 0}
+			<div class="flex flex-col gap-2">
+				{#each feature.weapon_modifiers as modifier, index (index)}
+					<HomebrewWeaponModifierEditor
+						bind:modifier={feature.weapon_modifiers[index]}
+						onRemove={() => removeWeaponModifier(index)}
+					/>
+				{/each}
+			</div>
 		{/if}
 	</div>
 
-	<!-- Actions -->
-	<div class="flex items-center justify-between gap-2 pt-2">
-		<div class="flex gap-2">
-			<Button size="sm" onclick={handleSave} disabled={!hasChanges}>Save</Button>
-			{#if hasChanges}
-				<Button size="sm" variant="link" onclick={handleReset}>Discard changes</Button>
-			{/if}
-		</div>
-		{#if onRemove}
+	<!-- Delete Feature Button -->
+	{#if onRemove}
+		<div class="flex justify-end pt-2">
 			<Button
+				type="button"
 				size="sm"
 				variant="link"
 				onclick={onRemove}
@@ -176,6 +141,6 @@
 			>
 				Delete Feature
 			</Button>
-		{/if}
-	</div>
+		</div>
+	{/if}
 </div>

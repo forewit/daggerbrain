@@ -10,7 +10,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import HomebrewCharacterConditions from './conditions-select.svelte';
 	import DicePicker from '$lib/components/app/dice/dice-picker.svelte';
-	import { cn, capitalize } from '$lib/utils';
+	import { capitalize } from '$lib/utils';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 
 	let {
@@ -301,7 +301,8 @@
 
 	<!-- Behaviour -->
 	<div class="flex flex-col gap-1">
-		<label for="behaviour-select" class="text-xs font-medium text-muted-foreground">Behaviour</label>
+		<label for="behaviour-select" class="text-xs font-medium text-muted-foreground">Behaviour</label
+		>
 		<Select.Root
 			type="single"
 			value={modifier?.behaviour ?? 'bonus'}
@@ -326,7 +327,8 @@
 	{#if (currentTargetStat === 'attack_roll' || currentTargetStat === 'damage_bonus') && modifier && (modifier.target_stat === 'attack_roll' || modifier.target_stat === 'damage_bonus')}
 		{@const valueModifier = modifier}
 		<div class="flex flex-col gap-1">
-			<label for="weapon-value-input" class="text-xs font-medium text-muted-foreground">Value</label>
+			<label for="weapon-value-input" class="text-xs font-medium text-muted-foreground">Value</label
+			>
 			<Input
 				id="weapon-value-input"
 				type="number"
@@ -441,7 +443,13 @@
 
 	<!-- Remove Button -->
 	{#if onRemove}
-		<Button size="sm" variant="link" onclick={onRemove} class="mx-auto w-min text-destructive">
+		<Button
+			type="button"
+			size="sm"
+			variant="link"
+			onclick={onRemove}
+			class="mx-auto w-min text-destructive"
+		>
 			Delete Weapon Modifier
 		</Button>
 	{/if}

@@ -18,6 +18,13 @@
 	import HomebrewFeatureForm from './features/feature-form.svelte';
 	import Dropdown from '../leveling/dropdown.svelte';
 	import Hand from '@lucide/svelte/icons/hand';
+	import {
+		WeaponFormSchema,
+		FeatureSchema,
+		extractFieldErrors,
+		type WeaponFormErrors
+	} from './form-schemas';
+	import { SvelteMap } from 'svelte/reactivity';
 
 	let { weapon = $bindable() }: { weapon: Weapon } = $props();
 
@@ -35,6 +42,12 @@
 	let formDamageBonus = $state('');
 	let formAttackRollBonus = $state('');
 	let formFeatures = $state<Feature[]>([]);
+
+	// Validation errors state
+	let errors = $state<WeaponFormErrors>({});
+
+	// Feature validation state - track which features have errors
+	const featureErrors = new SvelteMap<number, boolean>();
 
 	const rangeOptions: Ranges[] = ['Melee', 'Very Close', 'Close', 'Far', 'Very Far'];
 	const damageTypeOptions: DamageTypes[] = ['phy', 'mag'];
@@ -108,8 +121,7 @@
 		const attackRollBonusMatch = formAttackRollBonusNum === weapon.attack_roll_bonus;
 
 		// Compare features (deep comparison)
-		const featuresMatch =
-			JSON.stringify(formFeatures) === JSON.stringify(weapon.features);
+		const featuresMatch = JSON.stringify(formFeatures) === JSON.stringify(weapon.features);
 
 		return !(
 			titleMatch &&
@@ -144,15 +156,14 @@
 			formDamageBonus = weapon.damage_bonus === 0 ? '' : String(weapon.damage_bonus);
 			formAttackRollBonus = weapon.attack_roll_bonus === 0 ? '' : String(weapon.attack_roll_bonus);
 			formFeatures = JSON.parse(JSON.stringify(weapon.features));
+			// Clear errors when weapon changes
+			errors = {};
+			featureErrors.clear();
 		}
 	});
 
-	function handleSave() {
-		if (!weapon) return;
-
-		// Update the weapon prop with form values
-		weapon = {
-			...weapon,
+	function buildFormData() {
+		return {
 			title: formTitle.trim(),
 			description_html: formDescriptionHtml,
 			level_requirement: formTier ? tierToMinLevel(Number(formTier)) : 1,
@@ -167,6 +178,51 @@
 			attack_roll_bonus: formAttackRollBonus === '' ? 0 : Number(formAttackRollBonus),
 			features: JSON.parse(JSON.stringify(formFeatures))
 		};
+	}
+
+	function handleSubmit(e: SubmitEvent) {
+		e.preventDefault();
+		if (!weapon) return;
+
+		// Clear previous errors
+		errors = {};
+		featureErrors.clear();
+
+		// Validate all features directly
+		let allFeaturesValid = true;
+		for (let i = 0; i < formFeatures.length; i++) {
+			const result = FeatureSchema.safeParse(formFeatures[i]);
+			if (!result.success) {
+				allFeaturesValid = false;
+				featureErrors.set(i, true);
+			}
+		}
+
+		// Build form data
+		const formData = buildFormData();
+
+		// Validate with Zod
+		const result = WeaponFormSchema.safeParse(formData);
+
+		if (!result.success) {
+			errors = extractFieldErrors(result.error);
+			return;
+		}
+
+		if (!allFeaturesValid) {
+			errors = { ...errors, features: 'One or more features have validation errors' };
+			return;
+		}
+
+		// Update the weapon prop with validated form values
+		weapon = {
+			...weapon,
+			...result.data
+		};
+
+		// Clear errors on success
+		errors = {};
+		featureErrors.clear();
 	}
 
 	function handleReset() {
@@ -185,6 +241,9 @@
 		formDamageBonus = weapon.damage_bonus === 0 ? '' : String(weapon.damage_bonus);
 		formAttackRollBonus = weapon.attack_roll_bonus === 0 ? '' : String(weapon.attack_roll_bonus);
 		formFeatures = JSON.parse(JSON.stringify(weapon.features));
+		// Clear errors on reset
+		errors = {};
+		featureErrors.clear();
 	}
 
 	function toggleTrait(trait: TraitIds) {
@@ -193,6 +252,10 @@
 		} else {
 			formAvailableTraits = [...formAvailableTraits, trait];
 		}
+		// Clear trait error when user makes a selection
+		if (errors.available_traits) {
+			errors = { ...errors, available_traits: undefined };
+		}
 	}
 
 	function toggleDamageType(type: DamageTypes) {
@@ -200,6 +263,10 @@
 			formDamageTypes = formDamageTypes.filter((t) => t !== type);
 		} else {
 			formDamageTypes = [...formDamageTypes, type];
+		}
+		// Clear damage type error when user makes a selection
+		if (errors.available_damage_types) {
+			errors = { ...errors, available_damage_types: undefined };
 		}
 	}
 
@@ -215,14 +282,40 @@
 
 	function removeFeature(index: number) {
 		formFeatures = formFeatures.filter((_, i) => i !== index);
+		// Clean up errors and re-index for items after the removed one
+		featureErrors.delete(index);
+
+		// Collect entries that need re-indexing
+		const errorsToReindex: [number, boolean][] = [];
+		for (const [i, hasError] of featureErrors) {
+			if (i > index) {
+				errorsToReindex.push([i, hasError]);
+			}
+		}
+
+		// Delete old keys and set new ones
+		for (const [i] of errorsToReindex) {
+			featureErrors.delete(i);
+		}
+		for (const [i, hasError] of errorsToReindex) {
+			featureErrors.set(i - 1, hasError);
+		}
 	}
 </script>
 
-<div class="flex flex-col gap-4">
+<form onsubmit={handleSubmit} class="flex flex-col gap-4">
 	<!-- Title -->
 	<div class="flex flex-col gap-1">
 		<label for="hb-weapon-title" class="text-xs font-medium text-muted-foreground">Name</label>
-		<Input id="hb-weapon-title" bind:value={formTitle} placeholder="Weapon name" />
+		<Input
+			id="hb-weapon-title"
+			bind:value={formTitle}
+			placeholder="Weapon name"
+			aria-invalid={!!errors.title}
+		/>
+		{#if errors.title}
+			<p class="text-xs text-destructive">{errors.title}</p>
+		{/if}
 	</div>
 
 	<!-- Description -->
@@ -276,9 +369,9 @@
 		<div class="flex flex-col gap-1">
 			<label for="hb-weapon-burden" class="text-xs font-medium text-muted-foreground">Burden</label>
 			<Select.Root type="single" bind:value={formBurden}>
-				<Select.Trigger id="hb-weapon-burden" class="w-full ">
+				<Select.Trigger id="hb-weapon-burden" class="w-full">
 					<p class="truncate">{formBurden}</p>
-					<Hand class="mr-auto"/>
+					<Hand class="mr-auto" />
 				</Select.Trigger>
 				<Select.Content>
 					{#each burdenOptions as burden}
@@ -304,7 +397,9 @@
 
 	<!-- Available Traits -->
 	<div class="flex flex-col gap-2">
-		<p class="text-xs font-medium text-muted-foreground">Weapon Trait</p>
+		<p class={cn('text-xs font-medium text-muted-foreground', errors.available_traits && 'text-destructive')}>
+			Weapon Trait
+		</p>
 		<div class="flex flex-wrap gap-3">
 			{#each traitOptions as trait}
 				<label class="flex items-center gap-2 text-xs">
@@ -318,12 +413,17 @@
 				</label>
 			{/each}
 		</div>
+		{#if errors.available_traits}
+			<p class="text-xs text-destructive">{errors.available_traits}</p>
+		{/if}
 	</div>
 
 	<!-- Damage Type & Weapon Type Row -->
 	<div class="grid grid-cols-2 gap-3">
 		<div class="flex flex-col gap-2">
-			<p class="text-xs font-medium text-muted-foreground">Damage Type</p>
+			<p class={cn('text-xs font-medium text-muted-foreground', errors.available_damage_types && 'text-destructive')}>
+				Damage Type
+			</p>
 			<div class="flex gap-4">
 				{#each damageTypeOptions as type}
 					<label class="flex items-center gap-2 text-xs">
@@ -337,9 +437,14 @@
 					</label>
 				{/each}
 			</div>
+			{#if errors.available_damage_types}
+				<p class="text-xs text-destructive">{errors.available_damage_types}</p>
+			{/if}
 		</div>
 		<div class="flex flex-col gap-1">
-			<label for="hb-weapon-type" class="text-xs font-medium text-muted-foreground">Weapon Type</label>
+			<label for="hb-weapon-type" class="text-xs font-medium text-muted-foreground"
+				>Weapon Type</label
+			>
 			<Select.Root type="single" bind:value={formType}>
 				<Select.Trigger id="hb-weapon-type" class="w-full">
 					<p class="truncate">{formType}</p>
@@ -409,16 +514,22 @@
 	<!-- Features -->
 	<div class="flex flex-col gap-2">
 		<div class="flex items-center justify-between">
-			<p class="text-xs font-medium text-muted-foreground">Features</p>
-			<Button size="sm" variant="outline" onclick={addFeature}>
+			<p class={cn('text-xs font-medium text-muted-foreground', errors.features && 'text-destructive')}>
+				Features
+			</p>
+			<Button type="button" size="sm" variant="outline" onclick={addFeature}>
 				<Plus class="size-3.5" />
 				Add Feature
 			</Button>
 		</div>
+		{#if errors.features}
+			<p class="text-xs text-destructive">{errors.features}</p>
+		{/if}
 		<div class="flex flex-col gap-2">
-			{#each formFeatures as feature, index}
+			{#each formFeatures as feature, index (index)}
 				<Dropdown
 					title={feature.title || `Unnamed feature`}
+					class={featureErrors.get(index) ? 'border-destructive' : ''}
 				>
 					<HomebrewFeatureForm
 						bind:feature={formFeatures[index]}
@@ -426,16 +537,16 @@
 					/>
 				</Dropdown>
 			{:else}
-				<p class="text-xs text-muted-foreground italic">No features added</p>
+				<p class="text-xs italic text-muted-foreground">No features added</p>
 			{/each}
 		</div>
 	</div>
 
 	<!-- Actions -->
 	<div class="flex gap-2 pt-2">
-		<Button size="sm" onclick={handleSave} disabled={!hasChanges}>Save</Button>
+		<Button type="submit" size="sm" disabled={!hasChanges}>Save</Button>
 		{#if hasChanges}
-			<Button size="sm" variant="link" onclick={handleReset}>Discard changes</Button>
+			<Button type="button" size="sm" variant="link" onclick={handleReset}>Discard changes</Button>
 		{/if}
 	</div>
-</div>
+</form>

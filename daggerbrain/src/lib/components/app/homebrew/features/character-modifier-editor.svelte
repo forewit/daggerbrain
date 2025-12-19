@@ -283,7 +283,9 @@
 		>
 			<Select.Trigger id="target-select" class="w-full">
 				<p class="truncate">
-					{selectedTarget && (simpleTargetOptions.includes(selectedTarget as SimpleTarget) || selectedTarget === 'trait')
+					{selectedTarget &&
+					(simpleTargetOptions.includes(selectedTarget as SimpleTarget) ||
+						selectedTarget === 'trait')
 						? targetLabels[selectedTarget as ValidTarget]
 						: 'None selected'}
 				</p>
@@ -336,15 +338,17 @@
 	<!-- Behaviour and Type -->
 	<div class="grid grid-cols-2 gap-2">
 		<div class="flex flex-col gap-1">
-			<label for="behaviour-select" class="text-xs font-medium text-muted-foreground">Behaviour</label>
+			<label for="behaviour-select" class="text-xs font-medium text-muted-foreground"
+				>Behaviour</label
+			>
 			<Select.Root
 				type="single"
 				value={modifier?.behaviour ?? 'bonus'}
-			onValueChange={(value) => {
-				if (value && modifier && behaviourOptions.includes(value as ModifierBehaviour)) {
-					modifier = { ...modifier, behaviour: value as ModifierBehaviour };
-				}
-			}}
+				onValueChange={(value) => {
+					if (value && modifier && behaviourOptions.includes(value as ModifierBehaviour)) {
+						modifier = { ...modifier, behaviour: value as ModifierBehaviour };
+					}
+				}}
 			>
 				<Select.Trigger id="behaviour-select" class="w-full">
 					<p class="truncate">{behaviourLabels[modifier?.behaviour ?? 'bonus']}</p>
@@ -474,7 +478,13 @@
 
 	<!-- Remove Button -->
 	{#if onRemove}
-		<Button size="sm" variant="link" onclick={onRemove} class="mx-auto w-min text-destructive">
+		<Button
+			type="button"
+			size="sm"
+			variant="link"
+			onclick={onRemove}
+			class="mx-auto w-min text-destructive"
+		>
 			Delete Character Modifier
 		</Button>
 	{/if}
