@@ -2,6 +2,7 @@
 	import type { DamageTypes } from '$lib/types/compendium-types';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
+	import { getEditingHeaderContext } from '$lib/state/editing-header.svelte';
 	import HomebrewWeaponForm from '$lib/components/app/homebrew/homebrew-weapon-form.svelte';
 	import { capitalize, cn } from '$lib/utils';
 	import Hand from '@lucide/svelte/icons/hand';
@@ -12,6 +13,7 @@
 
 	const compendium = getCompendiumContext();
 	const homebrew = getHomebrewContext();
+	const editingHeader = getEditingHeaderContext();
 
 	// Get the uid from the layout data
 	let uid = $derived(data.uid);
@@ -38,6 +40,13 @@
 	$effect(() => {
 		if (!homebrew.loading && uid && !weapon) {
 			error(404, `Weapon with UID "${uid}" not found`);
+		}
+	});
+
+	// Set the editing header
+	$effect(() => {
+		if (weapon && weaponCategory) {
+			editingHeader.set(weapon.title, `Editing ${weaponCategory === 'primary' ? 'Primary' : 'Secondary'} Weapon`);
 		}
 	});
 
@@ -71,14 +80,6 @@
 			)}
 		>
 			<div class="w-full max-w-6xl space-y-4 px-4 py-4">
-				<!-- Header -->
-				<div class="flex flex-col gap-1">
-					<h1 class="text-2xl font-semibold">{weapon.title}</h1>
-					<p class="text-sm text-muted-foreground">
-						Editing {weaponCategory === 'primary' ? 'Primary' : 'Secondary'} Weapon
-					</p>
-				</div>
-
 				<!-- Main Content: Preview and Edit Side by Side -->
 				<div class="flex flex-col gap-6 lg:flex-row lg:items-start">
 					<!-- Preview Section -->
