@@ -18,6 +18,7 @@
 	import Dropdown from '../leveling/dropdown.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
 	import X from '@lucide/svelte/icons/x';
+	import ImageUrlInput from './image-url-input.svelte';
 	import {
 		ClassFormSchema,
 		FeatureSchema,
@@ -28,10 +29,17 @@
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 
-	let { characterClass = $bindable() }: { characterClass: CharacterClass } = $props();
+	let {
+		characterClass = $bindable()
+	}: {
+		characterClass: CharacterClass;
+	} = $props();
 
 	const compendium = getCompendiumContext();
 	const homebrew = getHomebrewContext();
+
+	// Reference to image input component
+	let imageInput: { uploadPendingFile: () => Promise<string | null> } | null = $state(null);
 
 	// Form state - initialized from characterClass prop
 	let formName = $state('');
@@ -224,7 +232,7 @@
 		};
 	}
 
-	function handleSubmit(e: SubmitEvent) {
+	async function handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
 		if (!characterClass) return;
 
@@ -232,6 +240,20 @@
 		errors = {};
 		featureErrors.clear();
 		hopeFeatureError = false;
+
+		// Upload pending image if there is one
+		if (imageInput) {
+			try {
+				const uploadedUrl = await imageInput.uploadPendingFile();
+				if (uploadedUrl) {
+					formImageUrl = uploadedUrl;
+				}
+			} catch (error) {
+				console.error('Failed to upload image:', error);
+				alert('Failed to upload image. Please try again.');
+				return;
+			}
+		}
 
 		// Validate hope feature
 		if (formHopeFeature) {
@@ -422,13 +444,14 @@
 		/>
 	</div>
 
-	<!-- Image URL -->
+	<!-- Image -->
 	<div class="flex flex-col gap-1">
-		<label for="hb-class-image-url" class="text-xs font-medium text-muted-foreground">Image URL</label>
-		<Input
+		<label for="hb-class-image-url" class="text-xs font-medium text-muted-foreground">Image</label>
+		<ImageUrlInput
+			bind:this={imageInput}
 			id="hb-class-image-url"
 			bind:value={formImageUrl}
-			placeholder="https://example.com/image.jpg"
+			alt="Class image"
 		/>
 	</div>
 

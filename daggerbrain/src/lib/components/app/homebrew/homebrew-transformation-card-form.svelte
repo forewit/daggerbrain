@@ -7,6 +7,7 @@
 	import HomebrewFeatureForm from './features/feature-form.svelte';
 	import Dropdown from '../leveling/dropdown.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
+	import ImageUrlInput from './image-url-input.svelte';
 	import {
 		TransformationCardFormSchema,
 		FeatureSchema,
@@ -14,14 +15,25 @@
 		type TransformationCardFormErrors
 	} from './form-schemas';
 	import { SvelteMap } from 'svelte/reactivity';
+	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 
-	let { transformationCard = $bindable() }: { transformationCard: TransformationCard } = $props();
+	let {
+		transformationCard = $bindable(),
+		uid
+	}: {
+		transformationCard: TransformationCard;
+		uid?: string;
+	} = $props();
+
+	const homebrew = getHomebrewContext();
+
+	// Reference to image input component
+	let imageInput: { uploadPendingFile: () => Promise<string | null> } | null = $state(null);
 
 	// Form state - initialized from transformationCard prop
 	let formTitle = $state('');
 	let formDescriptionHtml = $state('');
 	let formImageUrl = $state('');
-	let formArtistName = $state('');
 	let formFeatures = $state<Feature[]>([]);
 
 	// Validation errors state
@@ -37,12 +49,11 @@
 		const titleMatch = formTitle.trim() === transformationCard.title;
 		const descriptionMatch = formDescriptionHtml === transformationCard.description_html;
 		const imageUrlMatch = formImageUrl === transformationCard.image_url;
-		const artistNameMatch = formArtistName === transformationCard.artist_name;
 
 		// Compare features (deep comparison)
 		const featuresMatch = JSON.stringify(formFeatures) === JSON.stringify(transformationCard.features);
 
-		return !(titleMatch && descriptionMatch && imageUrlMatch && artistNameMatch && featuresMatch);
+		return !(titleMatch && descriptionMatch && imageUrlMatch && featuresMatch);
 	});
 
 	// Sync form state when transformationCard prop changes
@@ -51,7 +62,6 @@
 			formTitle = transformationCard.title;
 			formDescriptionHtml = transformationCard.description_html;
 			formImageUrl = transformationCard.image_url;
-			formArtistName = transformationCard.artist_name;
 			formFeatures = JSON.parse(JSON.stringify(transformationCard.features));
 			// Clear errors when transformationCard changes
 			errors = {};
@@ -65,18 +75,32 @@
 			title: formTitle.trim(),
 			description_html: formDescriptionHtml,
 			image_url: formImageUrl,
-			artist_name: formArtistName,
+			artist_name: '',
 			features: JSON.parse(JSON.stringify(formFeatures))
 		};
 	}
 
-	function handleSubmit(e: SubmitEvent) {
+	async function handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
 		if (!transformationCard) return;
 
 		// Clear previous errors
 		errors = {};
 		featureErrors.clear();
+
+		// Upload pending image if there is one
+		if (imageInput) {
+			try {
+				const uploadedUrl = await imageInput.uploadPendingFile();
+				if (uploadedUrl) {
+					formImageUrl = uploadedUrl;
+				}
+			} catch (error) {
+				console.error('Failed to upload image:', error);
+				alert('Failed to upload image. Please try again.');
+				return;
+			}
+		}
 
 		// Validate all features directly
 		let allFeaturesValid = true;
@@ -110,6 +134,7 @@
 			...result.data
 		};
 
+
 		// Clear errors on success
 		errors = {};
 		featureErrors.clear();
@@ -121,7 +146,6 @@
 		formTitle = transformationCard.title;
 		formDescriptionHtml = transformationCard.description_html;
 		formImageUrl = transformationCard.image_url;
-		formArtistName = transformationCard.artist_name;
 		formFeatures = JSON.parse(JSON.stringify(transformationCard.features));
 		// Clear errors on reset
 		errors = {};
@@ -193,27 +217,16 @@
 		/>
 	</div>
 
-	<!-- Image URL -->
+	<!-- Image -->
 	<div class="flex flex-col gap-1">
 		<label for="hb-transformation-card-image-url" class="text-xs font-medium text-muted-foreground"
-			>Image URL</label
+			>Image</label
 		>
-		<Input
+		<ImageUrlInput
+			bind:this={imageInput}
 			id="hb-transformation-card-image-url"
 			bind:value={formImageUrl}
-			placeholder="https://example.com/image.jpg"
-		/>
-	</div>
-
-	<!-- Artist Name -->
-	<div class="flex flex-col gap-1">
-		<label for="hb-transformation-card-artist-name" class="text-xs font-medium text-muted-foreground"
-			>Artist Name</label
-		>
-		<Input
-			id="hb-transformation-card-artist-name"
-			bind:value={formArtistName}
-			placeholder="Artist name"
+			alt="Transformation card image"
 		/>
 	</div>
 

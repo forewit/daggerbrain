@@ -1,13 +1,13 @@
 <script lang="ts">
-	import type { Feature, AncestryCard, AncestryCardChoice } from '$lib/types/compendium-types';
+	import type { Feature, AncestryCard } from '$lib/types/compendium-types';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { cn } from '$lib/utils';
 	import HomebrewFeatureForm from './features/feature-form.svelte';
-	import AncestryChoicesEditor from './features/ancestry-choices-editor.svelte';
 	import Dropdown from '../leveling/dropdown.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
+	import ImageUrlInput from './image-url-input.svelte';
 	import {
 		AncestryCardFormSchema,
 		FeatureSchema,
@@ -15,16 +15,24 @@
 		type AncestryCardFormErrors
 	} from './form-schemas';
 	import { SvelteMap } from 'svelte/reactivity';
+	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 
-	let { ancestryCard = $bindable() }: { ancestryCard: AncestryCard } = $props();
+	let {
+		ancestryCard = $bindable()
+	}: {
+		ancestryCard: AncestryCard;
+	} = $props();
+
+	const homebrew = getHomebrewContext();
+
+	// Reference to image input component
+	let imageInput: { uploadPendingFile: () => Promise<string | null> } | null = $state(null);
 
 	// Form state - initialized from ancestryCard prop
 	let formTitle = $state('');
 	let formDescriptionHtml = $state('');
 	let formImageUrl = $state('');
-	let formArtistName = $state('');
 	let formFeatures = $state<Feature[]>([]);
-	let formChoices = $state<AncestryCardChoice[]>([]);
 
 	// Validation errors state
 	let errors = $state<AncestryCardFormErrors>({});
@@ -39,14 +47,11 @@
 		const titleMatch = formTitle.trim() === ancestryCard.title;
 		const descriptionMatch = formDescriptionHtml === ancestryCard.description_html;
 		const imageUrlMatch = formImageUrl === ancestryCard.image_url;
-		const artistNameMatch = formArtistName === ancestryCard.artist_name;
 
 		// Compare features (deep comparison)
 		const featuresMatch = JSON.stringify(formFeatures) === JSON.stringify(ancestryCard.features);
-		// Compare choices (deep comparison)
-		const choicesMatch = JSON.stringify(formChoices) === JSON.stringify(ancestryCard.choices);
 
-		return !(titleMatch && descriptionMatch && imageUrlMatch && artistNameMatch && featuresMatch && choicesMatch);
+		return !(titleMatch && descriptionMatch && imageUrlMatch && featuresMatch);
 	});
 
 	// Sync form state when ancestryCard prop changes
@@ -55,9 +60,7 @@
 			formTitle = ancestryCard.title;
 			formDescriptionHtml = ancestryCard.description_html;
 			formImageUrl = ancestryCard.image_url;
-			formArtistName = ancestryCard.artist_name;
 			formFeatures = JSON.parse(JSON.stringify(ancestryCard.features));
-			formChoices = JSON.parse(JSON.stringify(ancestryCard.choices));
 			// Clear errors when ancestryCard changes
 			errors = {};
 			featureErrors.clear();
@@ -70,19 +73,33 @@
 			title: formTitle.trim(),
 			description_html: formDescriptionHtml,
 			image_url: formImageUrl,
-			artist_name: formArtistName,
+			artist_name: '',
 			features: JSON.parse(JSON.stringify(formFeatures)),
-			choices: JSON.parse(JSON.stringify(formChoices))
+			choices: []
 		};
 	}
 
-	function handleSubmit(e: SubmitEvent) {
+	async function handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
 		if (!ancestryCard) return;
 
 		// Clear previous errors
 		errors = {};
 		featureErrors.clear();
+
+		// Upload pending image if there is one
+		if (imageInput) {
+			try {
+				const uploadedUrl = await imageInput.uploadPendingFile();
+				if (uploadedUrl) {
+					formImageUrl = uploadedUrl;
+				}
+			} catch (error) {
+				console.error('Failed to upload image:', error);
+				alert('Failed to upload image. Please try again.');
+				return;
+			}
+		}
 
 		// Validate all features directly
 		let allFeaturesValid = true;
@@ -127,9 +144,7 @@
 		formTitle = ancestryCard.title;
 		formDescriptionHtml = ancestryCard.description_html;
 		formImageUrl = ancestryCard.image_url;
-		formArtistName = ancestryCard.artist_name;
 		formFeatures = JSON.parse(JSON.stringify(ancestryCard.features));
-		formChoices = JSON.parse(JSON.stringify(ancestryCard.choices));
 		// Clear errors on reset
 		errors = {};
 		featureErrors.clear();
@@ -200,27 +215,16 @@
 		/>
 	</div>
 
-	<!-- Image URL -->
+	<!-- Image -->
 	<div class="flex flex-col gap-1">
 		<label for="hb-ancestry-card-image-url" class="text-xs font-medium text-muted-foreground"
-			>Image URL</label
+			>Image</label
 		>
-		<Input
+		<ImageUrlInput
+			bind:this={imageInput}
 			id="hb-ancestry-card-image-url"
 			bind:value={formImageUrl}
-			placeholder="https://example.com/image.jpg"
-		/>
-	</div>
-
-	<!-- Artist Name -->
-	<div class="flex flex-col gap-1">
-		<label for="hb-ancestry-card-artist-name" class="text-xs font-medium text-muted-foreground"
-			>Artist Name</label
-		>
-		<Input
-			id="hb-ancestry-card-artist-name"
-			bind:value={formArtistName}
-			placeholder="Artist name"
+			alt="Ancestry card image"
 		/>
 	</div>
 
@@ -258,11 +262,6 @@
 				<p class="text-xs italic text-muted-foreground">No features added</p>
 			{/each}
 		</div>
-	</div>
-
-	<!-- Choices -->
-	<div class="flex flex-col gap-2">
-		<AncestryChoicesEditor bind:choices={formChoices} featureCount={formFeatures.length} />
 	</div>
 
 	<!-- Actions -->

@@ -6,7 +6,7 @@ import { get_db, get_auth } from '../utils';
 import { DomainSchema, DomainCardSchema } from '$lib/compendium/compendium-schemas';
 import type { Domain, DomainCard, DomainIds } from '$lib/types/compendium-types';
 import { homebrew_domains, homebrew_domain_cards } from '$lib/server/db/homebrew.schema';
-import { verifyOwnership } from './utils';
+import { verifyOwnership, getTotalHomebrewCount, HOMEBREW_LIMIT } from './utils';
 
 // ============================================================================
 // Domains
@@ -36,14 +36,10 @@ export const create_homebrew_domain = command(DomainSchema, async (data) => {
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Check if user has reached the limit of 1 domain
-	const existing = await db
-		.select()
-		.from(homebrew_domains)
-		.where(eq(homebrew_domains.clerk_user_id, userId));
-
-	if (existing.length >= 1) {
-		throw error(403, 'Homebrew limit reached. You can only have 1 custom domain.');
+	// Check if user has reached the global homebrew limit
+	const totalCount = await getTotalHomebrewCount(db, userId);
+	if (totalCount >= HOMEBREW_LIMIT) {
+		throw error(403, `Homebrew limit reached. You can only have ${HOMEBREW_LIMIT} custom items.`);
 	}
 
 	const validatedData = DomainSchema.parse({ ...data, source_id: 'Homebrew' as const });
@@ -146,14 +142,10 @@ export const create_homebrew_domain_card = command(DomainCardSchema, async (data
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Check if user has reached the limit of 1 domain card
-	const existing = await db
-		.select()
-		.from(homebrew_domain_cards)
-		.where(eq(homebrew_domain_cards.clerk_user_id, userId));
-
-	if (existing.length >= 1) {
-		throw error(403, 'Homebrew limit reached. You can only have 1 custom domain card.');
+	// Check if user has reached the global homebrew limit
+	const totalCount = await getTotalHomebrewCount(db, userId);
+	if (totalCount >= HOMEBREW_LIMIT) {
+		throw error(403, `Homebrew limit reached. You can only have ${HOMEBREW_LIMIT} custom items.`);
 	}
 
 	const validatedData = DomainCardSchema.parse({ ...data, source_id: 'Homebrew' as const });

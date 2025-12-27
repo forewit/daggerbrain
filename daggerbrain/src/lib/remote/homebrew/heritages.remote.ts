@@ -14,7 +14,7 @@ import {
 	homebrew_community_cards,
 	homebrew_transformation_cards
 } from '$lib/server/db/homebrew.schema';
-import { verifyOwnership } from './utils';
+import { verifyOwnership, getTotalHomebrewCount, HOMEBREW_LIMIT } from './utils';
 
 // ============================================================================
 // Ancestry Cards
@@ -44,14 +44,10 @@ export const create_homebrew_ancestry_card = command(AncestryCardSchema, async (
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Check if user has reached the limit of 1 ancestry card
-	const existing = await db
-		.select()
-		.from(homebrew_ancestry_cards)
-		.where(eq(homebrew_ancestry_cards.clerk_user_id, userId));
-
-	if (existing.length >= 1) {
-		throw error(403, 'Homebrew limit reached. You can only have 1 custom ancestry card.');
+	// Check if user has reached the global homebrew limit
+	const totalCount = await getTotalHomebrewCount(db, userId);
+	if (totalCount >= HOMEBREW_LIMIT) {
+		throw error(403, `Homebrew limit reached. You can only have ${HOMEBREW_LIMIT} custom items.`);
 	}
 
 	const validatedData = AncestryCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
@@ -152,14 +148,10 @@ export const create_homebrew_community_card = command(CommunityCardSchema, async
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Check if user has reached the limit of 1 community card
-	const existing = await db
-		.select()
-		.from(homebrew_community_cards)
-		.where(eq(homebrew_community_cards.clerk_user_id, userId));
-
-	if (existing.length >= 1) {
-		throw error(403, 'Homebrew limit reached. You can only have 1 custom community card.');
+	// Check if user has reached the global homebrew limit
+	const totalCount = await getTotalHomebrewCount(db, userId);
+	if (totalCount >= HOMEBREW_LIMIT) {
+		throw error(403, `Homebrew limit reached. You can only have ${HOMEBREW_LIMIT} custom items.`);
 	}
 
 	const validatedData = CommunityCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
@@ -262,14 +254,10 @@ export const create_homebrew_transformation_card = command(
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		// Check if user has reached the limit of 1 transformation card
-		const existing = await db
-			.select()
-			.from(homebrew_transformation_cards)
-			.where(eq(homebrew_transformation_cards.clerk_user_id, userId));
-
-		if (existing.length >= 1) {
-			throw error(403, 'Homebrew limit reached. You can only have 1 custom transformation card.');
+		// Check if user has reached the global homebrew limit
+		const totalCount = await getTotalHomebrewCount(db, userId);
+		if (totalCount >= HOMEBREW_LIMIT) {
+			throw error(403, `Homebrew limit reached. You can only have ${HOMEBREW_LIMIT} custom items.`);
 		}
 
 		const validatedData = TransformationCardSchema.parse({ ...data, source_id: 'Homebrew' as const });

@@ -15,10 +15,21 @@
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 
-	let { subclass = $bindable() }: { subclass: Subclass } = $props();
+	let {
+		subclass = $bindable(),
+		uid
+	}: {
+		subclass: Subclass;
+		uid?: string;
+	} = $props();
 
 	const compendium = getCompendiumContext();
 	const homebrew = getHomebrewContext();
+
+	// References to card editor components
+	let foundationEditor: { uploadPendingImage: () => Promise<void> } | null = $state(null);
+	let specializationEditor: { uploadPendingImage: () => Promise<void> } | null = $state(null);
+	let masteryEditor: { uploadPendingImage: () => Promise<void> } | null = $state(null);
 
 	// Form state - initialized from subclass prop
 	let formName = $state('');
@@ -83,20 +94,23 @@
 		};
 	}
 
-	function handleSubmit(e: SubmitEvent) {
+	async function handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
 		if (!subclass) return;
 
 		// Clear previous errors
 		errors = {};
 
-		// Validate cards
-		let foundationEditor: { validate: () => boolean } | null = null;
-		let specializationEditor: { validate: () => boolean } | null = null;
-		let masteryEditor: { validate: () => boolean } | null = null;
-
-		// We'll need to validate the cards through their editors
-		// For now, we'll just validate the form data structure
+		// Upload pending images for all cards
+		try {
+			if (foundationEditor) await foundationEditor.uploadPendingImage();
+			if (specializationEditor) await specializationEditor.uploadPendingImage();
+			if (masteryEditor) await masteryEditor.uploadPendingImage();
+		} catch (error) {
+			console.error('Failed to upload image:', error);
+			alert('Failed to upload image. Please try again.');
+			return;
+		}
 
 		// Build form data
 		const formData = buildFormData();
@@ -114,6 +128,7 @@
 			...subclass,
 			...result.data
 		};
+
 
 		// Clear errors on success
 		errors = {};
@@ -198,6 +213,7 @@
 			class={errors.foundation_card ? 'border-destructive' : ''}
 		>
 			<SubclassCardEditor
+				bind:this={foundationEditor}
 				bind:card={subclass.foundation_card}
 				cardType="foundation"
 				classId={formClassId}
@@ -215,6 +231,7 @@
 			class={errors.specialization_card ? 'border-destructive' : ''}
 		>
 			<SubclassCardEditor
+				bind:this={specializationEditor}
 				bind:card={subclass.specialization_card}
 				cardType="specialization"
 				classId={formClassId}
@@ -232,6 +249,7 @@
 			class={errors.mastery_card ? 'border-destructive' : ''}
 		>
 			<SubclassCardEditor
+				bind:this={masteryEditor}
 				bind:card={subclass.mastery_card}
 				cardType="mastery"
 				classId={formClassId}

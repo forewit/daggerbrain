@@ -15,8 +15,17 @@
 		type ArmorFormErrors
 	} from './form-schemas';
 	import { SvelteMap } from 'svelte/reactivity';
+	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 
-	let { armor = $bindable() }: { armor: Armor } = $props();
+	let {
+		armor = $bindable(),
+		uid
+	}: {
+		armor: Armor;
+		uid?: string;
+	} = $props();
+
+	const homebrew = getHomebrewContext();
 
 	// Form state - initialized from armor prop
 	let formTitle = $state('');
@@ -156,6 +165,7 @@
 			...armor,
 			...result.data
 		};
+
 
 		// Clear errors on success
 		errors = {};

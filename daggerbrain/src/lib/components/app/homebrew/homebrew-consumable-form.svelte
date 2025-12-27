@@ -9,13 +9,21 @@
 		extractFieldErrors,
 		type ConsumableFormErrors
 	} from './form-schemas';
+	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 
-	let { consumable = $bindable() }: { consumable: Consumable } = $props();
+	let {
+		consumable = $bindable(),
+		uid
+	}: {
+		consumable: Consumable;
+		uid?: string;
+	} = $props();
+
+	const homebrew = getHomebrewContext();
 
 	// Form state - initialized from consumable prop
 	let formTitle = $state('');
 	let formDescriptionHtml = $state('');
-	let formRarityRoll = $state('');
 
 	// Validation errors state
 	let errors = $state<ConsumableFormErrors>({});
@@ -26,10 +34,8 @@
 
 		const titleMatch = formTitle.trim() === consumable.title;
 		const descriptionMatch = formDescriptionHtml === consumable.description_html;
-		const formRarityRollNum = formRarityRoll === '' ? 0 : Number(formRarityRoll);
-		const rarityMatch = formRarityRollNum === consumable.rarity_roll;
 
-		return !(titleMatch && descriptionMatch && rarityMatch);
+		return !(titleMatch && descriptionMatch);
 	});
 
 	// Sync form state when consumable prop changes
@@ -37,7 +43,6 @@
 		if (consumable) {
 			formTitle = consumable.title;
 			formDescriptionHtml = consumable.description_html;
-			formRarityRoll = consumable.rarity_roll === 0 ? '' : String(consumable.rarity_roll);
 			// Clear errors when consumable changes
 			errors = {};
 		}
@@ -47,7 +52,7 @@
 		return {
 			title: formTitle.trim(),
 			description_html: formDescriptionHtml,
-			rarity_roll: formRarityRoll === '' ? 0 : Number(formRarityRoll)
+			rarity_roll: consumable?.rarity_roll ?? 1
 		};
 	}
 
@@ -75,6 +80,7 @@
 			...result.data
 		};
 
+
 		// Clear errors on success
 		errors = {};
 	}
@@ -84,7 +90,6 @@
 		// Re-sync form from consumable prop
 		formTitle = consumable.title;
 		formDescriptionHtml = consumable.description_html;
-		formRarityRoll = consumable.rarity_roll === 0 ? '' : String(consumable.rarity_roll);
 		// Clear errors on reset
 		errors = {};
 	}
@@ -120,32 +125,6 @@
 			placeholder="Consumable description"
 			rows={3}
 		/>
-	</div>
-
-	<!-- Rarity Roll -->
-	<div class="flex flex-col gap-1">
-		<label
-			for="hb-consumable-rarity-roll"
-			class={cn(
-				'text-xs font-medium text-muted-foreground',
-				errors.rarity_roll && 'text-destructive'
-			)}
-			>Rarity Roll (1-20)</label
-		>
-		<Input
-			id="hb-consumable-rarity-roll"
-			type="number"
-			inputmode="numeric"
-			bind:value={formRarityRoll}
-			placeholder="1"
-			min="1"
-			max="20"
-			step="1"
-			aria-invalid={!!errors.rarity_roll}
-		/>
-		{#if errors.rarity_roll}
-			<p class="text-xs text-destructive">{errors.rarity_roll}</p>
-		{/if}
 	</div>
 
 	<!-- Actions -->

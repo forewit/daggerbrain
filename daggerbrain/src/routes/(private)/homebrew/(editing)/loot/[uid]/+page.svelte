@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
-	import { getEditingHeaderContext } from '$lib/state/editing-header.svelte';
 	import HomebrewLootForm from '$lib/components/app/homebrew/homebrew-loot-form.svelte';
 	import { cn } from '$lib/utils';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
@@ -9,28 +8,26 @@
 	let { data } = $props();
 
 	const homebrew = getHomebrewContext();
-	const editingHeader = getEditingHeaderContext();
 
 	// Get the uid from the layout data
 	let uid = $derived(data.uid);
 
-	// Get loot directly from homebrew context - auto-save is handled by the context
+	// Get loot directly from homebrew context
 	let loot = $derived.by(() => {
 		if (!uid) return null;
 		return homebrew.loot[uid] || null;
+	});
+
+	// Check if loot is saved
+	let isSaved = $derived.by(() => {
+		if (!uid || !loot) return false;
+		return homebrew.isSaved('loot', uid);
 	});
 
 	// Check if loot is not found after loading completes
 	$effect(() => {
 		if (!homebrew.loading && uid && !loot) {
 			error(404, `Loot with UID "${uid}" not found`);
-		}
-	});
-
-	// Set the editing header
-	$effect(() => {
-		if (loot) {
-			editingHeader.set(loot.title, 'Editing Loot');
 		}
 	});
 </script>
@@ -51,11 +48,18 @@
 			)}
 		>
 			<div class="w-full max-w-6xl space-y-4 px-4 py-4">
+				<!-- Header -->
+				<div class="flex flex-col gap-1">
+					<h1 class="text-2xl font-semibold">{loot.title}</h1>
+					<p class="text-sm text-muted-foreground">Editing Loot</p>
+				</div>
+
 				<!-- Main Content: Preview and Edit Side by Side -->
 				<div class="flex flex-col gap-6 lg:flex-row lg:items-start">
 					<!-- Preview Section -->
-					<div class="flex-1 rounded-lg border bg-card p-6">
-						<h2 class="mb-4 text-lg font-semibold">Preview</h2>
+					<div class="flex-1 p-6">
+						<h2 class="mb-2 text-lg font-semibold">Preview</h2>
+						<p class="mb-4 text-xs text-muted-foreground">{isSaved ? 'Saved' : 'Not Saved'}</p>
 
 						<div class="flex flex-col gap-6">
 							<!-- Description -->
@@ -108,7 +112,7 @@
 					<div class="w-full lg:w-auto lg:min-w-[300px] lg:max-w-[300px]">
 						<div class="rounded-lg border bg-card p-6">
 							<h2 class="mb-4 text-lg font-semibold">Edit</h2>
-							<HomebrewLootForm bind:loot />
+							<HomebrewLootForm bind:loot {uid} />
 						</div>
 					</div>
 				</div>

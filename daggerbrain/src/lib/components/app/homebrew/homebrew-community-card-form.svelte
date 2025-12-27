@@ -8,6 +8,7 @@
 	import HomebrewFeatureForm from './features/feature-form.svelte';
 	import Dropdown from '../leveling/dropdown.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
+	import ImageUrlInput from './image-url-input.svelte';
 	import {
 		CommunityCardFormSchema,
 		FeatureSchema,
@@ -15,14 +16,25 @@
 		type CommunityCardFormErrors
 	} from './form-schemas';
 	import { SvelteMap } from 'svelte/reactivity';
+	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 
-	let { communityCard = $bindable() }: { communityCard: CommunityCard } = $props();
+	let {
+		communityCard = $bindable(),
+		uid
+	}: {
+		communityCard: CommunityCard;
+		uid?: string;
+	} = $props();
+
+	const homebrew = getHomebrewContext();
+
+	// Reference to image input component
+	let imageInput: { uploadPendingFile: () => Promise<string | null> } | null = $state(null);
 
 	// Form state - initialized from communityCard prop
 	let formTitle = $state('');
 	let formDescriptionHtml = $state('');
 	let formImageUrl = $state('');
-	let formArtistName = $state('');
 	let formTokens = $state(false);
 	let formFeatures = $state<Feature[]>([]);
 
@@ -39,13 +51,12 @@
 		const titleMatch = formTitle.trim() === communityCard.title;
 		const descriptionMatch = formDescriptionHtml === communityCard.description_html;
 		const imageUrlMatch = formImageUrl === communityCard.image_url;
-		const artistNameMatch = formArtistName === communityCard.artist_name;
 		const tokensMatch = formTokens === communityCard.tokens;
 
 		// Compare features (deep comparison)
 		const featuresMatch = JSON.stringify(formFeatures) === JSON.stringify(communityCard.features);
 
-		return !(titleMatch && descriptionMatch && imageUrlMatch && artistNameMatch && tokensMatch && featuresMatch);
+		return !(titleMatch && descriptionMatch && imageUrlMatch && tokensMatch && featuresMatch);
 	});
 
 	// Sync form state when communityCard prop changes
@@ -54,7 +65,6 @@
 			formTitle = communityCard.title;
 			formDescriptionHtml = communityCard.description_html;
 			formImageUrl = communityCard.image_url;
-			formArtistName = communityCard.artist_name;
 			formTokens = communityCard.tokens;
 			formFeatures = JSON.parse(JSON.stringify(communityCard.features));
 			// Clear errors when communityCard changes
@@ -69,19 +79,33 @@
 			title: formTitle.trim(),
 			description_html: formDescriptionHtml,
 			image_url: formImageUrl,
-			artist_name: formArtistName,
+			artist_name: '',
 			tokens: formTokens,
 			features: JSON.parse(JSON.stringify(formFeatures))
 		};
 	}
 
-	function handleSubmit(e: SubmitEvent) {
+	async function handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
 		if (!communityCard) return;
 
 		// Clear previous errors
 		errors = {};
 		featureErrors.clear();
+
+		// Upload pending image if there is one
+		if (imageInput) {
+			try {
+				const uploadedUrl = await imageInput.uploadPendingFile();
+				if (uploadedUrl) {
+					formImageUrl = uploadedUrl;
+				}
+			} catch (error) {
+				console.error('Failed to upload image:', error);
+				alert('Failed to upload image. Please try again.');
+				return;
+			}
+		}
 
 		// Validate all features directly
 		let allFeaturesValid = true;
@@ -115,6 +139,7 @@
 			...result.data
 		};
 
+
 		// Clear errors on success
 		errors = {};
 		featureErrors.clear();
@@ -126,7 +151,6 @@
 		formTitle = communityCard.title;
 		formDescriptionHtml = communityCard.description_html;
 		formImageUrl = communityCard.image_url;
-		formArtistName = communityCard.artist_name;
 		formTokens = communityCard.tokens;
 		formFeatures = JSON.parse(JSON.stringify(communityCard.features));
 		// Clear errors on reset
@@ -199,27 +223,16 @@
 		/>
 	</div>
 
-	<!-- Image URL -->
+	<!-- Image -->
 	<div class="flex flex-col gap-1">
 		<label for="hb-community-card-image-url" class="text-xs font-medium text-muted-foreground"
-			>Image URL</label
+			>Image</label
 		>
-		<Input
+		<ImageUrlInput
+			bind:this={imageInput}
 			id="hb-community-card-image-url"
 			bind:value={formImageUrl}
-			placeholder="https://example.com/image.jpg"
-		/>
-	</div>
-
-	<!-- Artist Name -->
-	<div class="flex flex-col gap-1">
-		<label for="hb-community-card-artist-name" class="text-xs font-medium text-muted-foreground"
-			>Artist Name</label
-		>
-		<Input
-			id="hb-community-card-artist-name"
-			bind:value={formArtistName}
-			placeholder="Artist name"
+			alt="Community card image"
 		/>
 	</div>
 

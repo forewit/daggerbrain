@@ -25,8 +25,15 @@
 		type WeaponFormErrors
 	} from './form-schemas';
 	import { SvelteMap } from 'svelte/reactivity';
+	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 
-	let { weapon = $bindable() }: { weapon: Weapon } = $props();
+	let {
+		weapon = $bindable()
+	}: {
+		weapon: Weapon;
+	} = $props();
+
+	const homebrew = getHomebrewContext();
 
 	// Form state - initialized from weapon prop
 	let formTitle = $state('');

@@ -2,7 +2,6 @@
 	import type { DamageTypes } from '$lib/types/compendium-types';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
-	import { getEditingHeaderContext } from '$lib/state/editing-header.svelte';
 	import HomebrewWeaponForm from '$lib/components/app/homebrew/homebrew-weapon-form.svelte';
 	import { capitalize, cn } from '$lib/utils';
 	import Hand from '@lucide/svelte/icons/hand';
@@ -13,7 +12,6 @@
 
 	const compendium = getCompendiumContext();
 	const homebrew = getHomebrewContext();
-	const editingHeader = getEditingHeaderContext();
 
 	// Get the uid from the layout data
 	let uid = $derived(data.uid);
@@ -30,23 +28,23 @@
 		return null;
 	});
 
-	// Get weapon directly from homebrew context - auto-save is handled by the context
+	// Get weapon directly from homebrew context
 	let weapon = $derived.by(() => {
 		if (!uid) return null;
 		return homebrew.primary_weapons[uid] || homebrew.secondary_weapons[uid] || null;
+	});
+
+	// Check if weapon is saved
+	let isSaved = $derived.by(() => {
+		if (!uid || !weapon) return false;
+		const type = weaponCategory === 'primary' ? 'primary_weapons' : 'secondary_weapons';
+		return homebrew.isSaved(type, uid);
 	});
 
 	// Check if weapon is not found after loading completes
 	$effect(() => {
 		if (!homebrew.loading && uid && !weapon) {
 			error(404, `Weapon with UID "${uid}" not found`);
-		}
-	});
-
-	// Set the editing header
-	$effect(() => {
-		if (weapon && weaponCategory) {
-			editingHeader.set(weapon.title, `Editing ${weaponCategory === 'primary' ? 'Primary' : 'Secondary'} Weapon`);
 		}
 	});
 
@@ -80,13 +78,22 @@
 			)}
 		>
 			<div class="w-full max-w-6xl space-y-4 px-4 py-4">
+				<!-- Header -->
+				<div class="flex flex-col gap-1">
+					<h1 class="text-2xl font-semibold">{weapon.title}</h1>
+					<p class="text-sm text-muted-foreground">
+						Editing {weaponCategory === 'primary' ? 'Primary' : 'Secondary'} Weapon
+					</p>
+				</div>
+
 				<!-- Main Content: Preview and Edit Side by Side -->
 				<div class="flex flex-col gap-6 lg:flex-row lg:items-start">
 					<!-- Preview Section -->
-					<div class="flex-1 rounded-lg border bg-card p-6">
-				<h2 class="mb-4 text-lg font-semibold">Preview</h2>
+					<div class="flex-1 p-6">
+						<h2 class="mb-2 text-lg font-semibold">Preview</h2>
+						<p class="mb-4 text-xs text-muted-foreground">{isSaved ? 'Saved' : 'Not Saved'}</p>
 
-				<div class="flex flex-col gap-6">
+						<div class="flex flex-col gap-6">
 					<!-- Description -->
 					{#if weapon.description_html.trim().length > 0}
 						<div class="text-sm">{@html weapon.description_html}</div>
@@ -161,8 +168,8 @@
 							<p class="text-sm text-muted-foreground italic">No features</p>
 						</div>
 					{/if}
+						</div>
 					</div>
-				</div>
 
 				<!-- Edit Section -->
 				<div class="w-full lg:w-auto lg:min-w-[300px] lg:max-w-[300px]">

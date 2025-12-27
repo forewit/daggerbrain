@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 	import HomebrewCommunityCardForm from '$lib/components/app/homebrew/homebrew-community-card-form.svelte';
+	import CommunityCard from '$lib/components/app/cards/full-cards/community-card.svelte';
 	import { cn } from '$lib/utils';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { error } from '@sveltejs/kit';
@@ -12,10 +13,16 @@
 	// Get the uid from the layout data
 	let uid = $derived(data.uid);
 
-	// Get community card directly from homebrew context - auto-save is handled by the context
+	// Get community card directly from homebrew context
 	let communityCard = $derived.by(() => {
 		if (!uid) return null;
 		return homebrew.community_cards[uid] || null;
+	});
+
+	// Check if community card is saved
+	let isSaved = $derived.by(() => {
+		if (!uid || !communityCard) return false;
+		return homebrew.isSaved('community_cards', uid);
 	});
 
 	// Check if community card is not found after loading completes
@@ -51,60 +58,17 @@
 				<!-- Main Content: Preview and Edit Side by Side -->
 				<div class="flex flex-col gap-6 lg:flex-row lg:items-start">
 					<!-- Preview Section -->
-					<div class="flex-1 rounded-lg border bg-card p-6">
-						<h2 class="mb-4 text-lg font-semibold">Preview</h2>
-
-						<div class="flex flex-col gap-6">
-							<!-- Description -->
-							{#if communityCard.description_html.trim().length > 0}
-								<div class="text-sm">{@html communityCard.description_html}</div>
-							{/if}
-
-							<!-- Image -->
-							{#if communityCard.image_url}
-								<div class="rounded-lg border bg-muted p-2">
-									<img src={communityCard.image_url} alt={communityCard.title} class="w-full rounded" />
-								</div>
-							{/if}
-
-							<!-- Artist -->
-							{#if communityCard.artist_name}
-								<p class="text-xs text-muted-foreground">Artist: {communityCard.artist_name}</p>
-							{/if}
-
-							<!-- Tokens -->
-							<div class="text-sm">
-								<span class="font-medium text-muted-foreground">Uses Tokens:</span> {communityCard.tokens ? 'Yes' : 'No'}
-							</div>
-
-							<!-- Features -->
-							{#if communityCard.features.length > 0}
-								<div class="rounded-lg border bg-primary/5 px-4 py-3">
-									<div class="flex items-center justify-between">
-										<p class="text-sm font-medium">Features</p>
-									</div>
-									<div class="mt-3 space-y-3">
-										{#each communityCard.features as feature}
-											<div class="border-l-2 border-accent/30 pl-3">
-												<p class="text-sm font-medium text-muted-foreground">{feature.title}</p>
-												<p class="mt-0.5 text-xs text-muted-foreground">{@html feature.description_html}</p>
-											</div>
-										{/each}
-									</div>
-								</div>
-							{:else}
-								<div class="rounded-lg border bg-muted/50 px-4 py-3">
-									<p class="text-sm text-muted-foreground italic">No features</p>
-								</div>
-							{/if}
-						</div>
+					<div class="flex-1 p-6">
+						<h2 class="mb-2 text-lg font-semibold">Preview</h2>
+						<p class="mb-4 text-xs text-muted-foreground">{isSaved ? 'Saved' : 'Not Saved'}</p>
+						<CommunityCard card={communityCard} />
 					</div>
 
 					<!-- Edit Section -->
 					<div class="w-full lg:w-auto lg:min-w-[300px] lg:max-w-[300px]">
 						<div class="rounded-lg border bg-card p-6">
 							<h2 class="mb-4 text-lg font-semibold">Edit</h2>
-							<HomebrewCommunityCardForm bind:communityCard />
+							<HomebrewCommunityCardForm bind:communityCard {uid} />
 						</div>
 					</div>
 				</div>

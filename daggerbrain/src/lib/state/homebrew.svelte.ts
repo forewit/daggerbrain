@@ -522,6 +522,62 @@ function createHomebrew() {
 		}
 	});
 
+	// Helper to check if an item is saved
+	function isSaved(type: keyof typeof homebrewCollections, id: string): boolean {
+		const currentCollection = homebrewCollections[type];
+		const lastSavedCollection = lastSavedCollections[type];
+		if (!currentCollection || !lastSavedCollection) return true; // Assume saved if not loaded yet
+
+		// Handle nested structure for domain_cards (id format: "domainId:cardId")
+		if (type === 'domain_cards') {
+			const [domainId, cardId] = id.split(':');
+			if (!domainId || !cardId) return true;
+			const currentItem = (currentCollection as typeof homebrew_domain_cards)[domainId as DomainIds]?.[cardId];
+			const saved = JSON.parse(lastSavedCollection) as typeof homebrew_domain_cards;
+			const savedItem = saved[domainId as DomainIds]?.[cardId];
+			return JSON.stringify(currentItem) === JSON.stringify(savedItem);
+		}
+
+		const currentItem = (currentCollection as Record<string, unknown>)[id];
+		const saved = JSON.parse(lastSavedCollection) as Record<string, unknown>;
+		const savedItem = saved[id];
+
+		return JSON.stringify(currentItem) === JSON.stringify(savedItem);
+	}
+
+	// Helper collections for isSaved
+	const homebrewCollections = {
+		classes: homebrew_classes,
+		subclasses: homebrew_subclasses,
+		domains: homebrew_domains,
+		domain_cards: homebrew_domain_cards,
+		primary_weapons: homebrew_primary_weapons,
+		secondary_weapons: homebrew_secondary_weapons,
+		armor: homebrew_armor,
+		loot: homebrew_loot,
+		consumables: homebrew_consumables,
+		ancestry_cards: homebrew_ancestry_cards,
+		community_cards: homebrew_community_cards,
+		transformation_cards: homebrew_transformation_cards,
+		beastforms: homebrew_beastforms
+	};
+
+	const lastSavedCollections = {
+		classes: lastSaved_classes,
+		subclasses: lastSaved_subclasses,
+		domains: lastSaved_domains,
+		domain_cards: lastSaved_domain_cards,
+		primary_weapons: lastSaved_primary_weapons,
+		secondary_weapons: lastSaved_secondary_weapons,
+		armor: lastSaved_armor,
+		loot: lastSaved_loot,
+		consumables: lastSaved_consumables,
+		ancestry_cards: lastSaved_ancestry_cards,
+		community_cards: lastSaved_community_cards,
+		transformation_cards: lastSaved_transformation_cards,
+		beastforms: lastSaved_beastforms
+	};
+
 	// Cleanup function
 	const destroy = () => {
 		for (const timer of Object.values(debounceTimers)) {
@@ -545,6 +601,9 @@ function createHomebrew() {
 		get transformation_cards() { return homebrew_transformation_cards; },
 		get beastforms() { return homebrew_beastforms; },
 		get loading() { return loading; },
+
+		// Save status helper
+		isSaved,
 
 		// Create helpers
 		async createClass(data: CharacterClass): Promise<string> {

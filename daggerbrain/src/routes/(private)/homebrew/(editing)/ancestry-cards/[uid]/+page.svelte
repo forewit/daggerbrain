@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 	import HomebrewAncestryCardForm from '$lib/components/app/homebrew/homebrew-ancestry-card-form.svelte';
+	import AncestryCard from '$lib/components/app/cards/full-cards/ancestry-card.svelte';
 	import { cn } from '$lib/utils';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { error } from '@sveltejs/kit';
@@ -12,10 +13,16 @@
 	// Get the uid from the layout data
 	let uid = $derived(data.uid);
 
-	// Get ancestry card directly from homebrew context - auto-save is handled by the context
+	// Get ancestry card directly from homebrew context
 	let ancestryCard = $derived.by(() => {
 		if (!uid) return null;
 		return homebrew.ancestry_cards[uid] || null;
+	});
+
+	// Check if ancestry card is saved
+	let isSaved = $derived.by(() => {
+		if (!uid || !ancestryCard) return false;
+		return homebrew.isSaved('ancestry_cards', uid);
 	});
 
 	// Check if ancestry card is not found after loading completes
@@ -51,66 +58,10 @@
 				<!-- Main Content: Preview and Edit Side by Side -->
 				<div class="flex flex-col gap-6 lg:flex-row lg:items-start">
 					<!-- Preview Section -->
-					<div class="flex-1 rounded-lg border bg-card p-6">
-						<h2 class="mb-4 text-lg font-semibold">Preview</h2>
-
-						<div class="flex flex-col gap-6">
-							<!-- Description -->
-							{#if ancestryCard.description_html.trim().length > 0}
-								<div class="text-sm">{@html ancestryCard.description_html}</div>
-							{/if}
-
-							<!-- Image -->
-							{#if ancestryCard.image_url}
-								<div class="rounded-lg border bg-muted p-2">
-									<img src={ancestryCard.image_url} alt={ancestryCard.title} class="w-full rounded" />
-								</div>
-							{/if}
-
-							<!-- Artist -->
-							{#if ancestryCard.artist_name}
-								<p class="text-xs text-muted-foreground">Artist: {ancestryCard.artist_name}</p>
-							{/if}
-
-							<!-- Features -->
-							{#if ancestryCard.features.length > 0}
-								<div class="rounded-lg border bg-primary/5 px-4 py-3">
-									<div class="flex items-center justify-between">
-										<p class="text-sm font-medium">Features</p>
-									</div>
-									<div class="mt-3 space-y-3">
-										{#each ancestryCard.features as feature}
-											<div class="border-l-2 border-accent/30 pl-3">
-												<p class="text-sm font-medium text-muted-foreground">{feature.title}</p>
-												<p class="mt-0.5 text-xs text-muted-foreground">{@html feature.description_html}</p>
-											</div>
-										{/each}
-									</div>
-								</div>
-							{:else}
-								<div class="rounded-lg border bg-muted/50 px-4 py-3">
-									<p class="text-sm text-muted-foreground italic">No features</p>
-								</div>
-							{/if}
-
-							<!-- Choices -->
-							{#if ancestryCard.choices.length > 0}
-								<div class="rounded-lg border bg-primary/5 px-4 py-3">
-									<div class="flex items-center justify-between">
-										<p class="text-sm font-medium">Choices</p>
-									</div>
-									<div class="mt-3 space-y-2">
-										{#each ancestryCard.choices as choice}
-											<div class="border-l-2 border-accent/30 pl-3">
-												<p class="text-xs text-muted-foreground">
-													{choice.choice_id} ({choice.type}, max: {choice.max})
-												</p>
-											</div>
-										{/each}
-									</div>
-								</div>
-							{/if}
-						</div>
+					<div class="flex-1 p-6">
+						<h2 class="mb-2 text-lg font-semibold">Preview</h2>
+						<p class="mb-4 text-xs text-muted-foreground">{isSaved ? 'Saved' : 'Not Saved'}</p>
+						<AncestryCard card={ancestryCard} />
 					</div>
 
 					<!-- Edit Section -->

@@ -298,7 +298,7 @@ export const ClassSchema = z.object({
 export const BeastformSchema = z.object({
 	compendium_id: z.string(),
 	source_id: SourceIdsSchema,
-	level_requirement: z.number(),
+	level_requirement: z.number().int().min(1).max(10),
 	name: z.string(),
 	category: z.string(),
 	character_trait: z.object({
@@ -369,7 +369,7 @@ export const DomainCardSchema = z.object({
 	title: z.string(),
 	artist_name: z.string(),
 	features: z.array(FeatureSchema),
-	level_requirement: z.number(),
+	level_requirement: z.number().int().min(1).max(10),
 	recall_cost: z.number(),
 	category: z.enum(['ability', 'spell', 'grimoire']),
 	choices: z.array(DomainCardChoiceSchema),
@@ -458,7 +458,7 @@ export const WeaponSchema = z.object({
 	source_id: SourceIdsSchema,
 	title: z.string(),
 	description_html: z.string(),
-	level_requirement: z.number(),
+	level_requirement: z.number().int().min(1).max(10),
 	category: WeaponCategoriesSchema,
 	type: WeaponTypeSchema,
 	available_traits: z.array(TraitIdsSchema),
@@ -474,7 +474,7 @@ export const WeaponSchema = z.object({
 export const ArmorSchema = z.object({
 	compendium_id: z.string(),
 	source_id: SourceIdsSchema,
-	level_requirement: z.number(),
+	level_requirement: z.number().int().min(1).max(10),
 	title: z.string(),
 	description_html: z.string(),
 	max_armor: z.number(),

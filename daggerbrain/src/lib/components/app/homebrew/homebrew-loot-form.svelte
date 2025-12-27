@@ -13,8 +13,17 @@
 		extractFieldErrors,
 		type LootFormErrors
 	} from './form-schemas';
+	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 
-	let { loot = $bindable() }: { loot: Loot } = $props();
+	let {
+		loot = $bindable(),
+		uid
+	}: {
+		loot: Loot;
+		uid?: string;
+	} = $props();
+
+	const homebrew = getHomebrewContext();
 
 	// Form state - initialized from loot prop
 	let formTitle = $state('');
@@ -86,6 +95,7 @@
 			...loot,
 			...result.data
 		};
+
 
 		// Clear errors on success
 		errors = {};

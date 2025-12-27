@@ -858,7 +858,7 @@
 			case 'beastform':
 				return entry.item.category;
 			case 'loot':
-				return 'Loot';
+				return `Rarity Roll: ${entry.item.rarity_roll}`;
 			case 'consumable':
 				return `Rarity Roll: ${entry.item.rarity_roll}`;
 			case 'class':

@@ -2,6 +2,7 @@
 	import type { DomainIds } from '$lib/types/compendium-types';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 	import HomebrewDomainCardForm from '$lib/components/app/homebrew/homebrew-domain-card-form.svelte';
+	import DomainCard from '$lib/components/app/cards/full-cards/domain-card.svelte';
 	import { cn } from '$lib/utils';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { error } from '@sveltejs/kit';
@@ -24,6 +25,23 @@
 		return null;
 	});
 
+	// Get domain ID for this card
+	let domainId = $derived.by(() => {
+		if (!uid) return null;
+		for (const id of Object.keys(homebrew.domain_cards) as DomainIds[]) {
+			if (homebrew.domain_cards[id][uid]) {
+				return id;
+			}
+		}
+		return null;
+	});
+
+	// Check if domain card is saved
+	let isSaved = $derived.by(() => {
+		if (!uid || !domainCard || !domainId) return false;
+		return homebrew.isSaved('domain_cards', `${domainId}:${uid}`);
+	});
+
 	// Check if domain card is not found after loading completes
 	$effect(() => {
 		if (!homebrew.loading && uid && !domainCard) {
@@ -31,13 +49,6 @@
 		}
 	});
 
-	// Helper to convert level requirement to tier
-	function levelToTier(level: number): number {
-		if (level >= 8) return 4;
-		if (level >= 5) return 3;
-		if (level >= 2) return 2;
-		return 1;
-	}
 </script>
 
 {#if homebrew.loading}
@@ -65,106 +76,19 @@
 				<!-- Main Content: Preview and Edit Side by Side -->
 				<div class="flex flex-col gap-6 lg:flex-row lg:items-start">
 					<!-- Preview Section -->
-					<div class="flex-1 rounded-lg border bg-card p-6">
-						<h2 class="mb-4 text-lg font-semibold">Preview</h2>
-
-						<div class="flex flex-col gap-6">
-							<!-- Image -->
-							{#if domainCard.image_url}
-								<div class="rounded-lg border bg-muted p-2">
-									<img src={domainCard.image_url} alt={domainCard.title} class="w-full rounded" />
-								</div>
-							{/if}
-
-							<!-- Artist -->
-							{#if domainCard.artist_name}
-								<p class="text-xs text-muted-foreground">Artist: {domainCard.artist_name}</p>
-							{/if}
-
-							<!-- Stats Table -->
-							<table class="w-full border-collapse text-sm">
-								<tbody>
-									<tr class="border-b">
-										<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Domain</th>
-										<td class="py-2 text-right">{domainCard.domain_id}</td>
-									</tr>
-									<tr class="border-b">
-										<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Category</th>
-										<td class="py-2 text-right">{domainCard.category}</td>
-									</tr>
-									<tr class="border-b">
-										<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Level Requirement</th>
-										<td class="py-2 text-right">{domainCard.level_requirement} (Tier {levelToTier(domainCard.level_requirement)})</td>
-									</tr>
-									<tr class="border-b">
-										<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Recall Cost</th>
-										<td class="py-2 text-right">{domainCard.recall_cost}</td>
-									</tr>
-									<tr class="border-b">
-										<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Uses Tokens</th>
-										<td class="py-2 text-right">{domainCard.tokens ? 'Yes' : 'No'}</td>
-									</tr>
-									<tr class="border-b">
-										<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Applies in Vault</th>
-										<td class="py-2 text-right">{domainCard.applies_in_vault ? 'Yes' : 'No'}</td>
-									</tr>
-									<tr class="border-b">
-										<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Forced in Loadout</th>
-										<td class="py-2 text-right">{domainCard.forced_in_loadout ? 'Yes' : 'No'}</td>
-									</tr>
-									<tr>
-										<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Forced in Vault</th>
-										<td class="py-2 text-right">{domainCard.forced_in_vault ? 'Yes' : 'No'}</td>
-									</tr>
-								</tbody>
-							</table>
-
-							<!-- Features -->
-							{#if domainCard.features.length > 0}
-								<div class="rounded-lg border bg-primary/5 px-4 py-3">
-									<div class="flex items-center justify-between">
-										<p class="text-sm font-medium">Features</p>
-									</div>
-									<div class="mt-3 space-y-3">
-										{#each domainCard.features as feature}
-											<div class="border-l-2 border-accent/30 pl-3">
-												<p class="text-sm font-medium text-muted-foreground">{feature.title}</p>
-												<p class="mt-0.5 text-xs text-muted-foreground">{@html feature.description_html}</p>
-											</div>
-										{/each}
-									</div>
-								</div>
-							{:else}
-								<div class="rounded-lg border bg-muted/50 px-4 py-3">
-									<p class="text-sm text-muted-foreground italic">No features</p>
-								</div>
-							{/if}
-
-							<!-- Choices -->
-							{#if domainCard.choices.length > 0}
-								<div class="rounded-lg border bg-primary/5 px-4 py-3">
-									<div class="flex items-center justify-between">
-										<p class="text-sm font-medium">Choices</p>
-									</div>
-									<div class="mt-3 space-y-2">
-										{#each domainCard.choices as choice}
-											<div class="border-l-2 border-accent/30 pl-3">
-												<p class="text-xs text-muted-foreground">
-													{choice.choice_id} ({choice.type}, max: {choice.max})
-												</p>
-											</div>
-										{/each}
-									</div>
-								</div>
-							{/if}
-						</div>
+					<div class="flex-1 p-6">
+						<h2 class="mb-2 text-lg font-semibold">Preview</h2>
+						<p class="mb-4 text-xs text-muted-foreground">{isSaved ? 'Saved' : 'Not Saved'}</p>
+						<DomainCard card={domainCard} />
 					</div>
 
 					<!-- Edit Section -->
 					<div class="w-full lg:w-auto lg:min-w-[300px] lg:max-w-[300px]">
 						<div class="rounded-lg border bg-card p-6">
 							<h2 class="mb-4 text-lg font-semibold">Edit</h2>
+							{#if domainId}
 							<HomebrewDomainCardForm bind:domainCard />
+						{/if}
 						</div>
 					</div>
 				</div>

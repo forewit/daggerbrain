@@ -7,13 +7,13 @@
 		TraitIds
 	} from '$lib/types/compendium-types';
 	import Input from '$lib/components/ui/input/input.svelte';
-	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import * as Select from '$lib/components/ui/select';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { cn, capitalize } from '$lib/utils';
 	import HomebrewFeatureForm from './feature-form.svelte';
 	import Dropdown from '../../leveling/dropdown.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
+	import ImageUrlInput from '../image-url-input.svelte';
 	import { FeatureSchema } from '../form-schemas';
 	import { SvelteMap } from 'svelte/reactivity';
 
@@ -29,13 +29,17 @@
 		classId: string;
 	} = $props();
 
+	// Reference to image input component
+	let imageInput: { uploadPendingFile: () => Promise<string | null> } | null = $state(null);
+
 	// Form state
 	let formTitle = $state('');
-	let formDescriptionHtml = $state('');
 	let formImageUrl = $state('');
-	let formArtistName = $state('');
 	let formSpellcastTrait = $state<TraitIds | null>(null);
 	let formFeatures = $state<Feature[]>([]);
+
+	// Description is automatically set based on card type
+	const descriptionHtml = $derived(capitalize(cardType));
 
 	// Feature validation state
 	const featureErrors = new SvelteMap<number, boolean>();
@@ -49,13 +53,26 @@
 		'knowledge'
 	];
 
-	// Sync form state when card prop changes
+	// Track a serialized snapshot to detect external changes
+	let lastCardSnapshot = $state<string>('');
+
+	// Sync form state when card prop changes externally
 	$effect(() => {
-		if (card) {
+		if (!card) return;
+
+		const currentSnapshot = JSON.stringify({
+			compendium_id: card.compendium_id,
+			title: card.title,
+			image_url: card.image_url,
+			features: card.features,
+			spellcast_trait: cardType === 'foundation' && 'spellcast_trait' in card ? card.spellcast_trait : null
+		});
+
+		// Only sync if the snapshot changed (external change)
+		if (currentSnapshot !== lastCardSnapshot) {
+			lastCardSnapshot = currentSnapshot;
 			formTitle = card.title;
-			formDescriptionHtml = card.description_html;
 			formImageUrl = card.image_url;
-			formArtistName = card.artist_name;
 			formFeatures = JSON.parse(JSON.stringify(card.features));
 			if (cardType === 'foundation' && 'spellcast_trait' in card) {
 				formSpellcastTrait = card.spellcast_trait;
@@ -75,21 +92,43 @@
 			image_url: formImageUrl,
 			card_type: card.card_type,
 			title: formTitle.trim(),
-			description_html: formDescriptionHtml,
-			artist_name: formArtistName,
+			description_html: descriptionHtml,
+			artist_name: '',
 			features: JSON.parse(JSON.stringify(formFeatures)),
 			class_id: classId
 		};
 
+		let updatedCard: SubclassCard;
 		if (cardType === 'foundation') {
-			card = {
+			updatedCard = {
 				...baseCard,
 				spellcast_trait: formSpellcastTrait
 			} as SubclassFoundationCard;
 		} else if (cardType === 'specialization') {
-			card = baseCard as SubclassSpecializationCard;
+			updatedCard = baseCard as SubclassSpecializationCard;
 		} else {
-			card = baseCard as SubclassMasteryCard;
+			updatedCard = baseCard as SubclassMasteryCard;
+		}
+
+		// Only update if values actually changed to prevent loops
+		const hasChanges =
+			card.title !== updatedCard.title ||
+			card.image_url !== updatedCard.image_url ||
+			JSON.stringify(card.features) !== JSON.stringify(updatedCard.features) ||
+			(cardType === 'foundation' &&
+				'spellcast_trait' in card &&
+				card.spellcast_trait !== (updatedCard as SubclassFoundationCard).spellcast_trait);
+
+		if (hasChanges) {
+			card = updatedCard;
+			// Update snapshot after internal update to prevent re-syncing
+			lastCardSnapshot = JSON.stringify({
+				compendium_id: card.compendium_id,
+				title: card.title,
+				image_url: card.image_url,
+				features: card.features,
+				spellcast_trait: cardType === 'foundation' && 'spellcast_trait' in card ? card.spellcast_trait : null
+			});
 		}
 	});
 
@@ -142,6 +181,21 @@
 	export function validate(): boolean {
 		return validateFeatures();
 	}
+
+	// Expose upload function for parent to call on save
+	export async function uploadPendingImage(): Promise<void> {
+		if (imageInput) {
+			try {
+				const uploadedUrl = await imageInput.uploadPendingFile();
+				if (uploadedUrl) {
+					formImageUrl = uploadedUrl;
+				}
+			} catch (error) {
+				console.error('Failed to upload image:', error);
+				throw error;
+			}
+		}
+	}
 </script>
 
 <div class="flex flex-col gap-4">
@@ -155,40 +209,16 @@
 		/>
 	</div>
 
-	<!-- Description -->
-	<div class="flex flex-col gap-1">
-		<label for="subclass-card-description" class="text-xs font-medium text-muted-foreground"
-			>Description</label
-		>
-		<Textarea
-			id="subclass-card-description"
-			bind:value={formDescriptionHtml}
-			placeholder={`${capitalize(cardType)} card description`}
-			rows={3}
-		/>
-	</div>
-
-	<!-- Image URL -->
+	<!-- Image -->
 	<div class="flex flex-col gap-1">
 		<label for="subclass-card-image-url" class="text-xs font-medium text-muted-foreground"
-			>Image URL</label
+			>Image</label
 		>
-		<Input
+		<ImageUrlInput
+			bind:this={imageInput}
 			id="subclass-card-image-url"
 			bind:value={formImageUrl}
-			placeholder="https://example.com/image.jpg"
-		/>
-	</div>
-
-	<!-- Artist Name -->
-	<div class="flex flex-col gap-1">
-		<label for="subclass-card-artist-name" class="text-xs font-medium text-muted-foreground"
-			>Artist Name</label
-		>
-		<Input
-			id="subclass-card-artist-name"
-			bind:value={formArtistName}
-			placeholder="Artist name"
+			alt="Subclass card image"
 		/>
 	</div>
 

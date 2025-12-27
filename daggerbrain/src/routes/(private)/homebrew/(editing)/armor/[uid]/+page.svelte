@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
-	import { getEditingHeaderContext } from '$lib/state/editing-header.svelte';
 	import HomebrewArmorForm from '$lib/components/app/homebrew/homebrew-armor-form.svelte';
 	import { cn } from '$lib/utils';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
@@ -9,28 +8,26 @@
 	let { data } = $props();
 
 	const homebrew = getHomebrewContext();
-	const editingHeader = getEditingHeaderContext();
 
 	// Get the uid from the layout data
 	let uid = $derived(data.uid);
 
-	// Get armor directly from homebrew context - auto-save is handled by the context
+	// Get armor directly from homebrew context
 	let armor = $derived.by(() => {
 		if (!uid) return null;
 		return homebrew.armor[uid] || null;
+	});
+
+	// Check if armor is saved
+	let isSaved = $derived.by(() => {
+		if (!uid || !armor) return false;
+		return homebrew.isSaved('armor', uid);
 	});
 
 	// Check if armor is not found after loading completes
 	$effect(() => {
 		if (!homebrew.loading && uid && !armor) {
 			error(404, `Armor with UID "${uid}" not found`);
-		}
-	});
-
-	// Set the editing header
-	$effect(() => {
-		if (armor) {
-			editingHeader.set(armor.title, 'Editing Armor');
 		}
 	});
 
@@ -59,11 +56,18 @@
 			)}
 		>
 			<div class="w-full max-w-6xl space-y-4 px-4 py-4">
+				<!-- Header -->
+				<div class="flex flex-col gap-1">
+					<h1 class="text-2xl font-semibold">{armor.title}</h1>
+					<p class="text-sm text-muted-foreground">Editing Armor</p>
+				</div>
+
 				<!-- Main Content: Preview and Edit Side by Side -->
 				<div class="flex flex-col gap-6 lg:flex-row lg:items-start">
 					<!-- Preview Section -->
-					<div class="flex-1 rounded-lg border bg-card p-6">
-						<h2 class="mb-4 text-lg font-semibold">Preview</h2>
+					<div class="flex-1 p-6">
+						<h2 class="mb-2 text-lg font-semibold">Preview</h2>
+						<p class="mb-4 text-xs text-muted-foreground">{isSaved ? 'Saved' : 'Not Saved'}</p>
 
 						<div class="flex flex-col gap-6">
 							<!-- Description -->
@@ -120,7 +124,7 @@
 					<div class="w-full lg:w-auto lg:min-w-[300px] lg:max-w-[300px]">
 						<div class="rounded-lg border bg-card p-6">
 							<h2 class="mb-4 text-lg font-semibold">Edit</h2>
-							<HomebrewArmorForm bind:armor />
+							<HomebrewArmorForm bind:armor {uid} />
 						</div>
 					</div>
 				</div>

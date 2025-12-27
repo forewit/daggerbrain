@@ -25,7 +25,7 @@
 	let clientWidth = $state(360);
 
 	const context = getCharacterContext();
-	let character = $derived(context.character);
+	let character = $derived(context?.character);
 	const compendium = getCompendiumContext();
 
 	let width = $state(300);

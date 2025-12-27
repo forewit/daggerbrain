@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
-	import { getEditingHeaderContext } from '$lib/state/editing-header.svelte';
 	import HomebrewClassForm from '$lib/components/app/homebrew/homebrew-class-form.svelte';
 	import { cn, capitalize } from '$lib/utils';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
@@ -11,28 +10,26 @@
 
 	const homebrew = getHomebrewContext();
 	const compendium = getCompendiumContext();
-	const editingHeader = getEditingHeaderContext();
 
 	// Get the uid from the layout data
 	let uid = $derived(data.uid);
 
-	// Get class directly from homebrew context - auto-save is handled by the context
+	// Get class directly from homebrew context
 	let characterClass = $derived.by(() => {
 		if (!uid) return null;
 		return homebrew.classes[uid] || null;
+	});
+
+	// Check if class is saved
+	let isSaved = $derived.by(() => {
+		if (!uid || !characterClass) return false;
+		return homebrew.isSaved('classes', uid);
 	});
 
 	// Check if class is not found after loading completes
 	$effect(() => {
 		if (!homebrew.loading && uid && !characterClass) {
 			error(404, `Class with UID "${uid}" not found`);
-		}
-	});
-
-	// Set the editing header
-	$effect(() => {
-		if (characterClass) {
-			editingHeader.set(characterClass.name, 'Editing Class');
 		}
 	});
 </script>
@@ -53,11 +50,18 @@
 			)}
 		>
 			<div class="w-full max-w-6xl space-y-4 px-4 py-4">
+				<!-- Header -->
+				<div class="flex flex-col gap-1">
+					<h1 class="text-2xl font-semibold">{characterClass.name}</h1>
+					<p class="text-sm text-muted-foreground">Editing Class</p>
+				</div>
+
 				<!-- Main Content: Preview and Edit Side by Side -->
 				<div class="flex flex-col gap-6 lg:flex-row lg:items-start">
 					<!-- Preview Section -->
-					<div class="flex-1 rounded-lg border bg-card p-6">
-						<h2 class="mb-4 text-lg font-semibold">Preview</h2>
+					<div class="flex-1 p-6">
+						<h2 class="mb-2 text-lg font-semibold">Preview</h2>
+						<p class="mb-4 text-xs text-muted-foreground">{isSaved ? 'Saved' : 'Not Saved'}</p>
 
 						<div class="flex flex-col gap-6">
 							<!-- Description -->

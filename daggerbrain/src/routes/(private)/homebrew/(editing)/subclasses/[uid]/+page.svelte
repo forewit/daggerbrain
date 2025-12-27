@@ -2,6 +2,7 @@
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import HomebrewSubclassForm from '$lib/components/app/homebrew/homebrew-subclass-form.svelte';
+	import SubclassCard from '$lib/components/app/cards/full-cards/subclass-card.svelte';
 	import { cn } from '$lib/utils';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { error } from '@sveltejs/kit';
@@ -14,10 +15,16 @@
 	// Get the uid from the layout data
 	let uid = $derived(data.uid);
 
-	// Get subclass directly from homebrew context - auto-save is handled by the context
+	// Get subclass directly from homebrew context
 	let subclass = $derived.by(() => {
 		if (!uid) return null;
 		return homebrew.subclasses[uid] || null;
+	});
+
+	// Check if subclass is saved
+	let isSaved = $derived.by(() => {
+		if (!uid || !subclass) return false;
+		return homebrew.isSaved('subclasses', uid);
 	});
 
 	// Get class name for display
@@ -60,8 +67,9 @@
 				<!-- Main Content: Preview and Edit Side by Side -->
 				<div class="flex flex-col gap-6 lg:flex-row lg:items-start">
 					<!-- Preview Section -->
-					<div class="flex-1 rounded-lg border bg-card p-6">
-						<h2 class="mb-4 text-lg font-semibold">Preview</h2>
+					<div class="flex-1 p-6">
+						<h2 class="mb-2 text-lg font-semibold">Preview</h2>
+						<p class="mb-4 text-xs text-muted-foreground">{isSaved ? 'Saved' : 'Not Saved'}</p>
 
 						<div class="flex flex-col gap-6">
 							<!-- Description -->
@@ -70,66 +78,21 @@
 							{/if}
 
 							<!-- Foundation Card -->
-							<div class="rounded-lg border bg-primary/5 px-4 py-3">
-								<p class="text-sm font-medium mb-3">Foundation Card</p>
-								<div class="space-y-2">
-									<p class="text-xs font-medium text-muted-foreground">{subclass.foundation_card.title}</p>
-									{#if subclass.foundation_card.description_html}
-										<p class="text-xs text-muted-foreground">{@html subclass.foundation_card.description_html}</p>
-									{/if}
-									{#if subclass.foundation_card.spellcast_trait}
-										<p class="text-xs text-muted-foreground">Spellcast Trait: {subclass.foundation_card.spellcast_trait}</p>
-									{/if}
-									{#if subclass.foundation_card.features.length > 0}
-										<div class="mt-2 space-y-1">
-											{#each subclass.foundation_card.features as feature}
-												<div class="border-l-2 border-accent/30 pl-2">
-													<p class="text-xs font-medium text-muted-foreground">{feature.title}</p>
-												</div>
-											{/each}
-										</div>
-									{/if}
-								</div>
+							<div>
+								<p class="mb-2 text-sm font-medium">Foundation Card</p>
+								<SubclassCard card={subclass.foundation_card} />
 							</div>
 
 							<!-- Specialization Card -->
-							<div class="rounded-lg border bg-primary/5 px-4 py-3">
-								<p class="text-sm font-medium mb-3">Specialization Card</p>
-								<div class="space-y-2">
-									<p class="text-xs font-medium text-muted-foreground">{subclass.specialization_card.title}</p>
-									{#if subclass.specialization_card.description_html}
-										<p class="text-xs text-muted-foreground">{@html subclass.specialization_card.description_html}</p>
-									{/if}
-									{#if subclass.specialization_card.features.length > 0}
-										<div class="mt-2 space-y-1">
-											{#each subclass.specialization_card.features as feature}
-												<div class="border-l-2 border-accent/30 pl-2">
-													<p class="text-xs font-medium text-muted-foreground">{feature.title}</p>
-												</div>
-											{/each}
-										</div>
-									{/if}
-								</div>
+							<div>
+								<p class="mb-2 text-sm font-medium">Specialization Card</p>
+								<SubclassCard card={subclass.specialization_card} />
 							</div>
 
 							<!-- Mastery Card -->
-							<div class="rounded-lg border bg-primary/5 px-4 py-3">
-								<p class="text-sm font-medium mb-3">Mastery Card</p>
-								<div class="space-y-2">
-									<p class="text-xs font-medium text-muted-foreground">{subclass.mastery_card.title}</p>
-									{#if subclass.mastery_card.description_html}
-										<p class="text-xs text-muted-foreground">{@html subclass.mastery_card.description_html}</p>
-									{/if}
-									{#if subclass.mastery_card.features.length > 0}
-										<div class="mt-2 space-y-1">
-											{#each subclass.mastery_card.features as feature}
-												<div class="border-l-2 border-accent/30 pl-2">
-													<p class="text-xs font-medium text-muted-foreground">{feature.title}</p>
-												</div>
-											{/each}
-										</div>
-									{/if}
-								</div>
+							<div>
+								<p class="mb-2 text-sm font-medium">Mastery Card</p>
+								<SubclassCard card={subclass.mastery_card} />
 							</div>
 						</div>
 					</div>
@@ -138,7 +101,7 @@
 					<div class="w-full lg:w-auto lg:min-w-[300px] lg:max-w-[300px]">
 						<div class="rounded-lg border bg-card p-6">
 							<h2 class="mb-4 text-lg font-semibold">Edit</h2>
-							<HomebrewSubclassForm bind:subclass />
+							<HomebrewSubclassForm bind:subclass {uid} />
 						</div>
 					</div>
 				</div>

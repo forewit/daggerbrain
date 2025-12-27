@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Feature, DomainCard, DomainCardChoice, DomainIds } from '$lib/types/compendium-types';
+	import type { Feature, DomainCard, DomainIds } from '$lib/types/compendium-types';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -7,9 +7,9 @@
 	import * as Select from '$lib/components/ui/select';
 	import { cn } from '$lib/utils';
 	import HomebrewFeatureForm from './features/feature-form.svelte';
-	import DomainChoicesEditor from './features/domain-choices-editor.svelte';
 	import Dropdown from '../leveling/dropdown.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
+	import ImageUrlInput from './image-url-input.svelte';
 	import {
 		DomainCardFormSchema,
 		FeatureSchema,
@@ -20,15 +20,21 @@
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 
-	let { domainCard = $bindable() }: { domainCard: DomainCard } = $props();
+	let {
+		domainCard = $bindable()
+	}: {
+		domainCard: DomainCard;
+	} = $props();
 
 	const compendium = getCompendiumContext();
 	const homebrew = getHomebrewContext();
 
+	// Reference to image input component
+	let imageInput: { uploadPendingFile: () => Promise<string | null> } | null = $state(null);
+
 	// Form state - initialized from domainCard prop
 	let formTitle = $state('');
 	let formImageUrl = $state('');
-	let formArtistName = $state('');
 	let formDomainId = $state<DomainIds>('arcana');
 	let formLevelRequirement = $state('');
 	let formRecallCost = $state('');
@@ -38,7 +44,6 @@
 	let formForcedInLoadout = $state(false);
 	let formForcedInVault = $state(false);
 	let formFeatures = $state<Feature[]>([]);
-	let formChoices = $state<DomainCardChoice[]>([]);
 
 	// Validation errors state
 	let errors = $state<DomainCardFormErrors>({});
@@ -83,7 +88,6 @@
 
 		const titleMatch = formTitle.trim() === domainCard.title;
 		const imageUrlMatch = formImageUrl === domainCard.image_url;
-		const artistNameMatch = formArtistName === domainCard.artist_name;
 		const domainMatch = formDomainId === domainCard.domain_id;
 		const formLevelNum = formLevelRequirement === '' ? 0 : Number(formLevelRequirement);
 		const levelMatch = formLevelNum === domainCard.level_requirement;
@@ -97,13 +101,10 @@
 
 		// Compare features (deep comparison)
 		const featuresMatch = JSON.stringify(formFeatures) === JSON.stringify(domainCard.features);
-		// Compare choices (deep comparison)
-		const choicesMatch = JSON.stringify(formChoices) === JSON.stringify(domainCard.choices);
 
 		return !(
 			titleMatch &&
 			imageUrlMatch &&
-			artistNameMatch &&
 			domainMatch &&
 			levelMatch &&
 			recallCostMatch &&
@@ -112,8 +113,7 @@
 			appliesInVaultMatch &&
 			forcedInLoadoutMatch &&
 			forcedInVaultMatch &&
-			featuresMatch &&
-			choicesMatch
+			featuresMatch
 		);
 	});
 
@@ -122,7 +122,6 @@
 		if (domainCard) {
 			formTitle = domainCard.title;
 			formImageUrl = domainCard.image_url;
-			formArtistName = domainCard.artist_name;
 			formDomainId = domainCard.domain_id;
 			formLevelRequirement = domainCard.level_requirement === 0 ? '' : String(domainCard.level_requirement);
 			formRecallCost = domainCard.recall_cost === 0 ? '' : String(domainCard.recall_cost);
@@ -132,7 +131,6 @@
 			formForcedInLoadout = domainCard.forced_in_loadout;
 			formForcedInVault = domainCard.forced_in_vault;
 			formFeatures = JSON.parse(JSON.stringify(domainCard.features));
-			formChoices = JSON.parse(JSON.stringify(domainCard.choices));
 			// Clear errors when domainCard changes
 			errors = {};
 			featureErrors.clear();
@@ -145,7 +143,7 @@
 			domain_id: formDomainId,
 			title: formTitle.trim(),
 			image_url: formImageUrl,
-			artist_name: formArtistName,
+			artist_name: '',
 			level_requirement: formLevelRequirement === '' ? 0 : Number(formLevelRequirement),
 			recall_cost: formRecallCost === '' ? 0 : Number(formRecallCost),
 			category: formCategory,
@@ -154,17 +152,38 @@
 			forced_in_loadout: formForcedInLoadout,
 			forced_in_vault: formForcedInVault,
 			features: JSON.parse(JSON.stringify(formFeatures)),
-			choices: JSON.parse(JSON.stringify(formChoices))
+			choices: []
 		};
 	}
 
-	function handleSubmit(e: SubmitEvent) {
+	async function handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
 		if (!domainCard) return;
 
 		// Clear previous errors
 		errors = {};
 		featureErrors.clear();
+
+		// Upload pending image if there is one
+		if (imageInput) {
+			try {
+				const uploadedUrl = await imageInput.uploadPendingFile();
+				if (uploadedUrl) {
+					formImageUrl = uploadedUrl;
+				}
+			} catch (error) {
+				console.error('Failed to upload image:', error);
+				alert('Failed to upload image. Please try again.');
+				return;
+			}
+		}
+
+		// Validate level requirement
+		const levelNum = formLevelRequirement === '' ? 0 : Number(formLevelRequirement);
+		if (levelNum < 1 || levelNum > 10 || !Number.isInteger(levelNum)) {
+			errors = { ...errors, level_requirement: 'Level requirement must be an integer between 1 and 10' };
+			return;
+		}
 
 		// Validate all features directly
 		let allFeaturesValid = true;
@@ -208,18 +227,16 @@
 		// Re-sync form from domainCard prop
 		formTitle = domainCard.title;
 		formImageUrl = domainCard.image_url;
-		formArtistName = domainCard.artist_name;
 		formDomainId = domainCard.domain_id;
 		formLevelRequirement = domainCard.level_requirement === 0 ? '' : String(domainCard.level_requirement);
 		formRecallCost = domainCard.recall_cost === 0 ? '' : String(domainCard.recall_cost);
 		formCategory = domainCard.category;
 		formTokens = domainCard.tokens;
 		formAppliesInVault = domainCard.applies_in_vault;
-		formForcedInLoadout = domainCard.forced_in_loadout;
-		formForcedInVault = domainCard.forced_in_vault;
-		formFeatures = JSON.parse(JSON.stringify(domainCard.features));
-		formChoices = JSON.parse(JSON.stringify(domainCard.choices));
-		// Clear errors on reset
+			formForcedInLoadout = domainCard.forced_in_loadout;
+			formForcedInVault = domainCard.forced_in_vault;
+			formFeatures = JSON.parse(JSON.stringify(domainCard.features));
+			// Clear errors on reset
 		errors = {};
 		featureErrors.clear();
 	}
@@ -323,8 +340,13 @@
 				bind:value={formLevelRequirement}
 				placeholder="1"
 				min="1"
+				max="10"
 				step="1"
+				aria-invalid={!!errors.level_requirement}
 			/>
+			{#if errors.level_requirement}
+				<p class="text-xs text-destructive">{errors.level_requirement}</p>
+			{/if}
 		</div>
 		<div class="flex flex-col gap-1">
 			<label for="hb-domain-card-recall-cost" class="text-xs font-medium text-muted-foreground"
@@ -342,27 +364,16 @@
 		</div>
 	</div>
 
-	<!-- Image URL -->
+	<!-- Image -->
 	<div class="flex flex-col gap-1">
 		<label for="hb-domain-card-image-url" class="text-xs font-medium text-muted-foreground"
-			>Image URL</label
+			>Image</label
 		>
-		<Input
+		<ImageUrlInput
+			bind:this={imageInput}
 			id="hb-domain-card-image-url"
 			bind:value={formImageUrl}
-			placeholder="https://example.com/image.jpg"
-		/>
-	</div>
-
-	<!-- Artist Name -->
-	<div class="flex flex-col gap-1">
-		<label for="hb-domain-card-artist-name" class="text-xs font-medium text-muted-foreground"
-			>Artist Name</label
-		>
-		<Input
-			id="hb-domain-card-artist-name"
-			bind:value={formArtistName}
-			placeholder="Artist name"
+			alt="Domain card image"
 		/>
 	</div>
 
@@ -429,11 +440,6 @@
 				<p class="text-xs italic text-muted-foreground">No features added</p>
 			{/each}
 		</div>
-	</div>
-
-	<!-- Choices -->
-	<div class="flex flex-col gap-2">
-		<DomainChoicesEditor bind:choices={formChoices} />
 	</div>
 
 	<!-- Actions -->

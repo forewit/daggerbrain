@@ -17,8 +17,17 @@
 		type BeastformFormErrors
 	} from './form-schemas';
 	import { SvelteMap } from 'svelte/reactivity';
+	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 
-	let { beastform = $bindable() }: { beastform: Beastform } = $props();
+	let {
+		beastform = $bindable(),
+		uid
+	}: {
+		beastform: Beastform;
+		uid?: string;
+	} = $props();
+
+	const homebrew = getHomebrewContext();
 
 	// Form state - initialized from beastform prop
 	let formName = $state('');
@@ -212,6 +221,7 @@
 			...beastform,
 			...result.data
 		};
+
 
 		// Clear errors on success
 		errors = {};

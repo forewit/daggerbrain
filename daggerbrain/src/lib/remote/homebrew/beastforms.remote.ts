@@ -6,7 +6,7 @@ import { get_db, get_auth } from '../utils';
 import { BeastformSchema } from '$lib/compendium/compendium-schemas';
 import type { Beastform } from '$lib/types/compendium-types';
 import { homebrew_beastforms } from '$lib/server/db/homebrew.schema';
-import { verifyOwnership } from './utils';
+import { verifyOwnership, getTotalHomebrewCount, HOMEBREW_LIMIT } from './utils';
 
 // ============================================================================
 // Beastforms
@@ -36,14 +36,10 @@ export const create_homebrew_beastform = command(BeastformSchema, async (data) =
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Check if user has reached the limit of 1 beastform
-	const existing = await db
-		.select()
-		.from(homebrew_beastforms)
-		.where(eq(homebrew_beastforms.clerk_user_id, userId));
-
-	if (existing.length >= 1) {
-		throw error(403, 'Homebrew limit reached. You can only have 1 custom beastform.');
+	// Check if user has reached the global homebrew limit
+	const totalCount = await getTotalHomebrewCount(db, userId);
+	if (totalCount >= HOMEBREW_LIMIT) {
+		throw error(403, `Homebrew limit reached. You can only have ${HOMEBREW_LIMIT} custom items.`);
 	}
 
 	const validatedData = BeastformSchema.parse({ ...data, source_id: 'Homebrew' as const });

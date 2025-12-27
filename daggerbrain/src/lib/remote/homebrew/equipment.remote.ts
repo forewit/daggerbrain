@@ -12,7 +12,7 @@ import {
 	homebrew_loot,
 	homebrew_consumables
 } from '$lib/server/db/homebrew.schema';
-import { verifyOwnership } from './utils';
+import { verifyOwnership, getTotalHomebrewCount, HOMEBREW_LIMIT } from './utils';
 
 // ============================================================================
 // Primary Weapons
@@ -42,14 +42,10 @@ export const create_homebrew_primary_weapon = command(WeaponSchema, async (data)
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Check if user has reached the limit of 1 primary weapon
-	const existing = await db
-		.select()
-		.from(homebrew_primary_weapons)
-		.where(eq(homebrew_primary_weapons.clerk_user_id, userId));
-
-	if (existing.length >= 1) {
-		throw error(403, 'Homebrew limit reached. You can only have 1 custom primary weapon.');
+	// Check if user has reached the global homebrew limit
+	const totalCount = await getTotalHomebrewCount(db, userId);
+	if (totalCount >= HOMEBREW_LIMIT) {
+		throw error(403, `Homebrew limit reached. You can only have ${HOMEBREW_LIMIT} custom items.`);
 	}
 
 	const validatedData = WeaponSchema.parse({ ...data, source_id: 'Homebrew' as const });
@@ -150,14 +146,10 @@ export const create_homebrew_secondary_weapon = command(WeaponSchema, async (dat
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Check if user has reached the limit of 1 secondary weapon
-	const existing = await db
-		.select()
-		.from(homebrew_secondary_weapons)
-		.where(eq(homebrew_secondary_weapons.clerk_user_id, userId));
-
-	if (existing.length >= 1) {
-		throw error(403, 'Homebrew limit reached. You can only have 1 custom secondary weapon.');
+	// Check if user has reached the global homebrew limit
+	const totalCount = await getTotalHomebrewCount(db, userId);
+	if (totalCount >= HOMEBREW_LIMIT) {
+		throw error(403, `Homebrew limit reached. You can only have ${HOMEBREW_LIMIT} custom items.`);
 	}
 
 	const validatedData = WeaponSchema.parse({ ...data, source_id: 'Homebrew' as const });
@@ -258,14 +250,10 @@ export const create_homebrew_armor = command(ArmorSchema, async (data) => {
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Check if user has reached the limit of 1 armor
-	const existing = await db
-		.select()
-		.from(homebrew_armor)
-		.where(eq(homebrew_armor.clerk_user_id, userId));
-
-	if (existing.length >= 1) {
-		throw error(403, 'Homebrew limit reached. You can only have 1 custom armor.');
+	// Check if user has reached the global homebrew limit
+	const totalCount = await getTotalHomebrewCount(db, userId);
+	if (totalCount >= HOMEBREW_LIMIT) {
+		throw error(403, `Homebrew limit reached. You can only have ${HOMEBREW_LIMIT} custom items.`);
 	}
 
 	const validatedData = ArmorSchema.parse({ ...data, source_id: 'Homebrew' as const });
@@ -356,14 +344,10 @@ export const create_homebrew_loot = command(LootSchema, async (data) => {
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Check if user has reached the limit of 1 loot item
-	const existing = await db
-		.select()
-		.from(homebrew_loot)
-		.where(eq(homebrew_loot.clerk_user_id, userId));
-
-	if (existing.length >= 1) {
-		throw error(403, 'Homebrew limit reached. You can only have 1 custom loot item.');
+	// Check if user has reached the global homebrew limit
+	const totalCount = await getTotalHomebrewCount(db, userId);
+	if (totalCount >= HOMEBREW_LIMIT) {
+		throw error(403, `Homebrew limit reached. You can only have ${HOMEBREW_LIMIT} custom items.`);
 	}
 
 	const validatedData = LootSchema.parse({ ...data, source_id: 'Homebrew' as const });
@@ -454,14 +438,10 @@ export const create_homebrew_consumable = command(ConsumableSchema, async (data)
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Check if user has reached the limit of 1 consumable
-	const existing = await db
-		.select()
-		.from(homebrew_consumables)
-		.where(eq(homebrew_consumables.clerk_user_id, userId));
-
-	if (existing.length >= 1) {
-		throw error(403, 'Homebrew limit reached. You can only have 1 custom consumable.');
+	// Check if user has reached the global homebrew limit
+	const totalCount = await getTotalHomebrewCount(db, userId);
+	if (totalCount >= HOMEBREW_LIMIT) {
+		throw error(403, `Homebrew limit reached. You can only have ${HOMEBREW_LIMIT} custom items.`);
 	}
 
 	const validatedData = ConsumableSchema.parse({ ...data, source_id: 'Homebrew' as const });
