@@ -498,7 +498,22 @@ export const SUBCLASSES = {
 				{
 					title: 'Unwavering',
 					description_html: '<p>Gain a permanent <b>+1</b> bonus to your damage thresholds.</p>',
-					character_modifiers: [],
+					character_modifiers: [
+						{
+							behaviour: 'bonus',
+							character_conditions: [],
+							type: 'flat',
+							value: 1,
+							target: 'major_damage_threshold'
+						},
+						{
+							behaviour: 'bonus',
+							character_conditions: [],
+							type: 'flat',
+							value: 1,
+							target: 'severe_damage_threshold'
+						}
+					],
 					weapon_modifiers: []
 				},
 				{

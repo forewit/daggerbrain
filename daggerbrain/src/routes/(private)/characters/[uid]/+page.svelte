@@ -25,11 +25,13 @@
 {:else if character}
 	{#if Object.values(character.selected_traits).includes(null) || !character.primary_class_id}
 		<div class="flex flex-col items-center justify-center gap-4 px-4 py-12">
-			<p class="text-sm text-muted-foreground italic">Ready to finish setting up your character?</p>
-			<Button
-				href={!character.primary_class_id ? `${character.id}/class/` : `${character.id}/traits/`}
-				>Edit Character</Button
-			>
+			{#if !character.primary_class_id}
+				<p class="text-sm text-muted-foreground italic">Your character is missing a class.</p>
+				<Button href={`${character.id}/class/`}>Edit Character</Button>
+			{:else}
+				<p class="text-sm text-muted-foreground italic">Your character is missing traits.</p>
+				<Button href={`${character.id}/traits/`}>Edit Character</Button>
+			{/if}
 		</div>
 	{:else}
 		<CharacterSheet class="mb-24" />

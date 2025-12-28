@@ -16,6 +16,7 @@
 	import TransformationCardComponent from './full-cards/transformation-card.svelte';
 	import SubclassCardComponent from './full-cards/subclass-card.svelte';
 	import { Button } from '$lib/components/ui/button';
+	import * as Dialog from '$lib/components/ui/dialog';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import ChevronFirst from '@lucide/svelte/icons/chevron-first';
@@ -55,6 +56,7 @@
 	let containerWidth: number = $state(null!);
 	let isShiftPressed = $state(false);
 	let isHovered = $state(false);
+	let dialogOpen = $state(false);
 
 	function handleScroll() {
 		if (cards.length === 0) {
@@ -125,7 +127,11 @@
 		}
 	}
 
-	function handleCardClick(event: MouseEvent) {
+	function handleCardClick(event: MouseEvent, index: number) {
+		if (index === selectedIndex) {
+			dialogOpen = true;
+			return;
+		}
 		const el = event.currentTarget as HTMLButtonElement;
 		el.scrollIntoView({
 			behavior: 'smooth',
@@ -170,12 +176,12 @@
 		{#each cards as card, index (card.compendium_id)}
 			<button
 				class={cn(
-					'transition-scale relative scale-95 snap-center rounded-xl duration-200',
+					'transition-scale relative scale-95 snap-center rounded-2xl duration-200',
 					selectedIndex === index && 'scale-100',
 					disabled_indices.has(index) && 'opacity-50'
 				)}
-				style="width: {cardWidth}px;"
-				onclick={handleCardClick}
+			style="width: {cardWidth}px;"
+			onclick={(e) => handleCardClick(e, index)}
 			>
 				<span
 					class="absolute inset-0 rounded-2xl"
@@ -251,3 +257,27 @@
 		</div>
 	</div>
 </div>
+
+<Dialog.Root bind:open={dialogOpen}>
+	<Dialog.Content class="w-fit max-w-[90vw] border-none bg-transparent p-0 shadow-none" closeClasses="-top-4 -right-4">
+		{#if cards[selectedIndex]}
+			{@const card = cards[selectedIndex]}
+			<div style="width: min(360px, 80vw);">
+				{#if card.card_type === 'domain'}
+					<DomainCardComponent card={card as DomainCard} variant="card" />
+				{:else if card.card_type === 'ancestry'}
+					<AncestryCardComponent card={card as AncestryCard} variant="card" />
+				{:else if card.card_type === 'community'}
+					<CommunityCardComponent card={card as CommunityCard} variant="card" />
+				{:else if card.card_type === 'transformation'}
+					<TransformationCardComponent card={card as TransformationCard} variant="card" />
+				{:else if ['subclass_foundation', 'subclass_specialization', 'subclass_mastery'].includes(card.card_type)}
+					<SubclassCardComponent
+						card={card as SubclassFoundationCard | SubclassSpecializationCard | SubclassMasteryCard}
+						variant="card"
+					/>
+				{/if}
+			</div>
+		{/if}
+	</Dialog.Content>
+</Dialog.Root>
