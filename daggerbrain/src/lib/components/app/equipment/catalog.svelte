@@ -13,15 +13,21 @@
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import Search from '@lucide/svelte/icons/search';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+	import Check from '@lucide/svelte/icons/check';
 	import { cn } from '$lib/utils';
+	import { SvelteSet } from 'svelte/reactivity';
 
 	let searchQuery = $state('');
 	let typeFilter = $state<'Weapons' | 'Armor' | 'Consumables' | 'Loot' | null>(null);
 	let tierFilter = $state<'1' | '2' | '3' | '4' | ''>('');
 	let weaponTypeFilter = $state<'Magical' | 'Physical' | ''>('');
 	let weaponCategoryFilter = $state<'Primary' | 'Secondary' | ''>('');
+	const ADD_BUTTON_DISABLE_DELAY_MS = 1200;
+
 	let customItemOpen = $state(false);
 	let customItemTitle = $state('');
+	let customItemDisabled = $state(false);
+	const disabledItems = new SvelteSet<string>();
 
 	// Clear subfilters when main filter changes
 	$effect(() => {
@@ -213,7 +219,7 @@
 			/>
 			<Button
 				size="sm"
-				disabled={!customItemTitle.trim()}
+				disabled={!customItemTitle.trim() || customItemDisabled}
 				onclick={() => {
 					if (customItemTitle.trim()) {
 						context.addToInventory(
@@ -221,10 +227,16 @@
 							'adventuring_gear'
 						);
 						customItemTitle = '';
+						customItemDisabled = true;
+						setTimeout(() => (customItemDisabled = false), ADD_BUTTON_DISABLE_DELAY_MS);
 					}
 				}}
 			>
-				Add Item
+				{#if customItemDisabled}
+					<Check /> Added
+				{:else}
+					Add Item
+				{/if}
 			</Button>
 		</Collapsible.Content>
 	</Collapsible.Root>
@@ -373,12 +385,23 @@
 							<WeaponDetails weapon={entry.item} />
 							<Button
 								size="sm"
+								disabled={disabledItems.has(entry.item.compendium_id)}
 								onclick={() => {
 									context.addToInventory(
 										entry.item,
 										entry.item.category === 'Primary' ? 'primary_weapon' : 'secondary_weapon'
 									);
-								}}>Add</Button
+									const id = entry.item.compendium_id;
+									disabledItems.add(id);
+									setTimeout(() => disabledItems.delete(id), ADD_BUTTON_DISABLE_DELAY_MS);
+								}}
+							>
+								{#if disabledItems.has(entry.item.compendium_id)}
+									<Check /> Added
+								{:else}
+									Add
+								{/if}
+							</Button
 							>
 						</div>
 					</Dropdown>
@@ -397,9 +420,20 @@
 							<ArmorDetails armor={entry.item} />
 							<Button
 								size="sm"
+								disabled={disabledItems.has(entry.item.compendium_id)}
 								onclick={() => {
 									context.addToInventory(entry.item, 'armor');
-								}}>Add</Button
+									const id = entry.item.compendium_id;
+									disabledItems.add(id);
+									setTimeout(() => disabledItems.delete(id), ADD_BUTTON_DISABLE_DELAY_MS);
+								}}
+							>
+								{#if disabledItems.has(entry.item.compendium_id)}
+									<Check /> Added
+								{:else}
+									Add
+								{/if}
+							</Button
 							>
 						</div>
 					</Dropdown>
@@ -415,10 +449,21 @@
 							<ConsumableDetails consumable={entry.item} />
 							<Button
 								size="sm"
-								disabled={context.consumable_count >= context.max_consumables}
+								disabled={context.consumable_count >= context.max_consumables ||
+									disabledItems.has(entry.item.compendium_id)}
 								onclick={() => {
 									context.addToInventory(entry.item, 'consumable');
-								}}>Add</Button
+									const id = entry.item.compendium_id;
+									disabledItems.add(id);
+									setTimeout(() => disabledItems.delete(id), ADD_BUTTON_DISABLE_DELAY_MS);
+								}}
+							>
+								{#if disabledItems.has(entry.item.compendium_id)}
+									<Check /> Added
+								{:else}
+									Add
+								{/if}
+							</Button
 							>
 						</div>
 					</Dropdown>
@@ -434,9 +479,20 @@
 							<LootDetails loot={entry.item} />
 							<Button
 								size="sm"
+								disabled={disabledItems.has(entry.item.compendium_id)}
 								onclick={() => {
 									context.addToInventory(entry.item, 'loot');
-								}}>Add</Button
+									const id = entry.item.compendium_id;
+									disabledItems.add(id);
+									setTimeout(() => disabledItems.delete(id), ADD_BUTTON_DISABLE_DELAY_MS);
+								}}
+							>
+								{#if disabledItems.has(entry.item.compendium_id)}
+									<Check /> Added
+								{:else}
+									Add
+								{/if}
+							</Button
 							>
 						</div>
 					</Dropdown>

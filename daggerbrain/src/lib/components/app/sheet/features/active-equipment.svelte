@@ -234,13 +234,13 @@
 	</div>
 
 	{#if isRogueClass}
-		<div class="pt- flex items-center gap-2 pl-4">
+		<div class="pt-1 flex items-center gap-2 pl-4">
 			<div class="w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs">
 				{context.level_to_tier(context.character?.level ?? 0)}d6
 			</div>
-			<p class="text-xs">Sneak Attack Damage</p>
+			<p class="text-xs text-nowrap">Sneak Attack Damage</p>
 			<p class="text-xs text-muted-foreground italic">
-				On successful attack while cloaked and in Melee range
+				While <em>Cloaked</em> or while an ally is within Melee range of your target
 			</p>
 		</div>
 	{/if}

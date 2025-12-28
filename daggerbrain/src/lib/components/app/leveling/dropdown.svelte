@@ -11,7 +11,8 @@
 		highlighted = false,
 		title_snippet = null,
 		subtitle_snippet = null,
-		children
+		children,
+		open = $bindable(false)
 	}: {
 		class?: string;
 		title?: string;
@@ -21,9 +22,9 @@
 		disabled?: boolean;
 		highlighted?: boolean;
 		children?: Snippet;
+		open?: boolean;
 	} = $props();
 
-	let open = $state(false);
 </script>
 
 <div

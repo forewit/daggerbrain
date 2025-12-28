@@ -9,6 +9,7 @@
 		ref = $bindable(null),
 		class: className,
 		overlayClasses,
+		closeClasses,
 		portalProps,
 		children,
 		hideClose = false,
@@ -17,6 +18,7 @@
 		portalProps?: DialogPrimitive.PortalProps;
 		hideClose?: boolean;
 		overlayClasses?: string;
+		closeClasses?: string;
 		children: Snippet;
 	} = $props();
 </script>
@@ -35,7 +37,10 @@
 		{@render children?.()}
 		{#if !hideClose}
 			<DialogPrimitive.Close
-				class="absolute top-4 right-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+				class={cn(
+					"absolute top-4 right-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+					closeClasses
+				)}
 			>
 				<XIcon />
 				<span class="sr-only">Close</span>

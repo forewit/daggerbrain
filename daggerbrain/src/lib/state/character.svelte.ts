@@ -1,4 +1,5 @@
 import { getUserContext } from './user.svelte';
+import { toast } from 'svelte-sonner';
 import {
 	ALL_LEVEL_UP_OPTIONS,
 	BASE_COMPANION,
@@ -3449,6 +3450,7 @@ function createCharacter(id: string) {
 		if (!character) return;
 
 		const compendium_id = item.compendium_id;
+		toast.success(`${item.title} added to inventory.`);
 
 		if (type === 'primary_weapon') {
 			// Generate unique id for this inventory item
@@ -3585,7 +3587,10 @@ function createCharacter(id: string) {
 		type: 'primary_weapon' | 'secondary_weapon' | 'armor'
 	) {
 		if (!character) return;
-		if (character.level < item.level_requirement) return; // Level requirement not met
+		if (character.level < item.level_requirement) {
+			toast.error(`You must be level ${item.level_requirement} to equip this item.`);
+			return; // Level requirement not met
+		}
 
 		if (type === 'primary_weapon') {
 			character.active_primary_weapon_id = item.id;

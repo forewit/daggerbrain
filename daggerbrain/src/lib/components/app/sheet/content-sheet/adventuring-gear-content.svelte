@@ -58,7 +58,7 @@
 		<!-- Adventuring Gear Table -->
 		<table class="w-full border-collapse text-sm">
 			<tbody>
-				{#each adventuringGear as gear (gear.title)}
+				{#each adventuringGear as gear}
 					<tr class="border-b">
 						<td class="py-2 pr-4 text-left text-muted-foreground">
 							{gear.title}

@@ -8,6 +8,7 @@
 	import { cn } from '$lib/utils';
 	import ArmorCard from './armor.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
+	import { toast } from 'svelte-sonner';
 
 	const context = getCharacterContext();
 	let character = $derived(context.character);
@@ -193,6 +194,8 @@
 		selectedLootOption = null;
 		selectedClassGearOption = null;
 		spellbookInput = '';
+
+		toast.success('Starting equipment added');
 	}
 </script>
 
