@@ -308,48 +308,23 @@ function createHomebrew() {
 
 	// Auto-save effect for primary_weapons
 	$effect(() => {
-		// #region agent log
-		fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew.svelte.ts:310',message:'primary_weapons auto-save effect triggered',data:{lastSavedIsNull:lastSaved_primary_weapons===null,weaponCount:Object.keys(homebrew_primary_weapons).length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-		// #endregion
 		if (lastSaved_primary_weapons === null) return;
 		const currentJson = JSON.stringify(homebrew_primary_weapons);
-		// #region agent log
-		fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew.svelte.ts:313',message:'primary_weapons comparison',data:{currentJsonLength:currentJson.length,lastSavedLength:lastSaved_primary_weapons.length,areEqual:currentJson===lastSaved_primary_weapons},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-		// #endregion
 		if (currentJson === lastSaved_primary_weapons) return;
 
 		const saved = JSON.parse(lastSaved_primary_weapons) as typeof homebrew_primary_weapons;
 		for (const [id, item] of Object.entries(homebrew_primary_weapons)) {
 			const itemJson = JSON.stringify(item);
 			const savedItemJson = saved[id] ? JSON.stringify(saved[id]) : null;
-			// #region agent log
-			fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew.svelte.ts:318',message:'primary_weapons item check',data:{id,hasSavedItem:!!saved[id],itemJsonLength:itemJson.length,savedItemJsonLength:savedItemJson?.length||0,areEqual:itemJson===savedItemJson,inFlight:inFlight.has(`primary_weapons:${id}`)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-			// #endregion
 			if (savedItemJson === null || itemJson === savedItemJson || inFlight.has(`primary_weapons:${id}`)) continue;
 
-			// #region agent log
-			fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew.svelte.ts:321',message:'primary_weapons scheduling save',data:{id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-			// #endregion
 			if (debounceTimers[`primary_weapons:${id}`]) clearTimeout(debounceTimers[`primary_weapons:${id}`]!);
 			debounceTimers[`primary_weapons:${id}`] = setTimeout(() => {
 				delete debounceTimers[`primary_weapons:${id}`];
 				inFlight.add(`primary_weapons:${id}`);
-				// #region agent log
-				fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew.svelte.ts:325',message:'primary_weapons calling update API',data:{id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-				// #endregion
 				update_homebrew_primary_weapon({ id, data: JSON.parse(JSON.stringify(homebrew_primary_weapons[id])) })
-					.then(() => { 
-						// #region agent log
-						fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew.svelte.ts:326',message:'primary_weapons save succeeded',data:{id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-						// #endregion
-						lastSaved_primary_weapons = JSON.stringify(homebrew_primary_weapons); 
-					})
-					.catch((e) => {
-						// #region agent log
-						fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew.svelte.ts:327',message:'primary_weapons save failed',data:{id,error:String(e)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-						// #endregion
-						console.error('Failed to auto-save primary weapon:', e);
-					})
+					.then(() => { lastSaved_primary_weapons = JSON.stringify(homebrew_primary_weapons); })
+					.catch((e) => console.error('Failed to auto-save primary weapon:', e))
 					.finally(() => inFlight.delete(`primary_weapons:${id}`));
 			}, 300);
 		}
@@ -357,48 +332,23 @@ function createHomebrew() {
 
 	// Auto-save effect for secondary_weapons
 	$effect(() => {
-		// #region agent log
-		fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew.svelte.ts:333',message:'secondary_weapons auto-save effect triggered',data:{lastSavedIsNull:lastSaved_secondary_weapons===null,weaponCount:Object.keys(homebrew_secondary_weapons).length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-		// #endregion
 		if (lastSaved_secondary_weapons === null) return;
 		const currentJson = JSON.stringify(homebrew_secondary_weapons);
-		// #region agent log
-		fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew.svelte.ts:336',message:'secondary_weapons comparison',data:{currentJsonLength:currentJson.length,lastSavedLength:lastSaved_secondary_weapons.length,areEqual:currentJson===lastSaved_secondary_weapons},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-		// #endregion
 		if (currentJson === lastSaved_secondary_weapons) return;
 
 		const saved = JSON.parse(lastSaved_secondary_weapons) as typeof homebrew_secondary_weapons;
 		for (const [id, item] of Object.entries(homebrew_secondary_weapons)) {
 			const itemJson = JSON.stringify(item);
 			const savedItemJson = saved[id] ? JSON.stringify(saved[id]) : null;
-			// #region agent log
-			fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew.svelte.ts:341',message:'secondary_weapons item check',data:{id,hasSavedItem:!!saved[id],itemJsonLength:itemJson.length,savedItemJsonLength:savedItemJson?.length||0,areEqual:itemJson===savedItemJson,inFlight:inFlight.has(`secondary_weapons:${id}`)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-			// #endregion
 			if (savedItemJson === null || itemJson === savedItemJson || inFlight.has(`secondary_weapons:${id}`)) continue;
 
-			// #region agent log
-			fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew.svelte.ts:344',message:'secondary_weapons scheduling save',data:{id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-			// #endregion
 			if (debounceTimers[`secondary_weapons:${id}`]) clearTimeout(debounceTimers[`secondary_weapons:${id}`]!);
 			debounceTimers[`secondary_weapons:${id}`] = setTimeout(() => {
 				delete debounceTimers[`secondary_weapons:${id}`];
 				inFlight.add(`secondary_weapons:${id}`);
-				// #region agent log
-				fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew.svelte.ts:348',message:'secondary_weapons calling update API',data:{id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-				// #endregion
 				update_homebrew_secondary_weapon({ id, data: JSON.parse(JSON.stringify(homebrew_secondary_weapons[id])) })
-					.then(() => { 
-						// #region agent log
-						fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew.svelte.ts:349',message:'secondary_weapons save succeeded',data:{id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-						// #endregion
-						lastSaved_secondary_weapons = JSON.stringify(homebrew_secondary_weapons); 
-					})
-					.catch((e) => {
-						// #region agent log
-						fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew.svelte.ts:350',message:'secondary_weapons save failed',data:{id,error:String(e)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-						// #endregion
-						console.error('Failed to auto-save secondary weapon:', e);
-					})
+					.then(() => { lastSaved_secondary_weapons = JSON.stringify(homebrew_secondary_weapons); })
+					.catch((e) => console.error('Failed to auto-save secondary weapon:', e))
 					.finally(() => inFlight.delete(`secondary_weapons:${id}`));
 			}, 300);
 		}

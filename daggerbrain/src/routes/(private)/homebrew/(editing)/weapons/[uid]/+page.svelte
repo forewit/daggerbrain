@@ -77,7 +77,7 @@
 			)}
 		>
 			<!-- Main Content: Preview and Edit Side by Side -->
-			<div class="flex w-full max-w-6xl flex-col justify-center gap-6 p-4 md:flex-row">
+			<div class="flex w-full max-w-6xl flex-col flex-col-reverse justify-center gap-6 p-4 md:flex-row">
 				<!-- Edit Section -->
 				<div class="w-full md:w-[400px]">
 					<div class="mb-2 flex items-center justify-between gap-4">
@@ -105,33 +105,17 @@
 								class="h-7 px-3"
 								disabled={!formHasChanges}
 								onclick={() => {
-									// #region agent log
-									fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'+page.svelte:107',message:'Save button clicked',data:{uid,weaponCategory,hasWeapon:!!weapon,weaponTitle:weapon?.title,formHasChanges},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
-									// #endregion
 									if (formComponent) {
-										// #region agent log
-										const weaponBeforeUpdate = JSON.stringify(weapon);
-										// #endregion
 										formComponent.handleSubmit();
-										// #region agent log
-										fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'+page.svelte:110',message:'handleSubmit called, weapon before state update',data:{weaponBeforeUpdate,weaponAfterFormSubmit:JSON.stringify(weapon),weaponChanged:weaponBeforeUpdate!==JSON.stringify(weapon)},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
-										// #endregion
 										// Update the homebrew state record so auto-save can detect the change
 										// Create a new object reference to ensure reactivity triggers
 										if (uid && weaponCategory && weapon) {
-											// #region agent log
-											const stateBefore = weaponCategory === 'primary' ? JSON.stringify(homebrew.primary_weapons[uid]) : JSON.stringify(homebrew.secondary_weapons[uid]);
-											// #endregion
 											const updatedWeapon = JSON.parse(JSON.stringify(weapon));
 											if (weaponCategory === 'primary') {
 												homebrew.primary_weapons[uid] = updatedWeapon;
 											} else {
 												homebrew.secondary_weapons[uid] = updatedWeapon;
 											}
-											// #region agent log
-											const stateAfter = weaponCategory === 'primary' ? JSON.stringify(homebrew.primary_weapons[uid]) : JSON.stringify(homebrew.secondary_weapons[uid]);
-											fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'+page.svelte:120',message:'homebrew state updated with new reference',data:{weaponCategory,stateBefore,stateAfter,stateChanged:stateBefore!==stateAfter},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
-											// #endregion
 										}
 									}
 								}}
@@ -152,11 +136,11 @@
 
 				<!-- Preview Section -->
 				<div>
-					<div class="sticky top-4 w-[300px] grow">
+					<div class="sticky top-4 grow">
 						<h2 class="mb-2 ml-2 flex items-center gap-2 text-lg font-semibold">Preview</h2>
 
 						<!-- actual preview -->
-						<div class="flex flex-col gap-4 rounded-lg border p-4">
+						<div class="mx-auto flex w-[300px] flex-col gap-4 rounded-lg border p-4">
 							<!-- Title and Subtitle -->
 							<div class="flex flex-col gap-1">
 								<h3 class="text-lg font-semibold">{weapon.title}</h3>
