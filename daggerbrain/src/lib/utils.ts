@@ -101,3 +101,45 @@ export function increase_range(range: Ranges): Ranges {
 			return range;
 	}
 }
+
+/**
+ * Converts a character level to its corresponding tier.
+ * Tier 1: Level 1
+ * Tier 2: Levels 2-4
+ * Tier 3: Levels 5-7
+ * Tier 4: Levels 8-10
+ *
+ * @param level - The character level
+ * @returns The tier (1, 2, 3, or 4)
+ *
+ * @example
+ * level_to_tier(1) // 1
+ * level_to_tier(3) // 2
+ * level_to_tier(6) // 3
+ * level_to_tier(10) // 4
+ */
+export function level_to_tier(level: number): 1 | 2 | 3 | 4 {
+	if (level === 1) return 1;
+	if (level >= 2 && level <= 4) return 2;
+	if (level >= 5 && level <= 7) return 3;
+	return 4;
+}
+
+/**
+ * Gets the minimum level required for a given tier.
+ *
+ * @param tier - The tier (1, 2, 3, or 4)
+ * @returns The minimum level for that tier
+ *
+ * @example
+ * tier_to_min_level(1) // 1
+ * tier_to_min_level(2) // 2
+ * tier_to_min_level(3) // 5
+ * tier_to_min_level(4) // 8
+ */
+export function tier_to_min_level(tier: number): number {
+	if (tier === 1) return 1;
+	if (tier === 2) return 2;
+	if (tier === 3) return 5;
+	return 8; // tier 4
+}

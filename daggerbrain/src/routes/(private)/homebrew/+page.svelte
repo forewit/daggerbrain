@@ -1,11 +1,13 @@
 <script lang="ts">
-	import { cn } from '$lib/utils';
+	import { cn, level_to_tier } from '$lib/utils';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
-	import * as Tabs from '$lib/components/ui/tabs';
 	import * as Select from '$lib/components/ui/select';
 	import * as Dialog from '$lib/components/ui/dialog';
+	import * as Collapsible from '$lib/components/ui/collapsible';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
+	import { getCompendiumContext } from '$lib/state/compendium.svelte';
+	import TemplateCombobox from '$lib/components/app/homebrew/template-combobox.svelte';
 	import type {
 		Weapon,
 		Armor,
@@ -33,261 +35,475 @@
 	import Sparkles from '@lucide/svelte/icons/sparkles';
 	import Footer from '$lib/components/app/footer.svelte';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import Plus from '@lucide/svelte/icons/plus';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import Label from '$lib/components/ui/label/label.svelte';
-
+	import Filter from '@lucide/svelte/icons/filter';
+	import { goto } from '$app/navigation';
+	import type { HomebrewType } from '$lib/types/homebrew-types';
+	import { MAX_HOMEBREW } from '$lib/types/homebrew-types';
+	
 	const homebrew = getHomebrewContext();
+	const compendium = getCompendiumContext();
 
 	// Create dialog state
-	type HomebrewType =
-		| 'weapon'
-		| 'armor'
-		| 'beastform'
-		| 'loot'
-		| 'consumable'
-		| 'class'
-		| 'subclass'
-		| 'domain_card'
-		| 'ancestry_card'
-		| 'community_card'
-		| 'transformation_card';
 	let showCreateDialog = $state(false);
 	let newItemType = $state<HomebrewType | undefined>(undefined);
 	let newItemName = $state('');
+	let selectedTemplateId = $state('');
 	let isCreating = $state(false);
+
+	// Reset template selection when type changes
+	$effect(() => {
+		newItemType; // track dependency
+		selectedTemplateId = '';
+	});
+
+	// Look up the selected template from compendium
+	const selectedTemplate = $derived.by(() => {
+		if (!selectedTemplateId || !newItemType) return null;
+
+		switch (newItemType) {
+			case 'weapon': {
+				const primary = compendium.primary_weapons[selectedTemplateId];
+				if (primary) return { type: 'primary' as const, data: primary };
+				const secondary = compendium.secondary_weapons[selectedTemplateId];
+				if (secondary) return { type: 'secondary' as const, data: secondary };
+				return null;
+			}
+			case 'armor':
+				return compendium.armor[selectedTemplateId] || null;
+			case 'beastform':
+				return compendium.beastforms[selectedTemplateId] || null;
+			case 'loot':
+				return compendium.loot[selectedTemplateId] || null;
+			case 'consumable':
+				return compendium.consumables[selectedTemplateId] || null;
+			case 'class':
+				return compendium.classes[selectedTemplateId] || null;
+			case 'subclass':
+				return compendium.subclasses[selectedTemplateId] || null;
+			case 'domain-cards': {
+				const domainIds: DomainIds[] = [
+					'arcana',
+					'blade',
+					'bone',
+					'codex',
+					'grace',
+					'midnight',
+					'sage',
+					'splendor',
+					'valor'
+				];
+				for (const domainId of domainIds) {
+					const card = compendium.domain_cards[domainId]?.[selectedTemplateId];
+					if (card) return card;
+				}
+				return null;
+			}
+			case 'ancestry-cards':
+				return compendium.ancestry_cards[selectedTemplateId] || null;
+			case 'community-cards':
+				return compendium.community_cards[selectedTemplateId] || null;
+			case 'transformation-cards':
+				return compendium.transformation_cards[selectedTemplateId] || null;
+			default:
+				return null;
+		}
+	});
 
 	async function handleCreateHomebrew() {
 		if (!newItemName.trim() || !newItemType) return;
 
 		isCreating = true;
 		try {
+			let id = '';
+			const itemType = newItemType; // Save type before resetting
 			switch (newItemType) {
-				case 'weapon':
-					await homebrew.createPrimaryWeapon({
-						compendium_id: '',
-						source_id: 'Homebrew',
-						title: newItemName.trim(),
-						description_html: '',
-						level_requirement: 1,
-						category: 'Primary',
-						type: 'Physical',
-						available_traits: [],
-						range: 'Melee',
-						features: [],
-						attack_roll_bonus: 0,
-						damage_bonus: 0,
-						damage_dice: '1d6',
-						available_damage_types: [],
-						burden: 1
-					});
-					break;
-				case 'armor':
-					await homebrew.createArmor({
-						compendium_id: '',
-						source_id: 'Homebrew',
-						title: newItemName.trim(),
-						description_html: '',
-						level_requirement: 1,
-						max_armor: 0,
-						damage_thresholds: { major: 0, severe: 0 },
-						features: []
-					});
-					break;
-				case 'beastform':
-					await homebrew.createBeastform({
-						compendium_id: '',
-						source_id: 'Homebrew',
-						level_requirement: 1,
-						name: newItemName.trim(),
-						category: '',
-						character_trait: {
-							trait: 'agility',
-							bonus: 0
-						},
-						attack: {
-							range: 'Melee',
-							trait: 'agility',
-							damage_dice: 'd4',
-							damage_bonus: 0,
-							damage_type: 'phy'
-						},
-						advantages: [],
-						evasion_bonus: 0,
-						features: []
-					});
-					break;
-				case 'loot':
-					await homebrew.createLoot({
-						compendium_id: '',
-						source_id: 'Homebrew',
-						title: newItemName.trim(),
-						description_html: '',
-						rarity_roll: 1,
-						character_modifiers: [],
-						weapon_modifiers: []
-					});
-					break;
-				case 'consumable':
-					await homebrew.createConsumable({
-						compendium_id: '',
-						source_id: 'Homebrew',
-						title: newItemName.trim(),
-						description_html: '',
-						rarity_roll: 1
-					});
-					break;
-				case 'class':
-					await homebrew.createClass({
-						compendium_id: '',
-						source_id: 'Homebrew',
-						name: newItemName.trim(),
-						image_url: '',
-						description_html: '',
-						starting_evasion: 0,
-						starting_max_hp: 0,
-						hope_feature: {
-							title: '',
+				case 'weapon': {
+					const template = selectedTemplate as {
+						type: 'primary' | 'secondary';
+						data: Weapon;
+					} | null;
+					if (template) {
+						const cloned = structuredClone(template.data) as Weapon;
+						cloned.compendium_id = '';
+						cloned.source_id = 'Homebrew';
+						cloned.title = newItemName.trim();
+						id = await homebrew.createPrimaryWeapon(cloned);
+					} else {
+						id = await homebrew.createPrimaryWeapon({
+							compendium_id: '',
+							source_id: 'Homebrew',
+							title: newItemName.trim(),
 							description_html: '',
+							level_requirement: 1,
+							category: 'Primary',
+							type: 'Physical',
+							available_traits: [],
+							range: 'Melee',
+							features: [],
+							attack_roll_bonus: 0,
+							damage_bonus: 0,
+							damage_dice: '1d6',
+							available_damage_types: [],
+							burden: 1
+						});
+					}
+					break;
+				}
+				case 'armor': {
+					const template = selectedTemplate as Armor | null;
+					if (template) {
+						const cloned = structuredClone(template) as Armor;
+						cloned.compendium_id = '';
+						cloned.source_id = 'Homebrew';
+						cloned.title = newItemName.trim();
+						id = await homebrew.createArmor(cloned);
+					} else {
+						id = await homebrew.createArmor({
+							compendium_id: '',
+							source_id: 'Homebrew',
+							title: newItemName.trim(),
+							description_html: '',
+							level_requirement: 1,
+							max_armor: 0,
+							damage_thresholds: { major: 0, severe: 0 },
+							features: []
+						});
+					}
+					break;
+				}
+				case 'beastform': {
+					const template = selectedTemplate as Beastform | null;
+					if (template) {
+						const cloned = structuredClone(template) as Beastform;
+						cloned.compendium_id = '';
+						cloned.source_id = 'Homebrew';
+						cloned.name = newItemName.trim();
+						id = await homebrew.createBeastform(cloned);
+					} else {
+						id = await homebrew.createBeastform({
+							compendium_id: '',
+							source_id: 'Homebrew',
+							level_requirement: 1,
+							name: newItemName.trim(),
+							category: '',
+							character_trait: {
+								trait: 'agility',
+								bonus: 0
+							},
+							attack: {
+								range: 'Melee',
+								trait: 'agility',
+								damage_dice: 'd4',
+								damage_bonus: 0,
+								damage_type: 'phy'
+							},
+							advantages: [],
+							evasion_bonus: 0,
+							features: []
+						});
+					}
+					break;
+				}
+				case 'loot': {
+					const template = selectedTemplate as Loot | null;
+					if (template) {
+						const cloned = structuredClone(template) as Loot;
+						cloned.compendium_id = '';
+						cloned.source_id = 'Homebrew';
+						cloned.title = newItemName.trim();
+						id = await homebrew.createLoot(cloned);
+					} else {
+						id = await homebrew.createLoot({
+							compendium_id: '',
+							source_id: 'Homebrew',
+							title: newItemName.trim(),
+							description_html: '',
+							rarity_roll: 1,
 							character_modifiers: [],
 							weapon_modifiers: []
-						},
-						primary_domain_id: 'arcana',
-						secondary_domain_id: 'arcana',
-						class_features: [],
-						subclass_ids: [],
-						suggested_traits: {
-							agility: null,
-							strength: null,
-							finesse: null,
-							instinct: null,
-							presence: null,
-							knowledge: null
-						},
-						suggested_primary_weapon_id: null,
-						suggested_secondary_weapon_id: null,
-						suggested_armor_id: null,
-						starting_inventory: {
-							gold_coins: 0,
-							free_gear: [],
-							loot_or_consumable_options: [],
-							class_gear_options: [],
-							spellbook_prompt: null
-						},
-						background_questions: [],
-						connection_questions: [],
-						character_description_suggestions: {
-							clothes: '',
-							eyes: '',
-							body: '',
-							skin: '',
-							attitude: ''
-						}
-					});
+						});
+					}
 					break;
-				case 'subclass':
-					await homebrew.createSubclass({
-						compendium_id: '',
-						source_id: 'Homebrew',
-						name: newItemName.trim(),
-						description_html: '',
-						class_id: '',
-						foundation_card: {
+				}
+				case 'consumable': {
+					const template = selectedTemplate as Consumable | null;
+					if (template) {
+						const cloned = structuredClone(template) as Consumable;
+						cloned.compendium_id = '';
+						cloned.source_id = 'Homebrew';
+						cloned.title = newItemName.trim();
+						id = await homebrew.createConsumable(cloned);
+					} else {
+						id = await homebrew.createConsumable({
 							compendium_id: '',
-							card_type: 'subclass_foundation',
-							title: '',
+							source_id: 'Homebrew',
+							title: newItemName.trim(),
+							description_html: '',
+							rarity_roll: 1
+						});
+					}
+					break;
+				}
+				case 'class': {
+					const template = selectedTemplate as CharacterClass | null;
+					if (template) {
+						const cloned = structuredClone(template) as CharacterClass;
+						cloned.compendium_id = '';
+						cloned.source_id = 'Homebrew';
+						cloned.name = newItemName.trim();
+						id = await homebrew.createClass(cloned);
+					} else {
+						id = await homebrew.createClass({
+							compendium_id: '',
+							source_id: 'Homebrew',
+							name: newItemName.trim(),
+							image_url: '',
+							description_html: '',
+							starting_evasion: 0,
+							starting_max_hp: 0,
+							hope_feature: {
+								title: '',
+								description_html: '',
+								character_modifiers: [],
+								weapon_modifiers: []
+							},
+							primary_domain_id: 'arcana',
+							secondary_domain_id: 'arcana',
+							class_features: [],
+							subclass_ids: [],
+							suggested_traits: {
+								agility: null,
+								strength: null,
+								finesse: null,
+								instinct: null,
+								presence: null,
+								knowledge: null
+							},
+							suggested_primary_weapon_id: null,
+							suggested_secondary_weapon_id: null,
+							suggested_armor_id: null,
+							starting_inventory: {
+								gold_coins: 0,
+								free_gear: [],
+								loot_or_consumable_options: [],
+								class_gear_options: [],
+								spellbook_prompt: null
+							},
+							background_questions: [],
+							connection_questions: [],
+							character_description_suggestions: {
+								clothes: '',
+								eyes: '',
+								body: '',
+								skin: '',
+								attitude: ''
+							}
+						});
+					}
+					break;
+				}
+				case 'subclass': {
+					const template = selectedTemplate as Subclass | null;
+					if (template) {
+						const cloned = structuredClone(template) as Subclass;
+						cloned.compendium_id = '';
+						cloned.source_id = 'Homebrew';
+						cloned.name = newItemName.trim();
+						id = await homebrew.createSubclass(cloned);
+					} else {
+						id = await homebrew.createSubclass({
+							compendium_id: '',
+							source_id: 'Homebrew',
+							name: newItemName.trim(),
+							description_html: '',
+							class_id: '',
+							foundation_card: {
+								compendium_id: '',
+								card_type: 'subclass_foundation',
+								title: '',
+								description_html: '',
+								image_url: '',
+								artist_name: '',
+								features: [],
+								spellcast_trait: null,
+								class_id: ''
+							},
+							specialization_card: {
+								compendium_id: '',
+								card_type: 'subclass_specialization',
+								title: '',
+								description_html: '',
+								image_url: '',
+								artist_name: '',
+								features: [],
+								class_id: ''
+							},
+							mastery_card: {
+								compendium_id: '',
+								card_type: 'subclass_mastery',
+								title: '',
+								description_html: '',
+								image_url: '',
+								artist_name: '',
+								features: [],
+								class_id: ''
+							}
+						});
+					}
+					break;
+				}
+				case 'domain-cards': {
+					const template = selectedTemplate as DomainCard | null;
+					if (template) {
+						const cloned = structuredClone(template) as DomainCard;
+						cloned.compendium_id = '';
+						cloned.source_id = 'Homebrew';
+						cloned.title = newItemName.trim();
+						id = await homebrew.createDomainCard(cloned);
+					} else {
+						id = await homebrew.createDomainCard({
+							compendium_id: '',
+							source_id: 'Homebrew',
+							card_type: 'domain',
+							title: newItemName.trim(),
+							image_url: '',
+							artist_name: '',
+							domain_id: 'arcana',
+							level_requirement: 1,
+							recall_cost: 0,
+							category: 'ability',
+							features: [],
+							choices: [],
+							tokens: false,
+							applies_in_vault: false,
+							forced_in_loadout: false,
+							forced_in_vault: false
+						});
+					}
+					break;
+				}
+				case 'ancestry-cards': {
+					const template = selectedTemplate as AncestryCard | null;
+					if (template) {
+						const cloned = structuredClone(template) as AncestryCard;
+						cloned.compendium_id = '';
+						cloned.source_id = 'Homebrew';
+						cloned.title = newItemName.trim();
+						id = await homebrew.createAncestryCard(cloned);
+					} else {
+						id = await homebrew.createAncestryCard({
+							compendium_id: '',
+							source_id: 'Homebrew',
+							card_type: 'ancestry',
+							title: newItemName.trim(),
 							description_html: '',
 							image_url: '',
 							artist_name: '',
 							features: [],
-							spellcast_trait: null,
-							class_id: ''
-						},
-						specialization_card: {
+							choices: []
+						});
+					}
+					break;
+				}
+				case 'community-cards': {
+					const template = selectedTemplate as CommunityCard | null;
+					if (template) {
+						const cloned = structuredClone(template) as CommunityCard;
+						cloned.compendium_id = '';
+						cloned.source_id = 'Homebrew';
+						cloned.title = newItemName.trim();
+						id = await homebrew.createCommunityCard(cloned);
+					} else {
+						id = await homebrew.createCommunityCard({
 							compendium_id: '',
-							card_type: 'subclass_specialization',
-							title: '',
+							source_id: 'Homebrew',
+							card_type: 'community',
+							title: newItemName.trim(),
 							description_html: '',
 							image_url: '',
 							artist_name: '',
 							features: [],
-							class_id: ''
-						},
-						mastery_card: {
+							tokens: false
+						});
+					}
+					break;
+				}
+				case 'transformation-cards': {
+					const template = selectedTemplate as TransformationCard | null;
+					if (template) {
+						const cloned = structuredClone(template) as TransformationCard;
+						cloned.compendium_id = '';
+						cloned.source_id = 'Homebrew';
+						cloned.title = newItemName.trim();
+						id = await homebrew.createTransformationCard(cloned);
+					} else {
+						id = await homebrew.createTransformationCard({
 							compendium_id: '',
-							card_type: 'subclass_mastery',
-							title: '',
+							source_id: 'Homebrew',
+							card_type: 'transformation',
+							title: newItemName.trim(),
 							description_html: '',
 							image_url: '',
 							artist_name: '',
-							features: [],
-							class_id: ''
-						}
-					});
+							features: []
+						});
+					}
 					break;
-				case 'domain_card':
-					await homebrew.createDomainCard({
-						compendium_id: '',
-						source_id: 'Homebrew',
-						card_type: 'domain',
-						title: newItemName.trim(),
-						image_url: '',
-						artist_name: '',
-						domain_id: 'arcana',
-						level_requirement: 1,
-						recall_cost: 0,
-						category: 'ability',
-						features: [],
-						choices: [],
-						tokens: false,
-						applies_in_vault: false,
-						forced_in_loadout: false,
-						forced_in_vault: false
-					});
-					break;
-				case 'ancestry_card':
-					await homebrew.createAncestryCard({
-						compendium_id: '',
-						source_id: 'Homebrew',
-						card_type: 'ancestry',
-						title: newItemName.trim(),
-						description_html: '',
-						image_url: '',
-						artist_name: '',
-						features: [],
-						choices: []
-					});
-					break;
-				case 'community_card':
-					await homebrew.createCommunityCard({
-						compendium_id: '',
-						source_id: 'Homebrew',
-						card_type: 'community',
-						title: newItemName.trim(),
-						description_html: '',
-						image_url: '',
-						artist_name: '',
-						features: [],
-						tokens: false
-					});
-					break;
-				case 'transformation_card':
-					await homebrew.createTransformationCard({
-						compendium_id: '',
-						source_id: 'Homebrew',
-						card_type: 'transformation',
-						title: newItemName.trim(),
-						description_html: '',
-						image_url: '',
-						artist_name: '',
-						features: []
-					});
-					break;
+				}
 			}
+
 			// Reset form and close dialog
 			newItemName = '';
 			newItemType = undefined;
+			selectedTemplateId = '';
 			showCreateDialog = false;
+
+			// Navigate to the newly created item
+			if (id) {
+				let route = '';
+				switch (itemType) {
+					case 'weapon':
+						route = `/homebrew/weapons/${id}`;
+						break;
+					case 'armor':
+						route = `/homebrew/armor/${id}`;
+						break;
+					case 'beastform':
+						route = `/homebrew/beastforms/${id}`;
+						break;
+					case 'loot':
+						route = `/homebrew/loot/${id}`;
+						break;
+					case 'consumable':
+						route = `/homebrew/consumables/${id}`;
+						break;
+					case 'class':
+						route = `/homebrew/classes/${id}`;
+						break;
+					case 'subclass':
+						route = `/homebrew/subclasses/${id}`;
+						break;
+					case 'domain-cards':
+						route = `/homebrew/domain-cards/${id}`;
+						break;
+					case 'ancestry-cards':
+						route = `/homebrew/ancestry-cards/${id}`;
+						break;
+					case 'community-cards':
+						route = `/homebrew/community-cards/${id}`;
+						break;
+					case 'transformation-cards':
+						route = `/homebrew/transformation-cards/${id}`;
+						break;
+				}
+				if (route) {
+					await goto(route);
+				}
+			}
 		} catch (err) {
 			console.error('Failed to create homebrew item:', err);
 		} finally {
@@ -298,7 +514,7 @@
 	// Filter state
 	let searchQuery = $state('');
 	let activeTab = $state<
-		| 'all'
+		| ''
 		| 'weapons'
 		| 'armor'
 		| 'beastforms'
@@ -306,11 +522,11 @@
 		| 'consumables'
 		| 'classes'
 		| 'subclasses'
-		| 'domain_cards'
-		| 'ancestry_cards'
-		| 'community_cards'
-		| 'transformation_cards'
-	>('all');
+		| 'domain-cards'
+		| 'ancestry-cards'
+		| 'community-cards'
+		| 'transformation-cards'
+	>('');
 	let tierFilter = $state<'1' | '2' | '3' | '4' | ''>('');
 	let weaponCategoryFilter = $state<'Primary' | 'Secondary' | ''>('');
 	let weaponTypeFilter = $state<'Magical' | 'Physical' | ''>('');
@@ -329,10 +545,10 @@
 			| 'consumable'
 			| 'class'
 			| 'subclass'
-			| 'domain_card'
-			| 'ancestry_card'
-			| 'community_card'
-			| 'transformation_card';
+			| 'domain-cards'
+			| 'ancestry-cards'
+			| 'community-cards'
+			| 'transformation-cards';
 		domainId?: DomainIds;
 	} | null>(null);
 
@@ -342,18 +558,13 @@
 			weaponCategoryFilter = '';
 			weaponTypeFilter = '';
 		}
-		if (activeTab === 'all' || (activeTab !== 'armor' && activeTab !== 'beastforms' && activeTab !== 'domain_cards')) {
+		if (
+			activeTab === '' ||
+			(activeTab !== 'armor' && activeTab !== 'beastforms' && activeTab !== 'domain-cards')
+		) {
 			tierFilter = '';
 		}
 	});
-
-	// Helper function to convert level to tier
-	function levelToTier(level: number): number {
-		if (level <= 4) return 1;
-		if (level <= 7) return 2;
-		if (level <= 9) return 3;
-		return 4;
-	}
 
 	// Helper function to strip HTML tags for search
 	function stripHtml(html: string): string {
@@ -369,18 +580,13 @@
 		return titleMatch || descMatch;
 	}
 
-	// Helper to convert tier string to number
-	function getTierNumber(tier: '1' | '2' | '3' | '4'): number {
-		return parseInt(tier);
-	}
-
 	// Filter primary weapons
 	let filteredPrimaryWeapons = $derived(
 		Object.entries(homebrew.primary_weapons)
 			.map(([id, weapon]) => ({ id, weapon }))
 			.filter(({ weapon }) => {
 				if (!matchesSearch(weapon.title, weapon.description_html, searchQuery)) return false;
-				if (tierFilter !== '' && levelToTier(weapon.level_requirement) !== getTierNumber(tierFilter))
+				if (tierFilter !== '' && level_to_tier(weapon.level_requirement) !== parseInt(tierFilter))
 					return false;
 				if (weaponTypeFilter !== '' && weapon.type !== weaponTypeFilter) return false;
 				return true;
@@ -393,7 +599,7 @@
 			.map(([id, weapon]) => ({ id, weapon }))
 			.filter(({ weapon }) => {
 				if (!matchesSearch(weapon.title, weapon.description_html, searchQuery)) return false;
-				if (tierFilter !== '' && levelToTier(weapon.level_requirement) !== getTierNumber(tierFilter))
+				if (tierFilter !== '' && level_to_tier(weapon.level_requirement) !== parseInt(tierFilter))
 					return false;
 				if (weaponTypeFilter !== '' && weapon.type !== weaponTypeFilter) return false;
 				return true;
@@ -406,7 +612,7 @@
 			.map(([id, armor]) => ({ id, armor }))
 			.filter(({ armor }) => {
 				if (!matchesSearch(armor.title, armor.description_html, searchQuery)) return false;
-				if (tierFilter !== '' && levelToTier(armor.level_requirement) !== getTierNumber(tierFilter))
+				if (tierFilter !== '' && level_to_tier(armor.level_requirement) !== parseInt(tierFilter))
 					return false;
 				return true;
 			})
@@ -421,7 +627,7 @@
 				if (!matchesSearch(beastform.name, descHtml, searchQuery)) return false;
 				if (
 					tierFilter !== '' &&
-					levelToTier(beastform.level_requirement) !== getTierNumber(tierFilter)
+					level_to_tier(beastform.level_requirement) !== parseInt(tierFilter)
 				)
 					return false;
 				return true;
@@ -473,7 +679,7 @@
 			.filter(({ card }) => {
 				const descHtml = card.features.map((f) => f.description_html).join(' ');
 				if (!matchesSearch(card.title, descHtml, searchQuery)) return false;
-				if (tierFilter !== '' && levelToTier(card.level_requirement) !== getTierNumber(tierFilter))
+				if (tierFilter !== '' && level_to_tier(card.level_requirement) !== parseInt(tierFilter))
 					return false;
 				return true;
 			})
@@ -519,15 +725,15 @@
 		| { type: 'consumable'; id: string; item: Consumable }
 		| { type: 'class'; id: string; item: CharacterClass }
 		| { type: 'subclass'; id: string; item: Subclass }
-		| { type: 'domain_card'; id: string; item: DomainCard; domainId: DomainIds }
-		| { type: 'ancestry_card'; id: string; item: AncestryCard }
-		| { type: 'community_card'; id: string; item: CommunityCard }
-		| { type: 'transformation_card'; id: string; item: TransformationCard };
+		| { type: 'domain-cards'; id: string; item: DomainCard; domainId: DomainIds }
+		| { type: 'ancestry-cards'; id: string; item: AncestryCard }
+		| { type: 'community-cards'; id: string; item: CommunityCard }
+		| { type: 'transformation-cards'; id: string; item: TransformationCard };
 
 	let filteredItems = $derived.by((): FilteredItem[] => {
 		const items: FilteredItem[] = [];
 
-		if (activeTab === 'all' || activeTab === 'weapons') {
+		if (activeTab === '' || activeTab === 'weapons') {
 			if (weaponCategoryFilter === '' || weaponCategoryFilter === 'Primary') {
 				items.push(
 					...filteredPrimaryWeapons.map(({ id, weapon }) => ({
@@ -548,7 +754,7 @@
 			}
 		}
 
-		if (activeTab === 'all' || activeTab === 'armor') {
+		if (activeTab === '' || activeTab === 'armor') {
 			items.push(
 				...filteredArmor.map(({ id, armor }) => ({
 					type: 'armor' as const,
@@ -558,7 +764,7 @@
 			);
 		}
 
-		if (activeTab === 'all' || activeTab === 'beastforms') {
+		if (activeTab === '' || activeTab === 'beastforms') {
 			items.push(
 				...filteredBeastforms.map(({ id, beastform }) => ({
 					type: 'beastform' as const,
@@ -568,7 +774,7 @@
 			);
 		}
 
-		if (activeTab === 'all' || activeTab === 'loot') {
+		if (activeTab === '' || activeTab === 'loot') {
 			items.push(
 				...filteredLoot.map(({ id, loot }) => ({
 					type: 'loot' as const,
@@ -578,7 +784,7 @@
 			);
 		}
 
-		if (activeTab === 'all' || activeTab === 'consumables') {
+		if (activeTab === '' || activeTab === 'consumables') {
 			items.push(
 				...filteredConsumables.map(({ id, consumable }) => ({
 					type: 'consumable' as const,
@@ -588,7 +794,7 @@
 			);
 		}
 
-		if (activeTab === 'all' || activeTab === 'classes') {
+		if (activeTab === '' || activeTab === 'classes') {
 			items.push(
 				...filteredClasses.map(({ id, characterClass }) => ({
 					type: 'class' as const,
@@ -598,7 +804,7 @@
 			);
 		}
 
-		if (activeTab === 'all' || activeTab === 'subclasses') {
+		if (activeTab === '' || activeTab === 'subclasses') {
 			items.push(
 				...filteredSubclasses.map(({ id, subclass }) => ({
 					type: 'subclass' as const,
@@ -608,10 +814,10 @@
 			);
 		}
 
-		if (activeTab === 'all' || activeTab === 'domain_cards') {
+		if (activeTab === '' || activeTab === 'domain-cards') {
 			items.push(
 				...filteredDomainCards.map(({ id, card, domainId }) => ({
-					type: 'domain_card' as const,
+					type: 'domain-cards' as const,
 					id,
 					item: card,
 					domainId
@@ -619,30 +825,30 @@
 			);
 		}
 
-		if (activeTab === 'all' || activeTab === 'ancestry_cards') {
+		if (activeTab === '' || activeTab === 'ancestry-cards') {
 			items.push(
 				...filteredAncestryCards.map(({ id, card }) => ({
-					type: 'ancestry_card' as const,
+					type: 'ancestry-cards' as const,
 					id,
 					item: card
 				}))
 			);
 		}
 
-		if (activeTab === 'all' || activeTab === 'community_cards') {
+		if (activeTab === '' || activeTab === 'community-cards') {
 			items.push(
 				...filteredCommunityCards.map(({ id, card }) => ({
-					type: 'community_card' as const,
+					type: 'community-cards' as const,
 					id,
 					item: card
 				}))
 			);
 		}
 
-		if (activeTab === 'all' || activeTab === 'transformation_cards') {
+		if (activeTab === '' || activeTab === 'transformation-cards') {
 			items.push(
 				...filteredTransformationCards.map(({ id, card }) => ({
-					type: 'transformation_card' as const,
+					type: 'transformation-cards' as const,
 					id,
 					item: card
 				}))
@@ -682,64 +888,8 @@
 			transformationCardCount
 	);
 
-	// Check if at limit for each type (limit of 1 per type)
-	let isWeaponAtLimit = $derived(primaryWeaponCount >= 1);
-	let isArmorAtLimit = $derived(armorCount >= 1);
-	let isBeastformAtLimit = $derived(beastformCount >= 1);
-	let isLootAtLimit = $derived(lootCount >= 1);
-	let isConsumableAtLimit = $derived(consumableCount >= 1);
-	let isClassAtLimit = $derived(classCount >= 1);
-	let isSubclassAtLimit = $derived(subclassCount >= 1);
-	let isDomainCardAtLimit = $derived(domainCardCount >= 1);
-	let isAncestryCardAtLimit = $derived(ancestryCardCount >= 1);
-	let isCommunityCardAtLimit = $derived(communityCardCount >= 1);
-	let isTransformationCardAtLimit = $derived(transformationCardCount >= 1);
-
-	// Check if the selected type in the create dialog is at limit
-	let isSelectedTypeAtLimit = $derived.by(() => {
-		if (!newItemType) return false;
-		switch (newItemType) {
-			case 'weapon':
-				return isWeaponAtLimit;
-			case 'armor':
-				return isArmorAtLimit;
-			case 'beastform':
-				return isBeastformAtLimit;
-			case 'loot':
-				return isLootAtLimit;
-			case 'consumable':
-				return isConsumableAtLimit;
-			case 'class':
-				return isClassAtLimit;
-			case 'subclass':
-				return isSubclassAtLimit;
-			case 'domain_card':
-				return isDomainCardAtLimit;
-			case 'ancestry_card':
-				return isAncestryCardAtLimit;
-			case 'community_card':
-				return isCommunityCardAtLimit;
-			case 'transformation_card':
-				return isTransformationCardAtLimit;
-			default:
-				return false;
-		}
-	});
-
 	// Check if all types are at limit
-	let allTypesAtLimit = $derived(
-		isWeaponAtLimit &&
-			isArmorAtLimit &&
-			isBeastformAtLimit &&
-			isLootAtLimit &&
-			isConsumableAtLimit &&
-			isClassAtLimit &&
-			isSubclassAtLimit &&
-			isDomainCardAtLimit &&
-			isAncestryCardAtLimit &&
-			isCommunityCardAtLimit &&
-			isTransformationCardAtLimit
-	);
+	let atLimit = $derived(totalCount >= MAX_HOMEBREW);
 
 	// Handle delete
 	function openDeleteDialog(
@@ -754,10 +904,10 @@
 			| 'consumable'
 			| 'class'
 			| 'subclass'
-			| 'domain_card'
-			| 'ancestry_card'
-			| 'community_card'
-			| 'transformation_card',
+			| 'domain-cards'
+			| 'ancestry-cards'
+			| 'community-cards'
+			| 'transformation-cards',
 		domainId?: DomainIds
 	) {
 		itemToDelete = { id, name, type, domainId };
@@ -793,18 +943,18 @@
 				case 'subclass':
 					await homebrew.deleteSubclass(itemToDelete.id);
 					break;
-				case 'domain_card':
+				case 'domain-cards':
 					if (itemToDelete.domainId) {
 						await homebrew.deleteDomainCard(itemToDelete.id, itemToDelete.domainId);
 					}
 					break;
-				case 'ancestry_card':
+				case 'ancestry-cards':
 					await homebrew.deleteAncestryCard(itemToDelete.id);
 					break;
-				case 'community_card':
+				case 'community-cards':
 					await homebrew.deleteCommunityCard(itemToDelete.id);
 					break;
-				case 'transformation_card':
+				case 'transformation-cards':
 					await homebrew.deleteTransformationCard(itemToDelete.id);
 					break;
 			}
@@ -830,10 +980,10 @@
 			case 'armor':
 			case 'loot':
 			case 'consumable':
-			case 'domain_card':
-			case 'ancestry_card':
-			case 'community_card':
-			case 'transformation_card':
+			case 'domain-cards':
+			case 'ancestry-cards':
+			case 'community-cards':
+			case 'transformation-cards':
 				return entry.item.title;
 		}
 	}
@@ -841,7 +991,7 @@
 	// Get item tier helper
 	function getItemTier(entry: FilteredItem): number | null {
 		if ('level_requirement' in entry.item) {
-			return levelToTier(entry.item.level_requirement);
+			return level_to_tier(entry.item.level_requirement);
 		}
 		return null;
 	}
@@ -865,14 +1015,14 @@
 				return 'Character Class';
 			case 'subclass':
 				return 'Subclass';
-			case 'domain_card':
+			case 'domain-cards':
 				const tier = getItemTier(entry);
 				return tier ? `Tier ${tier} Domain Card` : 'Domain Card';
-			case 'ancestry_card':
+			case 'ancestry-cards':
 				return 'Ancestry Card';
-			case 'community_card':
+			case 'community-cards':
 				return 'Community Card';
-			case 'transformation_card':
+			case 'transformation-cards':
 				return 'Transformation Card';
 		}
 	}
@@ -895,18 +1045,62 @@
 				return `/homebrew/classes/${entry.id}`;
 			case 'subclass':
 				return `/homebrew/subclasses/${entry.id}`;
-			case 'domain_card':
+			case 'domain-cards':
 				return `/homebrew/domain-cards/${entry.id}`;
-			case 'ancestry_card':
+			case 'ancestry-cards':
 				return `/homebrew/ancestry-cards/${entry.id}`;
-			case 'community_card':
+			case 'community-cards':
 				return `/homebrew/community-cards/${entry.id}`;
-			case 'transformation_card':
+			case 'transformation-cards':
 				return `/homebrew/transformation-cards/${entry.id}`;
 		}
 	}
 
+	let filtersExpanded = $state(false);
+	// number of custom filters set
+	let filterCount = $derived(
+		(activeTab !== '' ? 1 : 0) +
+			(tierFilter !== '' ? 1 : 0) +
+			(weaponCategoryFilter !== '' ? 1 : 0) +
+			(weaponTypeFilter !== '' ? 1 : 0)
+	);
 </script>
+
+{#snippet tierFilterSelect()}
+	<Select.Root
+		type="single"
+		value={tierFilter}
+		onValueChange={(v) => (tierFilter = (v as '1' | '2' | '3' | '4' | '') || '')}
+	>
+		<Select.Trigger class="w-[128px]">
+			{tierFilter ? `Tier ${tierFilter}` : 'All Tiers'}
+		</Select.Trigger>
+		<Select.Content>
+			<Select.Item value="">All Tiers</Select.Item>
+			<Select.Item value="1">Tier 1</Select.Item>
+			<Select.Item value="2">Tier 2</Select.Item>
+			<Select.Item value="3">Tier 3</Select.Item>
+			<Select.Item value="4">Tier 4</Select.Item>
+		</Select.Content>
+	</Select.Root>
+{/snippet}
+
+{#snippet resetButton()}
+	<Button
+		variant="link"
+		size="sm"
+		onclick={() => {
+			activeTab = '';
+			tierFilter = '';
+			weaponCategoryFilter = '';
+			weaponTypeFilter = '';
+		}}
+		class="text-muted-foreground"
+	>
+		Reset
+		<RotateCcw class="size-3.5" />
+	</Button>
+{/snippet}
 
 <div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
 	{#if homebrew.loading}
@@ -921,349 +1115,328 @@
 				'pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]'
 			)}
 		>
-		<div class="w-full max-w-6xl flex flex-col gap-4 px-4 py-4">
-			<!-- Header -->
-			<div class="flex items-center justify-between gap-2">
-				<p class="flex items-center gap-2 text-2xl font-bold">
-					My Homebrew
-					<span
-						class="rounded-full border bg-card px-2 py-0.5 text-base tracking-widest text-muted-foreground"
-					>
-						{totalCount}
-					</span>
-				</p>
+			<div class="flex w-full max-w-6xl flex-col gap-4 px-4 py-4">
+				<!-- Header -->
+				<div class="flex items-center justify-between gap-2">
+					<p class="flex items-center gap-2 text-2xl font-bold">
+						Homebrew
+						<span
+							class="rounded-full border bg-card px-2 py-0.5 text-base tracking-widest text-muted-foreground"
+						>
+							{totalCount}/{MAX_HOMEBREW}
+						</span>
+					</p>
 
-				<div class="flex gap-2">
-					<Button variant="outline" onclick={() => (showCreateDialog = true)} disabled={allTypesAtLimit}>
-						<Plus /> New Homebrew
-					</Button>
-				</div>
-			</div>
-
-				<!-- Tabs as Filter -->
-				<Tabs.Root bind:value={activeTab}>
-					<Tabs.List class="flex flex-wrap h-auto gap-y-1">
-						<Tabs.Trigger value="all" class="flex-initial gap-1">
-							All ({totalCount})
-						</Tabs.Trigger>
-						<Tabs.Trigger value="weapons" class="flex-initial gap-1">
-							<Swords class="size-4" />
-							Weapons ({weaponCount})
-						</Tabs.Trigger>
-						<Tabs.Trigger value="armor" class="flex-initial gap-1">
-							<Shield class="size-4" />
-							Armor ({armorCount})
-						</Tabs.Trigger>
-						<Tabs.Trigger value="beastforms" class="flex-initial gap-1">
-							<PawPrint class="size-4" />
-							Beastforms ({beastformCount})
-						</Tabs.Trigger>
-						<Tabs.Trigger value="loot" class="flex-initial gap-1">
-							<Package class="size-4" />
-							Loot ({lootCount})
-						</Tabs.Trigger>
-						<Tabs.Trigger value="consumables" class="flex-initial gap-1">
-							<FlaskConical class="size-4" />
-							Consumables ({consumableCount})
-						</Tabs.Trigger>
-						<Tabs.Trigger value="classes" class="flex-initial gap-1">
-							<GraduationCap class="size-4" />
-							Classes ({classCount})
-						</Tabs.Trigger>
-						<Tabs.Trigger value="subclasses" class="flex-initial gap-1">
-							<BookOpen class="size-4" />
-							Subclasses ({subclassCount})
-						</Tabs.Trigger>
-						<Tabs.Trigger value="domain_cards" class="flex-initial gap-1">
-							<BookOpen class="size-4" />
-							Domain Cards ({domainCardCount})
-						</Tabs.Trigger>
-						<Tabs.Trigger value="ancestry_cards" class="flex-initial gap-1">
-							<Users class="size-4" />
-							Ancestry Cards ({ancestryCardCount})
-						</Tabs.Trigger>
-						<Tabs.Trigger value="community_cards" class="flex-initial gap-1">
-							<Users class="size-4" />
-							Community Cards ({communityCardCount})
-						</Tabs.Trigger>
-						<Tabs.Trigger value="transformation_cards" class="flex-initial gap-1">
-							<Sparkles class="size-4" />
-							Transformation Cards ({transformationCardCount})
-						</Tabs.Trigger>
-					</Tabs.List>
-				</Tabs.Root>
-				
-			<div class="flex justify-center sm:justify-start flex-wrap gap-2">
-				<!-- Search Box -->
-				<div class="shrink relative h-min w-[200px]">
-					<Search
-						class="shrink pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-					/>
-					<Input bind:value={searchQuery} placeholder="Search..." class="pl-9" />
+					<div class="flex gap-2">
+						<Button variant="outline" onclick={() => (showCreateDialog = true)} disabled={atLimit}>
+							<Plus /> New Homebrew
+						</Button>
+					</div>
 				</div>
 
-				<!-- Subfilters for Weapons -->
-				{#if activeTab === 'weapons'}
-						<!-- Category Select (Primary/Secondary) -->
-						<Select.Root
-							type="single"
-							value={weaponCategoryFilter}
-							onValueChange={(v) => (weaponCategoryFilter = (v as 'Primary' | 'Secondary' | '') || '')}
-						>
-							<Select.Trigger class="w-32">
-								{weaponCategoryFilter || 'All Categories'}
-							</Select.Trigger>
-							<Select.Content>
-								<Select.Item value="">All Categories</Select.Item>
-								<Select.Item value="Primary">Primary</Select.Item>
-								<Select.Item value="Secondary">Secondary</Select.Item>
-							</Select.Content>
-						</Select.Root>
-
-						<!-- Tier Select -->
-						<Select.Root
-							type="single"
-							value={tierFilter}
-							onValueChange={(v) => (tierFilter = (v as '1' | '2' | '3' | '4' | '') || '')}
-						>
-							<Select.Trigger class="w-28">
-								{tierFilter ? `Tier ${tierFilter}` : 'All Tiers'}
-							</Select.Trigger>
-							<Select.Content>
-								<Select.Item value="">All Tiers</Select.Item>
-								<Select.Item value="1">Tier 1</Select.Item>
-								<Select.Item value="2">Tier 2</Select.Item>
-								<Select.Item value="3">Tier 3</Select.Item>
-								<Select.Item value="4">Tier 4</Select.Item>
-							</Select.Content>
-						</Select.Root>
-
-						<!-- Type Select (Magical/Physical) -->
-						<Select.Root
-							type="single"
-							value={weaponTypeFilter}
-							onValueChange={(v) => (weaponTypeFilter = (v as 'Magical' | 'Physical' | '') || '')}
-						>
-							<Select.Trigger class="w-28">
-								{weaponTypeFilter || 'All Types'}
-							</Select.Trigger>
-							<Select.Content>
-								<Select.Item value="">All Types</Select.Item>
-								<Select.Item value="Physical">Physical</Select.Item>
-								<Select.Item value="Magical">Magical</Select.Item>
-							</Select.Content>
-						</Select.Root>
-
-						<!-- Reset Button -->
-						{#if weaponCategoryFilter !== '' || tierFilter !== '' || weaponTypeFilter !== ''}
-							<Button
-								variant="link"
-								size="sm"
-								onclick={() => {
-									weaponCategoryFilter = '';
-									tierFilter = '';
-									weaponTypeFilter = '';
-								}}
-								class="text-muted-foreground"
+				<div class={cn('-mt-3', !filtersExpanded && 'mb-2')}>
+					<Collapsible.Root bind:open={filtersExpanded}>
+						<Collapsible.Trigger class="relative w-full">
+							<p
+								class="absolute -top-1 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded bg-background py-0.5 pr-2 pl-1 text-xs font-medium text-primary sm:left-4 sm:translate-x-0"
 							>
-								Reset
-								<RotateCcw class="size-3.5"/>
-							</Button>
-						{/if}
-				{/if}
+								<ChevronRight
+									class={cn('size-3.5 transition-transform', filtersExpanded && 'rotate-90')}
+								/>
 
-				<!-- Subfilters for Armor -->
-				{#if activeTab === 'armor'}
-						<!-- Tier Select -->
-						<Select.Root
-							type="single"
-							value={tierFilter}
-							onValueChange={(v) => (tierFilter = (v as '1' | '2' | '3' | '4' | '') || '')}
-						>
-							<Select.Trigger class="w-28">
-								{tierFilter ? `Tier ${tierFilter}` : 'All Tiers'}
-							</Select.Trigger>
-							<Select.Content>
-								<Select.Item value="">All Tiers</Select.Item>
-								<Select.Item value="1">Tier 1</Select.Item>
-								<Select.Item value="2">Tier 2</Select.Item>
-								<Select.Item value="3">Tier 3</Select.Item>
-								<Select.Item value="4">Tier 4</Select.Item>
-							</Select.Content>
-						</Select.Root>
-
-						<!-- Reset Button -->
-						{#if tierFilter !== ''}
-							<Button
-								variant="link"
-								size="sm"
-								onclick={() => {
-									tierFilter = '';
-								}}
-								class="text-muted-foreground"
+								Filters
+								{#if filterCount > 0}
+									({filterCount})
+								{/if}
+							</p>
+						</Collapsible.Trigger>
+						<div class={cn('border-t-2 bg-primary/5', filtersExpanded && 'border-b-2')}>
+							<Collapsible.Content
+								class="flex flex-wrap justify-center gap-2 px-4 py-4 sm:justify-start"
 							>
-								Reset
-							</Button>
-						{/if}
-				{/if}
-
-				<!-- Subfilters for Beastforms -->
-				{#if activeTab === 'beastforms'}
-						<!-- Tier Select -->
-						<Select.Root
-							type="single"
-							value={tierFilter}
-							onValueChange={(v) => (tierFilter = (v as '1' | '2' | '3' | '4' | '') || '')}
-						>
-							<Select.Trigger class="w-28">
-								{tierFilter ? `Tier ${tierFilter}` : 'All Tiers'}
-							</Select.Trigger>
-							<Select.Content>
-								<Select.Item value="">All Tiers</Select.Item>
-								<Select.Item value="1">Tier 1</Select.Item>
-								<Select.Item value="2">Tier 2</Select.Item>
-								<Select.Item value="3">Tier 3</Select.Item>
-								<Select.Item value="4">Tier 4</Select.Item>
-							</Select.Content>
-						</Select.Root>
-
-						<!-- Reset Button -->
-						{#if tierFilter !== ''}
-							<Button
-								variant="link"
-								size="sm"
-								onclick={() => {
-									tierFilter = '';
-								}}
-								class="text-muted-foreground"
-							>
-								Reset
-								<RotateCcw class="size-3.5"/>
-							</Button>
-						{/if}
-				{/if}
-
-				<!-- Subfilters for Domain Cards -->
-				{#if activeTab === 'domain_cards'}
-						<!-- Tier Select -->
-						<Select.Root
-							type="single"
-							value={tierFilter}
-							onValueChange={(v) => (tierFilter = (v as '1' | '2' | '3' | '4' | '') || '')}
-						>
-							<Select.Trigger class="w-28">
-								{tierFilter ? `Tier ${tierFilter}` : 'All Tiers'}
-							</Select.Trigger>
-							<Select.Content>
-								<Select.Item value="">All Tiers</Select.Item>
-								<Select.Item value="1">Tier 1</Select.Item>
-								<Select.Item value="2">Tier 2</Select.Item>
-								<Select.Item value="3">Tier 3</Select.Item>
-								<Select.Item value="4">Tier 4</Select.Item>
-							</Select.Content>
-						</Select.Root>
-
-						<!-- Reset Button -->
-						{#if tierFilter !== ''}
-							<Button
-								variant="link"
-								size="sm"
-								onclick={() => {
-									tierFilter = '';
-								}}
-								class="text-muted-foreground"
-							>
-								Reset
-								<RotateCcw class="size-3.5"/>
-							</Button>
-						{/if}
-				{/if}
-			</div>
-
-			<!-- Results Grid -->
-			{#if filteredItems.length === 0}
-				<p class="py-8 text-center text-sm text-muted-foreground">
-					{#if totalCount === 0}
-						You haven't created any homebrew items yet.
-					{:else}
-						No items match your filters.
-					{/if}
-				</p>
-			{:else}
-				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					{#each filteredItems as entry (entry.id)}
-						<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
-							<!-- Card Header -->
-							<a
-								href={getItemHref(entry)}
-								class="flex gap-2 border bg-primary-muted p-3 hover:bg-primary-muted/80"
-							>
-								<div class="flex size-12 shrink-0 items-center justify-center rounded-lg border-2 bg-card">
-									{#if entry.type === 'primary_weapon' || entry.type === 'secondary_weapon'}
-										<Swords class="size-6 text-muted-foreground" />
-									{:else if entry.type === 'armor'}
-										<Shield class="size-6 text-muted-foreground" />
-									{:else if entry.type === 'beastform'}
-										<PawPrint class="size-6 text-muted-foreground" />
-									{:else if entry.type === 'loot'}
-										<Package class="size-6 text-muted-foreground" />
-									{:else if entry.type === 'consumable'}
-										<FlaskConical class="size-6 text-muted-foreground" />
-									{:else if entry.type === 'class'}
-										<GraduationCap class="size-6 text-muted-foreground" />
-									{:else if entry.type === 'subclass'}
-										<BookOpen class="size-6 text-muted-foreground" />
-									{:else if entry.type === 'domain_card'}
-										<BookOpen class="size-6 text-muted-foreground" />
-									{:else if entry.type === 'ancestry_card'}
-										<Users class="size-6 text-muted-foreground" />
-									{:else if entry.type === 'community_card'}
-										<Users class="size-6 text-muted-foreground" />
-									{:else if entry.type === 'transformation_card'}
-										<Sparkles class="size-6 text-muted-foreground" />
-									{/if}
+								<!-- Search Box -->
+								<div class="relative h-min">
+									<Search
+										class="pointer-events-none absolute top-1/2 left-3 size-4 shrink -translate-y-1/2 text-muted-foreground"
+									/>
+									<Input bind:value={searchQuery} placeholder="Search..." class="pl-9" />
 								</div>
-								<div class="min-w-0 flex-1 truncate">
-									<p class="truncate text-lg font-bold">
-										{getItemName(entry)}
-									</p>
-									<p class="truncate text-xs text-muted-foreground">
-										{getItemSubtitle(entry)}
-									</p>
-								</div>
-							</a>
 
-							<!-- Card Actions -->
-							<div class="flex bg-muted">
-								<Button
-									variant="ghost"
-									size="sm"
-									class="hover:text-text grow rounded-none border"
-									href={getItemHref(entry)}
-								>
-									Edit
-								</Button>
-								<Button
-									variant="ghost"
-									size="sm"
-									class="grow rounded-none border border-x-0 text-destructive hover:text-destructive"
-									onclick={() => {
-										if (entry.type === 'domain_card') {
-											openDeleteDialog(entry.id, getItemName(entry), entry.type, entry.domainId);
-										} else {
-											openDeleteDialog(entry.id, getItemName(entry), entry.type);
-										}
+								<!-- Type Filter Select -->
+								<Select.Root
+									type="single"
+									value={activeTab || undefined}
+									onValueChange={(v) => {
+										activeTab = (v || '') as typeof activeTab;
 									}}
 								>
-									Delete
-								</Button>
-							</div>
+									<Select.Trigger class="w-[232px]">
+										<div class="flex items-center gap-2">
+											{#if activeTab === ''}
+												All ({totalCount})
+											{:else if activeTab === 'weapons'}
+												<Swords class="size-4" />
+												Weapons ({weaponCount})
+											{:else if activeTab === 'armor'}
+												<Shield class="size-4" />
+												Armor ({armorCount})
+											{:else if activeTab === 'beastforms'}
+												<PawPrint class="size-4" />
+												Beastforms ({beastformCount})
+											{:else if activeTab === 'loot'}
+												<Package class="size-4" />
+												Loot ({lootCount})
+											{:else if activeTab === 'consumables'}
+												<FlaskConical class="size-4" />
+												Consumables ({consumableCount})
+											{:else if activeTab === 'classes'}
+												<GraduationCap class="size-4" />
+												Classes ({classCount})
+											{:else if activeTab === 'subclasses'}
+												<BookOpen class="size-4" />
+												Subclasses ({subclassCount})
+											{:else if activeTab === 'domain-cards'}
+												<BookOpen class="size-4" />
+												Domain Cards ({domainCardCount})
+											{:else if activeTab === 'ancestry-cards'}
+												<Users class="size-4" />
+												Ancestry Cards ({ancestryCardCount})
+											{:else if activeTab === 'community-cards'}
+												<Users class="size-4" />
+												Community Cards ({communityCardCount})
+											{:else if activeTab === 'transformation-cards'}
+												<Sparkles class="size-4" />
+												Transformation Cards ({transformationCardCount})
+											{/if}
+										</div>
+									</Select.Trigger>
+									<Select.Content>
+										<Select.Item value="">
+											<div class="flex items-center gap-2">
+												All ({totalCount})
+											</div>
+										</Select.Item>
+										<Select.Item value="weapons">
+											<div class="flex items-center gap-2">
+												<Swords class="size-4" />
+												Weapons ({weaponCount})
+											</div>
+										</Select.Item>
+										<Select.Item value="armor">
+											<div class="flex items-center gap-2">
+												<Shield class="size-4" />
+												Armor ({armorCount})
+											</div>
+										</Select.Item>
+										<Select.Item value="beastforms">
+											<div class="flex items-center gap-2">
+												<PawPrint class="size-4" />
+												Beastforms ({beastformCount})
+											</div>
+										</Select.Item>
+										<Select.Item value="loot">
+											<div class="flex items-center gap-2">
+												<Package class="size-4" />
+												Loot ({lootCount})
+											</div>
+										</Select.Item>
+										<Select.Item value="consumables">
+											<div class="flex items-center gap-2">
+												<FlaskConical class="size-4" />
+												Consumables ({consumableCount})
+											</div>
+										</Select.Item>
+										<Select.Item value="classes">
+											<div class="flex items-center gap-2">
+												<GraduationCap class="size-4" />
+												Classes ({classCount})
+											</div>
+										</Select.Item>
+										<Select.Item value="subclasses">
+											<div class="flex items-center gap-2">
+												<BookOpen class="size-4" />
+												Subclasses ({subclassCount})
+											</div>
+										</Select.Item>
+										<Select.Item value="domain-cards">
+											<div class="flex items-center gap-2">
+												<BookOpen class="size-4" />
+												Domain Cards ({domainCardCount})
+											</div>
+										</Select.Item>
+										<Select.Item value="ancestry-cards">
+											<div class="flex items-center gap-2">
+												<Users class="size-4" />
+												Ancestry Cards ({ancestryCardCount})
+											</div>
+										</Select.Item>
+										<Select.Item value="community-cards">
+											<div class="flex items-center gap-2">
+												<Users class="size-4" />
+												Community Cards ({communityCardCount})
+											</div>
+										</Select.Item>
+										<Select.Item value="transformation-cards">
+											<div class="flex items-center gap-2">
+												<Sparkles class="size-4" />
+												Transformation Cards ({transformationCardCount})
+											</div>
+										</Select.Item>
+									</Select.Content>
+								</Select.Root>
+
+								<!-- Subfilters for Weapons -->
+								{#if activeTab === 'weapons'}
+									<!-- Category Select (Primary/Secondary) -->
+									<Select.Root
+										type="single"
+										value={weaponCategoryFilter}
+										onValueChange={(v) =>
+											(weaponCategoryFilter = (v as 'Primary' | 'Secondary' | '') || '')}
+									>
+										<Select.Trigger class="w-[142px]">
+											{weaponCategoryFilter || 'All Categories'}
+										</Select.Trigger>
+										<Select.Content>
+											<Select.Item value="">All Categories</Select.Item>
+											<Select.Item value="Primary">Primary</Select.Item>
+											<Select.Item value="Secondary">Secondary</Select.Item>
+										</Select.Content>
+									</Select.Root>
+
+									<!-- Tier Select -->
+									{@render tierFilterSelect()}
+
+									<!-- Type Select (Magical/Physical) -->
+									<Select.Root
+										type="single"
+										value={weaponTypeFilter}
+										onValueChange={(v) =>
+											(weaponTypeFilter = (v as 'Magical' | 'Physical' | '') || '')}
+									>
+										<Select.Trigger class="w-[128px]">
+											{weaponTypeFilter || 'All Types'}
+										</Select.Trigger>
+										<Select.Content>
+											<Select.Item value="">All Types</Select.Item>
+											<Select.Item value="Physical">Physical</Select.Item>
+											<Select.Item value="Magical">Magical</Select.Item>
+										</Select.Content>
+									</Select.Root>
+								{/if}
+
+								<!-- Subfilters for Armor -->
+								{#if activeTab === 'armor'}
+									<!-- Tier Select -->
+									{@render tierFilterSelect()}
+								{/if}
+
+								<!-- Subfilters for Beastforms -->
+								{#if activeTab === 'beastforms'}
+									<!-- Tier Select -->
+									{@render tierFilterSelect()}
+								{/if}
+
+								<!-- Subfilters for Domain Cards -->
+								{#if activeTab === 'domain-cards'}
+									<!-- Tier Select -->
+									{@render tierFilterSelect()}
+								{/if}
+
+								<!-- Global Reset Button (when no subfilters are shown) -->
+								{#if activeTab !== ''}
+									{@render resetButton()}
+								{/if}
+							</Collapsible.Content>
 						</div>
-					{/each}
+					</Collapsible.Root>
 				</div>
-			{/if}
+				<!-- Results Grid -->
+				{#if filteredItems.length === 0}
+					<p class="py-8 text-center text-sm text-muted-foreground">
+						{#if totalCount === 0}
+							You haven't created any homebrew items yet.
+						{:else}
+							No items match your filters.
+						{/if}
+					</p>
+				{:else}
+					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+						{#each filteredItems as entry (entry.id)}
+							<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
+								<!-- Card Header -->
+								<a
+									href={getItemHref(entry)}
+									class="flex gap-2 border bg-primary-muted p-3 hover:bg-primary-muted/80"
+								>
+									<div
+										class="flex size-12 shrink-0 items-center justify-center rounded-lg border-2 bg-card"
+									>
+										{#if entry.type === 'primary_weapon' || entry.type === 'secondary_weapon'}
+											<Swords class="size-6 text-muted-foreground" />
+										{:else if entry.type === 'armor'}
+											<Shield class="size-6 text-muted-foreground" />
+										{:else if entry.type === 'beastform'}
+											<PawPrint class="size-6 text-muted-foreground" />
+										{:else if entry.type === 'loot'}
+											<Package class="size-6 text-muted-foreground" />
+										{:else if entry.type === 'consumable'}
+											<FlaskConical class="size-6 text-muted-foreground" />
+										{:else if entry.type === 'class'}
+											<GraduationCap class="size-6 text-muted-foreground" />
+										{:else if entry.type === 'subclass'}
+											<BookOpen class="size-6 text-muted-foreground" />
+										{:else if entry.type === 'domain-cards'}
+											<BookOpen class="size-6 text-muted-foreground" />
+										{:else if entry.type === 'ancestry-cards'}
+											<Users class="size-6 text-muted-foreground" />
+										{:else if entry.type === 'community-cards'}
+											<Users class="size-6 text-muted-foreground" />
+										{:else if entry.type === 'transformation-cards'}
+											<Sparkles class="size-6 text-muted-foreground" />
+										{/if}
+									</div>
+									<div class="min-w-0 flex-1 truncate">
+										<p class="truncate text-lg font-bold">
+											{getItemName(entry)}
+										</p>
+										<p class="truncate text-xs text-muted-foreground">
+											{getItemSubtitle(entry)}
+										</p>
+									</div>
+								</a>
+
+								<!-- Card Actions -->
+								<div class="flex bg-muted">
+									<Button
+										variant="ghost"
+										size="sm"
+										class="hover:text-text grow rounded-none border"
+										href={getItemHref(entry)}
+									>
+										Edit
+									</Button>
+									<Button
+										variant="ghost"
+										size="sm"
+										class="grow rounded-none border border-x-0 text-destructive hover:text-destructive"
+										onclick={() => {
+											if (entry.type === 'domain-cards') {
+												openDeleteDialog(entry.id, getItemName(entry), entry.type, entry.domainId);
+											} else {
+												openDeleteDialog(entry.id, getItemName(entry), entry.type);
+											}
+										}}
+									>
+										Delete
+									</Button>
+								</div>
+							</div>
+						{/each}
+					</div>
+				{/if}
+			</div>
 		</div>
-	</div>
 	{/if}
 </div>
 
@@ -1300,171 +1473,182 @@
 			</Dialog.Description>
 		</Dialog.Header>
 
-		<div class="flex flex-col gap-4 py-4">
-			<!-- Type Selection -->
-			<div class="flex flex-col gap-2">
-				<Label>What do you want to create?</Label>
-				<Select.Root
-					type="single"
-					value={newItemType}
-					onValueChange={(v) => (newItemType = (v || undefined) as HomebrewType)}
+		<form
+			onsubmit={(e) => {
+				e.preventDefault();
+				if (newItemName.trim() && newItemType && !isCreating && !atLimit) {
+					handleCreateHomebrew();
+				}
+			}}
+		>
+			<div class="flex flex-col gap-4 py-4">
+				<!-- Type Selection -->
+				<div class="flex flex-col gap-2">
+					<Label>What do you want to create?</Label>
+					<Select.Root
+						type="single"
+						value={newItemType}
+						onValueChange={(v) => (newItemType = (v || undefined) as HomebrewType)}
+					>
+						<Select.Trigger class="w-full">
+							{#if newItemType === 'weapon'}
+								<div class="flex items-center gap-2">
+									<Swords class="size-4" />
+									Weapon
+								</div>
+							{:else if newItemType === 'armor'}
+								<div class="flex items-center gap-2">
+									<Shield class="size-4" />
+									Armor
+								</div>
+							{:else if newItemType === 'beastform'}
+								<div class="flex items-center gap-2">
+									<PawPrint class="size-4" />
+									Beastform
+								</div>
+							{:else if newItemType === 'loot'}
+								<div class="flex items-center gap-2">
+									<Package class="size-4" />
+									Loot
+								</div>
+							{:else if newItemType === 'consumable'}
+								<div class="flex items-center gap-2">
+									<FlaskConical class="size-4" />
+									Consumable
+								</div>
+							{:else if newItemType === 'class'}
+								<div class="flex items-center gap-2">
+									<GraduationCap class="size-4" />
+									Class
+								</div>
+							{:else if newItemType === 'subclass'}
+								<div class="flex items-center gap-2">
+									<BookOpen class="size-4" />
+									Subclass
+								</div>
+							{:else if newItemType === 'domain-cards'}
+								<div class="flex items-center gap-2">
+									<BookOpen class="size-4" />
+									Domain Card
+								</div>
+							{:else if newItemType === 'ancestry-cards'}
+								<div class="flex items-center gap-2">
+									<Users class="size-4" />
+									Ancestry Card
+								</div>
+							{:else if newItemType === 'community-cards'}
+								<div class="flex items-center gap-2">
+									<Users class="size-4" />
+									Community Card
+								</div>
+							{:else if newItemType === 'transformation-cards'}
+								<div class="flex items-center gap-2">
+									<Sparkles class="size-4" />
+									Transformation Card
+								</div>
+							{:else}
+								<span class="text-muted-foreground">Select a type...</span>
+							{/if}
+						</Select.Trigger>
+						<Select.Content>
+							<Select.Item value="weapon" disabled={atLimit}>
+								<div class="flex items-center gap-2">
+									<Swords class="size-4" />
+									Weapon
+								</div>
+							</Select.Item>
+							<Select.Item value="armor" disabled={atLimit}>
+								<div class="flex items-center gap-2">
+									<Shield class="size-4" />
+									Armor
+								</div>
+							</Select.Item>
+							<Select.Item value="beastform" disabled={atLimit}>
+								<div class="flex items-center gap-2">
+									<PawPrint class="size-4" />
+									Beastform
+								</div>
+							</Select.Item>
+							<Select.Item value="loot" disabled={atLimit}>
+								<div class="flex items-center gap-2">
+									<Package class="size-4" />
+									Loot
+								</div>
+							</Select.Item>
+							<Select.Item value="consumable" disabled={atLimit}>
+								<div class="flex items-center gap-2">
+									<FlaskConical class="size-4" />
+									Consumable
+								</div>
+							</Select.Item>
+							<Select.Item value="class" disabled={atLimit}>
+								<div class="flex items-center gap-2">
+									<GraduationCap class="size-4" />
+									Class
+								</div>
+							</Select.Item>
+							<Select.Item value="subclass" disabled={atLimit}>
+								<div class="flex items-center gap-2">
+									<BookOpen class="size-4" />
+									Subclass
+								</div>
+							</Select.Item>
+							<Select.Item value="domain_card" disabled={atLimit}>
+								<div class="flex items-center gap-2">
+									<BookOpen class="size-4" />
+									Domain Card
+								</div>
+							</Select.Item>
+							<Select.Item value="ancestry_card" disabled={atLimit}>
+								<div class="flex items-center gap-2">
+									<Users class="size-4" />
+									Ancestry Card
+								</div>
+							</Select.Item>
+							<Select.Item value="community_card" disabled={atLimit}>
+								<div class="flex items-center gap-2">
+									<Users class="size-4" />
+									Community Card
+								</div>
+							</Select.Item>
+							<Select.Item value="transformation_card" disabled={atLimit}>
+								<div class="flex items-center gap-2">
+									<Sparkles class="size-4" />
+									Transformation Card
+								</div>
+							</Select.Item>
+						</Select.Content>
+					</Select.Root>
+				</div>
+
+				<!-- Template Selection -->
+					<div class="flex flex-col gap-2">
+						<Label>Template</Label>
+						<TemplateCombobox disabled={!newItemType} homebrewType={newItemType} bind:value={selectedTemplateId} />
+					</div>
+
+				<!-- Name Input -->
+				<div class="flex flex-col gap-2">
+					<Label>Name</Label>
+					<Input
+						bind:value={newItemName}
+						placeholder="Enter a name..."
+						disabled={!newItemType}
+					/>
+				</div>
+			</div>
+
+			<Dialog.Footer class="flex gap-3">
+				<Dialog.Close class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}>
+					Cancel
+				</Dialog.Close>
+				<Button
+					type="submit"
+					disabled={!newItemName.trim() || !newItemType || isCreating || atLimit}
 				>
-					<Select.Trigger class="w-full">
-						{#if newItemType === 'weapon'}
-							<div class="flex items-center gap-2">
-								<Swords class="size-4" />
-								Weapon
-							</div>
-						{:else if newItemType === 'armor'}
-							<div class="flex items-center gap-2">
-								<Shield class="size-4" />
-								Armor
-							</div>
-						{:else if newItemType === 'beastform'}
-							<div class="flex items-center gap-2">
-								<PawPrint class="size-4" />
-								Beastform
-							</div>
-						{:else if newItemType === 'loot'}
-							<div class="flex items-center gap-2">
-								<Package class="size-4" />
-								Loot
-							</div>
-						{:else if newItemType === 'consumable'}
-							<div class="flex items-center gap-2">
-								<FlaskConical class="size-4" />
-								Consumable
-							</div>
-						{:else if newItemType === 'class'}
-							<div class="flex items-center gap-2">
-								<GraduationCap class="size-4" />
-								Class
-							</div>
-						{:else if newItemType === 'subclass'}
-							<div class="flex items-center gap-2">
-								<BookOpen class="size-4" />
-								Subclass
-							</div>
-						{:else if newItemType === 'domain_card'}
-							<div class="flex items-center gap-2">
-								<BookOpen class="size-4" />
-								Domain Card
-							</div>
-						{:else if newItemType === 'ancestry_card'}
-							<div class="flex items-center gap-2">
-								<Users class="size-4" />
-								Ancestry Card
-							</div>
-						{:else if newItemType === 'community_card'}
-							<div class="flex items-center gap-2">
-								<Users class="size-4" />
-								Community Card
-							</div>
-						{:else if newItemType === 'transformation_card'}
-							<div class="flex items-center gap-2">
-								<Sparkles class="size-4" />
-								Transformation Card
-							</div>
-						{:else}
-							<span class="text-muted-foreground">Select a type...</span>
-						{/if}
-					</Select.Trigger>
-				<Select.Content>
-					<Select.Item value="weapon" disabled={isWeaponAtLimit}>
-						<div class="flex items-center gap-2">
-							<Swords class="size-4" />
-							Weapon {isWeaponAtLimit ? '(1/1)' : '(0/1)'}
-						</div>
-					</Select.Item>
-					<Select.Item value="armor" disabled={isArmorAtLimit}>
-						<div class="flex items-center gap-2">
-							<Shield class="size-4" />
-							Armor {isArmorAtLimit ? '(1/1)' : '(0/1)'}
-						</div>
-					</Select.Item>
-					<Select.Item value="beastform" disabled={isBeastformAtLimit}>
-						<div class="flex items-center gap-2">
-							<PawPrint class="size-4" />
-							Beastform {isBeastformAtLimit ? '(1/1)' : '(0/1)'}
-						</div>
-					</Select.Item>
-					<Select.Item value="loot" disabled={isLootAtLimit}>
-						<div class="flex items-center gap-2">
-							<Package class="size-4" />
-							Loot {isLootAtLimit ? '(1/1)' : '(0/1)'}
-						</div>
-					</Select.Item>
-					<Select.Item value="consumable" disabled={isConsumableAtLimit}>
-						<div class="flex items-center gap-2">
-							<FlaskConical class="size-4" />
-							Consumable {isConsumableAtLimit ? '(1/1)' : '(0/1)'}
-						</div>
-					</Select.Item>
-					<Select.Item value="class" disabled={isClassAtLimit}>
-						<div class="flex items-center gap-2">
-							<GraduationCap class="size-4" />
-							Class {isClassAtLimit ? '(1/1)' : '(0/1)'}
-						</div>
-					</Select.Item>
-					<Select.Item value="subclass" disabled={isSubclassAtLimit}>
-						<div class="flex items-center gap-2">
-							<BookOpen class="size-4" />
-							Subclass {isSubclassAtLimit ? '(1/1)' : '(0/1)'}
-						</div>
-					</Select.Item>
-					<Select.Item value="domain_card" disabled={isDomainCardAtLimit}>
-						<div class="flex items-center gap-2">
-							<BookOpen class="size-4" />
-							Domain Card {isDomainCardAtLimit ? '(1/1)' : '(0/1)'}
-						</div>
-					</Select.Item>
-					<Select.Item value="ancestry_card" disabled={isAncestryCardAtLimit}>
-						<div class="flex items-center gap-2">
-							<Users class="size-4" />
-							Ancestry Card {isAncestryCardAtLimit ? '(1/1)' : '(0/1)'}
-						</div>
-					</Select.Item>
-					<Select.Item value="community_card" disabled={isCommunityCardAtLimit}>
-						<div class="flex items-center gap-2">
-							<Users class="size-4" />
-							Community Card {isCommunityCardAtLimit ? '(1/1)' : '(0/1)'}
-						</div>
-					</Select.Item>
-					<Select.Item value="transformation_card" disabled={isTransformationCardAtLimit}>
-						<div class="flex items-center gap-2">
-							<Sparkles class="size-4" />
-							Transformation Card {isTransformationCardAtLimit ? '(1/1)' : '(0/1)'}
-						</div>
-					</Select.Item>
-				</Select.Content>
-				</Select.Root>
-			</div>
-
-			<!-- Name Input -->
-			<div class="flex flex-col gap-2">
-				<Label>Name</Label>
-				<Input
-					bind:value={newItemName}
-					placeholder="Enter a name..."
-					onkeydown={(e) => {
-						if (e.key === 'Enter' && newItemName.trim() && newItemType && !isCreating) {
-							handleCreateHomebrew();
-						}
-					}}
-				/>
-			</div>
-		</div>
-
-		<Dialog.Footer class="flex gap-3">
-			<Dialog.Close class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}>
-				Cancel
-			</Dialog.Close>
-			<Button
-				onclick={handleCreateHomebrew}
-				disabled={!newItemName.trim() || !newItemType || isCreating || isSelectedTypeAtLimit}
-			>
-				{isCreating ? 'Creating...' : 'Create'}
-			</Button>
-		</Dialog.Footer>
+					{isCreating ? 'Creating...' : 'Create'}
+				</Button>
+			</Dialog.Footer>
+		</form>
 	</Dialog.Content>
 </Dialog.Root>
