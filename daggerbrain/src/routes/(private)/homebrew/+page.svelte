@@ -27,12 +27,13 @@
 	import Shield from '@lucide/svelte/icons/shield';
 	import Swords from '@lucide/svelte/icons/swords';
 	import PawPrint from '@lucide/svelte/icons/paw-print';
-	import Package from '@lucide/svelte/icons/package';
+	import Chest from '@lucide/svelte/icons/package';
 	import FlaskConical from '@lucide/svelte/icons/flask-conical';
 	import GraduationCap from '@lucide/svelte/icons/graduation-cap';
 	import BookOpen from '@lucide/svelte/icons/book-open';
 	import Users from '@lucide/svelte/icons/users';
 	import Sparkles from '@lucide/svelte/icons/sparkles';
+	import Anvil from '@lucide/svelte/icons/anvil';
 	import Footer from '$lib/components/app/footer.svelte';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
@@ -43,7 +44,7 @@
 	import { goto } from '$app/navigation';
 	import type { HomebrewType } from '$lib/types/homebrew-types';
 	import { MAX_HOMEBREW } from '$lib/types/homebrew-types';
-	
+
 	const homebrew = getHomebrewContext();
 	const compendium = getCompendiumContext();
 
@@ -58,6 +59,39 @@
 	$effect(() => {
 		newItemType; // track dependency
 		selectedTemplateId = '';
+	});
+
+	// Clear dialog fields when dialog closes
+	$effect(() => {
+		if (!showCreateDialog) {
+			newItemName = '';
+			newItemType = undefined;
+			selectedTemplateId = '';
+		}
+	});
+
+	// Set default type from active filter when dialog opens
+	$effect(() => {
+		if (showCreateDialog && !newItemType && activeTab) {
+			// Map activeTab to HomebrewType
+			const typeMap: Record<string, HomebrewType> = {
+				weapons: 'weapon',
+				armor: 'armor',
+				beastforms: 'beastform',
+				loot: 'loot',
+				consumables: 'consumable',
+				classes: 'class',
+				subclasses: 'subclass',
+				'domain-cards': 'domain-cards',
+				'ancestry-cards': 'ancestry-cards',
+				'community-cards': 'community-cards',
+				'transformation-cards': 'transformation-cards'
+			};
+			const mappedType = typeMap[activeTab];
+			if (mappedType) {
+				newItemType = mappedType;
+			}
+		}
 	});
 
 	// Look up the selected template from compendium
@@ -113,6 +147,14 @@
 		}
 	});
 
+	// Helper function to safely deep clone objects from reactive state
+	// Uses JSON serialization which works reliably with plain data objects
+	// This is safer than structuredClone for objects from Svelte 5 reactive state,
+	// which may contain proxies or other non-cloneable properties
+	function deepClone<T>(obj: T): T {
+		return JSON.parse(JSON.stringify(obj)) as T;
+	}
+
 	async function handleCreateHomebrew() {
 		if (!newItemName.trim() || !newItemType) return;
 
@@ -127,7 +169,7 @@
 						data: Weapon;
 					} | null;
 					if (template) {
-						const cloned = structuredClone(template.data) as Weapon;
+						const cloned = deepClone(template.data);
 						cloned.compendium_id = '';
 						cloned.source_id = 'Homebrew';
 						cloned.title = newItemName.trim();
@@ -156,7 +198,7 @@
 				case 'armor': {
 					const template = selectedTemplate as Armor | null;
 					if (template) {
-						const cloned = structuredClone(template) as Armor;
+						const cloned = deepClone(template);
 						cloned.compendium_id = '';
 						cloned.source_id = 'Homebrew';
 						cloned.title = newItemName.trim();
@@ -178,7 +220,7 @@
 				case 'beastform': {
 					const template = selectedTemplate as Beastform | null;
 					if (template) {
-						const cloned = structuredClone(template) as Beastform;
+						const cloned = deepClone(template);
 						cloned.compendium_id = '';
 						cloned.source_id = 'Homebrew';
 						cloned.name = newItemName.trim();
@@ -211,7 +253,7 @@
 				case 'loot': {
 					const template = selectedTemplate as Loot | null;
 					if (template) {
-						const cloned = structuredClone(template) as Loot;
+						const cloned = deepClone(template);
 						cloned.compendium_id = '';
 						cloned.source_id = 'Homebrew';
 						cloned.title = newItemName.trim();
@@ -232,7 +274,7 @@
 				case 'consumable': {
 					const template = selectedTemplate as Consumable | null;
 					if (template) {
-						const cloned = structuredClone(template) as Consumable;
+						const cloned = deepClone(template);
 						cloned.compendium_id = '';
 						cloned.source_id = 'Homebrew';
 						cloned.title = newItemName.trim();
@@ -251,7 +293,7 @@
 				case 'class': {
 					const template = selectedTemplate as CharacterClass | null;
 					if (template) {
-						const cloned = structuredClone(template) as CharacterClass;
+						const cloned = deepClone(template);
 						cloned.compendium_id = '';
 						cloned.source_id = 'Homebrew';
 						cloned.name = newItemName.trim();
@@ -309,7 +351,7 @@
 				case 'subclass': {
 					const template = selectedTemplate as Subclass | null;
 					if (template) {
-						const cloned = structuredClone(template) as Subclass;
+						const cloned = deepClone(template);
 						cloned.compendium_id = '';
 						cloned.source_id = 'Homebrew';
 						cloned.name = newItemName.trim();
@@ -359,7 +401,7 @@
 				case 'domain-cards': {
 					const template = selectedTemplate as DomainCard | null;
 					if (template) {
-						const cloned = structuredClone(template) as DomainCard;
+						const cloned = deepClone(template);
 						cloned.compendium_id = '';
 						cloned.source_id = 'Homebrew';
 						cloned.title = newItemName.trim();
@@ -389,7 +431,7 @@
 				case 'ancestry-cards': {
 					const template = selectedTemplate as AncestryCard | null;
 					if (template) {
-						const cloned = structuredClone(template) as AncestryCard;
+						const cloned = deepClone(template);
 						cloned.compendium_id = '';
 						cloned.source_id = 'Homebrew';
 						cloned.title = newItemName.trim();
@@ -412,7 +454,7 @@
 				case 'community-cards': {
 					const template = selectedTemplate as CommunityCard | null;
 					if (template) {
-						const cloned = structuredClone(template) as CommunityCard;
+						const cloned = deepClone(template);
 						cloned.compendium_id = '';
 						cloned.source_id = 'Homebrew';
 						cloned.title = newItemName.trim();
@@ -435,7 +477,7 @@
 				case 'transformation-cards': {
 					const template = selectedTemplate as TransformationCard | null;
 					if (template) {
-						const cloned = structuredClone(template) as TransformationCard;
+						const cloned = deepClone(template);
 						cloned.compendium_id = '';
 						cloned.source_id = 'Homebrew';
 						cloned.title = newItemName.trim();
@@ -1059,7 +1101,8 @@
 	let filtersExpanded = $state(false);
 	// number of custom filters set
 	let filterCount = $derived(
-		(activeTab !== '' ? 1 : 0) +
+		(searchQuery.length > 0 ? 1 : 0) +
+			(activeTab !== '' ? 1 : 0) +
 			(tierFilter !== '' ? 1 : 0) +
 			(weaponCategoryFilter !== '' ? 1 : 0) +
 			(weaponTypeFilter !== '' ? 1 : 0)
@@ -1085,24 +1128,18 @@
 	</Select.Root>
 {/snippet}
 
-{#snippet resetButton()}
-	<Button
-		variant="link"
-		size="sm"
-		onclick={() => {
-			activeTab = '';
-			tierFilter = '';
-			weaponCategoryFilter = '';
-			weaponTypeFilter = '';
-		}}
-		class="text-muted-foreground"
-	>
-		Reset
-		<RotateCcw class="size-3.5" />
-	</Button>
-{/snippet}
-
 <div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
+	<!-- Forge footer image with fade effect - background -->
+	<div
+		class="forge-fade-container pointer-events-none absolute right-0 bottom-0 left-0 z-0 h-64 w-full overflow-hidden"
+	>
+		<img
+			src="/images/art/forge.webp"
+			alt=""
+			class="forge-fade-container h-full w-full object-cover object-center"
+		/>
+	</div>
+
 	{#if homebrew.loading}
 		<!-- Keep the page height so the footer doesn't jump while loading -->
 		<div class="absolute inset-0 flex items-center justify-center">
@@ -1134,306 +1171,330 @@
 					</div>
 				</div>
 
-				<div class={cn('-mt-3', !filtersExpanded && 'mb-2')}>
-					<Collapsible.Root bind:open={filtersExpanded}>
-						<Collapsible.Trigger class="relative w-full">
-							<p
-								class="absolute -top-1 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded bg-background py-0.5 pr-2 pl-1 text-xs font-medium text-primary sm:left-4 sm:translate-x-0"
-							>
-								<ChevronRight
-									class={cn('size-3.5 transition-transform', filtersExpanded && 'rotate-90')}
-								/>
-
-								Filters
-								{#if filterCount > 0}
-									({filterCount})
-								{/if}
-							</p>
-						</Collapsible.Trigger>
-						<div class={cn('border-t-2 bg-primary/5', filtersExpanded && 'border-b-2')}>
-							<Collapsible.Content
-								class="flex flex-wrap justify-center gap-2 px-4 py-4 sm:justify-start"
-							>
-								<!-- Search Box -->
-								<div class="relative h-min">
-									<Search
-										class="pointer-events-none absolute top-1/2 left-3 size-4 shrink -translate-y-1/2 text-muted-foreground"
-									/>
-									<Input bind:value={searchQuery} placeholder="Search..." class="pl-9" />
-								</div>
-
-								<!-- Type Filter Select -->
-								<Select.Root
-									type="single"
-									value={activeTab || undefined}
-									onValueChange={(v) => {
-										activeTab = (v || '') as typeof activeTab;
-									}}
-								>
-									<Select.Trigger class="w-[232px]">
-										<div class="flex items-center gap-2">
-											{#if activeTab === ''}
-												All ({totalCount})
-											{:else if activeTab === 'weapons'}
-												<Swords class="size-4" />
-												Weapons ({weaponCount})
-											{:else if activeTab === 'armor'}
-												<Shield class="size-4" />
-												Armor ({armorCount})
-											{:else if activeTab === 'beastforms'}
-												<PawPrint class="size-4" />
-												Beastforms ({beastformCount})
-											{:else if activeTab === 'loot'}
-												<Package class="size-4" />
-												Loot ({lootCount})
-											{:else if activeTab === 'consumables'}
-												<FlaskConical class="size-4" />
-												Consumables ({consumableCount})
-											{:else if activeTab === 'classes'}
-												<GraduationCap class="size-4" />
-												Classes ({classCount})
-											{:else if activeTab === 'subclasses'}
-												<BookOpen class="size-4" />
-												Subclasses ({subclassCount})
-											{:else if activeTab === 'domain-cards'}
-												<BookOpen class="size-4" />
-												Domain Cards ({domainCardCount})
-											{:else if activeTab === 'ancestry-cards'}
-												<Users class="size-4" />
-												Ancestry Cards ({ancestryCardCount})
-											{:else if activeTab === 'community-cards'}
-												<Users class="size-4" />
-												Community Cards ({communityCardCount})
-											{:else if activeTab === 'transformation-cards'}
-												<Sparkles class="size-4" />
-												Transformation Cards ({transformationCardCount})
-											{/if}
-										</div>
-									</Select.Trigger>
-									<Select.Content>
-										<Select.Item value="">
-											<div class="flex items-center gap-2">
-												All ({totalCount})
-											</div>
-										</Select.Item>
-										<Select.Item value="weapons">
-											<div class="flex items-center gap-2">
-												<Swords class="size-4" />
-												Weapons ({weaponCount})
-											</div>
-										</Select.Item>
-										<Select.Item value="armor">
-											<div class="flex items-center gap-2">
-												<Shield class="size-4" />
-												Armor ({armorCount})
-											</div>
-										</Select.Item>
-										<Select.Item value="beastforms">
-											<div class="flex items-center gap-2">
-												<PawPrint class="size-4" />
-												Beastforms ({beastformCount})
-											</div>
-										</Select.Item>
-										<Select.Item value="loot">
-											<div class="flex items-center gap-2">
-												<Package class="size-4" />
-												Loot ({lootCount})
-											</div>
-										</Select.Item>
-										<Select.Item value="consumables">
-											<div class="flex items-center gap-2">
-												<FlaskConical class="size-4" />
-												Consumables ({consumableCount})
-											</div>
-										</Select.Item>
-										<Select.Item value="classes">
-											<div class="flex items-center gap-2">
-												<GraduationCap class="size-4" />
-												Classes ({classCount})
-											</div>
-										</Select.Item>
-										<Select.Item value="subclasses">
-											<div class="flex items-center gap-2">
-												<BookOpen class="size-4" />
-												Subclasses ({subclassCount})
-											</div>
-										</Select.Item>
-										<Select.Item value="domain-cards">
-											<div class="flex items-center gap-2">
-												<BookOpen class="size-4" />
-												Domain Cards ({domainCardCount})
-											</div>
-										</Select.Item>
-										<Select.Item value="ancestry-cards">
-											<div class="flex items-center gap-2">
-												<Users class="size-4" />
-												Ancestry Cards ({ancestryCardCount})
-											</div>
-										</Select.Item>
-										<Select.Item value="community-cards">
-											<div class="flex items-center gap-2">
-												<Users class="size-4" />
-												Community Cards ({communityCardCount})
-											</div>
-										</Select.Item>
-										<Select.Item value="transformation-cards">
-											<div class="flex items-center gap-2">
-												<Sparkles class="size-4" />
-												Transformation Cards ({transformationCardCount})
-											</div>
-										</Select.Item>
-									</Select.Content>
-								</Select.Root>
-
-								<!-- Subfilters for Weapons -->
-								{#if activeTab === 'weapons'}
-									<!-- Category Select (Primary/Secondary) -->
-									<Select.Root
-										type="single"
-										value={weaponCategoryFilter}
-										onValueChange={(v) =>
-											(weaponCategoryFilter = (v as 'Primary' | 'Secondary' | '') || '')}
-									>
-										<Select.Trigger class="w-[142px]">
-											{weaponCategoryFilter || 'All Categories'}
-										</Select.Trigger>
-										<Select.Content>
-											<Select.Item value="">All Categories</Select.Item>
-											<Select.Item value="Primary">Primary</Select.Item>
-											<Select.Item value="Secondary">Secondary</Select.Item>
-										</Select.Content>
-									</Select.Root>
-
-									<!-- Tier Select -->
-									{@render tierFilterSelect()}
-
-									<!-- Type Select (Magical/Physical) -->
-									<Select.Root
-										type="single"
-										value={weaponTypeFilter}
-										onValueChange={(v) =>
-											(weaponTypeFilter = (v as 'Magical' | 'Physical' | '') || '')}
-									>
-										<Select.Trigger class="w-[128px]">
-											{weaponTypeFilter || 'All Types'}
-										</Select.Trigger>
-										<Select.Content>
-											<Select.Item value="">All Types</Select.Item>
-											<Select.Item value="Physical">Physical</Select.Item>
-											<Select.Item value="Magical">Magical</Select.Item>
-										</Select.Content>
-									</Select.Root>
-								{/if}
-
-								<!-- Subfilters for Armor -->
-								{#if activeTab === 'armor'}
-									<!-- Tier Select -->
-									{@render tierFilterSelect()}
-								{/if}
-
-								<!-- Subfilters for Beastforms -->
-								{#if activeTab === 'beastforms'}
-									<!-- Tier Select -->
-									{@render tierFilterSelect()}
-								{/if}
-
-								<!-- Subfilters for Domain Cards -->
-								{#if activeTab === 'domain-cards'}
-									<!-- Tier Select -->
-									{@render tierFilterSelect()}
-								{/if}
-
-								<!-- Global Reset Button (when no subfilters are shown) -->
-								{#if activeTab !== ''}
-									{@render resetButton()}
-								{/if}
-							</Collapsible.Content>
-						</div>
-					</Collapsible.Root>
-				</div>
-				<!-- Results Grid -->
-				{#if filteredItems.length === 0}
-					<p class="py-8 text-center text-sm text-muted-foreground">
-						{#if totalCount === 0}
-							You haven't created any homebrew items yet.
-						{:else}
-							No items match your filters.
-						{/if}
-					</p>
+				{#if totalCount === 0}
+					<Button class="mx-auto my-24" onclick={() => (showCreateDialog = true)}>
+						<Anvil />
+						Create your first homebrew!
+					</Button>
 				{:else}
-					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-						{#each filteredItems as entry (entry.id)}
-							<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
-								<!-- Card Header -->
-								<a
-									href={getItemHref(entry)}
-									class="flex gap-2 border bg-primary-muted p-3 hover:bg-primary-muted/80"
+					<!-- filters -->
+					<div class={cn('-mt-3 mb-3', !filtersExpanded && 'mb-4')}>
+						<Collapsible.Root bind:open={filtersExpanded}>
+							<Collapsible.Trigger class="relative z-20 w-full">
+								<p
+									class="absolute top-1.5 left-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded bg-background py-0.5 pr-2 pl-1 text-xs font-medium text-primary sm:left-4 sm:translate-x-0"
 								>
-									<div
-										class="flex size-12 shrink-0 items-center justify-center rounded-lg border-2 bg-card"
-									>
-										{#if entry.type === 'primary_weapon' || entry.type === 'secondary_weapon'}
-											<Swords class="size-6 text-muted-foreground" />
-										{:else if entry.type === 'armor'}
-											<Shield class="size-6 text-muted-foreground" />
-										{:else if entry.type === 'beastform'}
-											<PawPrint class="size-6 text-muted-foreground" />
-										{:else if entry.type === 'loot'}
-											<Package class="size-6 text-muted-foreground" />
-										{:else if entry.type === 'consumable'}
-											<FlaskConical class="size-6 text-muted-foreground" />
-										{:else if entry.type === 'class'}
-											<GraduationCap class="size-6 text-muted-foreground" />
-										{:else if entry.type === 'subclass'}
-											<BookOpen class="size-6 text-muted-foreground" />
-										{:else if entry.type === 'domain-cards'}
-											<BookOpen class="size-6 text-muted-foreground" />
-										{:else if entry.type === 'ancestry-cards'}
-											<Users class="size-6 text-muted-foreground" />
-										{:else if entry.type === 'community-cards'}
-											<Users class="size-6 text-muted-foreground" />
-										{:else if entry.type === 'transformation-cards'}
-											<Sparkles class="size-6 text-muted-foreground" />
-										{/if}
-									</div>
-									<div class="min-w-0 flex-1 truncate">
-										<p class="truncate text-lg font-bold">
-											{getItemName(entry)}
-										</p>
-										<p class="truncate text-xs text-muted-foreground">
-											{getItemSubtitle(entry)}
-										</p>
-									</div>
-								</a>
+									<ChevronRight
+										class={cn('size-3.5 transition-transform', filtersExpanded && 'rotate-90')}
+									/>
 
-								<!-- Card Actions -->
-								<div class="flex bg-muted">
-									<Button
-										variant="ghost"
-										size="sm"
-										class="hover:text-text grow rounded-none border"
-										href={getItemHref(entry)}
-									>
-										Edit
-									</Button>
-									<Button
-										variant="ghost"
-										size="sm"
-										class="grow rounded-none border border-x-0 text-destructive hover:text-destructive"
-										onclick={() => {
-											if (entry.type === 'domain-cards') {
-												openDeleteDialog(entry.id, getItemName(entry), entry.type, entry.domainId);
-											} else {
-												openDeleteDialog(entry.id, getItemName(entry), entry.type);
-											}
+									Filters
+									{#if filterCount > 0}
+										({filterCount})
+									{/if}
+									{#if activeTab !== '' || searchQuery.length > 0}
+										<Button
+											variant="link"
+											size="sm"
+											onclick={(e) => {
+												e.preventDefault();
+												e.stopPropagation();
+												activeTab = '';
+												tierFilter = '';
+												weaponCategoryFilter = '';
+												weaponTypeFilter = '';
+												searchQuery = '';
+											}}
+											class="-top-2 right-0 ml-2 p-0 text-xs"
+										>
+											Reset
+											<RotateCcw class="size-3.5" />
+										</Button>
+									{/if}
+								</p>
+							</Collapsible.Trigger>
+							<div class={cn('border-t-2 bg-primary/5', filtersExpanded && 'border-b-2')}>
+								<Collapsible.Content
+									class="relative flex flex-wrap justify-center gap-3 px-4 py-4 sm:justify-start"
+								>
+									<!-- Search Box -->
+									<div class="relative h-min">
+										<Search
+											class="pointer-events-none absolute top-1/2 left-3 size-4 shrink -translate-y-1/2 text-muted-foreground"
+										/>
+										<Input bind:value={searchQuery} placeholder="Search..." class="pl-9" />
+									</div>
+
+									<!-- Type Filter Select -->
+									<Select.Root
+										type="single"
+										value={activeTab || undefined}
+										onValueChange={(v) => {
+											activeTab = (v || '') as typeof activeTab;
 										}}
 									>
-										Delete
-									</Button>
-								</div>
+										<Select.Trigger class="w-[232px]">
+											<div class="flex items-center gap-2">
+												{#if activeTab === ''}
+													All ({totalCount})
+												{:else if activeTab === 'weapons'}
+													<Swords class="size-4" />
+													Weapons ({weaponCount})
+												{:else if activeTab === 'armor'}
+													<Shield class="size-4" />
+													Armor ({armorCount})
+												{:else if activeTab === 'beastforms'}
+													<PawPrint class="size-4" />
+													Beastforms ({beastformCount})
+												{:else if activeTab === 'loot'}
+													<Chest class="size-4" />
+													Loot ({lootCount})
+												{:else if activeTab === 'consumables'}
+													<FlaskConical class="size-4" />
+													Consumables ({consumableCount})
+												{:else if activeTab === 'classes'}
+													<GraduationCap class="size-4" />
+													Classes ({classCount})
+												{:else if activeTab === 'subclasses'}
+													<BookOpen class="size-4" />
+													Subclasses ({subclassCount})
+												{:else if activeTab === 'domain-cards'}
+													<BookOpen class="size-4" />
+													Domain Cards ({domainCardCount})
+												{:else if activeTab === 'ancestry-cards'}
+													<Users class="size-4" />
+													Ancestry Cards ({ancestryCardCount})
+												{:else if activeTab === 'community-cards'}
+													<Users class="size-4" />
+													Community Cards ({communityCardCount})
+												{:else if activeTab === 'transformation-cards'}
+													<Sparkles class="size-4" />
+													Transformation Cards ({transformationCardCount})
+												{/if}
+											</div>
+										</Select.Trigger>
+										<Select.Content>
+											<Select.Item value="">
+												<div class="flex items-center gap-2">
+													All ({totalCount})
+												</div>
+											</Select.Item>
+											<Select.Item value="weapons">
+												<div class="flex items-center gap-2">
+													<Swords class="size-4" />
+													Weapons ({weaponCount})
+												</div>
+											</Select.Item>
+											<Select.Item value="armor">
+												<div class="flex items-center gap-2">
+													<Shield class="size-4" />
+													Armor ({armorCount})
+												</div>
+											</Select.Item>
+											<Select.Item value="beastforms">
+												<div class="flex items-center gap-2">
+													<PawPrint class="size-4" />
+													Beastforms ({beastformCount})
+												</div>
+											</Select.Item>
+											<Select.Item value="loot">
+												<div class="flex items-center gap-2">
+													<Chest class="size-4" />
+													Loot ({lootCount})
+												</div>
+											</Select.Item>
+											<Select.Item value="consumables">
+												<div class="flex items-center gap-2">
+													<FlaskConical class="size-4" />
+													Consumables ({consumableCount})
+												</div>
+											</Select.Item>
+											<Select.Item value="classes">
+												<div class="flex items-center gap-2">
+													<GraduationCap class="size-4" />
+													Classes ({classCount})
+												</div>
+											</Select.Item>
+											<Select.Item value="subclasses">
+												<div class="flex items-center gap-2">
+													<BookOpen class="size-4" />
+													Subclasses ({subclassCount})
+												</div>
+											</Select.Item>
+											<Select.Item value="domain-cards">
+												<div class="flex items-center gap-2">
+													<BookOpen class="size-4" />
+													Domain Cards ({domainCardCount})
+												</div>
+											</Select.Item>
+											<Select.Item value="ancestry-cards">
+												<div class="flex items-center gap-2">
+													<Users class="size-4" />
+													Ancestry Cards ({ancestryCardCount})
+												</div>
+											</Select.Item>
+											<Select.Item value="community-cards">
+												<div class="flex items-center gap-2">
+													<Users class="size-4" />
+													Community Cards ({communityCardCount})
+												</div>
+											</Select.Item>
+											<Select.Item value="transformation-cards">
+												<div class="flex items-center gap-2">
+													<Sparkles class="size-4" />
+													Transformation Cards ({transformationCardCount})
+												</div>
+											</Select.Item>
+										</Select.Content>
+									</Select.Root>
+
+									<!-- Subfilters for Weapons -->
+									{#if activeTab === 'weapons'}
+										<!-- Category Select (Primary/Secondary) -->
+										<Select.Root
+											type="single"
+											value={weaponCategoryFilter}
+											onValueChange={(v) =>
+												(weaponCategoryFilter = (v as 'Primary' | 'Secondary' | '') || '')}
+										>
+											<Select.Trigger class="w-[142px]">
+												{weaponCategoryFilter || 'All Categories'}
+											</Select.Trigger>
+											<Select.Content>
+												<Select.Item value="">All Categories</Select.Item>
+												<Select.Item value="Primary">Primary</Select.Item>
+												<Select.Item value="Secondary">Secondary</Select.Item>
+											</Select.Content>
+										</Select.Root>
+
+										<!-- Tier Select -->
+										{@render tierFilterSelect()}
+
+										<!-- Type Select (Magical/Physical) -->
+										<Select.Root
+											type="single"
+											value={weaponTypeFilter}
+											onValueChange={(v) =>
+												(weaponTypeFilter = (v as 'Magical' | 'Physical' | '') || '')}
+										>
+											<Select.Trigger class="w-[128px]">
+												{weaponTypeFilter || 'All Types'}
+											</Select.Trigger>
+											<Select.Content>
+												<Select.Item value="">All Types</Select.Item>
+												<Select.Item value="Physical">Physical</Select.Item>
+												<Select.Item value="Magical">Magical</Select.Item>
+											</Select.Content>
+										</Select.Root>
+									{/if}
+
+									<!-- Subfilters for Armor -->
+									{#if activeTab === 'armor'}
+										<!-- Tier Select -->
+										{@render tierFilterSelect()}
+									{/if}
+
+									<!-- Subfilters for Beastforms -->
+									{#if activeTab === 'beastforms'}
+										<!-- Tier Select -->
+										{@render tierFilterSelect()}
+									{/if}
+
+									<!-- Subfilters for Domain Cards -->
+									{#if activeTab === 'domain-cards'}
+										<!-- Tier Select -->
+										{@render tierFilterSelect()}
+									{/if}
+								</Collapsible.Content>
 							</div>
-						{/each}
+						</Collapsible.Root>
 					</div>
+
+					{#if filteredItems.length === 0}
+						<p class="my-16 text-center text-sm text-muted-foreground">
+							No items match the filters
+						</p>
+					{:else}
+						<!-- Results Grid -->
+						<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+							{#each filteredItems as entry (entry.id)}
+								<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
+									<!-- Card Header -->
+									<a
+										href={getItemHref(entry)}
+										class="flex gap-2 border bg-primary-muted p-3 hover:bg-primary-muted/80"
+									>
+										<div
+											class="flex size-12 shrink-0 items-center justify-center rounded-lg border-2 bg-card"
+										>
+											{#if entry.type === 'primary_weapon' || entry.type === 'secondary_weapon'}
+												<Swords class="size-6 text-muted-foreground" />
+											{:else if entry.type === 'armor'}
+												<Shield class="size-6 text-muted-foreground" />
+											{:else if entry.type === 'beastform'}
+												<PawPrint class="size-6 text-muted-foreground" />
+											{:else if entry.type === 'loot'}
+												<Chest class="size-6 text-muted-foreground" />
+											{:else if entry.type === 'consumable'}
+												<FlaskConical class="size-6 text-muted-foreground" />
+											{:else if entry.type === 'class'}
+												<GraduationCap class="size-6 text-muted-foreground" />
+											{:else if entry.type === 'subclass'}
+												<BookOpen class="size-6 text-muted-foreground" />
+											{:else if entry.type === 'domain-cards'}
+												<BookOpen class="size-6 text-muted-foreground" />
+											{:else if entry.type === 'ancestry-cards'}
+												<Users class="size-6 text-muted-foreground" />
+											{:else if entry.type === 'community-cards'}
+												<Users class="size-6 text-muted-foreground" />
+											{:else if entry.type === 'transformation-cards'}
+												<Sparkles class="size-6 text-muted-foreground" />
+											{/if}
+										</div>
+										<div class="min-w-0 flex-1 truncate">
+											<p class="truncate text-lg font-bold">
+												{getItemName(entry)}
+											</p>
+											<p class="truncate text-xs text-muted-foreground">
+												{getItemSubtitle(entry)}
+											</p>
+										</div>
+									</a>
+
+									<!-- Card Actions -->
+									<div class="flex bg-muted">
+										<Button
+											variant="ghost"
+											size="sm"
+											class="hover:text-text grow rounded-none border"
+											href={getItemHref(entry)}
+										>
+											Edit
+										</Button>
+										<Button
+											variant="ghost"
+											size="sm"
+											class="grow rounded-none border border-x-0 text-destructive hover:text-destructive"
+											onclick={() => {
+												if (entry.type === 'domain-cards') {
+													openDeleteDialog(
+														entry.id,
+														getItemName(entry),
+														entry.type,
+														entry.domainId
+													);
+												} else {
+													openDeleteDialog(entry.id, getItemName(entry), entry.type);
+												}
+											}}
+										>
+											Delete
+										</Button>
+									</div>
+								</div>
+							{/each}
+						</div>
+					{/if}
 				{/if}
 			</div>
 		</div>
@@ -1508,7 +1569,7 @@
 								</div>
 							{:else if newItemType === 'loot'}
 								<div class="flex items-center gap-2">
-									<Package class="size-4" />
+									<Chest class="size-4" />
 									Loot
 								</div>
 							{:else if newItemType === 'consumable'}
@@ -1571,7 +1632,11 @@
 							</Select.Item>
 							<Select.Item value="loot" disabled={atLimit}>
 								<div class="flex items-center gap-2">
-									<Package class="size-4" />
+									<svg viewBox="0 0 24 24" class="size-4 fill-current" aria-hidden="true">
+										<path
+											d="M18,0H6C2.691,0,0,2.691,0,6V24H24V6c0-3.309-2.691-6-6-6Zm4,6v3h-2V2.556c1.19,.694,2,1.97,2,3.444Zm-4-4v7h-3c0-1.654-1.346-3-3-3s-3,1.346-3,3h-3V2h12Zm-5,7v4h-2v-4c0-.551,.448-1,1-1s1,.449,1,1ZM4,2.556v6.444H2v-3c0-1.474,.81-2.75,2-3.444ZM20,22V13h-2v9H6V13h-2v9H2V11h7v4h6v-4h7v11h-2Z"
+										/>
+									</svg>
 									Loot
 								</div>
 							</Select.Item>
@@ -1593,27 +1658,128 @@
 									Subclass
 								</div>
 							</Select.Item>
-							<Select.Item value="domain_card" disabled={atLimit}>
+							<Select.Item value="domain-cards" disabled={atLimit}>
 								<div class="flex items-center gap-2">
-									<BookOpen class="size-4" />
+									<svg
+										class="size-4"
+										width="800px"
+										height="800px"
+										viewBox="0 0 24 24"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<path
+											d="M9.4 7.53333C9.2 7.26667 8.8 7.26667 8.6 7.53333L6.225 10.7C6.09167 10.8778 6.09167 11.1222 6.225 11.3L8.6 14.4667C8.8 14.7333 9.2 14.7333 9.4 14.4667L11.775 11.3C11.9083 11.1222 11.9083 10.8778 11.775 10.7L9.4 7.53333Z"
+											fill="currentColor"
+										/>
+										<path
+											d="M4.09245 5.63868C4.03647 5.5547 4.03647 5.4453 4.09245 5.36133L4.79199 4.31202C4.89094 4.16359 5.10906 4.16359 5.20801 4.31202L5.90755 5.36132C5.96353 5.4453 5.96353 5.5547 5.90755 5.63867L5.20801 6.68798C5.10906 6.83641 4.89094 6.83641 4.79199 6.68798L4.09245 5.63868Z"
+											fill="currentColor"
+										/>
+										<path
+											d="M13.208 15.312C13.1091 15.1636 12.8909 15.1636 12.792 15.312L12.0924 16.3613C12.0365 16.4453 12.0365 16.5547 12.0924 16.6387L12.792 17.688C12.8909 17.8364 13.1091 17.8364 13.208 17.688L13.9075 16.6387C13.9635 16.5547 13.9635 16.4453 13.9075 16.3613L13.208 15.312Z"
+											fill="currentColor"
+										/>
+										<path
+											fill-rule="evenodd"
+											clip-rule="evenodd"
+											d="M1 4C1 2.34315 2.34315 1 4 1H14C15.1323 1 16.1181 1.62732 16.6288 2.55337L20.839 3.68148C22.4394 4.11031 23.3891 5.75532 22.9603 7.35572L19.3368 20.8787C18.908 22.4791 17.263 23.4288 15.6626 23L8.19849 21H4C2.34315 21 1 19.6569 1 18V4ZM17 18V4.72339L20.3213 5.61334C20.8548 5.75628 21.1714 6.30461 21.0284 6.83808L17.405 20.361C17.262 20.8945 16.7137 21.2111 16.1802 21.0681L15.1198 20.784C16.222 20.3403 17 19.261 17 18ZM4 3C3.44772 3 3 3.44772 3 4V18C3 18.5523 3.44772 19 4 19H14C14.5523 19 15 18.5523 15 18V4C15 3.44772 14.5523 3 14 3H4Z"
+											fill="currentColor"
+										/>
+									</svg>
 									Domain Card
 								</div>
 							</Select.Item>
-							<Select.Item value="ancestry_card" disabled={atLimit}>
+							<Select.Item value="ancestry-cards" disabled={atLimit}>
 								<div class="flex items-center gap-2">
-									<Users class="size-4" />
+									<svg
+										width="800px"
+										height="800px"
+										viewBox="0 0 24 24"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<path
+											d="M9.4 7.53333C9.2 7.26667 8.8 7.26667 8.6 7.53333L6.225 10.7C6.09167 10.8778 6.09167 11.1222 6.225 11.3L8.6 14.4667C8.8 14.7333 9.2 14.7333 9.4 14.4667L11.775 11.3C11.9083 11.1222 11.9083 10.8778 11.775 10.7L9.4 7.53333Z"
+											fill="currentColor"
+										/>
+										<path
+											d="M4.09245 5.63868C4.03647 5.5547 4.03647 5.4453 4.09245 5.36133L4.79199 4.31202C4.89094 4.16359 5.10906 4.16359 5.20801 4.31202L5.90755 5.36132C5.96353 5.4453 5.96353 5.5547 5.90755 5.63867L5.20801 6.68798C5.10906 6.83641 4.89094 6.83641 4.79199 6.68798L4.09245 5.63868Z"
+											fill="currentColor"
+										/>
+										<path
+											d="M13.208 15.312C13.1091 15.1636 12.8909 15.1636 12.792 15.312L12.0924 16.3613C12.0365 16.4453 12.0365 16.5547 12.0924 16.6387L12.792 17.688C12.8909 17.8364 13.1091 17.8364 13.208 17.688L13.9075 16.6387C13.9635 16.5547 13.9635 16.4453 13.9075 16.3613L13.208 15.312Z"
+											fill="currentColor"
+										/>
+										<path
+											fill-rule="evenodd"
+											clip-rule="evenodd"
+											d="M1 4C1 2.34315 2.34315 1 4 1H14C15.1323 1 16.1181 1.62732 16.6288 2.55337L20.839 3.68148C22.4394 4.11031 23.3891 5.75532 22.9603 7.35572L19.3368 20.8787C18.908 22.4791 17.263 23.4288 15.6626 23L8.19849 21H4C2.34315 21 1 19.6569 1 18V4ZM17 18V4.72339L20.3213 5.61334C20.8548 5.75628 21.1714 6.30461 21.0284 6.83808L17.405 20.361C17.262 20.8945 16.7137 21.2111 16.1802 21.0681L15.1198 20.784C16.222 20.3403 17 19.261 17 18ZM4 3C3.44772 3 3 3.44772 3 4V18C3 18.5523 3.44772 19 4 19H14C14.5523 19 15 18.5523 15 18V4C15 3.44772 14.5523 3 14 3H4Z"
+											fill="currentColor"
+										/>
+									</svg>
 									Ancestry Card
 								</div>
 							</Select.Item>
-							<Select.Item value="community_card" disabled={atLimit}>
+							<Select.Item value="community-cards" disabled={atLimit}>
 								<div class="flex items-center gap-2">
-									<Users class="size-4" />
+									<svg
+										width="800px"
+										height="800px"
+										viewBox="0 0 24 24"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<path
+											d="M9.4 7.53333C9.2 7.26667 8.8 7.26667 8.6 7.53333L6.225 10.7C6.09167 10.8778 6.09167 11.1222 6.225 11.3L8.6 14.4667C8.8 14.7333 9.2 14.7333 9.4 14.4667L11.775 11.3C11.9083 11.1222 11.9083 10.8778 11.775 10.7L9.4 7.53333Z"
+											fill="currentColor"
+										/>
+										<path
+											d="M4.09245 5.63868C4.03647 5.5547 4.03647 5.4453 4.09245 5.36133L4.79199 4.31202C4.89094 4.16359 5.10906 4.16359 5.20801 4.31202L5.90755 5.36132C5.96353 5.4453 5.96353 5.5547 5.90755 5.63867L5.20801 6.68798C5.10906 6.83641 4.89094 6.83641 4.79199 6.68798L4.09245 5.63868Z"
+											fill="currentColor"
+										/>
+										<path
+											d="M13.208 15.312C13.1091 15.1636 12.8909 15.1636 12.792 15.312L12.0924 16.3613C12.0365 16.4453 12.0365 16.5547 12.0924 16.6387L12.792 17.688C12.8909 17.8364 13.1091 17.8364 13.208 17.688L13.9075 16.6387C13.9635 16.5547 13.9635 16.4453 13.9075 16.3613L13.208 15.312Z"
+											fill="currentColor"
+										/>
+										<path
+											fill-rule="evenodd"
+											clip-rule="evenodd"
+											d="M1 4C1 2.34315 2.34315 1 4 1H14C15.1323 1 16.1181 1.62732 16.6288 2.55337L20.839 3.68148C22.4394 4.11031 23.3891 5.75532 22.9603 7.35572L19.3368 20.8787C18.908 22.4791 17.263 23.4288 15.6626 23L8.19849 21H4C2.34315 21 1 19.6569 1 18V4ZM17 18V4.72339L20.3213 5.61334C20.8548 5.75628 21.1714 6.30461 21.0284 6.83808L17.405 20.361C17.262 20.8945 16.7137 21.2111 16.1802 21.0681L15.1198 20.784C16.222 20.3403 17 19.261 17 18ZM4 3C3.44772 3 3 3.44772 3 4V18C3 18.5523 3.44772 19 4 19H14C14.5523 19 15 18.5523 15 18V4C15 3.44772 14.5523 3 14 3H4Z"
+											fill="currentColor"
+										/>
+									</svg>
 									Community Card
 								</div>
 							</Select.Item>
-							<Select.Item value="transformation_card" disabled={atLimit}>
+							<Select.Item value="transformation-cards" disabled={atLimit}>
 								<div class="flex items-center gap-2">
-									<Sparkles class="size-4" />
+									<svg
+										width="800px"
+										height="800px"
+										viewBox="0 0 24 24"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<path
+											d="M9.4 7.53333C9.2 7.26667 8.8 7.26667 8.6 7.53333L6.225 10.7C6.09167 10.8778 6.09167 11.1222 6.225 11.3L8.6 14.4667C8.8 14.7333 9.2 14.7333 9.4 14.4667L11.775 11.3C11.9083 11.1222 11.9083 10.8778 11.775 10.7L9.4 7.53333Z"
+											fill="currentColor"
+										/>
+										<path
+											d="M4.09245 5.63868C4.03647 5.5547 4.03647 5.4453 4.09245 5.36133L4.79199 4.31202C4.89094 4.16359 5.10906 4.16359 5.20801 4.31202L5.90755 5.36132C5.96353 5.4453 5.96353 5.5547 5.90755 5.63867L5.20801 6.68798C5.10906 6.83641 4.89094 6.83641 4.79199 6.68798L4.09245 5.63868Z"
+											fill="currentColor"
+										/>
+										<path
+											d="M13.208 15.312C13.1091 15.1636 12.8909 15.1636 12.792 15.312L12.0924 16.3613C12.0365 16.4453 12.0365 16.5547 12.0924 16.6387L12.792 17.688C12.8909 17.8364 13.1091 17.8364 13.208 17.688L13.9075 16.6387C13.9635 16.5547 13.9635 16.4453 13.9075 16.3613L13.208 15.312Z"
+											fill="currentColor"
+										/>
+										<path
+											fill-rule="evenodd"
+											clip-rule="evenodd"
+											d="M1 4C1 2.34315 2.34315 1 4 1H14C15.1323 1 16.1181 1.62732 16.6288 2.55337L20.839 3.68148C22.4394 4.11031 23.3891 5.75532 22.9603 7.35572L19.3368 20.8787C18.908 22.4791 17.263 23.4288 15.6626 23L8.19849 21H4C2.34315 21 1 19.6569 1 18V4ZM17 18V4.72339L20.3213 5.61334C20.8548 5.75628 21.1714 6.30461 21.0284 6.83808L17.405 20.361C17.262 20.8945 16.7137 21.2111 16.1802 21.0681L15.1198 20.784C16.222 20.3403 17 19.261 17 18ZM4 3C3.44772 3 3 3.44772 3 4V18C3 18.5523 3.44772 19 4 19H14C14.5523 19 15 18.5523 15 18V4C15 3.44772 14.5523 3 14 3H4Z"
+											fill="currentColor"
+										/>
+									</svg>
 									Transformation Card
 								</div>
 							</Select.Item>
@@ -1622,19 +1788,19 @@
 				</div>
 
 				<!-- Template Selection -->
-					<div class="flex flex-col gap-2">
-						<Label>Template</Label>
-						<TemplateCombobox disabled={!newItemType} homebrewType={newItemType} bind:value={selectedTemplateId} />
-					</div>
+				<div class="flex flex-col gap-2">
+					<Label>Template</Label>
+					<TemplateCombobox
+						disabled={!newItemType}
+						homebrewType={newItemType}
+						bind:value={selectedTemplateId}
+					/>
+				</div>
 
 				<!-- Name Input -->
 				<div class="flex flex-col gap-2">
 					<Label>Name</Label>
-					<Input
-						bind:value={newItemName}
-						placeholder="Enter a name..."
-						disabled={!newItemType}
-					/>
+					<Input bind:value={newItemName} placeholder="Enter a name..." disabled={!newItemType} />
 				</div>
 			</div>
 
@@ -1652,3 +1818,12 @@
 		</form>
 	</Dialog.Content>
 </Dialog.Root>
+
+<style>
+	.forge-fade-container {
+		mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
+		-webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
+		mask-size: 100% 100%;
+		-webkit-mask-size: 100% 100%;
+	}
+</style>

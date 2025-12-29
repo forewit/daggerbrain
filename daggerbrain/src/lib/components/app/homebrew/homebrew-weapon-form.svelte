@@ -28,9 +28,15 @@
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 
 	let {
-		weapon = $bindable()
+		weapon = $bindable(),
+		hasChanges = $bindable(),
+		onSubmit,
+		onReset
 	}: {
 		weapon: Weapon;
+		hasChanges?: boolean;
+		onSubmit?: (e: SubmitEvent) => void;
+		onReset?: () => void;
 	} = $props();
 
 	const homebrew = getHomebrewContext();
@@ -93,7 +99,7 @@
 	}
 
 	// Check if form has changes compared to the weapon prop
-	let hasChanges = $derived.by(() => {
+	let formHasChanges = $derived.by(() => {
 		if (!weapon) return false;
 
 		const titleMatch = formTitle.trim() === weapon.title;
@@ -147,6 +153,11 @@
 		);
 	});
 
+	// Sync hasChanges to bindable prop
+	$effect(() => {
+		hasChanges = formHasChanges;
+	});
+
 	// Sync form state when weapon prop changes
 	$effect(() => {
 		if (weapon) {
@@ -187,8 +198,10 @@
 		};
 	}
 
-	function handleSubmit(e: SubmitEvent) {
-		e.preventDefault();
+	export function handleSubmit(e?: SubmitEvent) {
+		if (e) {
+			e.preventDefault();
+		}
 		if (!weapon) return;
 
 		// Clear previous errors
@@ -230,9 +243,14 @@
 		// Clear errors on success
 		errors = {};
 		featureErrors.clear();
+
+		// Call callback if provided
+		if (onSubmit && e) {
+			onSubmit(e);
+		}
 	}
 
-	function handleReset() {
+	export function handleReset() {
 		if (!weapon) return;
 		// Re-sync form from weapon prop
 		formTitle = weapon.title;
@@ -251,6 +269,11 @@
 		// Clear errors on reset
 		errors = {};
 		featureErrors.clear();
+
+		// Call callback if provided
+		if (onReset) {
+			onReset();
+		}
 	}
 
 	function toggleTrait(trait: TraitIds) {
@@ -551,9 +574,12 @@
 
 	<!-- Actions -->
 	<div class="flex gap-2 pt-2">
-		<Button type="submit" size="sm" disabled={!hasChanges}>Save</Button>
-		{#if hasChanges}
-			<Button type="button" size="sm" variant="link" onclick={handleReset}>Discard changes</Button>
+		<Button type="submit" size="sm" disabled={!formHasChanges}>Save</Button>
+		{#if formHasChanges}
+			<Button type="button" size="sm" variant="link" onclick={handleReset}>
+				<RotateCcw class="size-3.5" />
+				Discard
+			</Button>
 		{/if}
 	</div>
 </form>

@@ -5,6 +5,7 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import Plus from '@lucide/svelte/icons/plus';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
+	import UserRoundPen from '@lucide/svelte/icons/user-round-pen';
 	import { goto } from '$app/navigation';
 	import { getUserContext } from '$lib/state/user.svelte';
 	import { error } from '@sveltejs/kit';
@@ -58,6 +59,17 @@
 </script>
 
 <div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
+	<!-- Characters footer image with fade effect - background -->
+	<div
+		class="characters-fade-container pointer-events-none absolute right-0 bottom-0 left-0 z-0 h-64 w-full overflow-hidden"
+	>
+		<img
+			src="/images/art/characters.webp"
+			alt=""
+			class="characters-fade-container h-full w-full object-cover object-center"
+		/>
+	</div>
+
 	{#if isLoading}
 		<!-- Keep the page height so the footer doesn't jump while loading -->
 		<div class="absolute inset-0 flex items-center justify-center">
@@ -70,7 +82,7 @@
 				'pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]'
 			)}
 		>
-			<div class="w-full max-w-6xl space-y-4 px-4 py-4">
+			<div class="w-full max-w-6xl space-y-4 px-4 py-4 flex flex-col">
 				<!-- Header -->
 				<div class="flex items-center justify-between gap-2">
 					<p class="flex items-center gap-2 text-2xl font-bold">
@@ -88,59 +100,66 @@
 				</div>
 
 				<!-- Characters -->
-				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					{#each user.all_characters as char}
-						{#if char.id !== redirecting_to_character}
-							<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
-								<a
-									href={`/characters/${char.id}/`}
-									class="flex gap-2 border bg-primary-muted p-1 hover:bg-primary-muted/80"
-								>
-									<div class=" h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2">
-										<img
-											src={char.image_url || '/images/portrait-placeholder.png'}
-											alt={char.name.trim() || 'Unnamed Character'}
-											class="h-full w-full object-cover"
-										/>
-									</div>
-									<div class="truncate">
-										<p class="mt-1 truncate text-lg font-bold">
-											{char.name.trim() || 'Unnamed Character'}
-										</p>
+				{#if user.all_characters.length === 0}
+					<Button class="mx-auto my-24" onclick={handleCreateCharacter}>
+						<UserRoundPen />
+						Create your first character!
+					</Button>
+				{:else}
+					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+						{#each user.all_characters as char}
+							{#if char.id !== redirecting_to_character}
+								<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
+									<a
+										href={`/characters/${char.id}/`}
+										class="flex gap-2 border bg-primary-muted p-1 hover:bg-primary-muted/80"
+									>
+										<div class=" h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2">
+											<img
+												src={char.image_url || '/images/portrait-placeholder.png'}
+												alt={char.name.trim() || 'Unnamed Character'}
+												class="h-full w-full object-cover"
+											/>
+										</div>
+										<div class="truncate">
+											<p class="mt-1 truncate text-lg font-bold">
+												{char.name.trim() || 'Unnamed Character'}
+											</p>
 
-										<p class="mt-1 truncate text-xs text-muted-foreground">
-											{char.derived_descriptors.ancestry_name || 'No ancestry'}
-											&ensp;•&ensp;
-											{char.derived_descriptors.primary_class_name || 'No class'}
-											&ensp;•&ensp;
-											{char.derived_descriptors.primary_subclass_name || 'No subclass'}
-										</p>
+											<p class="mt-1 truncate text-xs text-muted-foreground">
+												{char.derived_descriptors.ancestry_name || 'No ancestry'}
+												&ensp;•&ensp;
+												{char.derived_descriptors.primary_class_name || 'No class'}
+												&ensp;•&ensp;
+												{char.derived_descriptors.primary_subclass_name || 'No subclass'}
+											</p>
+										</div>
+									</a>
+									<div class="flex bg-muted">
+										<Button
+											variant="ghost"
+											size="sm"
+											class="hover:text-text grow rounded-none border"
+											href={`/characters/${char.id}/`}>View</Button
+										>
+										<Button
+											variant="ghost"
+											size="sm"
+											class="hover:text-text grow rounded-none border border-x-0"
+											href={`/characters/${char.id}/edit`}>Edit</Button
+										>
+										<Button
+											variant="ghost"
+											size="sm"
+											class=" grow rounded-none border text-destructive hover:text-destructive"
+											onclick={() => handleDeleteCharacter(char.id, char.name)}>Delete</Button
+										>
 									</div>
-								</a>
-								<div class="flex bg-muted">
-									<Button
-										variant="ghost"
-										size="sm"
-										class="hover:text-text grow rounded-none border"
-										href={`/characters/${char.id}/`}>View</Button
-									>
-									<Button
-										variant="ghost"
-										size="sm"
-										class="hover:text-text grow rounded-none border border-x-0"
-										href={`/characters/${char.id}/edit`}>Edit</Button
-									>
-									<Button
-										variant="ghost"
-										size="sm"
-										class=" grow rounded-none border text-destructive hover:text-destructive"
-										onclick={() => handleDeleteCharacter(char.id, char.name)}>Delete</Button
-									>
 								</div>
-							</div>
-						{/if}
-					{/each}
-				</div>
+							{/if}
+						{/each}
+					</div>
+				{/if}
 			</div>
 		</div>
 	{/if}
@@ -169,3 +188,12 @@
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
+
+<style>
+	.characters-fade-container {
+		mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
+		-webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
+		mask-size: 100% 100%;
+		-webkit-mask-size: 100% 100%;
+	}
+</style>

@@ -3,10 +3,12 @@
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 	import HomebrewWeaponForm from '$lib/components/app/homebrew/homebrew-weapon-form.svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
 	import { capitalize, cn } from '$lib/utils';
 	import Hand from '@lucide/svelte/icons/hand';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { error } from '@sveltejs/kit';
+	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 
 	let { data } = $props();
 
@@ -34,13 +36,6 @@
 		return homebrew.primary_weapons[uid] || homebrew.secondary_weapons[uid] || null;
 	});
 
-	// Check if weapon is saved
-	let isSaved = $derived.by(() => {
-		if (!uid || !weapon) return false;
-		const type = weaponCategory === 'primary' ? 'primary_weapons' : 'secondary_weapons';
-		return homebrew.isSaved(type, uid);
-	});
-
 	// Check if weapon is not found after loading completes
 	$effect(() => {
 		if (!homebrew.loading && uid && !weapon) {
@@ -60,6 +55,10 @@
 		phy: 'Physical',
 		mag: 'Magical'
 	};
+
+	// Form component reference and state
+	let formComponent: HomebrewWeaponForm | null = $state(null);
+	let formHasChanges = $state(false);
 </script>
 
 {#if homebrew.loading}
@@ -77,110 +76,141 @@
 				'pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]'
 			)}
 		>
-			<div class="w-full max-w-6xl space-y-4 px-4 py-4">
-				<!-- Header -->
-				<div class="flex flex-col gap-1">
-					<h1 class="text-2xl font-semibold">{weapon.title}</h1>
-					<p class="text-sm text-muted-foreground">
-						Editing {weaponCategory === 'primary' ? 'Primary' : 'Secondary'} Weapon
-					</p>
-				</div>
+			<!-- Main Content: Preview and Edit Side by Side -->
+			<div class="flex w-full max-w-6xl justify-evenly flex-col gap-6 p-4 md:flex-row">
+				
 
-				<!-- Main Content: Preview and Edit Side by Side -->
-				<div class="flex flex-col gap-6 lg:flex-row lg:items-start">
-					<!-- Preview Section -->
-					<div class="flex-1 p-6">
-						<h2 class="mb-2 text-lg font-semibold">Preview</h2>
-						<p class="mb-4 text-xs text-muted-foreground">{isSaved ? 'Saved' : 'Not Saved'}</p>
-
-						<div class="flex flex-col gap-6">
-					<!-- Description -->
-					{#if weapon.description_html.trim().length > 0}
-						<div class="text-sm">{@html weapon.description_html}</div>
-					{/if}
-
-					<!-- Stats Table -->
-					<table class="w-full border-collapse text-sm">
-						<tbody>
-							<tr class="border-b">
-								<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Range</th>
-								<td class="py-2 text-right">{weapon.range}</td>
-							</tr>
-							<tr class="border-b">
-								<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Trait</th>
-								<td class="py-2 text-right">
-									{weapon.available_traits.map(capitalize).join(' / ') || 'None'}
-								</td>
-							</tr>
-							<tr class="border-b">
-								<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Damage</th>
-								<td class="py-2 text-right"
-									>{weapon.damage_dice}{#if weapon.damage_bonus > 0}+{weapon.damage_bonus}{/if}</td
+				<!-- Edit Section -->
+				<div class="w-full md:w-[400px]">
+					<div class="mb-2 flex items-center justify-between gap-4">
+						<h2 class="text-lg font-semibold">Edit</h2>
+						<div class="flex gap-2">
+							{#if formHasChanges}
+								<Button
+									type="button"
+									size="sm"
+									class="h-auto"
+									variant="link"
+									onclick={() => {
+										if (formComponent) {
+											formComponent.handleReset();
+										}
+									}}
 								>
-							</tr>
-							<tr class="border-b">
-								<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Damage Type</th>
-								<td class="py-2 text-right"
-									>{weapon.available_damage_types.length > 0
-										? weapon.available_damage_types.map((t) => damageTypeMap[t]).join(' / ')
-										: 'None'}</td
-								>
-							</tr>
-							<tr class="border-b">
-								<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Weapon Type</th>
-								<td class="py-2 text-right">{weapon.type}</td>
-							</tr>
-							<tr class="border-b">
-								<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Category</th>
-								<td class="py-2 text-right">{weapon.category}</td>
-							</tr>
-							<tr class="border-b">
-								<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Tier</th>
-								<td class="py-2 text-right">{levelToTier(weapon.level_requirement)}</td>
-							</tr>
-							<tr>
-								<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Burden</th>
-								<td class="py-2 text-right">
-									{weapon.burden}
-									<Hand class="-mt-0.5 ml-0.5 inline-block size-3.5" />
-								</td>
-							</tr>
-						</tbody>
-					</table>
-
-					<!-- Features -->
-					{#if weapon.features.length > 0}
-						<div class="rounded-lg border bg-primary/5 px-4 py-3">
-							<div class="flex items-center justify-between">
-								<p class="text-sm font-medium">Features</p>
-							</div>
-							<div class="mt-3 space-y-3">
-								{#each weapon.features as feature}
-									<div class="border-l-2 border-accent/30 pl-3">
-										<p class="text-sm font-medium text-muted-foreground">{feature.title}</p>
-										<p class="mt-0.5 text-xs text-muted-foreground">{@html feature.description_html}</p>
-									</div>
-								{/each}
-							</div>
-						</div>
-					{:else}
-						<div class="rounded-lg border bg-muted/50 px-4 py-3">
-							<p class="text-sm text-muted-foreground italic">No features</p>
-						</div>
-					{/if}
+								<RotateCcw class="size-3.5" />
+									Discard
+								</Button>
+							{/if}
+							<Button
+								type="button"
+								size="sm"
+								class="h-7 px-3"
+								disabled={!formHasChanges}
+								onclick={() => {
+									if (formComponent) {
+										formComponent.handleSubmit();
+										// Update the homebrew state record so auto-save can detect the change
+										if (uid && weaponCategory && weapon) {
+											if (weaponCategory === 'primary') {
+												homebrew.primary_weapons[uid] = weapon;
+											} else {
+												homebrew.secondary_weapons[uid] = weapon;
+											}
+										}
+									}
+								}}
+							>
+								Save
+							</Button>
+							
 						</div>
 					</div>
 
-				<!-- Edit Section -->
-				<div class="w-full lg:w-auto lg:min-w-[300px] lg:max-w-[300px]">
-					<div class="rounded-lg border bg-card p-6">
-						<h2 class="mb-4 text-lg font-semibold">Edit</h2>
-						<HomebrewWeaponForm bind:weapon />
+					<div class="rounded-lg border bg-card p-4">
+						<HomebrewWeaponForm bind:this={formComponent} bind:weapon bind:hasChanges={formHasChanges} />
+					</div>
+				</div>
+
+				<!-- Preview Section -->
+				<div class="grow max-w-[300px]">
+					<h2 class="ml-2 mb-2 flex items-center gap-2 text-lg font-semibold">
+						Preview
+					</h2>
+
+					<!-- actual preview -->
+					<div class="flex flex-col gap-4 rounded-lg border p-4">
+						<!-- Title and Subtitle -->
+						<div class="flex flex-col gap-1">
+							<h3 class="text-lg font-semibold">{weapon.title}</h3>
+							{#if weapon.category !== 'Unarmed'}
+								<p class="text-xs text-muted-foreground italic">
+									Tier {levelToTier(weapon.level_requirement)}
+									{weapon.category} Weapon
+								</p>
+							{/if}
+						</div>
+
+						<!-- Description -->
+						{#if weapon.description_html.trim().length > 0}
+							<p class="py-4 text-sm">{@html weapon.description_html}</p>
+						{/if}
+
+						<!-- Stats Table -->
+						<table class="w-full border-collapse text-sm">
+							<tbody>
+								<tr class="border-b">
+									<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Range</th>
+									<td class="py-2 text-right">{weapon.range}</td>
+								</tr>
+								<tr class="border-b">
+									<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Trait</th>
+									<td class="py-2 text-right"
+										>{weapon.available_traits.map(capitalize).join(' / ')}</td
+									>
+								</tr>
+								<tr class="border-b">
+									<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Damage</th>
+									<td class="py-2 text-right"
+										>{weapon.damage_dice}{#if weapon.damage_bonus > 0}+{weapon.damage_bonus}{/if}</td
+									>
+								</tr>
+								<tr class="border-b">
+									<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Damage Type</th>
+									<td class="py-2 text-right"
+										>{weapon.available_damage_types.map((t) => damageTypeMap[t]).join(' / ')}</td
+									>
+								</tr>
+								<tr>
+									<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Burden</th>
+									<td class="py-2 text-right">
+										{weapon.burden}
+										<Hand class="-mt-0.5 ml-0.5 inline-block size-3.5" />
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<!-- Features -->
+						{#if weapon.features.length > 0}
+							<div class="rounded-lg border bg-primary/5 px-4 py-3">
+								<div class="flex items-center justify-between">
+									<p class="text-sm">Features</p>
+								</div>
+								<div class="mt-3 space-y-3">
+									{#each weapon.features as feature}
+										<div class="border-l-2 border-accent/30 pl-3">
+											<p class="text-sm font-medium text-muted-foreground">{feature.title}</p>
+											<p class="mt-0.5 text-xs text-muted-foreground">
+												{@html feature.description_html}
+											</p>
+										</div>
+									{/each}
+								</div>
+							</div>
+						{/if}
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-</div>
 {/if}
-
