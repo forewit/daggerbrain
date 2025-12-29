@@ -66,7 +66,6 @@ function createCharacter(id: string) {
 		}
 	});
 
-
 	// ================================================
 	// DERIVED COMPENDIUM REFERENCES
 	// ================================================
@@ -2346,12 +2345,17 @@ function createCharacter(id: string) {
 				evaluate_character_condition(condition)
 			);
 			if (!conditions_met) continue;
-			
+
 			// Additional check: if modifier targets primary weapon but comes from secondary weapon features,
 			// ensure secondary weapon is actually equipped (not just in derived_secondary_weapon)
 			// This handles race conditions where derived_secondary_weapon hasn't updated yet
 			// BUT: only skip if primary weapon is NOT equipped (to avoid blocking modifiers from primary weapon itself)
-			if (modifier.target_weapon === 'primary' && new_primary_weapon === null && new_secondary_weapon === null && active_secondary_weapon === null) {
+			if (
+				modifier.target_weapon === 'primary' &&
+				new_primary_weapon === null &&
+				new_secondary_weapon === null &&
+				active_secondary_weapon === null
+			) {
 				// Modifier targets primary but neither primary nor secondary weapon is equipped - skip it
 				continue;
 			}

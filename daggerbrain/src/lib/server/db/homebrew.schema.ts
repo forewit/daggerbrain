@@ -132,8 +132,12 @@ export const homebrew_secondary_weapons = sqliteTable(
 );
 
 export const homebrew_secondary_weapons_schema = createSelectSchema(homebrew_secondary_weapons);
-export const homebrew_secondary_weapons_insert_schema = createInsertSchema(homebrew_secondary_weapons);
-export const homebrew_secondary_weapons_update_schema = createUpdateSchema(homebrew_secondary_weapons);
+export const homebrew_secondary_weapons_insert_schema = createInsertSchema(
+	homebrew_secondary_weapons
+);
+export const homebrew_secondary_weapons_update_schema = createUpdateSchema(
+	homebrew_secondary_weapons
+);
 
 // ============================================================================
 // Armor
@@ -251,9 +255,15 @@ export const homebrew_transformation_cards = sqliteTable(
 	(table) => [index('homebrew_transformation_cards_clerk_user_id_idx').on(table.clerk_user_id)]
 );
 
-export const homebrew_transformation_cards_schema = createSelectSchema(homebrew_transformation_cards);
-export const homebrew_transformation_cards_insert_schema = createInsertSchema(homebrew_transformation_cards);
-export const homebrew_transformation_cards_update_schema = createUpdateSchema(homebrew_transformation_cards);
+export const homebrew_transformation_cards_schema = createSelectSchema(
+	homebrew_transformation_cards
+);
+export const homebrew_transformation_cards_insert_schema = createInsertSchema(
+	homebrew_transformation_cards
+);
+export const homebrew_transformation_cards_update_schema = createUpdateSchema(
+	homebrew_transformation_cards
+);
 
 // ============================================================================
 // Beastforms

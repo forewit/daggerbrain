@@ -72,7 +72,11 @@
 							<!-- Image -->
 							{#if characterClass.image_url}
 								<div class="rounded-lg border bg-muted p-2">
-									<img src={characterClass.image_url} alt={characterClass.name} class="w-full rounded" />
+									<img
+										src={characterClass.image_url}
+										alt={characterClass.name}
+										class="w-full rounded"
+									/>
 								</div>
 							{/if}
 
@@ -80,19 +84,27 @@
 							<table class="w-full border-collapse text-sm">
 								<tbody>
 									<tr class="border-b">
-										<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Starting Evasion</th>
+										<th class="py-2 pr-4 text-left font-normal text-muted-foreground"
+											>Starting Evasion</th
+										>
 										<td class="py-2 text-right">{characterClass.starting_evasion}</td>
 									</tr>
 									<tr class="border-b">
-										<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Starting Max HP</th>
+										<th class="py-2 pr-4 text-left font-normal text-muted-foreground"
+											>Starting Max HP</th
+										>
 										<td class="py-2 text-right">{characterClass.starting_max_hp}</td>
 									</tr>
 									<tr class="border-b">
-										<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Primary Domain</th>
+										<th class="py-2 pr-4 text-left font-normal text-muted-foreground"
+											>Primary Domain</th
+										>
 										<td class="py-2 text-right">{characterClass.primary_domain_id}</td>
 									</tr>
 									<tr>
-										<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Secondary Domain</th>
+										<th class="py-2 pr-4 text-left font-normal text-muted-foreground"
+											>Secondary Domain</th
+										>
 										<td class="py-2 text-right">{characterClass.secondary_domain_id}</td>
 									</tr>
 								</tbody>
@@ -105,8 +117,12 @@
 								</div>
 								<div class="mt-3">
 									<div class="border-l-2 border-accent/30 pl-3">
-										<p class="text-sm font-medium text-muted-foreground">{characterClass.hope_feature.title}</p>
-										<p class="mt-0.5 text-xs text-muted-foreground">{@html characterClass.hope_feature.description_html}</p>
+										<p class="text-sm font-medium text-muted-foreground">
+											{characterClass.hope_feature.title}
+										</p>
+										<p class="mt-0.5 text-xs text-muted-foreground">
+											{@html characterClass.hope_feature.description_html}
+										</p>
 									</div>
 								</div>
 							</div>
@@ -121,7 +137,9 @@
 										{#each characterClass.class_features as feature}
 											<div class="border-l-2 border-accent/30 pl-3">
 												<p class="text-sm font-medium text-muted-foreground">{feature.title}</p>
-												<p class="mt-0.5 text-xs text-muted-foreground">{@html feature.description_html}</p>
+												<p class="mt-0.5 text-xs text-muted-foreground">
+													{@html feature.description_html}
+												</p>
 											</div>
 										{/each}
 									</div>
@@ -135,7 +153,7 @@
 					</div>
 
 					<!-- Edit Section -->
-					<div class="w-full lg:w-auto lg:min-w-[300px] lg:max-w-[300px]">
+					<div class="w-full lg:w-auto lg:max-w-[300px] lg:min-w-[300px]">
 						<div class="rounded-lg border bg-card p-6">
 							<h2 class="mb-4 text-lg font-semibold">Edit</h2>
 							<HomebrewClassForm bind:characterClass />

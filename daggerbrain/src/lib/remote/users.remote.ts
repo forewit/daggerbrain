@@ -54,10 +54,7 @@ export const dismiss_popup = command(z.string(), async (popupId) => {
 	}
 
 	if (existingUser) {
-		await db
-			.update(users_table)
-			.set({ dismissed_popups })
-			.where(eq(users_table.clerk_id, userId));
+		await db.update(users_table).set({ dismissed_popups }).where(eq(users_table.clerk_id, userId));
 	} else {
 		await db.insert(users_table).values({
 			clerk_id: userId,
@@ -83,10 +80,7 @@ export const update_user = command(users_table_update_schema, async (updates) =>
 		.limit(1);
 
 	if (existingUser) {
-		await db
-			.update(users_table)
-			.set(updates)
-			.where(eq(users_table.clerk_id, userId));
+		await db.update(users_table).set(updates).where(eq(users_table.clerk_id, userId));
 	} else {
 		await db.insert(users_table).values({
 			clerk_id: userId,

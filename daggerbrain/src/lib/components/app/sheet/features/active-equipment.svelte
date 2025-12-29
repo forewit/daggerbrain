@@ -234,7 +234,7 @@
 	</div>
 
 	{#if isRogueClass}
-		<div class="pt-1 flex items-center gap-2 pl-4">
+		<div class="flex items-center gap-2 pt-1 pl-4">
 			<div class="w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs">
 				{context.level_to_tier(context.character?.level ?? 0)}d6
 			</div>

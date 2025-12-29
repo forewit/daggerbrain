@@ -87,11 +87,15 @@
 										<td class="py-2 text-right">{armor.max_armor}</td>
 									</tr>
 									<tr class="border-b">
-										<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Major Threshold</th>
+										<th class="py-2 pr-4 text-left font-normal text-muted-foreground"
+											>Major Threshold</th
+										>
 										<td class="py-2 text-right">{armor.damage_thresholds.major}</td>
 									</tr>
 									<tr>
-										<th class="py-2 pr-4 text-left font-normal text-muted-foreground">Severe Threshold</th>
+										<th class="py-2 pr-4 text-left font-normal text-muted-foreground"
+											>Severe Threshold</th
+										>
 										<td class="py-2 text-right">{armor.damage_thresholds.severe}</td>
 									</tr>
 								</tbody>
@@ -107,7 +111,9 @@
 										{#each armor.features as feature}
 											<div class="border-l-2 border-accent/30 pl-3">
 												<p class="text-sm font-medium text-muted-foreground">{feature.title}</p>
-												<p class="mt-0.5 text-xs text-muted-foreground">{@html feature.description_html}</p>
+												<p class="mt-0.5 text-xs text-muted-foreground">
+													{@html feature.description_html}
+												</p>
 											</div>
 										{/each}
 									</div>
@@ -121,7 +127,7 @@
 					</div>
 
 					<!-- Edit Section -->
-					<div class="w-full lg:w-auto lg:min-w-[300px] lg:max-w-[300px]">
+					<div class="w-full lg:w-auto lg:max-w-[300px] lg:min-w-[300px]">
 						<div class="rounded-lg border bg-card p-6">
 							<h2 class="mb-4 text-lg font-semibold">Edit</h2>
 							<HomebrewArmorForm bind:armor {uid} />

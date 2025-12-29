@@ -24,7 +24,6 @@
 		children?: Snippet;
 		open?: boolean;
 	} = $props();
-
 </script>
 
 <div

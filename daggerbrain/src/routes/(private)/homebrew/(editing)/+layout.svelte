@@ -15,6 +15,3 @@
 </div>
 
 {@render children?.()}
-
-
-

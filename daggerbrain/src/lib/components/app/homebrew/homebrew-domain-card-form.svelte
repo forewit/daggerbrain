@@ -123,7 +123,8 @@
 			formTitle = domainCard.title;
 			formImageUrl = domainCard.image_url;
 			formDomainId = domainCard.domain_id;
-			formLevelRequirement = domainCard.level_requirement === 0 ? '' : String(domainCard.level_requirement);
+			formLevelRequirement =
+				domainCard.level_requirement === 0 ? '' : String(domainCard.level_requirement);
 			formRecallCost = domainCard.recall_cost === 0 ? '' : String(domainCard.recall_cost);
 			formCategory = domainCard.category;
 			formTokens = domainCard.tokens;
@@ -181,7 +182,10 @@
 		// Validate level requirement
 		const levelNum = formLevelRequirement === '' ? 0 : Number(formLevelRequirement);
 		if (levelNum < 1 || levelNum > 10 || !Number.isInteger(levelNum)) {
-			errors = { ...errors, level_requirement: 'Level requirement must be an integer between 1 and 10' };
+			errors = {
+				...errors,
+				level_requirement: 'Level requirement must be an integer between 1 and 10'
+			};
 			return;
 		}
 
@@ -228,15 +232,16 @@
 		formTitle = domainCard.title;
 		formImageUrl = domainCard.image_url;
 		formDomainId = domainCard.domain_id;
-		formLevelRequirement = domainCard.level_requirement === 0 ? '' : String(domainCard.level_requirement);
+		formLevelRequirement =
+			domainCard.level_requirement === 0 ? '' : String(domainCard.level_requirement);
 		formRecallCost = domainCard.recall_cost === 0 ? '' : String(domainCard.recall_cost);
 		formCategory = domainCard.category;
 		formTokens = domainCard.tokens;
 		formAppliesInVault = domainCard.applies_in_vault;
-			formForcedInLoadout = domainCard.forced_in_loadout;
-			formForcedInVault = domainCard.forced_in_vault;
-			formFeatures = JSON.parse(JSON.stringify(domainCard.features));
-			// Clear errors on reset
+		formForcedInLoadout = domainCard.forced_in_loadout;
+		formForcedInVault = domainCard.forced_in_vault;
+		formFeatures = JSON.parse(JSON.stringify(domainCard.features));
+		// Clear errors on reset
 		errors = {};
 		featureErrors.clear();
 	}

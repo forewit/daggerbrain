@@ -1,10 +1,5 @@
 <script lang="ts">
-	import type {
-		WeaponModifier,
-		Ranges,
-		DamageTypes,
-		TraitIds
-	} from '$lib/types/compendium-types';
+	import type { WeaponModifier, Ranges, DamageTypes, TraitIds } from '$lib/types/compendium-types';
 	import * as Select from '$lib/components/ui/select';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -250,7 +245,8 @@
 		>
 			<Select.Trigger id="target-stat-select" class="w-full">
 				<p class="truncate">
-					{selectedTargetStat && targetStatOptions.includes(selectedTargetStat as ModifierTargetStat)
+					{selectedTargetStat &&
+					targetStatOptions.includes(selectedTargetStat as ModifierTargetStat)
 						? targetStatLabels[selectedTargetStat as ModifierTargetStat]
 						: 'None selected'}
 				</p>

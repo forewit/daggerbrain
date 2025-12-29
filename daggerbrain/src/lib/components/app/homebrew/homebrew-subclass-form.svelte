@@ -7,11 +7,7 @@
 	import { cn } from '$lib/utils';
 	import SubclassCardEditor from './features/subclass-card-editor.svelte';
 	import Dropdown from '../leveling/dropdown.svelte';
-	import {
-		SubclassFormSchema,
-		extractFieldErrors,
-		type SubclassFormErrors
-	} from './form-schemas';
+	import { SubclassFormSchema, extractFieldErrors, type SubclassFormErrors } from './form-schemas';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 
@@ -69,7 +65,14 @@
 		const masteryMatch =
 			JSON.stringify(subclass.mastery_card) === JSON.stringify(subclass.mastery_card);
 
-		return !(nameMatch && descriptionMatch && classIdMatch && foundationMatch && specializationMatch && masteryMatch);
+		return !(
+			nameMatch &&
+			descriptionMatch &&
+			classIdMatch &&
+			foundationMatch &&
+			specializationMatch &&
+			masteryMatch
+		);
 	});
 
 	// Sync form state when subclass prop changes
@@ -129,7 +132,6 @@
 			...result.data
 		};
 
-
 		// Clear errors on success
 		errors = {};
 	}
@@ -181,10 +183,7 @@
 	<div class="flex flex-col gap-1">
 		<label
 			for="hb-subclass-class-id"
-			class={cn(
-				'text-xs font-medium text-muted-foreground',
-				errors.class_id && 'text-destructive'
-			)}
+			class={cn('text-xs font-medium text-muted-foreground', errors.class_id && 'text-destructive')}
 			>Class</label
 		>
 		<Select.Root type="single" bind:value={formClassId}>

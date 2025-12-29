@@ -27,7 +27,7 @@
 	{#if character_class?.compendium_id === compendium.classes.wizard.compendium_id}
 		<WizardFeatures />
 	{/if}
-	
+
 	{#each character_class?.class_features as feature}
 		<div class="relative text-sm">
 			<p class="pb-2 text-sm font-medium">{feature.title}</p>
@@ -39,14 +39,18 @@
 {/snippet}
 
 <div class="flex flex-col gap-4">
-	
 	{@render class_features(primary_class)}
 	{@render class_features(secondary_class)}
 	{#if (context.primary_subclass && context.primary_subclass.foundation_card.spellcast_trait) || (context.secondary_subclass && context.secondary_subclass.foundation_card.spellcast_trait)}
-		<div class="relative text-xs items-center flex gap-1">
-			<p class="font-medium">Spellcast Trait: </p>
+		<div class="relative flex items-center gap-1 text-xs">
+			<p class="font-medium">Spellcast Trait:</p>
 			<p class="text-xs text-muted-foreground">
-				{[capitalize(context.primary_subclass?.foundation_card.spellcast_trait ?? ''), capitalize(context.secondary_subclass?.foundation_card.spellcast_trait ?? '')].filter(str => !!str?.trim()).join(', ')}
+				{[
+					capitalize(context.primary_subclass?.foundation_card.spellcast_trait ?? ''),
+					capitalize(context.secondary_subclass?.foundation_card.spellcast_trait ?? '')
+				]
+					.filter((str) => !!str?.trim())
+					.join(', ')}
 			</p>
 		</div>
 	{/if}

@@ -180,8 +180,12 @@
 			formSuggestedArmorId = characterClass.suggested_armor_id;
 			formGoldCoins = String(characterClass.starting_inventory.gold_coins);
 			formFreeGear = JSON.parse(JSON.stringify(characterClass.starting_inventory.free_gear));
-			formLootOrConsumableOptions = [...characterClass.starting_inventory.loot_or_consumable_options];
-			formClassGearOptions = JSON.parse(JSON.stringify(characterClass.starting_inventory.class_gear_options));
+			formLootOrConsumableOptions = [
+				...characterClass.starting_inventory.loot_or_consumable_options
+			];
+			formClassGearOptions = JSON.parse(
+				JSON.stringify(characterClass.starting_inventory.class_gear_options)
+			);
 			formSpellbookPrompt = characterClass.starting_inventory.spellbook_prompt || '';
 			formBackgroundQuestions = [...characterClass.background_questions];
 			formConnectionQuestions = [...characterClass.connection_questions];
@@ -321,7 +325,9 @@
 		formGoldCoins = String(characterClass.starting_inventory.gold_coins);
 		formFreeGear = JSON.parse(JSON.stringify(characterClass.starting_inventory.free_gear));
 		formLootOrConsumableOptions = [...characterClass.starting_inventory.loot_or_consumable_options];
-		formClassGearOptions = JSON.parse(JSON.stringify(characterClass.starting_inventory.class_gear_options));
+		formClassGearOptions = JSON.parse(
+			JSON.stringify(characterClass.starting_inventory.class_gear_options)
+		);
 		formSpellbookPrompt = characterClass.starting_inventory.spellbook_prompt || '';
 		formBackgroundQuestions = [...characterClass.background_questions];
 		formConnectionQuestions = [...characterClass.connection_questions];
@@ -619,7 +625,9 @@
 		<div class="grid grid-cols-2 gap-3">
 			{#each traitOptions as trait}
 				<div class="flex flex-col gap-1">
-					<label for="class-suggested-trait-{trait}" class="text-xs text-muted-foreground">{capitalize(trait)}</label>
+					<label for="class-suggested-trait-{trait}" class="text-xs text-muted-foreground"
+						>{capitalize(trait)}</label
+					>
 					<Input
 						id="class-suggested-trait-{trait}"
 						type="number"
@@ -643,7 +651,9 @@
 		<p class="text-xs font-medium text-muted-foreground">Suggested Equipment</p>
 		<div class="grid grid-cols-3 gap-3">
 			<div class="flex flex-col gap-1">
-				<label for="class-primary-weapon" class="text-xs text-muted-foreground">Primary Weapon</label>
+				<label for="class-primary-weapon" class="text-xs text-muted-foreground"
+					>Primary Weapon</label
+				>
 				<Select.Root
 					type="single"
 					value={formSuggestedPrimaryWeaponId || undefined}
@@ -652,8 +662,8 @@
 					<Select.Trigger id="class-primary-weapon" class="w-full">
 						<p class="truncate">
 							{formSuggestedPrimaryWeaponId
-								? availablePrimaryWeapons.find((w) => w.id === formSuggestedPrimaryWeaponId)?.title ||
-									'Unknown'
+								? availablePrimaryWeapons.find((w) => w.id === formSuggestedPrimaryWeaponId)
+										?.title || 'Unknown'
 								: 'None'}
 						</p>
 					</Select.Trigger>
@@ -668,7 +678,9 @@
 				</Select.Root>
 			</div>
 			<div class="flex flex-col gap-1">
-				<label for="class-secondary-weapon" class="text-xs text-muted-foreground">Secondary Weapon</label>
+				<label for="class-secondary-weapon" class="text-xs text-muted-foreground"
+					>Secondary Weapon</label
+				>
 				<Select.Root
 					type="single"
 					value={formSuggestedSecondaryWeaponId || undefined}
@@ -677,8 +689,8 @@
 					<Select.Trigger id="class-secondary-weapon" class="w-full">
 						<p class="truncate">
 							{formSuggestedSecondaryWeaponId
-								? availableSecondaryWeapons.find((w) => w.id === formSuggestedSecondaryWeaponId)?.title ||
-									'Unknown'
+								? availableSecondaryWeapons.find((w) => w.id === formSuggestedSecondaryWeaponId)
+										?.title || 'Unknown'
 								: 'None'}
 						</p>
 					</Select.Trigger>
@@ -722,7 +734,7 @@
 	<!-- Starting Inventory -->
 	<div class="flex flex-col gap-2">
 		<p class="text-xs font-medium text-muted-foreground">Starting Inventory</p>
-		<div class="rounded-lg border bg-muted p-3 space-y-3">
+		<div class="space-y-3 rounded-lg border bg-muted p-3">
 			<!-- Gold Coins -->
 			<div class="flex flex-col gap-1">
 				<label for="class-gold-coins" class="text-xs text-muted-foreground">Gold Coins</label>
@@ -807,7 +819,12 @@
 								placeholder="Gear name"
 								class="flex-1"
 							/>
-							<Button type="button" size="sm" variant="ghost" onclick={() => removeClassGear(index)}>
+							<Button
+								type="button"
+								size="sm"
+								variant="ghost"
+								onclick={() => removeClassGear(index)}
+							>
 								<X class="size-3.5" />
 							</Button>
 						</div>
@@ -817,7 +834,9 @@
 
 			<!-- Spellbook Prompt -->
 			<div class="flex flex-col gap-1">
-				<label for="class-spellbook-prompt" class="text-xs text-muted-foreground">Spellbook Prompt (Optional)</label>
+				<label for="class-spellbook-prompt" class="text-xs text-muted-foreground"
+					>Spellbook Prompt (Optional)</label
+				>
 				<Input
 					id="class-spellbook-prompt"
 					bind:value={formSpellbookPrompt}
@@ -892,7 +911,7 @@
 	<!-- Character Description Suggestions -->
 	<div class="flex flex-col gap-2">
 		<p class="text-xs font-medium text-muted-foreground">Character Description Suggestions</p>
-		<div class="rounded-lg border bg-muted p-3 space-y-3">
+		<div class="space-y-3 rounded-lg border bg-muted p-3">
 			<div class="flex flex-col gap-1">
 				<label for="class-clothes" class="text-xs text-muted-foreground">Clothes</label>
 				<Input id="class-clothes" bind:value={formClothes} placeholder="Clothes suggestion" />

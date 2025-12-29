@@ -65,7 +65,7 @@
 					</div>
 
 					<!-- Edit Section -->
-					<div class="w-full lg:w-auto lg:min-w-[300px] lg:max-w-[300px]">
+					<div class="w-full lg:w-auto lg:max-w-[300px] lg:min-w-[300px]">
 						<div class="rounded-lg border bg-card p-6">
 							<h2 class="mb-4 text-lg font-semibold">Edit</h2>
 							<HomebrewBeastformForm bind:beastform {uid} />

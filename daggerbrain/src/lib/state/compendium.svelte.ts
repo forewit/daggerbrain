@@ -76,96 +76,120 @@ function createCompendium() {
 		return true;
 	}
 
-    $effect(()=>{
-		const new_all_classes: Record<string, CharacterClass> = {...homebrew.classes, ...all_classes} 
+	$effect(() => {
+		const new_all_classes: Record<string, CharacterClass> = { ...homebrew.classes, ...all_classes };
 		if (!compendiumEquivilanceCheck(new_all_classes, all_classes)) {
 			all_classes = new_all_classes;
 		}
-	})
+	});
 
-	$effect(()=>{
-		const new_all_subclasses: Record<string, Subclass> = {...homebrew.subclasses, ...all_subclasses} 
+	$effect(() => {
+		const new_all_subclasses: Record<string, Subclass> = {
+			...homebrew.subclasses,
+			...all_subclasses
+		};
 		if (!compendiumEquivilanceCheck(new_all_subclasses, all_subclasses)) {
 			all_subclasses = new_all_subclasses;
 		}
-	})
+	});
 
-	$effect(()=>{
-		const new_all_domains: Record<string, Domain> = {...homebrew.domains, ...all_domains} 
+	$effect(() => {
+		const new_all_domains: Record<string, Domain> = { ...homebrew.domains, ...all_domains };
 		if (!compendiumEquivilanceCheck(new_all_domains, all_domains)) {
 			all_domains = new_all_domains;
 		}
-	})
+	});
 
-	$effect(()=>{
-		const new_all_domain_cards: Record<DomainIds, Record<string, DomainCard>> = {...homebrew.domain_cards, ...all_domain_cards} 
+	$effect(() => {
+		const new_all_domain_cards: Record<DomainIds, Record<string, DomainCard>> = {
+			...homebrew.domain_cards,
+			...all_domain_cards
+		};
 		if (!compendiumEquivilanceCheck(new_all_domain_cards, all_domain_cards)) {
 			all_domain_cards = new_all_domain_cards;
 		}
-	})
+	});
 
-	$effect(()=>{
-		const new_all_primary_weapons: Record<string, Weapon> = {...homebrew.primary_weapons, ...all_primary_weapons} 
+	$effect(() => {
+		const new_all_primary_weapons: Record<string, Weapon> = {
+			...homebrew.primary_weapons,
+			...all_primary_weapons
+		};
 		if (!compendiumEquivilanceCheck(new_all_primary_weapons, all_primary_weapons)) {
 			all_primary_weapons = new_all_primary_weapons;
 		}
-	})
+	});
 
-	$effect(()=>{
-		const new_all_secondary_weapons: Record<string, Weapon> = {...homebrew.secondary_weapons, ...all_secondary_weapons} 
+	$effect(() => {
+		const new_all_secondary_weapons: Record<string, Weapon> = {
+			...homebrew.secondary_weapons,
+			...all_secondary_weapons
+		};
 		if (!compendiumEquivilanceCheck(new_all_secondary_weapons, all_secondary_weapons)) {
 			all_secondary_weapons = new_all_secondary_weapons;
 		}
-	})
+	});
 
-	$effect(()=>{
-		const new_all_armor: Record<string, Armor> = {...homebrew.armor, ...all_armor} 
+	$effect(() => {
+		const new_all_armor: Record<string, Armor> = { ...homebrew.armor, ...all_armor };
 		if (!compendiumEquivilanceCheck(new_all_armor, all_armor)) {
 			all_armor = new_all_armor;
 		}
-	})
+	});
 
-	$effect(()=>{
-		const new_all_loot: Record<string, Loot> = {...homebrew.loot, ...all_loot} 
+	$effect(() => {
+		const new_all_loot: Record<string, Loot> = { ...homebrew.loot, ...all_loot };
 		if (!compendiumEquivilanceCheck(new_all_loot, all_loot)) {
 			all_loot = new_all_loot;
 		}
-	})
+	});
 
-	$effect(()=>{
-		const new_all_consumables: Record<string, Consumable> = {...homebrew.consumables, ...all_consumables} 
+	$effect(() => {
+		const new_all_consumables: Record<string, Consumable> = {
+			...homebrew.consumables,
+			...all_consumables
+		};
 		if (!compendiumEquivilanceCheck(new_all_consumables, all_consumables)) {
 			all_consumables = new_all_consumables;
 		}
-	})
+	});
 
-	$effect(()=>{
-		const new_ancestry_cards: Record<string, AncestryCard> = {...homebrew.ancestry_cards, ...all_ancestry_cards} 
+	$effect(() => {
+		const new_ancestry_cards: Record<string, AncestryCard> = {
+			...homebrew.ancestry_cards,
+			...all_ancestry_cards
+		};
 		if (!compendiumEquivilanceCheck(new_ancestry_cards, all_ancestry_cards)) {
 			all_ancestry_cards = new_ancestry_cards;
 		}
-	})
-	
-	$effect(()=>{
-		const new_community_cards: Record<string, CommunityCard> = {...homebrew.community_cards, ...all_community_cards} 
+	});
+
+	$effect(() => {
+		const new_community_cards: Record<string, CommunityCard> = {
+			...homebrew.community_cards,
+			...all_community_cards
+		};
 		if (!compendiumEquivilanceCheck(new_community_cards, all_community_cards)) {
 			all_community_cards = new_community_cards;
 		}
-	})
+	});
 
-	$effect(()=>{
-		const new_transformation_cards: Record<string, TransformationCard> = {...homebrew.transformation_cards, ...all_transformation_cards} 
+	$effect(() => {
+		const new_transformation_cards: Record<string, TransformationCard> = {
+			...homebrew.transformation_cards,
+			...all_transformation_cards
+		};
 		if (!compendiumEquivilanceCheck(new_transformation_cards, all_transformation_cards)) {
 			all_transformation_cards = new_transformation_cards;
 		}
-	})
+	});
 
-	$effect(()=>{
-		const new_beastforms: Record<string, Beastform> = {...homebrew.beastforms, ...all_beastforms} 
+	$effect(() => {
+		const new_beastforms: Record<string, Beastform> = { ...homebrew.beastforms, ...all_beastforms };
 		if (!compendiumEquivilanceCheck(new_beastforms, all_beastforms)) {
 			all_beastforms = new_beastforms;
 		}
-	})
+	});
 
 	// Helper to fetch with retry on failure
 	async function fetchWithRetry<T>(

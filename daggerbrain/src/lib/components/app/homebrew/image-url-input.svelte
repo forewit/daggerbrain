@@ -114,14 +114,7 @@
 				<LoaderCircle class="size-6 animate-spin text-muted-foreground" />
 			</div>
 		{:else}
-			<img
-				class="h-full w-full rounded-md object-cover"
-				src={imageUrl}
-				alt={alt}
-			/>
+			<img class="h-full w-full rounded-md object-cover" src={imageUrl} {alt} />
 		{/if}
 	</button>
 </div>
-
-
-

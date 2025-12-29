@@ -1,7 +1,7 @@
 <script lang="ts">
 	import './layout.css';
 	import { ModeWatcher, setMode } from 'mode-watcher';
-	import { Toaster } from "$lib/components/ui/sonner/index.js";
+	import { Toaster } from '$lib/components/ui/sonner/index.js';
 
 	import { ClerkProvider } from 'svelte-clerk';
 	import Navbar from '$lib/components/app/navbar.svelte';
@@ -23,7 +23,7 @@
 </svelte:head>
 
 <ClerkProvider appearance={{ baseTheme: dark }}>
-	<Toaster position="top-center" richColors/>
+	<Toaster position="top-center" richColors />
 	<ModeWatcher />
 	<Navbar />
 	{@render children?.()}

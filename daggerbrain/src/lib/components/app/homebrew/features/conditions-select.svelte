@@ -188,78 +188,76 @@
 	</div>
 
 	{#if selectedTypes.length > 0}
+		<div class="mx-3 flex flex-col gap-3 border-l-2 border-dotted border-primary pt-3 pl-2">
+			<!-- Condition-specific fields -->
+			{#if selectedTypes.includes('armor_equipped_true') || selectedTypes.includes('armor_equipped_false')}
+				<p class="text-xs text-muted-foreground">
+					{selectedTypes.includes('armor_equipped_true')
+						? 'Armor must be equipped'
+						: 'Armor must not be equipped'}
+				</p>
+			{/if}
 
-	<div class="pt-3 mx-3 border-l-2 border-dotted border-primary pl-2 flex flex-col gap-3">
-	<!-- Condition-specific fields -->
-	{#if selectedTypes.includes('armor_equipped_true') || selectedTypes.includes('armor_equipped_false')}
-			<p class="text-xs text-muted-foreground">
-				{selectedTypes.includes('armor_equipped_true')
-					? 'Armor must be equipped'
-					: 'Armor must not be equipped'}
-			</p>
-	{/if}
+			{#if selectedTypes.includes('level')}
+				<div class="flex flex-col gap-1">
+					<p class="text-xs text-muted-foreground">Minimum level requirement</p>
+					<Input
+						id="level-input"
+						type="number"
+						value={levelCondition ? String(levelCondition.min_level) : '1'}
+						oninput={(e) => {
+							const level = Number(e.currentTarget.value);
+							if (level >= 1 && level <= 10) {
+								updateLevelCondition(level);
+							}
+						}}
+						min="1"
+						max="10"
+					/>
+				</div>
+			{/if}
 
-	{#if selectedTypes.includes('level')}
-		<div class="flex flex-col gap-1">
-			<p class="text-xs text-muted-foreground">Minimum level requirement</p>
-			<Input
-				id="level-input"
-				type="number"
-				value={levelCondition ? String(levelCondition.min_level) : '1'}
-				oninput={(e) => {
-					const level = Number(e.currentTarget.value);
-					if (level >= 1 && level <= 10) {
-						updateLevelCondition(level);
-					}
-				}}
-				min="1"
-				max="10"
-			/>
+			{#if selectedTypes.includes('min_loadout_cards_from_domain')}
+				<div class="flex flex-col gap-1">
+					<p class="text-xs text-muted-foreground">Minimum cards from a domain in your loadout</p>
+
+					<div class="flex gap-2">
+						<Select.Root
+							type="single"
+							value={loadoutCondition?.domain_id || 'arcana'}
+							onValueChange={(value) => {
+								if (value) {
+									updateLoadoutDomain(value as DomainIds);
+								}
+							}}
+						>
+							<Select.Trigger id="loadout-domain-select" class="w-full">
+								<p class="truncate">
+									{loadoutCondition ? getDomainName(loadoutCondition.domain_id) : 'Select domain'}
+								</p>
+							</Select.Trigger>
+							<Select.Content>
+								{#each domainOptions as domainId}
+									<Select.Item value={domainId}>{getDomainName(domainId)}</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+
+						<Input
+							id="min-cards-input"
+							type="number"
+							value={loadoutCondition ? String(loadoutCondition.min_cards) : '1'}
+							oninput={(e) => {
+								const cards = Number(e.currentTarget.value);
+								if (cards > 0) {
+									updateLoadoutMinCards(cards);
+								}
+							}}
+							min="1"
+						/>
+					</div>
+				</div>
+			{/if}
 		</div>
-	{/if}
-
-	{#if selectedTypes.includes('min_loadout_cards_from_domain')}
-		<div class="flex flex-col gap-1">
-			<p class="text-xs text-muted-foreground">Minimum cards from a domain in your loadout</p>
-
-			<div class="flex gap-2">
-				
-				<Select.Root
-					type="single"
-					value={loadoutCondition?.domain_id || 'arcana'}
-					onValueChange={(value) => {
-						if (value) {
-							updateLoadoutDomain(value as DomainIds);
-						}
-					}}
-				>
-					<Select.Trigger id="loadout-domain-select" class="w-full">
-						<p class="truncate">
-							{loadoutCondition ? getDomainName(loadoutCondition.domain_id) : 'Select domain'}
-						</p>
-					</Select.Trigger>
-					<Select.Content>
-						{#each domainOptions as domainId}
-							<Select.Item value={domainId}>{getDomainName(domainId)}</Select.Item>
-						{/each}
-					</Select.Content>
-				</Select.Root>
-	
-				<Input
-					id="min-cards-input"
-					type="number"
-					value={loadoutCondition ? String(loadoutCondition.min_cards) : '1'}
-					oninput={(e) => {
-						const cards = Number(e.currentTarget.value);
-						if (cards > 0) {
-							updateLoadoutMinCards(cards);
-						}
-					}}
-					min="1"
-				/>
-			</div>
-		</div>
-	{/if}
-	</div>
 	{/if}
 </div>

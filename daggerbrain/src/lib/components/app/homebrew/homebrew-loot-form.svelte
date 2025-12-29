@@ -8,11 +8,7 @@
 	import HomebrewWeaponModifierEditor from './features/weapon-modifier-editor.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Dropdown from '../leveling/dropdown.svelte';
-	import {
-		LootFormSchema,
-		extractFieldErrors,
-		type LootFormErrors
-	} from './form-schemas';
+	import { LootFormSchema, extractFieldErrors, type LootFormErrors } from './form-schemas';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 
 	let {
@@ -95,7 +91,6 @@
 			...loot,
 			...result.data
 		};
-
 
 		// Clear errors on success
 		errors = {};

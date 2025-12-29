@@ -77,7 +77,8 @@
 										{#each loot.character_modifiers as modifier}
 											<div class="border-l-2 border-accent/30 pl-3">
 												<p class="text-xs text-muted-foreground">
-													{modifier.behaviour} {modifier.target}
+													{modifier.behaviour}
+													{modifier.target}
 													{#if modifier.type === 'flat'}
 														: {modifier.value}
 													{/if}
@@ -98,7 +99,9 @@
 										{#each loot.weapon_modifiers as modifier}
 											<div class="border-l-2 border-accent/30 pl-3">
 												<p class="text-xs text-muted-foreground">
-													{modifier.behaviour} {modifier.target_weapon} {modifier.target_stat}
+													{modifier.behaviour}
+													{modifier.target_weapon}
+													{modifier.target_stat}
 												</p>
 											</div>
 										{/each}
@@ -109,7 +112,7 @@
 					</div>
 
 					<!-- Edit Section -->
-					<div class="w-full lg:w-auto lg:min-w-[300px] lg:max-w-[300px]">
+					<div class="w-full lg:w-auto lg:max-w-[300px] lg:min-w-[300px]">
 						<div class="rounded-lg border bg-card p-6">
 							<h2 class="mb-4 text-lg font-semibold">Edit</h2>
 							<HomebrewLootForm bind:loot {uid} />

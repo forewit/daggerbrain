@@ -82,7 +82,7 @@
 				'pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]'
 			)}
 		>
-			<div class="w-full max-w-6xl space-y-4 px-4 py-4 flex flex-col">
+			<div class="flex w-full max-w-6xl flex-col space-y-4 px-4 py-4">
 				<!-- Header -->
 				<div class="flex items-center justify-between gap-2">
 					<p class="flex items-center gap-2 text-2xl font-bold">

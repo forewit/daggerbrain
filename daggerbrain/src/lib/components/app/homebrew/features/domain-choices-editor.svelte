@@ -85,7 +85,11 @@
 		});
 	}
 
-	function updateConditionalChoice(choiceIndex: number, field: 'choice_id' | 'selection_id' | null, value: string | null) {
+	function updateConditionalChoice(
+		choiceIndex: number,
+		field: 'choice_id' | 'selection_id' | null,
+		value: string | null
+	) {
 		choices = choices.map((choice, i) => {
 			if (i === choiceIndex) {
 				if (field === null) {
@@ -97,8 +101,9 @@
 				return {
 					...choice,
 					conditional_choice: {
-						choice_id: field === 'choice_id' ? value : (choice.conditional_choice?.choice_id || ''),
-						selection_id: field === 'selection_id' ? value : (choice.conditional_choice?.selection_id || '')
+						choice_id: field === 'choice_id' ? value : choice.conditional_choice?.choice_id || '',
+						selection_id:
+							field === 'selection_id' ? value : choice.conditional_choice?.selection_id || ''
 					}
 				};
 			}
@@ -118,14 +123,9 @@
 	<div class="flex flex-col gap-3">
 		{#each choices as choice, choiceIndex (choiceIndex)}
 			<div class="rounded-lg border bg-muted p-3">
-				<div class="flex items-center justify-between mb-2">
+				<div class="mb-2 flex items-center justify-between">
 					<p class="text-xs font-medium">Choice {choiceIndex + 1}</p>
-					<Button
-						type="button"
-						size="sm"
-						variant="ghost"
-						onclick={() => removeChoice(choiceIndex)}
-					>
+					<Button type="button" size="sm" variant="ghost" onclick={() => removeChoice(choiceIndex)}>
 						<X class="size-3.5" />
 					</Button>
 				</div>
@@ -133,7 +133,9 @@
 				<div class="flex flex-col gap-3">
 					<!-- Choice ID -->
 					<div class="flex flex-col gap-1">
-						<label for="domain-choice-id-{choiceIndex}" class="text-xs text-muted-foreground">Choice ID</label>
+						<label for="domain-choice-id-{choiceIndex}" class="text-xs text-muted-foreground"
+							>Choice ID</label
+						>
 						<Input
 							id="domain-choice-id-{choiceIndex}"
 							value={choice.choice_id}
@@ -144,7 +146,9 @@
 
 					<!-- Choice Type -->
 					<div class="flex flex-col gap-1">
-						<label for="domain-choice-type-{choiceIndex}" class="text-xs text-muted-foreground">Choice Type</label>
+						<label for="domain-choice-type-{choiceIndex}" class="text-xs text-muted-foreground"
+							>Choice Type</label
+						>
 						<Select.Root
 							type="single"
 							value={choice.type}
@@ -174,7 +178,9 @@
 
 					<!-- Max -->
 					<div class="flex flex-col gap-1">
-						<label for="domain-max-selections-{choiceIndex}" class="text-xs text-muted-foreground">Max Selections</label>
+						<label for="domain-max-selections-{choiceIndex}" class="text-xs text-muted-foreground"
+							>Max Selections</label
+						>
 						<Input
 							id="domain-max-selections-{choiceIndex}"
 							type="number"
@@ -190,7 +196,10 @@
 						<p class="text-xs text-muted-foreground">Conditional Choice (Optional)</p>
 						<div class="grid grid-cols-2 gap-2">
 							<div class="flex flex-col gap-1">
-								<label for="domain-conditional-choice-id-{choiceIndex}" class="text-xs text-muted-foreground">Choice ID</label>
+								<label
+									for="domain-conditional-choice-id-{choiceIndex}"
+									class="text-xs text-muted-foreground">Choice ID</label
+								>
 								<Input
 									id="domain-conditional-choice-id-{choiceIndex}"
 									value={choice.conditional_choice?.choice_id || ''}
@@ -204,7 +213,10 @@
 								/>
 							</div>
 							<div class="flex flex-col gap-1">
-								<label for="domain-conditional-selection-id-{choiceIndex}" class="text-xs text-muted-foreground">Selection ID</label>
+								<label
+									for="domain-conditional-selection-id-{choiceIndex}"
+									class="text-xs text-muted-foreground">Selection ID</label
+								>
 								<Input
 									id="domain-conditional-selection-id-{choiceIndex}"
 									value={choice.conditional_choice?.selection_id || ''}
@@ -234,7 +246,12 @@
 						<div class="flex flex-col gap-2">
 							<div class="flex items-center justify-between">
 								<p class="text-xs text-muted-foreground">Options</p>
-								<Button type="button" size="sm" variant="outline" onclick={() => addOption(choiceIndex)}>
+								<Button
+									type="button"
+									size="sm"
+									variant="outline"
+									onclick={() => addOption(choiceIndex)}
+								>
 									<Plus class="size-3.5" />
 									Add Option
 								</Button>
@@ -242,7 +259,7 @@
 							<div class="flex flex-col gap-2">
 								{#each choice.options as option, optionIndex (optionIndex)}
 									<div class="rounded border bg-background p-2">
-										<div class="flex items-center justify-between mb-2">
+										<div class="mb-2 flex items-center justify-between">
 											<p class="text-xs font-medium">Option {optionIndex + 1}</p>
 											<Button
 												type="button"
@@ -257,19 +274,34 @@
 											<Input
 												value={option.selection_id}
 												oninput={(e) =>
-													updateOptionField(choiceIndex, optionIndex, 'selection_id', e.currentTarget.value)}
+													updateOptionField(
+														choiceIndex,
+														optionIndex,
+														'selection_id',
+														e.currentTarget.value
+													)}
 												placeholder="selection_id"
 											/>
 											<Input
 												value={option.title}
 												oninput={(e) =>
-													updateOptionField(choiceIndex, optionIndex, 'title', e.currentTarget.value)}
+													updateOptionField(
+														choiceIndex,
+														optionIndex,
+														'title',
+														e.currentTarget.value
+													)}
 												placeholder="Title"
 											/>
 											<Input
 												value={option.short_title}
 												oninput={(e) =>
-													updateOptionField(choiceIndex, optionIndex, 'short_title', e.currentTarget.value)}
+													updateOptionField(
+														choiceIndex,
+														optionIndex,
+														'short_title',
+														e.currentTarget.value
+													)}
 												placeholder="Short Title"
 											/>
 										</div>

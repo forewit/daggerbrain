@@ -87,10 +87,7 @@ export const update_homebrew_ancestry_card = command(
 			.update(homebrew_ancestry_cards)
 			.set({ data: validatedData, updated_at: now })
 			.where(
-				and(
-					eq(homebrew_ancestry_cards.id, id),
-					eq(homebrew_ancestry_cards.clerk_user_id, userId)
-				)
+				and(eq(homebrew_ancestry_cards.id, id), eq(homebrew_ancestry_cards.clerk_user_id, userId))
 			);
 
 		console.log('updated homebrew ancestry card in D1');
@@ -109,10 +106,7 @@ export const delete_homebrew_ancestry_card = command(z.string(), async (id) => {
 	await db
 		.delete(homebrew_ancestry_cards)
 		.where(
-			and(
-				eq(homebrew_ancestry_cards.id, id),
-				eq(homebrew_ancestry_cards.clerk_user_id, userId)
-			)
+			and(eq(homebrew_ancestry_cards.id, id), eq(homebrew_ancestry_cards.clerk_user_id, userId))
 		);
 
 	// refresh the ancestry cards query
@@ -191,10 +185,7 @@ export const update_homebrew_community_card = command(
 			.update(homebrew_community_cards)
 			.set({ data: validatedData, updated_at: now })
 			.where(
-				and(
-					eq(homebrew_community_cards.id, id),
-					eq(homebrew_community_cards.clerk_user_id, userId)
-				)
+				and(eq(homebrew_community_cards.id, id), eq(homebrew_community_cards.clerk_user_id, userId))
 			);
 
 		console.log('updated homebrew community card in D1');
@@ -213,10 +204,7 @@ export const delete_homebrew_community_card = command(z.string(), async (id) => 
 	await db
 		.delete(homebrew_community_cards)
 		.where(
-			and(
-				eq(homebrew_community_cards.id, id),
-				eq(homebrew_community_cards.clerk_user_id, userId)
-			)
+			and(eq(homebrew_community_cards.id, id), eq(homebrew_community_cards.clerk_user_id, userId))
 		);
 
 	// refresh the community cards query
@@ -260,7 +248,10 @@ export const create_homebrew_transformation_card = command(
 			throw error(403, `Homebrew limit reached. You can only have ${HOMEBREW_LIMIT} custom items.`);
 		}
 
-		const validatedData = TransformationCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
+		const validatedData = TransformationCardSchema.parse({
+			...data,
+			source_id: 'Homebrew' as const
+		});
 		const id = crypto.randomUUID();
 		const now = Date.now();
 
@@ -291,7 +282,10 @@ export const update_homebrew_transformation_card = command(
 			throw error(403, 'Not authorized to update this transformation card');
 		}
 
-		const validatedData = TransformationCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
+		const validatedData = TransformationCardSchema.parse({
+			...data,
+			source_id: 'Homebrew' as const
+		});
 		const now = Date.now();
 
 		await db

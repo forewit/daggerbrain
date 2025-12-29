@@ -51,7 +51,8 @@
 		const imageUrlMatch = formImageUrl === transformationCard.image_url;
 
 		// Compare features (deep comparison)
-		const featuresMatch = JSON.stringify(formFeatures) === JSON.stringify(transformationCard.features);
+		const featuresMatch =
+			JSON.stringify(formFeatures) === JSON.stringify(transformationCard.features);
 
 		return !(titleMatch && descriptionMatch && imageUrlMatch && featuresMatch);
 	});
@@ -134,7 +135,6 @@
 			...result.data
 		};
 
-
 		// Clear errors on success
 		errors = {};
 		featureErrors.clear();
@@ -206,8 +206,9 @@
 
 	<!-- Description -->
 	<div class="flex flex-col gap-1">
-		<label for="hb-transformation-card-description" class="text-xs font-medium text-muted-foreground"
-			>Description</label
+		<label
+			for="hb-transformation-card-description"
+			class="text-xs font-medium text-muted-foreground">Description</label
 		>
 		<Textarea
 			id="hb-transformation-card-description"

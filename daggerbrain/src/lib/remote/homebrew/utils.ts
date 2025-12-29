@@ -61,23 +61,11 @@ export async function getTotalHomebrewCount(
 			.where(eq(homebrew_secondary_weapons.clerk_user_id, userId)),
 		db.select().from(homebrew_armor).where(eq(homebrew_armor.clerk_user_id, userId)),
 		db.select().from(homebrew_loot).where(eq(homebrew_loot.clerk_user_id, userId)),
-		db
-			.select()
-			.from(homebrew_consumables)
-			.where(eq(homebrew_consumables.clerk_user_id, userId)),
-		db
-			.select()
-			.from(homebrew_beastforms)
-			.where(eq(homebrew_beastforms.clerk_user_id, userId)),
+		db.select().from(homebrew_consumables).where(eq(homebrew_consumables.clerk_user_id, userId)),
+		db.select().from(homebrew_beastforms).where(eq(homebrew_beastforms.clerk_user_id, userId)),
 		db.select().from(homebrew_classes).where(eq(homebrew_classes.clerk_user_id, userId)),
-		db
-			.select()
-			.from(homebrew_subclasses)
-			.where(eq(homebrew_subclasses.clerk_user_id, userId)),
-		db
-			.select()
-			.from(homebrew_domain_cards)
-			.where(eq(homebrew_domain_cards.clerk_user_id, userId)),
+		db.select().from(homebrew_subclasses).where(eq(homebrew_subclasses.clerk_user_id, userId)),
+		db.select().from(homebrew_domain_cards).where(eq(homebrew_domain_cards.clerk_user_id, userId)),
 		db
 			.select()
 			.from(homebrew_ancestry_cards)

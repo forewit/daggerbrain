@@ -112,13 +112,13 @@
 					</p>
 				</div>
 			</Label>
-			
+
 			<Label class="cursor-pointer">
 				<Checkbox
 					bind:checked={homebrewCheckboxState}
 					onCheckedChange={(checked) => handleHomebrewCheckboxChange(checked ?? false)}
 				/>
-					Enable Homebrew
+				Enable Homebrew
 			</Label>
 
 			<Dialog.Root>
@@ -193,8 +193,9 @@
 				class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
 				onclick={cancelDisableHomebrew}>Cancel</Dialog.Close
 			>
-			<Dialog.Close class={buttonVariants({ variant: 'destructive' })} onclick={confirmDisableHomebrew}
-				>Disable Homebrew</Dialog.Close
+			<Dialog.Close
+				class={buttonVariants({ variant: 'destructive' })}
+				onclick={confirmDisableHomebrew}>Disable Homebrew</Dialog.Close
 			>
 		</Dialog.Footer>
 	</Dialog.Content>

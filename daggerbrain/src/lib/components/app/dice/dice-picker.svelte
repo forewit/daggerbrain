@@ -90,7 +90,7 @@
 </script>
 
 {#if label}
-	<div class="flex items-center justify-between mb-2">
+	<div class="mb-2 flex items-center justify-between">
 		<p class="text-xs font-medium text-muted-foreground">{label}</p>
 		{#if diceString}
 			<span class="text-xs text-muted-foreground">{diceString}</span>

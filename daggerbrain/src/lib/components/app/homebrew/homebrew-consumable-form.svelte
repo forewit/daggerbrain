@@ -80,7 +80,6 @@
 			...result.data
 		};
 
-
 		// Clear errors on success
 		errors = {};
 	}

@@ -300,7 +300,7 @@
 						<Select.Item value="Secondary">Secondary</Select.Item>
 					</Select.Content>
 				</Select.Root>
-				
+
 				<!-- Tier Select -->
 				<Select.Root
 					type="single"
@@ -401,8 +401,7 @@
 								{:else}
 									Add
 								{/if}
-							</Button
-							>
+							</Button>
 						</div>
 					</Dropdown>
 				{:else if entry.type === 'armor'}
@@ -433,8 +432,7 @@
 								{:else}
 									Add
 								{/if}
-							</Button
-							>
+							</Button>
 						</div>
 					</Dropdown>
 				{:else if entry.type === 'consumable'}
@@ -463,8 +461,7 @@
 								{:else}
 									Add
 								{/if}
-							</Button
-							>
+							</Button>
 						</div>
 					</Dropdown>
 				{:else if entry.type === 'loot'}
@@ -492,8 +489,7 @@
 								{:else}
 									Add
 								{/if}
-							</Button
-							>
+							</Button>
 						</div>
 					</Dropdown>
 				{/if}

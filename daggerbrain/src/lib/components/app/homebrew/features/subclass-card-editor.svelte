@@ -65,7 +65,8 @@
 			title: card.title,
 			image_url: card.image_url,
 			features: card.features,
-			spellcast_trait: cardType === 'foundation' && 'spellcast_trait' in card ? card.spellcast_trait : null
+			spellcast_trait:
+				cardType === 'foundation' && 'spellcast_trait' in card ? card.spellcast_trait : null
 		});
 
 		// Only sync if the snapshot changed (external change)
@@ -127,7 +128,8 @@
 				title: card.title,
 				image_url: card.image_url,
 				features: card.features,
-				spellcast_trait: cardType === 'foundation' && 'spellcast_trait' in card ? card.spellcast_trait : null
+				spellcast_trait:
+					cardType === 'foundation' && 'spellcast_trait' in card ? card.spellcast_trait : null
 			});
 		}
 	});

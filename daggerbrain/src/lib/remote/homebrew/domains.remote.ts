@@ -210,9 +210,7 @@ export const delete_homebrew_domain_card = command(z.string(), async (id) => {
 
 	await db
 		.delete(homebrew_domain_cards)
-		.where(
-			and(eq(homebrew_domain_cards.id, id), eq(homebrew_domain_cards.clerk_user_id, userId))
-		);
+		.where(and(eq(homebrew_domain_cards.id, id), eq(homebrew_domain_cards.clerk_user_id, userId)));
 
 	// refresh the domain cards query
 	get_homebrew_domain_cards().refresh();

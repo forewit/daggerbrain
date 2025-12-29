@@ -3,7 +3,12 @@ import { error } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 import { get_db, get_auth } from '../utils';
-import { WeaponSchema, ArmorSchema, LootSchema, ConsumableSchema } from '$lib/compendium/compendium-schemas';
+import {
+	WeaponSchema,
+	ArmorSchema,
+	LootSchema,
+	ConsumableSchema
+} from '$lib/compendium/compendium-schemas';
 import type { Weapon, Armor, Loot, Consumable } from '$lib/types/compendium-types';
 import {
 	homebrew_primary_weapons,
@@ -85,10 +90,7 @@ export const update_homebrew_primary_weapon = command(
 			.update(homebrew_primary_weapons)
 			.set({ data: validatedData, updated_at: now })
 			.where(
-				and(
-					eq(homebrew_primary_weapons.id, id),
-					eq(homebrew_primary_weapons.clerk_user_id, userId)
-				)
+				and(eq(homebrew_primary_weapons.id, id), eq(homebrew_primary_weapons.clerk_user_id, userId))
 			);
 
 		console.log('updated homebrew primary weapon in D1');
@@ -107,10 +109,7 @@ export const delete_homebrew_primary_weapon = command(z.string(), async (id) => 
 	await db
 		.delete(homebrew_primary_weapons)
 		.where(
-			and(
-				eq(homebrew_primary_weapons.id, id),
-				eq(homebrew_primary_weapons.clerk_user_id, userId)
-			)
+			and(eq(homebrew_primary_weapons.id, id), eq(homebrew_primary_weapons.clerk_user_id, userId))
 		);
 
 	// refresh the primary weapons query
@@ -480,9 +479,7 @@ export const update_homebrew_consumable = command(
 		await db
 			.update(homebrew_consumables)
 			.set({ data: validatedData, updated_at: now })
-			.where(
-				and(eq(homebrew_consumables.id, id), eq(homebrew_consumables.clerk_user_id, userId))
-			);
+			.where(and(eq(homebrew_consumables.id, id), eq(homebrew_consumables.clerk_user_id, userId)));
 
 		console.log('updated homebrew consumable');
 	}
@@ -499,9 +496,7 @@ export const delete_homebrew_consumable = command(z.string(), async (id) => {
 
 	await db
 		.delete(homebrew_consumables)
-		.where(
-			and(eq(homebrew_consumables.id, id), eq(homebrew_consumables.clerk_user_id, userId))
-		);
+		.where(and(eq(homebrew_consumables.id, id), eq(homebrew_consumables.clerk_user_id, userId)));
 
 	// refresh the consumables query
 	get_homebrew_consumables().refresh();

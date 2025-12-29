@@ -173,9 +173,7 @@ export const update_homebrew_subclass = command(
 		await db
 			.update(homebrew_subclasses)
 			.set({ data: validatedData, updated_at: now })
-			.where(
-				and(eq(homebrew_subclasses.id, id), eq(homebrew_subclasses.clerk_user_id, userId))
-			);
+			.where(and(eq(homebrew_subclasses.id, id), eq(homebrew_subclasses.clerk_user_id, userId)));
 
 		console.log('updated homebrew subclass in D1');
 	}

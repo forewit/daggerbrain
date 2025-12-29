@@ -181,12 +181,25 @@ export type ArmorFormErrors = Partial<Record<keyof ArmorFormData | 'features', s
 export type BeastformFormErrors = Partial<Record<keyof BeastformFormData | 'features', string>>;
 export type LootFormErrors = Partial<Record<keyof LootFormData, string>>;
 export type ConsumableFormErrors = Partial<Record<keyof ConsumableFormData, string>>;
-export type ClassFormErrors = Partial<Record<keyof ClassFormData | 'hope_feature' | 'class_features', string>>;
-export type SubclassFormErrors = Partial<Record<keyof SubclassFormData | 'foundation_card' | 'specialization_card' | 'mastery_card', string>>;
+export type ClassFormErrors = Partial<
+	Record<keyof ClassFormData | 'hope_feature' | 'class_features', string>
+>;
+export type SubclassFormErrors = Partial<
+	Record<
+		keyof SubclassFormData | 'foundation_card' | 'specialization_card' | 'mastery_card',
+		string
+	>
+>;
 export type DomainCardFormErrors = Partial<Record<keyof DomainCardFormData | 'features', string>>;
-export type AncestryCardFormErrors = Partial<Record<keyof AncestryCardFormData | 'features', string>>;
-export type CommunityCardFormErrors = Partial<Record<keyof CommunityCardFormData | 'features', string>>;
-export type TransformationCardFormErrors = Partial<Record<keyof TransformationCardFormData | 'features', string>>;
+export type AncestryCardFormErrors = Partial<
+	Record<keyof AncestryCardFormData | 'features', string>
+>;
+export type CommunityCardFormErrors = Partial<
+	Record<keyof CommunityCardFormData | 'features', string>
+>;
+export type TransformationCardFormErrors = Partial<
+	Record<keyof TransformationCardFormData | 'features', string>
+>;
 
 // ============================================================================
 // Helper to extract field errors from Zod error
@@ -207,4 +220,3 @@ export function extractFieldErrors<T extends Record<string, unknown>>(
 	}
 	return errors;
 }
-

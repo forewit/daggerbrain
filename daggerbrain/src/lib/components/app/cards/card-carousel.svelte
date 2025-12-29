@@ -180,8 +180,8 @@
 					selectedIndex === index && 'scale-100',
 					disabled_indices.has(index) && 'opacity-50'
 				)}
-			style="width: {cardWidth}px;"
-			onclick={(e) => handleCardClick(e, index)}
+				style="width: {cardWidth}px;"
+				onclick={(e) => handleCardClick(e, index)}
 			>
 				<span
 					class="absolute inset-0 rounded-2xl"
@@ -259,7 +259,10 @@
 </div>
 
 <Dialog.Root bind:open={dialogOpen}>
-	<Dialog.Content class="w-fit max-w-[90vw] border-none bg-transparent p-0 shadow-none" closeClasses="-top-4 -right-4">
+	<Dialog.Content
+		class="w-fit max-w-[90vw] border-none bg-transparent p-0 shadow-none"
+		closeClasses="-top-4 -right-4"
+	>
 		{#if cards[selectedIndex]}
 			{@const card = cards[selectedIndex]}
 			<div style="width: min(360px, 80vw);">

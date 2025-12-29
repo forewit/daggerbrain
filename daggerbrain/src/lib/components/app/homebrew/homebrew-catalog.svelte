@@ -95,7 +95,10 @@
 
 	// Check if user has applied any filter or search
 	let hasActiveFilter = $derived(
-		searchQuery.trim() !== '' || tierFilter !== '' || weaponTypeFilter !== '' || categoryFilter !== ''
+		searchQuery.trim() !== '' ||
+			tierFilter !== '' ||
+			weaponTypeFilter !== '' ||
+			categoryFilter !== ''
 	);
 
 	// Combined filtered items
@@ -233,4 +236,3 @@
 		{/if}
 	</div>
 </div>
-

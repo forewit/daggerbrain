@@ -199,6 +199,9 @@
 	}
 
 	export function handleSubmit(e?: SubmitEvent) {
+		// #region agent log
+		fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew-weapon-form.svelte:201',message:'handleSubmit called',data:{hasEvent:!!e,hasWeapon:!!weapon,weaponId:weapon?.title},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+		// #endregion
 		if (e) {
 			e.preventDefault();
 		}
@@ -220,25 +223,65 @@
 
 		// Build form data
 		const formData = buildFormData();
+		// #region agent log
+		fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew-weapon-form.svelte:222',message:'formData built',data:{title:formData.title,hasChanges:JSON.stringify(formData)!==JSON.stringify(weapon)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+		// #endregion
 
 		// Validate with Zod
 		const result = WeaponFormSchema.safeParse(formData);
 
 		if (!result.success) {
+			// #region agent log
+			fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew-weapon-form.svelte:227',message:'validation failed',data:{issues:result.error.issues.map(i=>({path:i.path,message:i.message}))},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+			// #endregion
 			errors = extractFieldErrors(result.error);
 			return;
 		}
 
 		if (!allFeaturesValid) {
+			// #region agent log
+			fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew-weapon-form.svelte:232',message:'features validation failed',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+			// #endregion
 			errors = { ...errors, features: 'One or more features have validation errors' };
 			return;
 		}
 
+		// #region agent log
+		const weaponBefore = JSON.stringify(weapon);
+		// #endregion
+		// Save the original weapon reference to find it in homebrew state
+		const originalWeapon = weapon;
 		// Update the weapon prop with validated form values
-		weapon = {
+		const updatedWeapon = {
 			...weapon,
 			...result.data
 		};
+		weapon = updatedWeapon;
+		// #region agent log
+		fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew-weapon-form.svelte:238',message:'weapon prop updated',data:{weaponBefore,weaponAfter:JSON.stringify(weapon),changed:weaponBefore!==JSON.stringify(weapon)},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
+		// #endregion
+
+		// Update the homebrew state record so auto-save can detect the change
+		// Find the weapon's UID in both collections using the original reference
+		const newWeaponRef = JSON.parse(JSON.stringify(updatedWeapon));
+		for (const [uid, w] of Object.entries(homebrew.primary_weapons)) {
+			if (w === originalWeapon) {
+				// #region agent log
+				fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew-weapon-form.svelte:262',message:'Updating primary weapon in homebrew state',data:{uid},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
+				// #endregion
+				homebrew.primary_weapons[uid] = newWeaponRef;
+				break;
+			}
+		}
+		for (const [uid, w] of Object.entries(homebrew.secondary_weapons)) {
+			if (w === originalWeapon) {
+				// #region agent log
+				fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew-weapon-form.svelte:270',message:'Updating secondary weapon in homebrew state',data:{uid},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
+				// #endregion
+				homebrew.secondary_weapons[uid] = newWeaponRef;
+				break;
+			}
+		}
 
 		// Clear errors on success
 		errors = {};
@@ -248,6 +291,9 @@
 		if (onSubmit && e) {
 			onSubmit(e);
 		}
+		// #region agent log
+		fetch('http://127.0.0.1:7242/ingest/68bc2686-e8d3-4831-843d-788ced0b0671',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homebrew-weapon-form.svelte:283',message:'handleSubmit completed',data:{hasOnSubmit:!!onSubmit},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
+		// #endregion
 	}
 
 	export function handleReset() {
@@ -573,13 +619,14 @@
 	</div>
 
 	<!-- Actions -->
-	<div class="flex gap-2 pt-2">
-		<Button type="submit" size="sm" disabled={!formHasChanges}>Save</Button>
+	<div class="flex gap-2 pt-2 justify-end">
 		{#if formHasChanges}
 			<Button type="button" size="sm" variant="link" onclick={handleReset}>
 				<RotateCcw class="size-3.5" />
 				Discard
 			</Button>
 		{/if}
+		<Button type="submit" size="sm" disabled={!formHasChanges}>Save</Button>
+		
 	</div>
 </form>

@@ -15,8 +15,3 @@
 		<Companion />
 	</div>
 {/if}
-
-
-
-
-
