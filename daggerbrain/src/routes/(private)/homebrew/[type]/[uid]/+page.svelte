@@ -49,6 +49,8 @@
 	import CommunityCardPreview from '$lib/components/app/homebrew/previews/community-card-preview.svelte';
 	import TransformationCardPreview from '$lib/components/app/homebrew/previews/transformation-card-preview.svelte';
 	import DomainCardPreview from '$lib/components/app/homebrew/previews/domain-card-preview.svelte';
+	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+	import Anvil from '@lucide/svelte/icons/anvil';
 
 	let { data } = $props();
 
@@ -109,73 +111,93 @@
 				case 'weapon':
 					const weapon =
 						homebrew.primary_weapons[data.uid] || homebrew.secondary_weapons[data.uid] || null;
-					homebrewItem = weapon ?  {
-						type: 'weapon',
-						item: weapon
-					} : null;
+					homebrewItem = weapon
+						? {
+								type: 'weapon',
+								item: weapon
+							}
+						: null;
 					break;
 				case 'armor':
 					const armor = homebrew.armor[data.uid] || null;
-					homebrewItem = armor ? {
-						type: 'armor',
-						item: armor
-					} : null;
+					homebrewItem = armor
+						? {
+								type: 'armor',
+								item: armor
+							}
+						: null;
 					break;
 				case 'beastform':
 					const beastform = homebrew.beastforms[data.uid] || null;
-					homebrewItem = beastform ? {
-						type: 'beastform',
-						item: beastform
-					} : null;
+					homebrewItem = beastform
+						? {
+								type: 'beastform',
+								item: beastform
+							}
+						: null;
 					break;
 				case 'loot':
 					const loot = homebrew.loot[data.uid] || null;
-					homebrewItem = loot ? {
-						type: 'loot',
-						item: loot
-					} : null;
+					homebrewItem = loot
+						? {
+								type: 'loot',
+								item: loot
+							}
+						: null;
 					break;
 				case 'consumable':
 					const consumable = homebrew.consumables[data.uid] || null;
-					homebrewItem = consumable ? {
-						type: 'consumable',
-						item: consumable
-					} : null;
+					homebrewItem = consumable
+						? {
+								type: 'consumable',
+								item: consumable
+							}
+						: null;
 					break;
 				case 'class':
 					const characterClass = homebrew.classes[data.uid] || null;
-					homebrewItem = characterClass ? {
-						type: 'class',
-						item: characterClass
-					} : null;
+					homebrewItem = characterClass
+						? {
+								type: 'class',
+								item: characterClass
+							}
+						: null;
 					break;
 				case 'subclass':
 					const subclass = homebrew.subclasses[data.uid] || null;
-					homebrewItem = subclass ? {
-						type: 'subclass',
-						item: subclass
-					} : null;
+					homebrewItem = subclass
+						? {
+								type: 'subclass',
+								item: subclass
+							}
+						: null;
 					break;
 				case 'ancestry-cards':
 					const ancestryCard = homebrew.ancestry_cards[data.uid] || null;
-					homebrewItem = ancestryCard ? {
-						type: 'ancestry-cards',
-						item: ancestryCard
-					} : null;
+					homebrewItem = ancestryCard
+						? {
+								type: 'ancestry-cards',
+								item: ancestryCard
+							}
+						: null;
 					break;
 				case 'community-cards':
 					const communityCard = homebrew.community_cards[data.uid] || null;
-					homebrewItem = communityCard ? {
-						type: 'community-cards',
-						item: communityCard
-					} : null;
+					homebrewItem = communityCard
+						? {
+								type: 'community-cards',
+								item: communityCard
+							}
+						: null;
 					break;
 				case 'transformation-cards':
 					const transformationCard = homebrew.transformation_cards[data.uid] || null;
-					homebrewItem = transformationCard ? {
-						type: 'transformation-cards',
-						item: transformationCard
-					} : null;
+					homebrewItem = transformationCard
+						? {
+								type: 'transformation-cards',
+								item: transformationCard
+							}
+						: null;
 					break;
 				case 'domain-cards':
 					for (const domainId of Object.keys(homebrew.domain_cards) as DomainIds[]) {
@@ -210,7 +232,7 @@
 		const currentlySaving = homebrew.saving;
 		if (wasSaving && !currentlySaving && !hasChanges) {
 			// Save completed successfully
-			toast.success('Changes saved successfully');
+			toast.success('Changes saved');
 		}
 		wasSaving = currentlySaving;
 	});
@@ -284,26 +306,22 @@
 				'pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]'
 			)}
 		>
-			<!-- Main Content: Preview and Edit Side by Side -->
-			<div
-				class="flex w-full max-w-6xl flex-col flex-col-reverse justify-center gap-6 p-4 md:flex-row"
-			>
-				<!-- Edit Section -->
-				<div class="w-full md:w-[400px]">
-					<div class="mb-2 flex items-center justify-between gap-4">
-						<h2 class="text-lg font-semibold">Edit</h2>
+			<!-- navigation -->
+			<div class="sticky top-0 z-10 w-full bg-background">
+				<div class="w-full bg-muted/50">
+					<div class="px- mx-auto flex w-full max-w-4xl items-center gap-2 py-2">
+						<Button href="/homebrew" variant="link">
+							<ChevronLeft />
+							Back to Homebrew
+						</Button>
+
 						<div class="flex gap-2">
-							{#if hasChanges}
-								<Button type="button" size="sm" class="h-auto" variant="link" onclick={handleReset}>
-									<RotateCcw class="size-3.5" />
-									Discard
-								</Button>
-							{/if}
 							<Button
 								type="button"
 								size="sm"
 								class={cn('h-7 ', hasErrors && 'border border-destructive')}
 								disabled={!hasChanges || homebrew.saving}
+								hidden={!hasChanges && !homebrew.saving}
 								onclick={handleSave}
 							>
 								{#if homebrew.saving}
@@ -313,8 +331,24 @@
 									Save
 								{/if}
 							</Button>
+							{#if hasChanges}
+								<Button type="button" size="sm" class="h-auto" variant="link" onclick={handleReset}>
+									<RotateCcw class="size-3.5" />
+									Discard
+								</Button>
+							{/if}
 						</div>
 					</div>
+				</div>
+			</div>
+
+			<!-- Main Content: Preview and Edit Side by Side -->
+			<div
+				class="flex w-full max-w-4xl flex-col flex-col-reverse justify-between gap-6 p-4 md:flex-row"
+			>
+				<!-- Edit Section -->
+				<div class="mb-22">
+					<h2 class="mb-2 text-lg font-semibold">Edit</h2>
 
 					<div class="rounded-lg border bg-card p-4">
 						{#if homebrewItem.type === 'weapon'}
@@ -422,7 +456,7 @@
 
 				<!-- Preview Section -->
 				<div>
-					<div class="sticky top-4 grow">
+					<div class="sticky top-17 grow">
 						<h2 class="mb-2 ml-2 flex items-center gap-2 text-lg font-semibold">Preview</h2>
 						{#if homebrewItem.type === 'weapon'}
 							<WeaponPreview weapon={homebrewItem.item} />
