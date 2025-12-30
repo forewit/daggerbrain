@@ -506,45 +506,8 @@
 
 			// Navigate to the newly created item
 			if (id) {
-				let route = '';
-				switch (itemType) {
-					case 'weapon':
-						route = `/homebrew/weapons/${id}`;
-						break;
-					case 'armor':
-						route = `/homebrew/armor/${id}`;
-						break;
-					case 'beastform':
-						route = `/homebrew/beastforms/${id}`;
-						break;
-					case 'loot':
-						route = `/homebrew/loot/${id}`;
-						break;
-					case 'consumable':
-						route = `/homebrew/consumables/${id}`;
-						break;
-					case 'class':
-						route = `/homebrew/classes/${id}`;
-						break;
-					case 'subclass':
-						route = `/homebrew/subclasses/${id}`;
-						break;
-					case 'domain-cards':
-						route = `/homebrew/domain-cards/${id}`;
-						break;
-					case 'ancestry-cards':
-						route = `/homebrew/ancestry-cards/${id}`;
-						break;
-					case 'community-cards':
-						route = `/homebrew/community-cards/${id}`;
-						break;
-					case 'transformation-cards':
-						route = `/homebrew/transformation-cards/${id}`;
-						break;
-				}
-				if (route) {
-					await goto(route);
-				}
+				const route = `/homebrew/${itemType}/${id}`;
+				await goto(route);
 			}
 		} catch (err) {
 			console.error('Failed to create homebrew item:', err);
@@ -1071,31 +1034,45 @@
 
 	// Get item href helper
 	function getItemHref(entry: FilteredItem): string {
+		// Map FilteredItem type to HomebrewType for the route
+		let type: HomebrewType;
 		switch (entry.type) {
 			case 'primary_weapon':
 			case 'secondary_weapon':
-				return `/homebrew/weapons/${entry.id}`;
+				type = 'weapon';
+				break;
 			case 'armor':
-				return `/homebrew/armor/${entry.id}`;
+				type = 'armor';
+				break;
 			case 'beastform':
-				return `/homebrew/beastforms/${entry.id}`;
+				type = 'beastform';
+				break;
 			case 'loot':
-				return `/homebrew/loot/${entry.id}`;
+				type = 'loot';
+				break;
 			case 'consumable':
-				return `/homebrew/consumables/${entry.id}`;
+				type = 'consumable';
+				break;
 			case 'class':
-				return `/homebrew/classes/${entry.id}`;
+				type = 'class';
+				break;
 			case 'subclass':
-				return `/homebrew/subclasses/${entry.id}`;
+				type = 'subclass';
+				break;
 			case 'domain-cards':
-				return `/homebrew/domain-cards/${entry.id}`;
+				type = 'domain-cards';
+				break;
 			case 'ancestry-cards':
-				return `/homebrew/ancestry-cards/${entry.id}`;
+				type = 'ancestry-cards';
+				break;
 			case 'community-cards':
-				return `/homebrew/community-cards/${entry.id}`;
+				type = 'community-cards';
+				break;
 			case 'transformation-cards':
-				return `/homebrew/transformation-cards/${entry.id}`;
+				type = 'transformation-cards';
+				break;
 		}
+		return `/homebrew/${type}/${entry.id}`;
 	}
 
 	let filtersExpanded = $state(false);

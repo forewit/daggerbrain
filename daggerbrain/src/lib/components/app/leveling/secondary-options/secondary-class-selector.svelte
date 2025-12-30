@@ -4,7 +4,7 @@
 	import * as Collapsible from '$lib/components/ui/collapsible/';
 	import { cn } from '$lib/utils';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import ClassSummary from '../class-summary.svelte';
+	import ClassSummary from './class-summary.svelte';
 	import SubclassCard from '$lib/components/app/cards/full-cards/subclass-card.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';

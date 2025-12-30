@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog/';
-	import ClassSummary from '../class-summary.svelte';
+	import ClassSummary from './class-summary.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 
