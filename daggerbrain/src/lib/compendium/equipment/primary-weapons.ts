@@ -21,7 +21,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Reliable',
-				description_html: '<p>+1 to attack rolls</p>',
+				description_html: '+1 to attack rolls',
 				character_modifiers: []
 			}
 		]
@@ -83,7 +83,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Massive',
 				description_html:
-					'<p>-1 to Evasion. On a successful attack, roll an additional damage die and discard the lowest result.</p>',
+					'-1 to Evasion. On a successful attack, roll an additional damage die and discard the lowest result.',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -134,7 +134,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Heavy',
-				description_html: '<p>-1 to Evasion</p>',
+				description_html: '-1 to Evasion',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -222,7 +222,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Quick',
 				description_html:
-					'<p>When you make an attack, you can mark a Stress to target another creature within range.</p>',
+					'When you make an attack, you can mark a Stress to target another creature within range.',
 				character_modifiers: []
 			}
 		]
@@ -318,7 +318,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Cumbersome',
-				description_html: '<p>-1 to Finesse</p>',
+				description_html: '-1 to Finesse',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -421,7 +421,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Returning',
 				description_html:
-					'<p>When this weapon is thrown within its range, it appears in your hand immediately after the attack.</p>',
+					'When this weapon is thrown within its range, it appears in your hand immediately after the attack.',
 				character_modifiers: []
 			}
 		]
@@ -480,7 +480,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Versatile',
 				description_html:
-					'<p>This weapon can also be used with these statistics—Presence, Melee, d8.</p>',
+					'This weapon can also be used with these statistics—Presence, Melee, d8.',
 				character_modifiers: []
 			}
 		]
@@ -522,7 +522,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Powerful',
 				description_html:
-					'<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>',
+					'On a successful attack, roll an additional damage die and discard the lowest result.',
 				character_modifiers: []
 			}
 		]
@@ -549,7 +549,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Reliable',
-				description_html: '<p>+1 to attack rolls</p>',
+				description_html: '+1 to attack rolls',
 				character_modifiers: []
 			}
 		]
@@ -608,7 +608,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Massive',
 				description_html:
-					'<p>-1 to Evasion. On a successful attack, roll an additional damage die and discard the lowest result.</p>',
+					'-1 to Evasion. On a successful attack, roll an additional damage die and discard the lowest result.',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -657,7 +657,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Heavy',
-				description_html: '<p>-1 to Evasion</p>',
+				description_html: '-1 to Evasion',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -741,7 +741,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Quick',
 				description_html:
-					'<p>When you make an attack, you can mark a Stress to target another creature within range.</p>',
+					'When you make an attack, you can mark a Stress to target another creature within range.',
 				character_modifiers: []
 			}
 		]
@@ -765,7 +765,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Cumbersome',
-				description_html: '<p>-1 to Finesse</p>',
+				description_html: '-1 to Finesse',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -849,7 +849,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Cumbersome',
-				description_html: '<p>-1 to Finesse</p>',
+				description_html: '-1 to Finesse',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -883,7 +883,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Powerful',
 				description_html:
-					'<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>',
+					'On a successful attack, roll an additional damage die and discard the lowest result.',
 				character_modifiers: []
 			}
 		]
@@ -908,7 +908,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Brutal',
 				description_html:
-					'<p>When you roll the maximum value on a damage die, roll an additional damage die.</p>',
+					'When you roll the maximum value on a damage die, roll an additional damage die.',
 				character_modifiers: []
 			}
 		]
@@ -958,7 +958,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Quick',
 				description_html:
-					'<p>When you make an attack, you can mark a Stress to target another creature within range.</p>',
+					'When you make an attack, you can mark a Stress to target another creature within range.',
 				character_modifiers: []
 			}
 		]
@@ -982,7 +982,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Scary',
-				description_html: '<p>On a successful attack, the target must mark a Stress.</p>',
+				description_html: 'On a successful attack, the target must mark a Stress.',
 				character_modifiers: []
 			}
 		]
@@ -1006,7 +1006,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Reliable',
-				description_html: '<p>+1 to attack rolls</p>',
+				description_html: '+1 to attack rolls',
 				character_modifiers: []
 			}
 		]
@@ -1031,7 +1031,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Reloading',
 				description_html:
-					'<p>After you make an attack, roll a d6. On a result of 1, you must mark a Stress to reload this weapon before you can fire it again.</p>',
+					'After you make an attack, roll a d6. On a result of 1, you must mark a Stress to reload this weapon before you can fire it again.',
 				character_modifiers: []
 			}
 		]
@@ -1056,7 +1056,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Powerful',
 				description_html:
-					'<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>',
+					'On a successful attack, roll an additional damage die and discard the lowest result.',
 				character_modifiers: []
 			}
 		]
@@ -1080,7 +1080,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Reliable',
-				description_html: '<p>+1 to attack rolls</p>',
+				description_html: '+1 to attack rolls',
 				character_modifiers: []
 			}
 		]
@@ -1175,7 +1175,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Returning',
 				description_html:
-					'<p>When this weapon is thrown within its range, it appears in your hand immediately after the attack.</p>',
+					'When this weapon is thrown within its range, it appears in your hand immediately after the attack.',
 				character_modifiers: []
 			}
 		]
@@ -1234,7 +1234,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Versatile',
 				description_html:
-					'<p>This weapon can also be used with these statistics—Presence, Melee, d8+3.</p>',
+					'This weapon can also be used with these statistics—Presence, Melee, d8+3.',
 				character_modifiers: []
 			}
 		]
@@ -1276,7 +1276,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Powerful',
 				description_html:
-					'<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>',
+					'On a successful attack, roll an additional damage die and discard the lowest result.',
 				character_modifiers: []
 			}
 		]
@@ -1300,7 +1300,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Pompous',
-				description_html: '<p>You must have a Presence of 0 or lower to use this weapon.</p>',
+				description_html: 'You must have a Presence of 0 or lower to use this weapon.',
 				character_modifiers: []
 			}
 		]
@@ -1325,7 +1325,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Versatile',
 				description_html:
-					'<p>This weapon can also be used with these statistics—Knowledge, Far, d6+3.</p>',
+					'This weapon can also be used with these statistics—Knowledge, Far, d6+3.',
 				character_modifiers: []
 			}
 		]
@@ -1349,7 +1349,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Scary',
-				description_html: '<p>On a successful attack, the target must mark a Stress.</p>',
+				description_html: 'On a successful attack, the target must mark a Stress.',
 				character_modifiers: []
 			}
 		]
@@ -1374,7 +1374,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Eruptive',
 				description_html:
-					'<p>On a successful attack against a target within Melee range, all other adversaries within Very Close range must succeed on a reaction roll (14) or take half damage.</p>',
+					'On a successful attack against a target within Melee range, all other adversaries within Very Close range must succeed on a reaction roll (14) or take half damage.',
 				character_modifiers: []
 			}
 		]
@@ -1399,7 +1399,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Brutal',
 				description_html:
-					'<p>When you roll the maximum value on a damage die, roll an additional damage die.</p>',
+					'When you roll the maximum value on a damage die, roll an additional damage die.',
 				character_modifiers: []
 			}
 		]
@@ -1424,7 +1424,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Powerful',
 				description_html:
-					'<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>',
+					'On a successful attack, roll an additional damage die and discard the lowest result.',
 				character_modifiers: []
 			}
 		]
@@ -1474,7 +1474,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Persuasive',
 				description_html:
-					'<p>Before you make a Presence Roll, you can mark a Stress to gain a +2 bonus to the result.</p>',
+					'Before you make a Presence Roll, you can mark a Stress to gain a +2 bonus to the result.',
 				character_modifiers: []
 			}
 		]
@@ -1498,7 +1498,7 @@ export const TIER_2_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Reliable',
-				description_html: '<p>+1 to attack rolls</p>',
+				description_html: '+1 to attack rolls',
 				character_modifiers: []
 			}
 		]
@@ -1525,7 +1525,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Reliable',
-				description_html: '<p>+1 to attack rolls</p>',
+				description_html: '+1 to attack rolls',
 				character_modifiers: []
 			}
 		]
@@ -1584,7 +1584,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Massive',
 				description_html:
-					'<p>−1 to Evasion; on a successful attack, roll an additional damage die and discard the lowest result.</p>',
+					'−1 to Evasion; on a successful attack, roll an additional damage die and discard the lowest result.',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -1717,7 +1717,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Quick',
 				description_html:
-					'<p>When you make an attack, you can mark a Stress to target another creature within range.</p>',
+					'When you make an attack, you can mark a Stress to target another creature within range.',
 				character_modifiers: []
 			}
 		]
@@ -1858,7 +1858,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Sharpwing',
-				description_html: '<p>Gain a bonus to your damage rolls equal to your Agility.</p>',
+				description_html: 'Gain a bonus to your damage rolls equal to your Agility.',
 				character_modifiers: []
 			}
 		]
@@ -1882,7 +1882,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Brave',
-				description_html: '<p>−1 to Evasion; +3 to Severe damage threshold</p>',
+				description_html: '−1 to Evasion; +3 to Severe damage threshold',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -1922,7 +1922,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Devastating',
 				description_html:
-					'<p>Before you make an attack roll, you can mark a Stress to use a d20 as your damage die.</p>',
+					'Before you make an attack roll, you can mark a Stress to use a d20 as your damage die.',
 				character_modifiers: []
 			}
 		]
@@ -1946,7 +1946,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Protective',
-				description_html: '<p>+1 to Armor Score</p>',
+				description_html: '+1 to Armor Score',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -1979,7 +1979,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Dueling',
 				description_html:
-					'<p>When there are no other creatures within Close range of the target, gain advantage on your attack roll against them.</p>',
+					'When there are no other creatures within Close range of the target, gain advantage on your attack roll against them.',
 				character_modifiers: []
 			}
 		]
@@ -2003,7 +2003,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Retractable',
-				description_html: '<p>The blade can be hidden in the hilt to avoid detection.</p>',
+				description_html: 'The blade can be hidden in the hilt to avoid detection.',
 				character_modifiers: []
 			}
 		]
@@ -2028,7 +2028,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Powerful',
 				description_html:
-					'<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>',
+					'On a successful attack, roll an additional damage die and discard the lowest result.',
 				character_modifiers: []
 			}
 		]
@@ -2053,7 +2053,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Brutal',
 				description_html:
-					'<p>When you roll the maximum value on a damage die, roll an additional damage die.</p>',
+					'When you roll the maximum value on a damage die, roll an additional damage die.',
 				character_modifiers: []
 			}
 		]
@@ -2078,7 +2078,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Reloading',
 				description_html:
-					'<p>After you make an attack, roll a d6. On a result of 1, you must mark a Stress to reload this weapon before you can fire it again.</p>',
+					'After you make an attack, roll a d6. On a result of 1, you must mark a Stress to reload this weapon before you can fire it again.',
 				character_modifiers: []
 			}
 		]
@@ -2103,7 +2103,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Versatile',
 				description_html:
-					'<p>This weapon can also be used with these statistics—Agility, Melee, d10+5.</p>',
+					'This weapon can also be used with these statistics—Agility, Melee, d10+5.',
 				character_modifiers: []
 			}
 		]
@@ -2197,7 +2197,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Returning',
 				description_html:
-					'<p>When this weapon is thrown within its range, it appears in your hand immediately after the attack.</p>',
+					'When this weapon is thrown within its range, it appears in your hand immediately after the attack.',
 				character_modifiers: []
 			}
 		]
@@ -2256,7 +2256,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Versatile',
 				description_html:
-					'<p>This weapon can also be used with these statistics—Presence, Melee, d8+4.</p>',
+					'This weapon can also be used with these statistics—Presence, Melee, d8+4.',
 				character_modifiers: []
 			}
 		]
@@ -2298,7 +2298,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Powerful',
 				description_html:
-					'<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>',
+					'On a successful attack, roll an additional damage die and discard the lowest result.',
 				character_modifiers: []
 			}
 		]
@@ -2322,7 +2322,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Lucky',
-				description_html: '<p>On a failed attack, you can mark a Stress to reroll your attack.</p>',
+				description_html: 'On a failed attack, you can mark a Stress to reroll your attack.',
 				character_modifiers: []
 			}
 		]
@@ -2346,7 +2346,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Healing',
-				description_html: '<p>During downtime, automatically clear a Hit Point.</p>',
+				description_html: 'During downtime, automatically clear a Hit Point.',
 				character_modifiers: []
 			}
 		]
@@ -2370,7 +2370,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Otherworldly',
-				description_html: '<p>On a successful attack, you can deal physical or magic damage.</p>',
+				description_html: 'On a successful attack, you can deal physical or magic damage.',
 				character_modifiers: []
 			}
 		]
@@ -2394,7 +2394,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Painful',
-				description_html: '<p>Each time you make a successful attack, you must mark a Stress.</p>',
+				description_html: 'Each time you make a successful attack, you must mark a Stress.',
 				character_modifiers: []
 			}
 		]
@@ -2419,7 +2419,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Timebending',
 				description_html:
-					'<p>You choose the target of your attack after making your attack roll.</p>',
+					'You choose the target of your attack after making your attack roll.',
 				character_modifiers: []
 			}
 		]
@@ -2443,7 +2443,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Self-Correcting',
-				description_html: '<p>When you roll a 1 on a damage die, it deals 6 damage instead.</p>',
+				description_html: 'When you roll a 1 on a damage die, it deals 6 damage instead.',
 				character_modifiers: []
 			}
 		]
@@ -2468,7 +2468,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Burning',
 				description_html:
-					'<p>When you roll a 6 on a damage die, the target must mark a Stress.</p>',
+					'When you roll a 6 on a damage die, the target must mark a Stress.',
 				character_modifiers: []
 			}
 		]
@@ -2493,7 +2493,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Powerful',
 				description_html:
-					'<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>',
+					'On a successful attack, roll an additional damage die and discard the lowest result.',
 				character_modifiers: []
 			}
 		]
@@ -2518,7 +2518,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Reloading',
 				description_html:
-					'<p>After you make an attack, roll a d6. On a result of 1, you must mark a Stress to reload this weapon before you can fire it again.</p>',
+					'After you make an attack, roll a d6. On a result of 1, you must mark a Stress to reload this weapon before you can fire it again.',
 				character_modifiers: []
 			}
 		]
@@ -2545,7 +2545,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Reliable',
-				description_html: '<p>+1 to attack rolls</p>',
+				description_html: '+1 to attack rolls',
 				character_modifiers: []
 			}
 		]
@@ -2604,7 +2604,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Massive',
 				description_html:
-					'<p>−1 to Evasion; on a successful attack, roll an additional damage die and discard the lowest result.</p>',
+					'−1 to Evasion; on a successful attack, roll an additional damage die and discard the lowest result.',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -2737,7 +2737,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Quick',
 				description_html:
-					'<p>When you make an attack, you can mark a Stress to target another creature within range.</p>',
+					'When you make an attack, you can mark a Stress to target another creature within range.',
 				character_modifiers: []
 			}
 		]
@@ -2879,7 +2879,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Valiant',
 				description_html:
-					'<p>When you have 3 or more HP marked, gain a +2 bonus to your attack rolls.</p>',
+					'When you have 3 or more HP marked, gain a +2 bonus to your attack rolls.',
 				character_modifiers: []
 			}
 		]
@@ -2904,7 +2904,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Soul Eater',
 				description_html:
-					'<p>When you deal damage to a target, you can mark a Stress to clear a Hit Point.</p>',
+					'When you deal damage to a target, you can mark a Stress to clear a Hit Point.',
 				character_modifiers: []
 			}
 		]
@@ -2929,7 +2929,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Void-Touched',
 				description_html:
-					'<p>On a successful attack, you can mark a Stress to teleport to any unoccupied space within Close range.</p>',
+					'On a successful attack, you can mark a Stress to teleport to any unoccupied space within Close range.',
 				character_modifiers: []
 			}
 		]
@@ -2954,7 +2954,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: "Dragon's Fury",
 				description_html:
-					'<p>When you roll the maximum value on a damage die, you can make an additional attack against the same target.</p>',
+					'When you roll the maximum value on a damage die, you can make an additional attack against the same target.',
 				character_modifiers: []
 			}
 		]
@@ -2979,7 +2979,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Crushing',
 				description_html:
-					'<p>On a successful attack, the target must succeed on a reaction roll (16) or be knocked prone.</p>',
+					'On a successful attack, the target must succeed on a reaction roll (16) or be knocked prone.',
 				character_modifiers: []
 			}
 		]
@@ -3036,7 +3036,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Whirlwind',
 				description_html:
-					'<p>When you make an attack, you can mark a Stress to target all creatures within Melee range.</p>',
+					'When you make an attack, you can mark a Stress to target all creatures within Melee range.',
 				character_modifiers: []
 			}
 		]
@@ -3061,7 +3061,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Rapid Fire',
 				description_html:
-					'<p>When you make an attack, you can mark a Stress to make an additional attack against the same target.</p>',
+					'When you make an attack, you can mark a Stress to make an additional attack against the same target.',
 				character_modifiers: []
 			}
 		]
@@ -3086,7 +3086,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Oathbound',
 				description_html:
-					'<p>At the start of a scene, you can choose one target. Your attacks against that target deal an additional +2 damage.</p>',
+					'At the start of a scene, you can choose one target. Your attacks against that target deal an additional +2 damage.',
 				character_modifiers: []
 			}
 		]
@@ -3180,7 +3180,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Returning',
 				description_html:
-					'<p>When this weapon is thrown within its range, it appears in your hand immediately after the attack.</p>',
+					'When this weapon is thrown within its range, it appears in your hand immediately after the attack.',
 				character_modifiers: []
 			}
 		]
@@ -3239,7 +3239,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Versatile',
 				description_html:
-					'<p>This weapon can also be used with these statistics—Presence, Melee, 1d8+6.</p>',
+					'This weapon can also be used with these statistics—Presence, Melee, 1d8+6.',
 				character_modifiers: []
 			}
 		]
@@ -3281,7 +3281,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Powerful',
 				description_html:
-					'<p>On a successful attack, roll an additional damage die and discard the lowest result.</p>',
+					'On a successful attack, roll an additional damage die and discard the lowest result.',
 				character_modifiers: []
 			}
 		]
@@ -3306,7 +3306,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: "Ancient's Wisdom",
 				description_html:
-					'<p>When you make an attack, you can mark a Stress to gain advantage on the roll.</p>',
+					'When you make an attack, you can mark a Stress to gain advantage on the roll.',
 				character_modifiers: []
 			}
 		]
@@ -3331,7 +3331,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: "Magi's Power",
 				description_html:
-					'<p>When you roll the maximum value on a damage die, you can choose to deal that damage to another target within range.</p>',
+					'When you roll the maximum value on a damage die, you can choose to deal that damage to another target within range.',
 				character_modifiers: []
 			}
 		]
@@ -3356,7 +3356,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Sunfire',
 				description_html:
-					'<p>On a successful attack, the target must succeed on a reaction roll (16) or be blinded for one round.</p>',
+					'On a successful attack, the target must succeed on a reaction roll (16) or be blinded for one round.',
 				character_modifiers: []
 			}
 		]
@@ -3381,7 +3381,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Frostwind',
 				description_html:
-					"<p>On a successful attack, the target's movement speed is halved for one round.</p>",
+					"On a successful attack, the target's movement speed is halved for one round.",
 				character_modifiers: []
 			}
 		]
@@ -3406,7 +3406,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Stormcaller',
 				description_html:
-					'<p>When you throw this weapon, you can mark a Stress to have it return to your hand immediately after the attack.</p>',
+					'When you throw this weapon, you can mark a Stress to have it return to your hand immediately after the attack.',
 				character_modifiers: []
 			}
 		]
@@ -3431,7 +3431,7 @@ export const TIER_4_PRIMARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Earthshaker',
 				description_html:
-					'<p>On a successful attack, you can mark a Stress to force all creatures within Close range to succeed on a reaction roll (16) or be knocked prone.</p>',
+					'On a successful attack, you can mark a Stress to force all creatures within Close range to succeed on a reaction roll (16) or be knocked prone.',
 				character_modifiers: []
 			}
 		]

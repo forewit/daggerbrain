@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { capitalize } from '$lib/utils';
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import type { Weapon } from '$lib/types/compendium-types';
 	import Hand from '@lucide/svelte/icons/hand';
 
@@ -10,7 +11,7 @@
 	<!-- Description -->
 	{#if weapon.description_html}
 		<div class="text-sm text-muted-foreground">
-			{@html weapon.description_html}
+			{@html renderMarkdown(weapon.description_html)}
 		</div>
 	{/if}
 
@@ -61,7 +62,7 @@
 				{#each weapon.features as feature}
 					<div class="text-sm text-muted-foreground">
 						<p class="text-sm font-medium text-foreground">{feature.title}</p>
-						{@html feature.description_html}
+						{@html renderMarkdown(feature.description_html)}
 					</div>
 				{/each}
 			</div>

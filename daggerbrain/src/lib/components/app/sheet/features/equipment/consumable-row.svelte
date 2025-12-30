@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 
 	let {
@@ -41,7 +42,7 @@
 		<td class="py-2 pr-4 text-right">
 			{#if consumable.description_html}
 				<div class="line-clamp-1 text-muted-foreground">
-					{@html consumable.description_html}
+					{@html renderMarkdown(consumable.description_html)}
 				</div>
 			{:else}
 				<span class="text-muted-foreground">—</span>

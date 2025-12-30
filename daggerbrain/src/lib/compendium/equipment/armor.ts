@@ -16,7 +16,7 @@ export const TIER_1_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Flexible',
-				description_html: '<p>+1 to Evasion</p>',
+				description_html: '+1 to Evasion',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -57,7 +57,7 @@ export const TIER_1_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Heavy',
-				description_html: '<p>−1 to Evasion</p>',
+				description_html: '−1 to Evasion',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -85,7 +85,7 @@ export const TIER_1_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Very Heavy',
-				description_html: '<p>−2 to Evasion; −1 to Agility</p>',
+				description_html: '−2 to Evasion; −1 to Agility',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -124,7 +124,7 @@ export const TIER_2_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Flexible',
-				description_html: '<p>+1 to Evasion</p>',
+				description_html: '+1 to Evasion',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -165,7 +165,7 @@ export const TIER_2_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Heavy',
-				description_html: '<p>−1 to Evasion</p>',
+				description_html: '−1 to Evasion',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -193,7 +193,7 @@ export const TIER_2_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Very Heavy',
-				description_html: '<p>−2 to Evasion; −1 to Agility</p>',
+				description_html: '−2 to Evasion; −1 to Agility',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -230,7 +230,7 @@ export const TIER_2_ARMOR = {
 				weapon_modifiers: [],
 				title: 'Warded',
 				description_html:
-					'<p>You reduce incoming magic damage by your Armor Score before applying it to your damage thresholds.</p>',
+					'You reduce incoming magic damage by your Armor Score before applying it to your damage thresholds.',
 				character_modifiers: []
 			}
 		]
@@ -251,7 +251,7 @@ export const TIER_2_ARMOR = {
 				weapon_modifiers: [],
 				title: 'Resilient',
 				description_html:
-					'<p>Before you mark your last Armor Slot, roll a d6. On a result of 6, reduce the severity by one threshold without marking an Armor Slot.</p>',
+					'Before you mark your last Armor Slot, roll a d6. On a result of 6, reduce the severity by one threshold without marking an Armor Slot.',
 				character_modifiers: []
 			}
 		]
@@ -272,7 +272,7 @@ export const TIER_2_ARMOR = {
 				weapon_modifiers: [],
 				title: 'Reinforced',
 				description_html:
-					'<p>When you mark your last Armor Slot, increase your damage thresholds by +2 until you clear at least 1 Armor Slot.</p>',
+					'When you mark your last Armor Slot, increase your damage thresholds by +2 until you clear at least 1 Armor Slot.',
 				character_modifiers: []
 			}
 		]
@@ -293,7 +293,7 @@ export const TIER_2_ARMOR = {
 				weapon_modifiers: [],
 				title: 'Shifting',
 				description_html:
-					'<p>When you are targeted for an attack, you can mark an Armor Slot to give the attack roll against you disadvantage.</p>',
+					'When you are targeted for an attack, you can mark an Armor Slot to give the attack roll against you disadvantage.',
 				character_modifiers: []
 			}
 		]
@@ -313,7 +313,7 @@ export const TIER_2_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Quiet',
-				description_html: '<p>You gain a +2 bonus to rolls you make to move silently.</p>',
+				description_html: 'You gain a +2 bonus to rolls you make to move silently.',
 				character_modifiers: []
 			}
 		]
@@ -333,7 +333,7 @@ export const TIER_2_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Hopeful',
-				description_html: '<p>When you would spend a Hope, you can mark an Armor Slot instead.</p>',
+				description_html: 'When you would spend a Hope, you can mark an Armor Slot instead.',
 				character_modifiers: []
 			}
 		]
@@ -356,7 +356,7 @@ export const TIER_3_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Flexible',
-				description_html: '<p>+1 to Evasion</p>',
+				description_html: '+1 to Evasion',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -397,7 +397,7 @@ export const TIER_3_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Heavy',
-				description_html: '<p>−1 to Evasion</p>',
+				description_html: '−1 to Evasion',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -425,7 +425,7 @@ export const TIER_3_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Very Heavy',
-				description_html: '<p>−2 to Evasion; −1 to Agility</p>',
+				description_html: '−2 to Evasion; −1 to Agility',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -461,7 +461,7 @@ export const TIER_3_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Gilded',
-				description_html: '<p>+1 to Presence</p>',
+				description_html: '+1 to Presence',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -491,7 +491,7 @@ export const TIER_3_ARMOR = {
 				weapon_modifiers: [],
 				title: 'Impenetrable',
 				description_html:
-					'<p>Once per short rest, when you would mark your last Hit Point, you can instead mark a Stress.</p>',
+					'Once per short rest, when you would mark your last Hit Point, you can instead mark a Stress.',
 				character_modifiers: []
 			}
 		]
@@ -512,7 +512,7 @@ export const TIER_3_ARMOR = {
 				weapon_modifiers: [],
 				title: 'Sharp',
 				description_html:
-					'<p>On a successful attack against a target within Melee range, add a d4 to the damage roll.</p>',
+					'On a successful attack against a target within Melee range, add a d4 to the damage roll.',
 				character_modifiers: []
 			}
 		]
@@ -532,7 +532,7 @@ export const TIER_3_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Physical',
-				description_html: '<p>You can’t mark an Armor Slot to reduce magic damage.</p>',
+				description_html: "You can't mark an Armor Slot to reduce magic damage.",
 				character_modifiers: []
 			}
 		]
@@ -552,7 +552,7 @@ export const TIER_3_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Magic',
-				description_html: '<p>You can’t mark an Armor Slot to reduce physical damage.</p>',
+				description_html: "You can't mark an Armor Slot to reduce physical damage.",
 				character_modifiers: []
 			}
 		]
@@ -572,7 +572,7 @@ export const TIER_3_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Painful',
-				description_html: '<p>Each time you mark an Armor Slot, you must mark a Stress.</p>',
+				description_html: 'Each time you mark an Armor Slot, you must mark a Stress.',
 				character_modifiers: []
 			}
 		]
@@ -595,7 +595,7 @@ export const TIER_4_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Flexible',
-				description_html: '<p>+1 to Evasion</p>',
+				description_html: '+1 to Evasion',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -636,7 +636,7 @@ export const TIER_4_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Heavy',
-				description_html: '<p>−1 to Evasion</p>',
+				description_html: '−1 to Evasion',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -664,7 +664,7 @@ export const TIER_4_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Very Heavy',
-				description_html: '<p>−2 to Evasion; −1 to Agility</p>',
+				description_html: '−2 to Evasion; −1 to Agility',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -701,7 +701,7 @@ export const TIER_4_ARMOR = {
 				weapon_modifiers: [],
 				title: 'Timeslowing',
 				description_html:
-					'<p>Mark an Armor Slot to roll a d4 and add its result as a bonus to your Evasion against an incoming attack.</p>',
+					'Mark an Armor Slot to roll a d4 and add its result as a bonus to your Evasion against an incoming attack.',
 				character_modifiers: []
 			}
 		]
@@ -721,7 +721,7 @@ export const TIER_4_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Channeling',
-				description_html: '<p>+1 to Spellcast Rolls</p>',
+				description_html: '+1 to Spellcast Rolls',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -750,7 +750,7 @@ export const TIER_4_ARMOR = {
 				weapon_modifiers: [],
 				title: 'Burning',
 				description_html:
-					'<p>When an adversary attacks you within Melee range, they mark a Stress.</p>',
+					'When an adversary attacks you within Melee range, they mark a Stress.',
 				character_modifiers: []
 			}
 		]
@@ -771,7 +771,7 @@ export const TIER_4_ARMOR = {
 				weapon_modifiers: [],
 				title: 'Fortified',
 				description_html:
-					'<p>When you mark an Armor Slot, you reduce the severity of an attack by two thresholds instead of one.</p>',
+					'When you mark an Armor Slot, you reduce the severity of an attack by two thresholds instead of one.',
 				character_modifiers: []
 			}
 		]
@@ -792,7 +792,7 @@ export const TIER_4_ARMOR = {
 				weapon_modifiers: [],
 				title: 'Truthseeking',
 				description_html:
-					'<p>This armor glows when another creature within Close range tells a lie.</p>',
+					'This armor glows when another creature within Close range tells a lie.',
 				character_modifiers: []
 			}
 		]
@@ -812,7 +812,7 @@ export const TIER_4_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Difficult',
-				description_html: '<p>−1 to all character traits and Evasion</p>',
+				description_html: '−1 to all character traits and Evasion',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',

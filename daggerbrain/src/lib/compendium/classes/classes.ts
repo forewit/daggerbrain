@@ -17,10 +17,10 @@ export const CLASSES = {
 		name: 'Assassin',
 		image_url: '/images/art/placeholder-art.webp',
 		description_html:
-			'<p>As an assassin, you utilize unmatched stealth and precision to ambush the unwary.</p>',
+			'As an assassin, you utilize unmatched stealth and precision to ambush the unwary.',
 		hope_feature: {
 			title: 'Grim Resolve',
-			description_html: '<p><b>Spend 3 Hope</b> to clear 2 Stress.</p>',
+			description_html: '**Spend 3 Hope** to clear 2 Stress.',
 			character_modifiers: [],
 			weapon_modifiers: []
 		},
@@ -29,22 +29,22 @@ export const CLASSES = {
 		class_features: [
 			{
 				title: 'Marked for Death',
-				description_html: `<p>On a successful weapon attack, you can <b>mark a Stress</b> to make the target 
-              <i>Marked for Death</i>. Attacks you make against a target that's <i>Marked for 
-              Death</i> gain a bonus to damage equal to <b>+1d4</b> per tier.</p>
-          
-              <p>You can only have one adversary <i>Marked for Death</i> at a time, and can't transfer or 
+				description_html: `On a successful weapon attack, you can **mark a Stress** to make the target 
+              *Marked for Death*. Attacks you make against a target that's *Marked for 
+              Death* gain a bonus to damage equal to **+1d4** per tier.
+
+              You can only have one adversary *Marked for Death* at a time, and can't transfer or 
               remove the condition except by defeating the target. The GM can spend a number of Fear equal 
-              to your Proficiency to remove the <i>Marked for Death</i> condition. Otherwise, it ends
-              automatically when you take a rest.</p>`,
+              to your Proficiency to remove the *Marked for Death* condition. Otherwise, it ends
+              automatically when you take a rest.`,
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Get In & Get Out',
-				description_html: `<p><b>Spend a Hope</b> to ask the GM for either a quick or inconspicuous way 
+				description_html: `**Spend a Hope** to ask the GM for either a quick or inconspicuous way 
               into or out of a building or structure you can see. The next roll you make that capitalizes 
-              on this information has advantage.</p>`,
+              on this information has advantage.`,
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -99,11 +99,11 @@ export const CLASSES = {
 		name: 'Brawler',
 		image_url: '/images/art/placeholder-art.webp',
 		description_html:
-			'<p>As a brawler, you can use your fists just as well as any weapon to fight off the threats that get in your way.</p>',
+			'As a brawler, you can use your fists just as well as any weapon to fight off the threats that get in your way.',
 		hope_feature: {
 			title: 'Staggering Strike',
 			description_html:
-				'<p><b>Spend 3 Hope</b> when you succeed on an attack to temporarily Stagger your target and force them to mark a Stress. While Staggered, they have disadvantage on attack rolls.</p>',
+				'**Spend 3 Hope** when you succeed on an attack to temporarily Stagger your target and force them to mark a Stress. While Staggered, they have disadvantage on attack rolls.',
 			character_modifiers: [],
 			weapon_modifiers: []
 		},
@@ -112,11 +112,9 @@ export const CLASSES = {
 		class_features: [
 			{
 				title: 'I am the Weapon',
-				description_html: `<p>While you don't have any equipped weapons</p>
-                    <ul class="list-disc list-inside ml-2">
-                        <li>You gain a +1 bonus to Evasion</li>
-                        <li>Your unarmed strikes are considered a Melee weapon, use the trait of your choice, and deal <b>d8+d6</b> phy damage using your Proficiency.</li>
-                     </ul>`,
+				description_html: `While you don't have any equipped weapons:
+- You gain a +1 bonus to Evasion
+- Your unarmed strikes are considered a Melee weapon, use the trait of your choice, and deal **d8+d6** phy damage using your Proficiency.`,
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -188,18 +186,18 @@ export const CLASSES = {
 			},
 			{
 				title: 'Combo Strikes',
-				description_html: `<p>After making a damage roll with a Melee weapon but before dealing
-                    that damage to the target, <b>mark a Stress</b> to start a combo strike.
+				description_html: `After making a damage roll with a Melee weapon but before dealing
+                    that damage to the target, **mark a Stress** to start a combo strike.
                     When you do, roll your Combo Die and note its value. Then, roll your
                     Combo Die again. If the value of the second roll is equal to or greater
                     than your fi rst roll, continue rolling until the latest Combo Die's roll is
                     less than the roll that preceeded it. Total all rolled values and add that
                     amount to your weapon's damage. These values cannot be adjusted
-                    by features that aff ect damage dice.</p>
+                    by features that aff ect damage dice.
 
-                    <p>Your Combo Die starts as a <b>d4</b>. When you level up, once per tier you
+                    Your Combo Die starts as a **d4**. When you level up, once per tier you
                     may use one of your advancement options to increase your Combo
-                    Die instead.</p>`,
+                    Die instead.`,
 				// todo: find a way to update dice on changing tier
 				// todo: add a "change weapon type" modifier type
 				character_modifiers: [],
@@ -256,11 +254,11 @@ export const CLASSES = {
 		name: 'Bard',
 		image_url: '/images/art/placeholder-art.webp',
 		description_html:
-			'<p>As a bard, you know how to get people to talk, bring attention to yourself, and use words or music to influence the world around you.</p>',
+			'As a bard, you know how to get people to talk, bring attention to yourself, and use words or music to influence the world around you.',
 		hope_feature: {
 			title: 'Make a Scene',
 			description_html:
-				'<p><b>Spend 3 Hope</b> to temporarily <i>Distract</i> a target within Close range, giving them a -2 penalty to their Difficulty.</p>',
+				'**Spend 3 Hope** to temporarily *Distract* a target within Close range, giving them a -2 penalty to their Difficulty.',
 			character_modifiers: [],
 			weapon_modifiers: []
 		},
@@ -269,7 +267,7 @@ export const CLASSES = {
 		class_features: [
 			{
 				title: 'Rally',
-				description_html: `<p>Once per session, describe how you rally the party and give yourself and each of your allies a Rally Die. At level 1, your Rally Die is a <b>d6</b>. A PC can spend their Rally Die to roll it, adding the result to their action roll, reaction roll, damage roll, or to clear a number of Stress equal to the result. At the end of each session, clear all unspent Rally Dice. At level 5, your Rally Die increases to a <b>d8</b>.</p>`,
+				description_html: `Once per session, describe how you rally the party and give yourself and each of your allies a Rally Die. At level 1, your Rally Die is a **d6**. A PC can spend their Rally Die to roll it, adding the result to their action roll, reaction roll, damage roll, or to clear a number of Stress equal to the result. At the end of each session, clear all unspent Rally Dice. At level 5, your Rally Die increases to a **d8**.`,
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -320,11 +318,11 @@ export const CLASSES = {
 		name: 'Druid',
 		image_url: '/images/art/placeholder-art.webp',
 		description_html:
-			'<p>As a druid, you are a force of nature, preserving the balance of life and death by channeling the wilds themselves through you.</p>',
+			'As a druid, you are a force of nature, preserving the balance of life and death by channeling the wilds themselves through you.',
 		hope_feature: {
 			title: 'Evolution',
 			description_html:
-				'<p><b>Spend 3 Hope</b> to transform into a Beastform without marking a Stress. When you do, choose one trait to raise by +1 until you drop out of that Beastform.</p>',
+				'**Spend 3 Hope** to transform into a Beastform without marking a Stress. When you do, choose one trait to raise by +1 until you drop out of that Beastform.',
 			character_modifiers: [],
 			weapon_modifiers: []
 		},
@@ -333,14 +331,14 @@ export const CLASSES = {
 		class_features: [
 			{
 				title: 'Beastform',
-				description_html: `<p><b>Mark a Stress</b> to magically transform into a creature of your tier or lower from the Beastform list. You can drop out of this form at any time. While transformed, you can't use weapons or cast spells from domain cards, but you can still use other features or abilities you have access to. Spells you cast before you transform stay active and last for their normal duration, and you can talk and communicate as normal. Additionally, you gain the Beastform's features, add their Evasion bonus to your Evasion, and use the trait specified in their statistics for your attack. While you're in a Beastform, your armor becomes part of your body and you mark Armor Slots as usual; when you drop out of a Beastform, those marked Armor Slots remain marked. If you mark your last Hit Point, you automatically drop out of this form.</p>`,
+				description_html: `**Mark a Stress** to magically transform into a creature of your tier or lower from the Beastform list. You can drop out of this form at any time. While transformed, you can't use weapons or cast spells from domain cards, but you can still use other features or abilities you have access to. Spells you cast before you transform stay active and last for their normal duration, and you can talk and communicate as normal. Additionally, you gain the Beastform's features, add their Evasion bonus to your Evasion, and use the trait specified in their statistics for your attack. While you're in a Beastform, your armor becomes part of your body and you mark Armor Slots as usual; when you drop out of a Beastform, those marked Armor Slots remain marked. If you mark your last Hit Point, you automatically drop out of this form.`,
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Wildtouch',
 				description_html:
-					'<p>You can perform harmless, subtle effects that involve nature—such as causing a flower to rapidly grow, summoning a slight gust of wind, or starting a campfire—at will.</p>',
+					'You can perform harmless, subtle effects that involve nature—such as causing a flower to rapidly grow, summoning a slight gust of wind, or starting a campfire—at will.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -394,10 +392,10 @@ export const CLASSES = {
 		name: 'Guardian',
 		image_url: '/images/art/placeholder-art.webp',
 		description_html:
-			'<p>As a guardian, you run into danger to protect your party, keeping watch over those who might not survive without you there.</p>',
+			'As a guardian, you run into danger to protect your party, keeping watch over those who might not survive without you there.',
 		hope_feature: {
 			title: 'Frontline Tank',
-			description_html: '<p><b>Spend 3 Hope</b> to clear 2 Armor Slots.</p>',
+			description_html: '**Spend 3 Hope** to clear 2 Armor Slots.',
 			character_modifiers: [],
 			weapon_modifiers: []
 		},
@@ -406,13 +404,12 @@ export const CLASSES = {
 		class_features: [
 			{
 				title: 'Unstoppable',
-				description_html: `<p>Once per long rest, you can become <i>Unstoppable</i>. You gain an Unstoppable Die. At level 1, your Unstoppable Die is a <b>d4</b>. Place it on your character sheet in the space provided, starting with the 1 value facing up. After you make a damage roll that deals 1 or more Hit Points to a target, increase the Unstoppable Die value by one. When the die's value would exceed its maximum value or when the scene ends, remove the die and drop out of <i>Unstoppable</i>. At level 5, your Unstoppable Die increases to a <b>d6</b>.</p>
-				<p>While <i>Unstoppable</i>, you gain the following benefits:</p>
-				<ul class="list-disc list-inside ml-2">
-					<li>You reduce the severity of physical damage by one threshold (Severe to Major, Major to Minor, Minor to None).</li>
-					<li>You add the current value of the Unstoppable Die to your damage roll.</li>
-					<li>You can't be Restrained or Vulnerable.</li>
-				</ul>`,
+				description_html: `Once per long rest, you can become *Unstoppable*. You gain an Unstoppable Die. At level 1, your Unstoppable Die is a **d4**. Place it on your character sheet in the space provided, starting with the 1 value facing up. After you make a damage roll that deals 1 or more Hit Points to a target, increase the Unstoppable Die value by one. When the die's value would exceed its maximum value or when the scene ends, remove the die and drop out of *Unstoppable*. At level 5, your Unstoppable Die increases to a **d6**.
+
+				While *Unstoppable*, you gain the following benefits:
+- You reduce the severity of physical damage by one threshold (Severe to Major, Major to Minor, Minor to None).
+- You add the current value of the Unstoppable Die to your damage roll.
+- You can't be Restrained or Vulnerable.`,
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -463,11 +460,11 @@ export const CLASSES = {
 		name: 'Ranger',
 		image_url: '/images/art/placeholder-art.webp',
 		description_html:
-			'<p>As a ranger, your keen eyes and graceful haste make you indispensable when tracking down enemies and navigating the wilds.</p>',
+			'As a ranger, your keen eyes and graceful haste make you indispensable when tracking down enemies and navigating the wilds.',
 		hope_feature: {
 			title: 'Hold Them Off',
 			description_html:
-				'<p><b>Spend 3 Hope</b> when you succeed on an attack with a weapon to use that same roll against two additional adversaries within range of the attack.</p>',
+				'**Spend 3 Hope** when you succeed on an attack with a weapon to use that same roll against two additional adversaries within range of the attack.',
 			character_modifiers: [],
 			weapon_modifiers: []
 		},
@@ -476,12 +473,10 @@ export const CLASSES = {
 		class_features: [
 			{
 				title: "Ranger's Focus",
-				description_html: `<p><b>Spend a Hope</b> and make an attack against a target. On a success, deal your attack's normal damage and temporarily make the attack's target your <i>Focus</i>. Until this feature ends or you make a different creature your <i>Focus</i>, you gain the following benefits against your <i>Focus</i>:</p>
-				<ul class="list-disc list-inside ml-2">
-					<li>You know precisely what direction they are in.</li>
-					<li>When you deal damage to them, they must mark a Stress.</li>
-					<li>When you fail an attack against them, you can end your Ranger's Focus feature to reroll your Duality Dice.</li>
-				</ul>`,
+				description_html: `**Spend a Hope** and make an attack against a target. On a success, deal your attack's normal damage and temporarily make the attack's target your *Focus*. Until this feature ends or you make a different creature your *Focus*, you gain the following benefits against your *Focus*:
+- You know precisely what direction they are in.
+- When you deal damage to them, they must mark a Stress.
+- When you fail an attack against them, you can end your Ranger's Focus feature to reroll your Duality Dice.`,
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -535,11 +530,11 @@ export const CLASSES = {
 		name: 'Rogue',
 		image_url: '/images/art/placeholder-art.webp',
 		description_html:
-			'<p>As a rogue, you have experience fighting with your blade as well as your wit, preferring to move quickly and fight quietly.</p>',
+			'As a rogue, you have experience fighting with your blade as well as your wit, preferring to move quickly and fight quietly.',
 		hope_feature: {
 			title: "Rogue's Dodge",
 			description_html:
-				'<p><b>Spend 3 Hope</b> to gain a <b>+2</b> bonus to your Evasion until the next time an attack succeeds against you. Otherwise, this bonus lasts until your next rest.</p>',
+				'**Spend 3 Hope** to gain a **+2** bonus to your Evasion until the next time an attack succeeds against you. Otherwise, this bonus lasts until your next rest.',
 			character_modifiers: [],
 			weapon_modifiers: []
 		},
@@ -548,19 +543,17 @@ export const CLASSES = {
 		class_features: [
 			{
 				title: 'Cloaked',
-				description_html: `<p>Any time you would be <i>Hidden</i>, you are instead <i>Cloaked</i>. In addition to the benefits of the <i>Hidden</i> condition, while <i>Cloaked</i> you remain unseen if you are stationary when an adversary moves to where they would normally see you. After you make an attack or end a move within line of sight of an adversary, you are no longer <i>Cloaked</i>.</p>`,
+				description_html: `Any time you would be *Hidden*, you are instead *Cloaked*. In addition to the benefits of the *Hidden* condition, while *Cloaked* you remain unseen if you are stationary when an adversary moves to where they would normally see you. After you make an attack or end a move within line of sight of an adversary, you are no longer *Cloaked*.`,
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Sneak Attack',
-				description_html: `<p>When you succeed on an attack while <i>Cloaked</i> or while an ally is within Melee range of your target, add a number of <b>d6s</b> equal to your tier to your damage roll.</p>
-				<ul class="list-disc list-inside ml-2">
-					<li>Level 1 → Tier 1</li>
-					<li>Levels 2–4 → Tier 2</li>
-					<li>Levels 5–7 → Tier 3</li>
-					<li>Levels 8–10 → Tier 4</li>
-				</ul>`,
+				description_html: `When you succeed on an attack while *Cloaked* or while an ally is within Melee range of your target, add a number of **d6s** equal to your tier to your damage roll.
+- Level 1 → Tier 1
+- Levels 2–4 → Tier 2
+- Levels 5–7 → Tier 3
+- Levels 8–10 → Tier 4`,
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -611,11 +604,11 @@ export const CLASSES = {
 		name: 'Seraph',
 		image_url: '/images/art/placeholder-art.webp',
 		description_html:
-			"<p>As a seraph, you've taken a vow to a god who helps you channel sacred arcane power to keep your party on their feet.</p>",
+			"As a seraph, you've taken a vow to a god who helps you channel sacred arcane power to keep your party on their feet.",
 		hope_feature: {
 			title: 'Life Support',
 			description_html:
-				'<p><b>Spend 3 Hope</b> to clear a Hit Point on an ally within Close range.</p>',
+				'**Spend 3 Hope** to clear a Hit Point on an ally within Close range.',
 			character_modifiers: [],
 			weapon_modifiers: []
 		},
@@ -624,7 +617,7 @@ export const CLASSES = {
 		class_features: [
 			{
 				title: 'Prayer Dice',
-				description_html: `<p>At the beginning of each session, roll a number of <b>d4s</b> equal to your subclass's Spellcast trait and place them on your character sheet in the space provided. These are your Prayer Dice. You can spend any number of Prayer Dice to aid yourself or an ally within Far range. You can use a spent die's value to reduce incoming damage, add to a roll's result after the roll is made, or gain Hope equal to the result. At the end of each session, clear all unspent Prayer Dice.</p>`,
+				description_html: `At the beginning of each session, roll a number of **d4s** equal to your subclass's Spellcast trait and place them on your character sheet in the space provided. These are your Prayer Dice. You can spend any number of Prayer Dice to aid yourself or an ally within Far range. You can use a spent die's value to reduce incoming damage, add to a roll's result after the roll is made, or gain Hope equal to the result. At the end of each session, clear all unspent Prayer Dice.`,
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -675,11 +668,11 @@ export const CLASSES = {
 		name: 'Sorcerer',
 		image_url: '/images/art/placeholder-art.webp',
 		description_html:
-			"<p>As a sorcerer, you were born with innate magical power, and you've learned how to wield that power to get what you want.</p>",
+			"As a sorcerer, you were born with innate magical power, and you've learned how to wield that power to get what you want.",
 		hope_feature: {
 			title: 'Volatile Magic',
 			description_html:
-				'<p><b>Spend 3 Hope</b> to reroll any number of your damage dice on an attack that deals magic damage.</p>',
+				'**Spend 3 Hope** to reroll any number of your damage dice on an attack that deals magic damage.',
 			character_modifiers: [],
 			weapon_modifiers: []
 		},
@@ -689,24 +682,22 @@ export const CLASSES = {
 			{
 				title: 'Arcane Sense',
 				description_html:
-					'<p>You can sense the presence of magical people and objects within Close range.</p>',
+					'You can sense the presence of magical people and objects within Close range.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Minor Illusion',
 				description_html:
-					'<p>Make a Spellcast Roll (10). On a success, you create a minor visual illusion no larger than yourself within Close range. This illusion is convincing to anyone at Close range or farther.</p>',
+					'Make a Spellcast Roll (10). On a success, you create a minor visual illusion no larger than yourself within Close range. This illusion is convincing to anyone at Close range or farther.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Channel Raw Power',
-				description_html: `<p>Once per long rest, you can place a domain card from your loadout into your vault and choose to either:</p>
-				<ul class="list-disc list-inside ml-2">
-					<li>Gain Hope equal to the level of the card.</li>
-					<li>Enhance a spell that deals damage, gaining a bonus to your damage roll equal to twice the level of the card.</li>
-				</ul>`,
+				description_html: `Once per long rest, you can place a domain card from your loadout into your vault and choose to either:
+- Gain Hope equal to the level of the card.
+- Enhance a spell that deals damage, gaining a bonus to your damage roll equal to twice the level of the card.`,
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -757,11 +748,11 @@ export const CLASSES = {
 		name: 'Warrior',
 		image_url: '/images/art/placeholder-art.webp',
 		description_html:
-			'<p>As a warrior, you have trained your body and mind to face any challenge that comes your way.</p>',
+			'As a warrior, you have trained your body and mind to face any challenge that comes your way.',
 		hope_feature: {
 			title: 'No Mercy',
 			description_html:
-				'<p><b>Spend 3 Hope</b> to gain a <b>+1</b> bonus to your attack rolls until your next rest.</p>',
+				'**Spend 3 Hope** to gain a **+1** bonus to your attack rolls until your next rest.',
 			character_modifiers: [],
 			weapon_modifiers: []
 		},
@@ -770,18 +761,16 @@ export const CLASSES = {
 		class_features: [
 			{
 				title: 'Attack of Opportunity',
-				description_html: `<p>If an adversary within Melee range attempts to leave that range, make a reaction roll using a trait of your choice against their Difficulty. Choose one effect on a success, or two if you critically succeed:</p>
-				<ul class="list-disc list-inside ml-2">
-					<li>They can't move from where they are.</li>
-					<li>You deal damage to them equal to your primary weapon's damage.</li>
-					<li>You move with them.</li>
-				</ul>`,
+				description_html: `If an adversary within Melee range attempts to leave that range, make a reaction roll using a trait of your choice against their Difficulty. Choose one effect on a success, or two if you critically succeed:
+- They can't move from where they are.
+- You deal damage to them equal to your primary weapon's damage.
+- You move with them.`,
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Combat Training',
-				description_html: `<p>You ignore burden when equipping weapons. When you deal physical damage, you gain a bonus to your damage roll equal to your level.</p>`,
+				description_html: `You ignore burden when equipping weapons. When you deal physical damage, you gain a bonus to your damage roll equal to your level.`,
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -832,11 +821,11 @@ export const CLASSES = {
 		name: 'Wizard',
 		image_url: '/images/art/placeholder-art.webp',
 		description_html:
-			"<p>As a wizard, you've become familiar with the arcane through the relentless study of grimoires and other tools of magic.</p>",
+			"As a wizard, you've become familiar with the arcane through the relentless study of grimoires and other tools of magic.",
 		hope_feature: {
 			title: 'Not This Time',
 			description_html:
-				'<p><b>Spend 3 Hope</b> to force an adversary within Far range to reroll an attack or damage roll.</p>',
+				'**Spend 3 Hope** to force an adversary within Far range to reroll an attack or damage roll.',
 			character_modifiers: [],
 			weapon_modifiers: []
 		},
@@ -845,14 +834,15 @@ export const CLASSES = {
 		class_features: [
 			{
 				title: 'Prestidigitation',
-				description_html: `<p>You can perform harmless, subtle magical effects at will. For example, you can change an object's color, create a smell, light a candle, cause a tiny object to float, illuminate a room, or repair a small object.</p>`,
+				description_html: `You can perform harmless, subtle magical effects at will. For example, you can change an object's color, create a smell, light a candle, cause a tiny object to float, illuminate a room, or repair a small object.`,
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Strange Patterns',
-				description_html: `<p>Choose a number between 1 and 12. When you roll that number on a Duality Die, gain a Hope or clear a Stress.</p>
-				<p>You can change this number when you take a long rest.</p>`,
+				description_html: `Choose a number between 1 and 12. When you roll that number on a Duality Die, gain a Hope or clear a Stress.
+
+				You can change this number when you take a long rest.`,
 				character_modifiers: [],
 				weapon_modifiers: []
 			}

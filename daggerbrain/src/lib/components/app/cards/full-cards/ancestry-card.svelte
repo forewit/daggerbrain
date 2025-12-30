@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { AncestryCard, AncestryCardChoice } from '$lib/types/compendium-types';
 	import { cn } from '$lib/utils';
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import type { Snippet } from 'svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
@@ -189,7 +190,7 @@
 
 			<!-- description -->
 			<p class="text-xs italic">
-				{@html card.description_html}
+				{@html renderMarkdown(card.description_html)}
 			</p>
 
 			<!-- mixed ancestry selectors -->
@@ -199,7 +200,7 @@
 			{#each card.features as feature}
 				<p class="text-xs">
 					<b><em>{feature.title}:</em></b>
-					{@html feature.description_html}
+					{@html renderMarkdown(feature.description_html)}
 				</p>
 			{/each}
 
@@ -244,7 +245,7 @@
 					{card.title}
 				</p>
 				<p class="text-[12px] text-black italic">
-					{@html card.description_html}
+					{@html renderMarkdown(card.description_html)}
 				</p>
 
 				<!-- mixed ancestry selectors -->
@@ -253,7 +254,7 @@
 				{#each card.features as feature}
 					<p class="text-[12px] text-black">
 						<b><em>{feature.title}:</em></b>
-						{@html feature.description_html}
+						{@html renderMarkdown(feature.description_html)}
 					</p>
 				{/each}
 

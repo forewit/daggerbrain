@@ -5,6 +5,7 @@
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { cn } from '$lib/utils';
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ConsumableRules from '../../rules/consumable-rules.svelte';
@@ -95,7 +96,7 @@
 			{#if (consumable.description_html || '').trim().length > 0}
 				<div class="mt-3">
 					<div class="border-l-2 border-accent/30 pl-3">
-						<p class="text-xs text-muted-foreground">{@html consumable.description_html}</p>
+						<p class="text-xs text-muted-foreground">{@html renderMarkdown(consumable.description_html)}</p>
 					</div>
 				</div>
 			{:else}

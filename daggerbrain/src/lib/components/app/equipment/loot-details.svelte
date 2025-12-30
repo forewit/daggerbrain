@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import type { Loot } from '$lib/types/compendium-types';
 
 	let { loot }: { loot: Loot } = $props();
@@ -8,7 +9,7 @@
 	<!-- Description -->
 	{#if loot.description_html}
 		<div class="text-sm text-muted-foreground">
-			{@html loot.description_html}
+			{@html renderMarkdown(loot.description_html)}
 		</div>
 	{/if}
 </div>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import * as Select from '$lib/components/ui/select';
@@ -64,7 +65,7 @@
 				</p>
 				<div class="flex flex-col gap-2">
 					<p class="text-left text-xs text-muted-foreground">
-						{@html context.primary_class.hope_feature.description_html}
+						{@html renderMarkdown(context.primary_class.hope_feature.description_html)}
 					</p>
 					{#if is_druid}
 						<Select.Root
@@ -106,7 +107,7 @@
 				<span class="mr-1 text-xs font-bold text-nowrap text-foreground"
 					>{context.primary_class.hope_feature.title}:</span
 				>
-				<span class="text-left">{@html context.primary_class.hope_feature.description_html}</span>
+				<span class="text-left">{@html renderMarkdown(context.primary_class.hope_feature.description_html)}</span>
 			</p> -->
 		{/if}
 	</div>

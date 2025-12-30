@@ -2,6 +2,7 @@
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog/';
 	import ClassSummary from '../class-summary.svelte';
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 
@@ -23,14 +24,14 @@
 			<div class="mt-4 flex flex-col gap-2">
 				<p class="text font-medium">{context.primary_class.hope_feature.title}</p>
 				<div class="mb-2 flex flex-col gap-2 text-sm text-muted-foreground">
-					{@html context.primary_class.hope_feature.description_html}
+					{@html renderMarkdown(context.primary_class.hope_feature.description_html)}
 				</div>
 			</div>
 			{#each context.primary_class.class_features as feature}
 				<div class="flex flex-col gap-2">
 					<p class="text font-medium">{feature.title}</p>
 					<div class="mb-2 flex flex-col gap-2 text-sm text-muted-foreground">
-						{@html feature.description_html}
+						{@html renderMarkdown(feature.description_html)}
 					</div>
 				</div>
 			{/each}

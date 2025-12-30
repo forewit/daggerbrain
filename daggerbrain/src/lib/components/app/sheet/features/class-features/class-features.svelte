@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { capitalize } from '$lib/utils';
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import BardFeatures from './bard-features.svelte';
 	import type { CharacterClass } from '$lib/types/compendium-types';
@@ -32,7 +33,7 @@
 		<div class="relative text-sm">
 			<p class="pb-2 text-sm font-medium">{feature.title}</p>
 			<div class="flex flex-col gap-2 pl-2 text-xs leading-relaxed text-muted-foreground">
-				{@html feature.description_html}
+				{@html renderMarkdown(feature.description_html)}
 			</div>
 		</div>
 	{/each}

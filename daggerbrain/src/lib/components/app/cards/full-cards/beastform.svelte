@@ -5,6 +5,7 @@
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import * as Select from '$lib/components/ui/select/';
 	import { capitalize, cn, applyProficiencyToDice } from '$lib/utils';
+	import { renderMarkdown } from '$lib/utils/markdown';
 
 	let {
 		bind_choice_select = false,
@@ -90,7 +91,7 @@
 			{#each beastform.features as feature}
 				<p class="text-xs text-muted-foreground">
 					<span class="font-medium text-foreground">{feature.title}:</span>
-					{@html feature.description_html}
+					{@html renderMarkdown(feature.description_html)}
 				</p>
 			{/each}
 		{/if}

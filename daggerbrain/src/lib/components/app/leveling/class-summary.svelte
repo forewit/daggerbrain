@@ -2,6 +2,7 @@
 	import Banner from '$lib/components/app/cards/class-banner.svelte';
 	import type { CharacterClass, DomainIds } from '$lib/types/compendium-types';
 	import { cn } from '$lib/utils';
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import type { Snippet } from 'svelte';
 	import * as Select from '$lib/components/ui/select/';
 	import DomainBanner from '$lib/components/app/cards/domain-banner.svelte';
@@ -36,7 +37,7 @@
 		<div class="flex grow grow-4 flex-col gap-2">
 			<p class="text-lg font-medium">{character_class.name}</p>
 			<p class="-mt-2 text-xs text-muted-foreground italic">
-				{@html character_class.description_html}
+				{@html renderMarkdown(character_class.description_html)}
 			</p>
 
 			<div class="flex flex-col gap-2">

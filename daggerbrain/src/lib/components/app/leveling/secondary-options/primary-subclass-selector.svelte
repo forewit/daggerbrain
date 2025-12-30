@@ -4,6 +4,7 @@
 	import * as Collapsible from '$lib/components/ui/collapsible/';
 	import SubclassCard from '$lib/components/app/cards/full-cards/subclass-card.svelte';
 	import { cn } from '$lib/utils';
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
@@ -24,7 +25,7 @@
 		<div class="flex flex-col gap-4">
 			<p class="text-lg font-medium">{context.primary_subclass?.name}</p>
 			<p class="-mt-2 text-xs text-muted-foreground italic">
-				{@html context.primary_subclass?.description_html}
+				{@html renderMarkdown(context.primary_subclass?.description_html || '')}
 			</p>
 
 			<SubclassCard card={context.primary_subclass.foundation_card} />
@@ -67,7 +68,7 @@
 						<div class="flex flex-col gap-3 rounded-md border-2 bg-primary-muted p-3">
 							<p class="text-lg font-medium">{subclass.name}</p>
 							<p class="-mt-2 text-xs text-muted-foreground italic">
-								{@html subclass.description_html}
+								{@html renderMarkdown(subclass.description_html)}
 							</p>
 							{#if subclass.foundation_card.spellcast_trait}
 								<p class="text-xs text-muted-foreground italic">

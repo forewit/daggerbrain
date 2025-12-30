@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import * as Select from '$lib/components/ui/select/';
 	import { TIER_2_BASE_OPTIONS, TIER_3_BASE_OPTIONS } from '$lib/types/rules';
 	import { getCharacterContext } from '$lib/state/character.svelte';
@@ -190,7 +191,7 @@
 						{@const max_level = choices[key].option_id === 'tier_2_domain_card' ? 4 : 7}
 						<div class="flex flex-col gap-2 rounded-md bg-primary/50 p-2">
 							<p class="px-2 py-1 text-xs text-muted-foreground italic">
-								{@html chosen_options[key]?.title_html || ''}
+								{@html renderMarkdown(chosen_options[key]?.title_html || '')}
 							</p>
 							<DomainCardSelector
 								bind:selected_card_id={choices[key].selected_domain_card_id}

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import Dropdown from './dropdown.svelte';
 	import PrimaryClassSelector from './secondary-options/primary-class-selector.svelte';
 	import PrimarySubclassSelector from './secondary-options/primary-subclass-selector.svelte';
@@ -72,7 +73,7 @@
 						: `<p>Choose up to 2 level 1 domain cards.</p>`}
 				<div class="flex flex-col gap-3 rounded-md bg-primary/50 p-2">
 					<p class="px-2 pt-1 text-xs text-muted-foreground italic">
-						{@html description_html}
+						{@html renderMarkdown(description_html)}
 					</p>
 					<DomainCardSelector
 						bind:selected_card_id={character.level_up_domain_card_ids[1].A}

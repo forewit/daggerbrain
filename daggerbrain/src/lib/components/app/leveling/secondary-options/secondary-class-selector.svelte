@@ -3,6 +3,7 @@
 	import * as Dialog from '$lib/components/ui/dialog/';
 	import * as Collapsible from '$lib/components/ui/collapsible/';
 	import { cn } from '$lib/utils';
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import ClassSummary from '../class-summary.svelte';
 	import SubclassCard from '$lib/components/app/cards/full-cards/subclass-card.svelte';
@@ -48,7 +49,7 @@
 						<div class="flex flex-col gap-2">
 							<p class="text-sm font-medium">{feature.title}</p>
 							<div class="mb-2 flex flex-col gap-2 text-xs text-muted-foreground">
-								{@html feature.description_html}
+								{@html renderMarkdown(feature.description_html)}
 							</div>
 						</div>
 					{/each}
@@ -76,7 +77,7 @@
 				<div class="flex flex-col gap-4">
 					<p class="text-lg font-medium">{context.secondary_subclass.name}</p>
 					<p class="-mt-2 text-xs text-muted-foreground italic">
-						{@html context.secondary_subclass.description_html}
+						{@html renderMarkdown(context.secondary_subclass.description_html)}
 					</p>
 
 					<SubclassCard card={context.secondary_subclass.foundation_card} />
@@ -186,7 +187,7 @@
 						<div class="flex flex-col gap-3 rounded-md border-2 bg-primary-muted p-3">
 							<p class="text-lg font-medium">{subclass.name}</p>
 							<p class="-mt-2 text-xs text-muted-foreground italic">
-								{@html subclass.description_html}
+								{@html renderMarkdown(subclass.description_html)}
 							</p>
 							{#if subclass.foundation_card.spellcast_trait}
 								<p class="text-xs text-muted-foreground italic">

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { DomainCard, DomainCardChoice } from '$lib/types/compendium-types';
 	import { cn } from '$lib/utils';
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import type { Snippet } from 'svelte';
 	import DomainBanner from '../domain-banner.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
@@ -188,7 +189,7 @@
 			<!-- features -->
 			{#each card.features as feature}
 				<div class="flex flex-col gap-2 text-xs">
-					{@html feature.description_html}
+					{@html renderMarkdown(feature.description_html)}
 				</div>
 			{/each}
 
@@ -286,7 +287,7 @@
 
 				{#each card.features as feature}
 					<div class="flex flex-col gap-[12px] text-[12px] text-black">
-						{@html feature.description_html}
+						{@html renderMarkdown(feature.description_html)}
 					</div>
 				{/each}
 

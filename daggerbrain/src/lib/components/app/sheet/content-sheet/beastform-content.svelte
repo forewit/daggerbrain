@@ -32,7 +32,7 @@
 </script>
 
 <Sheet.Header>
-	<Sheet.Title>Choose Beastform</Sheet.Title>
+	<Sheet.Title>Choose a Beastform</Sheet.Title>
 	<Sheet.Description class="text-xs italic"
 		>Select a beastform for your character. Special beastforms (Legendary, Mythic) require
 		additional choices.</Sheet.Description
