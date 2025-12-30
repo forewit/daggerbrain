@@ -1,12 +1,8 @@
 <script lang="ts">
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog/';
-<<<<<<< HEAD
 	import ClassSummary from './class-summary.svelte';
-=======
-	import ClassSummary from '../class-summary.svelte';
 	import { renderMarkdown } from '$lib/utils/markdown';
->>>>>>> main
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 
