@@ -6,6 +6,7 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { cn, capitalize } from '$lib/utils';
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import Hand from '@lucide/svelte/icons/hand';
@@ -337,7 +338,7 @@
 
 	<div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
 		{#if weapon.description_html.trim().length > 0}
-			<p class="py-4 text-sm">{@html weapon.description_html}</p>
+			<p class="py-4 text-sm">{@html renderMarkdown(weapon.description_html)}</p>
 		{/if}
 
 		<!-- Stats Table -->
@@ -384,7 +385,7 @@
 					{#each weapon.features as feature}
 						<div class="border-l-2 border-accent/30 pl-3">
 							<p class="text-sm font-medium text-muted-foreground">{feature.title}</p>
-							<p class="mt-0.5 text-xs text-muted-foreground">{@html feature.description_html}</p>
+							<p class="mt-0.5 text-xs text-muted-foreground">{@html renderMarkdown(feature.description_html)}</p>
 						</div>
 					{/each}
 				</div>

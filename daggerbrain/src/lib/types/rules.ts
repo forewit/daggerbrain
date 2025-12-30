@@ -18,19 +18,19 @@ export const CONDITIONS: Record<ConditionIds, Condition> = {
 		id: 'hidden',
 		title: 'Hidden',
 		description_html:
-			"<p>While you're out of sight from all enemies and they don't otherwise know your location, you gain the Hidden condition. Any rolls against a Hidden creature have disadvantage. After an adversary moves to where they would see you, you move into their line of sight, or you make an attack, you are no longer Hidden.</p>"
+			"While you're out of sight from all enemies and they don't otherwise know your location, you gain the Hidden condition. Any rolls against a Hidden creature have disadvantage. After an adversary moves to where they would see you, you move into their line of sight, or you make an attack, you are no longer Hidden."
 	},
 	restrained: {
 		id: 'restrained',
 		title: 'Restrained',
 		description_html:
-			"<p>Restrained characters can't move, but you can still take actions from their current position.</p>"
+			"Restrained characters can't move, but you can still take actions from their current position."
 	},
 	vulnerable: {
 		id: 'vulnerable',
 		title: 'Vulnerable',
 		description_html:
-			'<p>When a creature is Vulnerable, all rolls targeting them have advantage.</p>'
+			'When a creature is Vulnerable, all rolls targeting them have advantage.'
 	}
 } as const;
 
@@ -82,8 +82,8 @@ export const BASE_MIXED_ANCESTRY_CARD: AncestryCard = {
 	image_url: '/images/art/placeholder-art.webp',
 	title: 'Mixed Ancestry',
 	artist_name: '',
-	description_html:
-		"<p> Anyone's appearance and abilities can be shaped by blood, magic, proximity, or a variety of other factors. </p>",
+		description_html:
+			"Anyone's appearance and abilities can be shaped by blood, magic, proximity, or a variety of other factors.",
 	features: [],
 	choices: []
 };
@@ -191,7 +191,7 @@ export const BASE_COMPANION: Companion = {
 
 export const TIER_1_BASE_OPTIONS = {
 	tier_1_domain_cards: {
-		title_html: '<p>Choose 2 level 1 domain cards from the domains available to you.</p>',
+		title_html: 'Choose 2 level 1 domain cards from the domains available to you.',
 		short_title: 'Starting Domain Cards',
 		max: 1,
 		costs_two_choices: false,
@@ -201,14 +201,14 @@ export const TIER_1_BASE_OPTIONS = {
 
 export const TIER_2_BASE_OPTIONS = {
 	tier_2_traits: {
-		title_html: '<p>Gain a +1 bonus to two unmarked character traits and mark them.</p>',
+		title_html: 'Gain a +1 bonus to two unmarked character traits and mark them.',
 		short_title: '+1 to 2 Traits',
 		max: 3,
 		costs_two_choices: false,
 		character_modifiers: []
 	},
 	tier_2_max_hp: {
-		title_html: '<p>Permanently gain 1 Hit Point slot.</p>',
+		title_html: 'Permanently gain 1 Hit Point slot.',
 		short_title: '+1 HP Slot',
 		max: 2,
 		costs_two_choices: false,
@@ -223,7 +223,7 @@ export const TIER_2_BASE_OPTIONS = {
 		]
 	},
 	tier_2_max_stress: {
-		title_html: '<p>Permanently gain 1 Stress slot.</p>',
+		title_html: 'Permanently gain 1 Stress slot.',
 		short_title: '+1 Stress Slot',
 		max: 2,
 		costs_two_choices: false,
@@ -238,7 +238,7 @@ export const TIER_2_BASE_OPTIONS = {
 		]
 	},
 	tier_2_experience_bonus: {
-		title_html: '<p>Permanently gain a +1 bonus to two Experiences.</p>',
+		title_html: 'Permanently gain a +1 bonus to two Experiences.',
 		short_title: '+1 to 2 Experiences',
 		max: 1,
 		costs_two_choices: false,
@@ -246,14 +246,14 @@ export const TIER_2_BASE_OPTIONS = {
 	},
 	tier_2_domain_card: {
 		title_html:
-			'<p>Choose an additional domain card of your level or lower from a domain you have access to (up to level 4).</p>',
+			'Choose an additional domain card of your level or lower from a domain you have access to (up to level 4).',
 		short_title: '+1 Domain Card',
 		max: 1,
 		costs_two_choices: false,
 		character_modifiers: []
 	},
 	tier_2_evasion: {
-		title_html: '<p>Permanently gain a +1 bonus to your Evasion.</p>',
+		title_html: 'Permanently gain a +1 bonus to your Evasion.',
 		short_title: '+1 Evasion',
 		max: 1,
 		costs_two_choices: false,
@@ -271,14 +271,14 @@ export const TIER_2_BASE_OPTIONS = {
 
 export const TIER_3_BASE_OPTIONS = {
 	tier_3_traits: {
-		title_html: '<p>Gain a +1 bonus to two unmarked character traits and mark them.</p>',
+		title_html: 'Gain a +1 bonus to two unmarked character traits and mark them.',
 		short_title: '+1 to 2 Traits',
 		max: 3,
 		costs_two_choices: false,
 		character_modifiers: []
 	},
 	tier_3_max_hp: {
-		title_html: '<p>Permanently gain 1 Hit Point slot.</p>',
+		title_html: 'Permanently gain 1 Hit Point slot.',
 		short_title: '+1 HP Slot',
 		max: 2,
 		costs_two_choices: false,
@@ -293,7 +293,7 @@ export const TIER_3_BASE_OPTIONS = {
 		]
 	},
 	tier_3_max_stress: {
-		title_html: '<p>Permanently gain 1 Stress slot.</p>',
+		title_html: 'Permanently gain 1 Stress slot.',
 		short_title: '+1 Stress Slot',
 		max: 2,
 		costs_two_choices: false,
@@ -308,7 +308,7 @@ export const TIER_3_BASE_OPTIONS = {
 		]
 	},
 	tier_3_experience_bonus: {
-		title_html: '<p>Permanently gain a +1 bonus to two Experiences.</p>',
+		title_html: 'Permanently gain a +1 bonus to two Experiences.',
 		short_title: '+1 to 2 Experiences',
 		max: 1,
 		costs_two_choices: false,
@@ -316,14 +316,14 @@ export const TIER_3_BASE_OPTIONS = {
 	},
 	tier_3_domain_card: {
 		title_html:
-			'<p>Choose an additional domain card of your level or lower from a domain you have access to (up to level 7).</p>',
+			'Choose an additional domain card of your level or lower from a domain you have access to (up to level 7).',
 		short_title: '+1 Domain Card',
 		max: 1,
 		costs_two_choices: false,
 		character_modifiers: []
 	},
 	tier_3_evasion: {
-		title_html: '<p>Permanently gain a +1 bonus to your Evasion.</p>',
+		title_html: 'Permanently gain a +1 bonus to your Evasion.',
 		short_title: '+1 Evasion',
 		max: 1,
 		costs_two_choices: false,
@@ -339,14 +339,14 @@ export const TIER_3_BASE_OPTIONS = {
 	},
 	tier_3_subclass_upgrade: {
 		title_html:
-			'<p>Take an upgraded subclass card. Disables the <b>Multiclass</b> option for this tier</p>',
+			'Take an upgraded subclass card. Disables the **Multiclass** option for this tier',
 		short_title: 'Upgrade Subclass',
 		max: 1,
 		costs_two_choices: false,
 		character_modifiers: []
 	},
 	tier_3_proficiency: {
-		title_html: '<p>Increase your Proficiency by +1.</p>',
+		title_html: 'Increase your Proficiency by +1.',
 		short_title: '+1 Proficiency',
 		max: 1,
 		costs_two_choices: true,
@@ -362,7 +362,7 @@ export const TIER_3_BASE_OPTIONS = {
 	},
 	tier_3_multiclass: {
 		title_html:
-			'<p>Multiclass: Choose an additional class for your character (disables <b>Take an upgraded subclass card</b> for this tier and the <b>Tier 4 Multiclass</b> option).</p>',
+			'Multiclass: Choose an additional class for your character (disables **Take an upgraded subclass card** for this tier and the **Tier 4 Multiclass** option).',
 		short_title: 'Multiclass',
 		max: 1,
 		costs_two_choices: true,
@@ -372,14 +372,14 @@ export const TIER_3_BASE_OPTIONS = {
 
 export const TIER_4_BASE_OPTIONS = {
 	tier_4_traits: {
-		title_html: '<p>Gain a +1 bonus to two unmarked character traits and mark them.</p>',
+		title_html: 'Gain a +1 bonus to two unmarked character traits and mark them.',
 		short_title: '+1 to 2 Traits',
 		max: 3,
 		costs_two_choices: false,
 		character_modifiers: []
 	},
 	tier_4_max_hp: {
-		title_html: '<p>Permanently gain 1 Hit Point slot.</p>',
+		title_html: 'Permanently gain 1 Hit Point slot.',
 		short_title: '+1 HP Slot',
 		max: 2,
 		costs_two_choices: false,
@@ -394,7 +394,7 @@ export const TIER_4_BASE_OPTIONS = {
 		]
 	},
 	tier_4_max_stress: {
-		title_html: '<p>Permanently gain 1 Stress slot.</p>',
+		title_html: 'Permanently gain 1 Stress slot.',
 		short_title: '+1 Stress Slot',
 		max: 2,
 		costs_two_choices: false,
@@ -409,7 +409,7 @@ export const TIER_4_BASE_OPTIONS = {
 		]
 	},
 	tier_4_experience_bonus: {
-		title_html: '<p>Permanently gain a +1 bonus to two Experiences.</p>',
+		title_html: 'Permanently gain a +1 bonus to two Experiences.',
 		short_title: '+1 to 2 Experiences',
 		max: 1,
 		costs_two_choices: false,
@@ -417,14 +417,14 @@ export const TIER_4_BASE_OPTIONS = {
 	},
 	tier_4_domain_card: {
 		title_html:
-			'<p>Choose an additional domain card of your level or lower from a domain you have access to.</p>',
+			'Choose an additional domain card of your level or lower from a domain you have access to.',
 		short_title: '+1 Domain Card',
 		max: 1,
 		costs_two_choices: false,
 		character_modifiers: []
 	},
 	tier_4_evasion: {
-		title_html: '<p>Permanently gain a +1 bonus to your Evasion.</p>',
+		title_html: 'Permanently gain a +1 bonus to your Evasion.',
 		short_title: '+1 Evasion',
 		max: 1,
 		costs_two_choices: false,
@@ -440,14 +440,14 @@ export const TIER_4_BASE_OPTIONS = {
 	},
 	tier_4_subclass_upgrade: {
 		title_html:
-			'<p>Take an upgraded subclass card. Disables the <b>Multiclass</b> option for this tier</p>',
+			'Take an upgraded subclass card. Disables the **Multiclass** option for this tier',
 		short_title: 'Upgrade Subclass',
 		max: 1,
 		costs_two_choices: false,
 		character_modifiers: []
 	},
 	tier_4_proficiency: {
-		title_html: '<p>Increase your Proficiency by +1.</p>',
+		title_html: 'Increase your Proficiency by +1.',
 		short_title: '+1 Proficiency',
 		max: 1,
 		costs_two_choices: true,
@@ -463,7 +463,7 @@ export const TIER_4_BASE_OPTIONS = {
 	},
 	tier_4_multiclass: {
 		title_html:
-			'<p>Multiclass: Choose an additional class for your character (disables <b>Take an upgraded subclass card</b> for this tier and the <b>Tier 3 Multiclass</b> option).</p>',
+			'Multiclass: Choose an additional class for your character (disables **Take an upgraded subclass card** for this tier and the **Tier 3 Multiclass** option).',
 		short_title: 'Multiclass',
 		max: 1,
 		costs_two_choices: true,

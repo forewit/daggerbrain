@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { DomainCard } from '$lib/types/compendium-types';
 	import { cn } from '$lib/utils';
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import * as Dialog from '$lib/components/ui/dialog/';
@@ -117,7 +118,7 @@
 				</Dialog.Header>
 				<Dialog.Description>
 					<p class="text-xs text-muted-foreground italic">
-						{@html description_html}
+						{@html renderMarkdown(description_html)}
 					</p>
 				</Dialog.Description>
 				<div class="relative">

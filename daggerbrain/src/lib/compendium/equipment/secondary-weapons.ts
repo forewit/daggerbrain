@@ -29,7 +29,7 @@ export const TIER_1_SECONDARY_WEAPONS = {
 					}
 				],
 				title: 'Paired',
-				description_html: '<p>+2 to primary weapon damage to targets within Melee range</p>',
+				description_html: '+2 to primary weapon damage to targets within Melee range',
 				character_modifiers: []
 			}
 		]
@@ -53,7 +53,7 @@ export const TIER_1_SECONDARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Protective',
-				description_html: '<p>+1 to Armor Score</p>',
+				description_html: '+1 to Armor Score',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -85,7 +85,7 @@ export const TIER_1_SECONDARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Barrier',
-				description_html: '<p>+2 to Armor Score; −1 to Evasion</p>',
+				description_html: '+2 to Armor Score; −1 to Evasion',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -132,7 +132,7 @@ export const TIER_1_SECONDARY_WEAPONS = {
 					}
 				],
 				title: 'Paired',
-				description_html: '<p>+2 to primary weapon damage to targets within Melee range</p>',
+				description_html: '+2 to primary weapon damage to targets within Melee range',
 				character_modifiers: []
 			}
 		]
@@ -157,7 +157,7 @@ export const TIER_1_SECONDARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Startling',
 				description_html:
-					'<p>Mark a Stress to crack the whip and force all adversaries within Melee range back to Close range.</p>',
+					'Mark a Stress to crack the whip and force all adversaries within Melee range back to Close range.',
 				character_modifiers: [] // narrative effect, no numeric modifier
 			}
 		]
@@ -182,7 +182,7 @@ export const TIER_1_SECONDARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Hooked',
 				description_html:
-					'<p>On a successful attack, you can pull the target into Melee range.</p>',
+					'On a successful attack, you can pull the target into Melee range.',
 				character_modifiers: [] // positional effect, no numeric modifier
 			}
 		]
@@ -234,7 +234,7 @@ export const TIER_2_SECONDARY_WEAPONS = {
 					}
 				],
 				title: 'Paired',
-				description_html: '<p>+3 to primary weapon damage to targets within Melee range</p>',
+				description_html: '+3 to primary weapon damage to targets within Melee range',
 				character_modifiers: []
 			}
 		]
@@ -258,7 +258,7 @@ export const TIER_2_SECONDARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Protective',
-				description_html: '<p>+2 to Armor Score</p>',
+				description_html: '+2 to Armor Score',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -290,7 +290,7 @@ export const TIER_2_SECONDARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Barrier',
-				description_html: '<p>+3 to Armor Score; −1 to Evasion</p>',
+				description_html: '+3 to Armor Score; −1 to Evasion',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -337,7 +337,7 @@ export const TIER_2_SECONDARY_WEAPONS = {
 					}
 				],
 				title: 'Paired',
-				description_html: '<p>+3 to primary weapon damage to targets within Melee range</p>',
+				description_html: '+3 to primary weapon damage to targets within Melee range',
 				character_modifiers: []
 			}
 		]
@@ -362,7 +362,7 @@ export const TIER_2_SECONDARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Startling',
 				description_html:
-					'<p>Mark a Stress to crack the whip and force all adversaries within Melee range back to Close range.</p>',
+					'Mark a Stress to crack the whip and force all adversaries within Melee range back to Close range.',
 				character_modifiers: []
 			}
 		]
@@ -387,7 +387,7 @@ export const TIER_2_SECONDARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Hooked',
 				description_html:
-					'<p>On a successful attack, you can pull the target into Melee range.</p>',
+					'On a successful attack, you can pull the target into Melee range.',
 				character_modifiers: []
 			}
 		]
@@ -437,7 +437,7 @@ export const TIER_2_SECONDARY_WEAPONS = {
 				],
 				title: 'Double Duty',
 				description_html:
-					'<p>+1 to Armor Score; +1 to primary weapon damage within Melee range</p>',
+					'+1 to Armor Score; +1 to primary weapon damage within Melee range',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -470,7 +470,7 @@ export const TIER_2_SECONDARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Parry',
 				description_html:
-					"<p>When you are attacked, roll this weapon's damage dice. If any of the attacker's damage dice rolled the same value as your dice, the matching results are discarded from the attacker's damage dice before the damage you take is totaled.</p>",
+					"When you are attacked, roll this weapon's damage dice. If any of the attacker's damage dice rolled the same value as your dice, the matching results are discarded from the attacker's damage dice before the damage you take is totaled.",
 				character_modifiers: []
 			}
 		]
@@ -495,7 +495,7 @@ export const TIER_2_SECONDARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Returning',
 				description_html:
-					'<p>When this weapon is thrown within its range, it appears in your hand immediately after the attack.</p>',
+					'When this weapon is thrown within its range, it appears in your hand immediately after the attack.',
 				character_modifiers: []
 			}
 		]
@@ -530,7 +530,7 @@ export const TIER_3_SECONDARY_WEAPONS = {
 					}
 				],
 				title: 'Paired',
-				description_html: '<p>+4 to primary weapon damage to targets within Melee range</p>',
+				description_html: '+4 to primary weapon damage to targets within Melee range',
 				character_modifiers: []
 			}
 		]
@@ -554,7 +554,7 @@ export const TIER_3_SECONDARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Protective',
-				description_html: '<p>+3 to Armor Score</p>',
+				description_html: '+3 to Armor Score',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -586,7 +586,7 @@ export const TIER_3_SECONDARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Barrier',
-				description_html: '<p>+4 to Armor Score; −1 to Evasion</p>',
+				description_html: '+4 to Armor Score; −1 to Evasion',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -633,7 +633,7 @@ export const TIER_3_SECONDARY_WEAPONS = {
 					}
 				],
 				title: 'Paired',
-				description_html: '<p>+4 to primary weapon damage to targets within Melee range</p>',
+				description_html: '+4 to primary weapon damage to targets within Melee range',
 				character_modifiers: []
 			}
 		]
@@ -658,7 +658,7 @@ export const TIER_3_SECONDARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Startling',
 				description_html:
-					'<p>Mark a Stress to crack the whip and force all adversaries within Melee range back to Close range.</p>',
+					'Mark a Stress to crack the whip and force all adversaries within Melee range back to Close range.',
 				character_modifiers: []
 			}
 		]
@@ -683,7 +683,7 @@ export const TIER_3_SECONDARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Hooked',
 				description_html:
-					'<p>On a successful attack, you can pull the target into Melee range.</p>',
+					'On a successful attack, you can pull the target into Melee range.',
 				character_modifiers: []
 			}
 		]
@@ -725,7 +725,7 @@ export const TIER_3_SECONDARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Deflecting',
 				description_html:
-					'<p>When you are attacked, you can mark an Armor Slot to gain a bonus to your Evasion equal to your available Armor Score against the attack.</p>',
+					'When you are attacked, you can mark an Armor Slot to gain a bonus to your Evasion equal to your available Armor Score against the attack.',
 				character_modifiers: []
 			}
 		]
@@ -750,7 +750,7 @@ export const TIER_3_SECONDARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Charged',
 				description_html:
-					'<p>Mark a Stress to gain a +1 bonus to your Proficiency on a primary weapon attack.</p>',
+					'Mark a Stress to gain a +1 bonus to your Proficiency on a primary weapon attack.',
 				character_modifiers: []
 			}
 		]
@@ -775,7 +775,7 @@ export const TIER_3_SECONDARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Versatile',
 				description_html:
-					'<p>This weapon can also be used with these statistics—Finesse, Close, 1d8+4.</p>',
+					'This weapon can also be used with these statistics—Finesse, Close, 1d8+4.',
 				character_modifiers: []
 			}
 		]
@@ -810,7 +810,7 @@ export const TIER_4_SECONDARY_WEAPONS = {
 					}
 				],
 				title: 'Paired',
-				description_html: '<p>+5 to primary weapon damage to targets within Melee range</p>',
+				description_html: '+5 to primary weapon damage to targets within Melee range',
 				character_modifiers: []
 			}
 		]
@@ -834,7 +834,7 @@ export const TIER_4_SECONDARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Protective',
-				description_html: '<p>+4 to Armor Score</p>',
+				description_html: '+4 to Armor Score',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -866,7 +866,7 @@ export const TIER_4_SECONDARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Barrier',
-				description_html: '<p>+5 to Armor Score; −1 to Evasion</p>',
+				description_html: '+5 to Armor Score; −1 to Evasion',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -913,7 +913,7 @@ export const TIER_4_SECONDARY_WEAPONS = {
 					}
 				],
 				title: 'Paired',
-				description_html: '<p>+5 to primary weapon damage to targets within Melee range</p>',
+				description_html: '+5 to primary weapon damage to targets within Melee range',
 				character_modifiers: []
 			}
 		]
@@ -938,7 +938,7 @@ export const TIER_4_SECONDARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Startling',
 				description_html:
-					'<p>Mark a Stress to crack the whip and force all adversaries within Melee range back to Close range.</p>',
+					'Mark a Stress to crack the whip and force all adversaries within Melee range back to Close range.',
 				character_modifiers: []
 			}
 		]
@@ -963,7 +963,7 @@ export const TIER_4_SECONDARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Hooked',
 				description_html:
-					'<p>On a successful attack, you can pull the target into Melee range.</p>',
+					'On a successful attack, you can pull the target into Melee range.',
 				character_modifiers: []
 			}
 		]
@@ -1005,7 +1005,7 @@ export const TIER_4_SECONDARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Sheltering',
 				description_html:
-					'<p>When you mark an Armor Slot, it reduces damage for you and all allies within Melee range of you who took the same damage.</p>',
+					'When you mark an Armor Slot, it reduces damage for you and all allies within Melee range of you who took the same damage.',
 				character_modifiers: []
 			}
 		]
@@ -1030,7 +1030,7 @@ export const TIER_4_SECONDARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Doubled Up',
 				description_html:
-					'<p>When you make an attack with your primary weapon, you can deal damage to another target within Melee range.</p>',
+					'When you make an attack with your primary weapon, you can deal damage to another target within Melee range.',
 				character_modifiers: []
 			}
 		]
@@ -1055,7 +1055,7 @@ export const TIER_4_SECONDARY_WEAPONS = {
 				weapon_modifiers: [],
 				title: 'Locked On',
 				description_html:
-					'<p>On a successful attack, your next attack against the same target with your primary weapon automatically succeeds.</p>',
+					'On a successful attack, your next attack against the same target with your primary weapon automatically succeeds.',
 				character_modifiers: []
 			}
 		]

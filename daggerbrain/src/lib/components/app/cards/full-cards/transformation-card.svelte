@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { TransformationCard } from '$lib/types/compendium-types';
 	import { cn } from '$lib/utils';
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import type { Snippet } from 'svelte';
 
 	let {
@@ -45,14 +46,14 @@
 
 			<!-- description -->
 			<p class="text-xs italic">
-				{@html card.description_html}
+				{@html renderMarkdown(card.description_html)}
 			</p>
 
 			<!-- features -->
 			{#each card.features as feature}
 				<p class="text-xs">
 					<b><em>{feature.title}:</em></b>
-					{@html feature.description_html}
+					{@html renderMarkdown(feature.description_html)}
 				</p>
 			{/each}
 			{@render children?.()}
@@ -89,12 +90,12 @@
 			<div class="flex shrink-0 flex-col gap-[6px] px-[12px] pt-[8px] pb-[6px]">
 				<p class="z-5 font-eveleth text-[26px] leading-none text-black uppercase">{card.title}</p>
 				<p class="text-[12px] text-black italic">
-					{@html card.description_html}
+					{@html renderMarkdown(card.description_html)}
 				</p>
 				{#each card.features as feature}
 					<p class="text-[12px] text-black">
 						<b><em>{feature.title}:</em></b>
-						{@html feature.description_html}
+						{@html renderMarkdown(feature.description_html)}
 					</p>
 				{/each}
 			</div>

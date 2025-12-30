@@ -24,7 +24,7 @@ const TIER_1_BEASTFORMS = {
 			{
 				title: 'Agile',
 				description_html:
-					'Your movement is silent, and you can <b>spend a Hope</b> to move up to Far range without rolling.',
+					'Your movement is silent, and you can **spend a Hope** to move up to Far range without rolling.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
@@ -58,7 +58,7 @@ const TIER_1_BEASTFORMS = {
 		features: [
 			{
 				title: 'Companion',
-				description_html: 'When you Help an Ally, you can roll a <b>d8</b> as your advantage die.',
+				description_html: 'When you Help an Ally, you can roll a **d8** as your advantage die.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
@@ -93,7 +93,7 @@ const TIER_1_BEASTFORMS = {
 			{
 				title: 'Elusive Prey',
 				description_html:
-					'When an attack roll against you would succeed, you can <b>mark a Stress</b> and roll a <b>d4</b>. Add the result to your Evasion against this attack.',
+					'When an attack roll against you would succeed, you can **mark a Stress** and roll a **d4**. Add the result to your Evasion against this attack.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
@@ -128,14 +128,14 @@ const TIER_1_BEASTFORMS = {
 			{
 				title: 'Hobbling Strike',
 				description_html:
-					'When you succeed on an attack against a target within Melee range, you can <b>mark a Stress</b> to make the target temporarily <em>Vulnerable</em>.',
+					'When you succeed on an attack against a target within Melee range, you can **mark a Stress** to make the target temporarily *Vulnerable*.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Pack Hunting',
 				description_html:
-					'When you succeed on an attack against the same target as an ally who acts immediately before you, add a <b>d8</b> to your damage roll.',
+					'When you succeed on an attack against the same target as an ally who acts immediately before you, add a **d8** to your damage roll.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -198,14 +198,14 @@ const TIER_1_BEASTFORMS = {
 			{
 				title: 'Venomous Bite',
 				description_html:
-					'When you succeed on an attack against a target within Melee range, the target becomes temporarily <em>Poisoned</em>. A <em>Poisoned</em> creature takes <b>1d10</b> direct physical damage each time they act.',
+					'When you succeed on an attack against a target within Melee range, the target becomes temporarily *Poisoned*. A *Poisoned* creature takes **1d10** direct physical damage each time they act.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Webslinger',
 				description_html:
-					'You can create a strong web material useful for both adventuring and battle. The web is resilient enough to support one creature. You can temporarily <em>Restrain</em> a target within Close range by succeeding on a Finesse Roll against them.',
+					'You can create a strong web material useful for both adventuring and battle. The web is resilient enough to support one creature. You can temporarily *Restrain* a target within Close range by succeeding on a Finesse Roll against them.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -237,14 +237,14 @@ const TIER_2_BEASTFORMS = {
 			{
 				title: 'Armored Shell',
 				description_html:
-					"Your hardened exterior gives you resistance to physical damage. Additionally, <b>mark an Armor Slot</b> to retract into your shell. While in your shell, physical damage is reduced by a number equal to your Armor Score (after applying resistance), but you can't perform other actions without leaving this form.",
+					"Your hardened exterior gives you resistance to physical damage. Additionally, **mark an Armor Slot** to retract into your shell. While in your shell, physical damage is reduced by a number equal to your Armor Score (after applying resistance), but you can't perform other actions without leaving this form.",
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Cannonball',
 				description_html:
-					"<b>Mark a Stress</b> to allow an ally to throw or launch you at an adversary. To do so, the ally makes an attack roll using Agility or Strength (their choice) against a target within Close range. On a success, the adversary takes <b>d12+2</b> physical damage using the thrower's Proficiency. You can <b>spend a Hope</b> to target an additional adversary within Very Close range of the first. The second target takes half the damage dealt to the first target.",
+					"**Mark a Stress** to allow an ally to throw or launch you at an adversary. To do so, the ally makes an attack roll using Agility or Strength (their choice) against a target within Close range. On a success, the adversary takes **d12+2** physical damage using the thrower's Proficiency. You can **spend a Hope** to target an additional adversary within Very Close range of the first. The second target takes half the damage dealt to the first target.",
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -273,7 +273,7 @@ const TIER_2_BEASTFORMS = {
 			{
 				title: 'Rampage',
 				description_html:
-					'When you roll a 1 on a damage die, you can roll a <b>d10</b> and add the result to the damage roll. Additionally, before you make an attack roll, you can <b>mark a Stress</b> to gain a +1 bonus to your Proficiency for that attack.',
+					'When you roll a 1 on a damage die, you can roll a **d10** and add the result to the damage roll. Additionally, before you make an attack roll, you can **mark a Stress** to gain a +1 bonus to your Proficiency for that attack.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
@@ -329,7 +329,7 @@ const TIER_2_BEASTFORMS = {
 			{
 				title: 'Trample',
 				description_html:
-					'<b>Mark a Stress</b> to move up to Close range in a straight line and make an attack against all targets within Melee range of the line. Targets you succeed against take <b>d8+1</b> physical damage using your Proficiency and are temporarily <em>Vulnerable</em>.',
+					'**Mark a Stress** to move up to Close range in a straight line and make an attack against all targets within Melee range of the line. Targets you succeed against take **d8+1** physical damage using your Proficiency and are temporarily *Vulnerable*.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -358,14 +358,14 @@ const TIER_2_BEASTFORMS = {
 			{
 				title: 'Venomous Strike',
 				description_html:
-					'Make an attack against any number of targets within Very Close range. On a success, a target is temporarily <em>Poisoned</em>. A <em>Poisoned</em> creature takes <b>1d10</b> direct physical damage each time they act.',
+					'Make an attack against any number of targets within Very Close range. On a success, a target is temporarily *Poisoned*. A *Poisoned* creature takes **1d10** direct physical damage each time they act.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Warning Hiss',
 				description_html:
-					'<b>Mark a Stress</b> to force any number of targets within Melee range to move back to Very Close range.',
+					'**Mark a Stress** to force any number of targets within Melee range to move back to Very Close range.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -393,14 +393,14 @@ const TIER_2_BEASTFORMS = {
 		features: [
 			{
 				title: 'Fleet',
-				description_html: '<b>Spend a Hope</b> to move up to Far range without rolling.',
+				description_html: '**Spend a Hope** to move up to Far range without rolling.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Takedown',
 				description_html:
-					'<b>Mark a Stress</b> to move into Melee range of a target and make an attack roll against them. On a success, you gain a <b>+2</b> bonus to your Proficiency for this attack and the target must <b>mark a Stress</b>.',
+					'**Mark a Stress** to move into Melee range of a target and make an attack roll against them. On a success, you gain a **+2** bonus to your Proficiency for this attack and the target must **mark a Stress**.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -435,7 +435,7 @@ const TIER_2_BEASTFORMS = {
 			},
 			{
 				title: 'Hollow Bones',
-				description_html: 'You gain a <b>−2</b> penalty to your damage thresholds.',
+				description_html: 'You gain a **−2** penalty to your damage thresholds.',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -488,7 +488,7 @@ const TIER_3_BEASTFORMS = {
 			{
 				title: 'Vicious Maul',
 				description_html:
-					'When you succeed on an attack against a target, you can <b>spend a Hope</b> to make them temporarily <em>Vulnerable</em> and gain a +1 bonus to your Proficiency for this attack.',
+					'When you succeed on an attack against a target, you can **spend a Hope** to make them temporarily *Vulnerable* and gain a +1 bonus to your Proficiency for this attack.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -538,7 +538,7 @@ const TIER_3_BEASTFORMS = {
 			{
 				title: 'Snapping Strike',
 				description_html:
-					'When you succeed on an attack against a target within Melee range, you can <b>spend a Hope</b> to clamp that opponent in your jaws, making them temporarily <em>Restrained</em> and <em>Vulnerable</em>.',
+					'When you succeed on an attack against a target within Melee range, you can **spend a Hope** to clamp that opponent in your jaws, making them temporarily *Restrained* and *Vulnerable*.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -608,7 +608,7 @@ const TIER_3_BEASTFORMS = {
 			{
 				title: 'Vicious Maul',
 				description_html:
-					'When you succeed on an attack against a target, you can <b>spend a Hope</b> to make them <em>Vulnerable</em> and gain a +1 bonus to your Proficiency for this attack.',
+					'When you succeed on an attack against a target, you can **spend a Hope** to make them *Vulnerable* and gain a +1 bonus to your Proficiency for this attack.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -637,7 +637,7 @@ const TIER_3_BEASTFORMS = {
 			{
 				title: 'Evolved',
 				description_html:
-					'Pick a Tier 1 Beastform option and become a larger, more powerful version of that creature. While you\'re in this form, you retain all traits and features from the original form and gain the following bonuses:<ul class="list-disc list-inside ml-2"><li>A +6 bonus to damage rolls</li><li>A +1 bonus to the trait used by this form</li><li>A +2 bonus to Evasion</li></ul>',
+					'Pick a Tier 1 Beastform option and become a larger, more powerful version of that creature. While you\'re in this form, you retain all traits and features from the original form and gain the following bonuses:\n- A +6 bonus to damage rolls\n- A +1 bonus to the trait used by this form\n- A +2 bonus to Evasion',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -666,7 +666,7 @@ const TIER_3_BEASTFORMS = {
 			{
 				title: 'Hybrid Features',
 				description_html:
-					'To transform into this creature, <b>mark an additional Stress</b>. Choose any two Beastform options from Tiers 1–2. Choose a total of four advantages and two features from those options.',
+					'To transform into this creature, **mark an additional Stress**. Choose any two Beastform options from Tiers 1–2. Choose a total of four advantages and two features from those options.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -704,7 +704,7 @@ const TIER_4_BEASTFORMS = {
 			{
 				title: 'Demolish',
 				description_html:
-					'<b>Spend a Hope</b> to move up to Far range in a straight line and make an attack against all targets within Melee range of the line. Targets you succeed against take <b>d8+10</b> physical damage using your Proficiency and are temporarily <em>Vulnerable</em>.',
+					'**Spend a Hope** to move up to Far range in a straight line and make an attack against all targets within Melee range of the line. Targets you succeed against take **d8+10** physical damage using your Proficiency and are temporarily *Vulnerable*.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
@@ -754,7 +754,7 @@ const TIER_4_BEASTFORMS = {
 			{
 				title: 'Devastating Strikes',
 				description_html:
-					'When you deal Severe damage to a target within Melee range, you can <b>mark a Stress</b> to force them to mark an additional Hit Point.',
+					'When you deal Severe damage to a target within Melee range, you can **mark a Stress** to force them to mark an additional Hit Point.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
@@ -825,14 +825,14 @@ const TIER_4_BEASTFORMS = {
 			{
 				title: 'Ocean Master',
 				description_html:
-					'You can breathe and move naturally underwater. When you succeed on an attack against a target within Melee range, you can temporarily <em>Restrain</em> them.',
+					'You can breathe and move naturally underwater. When you succeed on an attack against a target within Melee range, you can temporarily *Restrain* them.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
 			{
 				title: 'Unyielding',
 				description_html:
-					'When you would mark an Armor Slot, roll a <b>d6</b>. On a result of 5 or higher, reduce the severity by one threshold without marking an Armor Slot.',
+					'When you would mark an Armor Slot, roll a **d6**. On a result of 5 or higher, reduce the severity by one threshold without marking an Armor Slot.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -861,7 +861,7 @@ const TIER_4_BEASTFORMS = {
 			{
 				title: 'Evolved',
 				description_html:
-					'Pick a Tier 1 or Tier 2 Beastform option and become a larger, more powerful version of that creature. While you\'re in this form, you retain all traits and features from the original form and gain the following bonuses:<ul class="list-disc list-inside ml-2"><li>A +9 bonus to damage rolls</li><li>A +2 bonus to the trait used by this form</li><li>A +3 bonus to Evasion</li><li>Your damage die increases by one size (d6 becomes d8, d8 becomes d10, etc.)</li></ul>',
+					'Pick a Tier 1 or Tier 2 Beastform option and become a larger, more powerful version of that creature. While you\'re in this form, you retain all traits and features from the original form and gain the following bonuses:\n- A +9 bonus to damage rolls\n- A +2 bonus to the trait used by this form\n- A +3 bonus to Evasion\n- Your damage die increases by one size (d6 becomes d8, d8 becomes d10, etc.)',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -890,7 +890,7 @@ const TIER_4_BEASTFORMS = {
 			{
 				title: 'Hybrid Features',
 				description_html:
-					'To transform into this creature, <b>mark 2 additional Stress</b>. Choose any three Beastform options from Tiers 1-3. Choose a total of five advantages and three features from those options.',
+					'To transform into this creature, **mark 2 additional Stress**. Choose any three Beastform options from Tiers 1-3. Choose a total of five advantages and three features from those options.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}

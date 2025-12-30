@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import type { Armor } from '$lib/types/compendium-types';
 	import Shield from '@lucide/svelte/icons/shield';
 
@@ -9,7 +10,7 @@
 	<!-- Description -->
 	{#if armor.description_html}
 		<div class="text-sm text-muted-foreground">
-			{@html armor.description_html}
+			{@html renderMarkdown(armor.description_html)}
 		</div>
 	{/if}
 
@@ -38,7 +39,7 @@
 				{#each armor.features as feature}
 					<div class="text-sm text-muted-foreground">
 						<p class="text-sm font-medium text-foreground">{feature.title}</p>
-						{@html feature.description_html}
+						{@html renderMarkdown(feature.description_html)}
 					</div>
 				{/each}
 			</div>

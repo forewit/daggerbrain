@@ -5,6 +5,7 @@
 		SubclassMasteryCard
 	} from '$lib/types/compendium-types';
 	import { cn } from '$lib/utils';
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import type { Snippet } from 'svelte';
 	import ClassBanner from '../class-banner.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
@@ -71,7 +72,7 @@
 			{#each card.features as feature}
 				<p class="text-xs">
 					<b><em>{feature.title}:</em></b>
-					{@html feature.description_html}
+					{@html renderMarkdown(feature.description_html)}
 				</p>
 			{/each}
 			{@render children?.()}
@@ -126,7 +127,7 @@
 					</p>
 
 					<p class="text-center text-[14px] text-black italic">
-						{card.description_html}
+						{@html renderMarkdown(card.description_html)}
 					</p>
 
 					{#if card.card_type === 'subclass_foundation' && (card as SubclassFoundationCard).spellcast_trait}
@@ -139,7 +140,7 @@
 
 				{#each card.features as feature}
 					<p class="text-[12px] text-black">
-						{@html feature.description_html}
+						{@html renderMarkdown(feature.description_html)}
 					</p>
 				{/each}
 			</div>

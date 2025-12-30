@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { AllTierOptionIds, LevelUpChoice, LevelUpOption } from '$lib/types/rule-types';
 	import { cn } from '$lib/utils';
+	import { renderMarkdown } from '$lib/utils/markdown';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import Square from '@lucide/svelte/icons/square';
 	import SquareCheck from '@lucide/svelte/icons/square-check';
@@ -124,7 +125,7 @@
 							{/each}
 						</div>
 					</div>
-					<p class={cn('grow')}>{@html option.title_html}</p>
+					<p class={cn('grow')}>{@html renderMarkdown(option.title_html || '')}</p>
 					<div class="size-4">
 						{#if (option_id === choices.A.option_id && option_id === choices.B.option_id) || (option_id === choices.A.option_id && option.costs_two_choices) || (option_id === choices.B.option_id && option.costs_two_choices)}
 							<CheckCheck class="size-4" />
