@@ -20,19 +20,24 @@
 		BeastformFormSchema,
 		FeatureSchema,
 		extractFieldErrors,
-		type BeastformFormErrors
-		} from '../form-schemas';
+		extractFeatureErrors,
+		type BeastformFormErrors,
+		type FeatureValidationErrors
+	} from '../form-schemas';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
 
 	let {
 		item = $bindable(),
 		hasChanges = $bindable(),
+		hasErrors = $bindable(),
 		onSubmit,
 		onReset
 	}: {
 		item: Beastform;
 		hasChanges?: boolean;
+		hasErrors?: boolean;
 		onSubmit?: (e?: SubmitEvent) => void;
 		onReset?: () => void;
 	} = $props();
@@ -57,8 +62,8 @@
 	// Validation errors state
 	let errors = $state<BeastformFormErrors>({});
 
-	// Feature validation state - track which features have errors
-	const featureErrors = new SvelteMap<number, boolean>();
+	// Feature validation state - track detailed errors for each feature
+	const featureErrors = new SvelteMap<number, FeatureValidationErrors>();
 
 	const rangeOptions: Ranges[] = ['Melee', 'Very Close', 'Close', 'Far', 'Very Far'];
 	const damageTypeOptions: DamageTypes[] = ['phy', 'mag'];
@@ -151,6 +156,16 @@
 		hasChanges = formHasChanges;
 	});
 
+	// Check if there are validation errors
+	let hasValidationErrors = $derived.by(() => {
+		return Object.keys(errors).length > 0 || featureErrors.size > 0;
+	});
+
+	// Sync hasValidationErrors to bindable prop
+	$effect(() => {
+		hasErrors = hasValidationErrors;
+	});
+
 	// Sync form state when item prop changes
 	$effect(() => {
 		if (item) {
@@ -207,13 +222,16 @@
 		errors = {};
 		featureErrors.clear();
 
-		// Validate all features directly
+		// Validate all features directly and extract detailed errors
 		let allFeaturesValid = true;
 		for (let i = 0; i < formFeatures.length; i++) {
 			const result = FeatureSchema.safeParse(formFeatures[i]);
 			if (!result.success) {
 				allFeaturesValid = false;
-				featureErrors.set(i, true);
+				const featureErrorsData = extractFeatureErrors(result.error);
+				featureErrors.set(i, featureErrorsData);
+			} else {
+				featureErrors.delete(i);
 			}
 		}
 
@@ -229,7 +247,7 @@
 		}
 
 		if (!allFeaturesValid) {
-			errors = { ...errors, features: 'One or more features have validation errors' };
+			// Don't set generic error message - errors are shown inline in each feature
 			return;
 		}
 
@@ -301,10 +319,10 @@
 		featureErrors.delete(index);
 
 		// Collect entries that need re-indexing
-		const errorsToReindex: [number, boolean][] = [];
-		for (const [i, hasError] of featureErrors) {
+		const errorsToReindex: [number, FeatureValidationErrors][] = [];
+		for (const [i, errorData] of featureErrors) {
 			if (i > index) {
-				errorsToReindex.push([i, hasError]);
+				errorsToReindex.push([i, errorData]);
 			}
 		}
 
@@ -312,8 +330,8 @@
 		for (const [i] of errorsToReindex) {
 			featureErrors.delete(i);
 		}
-		for (const [i, hasError] of errorsToReindex) {
-			featureErrors.set(i - 1, hasError);
+		for (const [i, errorData] of errorsToReindex) {
+			featureErrors.set(i - 1, errorData);
 		}
 	}
 </script>
@@ -547,12 +565,7 @@
 	<!-- Features -->
 	<div class="flex flex-col gap-2">
 		<div class="flex items-center justify-between">
-			<p
-				class={cn(
-					'text-xs font-medium text-muted-foreground',
-					errors.features && 'text-destructive'
-				)}
-			>
+			<p class="text-xs font-medium text-muted-foreground">
 				Features
 			</p>
 			<Button type="button" size="sm" variant="outline" onclick={addFeature}>
@@ -560,18 +573,16 @@
 				Add Feature
 			</Button>
 		</div>
-		{#if errors.features}
-			<p class="text-xs text-destructive">{errors.features}</p>
-		{/if}
 		<div class="flex flex-col gap-2">
 			{#each formFeatures as feature, index (index)}
 				<Dropdown
 					title={feature.title || `Unnamed feature`}
-					class={featureErrors.get(index) ? 'border-destructive' : ''}
+					class={featureErrors.has(index) ? 'border-destructive' : ''}
 				>
 					<HomebrewFeatureForm
 						bind:feature={formFeatures[index]}
 						onRemove={() => removeFeature(index)}
+						errors={featureErrors.get(index)}
 					/>
 				</Dropdown>
 			{:else}
@@ -582,7 +593,14 @@
 
 	<!-- Actions -->
 	<div class="flex gap-2 pt-2">
-		<Button type="submit" size="sm" disabled={!formHasChanges}>Save</Button>
+		<Button type="submit" size="sm" disabled={!formHasChanges || homebrew.saving}>
+			{#if homebrew.saving}
+				<Loader2 class="size-3.5 animate-spin" />
+				Saving...
+			{:else}
+				Save
+			{/if}
+		</Button>
 		{#if formHasChanges}
 			<Button type="button" size="sm" variant="link" onclick={handleReset}>Discard changes</Button>
 		{/if}

@@ -10,15 +10,18 @@
 	import { SubclassFormSchema, extractFieldErrors, type SubclassFormErrors } from '../form-schemas';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
 
 	let {
 		item = $bindable(),
 		hasChanges = $bindable(),
+		hasErrors = $bindable(),
 		onSubmit,
 		onReset
 	}: {
 		item: Subclass;
 		hasChanges?: boolean;
+		hasErrors?: boolean;
 		onSubmit?: (e?: SubmitEvent) => void;
 		onReset?: () => void;
 	} = $props();
@@ -82,6 +85,16 @@
 	// Sync hasChanges to bindable prop
 	$effect(() => {
 		hasChanges = formHasChanges;
+	});
+
+	// Check if there are validation errors
+	let hasValidationErrors = $derived.by(() => {
+		return Object.keys(errors).length > 0;
+	});
+
+	// Sync hasValidationErrors to bindable prop
+	$effect(() => {
+		hasErrors = hasValidationErrors;
 	});
 
 	// Sync form state when item prop changes
@@ -282,7 +295,14 @@
 
 	<!-- Actions -->
 	<div class="flex gap-2 pt-2">
-		<Button type="submit" size="sm" disabled={!formHasChanges}>Save</Button>
+		<Button type="submit" size="sm" disabled={!formHasChanges || homebrew.saving}>
+			{#if homebrew.saving}
+				<Loader2 class="size-3.5 animate-spin" />
+				Saving...
+			{:else}
+				Save
+			{/if}
+		</Button>
 		{#if formHasChanges}
 			<Button type="button" size="sm" variant="link" onclick={handleReset}>Discard changes</Button>
 		{/if}

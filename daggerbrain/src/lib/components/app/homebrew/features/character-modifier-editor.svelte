@@ -16,11 +16,13 @@
 	let {
 		modifier = $bindable(),
 		onModifierChange,
-		onRemove
+		onRemove,
+		errors
 	}: {
 		modifier?: CharacterModifier;
 		onModifierChange?: (modifier: CharacterModifier) => void;
 		onRemove?: (() => void) | undefined;
+		errors?: string[];
 	} = $props();
 
 	// Use internal state if callback is provided
@@ -32,16 +34,8 @@
 		if (onModifierChange) {
 			if (modifier) {
 				internalModifier = modifier;
-			} else if (!internalModifier) {
-				// Initialize with default
-				internalModifier = {
-					behaviour: 'bonus',
-					character_conditions: [],
-					type: 'flat',
-					value: 0,
-					target: 'evasion'
-				};
 			}
+			// Don't auto-initialize - wait for user to select a target
 		}
 	});
 
@@ -153,135 +147,182 @@
 
 	// Track UI selection state (can be empty for "-- none selected --")
 	let selectedTarget = $state<string>('');
-	let isExplicitlyNoneSelected = $state(false);
+	let isExplicitlyNoneSelected = $state(true); // Start with "none selected" by default
 
 	// Get current target from modifier
 	let currentTarget = $derived(effectiveModifier?.target || '');
 
-	// Sync selectedTarget with currentTarget when modifier changes externally
-	// (but not if user explicitly selected "-- none selected --")
+	// Initialize selectedTarget from modifier on mount or when modifier changes externally
 	$effect(() => {
-		if (!isExplicitlyNoneSelected && currentTarget && selectedTarget !== currentTarget) {
-			selectedTarget = currentTarget;
+		if (currentTarget) {
+			// If we have a value in the modifier, sync it to the UI state
+			if (selectedTarget !== currentTarget) {
+				selectedTarget = currentTarget;
+				isExplicitlyNoneSelected = false;
+			}
+		} else if (!isExplicitlyNoneSelected && !currentTarget) {
+			// If modifier has no value and user hasn't explicitly selected "none", 
+			// keep UI in sync (but don't change isExplicitlyNoneSelected)
+			selectedTarget = '';
 		}
 	});
 
-	// Initialize modifier if needed
-	$effect(() => {
-		if (!modifier) {
-			modifier = {
-				behaviour: 'bonus',
-				character_conditions: [],
-				type: 'flat',
-				value: 0,
-				target: 'evasion'
-			};
-		}
-	});
+	// Don't auto-initialize modifier - let it remain undefined until user selects a target
 
 	// Update type
 	function updateType(newType: ModifierType) {
-		if (!modifier) return;
+		// Need a modifier with a target to update type
+		if (!effectiveModifier) {
+			return;
+		}
+		
 		// Preserve base properties
 		const baseProps = {
-			behaviour: modifier.behaviour,
-			character_conditions: modifier.character_conditions,
-			target: modifier.target
+			behaviour: effectiveModifier.behaviour,
+			character_conditions: effectiveModifier.character_conditions,
+			target: effectiveModifier.target
 		};
 
 		// Set type-specific properties
+		let newModifier: CharacterModifier;
 		if (newType === 'derived_from_trait') {
-			modifier = {
+			newModifier = {
 				...baseProps,
 				type: 'derived_from_trait',
 				trait: 'agility',
 				multiplier: 1
 			} as CharacterModifier;
 		} else if (newType === 'flat') {
-			modifier = {
+			newModifier = {
 				...baseProps,
 				type: 'flat',
 				value: 0
 			} as CharacterModifier;
 		} else if (newType === 'derived_from_proficiency') {
-			modifier = {
+			newModifier = {
 				...baseProps,
 				type: 'derived_from_proficiency',
 				multiplier: 1
 			} as CharacterModifier;
 		} else if (newType === 'derived_from_level') {
-			modifier = {
+			newModifier = {
 				...baseProps,
 				type: 'derived_from_level',
 				multiplier: 1
 			} as CharacterModifier;
+		} else {
+			return;
 		}
+		
+		updateModifier(newModifier);
 	}
 
 	// Update target
 	function updateTarget(newTarget: ValidTarget | '') {
-		if (!modifier) return;
-		// If empty string, don't update modifier (just update UI to show "-- none selected --")
+		// If empty string, clear the target from the modifier (make it invalid for validation)
 		if (newTarget === '') {
+			// If modifier exists, remove the target property to make it invalid
+			// This ensures validation will fail when the user tries to save
+			if (effectiveModifier) {
+				// Create a modifier without target (will fail validation)
+				const invalidModifier = {
+					behaviour: effectiveModifier.behaviour,
+					character_conditions: effectiveModifier.character_conditions,
+					type: effectiveModifier.type,
+					...(effectiveModifier.type === 'flat' && { value: effectiveModifier.value }),
+					...(effectiveModifier.type === 'derived_from_trait' && { 
+						trait: effectiveModifier.trait, 
+						multiplier: effectiveModifier.multiplier 
+					}),
+					...(effectiveModifier.type === 'derived_from_proficiency' && { multiplier: effectiveModifier.multiplier }),
+					...(effectiveModifier.type === 'derived_from_level' && { multiplier: effectiveModifier.multiplier })
+					// Intentionally missing 'target' property - will fail CharacterModifierSchema validation
+				} as any as CharacterModifier;
+				
+				updateModifier(invalidModifier);
+			}
 			return;
 		}
+		
+		// Get current modifier or create default
+		const currentModifier = effectiveModifier || {
+			behaviour: 'bonus' as const,
+			character_conditions: [],
+			type: 'flat' as const,
+			value: 0
+		};
+		
 		// Preserve base properties
 		const baseProps = {
-			behaviour: modifier.behaviour,
-			character_conditions: modifier.character_conditions,
-			type: modifier.type
+			behaviour: currentModifier.behaviour,
+			character_conditions: currentModifier.character_conditions,
+			type: currentModifier.type
 		};
 
 		// Preserve type-specific properties
 		const typeProps: any = {};
-		if (modifier.type === 'derived_from_trait') {
-			typeProps.trait = modifier.trait;
-			typeProps.multiplier = modifier.multiplier;
-		} else if (modifier.type === 'flat') {
-			typeProps.value = modifier.value;
+		if (currentModifier.type === 'derived_from_trait') {
+			typeProps.trait = currentModifier.trait;
+			typeProps.multiplier = currentModifier.multiplier;
+		} else if (currentModifier.type === 'flat') {
+			typeProps.value = currentModifier.value;
 		} else if (
-			modifier.type === 'derived_from_proficiency' ||
-			modifier.type === 'derived_from_level'
+			currentModifier.type === 'derived_from_proficiency' ||
+			currentModifier.type === 'derived_from_level'
 		) {
-			typeProps.multiplier = modifier.multiplier;
+			typeProps.multiplier = currentModifier.multiplier;
 		}
 
 		// Set target-specific properties
+		let newModifier: CharacterModifier;
 		if (newTarget === 'trait') {
-			modifier = {
+			// Preserve trait if already set, otherwise use default
+			const existingTrait = ('target' in currentModifier && currentModifier.target === 'trait') 
+				? (currentModifier as any).trait ?? 'agility' 
+				: 'agility';
+			newModifier = {
 				...baseProps,
 				...typeProps,
 				target: 'trait',
-				trait: 'agility'
+				trait: existingTrait
 			} as CharacterModifier;
 		} else {
 			// Simple target
-			modifier = {
+			newModifier = {
 				...baseProps,
 				...typeProps,
 				target: newTarget
 			} as CharacterModifier;
 		}
+		
+		updateModifier(newModifier);
 	}
 </script>
 
 <div class="flex flex-col gap-3 rounded-lg border bg-muted p-3">
 	<!-- Target -->
 	<div class="flex flex-col gap-1">
-		<label for="target-select" class="text-xs font-medium text-muted-foreground"
+		<label
+			for="target-select"
+			class={cn('text-xs font-medium text-muted-foreground', errors && errors.length > 0 && 'text-destructive')}
 			>Character attribute to modify</label
 		>
 		<Select.Root
 			type="single"
 			value={selectedTarget || ''}
 			onValueChange={(value) => {
-				const newValue = value || '';
-				selectedTarget = newValue;
-				isExplicitlyNoneSelected = newValue === '';
-				updateTarget(newValue as ValidTarget | '');
+				if (value) {
+					const newValue = value;
+					selectedTarget = newValue;
+					isExplicitlyNoneSelected = false;
+					updateTarget(newValue as ValidTarget);
+				}
 			}}
 		>
-			<Select.Trigger id="target-select" class="w-full">
+			<Select.Trigger
+				id="target-select"
+				class={cn('w-full', errors && errors.length > 0 && 'border-destructive')}
+			>
 				<p class="truncate">
 					{selectedTarget &&
 					(simpleTargetOptions.includes(selectedTarget as SimpleTarget) ||
@@ -291,11 +332,6 @@
 				</p>
 			</Select.Trigger>
 			<Select.Content>
-				<Select.Item
-					value=""
-					disabled={selectedTarget === ''}
-					class="justify-center text-muted-foreground">-- none selected --</Select.Item
-				>
 				{#each simpleTargetOptions as target}
 					<Select.Item value={target}>{targetLabels[target]}</Select.Item>
 				{/each}
@@ -316,10 +352,10 @@
 				value={traitTargetModifier.trait}
 				onValueChange={(value) => {
 					if (value && traitOptions.includes(value as TraitIds)) {
-						modifier = {
+						updateModifier({
 							...traitTargetModifier,
 							trait: value as TraitIds
-						};
+						});
 					}
 				}}
 			>
@@ -345,8 +381,8 @@
 				type="single"
 				value={modifier?.behaviour ?? 'bonus'}
 				onValueChange={(value) => {
-					if (value && modifier && behaviourOptions.includes(value as ModifierBehaviour)) {
-						modifier = { ...modifier, behaviour: value as ModifierBehaviour };
+					if (value && effectiveModifier && behaviourOptions.includes(value as ModifierBehaviour)) {
+						updateModifier({ ...effectiveModifier, behaviour: value as ModifierBehaviour });
 					}
 				}}
 			>
@@ -394,10 +430,10 @@
 					value={traitModifier.trait}
 					onValueChange={(value) => {
 						if (value && traitOptions.includes(value as TraitIds)) {
-							modifier = {
+							updateModifier({
 								...traitModifier,
 								trait: value as TraitIds
-							};
+							});
 						}
 					}}
 				>
@@ -421,10 +457,10 @@
 					value={String(traitModifier.multiplier)}
 					oninput={(e) => {
 						const intValue = parseInt(e.currentTarget.value, 10) || 0;
-						modifier = {
+						updateModifier({
 							...traitModifier,
 							multiplier: intValue
-						};
+						});
 					}}
 					step="1"
 				/>
@@ -439,10 +475,10 @@
 				type="number"
 				value={String(flatModifier.value)}
 				oninput={(e) => {
-					modifier = {
+					updateModifier({
 						...flatModifier,
 						value: Number(e.currentTarget.value)
-					};
+					});
 				}}
 			/>
 		</div>
@@ -458,10 +494,10 @@
 				value={String(multiplierModifier.multiplier)}
 				oninput={(e) => {
 					const intValue = parseInt(e.currentTarget.value, 10) || 0;
-					modifier = {
+					updateModifier({
 						...multiplierModifier,
 						multiplier: intValue
-					};
+					});
 				}}
 				step="1"
 			/>

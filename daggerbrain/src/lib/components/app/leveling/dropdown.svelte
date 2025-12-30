@@ -27,6 +27,7 @@
 </script>
 
 <div
+	data-open={open}
 	class={cn(
 		'relative rounded-lg',
 		highlighted && !disabled && 'outline-2 outline-offset-2 outline-primary',

@@ -553,7 +553,7 @@
 						{#each group.items as template (template.id)}
 							<Command.Item
 								value={template.id}
-								keywords={[template.name]}
+								keywords={[template.name, group.heading]}
 								class="!bg-transparent !p-0 hover:!bg-transparent aria-selected:!bg-transparent"
 							>
 								<Select.Item value={template.id} class="cursor-pointer pl-4">

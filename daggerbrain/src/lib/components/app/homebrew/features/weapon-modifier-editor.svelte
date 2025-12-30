@@ -5,17 +5,19 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import HomebrewCharacterConditions from './conditions-select.svelte';
 	import DicePicker from '$lib/components/app/dice/dice-picker.svelte';
-	import { capitalize } from '$lib/utils';
+	import { capitalize, cn } from '$lib/utils';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 
 	let {
 		modifier = $bindable(),
 		onModifierChange,
-		onRemove
+		onRemove,
+		errors
 	}: {
 		modifier?: WeaponModifier;
 		onModifierChange?: (modifier: WeaponModifier) => void;
 		onRemove?: (() => void) | undefined;
+		errors?: string[];
 	} = $props();
 
 	// Use internal state if callback is provided
@@ -27,18 +29,20 @@
 		if (onModifierChange) {
 			if (modifier) {
 				internalModifier = modifier;
-			} else if (!internalModifier) {
-				// Initialize with default
-				internalModifier = {
-					behaviour: 'bonus',
-					character_conditions: [],
-					target_weapon: 'all',
-					target_stat: 'attack_roll',
-					value: 0
-				};
 			}
+			// Don't auto-initialize - wait for user to select a target stat
 		}
 	});
+
+	// Update modifier helper
+	function updateModifier(newModifier: WeaponModifier) {
+		if (onModifierChange) {
+			internalModifier = newModifier;
+			onModifierChange(newModifier);
+		} else {
+			modifier = newModifier;
+		}
+	}
 
 	// Extract types from WeaponModifier
 	type ModifierBehaviour = WeaponModifier['behaviour'];
@@ -114,86 +118,109 @@
 	];
 
 	// Get current target stat
-	let currentTargetStat = $derived(effectiveModifier?.target_stat || 'attack_roll');
+	let currentTargetStat = $derived(effectiveModifier?.target_stat || '');
 
 	// Track UI selection state (can be empty for "-- none selected --")
 	let selectedTargetStat = $state<string>('');
-	let isExplicitlyNoneSelected = $state(false);
+	let isExplicitlyNoneSelected = $state(true); // Start with "none selected" by default
 
 	// Get current target stat from modifier
 	let currentTargetStatValue = $derived(effectiveModifier?.target_stat || '');
 
-	// Sync selectedTargetStat with currentTargetStatValue when modifier changes externally
-	// (but not if user explicitly selected "-- none selected --")
+	// Initialize selectedTargetStat from modifier on mount or when modifier changes externally
 	$effect(() => {
-		if (
-			!isExplicitlyNoneSelected &&
-			currentTargetStatValue &&
-			selectedTargetStat !== currentTargetStatValue
-		) {
-			selectedTargetStat = currentTargetStatValue;
+		if (currentTargetStatValue) {
+			// If we have a value in the modifier, sync it to the UI state
+			if (selectedTargetStat !== currentTargetStatValue) {
+				selectedTargetStat = currentTargetStatValue;
+				isExplicitlyNoneSelected = false;
+			}
+		} else if (!isExplicitlyNoneSelected && !currentTargetStatValue) {
+			// If modifier has no value and user hasn't explicitly selected "none", 
+			// keep UI in sync (but don't change isExplicitlyNoneSelected)
+			selectedTargetStat = '';
 		}
 	});
 
-	// Initialize modifier if needed
-	$effect(() => {
-		if (!modifier) {
-			modifier = {
-				behaviour: 'bonus',
-				character_conditions: [],
-				target_weapon: 'all',
-				target_stat: 'attack_roll',
-				value: 0
-			};
-		}
-	});
+	// Don't auto-initialize modifier - let it remain undefined until user selects a target stat
 
 	// Update target stat
 	function updateTargetStat(newTargetStat: ModifierTargetStat | '') {
-		if (!modifier) return;
 		// If empty string, don't update modifier (just update UI to show "-- none selected --")
 		if (newTargetStat === '') {
 			return;
 		}
-		// Preserve base properties
-		const baseProps = {
-			behaviour: modifier.behaviour,
-			character_conditions: modifier.character_conditions,
-			target_weapon: modifier.target_weapon
+		
+		// Get current modifier or create default base properties
+		const baseProps = effectiveModifier ? {
+			behaviour: effectiveModifier.behaviour,
+			character_conditions: effectiveModifier.character_conditions,
+			target_weapon: effectiveModifier.target_weapon
+		} : {
+			behaviour: 'bonus' as const,
+			character_conditions: [],
+			target_weapon: 'all' as const
 		};
 
 		// Set target stat-specific properties
+		// Preserve existing values when compatible, otherwise use defaults
+		let newModifier: WeaponModifier;
 		if (newTargetStat === 'attack_roll' || newTargetStat === 'damage_bonus') {
-			modifier = {
+			// Preserve value if switching between attack_roll and damage_bonus
+			const existingValue = (effectiveModifier && 
+				(effectiveModifier.target_stat === 'attack_roll' || effectiveModifier.target_stat === 'damage_bonus'))
+				? effectiveModifier.value
+				: 0;
+			newModifier = {
 				...baseProps,
 				target_stat: newTargetStat,
-				value: 0
+				value: existingValue
 			};
 		} else if (newTargetStat === 'damage_dice') {
-			modifier = {
+			// Preserve dice if already set
+			const existingDice = (effectiveModifier && effectiveModifier.target_stat === 'damage_dice')
+				? effectiveModifier.dice
+				: '';
+			newModifier = {
 				...baseProps,
 				target_stat: 'damage_dice',
-				dice: ''
+				dice: existingDice
 			};
 		} else if (newTargetStat === 'damage_type') {
-			modifier = {
+			// Preserve damage_type if already set
+			const existingDamageType = (effectiveModifier && effectiveModifier.target_stat === 'damage_type')
+				? effectiveModifier.damage_type
+				: 'phy';
+			newModifier = {
 				...baseProps,
 				target_stat: 'damage_type',
-				damage_type: 'phy'
+				damage_type: existingDamageType
 			};
 		} else if (newTargetStat === 'range') {
-			modifier = {
+			// Preserve range if already set
+			const existingRange = (effectiveModifier && effectiveModifier.target_stat === 'range')
+				? effectiveModifier.range
+				: 'Melee';
+			newModifier = {
 				...baseProps,
 				target_stat: 'range',
-				range: 'Melee'
+				range: existingRange
 			};
 		} else if (newTargetStat === 'trait') {
-			modifier = {
+			// Preserve trait if already set
+			const existingTrait = (effectiveModifier && effectiveModifier.target_stat === 'trait')
+				? effectiveModifier.trait
+				: 'agility';
+			newModifier = {
 				...baseProps,
 				target_stat: 'trait',
-				trait: 'agility'
+				trait: existingTrait
 			};
+		} else {
+			return;
 		}
+		
+		updateModifier(newModifier);
 	}
 </script>
 
@@ -205,19 +232,16 @@
 		>
 		<Select.Root
 			type="single"
-			value={modifier?.target_weapon ?? 'all'}
+			value={effectiveModifier?.target_weapon ?? 'all'}
 			onValueChange={(value) => {
-				if (value && modifier && targetWeaponOptions.includes(value as ModifierTargetWeapon)) {
-					modifier = {
-						...modifier,
-						target_weapon: value as ModifierTargetWeapon
-					};
+				if (value && effectiveModifier && targetWeaponOptions.includes(value as ModifierTargetWeapon)) {
+					updateModifier({ ...effectiveModifier, target_weapon: value as ModifierTargetWeapon });
 				}
 			}}
 		>
 			<Select.Trigger id="target-weapon-select" class="w-full">
 				<p class="truncate">
-					{targetWeaponLabels[modifier?.target_weapon ?? 'all']}
+					{targetWeaponLabels[effectiveModifier?.target_weapon ?? 'all']}
 				</p>
 			</Select.Trigger>
 			<Select.Content>
@@ -230,20 +254,27 @@
 
 	<!-- Target Stat -->
 	<div class="flex flex-col gap-1">
-		<label for="target-stat-select" class="text-xs font-medium text-muted-foreground"
+		<label
+			for="target-stat-select"
+			class={cn('text-xs font-medium text-muted-foreground', errors && errors.length > 0 && 'text-destructive')}
 			>Weapon stat to modify</label
 		>
 		<Select.Root
 			type="single"
 			value={selectedTargetStat || ''}
 			onValueChange={(value) => {
-				const newValue = value || '';
-				selectedTargetStat = newValue;
-				isExplicitlyNoneSelected = newValue === '';
-				updateTargetStat(newValue as ModifierTargetStat | '');
+				if (value) {
+					const newValue = value;
+					selectedTargetStat = newValue;
+					isExplicitlyNoneSelected = false;
+					updateTargetStat(newValue as ModifierTargetStat);
+				}
 			}}
 		>
-			<Select.Trigger id="target-stat-select" class="w-full">
+			<Select.Trigger
+				id="target-stat-select"
+				class={cn('w-full', errors && errors.length > 0 && 'border-destructive')}
+			>
 				<p class="truncate">
 					{selectedTargetStat &&
 					targetStatOptions.includes(selectedTargetStat as ModifierTargetStat)
@@ -252,11 +283,6 @@
 				</p>
 			</Select.Trigger>
 			<Select.Content>
-				<Select.Item
-					value=""
-					disabled={selectedTargetStat === ''}
-					class="justify-center text-muted-foreground">-- none selected --</Select.Item
-				>
 				{#each targetStatOptions as stat}
 					<Select.Item value={stat}>{targetStatLabels[stat]}</Select.Item>
 				{/each}
@@ -265,8 +291,8 @@
 	</div>
 
 	<!-- Target Stat-specific fields -->
-	{#if currentTargetStat === 'trait' && modifier && modifier.target_stat === 'trait'}
-		{@const traitTargetModifier = modifier}
+	{#if currentTargetStat === 'trait' && effectiveModifier && effectiveModifier.target_stat === 'trait'}
+		{@const traitTargetModifier = effectiveModifier}
 		<div class="flex flex-col gap-1">
 			<label for="target-trait-select" class="text-xs font-medium text-muted-foreground"
 				>Choose a trait</label
@@ -276,10 +302,10 @@
 				value={traitTargetModifier.trait}
 				onValueChange={(value) => {
 					if (value && traitOptions.includes(value as TraitIds)) {
-						modifier = {
+						updateModifier({
 							...traitTargetModifier,
 							trait: value as TraitIds
-						};
+						});
 					}
 				}}
 			>
@@ -301,15 +327,15 @@
 		>
 		<Select.Root
 			type="single"
-			value={modifier?.behaviour ?? 'bonus'}
+			value={effectiveModifier?.behaviour ?? 'bonus'}
 			onValueChange={(value) => {
-				if (value && modifier && behaviourOptions.includes(value as ModifierBehaviour)) {
-					modifier = { ...modifier, behaviour: value as ModifierBehaviour };
+				if (value && effectiveModifier && behaviourOptions.includes(value as ModifierBehaviour)) {
+					updateModifier({ ...effectiveModifier, behaviour: value as ModifierBehaviour });
 				}
 			}}
 		>
 			<Select.Trigger id="behaviour-select" class="w-full">
-				<p class="truncate">{behaviourLabels[modifier?.behaviour ?? 'bonus']}</p>
+				<p class="truncate">{behaviourLabels[effectiveModifier?.behaviour ?? 'bonus']}</p>
 			</Select.Trigger>
 			<Select.Content>
 				{#each behaviourOptions as behaviour}
@@ -320,8 +346,8 @@
 	</div>
 
 	<!-- Target Stat-specific fields -->
-	{#if (currentTargetStat === 'attack_roll' || currentTargetStat === 'damage_bonus') && modifier && (modifier.target_stat === 'attack_roll' || modifier.target_stat === 'damage_bonus')}
-		{@const valueModifier = modifier}
+	{#if (currentTargetStat === 'attack_roll' || currentTargetStat === 'damage_bonus') && effectiveModifier && (effectiveModifier.target_stat === 'attack_roll' || effectiveModifier.target_stat === 'damage_bonus')}
+		{@const valueModifier = effectiveModifier}
 		<div class="flex flex-col gap-1">
 			<label for="weapon-value-input" class="text-xs font-medium text-muted-foreground">Value</label
 			>
@@ -330,15 +356,15 @@
 				type="number"
 				value={String(valueModifier.value)}
 				oninput={(e) => {
-					modifier = {
+					updateModifier({
 						...valueModifier,
 						value: Number(e.currentTarget.value)
-					};
+					});
 				}}
 			/>
 		</div>
-	{:else if currentTargetStat === 'damage_dice' && modifier && modifier.target_stat === 'damage_dice'}
-		{@const diceModifier = modifier}
+	{:else if currentTargetStat === 'damage_dice' && effectiveModifier && effectiveModifier.target_stat === 'damage_dice'}
+		{@const diceModifier = effectiveModifier}
 		<div class="flex flex-col gap-2">
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-2">
@@ -352,10 +378,10 @@
 					disabled={!diceModifier.dice || diceModifier.dice === ''}
 					class="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground disabled:hidden"
 					onclick={() => {
-						modifier = {
+						updateModifier({
 							...diceModifier,
 							dice: ''
-						};
+						});
 					}}
 					title="Reset dice"
 				>
@@ -366,15 +392,15 @@
 			<DicePicker
 				value={diceModifier.dice || ''}
 				onChange={(v) => {
-					modifier = {
+					updateModifier({
 						...diceModifier,
 						dice: v
-					};
+					});
 				}}
 			/>
 		</div>
-	{:else if currentTargetStat === 'damage_type' && modifier && modifier.target_stat === 'damage_type'}
-		{@const damageTypeModifier = modifier}
+	{:else if currentTargetStat === 'damage_type' && effectiveModifier && effectiveModifier.target_stat === 'damage_type'}
+		{@const damageTypeModifier = effectiveModifier}
 		<div class="flex flex-col gap-1">
 			<label for="damage-type-select" class="text-xs font-medium text-muted-foreground"
 				>Damage Type</label
@@ -384,10 +410,10 @@
 				value={damageTypeModifier.damage_type}
 				onValueChange={(value) => {
 					if (value && damageTypeOptions.includes(value as DamageTypes)) {
-						modifier = {
+						updateModifier({
 							...damageTypeModifier,
 							damage_type: value as DamageTypes
-						};
+						});
 					}
 				}}
 			>
@@ -401,8 +427,8 @@
 				</Select.Content>
 			</Select.Root>
 		</div>
-	{:else if currentTargetStat === 'range' && modifier && modifier.target_stat === 'range'}
-		{@const rangeModifier = modifier}
+	{:else if currentTargetStat === 'range' && effectiveModifier && effectiveModifier.target_stat === 'range'}
+		{@const rangeModifier = effectiveModifier}
 		<div class="flex flex-col gap-1">
 			<label for="range-select" class="text-xs font-medium text-muted-foreground">Range</label>
 			<Select.Root
@@ -410,10 +436,10 @@
 				value={rangeModifier.range}
 				onValueChange={(value) => {
 					if (value && rangeOptions.includes(value as Ranges)) {
-						modifier = {
+						updateModifier({
 							...rangeModifier,
 							range: value as Ranges
-						};
+						});
 					}
 				}}
 			>

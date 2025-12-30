@@ -220,3 +220,93 @@ export function extractFieldErrors<T extends Record<string, unknown>>(
 	}
 	return errors;
 }
+
+// ============================================================================
+// Helper to extract nested validation errors from Feature validation
+// Returns errors for character_modifiers and weapon_modifiers arrays
+// ============================================================================
+
+export type FeatureValidationErrors = {
+	character_modifiers?: Map<number, string[]>;
+	weapon_modifiers?: Map<number, string[]>;
+	title?: string;
+	description_html?: string;
+};
+
+/**
+ * Helper to process modifier errors and build user-friendly messages
+ */
+function processModifierError(
+	issue: z.ZodError['issues'][number],
+	fieldPath: readonly PropertyKey[],
+	targetField: 'target' | 'target_stat',
+	requiredMessage: string
+): string {
+	const nestedPath = fieldPath.slice(2);
+	
+	if (nestedPath.length > 0) {
+		const fieldName = nestedPath.map(String).join('.');
+		if (fieldName === targetField || issue.message.includes(targetField)) {
+			return requiredMessage;
+		}
+		return `${fieldName}: ${issue.message}`;
+	}
+	
+	// Handle discriminated union errors (missing target/target_stat)
+	if (issue.message.includes(targetField) || issue.code === 'invalid_union') {
+		return requiredMessage;
+	}
+	
+	return issue.message;
+}
+
+export function extractFeatureErrors(error: z.ZodError): FeatureValidationErrors {
+	const errors: FeatureValidationErrors = {};
+	
+	for (const issue of error.issues) {
+		const path = issue.path;
+		
+		if (path.length === 0) continue;
+		
+		const [firstPath, secondPath] = path;
+		
+		// Handle character_modifiers errors
+		if (firstPath === 'character_modifiers' && typeof secondPath === 'number') {
+			const modifierIndex = secondPath;
+			if (!errors.character_modifiers) {
+				errors.character_modifiers = new Map();
+			}
+			const existingErrors = errors.character_modifiers.get(modifierIndex) || [];
+			const errorMessage = processModifierError(
+				issue,
+				path,
+				'target',
+				'Character attribute to modify is required'
+			);
+			errors.character_modifiers.set(modifierIndex, [...existingErrors, errorMessage]);
+		}
+		// Handle weapon_modifiers errors
+		else if (firstPath === 'weapon_modifiers' && typeof secondPath === 'number') {
+			const modifierIndex = secondPath;
+			if (!errors.weapon_modifiers) {
+				errors.weapon_modifiers = new Map();
+			}
+			const existingErrors = errors.weapon_modifiers.get(modifierIndex) || [];
+			const errorMessage = processModifierError(
+				issue,
+				path,
+				'target_stat',
+				'Weapon stat to modify is required'
+			);
+			errors.weapon_modifiers.set(modifierIndex, [...existingErrors, errorMessage]);
+		}
+		// Handle top-level feature errors
+		else if (firstPath === 'title') {
+			errors.title = issue.message;
+		} else if (firstPath === 'description_html') {
+			errors.description_html = issue.message;
+		}
+	}
+	
+	return errors;
+}

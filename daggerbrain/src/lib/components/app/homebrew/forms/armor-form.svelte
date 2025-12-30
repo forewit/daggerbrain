@@ -4,7 +4,7 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { cn } from '$lib/utils';
+	import { cn, tier_to_min_level, level_to_tier } from '$lib/utils';
 	import HomebrewFeatureForm from '../features/feature-form.svelte';
 	import Dropdown from '../../leveling/dropdown.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
@@ -17,15 +17,19 @@
 	} from '../form-schemas';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
+	import { tick } from 'svelte';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
 
 	let {
 		item = $bindable(),
 		hasChanges = $bindable(),
+		hasErrors = $bindable(),
 		onSubmit,
 		onReset
 	}: {
 		item: Armor;
 		hasChanges?: boolean;
+		hasErrors?: boolean;
 		onSubmit?: (e?: SubmitEvent) => void;
 		onReset?: () => void;
 	} = $props();
@@ -47,22 +51,8 @@
 	// Feature validation state - track which features have errors
 	const featureErrors = new SvelteMap<number, boolean>();
 
-	// Helper to convert tier to level requirement
-	function tierToMinLevel(tier: number): number {
-		if (tier === 1) return 1;
-		if (tier === 2) return 2;
-		if (tier === 3) return 5;
-		if (tier === 4) return 8;
-		return 1;
-	}
-
-	// Helper to convert level requirement to tier
-	function levelToTier(level: number): number {
-		if (level >= 8) return 4;
-		if (level >= 5) return 3;
-		if (level >= 2) return 2;
-		return 1;
-	}
+	// svelte-ignore non_reactive_update
+	let dropdownOpenIndex = -1;
 
 	// Check if form has changes compared to the armor prop
 	let formHasChanges = $derived.by(() => {
@@ -72,7 +62,7 @@
 		const descriptionMatch = formDescriptionHtml === item.description_html;
 
 		// Compare tier/level
-		const formLevelRequirement = formTier ? tierToMinLevel(Number(formTier)) : 1;
+		const formLevelRequirement = formTier ? tier_to_min_level(Number(formTier)) : 1;
 		const tierMatch = formLevelRequirement === item.level_requirement;
 
 		// Compare max armor
@@ -104,12 +94,22 @@
 		hasChanges = formHasChanges;
 	});
 
+	// Check if there are validation errors
+	let hasValidationErrors = $derived.by(() => {
+		return Object.keys(errors).length > 0 || featureErrors.size > 0;
+	});
+
+	// Sync hasValidationErrors to bindable prop
+	$effect(() => {
+		hasErrors = hasValidationErrors;
+	});
+
 	// Sync form state when armor prop changes
 	$effect(() => {
 		if (item) {
 			formTitle = item.title;
 			formDescriptionHtml = item.description_html;
-			formTier = String(levelToTier(item.level_requirement));
+			formTier = String(level_to_tier(item.level_requirement));
 			formMaxArmor = item.max_armor === 0 ? '' : String(item.max_armor);
 			formMajorThreshold =
 				item.damage_thresholds.major === 0 ? '' : String(item.damage_thresholds.major);
@@ -126,7 +126,7 @@
 		return {
 			title: formTitle.trim(),
 			description_html: formDescriptionHtml,
-			level_requirement: formTier ? tierToMinLevel(Number(formTier)) : 1,
+			level_requirement: formTier ? tier_to_min_level(Number(formTier)) : 1,
 			max_armor: formMaxArmor === '' ? 0 : Number(formMaxArmor),
 			damage_thresholds: {
 				major: formMajorThreshold === '' ? 0 : Number(formMajorThreshold),
@@ -206,7 +206,7 @@
 		// Re-sync form from armor prop
 		formTitle = item.title;
 		formDescriptionHtml = item.description_html;
-		formTier = String(levelToTier(item.level_requirement));
+		formTier = String(level_to_tier(item.level_requirement));
 		formMaxArmor = item.max_armor === 0 ? '' : String(item.max_armor);
 		formMajorThreshold =
 			item.damage_thresholds.major === 0 ? '' : String(item.damage_thresholds.major);
@@ -224,6 +224,8 @@
 	}
 
 	function addFeature() {
+		const newIndex = formFeatures.length;
+		dropdownOpenIndex = newIndex;
 		const newFeature: Feature = {
 			title: '',
 			description_html: '',
@@ -231,6 +233,10 @@
 			weapon_modifiers: []
 		};
 		formFeatures = [...formFeatures, newFeature];
+		
+		tick().then(() => {
+			dropdownOpenIndex = -1;
+		});
 	}
 
 	function removeFeature(index: number) {
@@ -379,6 +385,7 @@
 				<Dropdown
 					title={feature.title || `Unnamed feature`}
 					class={featureErrors.get(index) ? 'border-destructive' : ''}
+					open={dropdownOpenIndex === index}
 				>
 					<HomebrewFeatureForm
 						bind:feature={formFeatures[index]}
@@ -399,7 +406,14 @@
 				Discard
 			</Button>
 		{/if}
-		<Button type="submit" size="sm" disabled={!formHasChanges}>Save</Button>
+		<Button type="submit" size="sm" disabled={!formHasChanges || homebrew.saving}>
+			{#if homebrew.saving}
+				<Loader2 class="size-3.5 animate-spin" />
+				Saving...
+			{:else}
+				Save
+			{/if}
+		</Button>
 		
 	</div>
 </form>

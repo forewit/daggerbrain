@@ -20,6 +20,9 @@
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { error } from '@sveltejs/kit';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
+	import { beforeNavigate } from '$app/navigation';
+	import { toast } from 'svelte-sonner';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
 
 	// Import all form components
 	import HomebrewWeaponForm from '$lib/components/app/homebrew/forms/weapon-form.svelte';
@@ -97,93 +100,97 @@
 				item: DomainCard;
 		  };
 
-	let homebrewItem: HomebrewItem | null = $derived.by(() => {
-		if (!data.type || !data.uid) return null;
-
-		switch (data.type) {
-			case 'weapon':
-				const weapon =
-					homebrew.primary_weapons[data.uid] || homebrew.secondary_weapons[data.uid] || null;
-				if (!weapon) return null;
-				return {
-					type: 'weapon',
-					item: weapon
-				};
-			case 'armor':
-				const armor = homebrew.armor[data.uid] || null;
-				if (!armor) return null;
-				return {
-					type: 'armor',
-					item: armor
-				};
-			case 'beastform':
-				const beastform = homebrew.beastforms[data.uid] || null;
-				if (!beastform) return null;
-				return {
-					type: 'beastform',
-					item: beastform
-				};
-			case 'loot':
-				const loot = homebrew.loot[data.uid] || null;
-				if (!loot) return null;
-				return {
-					type: 'loot',
-					item: loot
-				};
-			case 'consumable':
-				const consumable = homebrew.consumables[data.uid] || null;
-				if (!consumable) return null;
-				return {
-					type: 'consumable',
-					item: consumable
-				};
-			case 'class':
-				const characterClass = homebrew.classes[data.uid] || null;
-				if (!characterClass) return null;
-				return {
-					type: 'class',
-					item: characterClass
-				};
-			case 'subclass':
-				const subclass = homebrew.subclasses[data.uid] || null;
-				if (!subclass) return null;
-				return {
-					type: 'subclass',
-					item: subclass
-				};
-			case 'ancestry-cards':
-				const ancestryCard = homebrew.ancestry_cards[data.uid] || null;
-				if (!ancestryCard) return null;
-				return {
-					type: 'ancestry-cards',
-					item: ancestryCard
-				};
-			case 'community-cards':
-				const communityCard = homebrew.community_cards[data.uid] || null;
-				if (!communityCard) return null;
-				return {
-					type: 'community-cards',
-					item: communityCard
-				};
-			case 'transformation-cards':
-				const transformationCard = homebrew.transformation_cards[data.uid] || null;
-				if (!transformationCard) return null;
-				return {
-					type: 'transformation-cards',
-					item: transformationCard
-				};
-			case 'domain-cards':
-				for (const domainId of Object.keys(homebrew.domain_cards) as DomainIds[]) {
-					if (homebrew.domain_cards[domainId]?.[data.uid]) {
-						return {
-							type: 'domain-cards',
-							item: homebrew.domain_cards[domainId][data.uid]
-						};
+	let homebrewItem: HomebrewItem | null = $state(null);
+	$effect(() => {
+		if (!data.type || !data.uid) {
+			homebrewItem = null;
+		} else {
+			switch (data.type) {
+				case 'weapon':
+					const weapon =
+						homebrew.primary_weapons[data.uid] || homebrew.secondary_weapons[data.uid] || null;
+					homebrewItem = weapon ?  {
+						type: 'weapon',
+						item: weapon
+					} : null;
+					break;
+				case 'armor':
+					const armor = homebrew.armor[data.uid] || null;
+					homebrewItem = armor ? {
+						type: 'armor',
+						item: armor
+					} : null;
+					break;
+				case 'beastform':
+					const beastform = homebrew.beastforms[data.uid] || null;
+					homebrewItem = beastform ? {
+						type: 'beastform',
+						item: beastform
+					} : null;
+					break;
+				case 'loot':
+					const loot = homebrew.loot[data.uid] || null;
+					homebrewItem = loot ? {
+						type: 'loot',
+						item: loot
+					} : null;
+					break;
+				case 'consumable':
+					const consumable = homebrew.consumables[data.uid] || null;
+					homebrewItem = consumable ? {
+						type: 'consumable',
+						item: consumable
+					} : null;
+					break;
+				case 'class':
+					const characterClass = homebrew.classes[data.uid] || null;
+					homebrewItem = characterClass ? {
+						type: 'class',
+						item: characterClass
+					} : null;
+					break;
+				case 'subclass':
+					const subclass = homebrew.subclasses[data.uid] || null;
+					homebrewItem = subclass ? {
+						type: 'subclass',
+						item: subclass
+					} : null;
+					break;
+				case 'ancestry-cards':
+					const ancestryCard = homebrew.ancestry_cards[data.uid] || null;
+					homebrewItem = ancestryCard ? {
+						type: 'ancestry-cards',
+						item: ancestryCard
+					} : null;
+					break;
+				case 'community-cards':
+					const communityCard = homebrew.community_cards[data.uid] || null;
+					homebrewItem = communityCard ? {
+						type: 'community-cards',
+						item: communityCard
+					} : null;
+					break;
+				case 'transformation-cards':
+					const transformationCard = homebrew.transformation_cards[data.uid] || null;
+					homebrewItem = transformationCard ? {
+						type: 'transformation-cards',
+						item: transformationCard
+					} : null;
+					break;
+				case 'domain-cards':
+					for (const domainId of Object.keys(homebrew.domain_cards) as DomainIds[]) {
+						if (homebrew.domain_cards[domainId]?.[data.uid]) {
+							homebrewItem = {
+								type: 'domain-cards',
+								item: homebrew.domain_cards[domainId][data.uid]
+							};
+							break;
+						}
 					}
-				}
-				return null;
-			default:
-				return null;
+					break;
+				default:
+					homebrewItem = null;
+			}
 		}
 	});
 
@@ -195,6 +202,44 @@
 	});
 
 	let hasChanges = $state(false);
+	let hasErrors = $state(false);
+	let wasSaving = $state(false);
+
+	// Watch for save completion and show toast
+	$effect(() => {
+		const currentlySaving = homebrew.saving;
+		if (wasSaving && !currentlySaving && !hasChanges) {
+			// Save completed successfully
+			toast.success('Changes saved successfully');
+		}
+		wasSaving = currentlySaving;
+	});
+
+	// Prevent navigation if there are unsaved changes
+	beforeNavigate(({ cancel }) => {
+		if (hasChanges) {
+			if (!confirm('You have unsaved changes. Are you sure you want to leave this page?')) {
+				cancel();
+			}
+		}
+	});
+
+	// Handle browser navigation (closing tab, refreshing, etc.)
+	$effect(() => {
+		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+			if (hasChanges) {
+				e.preventDefault();
+				// Modern browsers ignore custom messages, but we still need to set returnValue
+				e.returnValue = '';
+			}
+		};
+
+		window.addEventListener('beforeunload', handleBeforeUnload);
+
+		return () => {
+			window.removeEventListener('beforeunload', handleBeforeUnload);
+		};
+	});
 
 	// Union type for all form components that export handleSubmit and handleReset
 	type HomebrewFormComponent =
@@ -257,11 +302,16 @@
 							<Button
 								type="button"
 								size="sm"
-								class="h-7 px-3"
-								disabled={!hasChanges}
+								class={cn('h-7 ', hasErrors && 'border border-destructive')}
+								disabled={!hasChanges || homebrew.saving}
 								onclick={handleSave}
 							>
-								Save
+								{#if homebrew.saving}
+									<Loader2 class="size-3.5 animate-spin" />
+									Saving...
+								{:else}
+									Save
+								{/if}
 							</Button>
 						</div>
 					</div>
@@ -272,6 +322,7 @@
 								bind:this={formComponent}
 								bind:item={homebrewItem.item}
 								bind:hasChanges
+								bind:hasErrors
 								onSubmit={handleSave}
 								onReset={handleReset}
 							/>
@@ -280,6 +331,7 @@
 								bind:this={formComponent}
 								bind:item={homebrewItem.item}
 								bind:hasChanges
+								bind:hasErrors
 								onSubmit={handleSave}
 								onReset={handleReset}
 							/>
@@ -288,6 +340,7 @@
 								bind:this={formComponent}
 								bind:item={homebrewItem.item}
 								bind:hasChanges
+								bind:hasErrors
 								onSubmit={handleSave}
 								onReset={handleReset}
 							/>
@@ -296,6 +349,7 @@
 								bind:this={formComponent}
 								bind:item={homebrewItem.item}
 								bind:hasChanges
+								bind:hasErrors
 								onSubmit={handleSave}
 								onReset={handleReset}
 							/>
@@ -304,6 +358,7 @@
 								bind:this={formComponent}
 								bind:item={homebrewItem.item}
 								bind:hasChanges
+								bind:hasErrors
 								onSubmit={handleSave}
 								onReset={handleReset}
 							/>
@@ -312,6 +367,7 @@
 								bind:this={formComponent}
 								bind:item={homebrewItem.item}
 								bind:hasChanges
+								bind:hasErrors
 								onSubmit={handleSave}
 								onReset={handleReset}
 							/>
@@ -320,6 +376,7 @@
 								bind:this={formComponent}
 								bind:item={homebrewItem.item}
 								bind:hasChanges
+								bind:hasErrors
 								onSubmit={handleSave}
 								onReset={handleReset}
 							/>
@@ -328,6 +385,7 @@
 								bind:this={formComponent}
 								bind:item={homebrewItem.item}
 								bind:hasChanges
+								bind:hasErrors
 								onSubmit={handleSave}
 								onReset={handleReset}
 							/>
@@ -336,6 +394,7 @@
 								bind:this={formComponent}
 								bind:item={homebrewItem.item}
 								bind:hasChanges
+								bind:hasErrors
 								onSubmit={handleSave}
 								onReset={handleReset}
 							/>
@@ -344,6 +403,7 @@
 								bind:this={formComponent}
 								bind:item={homebrewItem.item}
 								bind:hasChanges
+								bind:hasErrors
 								onSubmit={handleSave}
 								onReset={handleReset}
 							/>
@@ -352,6 +412,7 @@
 								bind:this={formComponent}
 								bind:item={homebrewItem.item}
 								bind:hasChanges
+								bind:hasErrors
 								onSubmit={handleSave}
 								onReset={handleReset}
 							/>

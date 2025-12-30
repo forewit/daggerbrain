@@ -14,6 +14,7 @@ import type {
 	Weapon
 } from '$lib/types/compendium-types';
 import { getContext, setContext } from 'svelte';
+import { SvelteSet } from 'svelte/reactivity';
 import {
 	get_homebrew_classes,
 	create_homebrew_class,
@@ -121,7 +122,8 @@ function createHomebrew() {
 
 	// Debounce timers and in-flight tracking
 	const debounceTimers: Record<string, ReturnType<typeof setTimeout> | null> = {};
-	const inFlight = new Set<string>();
+	const inFlight = new SvelteSet<string>();
+	let saving = $derived(inFlight.size > 0);
 
 	// Helper to fetch with retry on failure
 	async function fetchWithRetry<T>(
@@ -219,9 +221,9 @@ function createHomebrew() {
 			if (savedItemJson === null || itemJson === savedItemJson || inFlight.has(`classes:${id}`)) continue;
 
 			if (debounceTimers[`classes:${id}`]) clearTimeout(debounceTimers[`classes:${id}`]!);
+			inFlight.add(`classes:${id}`);
 			debounceTimers[`classes:${id}`] = setTimeout(() => {
 				delete debounceTimers[`classes:${id}`];
-				inFlight.add(`classes:${id}`);
 				update_homebrew_class({ id, data: JSON.parse(JSON.stringify(homebrew_classes[id])) })
 					.then(() => { lastSaved_classes = JSON.stringify(homebrew_classes); })
 					.catch((e) => console.error('Failed to auto-save class:', e))
@@ -243,9 +245,9 @@ function createHomebrew() {
 			if (savedItemJson === null || itemJson === savedItemJson || inFlight.has(`subclasses:${id}`)) continue;
 
 			if (debounceTimers[`subclasses:${id}`]) clearTimeout(debounceTimers[`subclasses:${id}`]!);
+			inFlight.add(`subclasses:${id}`);
 			debounceTimers[`subclasses:${id}`] = setTimeout(() => {
 				delete debounceTimers[`subclasses:${id}`];
-				inFlight.add(`subclasses:${id}`);
 				update_homebrew_subclass({ id, data: JSON.parse(JSON.stringify(homebrew_subclasses[id])) })
 					.then(() => { lastSaved_subclasses = JSON.stringify(homebrew_subclasses); })
 					.catch((e) => console.error('Failed to auto-save subclass:', e))
@@ -267,9 +269,9 @@ function createHomebrew() {
 			if (savedItemJson === null || itemJson === savedItemJson || inFlight.has(`domains:${id}`)) continue;
 
 			if (debounceTimers[`domains:${id}`]) clearTimeout(debounceTimers[`domains:${id}`]!);
+			inFlight.add(`domains:${id}`);
 			debounceTimers[`domains:${id}`] = setTimeout(() => {
 				delete debounceTimers[`domains:${id}`];
-				inFlight.add(`domains:${id}`);
 				update_homebrew_domain({ id, data: JSON.parse(JSON.stringify(homebrew_domains[id])) })
 					.then(() => { lastSaved_domains = JSON.stringify(homebrew_domains); })
 					.catch((e) => console.error('Failed to auto-save domain:', e))
@@ -294,9 +296,9 @@ function createHomebrew() {
 				if (savedCardJson === null || cardJson === savedCardJson || inFlight.has(key)) continue;
 
 				if (debounceTimers[key]) clearTimeout(debounceTimers[key]!);
+				inFlight.add(key);
 				debounceTimers[key] = setTimeout(() => {
 					delete debounceTimers[key];
-					inFlight.add(key);
 					update_homebrew_domain_card({ id: cardId, data: JSON.parse(JSON.stringify(homebrew_domain_cards[domainId as DomainIds][cardId])) })
 						.then(() => { lastSaved_domain_cards = JSON.stringify(homebrew_domain_cards); })
 						.catch((e) => console.error('Failed to auto-save domain card:', e))
@@ -319,9 +321,9 @@ function createHomebrew() {
 			if (savedItemJson === null || itemJson === savedItemJson || inFlight.has(`primary_weapons:${id}`)) continue;
 
 			if (debounceTimers[`primary_weapons:${id}`]) clearTimeout(debounceTimers[`primary_weapons:${id}`]!);
+			inFlight.add(`primary_weapons:${id}`);
 			debounceTimers[`primary_weapons:${id}`] = setTimeout(() => {
 				delete debounceTimers[`primary_weapons:${id}`];
-				inFlight.add(`primary_weapons:${id}`);
 				update_homebrew_primary_weapon({ id, data: JSON.parse(JSON.stringify(homebrew_primary_weapons[id])) })
 					.then(() => { lastSaved_primary_weapons = JSON.stringify(homebrew_primary_weapons); })
 					.catch((e) => console.error('Failed to auto-save primary weapon:', e))
@@ -343,9 +345,9 @@ function createHomebrew() {
 			if (savedItemJson === null || itemJson === savedItemJson || inFlight.has(`secondary_weapons:${id}`)) continue;
 
 			if (debounceTimers[`secondary_weapons:${id}`]) clearTimeout(debounceTimers[`secondary_weapons:${id}`]!);
+			inFlight.add(`secondary_weapons:${id}`);
 			debounceTimers[`secondary_weapons:${id}`] = setTimeout(() => {
 				delete debounceTimers[`secondary_weapons:${id}`];
-				inFlight.add(`secondary_weapons:${id}`);
 				update_homebrew_secondary_weapon({ id, data: JSON.parse(JSON.stringify(homebrew_secondary_weapons[id])) })
 					.then(() => { lastSaved_secondary_weapons = JSON.stringify(homebrew_secondary_weapons); })
 					.catch((e) => console.error('Failed to auto-save secondary weapon:', e))
@@ -367,9 +369,9 @@ function createHomebrew() {
 			if (savedItemJson === null || itemJson === savedItemJson || inFlight.has(`armor:${id}`)) continue;
 
 			if (debounceTimers[`armor:${id}`]) clearTimeout(debounceTimers[`armor:${id}`]!);
+			inFlight.add(`armor:${id}`);
 			debounceTimers[`armor:${id}`] = setTimeout(() => {
 				delete debounceTimers[`armor:${id}`];
-				inFlight.add(`armor:${id}`);
 				update_homebrew_armor({ id, data: JSON.parse(JSON.stringify(homebrew_armor[id])) })
 					.then(() => { lastSaved_armor = JSON.stringify(homebrew_armor); })
 					.catch((e) => console.error('Failed to auto-save armor:', e))
@@ -391,9 +393,9 @@ function createHomebrew() {
 			if (savedItemJson === null || itemJson === savedItemJson || inFlight.has(`loot:${id}`)) continue;
 
 			if (debounceTimers[`loot:${id}`]) clearTimeout(debounceTimers[`loot:${id}`]!);
+			inFlight.add(`loot:${id}`);
 			debounceTimers[`loot:${id}`] = setTimeout(() => {
 				delete debounceTimers[`loot:${id}`];
-				inFlight.add(`loot:${id}`);
 				update_homebrew_loot({ id, data: JSON.parse(JSON.stringify(homebrew_loot[id])) })
 					.then(() => { lastSaved_loot = JSON.stringify(homebrew_loot); })
 					.catch((e) => console.error('Failed to auto-save loot:', e))
@@ -415,9 +417,9 @@ function createHomebrew() {
 			if (savedItemJson === null || itemJson === savedItemJson || inFlight.has(`consumables:${id}`)) continue;
 
 			if (debounceTimers[`consumables:${id}`]) clearTimeout(debounceTimers[`consumables:${id}`]!);
+			inFlight.add(`consumables:${id}`);
 			debounceTimers[`consumables:${id}`] = setTimeout(() => {
 				delete debounceTimers[`consumables:${id}`];
-				inFlight.add(`consumables:${id}`);
 				update_homebrew_consumable({ id, data: JSON.parse(JSON.stringify(homebrew_consumables[id])) })
 					.then(() => { lastSaved_consumables = JSON.stringify(homebrew_consumables); })
 					.catch((e) => console.error('Failed to auto-save consumable:', e))
@@ -439,9 +441,9 @@ function createHomebrew() {
 			if (savedItemJson === null || itemJson === savedItemJson || inFlight.has(`ancestry_cards:${id}`)) continue;
 
 			if (debounceTimers[`ancestry_cards:${id}`]) clearTimeout(debounceTimers[`ancestry_cards:${id}`]!);
+			inFlight.add(`ancestry_cards:${id}`);
 			debounceTimers[`ancestry_cards:${id}`] = setTimeout(() => {
 				delete debounceTimers[`ancestry_cards:${id}`];
-				inFlight.add(`ancestry_cards:${id}`);
 				update_homebrew_ancestry_card({ id, data: JSON.parse(JSON.stringify(homebrew_ancestry_cards[id])) })
 					.then(() => { lastSaved_ancestry_cards = JSON.stringify(homebrew_ancestry_cards); })
 					.catch((e) => console.error('Failed to auto-save ancestry card:', e))
@@ -463,9 +465,9 @@ function createHomebrew() {
 			if (savedItemJson === null || itemJson === savedItemJson || inFlight.has(`community_cards:${id}`)) continue;
 
 			if (debounceTimers[`community_cards:${id}`]) clearTimeout(debounceTimers[`community_cards:${id}`]!);
+			inFlight.add(`community_cards:${id}`);
 			debounceTimers[`community_cards:${id}`] = setTimeout(() => {
 				delete debounceTimers[`community_cards:${id}`];
-				inFlight.add(`community_cards:${id}`);
 				update_homebrew_community_card({ id, data: JSON.parse(JSON.stringify(homebrew_community_cards[id])) })
 					.then(() => { lastSaved_community_cards = JSON.stringify(homebrew_community_cards); })
 					.catch((e) => console.error('Failed to auto-save community card:', e))
@@ -487,9 +489,9 @@ function createHomebrew() {
 			if (savedItemJson === null || itemJson === savedItemJson || inFlight.has(`transformation_cards:${id}`)) continue;
 
 			if (debounceTimers[`transformation_cards:${id}`]) clearTimeout(debounceTimers[`transformation_cards:${id}`]!);
+			inFlight.add(`transformation_cards:${id}`);
 			debounceTimers[`transformation_cards:${id}`] = setTimeout(() => {
 				delete debounceTimers[`transformation_cards:${id}`];
-				inFlight.add(`transformation_cards:${id}`);
 				update_homebrew_transformation_card({ id, data: JSON.parse(JSON.stringify(homebrew_transformation_cards[id])) })
 					.then(() => { lastSaved_transformation_cards = JSON.stringify(homebrew_transformation_cards); })
 					.catch((e) => console.error('Failed to auto-save transformation card:', e))
@@ -511,9 +513,9 @@ function createHomebrew() {
 			if (savedItemJson === null || itemJson === savedItemJson || inFlight.has(`beastforms:${id}`)) continue;
 
 			if (debounceTimers[`beastforms:${id}`]) clearTimeout(debounceTimers[`beastforms:${id}`]!);
+			inFlight.add(`beastforms:${id}`);
 			debounceTimers[`beastforms:${id}`] = setTimeout(() => {
 				delete debounceTimers[`beastforms:${id}`];
-				inFlight.add(`beastforms:${id}`);
 				update_homebrew_beastform({ id, data: JSON.parse(JSON.stringify(homebrew_beastforms[id])) })
 					.then(() => { lastSaved_beastforms = JSON.stringify(homebrew_beastforms); })
 					.catch((e) => console.error('Failed to auto-save beastform:', e))
@@ -545,6 +547,7 @@ function createHomebrew() {
 		get transformation_cards() { return homebrew_transformation_cards; },
 		get beastforms() { return homebrew_beastforms; },
 		get loading() { return loading; },
+		get saving() { return saving; },
 
 		// Create helpers
 		async createClass(data: CharacterClass): Promise<string> {
