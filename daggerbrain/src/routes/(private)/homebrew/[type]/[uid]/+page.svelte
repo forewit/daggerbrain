@@ -51,12 +51,13 @@
 	import DomainCardPreview from '$lib/components/app/homebrew/previews/domain-card-preview.svelte';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import Anvil from '@lucide/svelte/icons/anvil';
+	import Footer from '$lib/components/app/footer.svelte';
 
 	let { data } = $props();
 
 	const homebrew = getHomebrewContext();
 
-	type HomebrewItem =
+	type HomebrewItem = { name: string; typeName: string } & (
 		| {
 				type: 'weapon';
 				item: Weapon;
@@ -100,7 +101,8 @@
 		| {
 				type: 'domain-cards';
 				item: DomainCard;
-		  };
+		  }
+	);
 
 	let homebrewItem: HomebrewItem | null = $state(null);
 	$effect(() => {
@@ -114,7 +116,9 @@
 					homebrewItem = weapon
 						? {
 								type: 'weapon',
-								item: weapon
+								typeName: 'Weapon',
+								item: weapon,
+								name: weapon.title
 							}
 						: null;
 					break;
@@ -123,7 +127,9 @@
 					homebrewItem = armor
 						? {
 								type: 'armor',
-								item: armor
+								typeName: 'Armor',
+								item: armor,
+								name: armor.title
 							}
 						: null;
 					break;
@@ -132,7 +138,9 @@
 					homebrewItem = beastform
 						? {
 								type: 'beastform',
-								item: beastform
+								typeName: 'Beastform',
+								item: beastform,
+								name: beastform.name
 							}
 						: null;
 					break;
@@ -141,7 +149,9 @@
 					homebrewItem = loot
 						? {
 								type: 'loot',
-								item: loot
+								typeName: 'Loot',
+								item: loot,
+								name: loot.title
 							}
 						: null;
 					break;
@@ -150,7 +160,9 @@
 					homebrewItem = consumable
 						? {
 								type: 'consumable',
-								item: consumable
+								typeName: 'Consumable',
+								item: consumable,
+								name: consumable.title
 							}
 						: null;
 					break;
@@ -159,7 +171,9 @@
 					homebrewItem = characterClass
 						? {
 								type: 'class',
-								item: characterClass
+								typeName: 'Class',
+								item: characterClass,
+								name: characterClass.name
 							}
 						: null;
 					break;
@@ -168,7 +182,9 @@
 					homebrewItem = subclass
 						? {
 								type: 'subclass',
-								item: subclass
+								typeName: 'Subclass',
+								item: subclass,
+								name: subclass.name
 							}
 						: null;
 					break;
@@ -177,7 +193,9 @@
 					homebrewItem = ancestryCard
 						? {
 								type: 'ancestry-cards',
-								item: ancestryCard
+								typeName: 'Ancestry Card',
+								item: ancestryCard,
+								name: ancestryCard.title
 							}
 						: null;
 					break;
@@ -186,7 +204,9 @@
 					homebrewItem = communityCard
 						? {
 								type: 'community-cards',
-								item: communityCard
+								typeName: 'Community Card',
+								item: communityCard,
+								name: communityCard.title
 							}
 						: null;
 					break;
@@ -195,16 +215,21 @@
 					homebrewItem = transformationCard
 						? {
 								type: 'transformation-cards',
-								item: transformationCard
+								typeName: 'Transformation Card',
+								item: transformationCard,
+								name: transformationCard.title
 							}
 						: null;
 					break;
 				case 'domain-cards':
 					for (const domainId of Object.keys(homebrew.domain_cards) as DomainIds[]) {
-						if (homebrew.domain_cards[domainId]?.[data.uid]) {
+						const domainCard = homebrew.domain_cards[domainId]?.[data.uid];
+						if (domainCard) {
 							homebrewItem = {
 								type: 'domain-cards',
-								item: homebrew.domain_cards[domainId][data.uid]
+								typeName: 'Domain Card',
+								item: domainCard,
+								name: domainCard.title
 							};
 							break;
 						}
@@ -289,6 +314,8 @@
 	function handleReset() {
 		formComponent?.handleReset();
 	}
+
+	let editMode = $state(false);
 </script>
 
 {#if homebrew.loading}
@@ -300,6 +327,17 @@
 	</div>
 {:else if homebrewItem}
 	<div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
+		<!-- Forge side image with fade effect - background -->
+		<div
+			class="forge-fade-container pointer-events-none absolute right-0 top-0 bottom-0 z-0 w-96 overflow-hidden"
+		>
+			<img
+				src="/images/art/forge.webp"
+				alt=""
+				class="forge-fade-container h-full w-full object-cover object-right"
+			/>
+		</div>
+
 		<div
 			class={cn(
 				'relative z-10 flex h-full w-full flex-col items-center justify-start',
@@ -307,15 +345,25 @@
 			)}
 		>
 			<!-- navigation -->
-			<div class="sticky top-0 z-10 w-full bg-background">
-				<div class="w-full bg-muted/50">
-					<div class="px- mx-auto flex w-full max-w-4xl items-center gap-2 py-2">
+			<div
+				class=" sticky top-[calc(var(--navbar-height,3.5rem)-1px)] z-20 w-full bg-background sm:top-0"
+			>
+				<div class="w-full bg-primary/50">
+					<div class="relative mx-auto flex w-full max-w-6xl items-center gap-2 py-2 pr-4">
 						<Button href="/homebrew" variant="link">
 							<ChevronLeft />
 							Back to Homebrew
 						</Button>
 
-						<div class="flex gap-2">
+						<div class="grow"></div>
+
+						<div class="gap- flex">
+							{#if hasChanges}
+								<Button type="button" size="sm" class="h-auto" variant="link" onclick={handleReset}>
+									<RotateCcw class="size-3.5" />
+									<p class="hidden sm:block">Discard</p>
+								</Button>
+							{/if}
 							<Button
 								type="button"
 								size="sm"
@@ -331,159 +379,167 @@
 									Save
 								{/if}
 							</Button>
-							{#if hasChanges}
-								<Button type="button" size="sm" class="h-auto" variant="link" onclick={handleReset}>
-									<RotateCcw class="size-3.5" />
-									Discard
-								</Button>
-							{/if}
 						</div>
 					</div>
 				</div>
 			</div>
 
 			<!-- Main Content: Preview and Edit Side by Side -->
-			<div
-				class="flex w-full max-w-4xl flex-col flex-col-reverse justify-between gap-6 p-4 md:flex-row"
-			>
-				<!-- Edit Section -->
-				<div class="mb-22">
-					<h2 class="mb-2 text-lg font-semibold">Edit</h2>
-
-					<div class="rounded-lg border bg-card p-4">
-						{#if homebrewItem.type === 'weapon'}
-							<HomebrewWeaponForm
-								bind:this={formComponent}
-								bind:item={homebrewItem.item}
-								bind:hasChanges
-								bind:hasErrors
-								onSubmit={handleSave}
-								onReset={handleReset}
-							/>
-						{:else if homebrewItem.type === 'armor'}
-							<HomebrewArmorForm
-								bind:this={formComponent}
-								bind:item={homebrewItem.item}
-								bind:hasChanges
-								bind:hasErrors
-								onSubmit={handleSave}
-								onReset={handleReset}
-							/>
-						{:else if homebrewItem.type === 'beastform'}
-							<HomebrewBeastformForm
-								bind:this={formComponent}
-								bind:item={homebrewItem.item}
-								bind:hasChanges
-								bind:hasErrors
-								onSubmit={handleSave}
-								onReset={handleReset}
-							/>
-						{:else if homebrewItem.type === 'loot'}
-							<HomebrewLootForm
-								bind:this={formComponent}
-								bind:item={homebrewItem.item}
-								bind:hasChanges
-								bind:hasErrors
-								onSubmit={handleSave}
-								onReset={handleReset}
-							/>
-						{:else if homebrewItem.type === 'consumable'}
-							<HomebrewConsumableForm
-								bind:this={formComponent}
-								bind:item={homebrewItem.item}
-								bind:hasChanges
-								bind:hasErrors
-								onSubmit={handleSave}
-								onReset={handleReset}
-							/>
-						{:else if homebrewItem.type === 'class'}
-							<HomebrewClassForm
-								bind:this={formComponent}
-								bind:item={homebrewItem.item}
-								bind:hasChanges
-								bind:hasErrors
-								onSubmit={handleSave}
-								onReset={handleReset}
-							/>
-						{:else if homebrewItem.type === 'subclass'}
-							<HomebrewSubclassForm
-								bind:this={formComponent}
-								bind:item={homebrewItem.item}
-								bind:hasChanges
-								bind:hasErrors
-								onSubmit={handleSave}
-								onReset={handleReset}
-							/>
-						{:else if homebrewItem.type === 'ancestry-cards'}
-							<HomebrewAncestryCardForm
-								bind:this={formComponent}
-								bind:item={homebrewItem.item}
-								bind:hasChanges
-								bind:hasErrors
-								onSubmit={handleSave}
-								onReset={handleReset}
-							/>
-						{:else if homebrewItem.type === 'community-cards'}
-							<HomebrewCommunityCardForm
-								bind:this={formComponent}
-								bind:item={homebrewItem.item}
-								bind:hasChanges
-								bind:hasErrors
-								onSubmit={handleSave}
-								onReset={handleReset}
-							/>
-						{:else if homebrewItem.type === 'transformation-cards'}
-							<HomebrewTransformationCardForm
-								bind:this={formComponent}
-								bind:item={homebrewItem.item}
-								bind:hasChanges
-								bind:hasErrors
-								onSubmit={handleSave}
-								onReset={handleReset}
-							/>
-						{:else if homebrewItem.type === 'domain-cards'}
-							<HomebrewDomainCardForm
-								bind:this={formComponent}
-								bind:item={homebrewItem.item}
-								bind:hasChanges
-								bind:hasErrors
-								onSubmit={handleSave}
-								onReset={handleReset}
-							/>
-						{/if}
+			<div class="w-full max-w-6xl sm:px-4 sm:py-8">
+				<div
+					class="relative grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-6 px-2 sm:px-6 py-8 sm:py-6 sm:rounded-3xl bg-accent/5 sm:border-x border-accent/10"
+				>
+					<!-- edit -->
+					<div>
+						<p class="text-accent mb-4 text-center font-eveleth">Edit</p>
+						<div class="rounded-lg bg-background p-4">
+							{#if homebrewItem.type === 'weapon'}
+								<HomebrewWeaponForm
+									bind:this={formComponent}
+									bind:item={homebrewItem.item}
+									bind:hasChanges
+									bind:hasErrors
+									onSubmit={handleSave}
+									onReset={handleReset}
+								/>
+							{:else if homebrewItem.type === 'armor'}
+								<HomebrewArmorForm
+									bind:this={formComponent}
+									bind:item={homebrewItem.item}
+									bind:hasChanges
+									bind:hasErrors
+									onSubmit={handleSave}
+									onReset={handleReset}
+								/>
+							{:else if homebrewItem.type === 'beastform'}
+								<HomebrewBeastformForm
+									bind:this={formComponent}
+									bind:item={homebrewItem.item}
+									bind:hasChanges
+									bind:hasErrors
+									onSubmit={handleSave}
+									onReset={handleReset}
+								/>
+							{:else if homebrewItem.type === 'loot'}
+								<HomebrewLootForm
+									bind:this={formComponent}
+									bind:item={homebrewItem.item}
+									bind:hasChanges
+									bind:hasErrors
+									onSubmit={handleSave}
+									onReset={handleReset}
+								/>
+							{:else if homebrewItem.type === 'consumable'}
+								<HomebrewConsumableForm
+									bind:this={formComponent}
+									bind:item={homebrewItem.item}
+									bind:hasChanges
+									bind:hasErrors
+									onSubmit={handleSave}
+									onReset={handleReset}
+								/>
+							{:else if homebrewItem.type === 'class'}
+								<HomebrewClassForm
+									bind:this={formComponent}
+									bind:item={homebrewItem.item}
+									bind:hasChanges
+									bind:hasErrors
+									onSubmit={handleSave}
+									onReset={handleReset}
+								/>
+							{:else if homebrewItem.type === 'subclass'}
+								<HomebrewSubclassForm
+									bind:this={formComponent}
+									bind:item={homebrewItem.item}
+									bind:hasChanges
+									bind:hasErrors
+									onSubmit={handleSave}
+									onReset={handleReset}
+								/>
+							{:else if homebrewItem.type === 'ancestry-cards'}
+								<HomebrewAncestryCardForm
+									bind:this={formComponent}
+									bind:item={homebrewItem.item}
+									bind:hasChanges
+									bind:hasErrors
+									onSubmit={handleSave}
+									onReset={handleReset}
+								/>
+							{:else if homebrewItem.type === 'community-cards'}
+								<HomebrewCommunityCardForm
+									bind:this={formComponent}
+									bind:item={homebrewItem.item}
+									bind:hasChanges
+									bind:hasErrors
+									onSubmit={handleSave}
+									onReset={handleReset}
+								/>
+							{:else if homebrewItem.type === 'transformation-cards'}
+								<HomebrewTransformationCardForm
+									bind:this={formComponent}
+									bind:item={homebrewItem.item}
+									bind:hasChanges
+									bind:hasErrors
+									onSubmit={handleSave}
+									onReset={handleReset}
+								/>
+							{:else if homebrewItem.type === 'domain-cards'}
+								<HomebrewDomainCardForm
+									bind:this={formComponent}
+									bind:item={homebrewItem.item}
+									bind:hasChanges
+									bind:hasErrors
+									onSubmit={handleSave}
+									onReset={handleReset}
+								/>
+							{/if}
+						</div>
 					</div>
-				</div>
 
-				<!-- Preview Section -->
-				<div>
-					<div class="sticky top-17 grow">
-						<h2 class="mb-2 ml-2 flex items-center gap-2 text-lg font-semibold">Preview</h2>
-						{#if homebrewItem.type === 'weapon'}
-							<WeaponPreview weapon={homebrewItem.item} />
-						{:else if homebrewItem.type === 'armor'}
-							<ArmorPreview armor={homebrewItem.item} />
-						{:else if homebrewItem.type === 'beastform'}
-							<BeastformPreview beastform={homebrewItem.item} />
-						{:else if homebrewItem.type === 'loot'}
-							<LootPreview loot={homebrewItem.item} />
-						{:else if homebrewItem.type === 'consumable'}
-							<ConsumablePreview consumable={homebrewItem.item} />
-						{:else if homebrewItem.type === 'class'}
-							<ClassPreview characterClass={homebrewItem.item} />
-						{:else if homebrewItem.type === 'subclass'}
-							<SubclassPreview subclass={homebrewItem.item} />
-						{:else if homebrewItem.type === 'ancestry-cards'}
-							<AncestryCardPreview card={homebrewItem.item} />
-						{:else if homebrewItem.type === 'community-cards'}
-							<CommunityCardPreview card={homebrewItem.item} />
-						{:else if homebrewItem.type === 'transformation-cards'}
-							<TransformationCardPreview card={homebrewItem.item} />
-						{:else if homebrewItem.type === 'domain-cards'}
-							<DomainCardPreview card={homebrewItem.item} />
-						{/if}
+					<!-- preview -->
+					<div>
+						<div class="sticky top-17">
+						<p class="text-accent mb-4 text-center font-eveleth">Preview</p>
+						<div class="  flex flex-col items-center gap-4">
+							{#if homebrewItem.type === 'weapon'}
+								<WeaponPreview weapon={homebrewItem.item} />
+							{:else if homebrewItem.type === 'armor'}
+								<ArmorPreview armor={homebrewItem.item} />
+							{:else if homebrewItem.type === 'beastform'}
+								<BeastformPreview beastform={homebrewItem.item} />
+							{:else if homebrewItem.type === 'loot'}
+								<LootPreview loot={homebrewItem.item} />
+							{:else if homebrewItem.type === 'consumable'}
+								<ConsumablePreview consumable={homebrewItem.item} />
+							{:else if homebrewItem.type === 'class'}
+								<ClassPreview characterClass={homebrewItem.item} />
+							{:else if homebrewItem.type === 'subclass'}
+								<SubclassPreview subclass={homebrewItem.item} />
+							{:else if homebrewItem.type === 'ancestry-cards'}
+								<AncestryCardPreview card={homebrewItem.item} />
+							{:else if homebrewItem.type === 'community-cards'}
+								<CommunityCardPreview card={homebrewItem.item} />
+							{:else if homebrewItem.type === 'transformation-cards'}
+								<TransformationCardPreview card={homebrewItem.item} />
+							{:else if homebrewItem.type === 'domain-cards'}
+								<DomainCardPreview card={homebrewItem.item} />
+							{/if}
+						</div>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 {/if}
+
+<Footer />
+
+<style>
+	.forge-fade-container {
+		mask-image: linear-gradient(to left, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
+		-webkit-mask-image: linear-gradient(to left, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
+		mask-size: 100% 100%;
+		-webkit-mask-size: 100% 100%;
+	}
+</style>

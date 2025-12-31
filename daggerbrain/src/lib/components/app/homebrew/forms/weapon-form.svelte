@@ -519,7 +519,7 @@
 	}
 </script>
 
-<form onsubmit={handleSubmit} class="flex flex-col gap-4 max-w-[400px]">
+<form onsubmit={handleSubmit} class="flex flex-col gap-4">
 	
 		<!-- Title -->
 		<div class="flex flex-col gap-1">
@@ -760,7 +760,7 @@
 		</div>
 
 		<!-- Actions -->
-		<!-- <div class="flex flex-col gap-2 pt-2">
+		<div class="flex flex-col gap-2 pt-2">
 			<div class="flex gap-2 justify-end">
 				{#if formHasChanges}
 					<Button type="button" size="sm" variant="link" onclick={handleReset}>
@@ -789,5 +789,5 @@
 						{/each}
 					</ul>
 			{/if}
-		</div> -->
+		</div>
 </form>
