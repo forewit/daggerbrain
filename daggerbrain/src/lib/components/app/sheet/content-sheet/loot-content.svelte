@@ -90,7 +90,7 @@
 		<Sheet.Title>{loot.title}</Sheet.Title>
 		<p class="flex items-center gap-1.5 text-xs text-muted-foreground italic">
 			{#if loot.source_id === 'Homebrew'}
-				<HomebrewBadge type="loot" id={loot.compendium_id} />
+				<HomebrewBadge type="loot" id={loot.compendium_id} class="-mt-0.5 size-4" />
 			{/if}
 			Loot
 		</p>

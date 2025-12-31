@@ -26,4 +26,4 @@
 	} = $props();
 </script>
 
-<Anvil class={cn('-mt-0.5 size-4 text-accent', className)} />
+<Anvil class={cn('text-accent', className)} />

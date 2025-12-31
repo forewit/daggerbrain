@@ -533,7 +533,7 @@
 								class="flex items-center gap-1.5 truncate text-[10px] leading-none text-muted-foreground italic"
 							>
 								{#if entry.item.source_id === 'Homebrew'}
-									<HomebrewBadge type="armor" id={entry.item.compendium_id} class="size-3" />
+									<HomebrewBadge type="armor" id={entry.item.compendium_id} class="-mt-0.5 size-3" />
 								{/if}
 								Tier {context.level_to_tier(entry.item.level_requirement)} Armor
 							</p>

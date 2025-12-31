@@ -4,7 +4,6 @@
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import { cn } from '$lib/utils';
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
-	import ExternalLink from '@lucide/svelte/icons/external-link';
 </script>
 
 <svelte:head>
@@ -28,20 +27,56 @@
 	</div>
 
 	<!-- Content -->
-	<div class="relative z-10 mx-auto h-full w-full max-w-6xl px-4 sm:px-8">
+	<div class="relative z-10 mx-auto h-full w-full">
 		<div class="flex flex-col items-center sm:items-start">
-			<Button
-				href="https://buymeacoffee.com/marcanderson/finally-launched-daggerbrain"
-				target="_blank"
-				variant="link"
-				size="lg"
-				class="z-10 mx-auto mt-14 -mb-6 text-lg"
-			>
-				Read the launch announcement! <ExternalLink /></Button
-			>
+
+
+			<!-- Homebrew Showcase - Full Width Glass Pane -->
+			<section class="relative z-10 mt-14 w-full">
+				<button
+					class="homebrew-showcase group relative w-full min-h-[400px] sm:min-h-[320px] cursor-pointer overflow-hidden border-y border-muted-foreground/30 bg-background"
+					onclick={() => {
+						goto('/homebrew');
+					}}
+				>
+					<!-- Forge Background Image -->
+					<div class="absolute inset-0">
+						<img
+							src="/images/art/forge.webp"
+							alt=""
+							class="h-full w-full object-cover transition-all duration-600 group-hover:scale-103 opacity-30 group-hover:opacity-40"
+							loading="lazy"
+						/>
+					</div>
+
+					<div class="relative z-10 mx-auto flex h-full w-full max-w-5xl flex-col justify-center gap-4 px-4 py-8 sm:px-8 sm:py-12">
+							<div class="flex flex-col gap-8 items-center  sm:text-left">
+								<h3 class="font-eveleth text-2xl font-bold text-foreground">
+									Announcing Homebrew!
+								</h3>
+								<p class="text-sm text-center">
+									Design your own Weapons, Armor, Loot, and more! <br>Build
+									custom content for your Daggerheart characters.
+								</p>
+
+									<div
+								class={cn(
+									buttonVariants({ variant: 'outline' }),
+									'w-min shrink-0 pointer-events-none mx-auto sm:mx-0'
+								)}
+							>
+								Explore Homebrew
+								<ArrowRight class="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+							</div>
+							
+						</div>
+					</div>
+				</button>
+			</section>
+
 			<!-- Hero section-->
 			<section
-				class="flex w-full flex-col items-center gap-x-10 gap-y-16 pt-16 sm:flex-row sm:justify-evenly"
+				class="mx-auto flex w-full max-w-6xl flex-col items-center gap-x-10 gap-y-16 px-4 pt-16 sm:px-8 sm:flex-row sm:justify-evenly"
 			>
 				<!-- Hero Card -->
 				<button
@@ -114,7 +149,7 @@
 			</section>
 
 			<!-- Character Sheet -->
-			<section class="mx-auto w-full max-w-3xl pt-24 pb-30">
+			<section class="mx-auto w-full max-w-3xl px-4 pt-24 pb-30 sm:px-8">
 				<div
 					class="relative flex flex-col overflow-hidden rounded-xl border border-muted-foreground/20 bg-background/70 text-left shadow-lg backdrop-blur-sm sm:flex-row"
 				>
@@ -164,5 +199,11 @@
 	.hero-gradient-bottom {
 		height: 8%;
 		background: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%);
+	}
+
+	.homebrew-showcase {
+		box-shadow: 
+			0 -8px 16px -4px rgba(0, 0, 0, 1),
+			0 8px 16px -4px rgba(0, 0, 0, 1);
 	}
 </style>

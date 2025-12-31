@@ -332,7 +332,7 @@
 		{#if weapon.category !== 'Unarmed'}
 			<p class="flex items-center gap-1.5 text-xs text-muted-foreground italic">
 				{#if weapon.source_id === 'Homebrew'}
-					<HomebrewBadge type="weapon" id={weapon.compendium_id} />
+					<HomebrewBadge type="weapon" id={weapon.compendium_id} class="-mt-0.5 size-4" />
 				{/if}
 				Tier {context.level_to_tier(weapon.level_requirement)}
 				{weapon.category} Weapon

@@ -1,30 +1,38 @@
 <script lang="ts">
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import type { Beastform } from '$lib/types/compendium-types';
+	import * as Select from '$lib/components/ui/select';
+	import type { Beastform, SourceIds } from '$lib/types/compendium-types';
 	import BeastformComponent from './full-cards/beastform.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import Dropdown from '../leveling/dropdown.svelte';
 	import Search from '@lucide/svelte/icons/search';
-
-	type TierFilter = 'all' | 'tier_1' | 'tier_2' | 'tier_3' | 'tier_4';
+	import HomebrewBadge from '../homebrew/homebrew-badge.svelte';
 
 	let {
 		onBeastformClick = () => {},
-		initialTierFilter = 'all' as TierFilter,
+		initialTierFilter = '' as '1' | '2' | '3' | '4' | '',
 		maxLevel
 	}: {
 		onBeastformClick?: (beastform: Beastform) => void;
-		initialTierFilter?: TierFilter;
+		initialTierFilter?: '1' | '2' | '3' | '4' | '';
 		maxLevel?: number;
 	} = $props();
 
 	let searchQuery = $state('');
-	let tierFilter = $state<TierFilter>(initialTierFilter);
+	let tierFilter = $state<'1' | '2' | '3' | '4' | ''>(initialTierFilter);
+	let sourceFilter = $state<SourceIds | ''>('');
 
 	const compendium = getCompendiumContext();
 	const context = getCharacterContext();
+
+	// Get available sources from whitelist, sorted by short_title
+	let availableSources = $derived(
+		Object.values(compendium.sources)
+			.filter((source) => compendium.source_whitelist.has(source.source_id))
+			.sort((a, b) => a.short_title.localeCompare(b.short_title))
+	);
 
 	// Get all beastforms from compendium
 	let allBeastforms = $derived(Object.values(compendium.beastforms));
@@ -54,17 +62,22 @@
 		return nameMatch || categoryMatch || advantagesMatch || featuresMatch;
 	}
 
+	// Helper to convert tier string to number
+	function getTierNumber(tier: '1' | '2' | '3' | '4'): number {
+		return parseInt(tier);
+	}
+
 	// Filter beastforms
 	let filteredBeastforms = $derived(
 		allBeastforms.filter((beastform) => {
 			// Tier filter
-			if (tierFilter !== 'all' && context) {
+			if (tierFilter !== '' && context) {
 				const tier = context.level_to_tier(beastform.level_requirement);
-				if (tierFilter === 'tier_1' && tier !== 1) return false;
-				if (tierFilter === 'tier_2' && tier !== 2) return false;
-				if (tierFilter === 'tier_3' && tier !== 3) return false;
-				if (tierFilter === 'tier_4' && tier !== 4) return false;
+				if (tier !== getTierNumber(tierFilter)) return false;
 			}
+
+			// Source filter
+			if (sourceFilter !== '' && beastform.source_id !== sourceFilter) return false;
 
 			// Search filter
 			if (!matchesSearch(beastform, searchQuery)) return false;
@@ -74,7 +87,10 @@
 	);
 
 	// Check if user has applied any filter or search
-	let hasActiveFilter = $derived(searchQuery.trim() !== '' || tierFilter !== 'all');
+	// Show results if a tier is selected, a source is selected, or there's a search query
+	let hasActiveFilter = $derived(
+		tierFilter !== '' || sourceFilter !== '' || searchQuery.trim() !== ''
+	);
 </script>
 
 <div class="flex flex-col gap-4">
@@ -92,33 +108,54 @@
 			<div class="flex grow flex-wrap justify-center gap-1">
 				<Button
 					size="sm"
-					variant={tierFilter === 'tier_1' ? 'default' : 'outline'}
-					onclick={() => (tierFilter = tierFilter === 'tier_1' ? 'all' : 'tier_1')}
+					variant={tierFilter === '1' ? 'default' : 'outline'}
+					onclick={() => (tierFilter = tierFilter === '1' ? '' : '1')}
 				>
 					Tier 1
 				</Button>
 				<Button
 					size="sm"
-					variant={tierFilter === 'tier_2' ? 'default' : 'outline'}
-					onclick={() => (tierFilter = tierFilter === 'tier_2' ? 'all' : 'tier_2')}
+					variant={tierFilter === '2' ? 'default' : 'outline'}
+					onclick={() => (tierFilter = tierFilter === '2' ? '' : '2')}
 				>
 					Tier 2
 				</Button>
 				<Button
 					size="sm"
-					variant={tierFilter === 'tier_3' ? 'default' : 'outline'}
-					onclick={() => (tierFilter = tierFilter === 'tier_3' ? 'all' : 'tier_3')}
+					variant={tierFilter === '3' ? 'default' : 'outline'}
+					onclick={() => (tierFilter = tierFilter === '3' ? '' : '3')}
 				>
 					Tier 3
 				</Button>
 				<Button
 					size="sm"
-					variant={tierFilter === 'tier_4' ? 'default' : 'outline'}
-					onclick={() => (tierFilter = tierFilter === 'tier_4' ? 'all' : 'tier_4')}
+					variant={tierFilter === '4' ? 'default' : 'outline'}
+					onclick={() => (tierFilter = tierFilter === '4' ? '' : '4')}
 				>
 					Tier 4
 				</Button>
 			</div>
+		</div>
+
+		<div class="flex flex-wrap justify-center gap-2">
+			<!-- Source Select -->
+			<Select.Root
+				type="single"
+				value={sourceFilter}
+				onValueChange={(v) => (sourceFilter = v as SourceIds | '')}
+			>
+				<Select.Trigger class="w-32">
+					{sourceFilter
+						? compendium.sources[sourceFilter]?.short_title || sourceFilter
+						: 'All Sources'}
+				</Select.Trigger>
+				<Select.Content>
+					<Select.Item value="">All Sources</Select.Item>
+					{#each availableSources as source}
+						<Select.Item value={source.source_id}>{source.short_title}</Select.Item>
+					{/each}
+				</Select.Content>
+			</Select.Root>
 		</div>
 	</div>
 
@@ -136,8 +173,13 @@
 				{#snippet title_snippet()}
 					<div class="gap-4 text-left">
 						<p class="text-md font-medium">{beastform.name}</p>
-						<p class="truncate text-[10px] leading-none text-muted-foreground italic">
-							{beastform.category}
+						<p
+							class="flex items-center gap-1.5 truncate text-[10px] leading-none text-muted-foreground italic"
+						>
+							{#if beastform.source_id === 'Homebrew'}
+								<HomebrewBadge type="beastform" id={beastform.compendium_id} class="size-3" />
+							{/if}
+							Tier {tier} {beastform.category}
 						</p>
 					</div>
 				{/snippet}

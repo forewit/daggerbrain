@@ -4,7 +4,7 @@
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import * as Select from '$lib/components/ui/select/';
-	import { capitalize, cn, applyProficiencyToDice } from '$lib/utils';
+	import { capitalize, cn, applyProficiencyToDice, level_to_tier } from '$lib/utils';
 	import { renderMarkdown } from '$lib/utils/markdown';
 
 	let {
@@ -64,13 +64,13 @@
 </script>
 
 <div
-	class={cn('flex max-w-[calc(min(100%,400px))] flex-col gap-4 rounded bg-card/50 p-3', className)}
+	class={cn('flex max-w-[calc(min(100%,400px))] flex-col gap-4 rounded bg-card/50 border p-3', className)}
 >
 	<div class="flex flex-wrap gap-2">
 		<!-- Header with Name and Category -->
 		<div class=" flex grow items-center justify-between gap-1">
 			<h3 class="text-sm font-semibold text-foreground">{beastform.name}</h3>
-			<p class="text-right text-xs text-muted-foreground italic">{beastform.category}</p>
+			<p class="text-right text-xs text-muted-foreground italic">Tier {level_to_tier(beastform.level_requirement)} {beastform.category}</p>
 		</div>
 
 		<!-- Stats Table -->

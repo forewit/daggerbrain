@@ -34,7 +34,7 @@
 <Sheet.Header>
 	<Sheet.Title>Choose a Beastform</Sheet.Title>
 	<Sheet.Description class="text-xs italic"
-		>Select a beastform for your character. Special beastforms (Legendary, Mythic) require
+		>Select a beastform for your character. Evolved Beast and Hybrid beastforms require
 		additional choices.</Sheet.Description
 	>
 </Sheet.Header>
@@ -53,6 +53,9 @@
 	<!-- Beastform Catalog -->
 	<div class="flex flex-col gap-2">
 		<h3 class="text-sm font-medium">Browse Beastforms</h3>
-		<BeastformsCatalog onBeastformClick={handleBeastformClick} maxLevel={character?.level} />
+		<BeastformsCatalog
+			onBeastformClick={handleBeastformClick}
+			maxLevel={character?.level}
+		/>
 	</div>
 </div>

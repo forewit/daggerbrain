@@ -111,6 +111,7 @@
 														? 'community-cards'
 														: 'transformation-cards'}
 												id={card.compendium_id}
+												class="-mt-0.5 size-4"
 											/>
 										{/if}
 										{getCardTypeName(card)}

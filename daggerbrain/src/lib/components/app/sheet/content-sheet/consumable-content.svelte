@@ -89,7 +89,7 @@
 		<Sheet.Title>{consumable.title}</Sheet.Title>
 		<p class="flex items-center gap-1.5 text-xs text-muted-foreground italic">
 			{#if consumable.source_id === 'Homebrew'}
-				<HomebrewBadge type="consumable" id={consumable.compendium_id} />
+				<HomebrewBadge type="consumable" id={consumable.compendium_id} class="-mt-0.5 size-4" />
 			{/if}
 			Consumable
 		</p>

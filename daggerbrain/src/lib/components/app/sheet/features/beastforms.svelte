@@ -44,7 +44,7 @@
 </script>
 
 {#if character && (character.primary_class_id === druid_class_id || character.secondary_class_id === druid_class_id)}
-	<div class="flex flex-col items-center gap-2">
+	<div class="flex flex-col items-center gap-4">
 		{#if derivedBeastform}
 			<label
 				class={cn(

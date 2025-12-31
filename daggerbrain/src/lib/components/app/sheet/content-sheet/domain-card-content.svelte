@@ -114,7 +114,7 @@
 									<span class="font-medium">{card.title}</span>
 									<span class="flex items-center gap-1.5 text-xs text-muted-foreground">
 										{#if card.source_id === 'Homebrew'}
-											<HomebrewBadge type="domain-cards" id={card.compendium_id} />
+											<HomebrewBadge type="domain-cards" id={card.compendium_id} class="-mt-0.5 size-4" />
 										{/if}
 										{getDomainName(card.domain_id)} • Level {card.level_requirement}
 									</span>

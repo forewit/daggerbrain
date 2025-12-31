@@ -242,7 +242,7 @@
 		{#if armor.compendium_id !== 'unarmored'}
 			<p class="flex items-center gap-1.5 text-xs text-muted-foreground italic">
 				{#if armor.source_id === 'Homebrew'}
-					<HomebrewBadge type="armor" id={armor.compendium_id} />
+					<HomebrewBadge type="armor" id={armor.compendium_id} class="-mt-0.5 size-4" />
 				{/if}
 				Tier {context.level_to_tier(armor.level_requirement)}
 			</p>
