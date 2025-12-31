@@ -29,12 +29,10 @@
 	<!-- Content -->
 	<div class="relative z-10 mx-auto h-full w-full">
 		<div class="flex flex-col items-center sm:items-start">
-
-
 			<!-- Homebrew Showcase - Full Width Glass Pane -->
 			<section class="relative z-10 mt-14 w-full">
 				<button
-					class="homebrew-showcase group relative w-full min-h-[400px] sm:min-h-[320px] cursor-pointer overflow-hidden border-y border-muted-foreground/30 bg-background"
+					class="homebrew-showcase group relative min-h-[400px] w-full cursor-pointer overflow-hidden border-y border-muted-foreground/30 bg-background sm:min-h-[320px]"
 					onclick={() => {
 						goto('/homebrew');
 					}}
@@ -44,31 +42,32 @@
 						<img
 							src="/images/art/forge.webp"
 							alt=""
-							class="h-full w-full object-cover transition-all duration-600 group-hover:scale-103 opacity-30 group-hover:opacity-40"
+							class="h-full w-full object-cover opacity-30 transition-all duration-600 group-hover:scale-103 group-hover:opacity-40"
 							loading="lazy"
 						/>
 					</div>
 
-					<div class="relative z-10 mx-auto flex h-full w-full max-w-5xl flex-col justify-center gap-4 px-4 py-8 sm:px-8 sm:py-12">
-							<div class="flex flex-col gap-8 items-center  sm:text-left">
-								<h3 class="font-eveleth text-2xl font-bold text-foreground">
-									Announcing Homebrew!
-								</h3>
-								<p class="text-sm text-center">
-									Design your own Weapons, Armor, Loot, and more! <br>Build
-									custom content for your Daggerheart characters.
-								</p>
+					<div
+						class="relative z-10 mx-auto flex h-full w-full max-w-5xl flex-col justify-center gap-4 px-4 py-8 sm:px-8 sm:py-12"
+					>
+						<div class="flex flex-col items-center gap-8 sm:text-left">
+							<h3 class="font-eveleth text-2xl font-bold text-foreground">Announcing Homebrew!</h3>
+							<p class="text-center text-sm">
+								Design your own Weapons, Armor, Loot, and more! <br />Build custom content for your
+								Daggerheart characters.
+							</p>
 
-									<div
+							<div
 								class={cn(
 									buttonVariants({ variant: 'outline' }),
-									'w-min shrink-0 pointer-events-none mx-auto sm:mx-0'
+									'pointer-events-none mx-auto w-min shrink-0 sm:mx-0'
 								)}
 							>
 								Explore Homebrew
-								<ArrowRight class="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+								<ArrowRight
+									class="size-3.5 transition-transform duration-300 group-hover:translate-x-1"
+								/>
 							</div>
-							
 						</div>
 					</div>
 				</button>
@@ -76,7 +75,7 @@
 
 			<!-- Hero section-->
 			<section
-				class="mx-auto flex w-full max-w-6xl flex-col items-center gap-x-10 gap-y-16 px-4 pt-16 sm:px-8 sm:flex-row sm:justify-evenly"
+				class="mx-auto flex w-full max-w-6xl flex-col items-center gap-x-10 gap-y-16 px-4 pt-16 sm:flex-row sm:justify-evenly sm:px-8"
 			>
 				<!-- Hero Card -->
 				<button
@@ -202,7 +201,7 @@
 	}
 
 	.homebrew-showcase {
-		box-shadow: 
+		box-shadow:
 			0 -8px 16px -4px rgba(0, 0, 0, 1),
 			0 8px 16px -4px rgba(0, 0, 0, 1);
 	}

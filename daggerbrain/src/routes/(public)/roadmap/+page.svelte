@@ -62,7 +62,10 @@
 								>
 							</div>
 							<div class="px-5 pt-3 pb-4 text-sm text-muted-foreground">
-								Added homebrew support for Weapons, Armor, Loot, Consumables, and Beastforms. <a href="/homebrew" class="underline hover:text-emerald-500">Check it out!</a>
+								Added homebrew support for Weapons, Armor, Loot, Consumables, and Beastforms. <a
+									href="/homebrew"
+									class="underline hover:text-emerald-500">Check it out!</a
+								>
 							</div>
 						</div>
 					</li>
@@ -118,7 +121,7 @@
 
 									<li>
 										<span class="text-foreground">DM tools</span>
-									campaigns, fear tracking, encounter manager
+										campaigns, fear tracking, encounter manager
 									</li>
 									<li><span class="text-foreground">PDF export</span></li>
 

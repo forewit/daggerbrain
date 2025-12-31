@@ -179,7 +179,8 @@
 							{#if beastform.source_id === 'Homebrew'}
 								<HomebrewBadge type="beastform" id={beastform.compendium_id} class="size-3" />
 							{/if}
-							Tier {tier} {beastform.category}
+							Tier {tier}
+							{beastform.category}
 						</p>
 					</div>
 				{/snippet}

@@ -6,6 +6,7 @@ CREATE TABLE `homebrew_ancestry_cards` (
 	`updated_at` integer NOT NULL
 );
 --> statement-breakpoint
+CREATE INDEX `homebrew_ancestry_cards_clerk_user_id_idx` ON `homebrew_ancestry_cards` (`clerk_user_id`);--> statement-breakpoint
 CREATE TABLE `homebrew_armor` (
 	`id` text PRIMARY KEY NOT NULL,
 	`clerk_user_id` text NOT NULL,
@@ -14,6 +15,7 @@ CREATE TABLE `homebrew_armor` (
 	`updated_at` integer NOT NULL
 );
 --> statement-breakpoint
+CREATE INDEX `homebrew_armor_clerk_user_id_idx` ON `homebrew_armor` (`clerk_user_id`);--> statement-breakpoint
 CREATE TABLE `homebrew_beastforms` (
 	`id` text PRIMARY KEY NOT NULL,
 	`clerk_user_id` text NOT NULL,
@@ -22,6 +24,7 @@ CREATE TABLE `homebrew_beastforms` (
 	`updated_at` integer NOT NULL
 );
 --> statement-breakpoint
+CREATE INDEX `homebrew_beastforms_clerk_user_id_idx` ON `homebrew_beastforms` (`clerk_user_id`);--> statement-breakpoint
 CREATE TABLE `homebrew_classes` (
 	`id` text PRIMARY KEY NOT NULL,
 	`clerk_user_id` text NOT NULL,
@@ -30,6 +33,7 @@ CREATE TABLE `homebrew_classes` (
 	`updated_at` integer NOT NULL
 );
 --> statement-breakpoint
+CREATE INDEX `homebrew_classes_clerk_user_id_idx` ON `homebrew_classes` (`clerk_user_id`);--> statement-breakpoint
 CREATE TABLE `homebrew_community_cards` (
 	`id` text PRIMARY KEY NOT NULL,
 	`clerk_user_id` text NOT NULL,
@@ -38,6 +42,7 @@ CREATE TABLE `homebrew_community_cards` (
 	`updated_at` integer NOT NULL
 );
 --> statement-breakpoint
+CREATE INDEX `homebrew_community_cards_clerk_user_id_idx` ON `homebrew_community_cards` (`clerk_user_id`);--> statement-breakpoint
 CREATE TABLE `homebrew_consumables` (
 	`id` text PRIMARY KEY NOT NULL,
 	`clerk_user_id` text NOT NULL,
@@ -46,6 +51,7 @@ CREATE TABLE `homebrew_consumables` (
 	`updated_at` integer NOT NULL
 );
 --> statement-breakpoint
+CREATE INDEX `homebrew_consumables_clerk_user_id_idx` ON `homebrew_consumables` (`clerk_user_id`);--> statement-breakpoint
 CREATE TABLE `homebrew_domain_cards` (
 	`id` text PRIMARY KEY NOT NULL,
 	`clerk_user_id` text NOT NULL,
@@ -54,6 +60,7 @@ CREATE TABLE `homebrew_domain_cards` (
 	`updated_at` integer NOT NULL
 );
 --> statement-breakpoint
+CREATE INDEX `homebrew_domain_cards_clerk_user_id_idx` ON `homebrew_domain_cards` (`clerk_user_id`);--> statement-breakpoint
 CREATE TABLE `homebrew_domains` (
 	`id` text PRIMARY KEY NOT NULL,
 	`clerk_user_id` text NOT NULL,
@@ -62,6 +69,7 @@ CREATE TABLE `homebrew_domains` (
 	`updated_at` integer NOT NULL
 );
 --> statement-breakpoint
+CREATE INDEX `homebrew_domains_clerk_user_id_idx` ON `homebrew_domains` (`clerk_user_id`);--> statement-breakpoint
 CREATE TABLE `homebrew_loot` (
 	`id` text PRIMARY KEY NOT NULL,
 	`clerk_user_id` text NOT NULL,
@@ -70,6 +78,7 @@ CREATE TABLE `homebrew_loot` (
 	`updated_at` integer NOT NULL
 );
 --> statement-breakpoint
+CREATE INDEX `homebrew_loot_clerk_user_id_idx` ON `homebrew_loot` (`clerk_user_id`);--> statement-breakpoint
 CREATE TABLE `homebrew_primary_weapons` (
 	`id` text PRIMARY KEY NOT NULL,
 	`clerk_user_id` text NOT NULL,
@@ -78,6 +87,7 @@ CREATE TABLE `homebrew_primary_weapons` (
 	`updated_at` integer NOT NULL
 );
 --> statement-breakpoint
+CREATE INDEX `homebrew_primary_weapons_clerk_user_id_idx` ON `homebrew_primary_weapons` (`clerk_user_id`);--> statement-breakpoint
 CREATE TABLE `homebrew_secondary_weapons` (
 	`id` text PRIMARY KEY NOT NULL,
 	`clerk_user_id` text NOT NULL,
@@ -86,6 +96,7 @@ CREATE TABLE `homebrew_secondary_weapons` (
 	`updated_at` integer NOT NULL
 );
 --> statement-breakpoint
+CREATE INDEX `homebrew_secondary_weapons_clerk_user_id_idx` ON `homebrew_secondary_weapons` (`clerk_user_id`);--> statement-breakpoint
 CREATE TABLE `homebrew_subclasses` (
 	`id` text PRIMARY KEY NOT NULL,
 	`clerk_user_id` text NOT NULL,
@@ -94,6 +105,7 @@ CREATE TABLE `homebrew_subclasses` (
 	`updated_at` integer NOT NULL
 );
 --> statement-breakpoint
+CREATE INDEX `homebrew_subclasses_clerk_user_id_idx` ON `homebrew_subclasses` (`clerk_user_id`);--> statement-breakpoint
 CREATE TABLE `homebrew_transformation_cards` (
 	`id` text PRIMARY KEY NOT NULL,
 	`clerk_user_id` text NOT NULL,
@@ -102,9 +114,10 @@ CREATE TABLE `homebrew_transformation_cards` (
 	`updated_at` integer NOT NULL
 );
 --> statement-breakpoint
+CREATE INDEX `homebrew_transformation_cards_clerk_user_id_idx` ON `homebrew_transformation_cards` (`clerk_user_id`);--> statement-breakpoint
 PRAGMA foreign_keys=OFF;--> statement-breakpoint
 CREATE TABLE `__new_characters_table` (
-	`id` text PRIMARY KEY DEFAULT '3e49ddd8-1a3b-43f3-a9f0-b9110306e25a' NOT NULL,
+	`id` text PRIMARY KEY DEFAULT '38dae4e3-cbbd-4309-aba8-9a87d480a3cf' NOT NULL,
 	`clerk_user_id` text NOT NULL,
 	`name` text DEFAULT 'New Character' NOT NULL,
 	`image_url` text DEFAULT '/images/portrait-placeholder.png' NOT NULL,
@@ -145,7 +158,7 @@ CREATE TABLE `__new_characters_table` (
 	`selected_traits` text DEFAULT '{"agility":null,"strength":null,"finesse":null,"instinct":null,"presence":null,"knowledge":null}' NOT NULL,
 	`marked_hp` integer DEFAULT 0 NOT NULL,
 	`marked_stress` integer DEFAULT 0 NOT NULL,
-	`marked_hope` integer DEFAULT 0 NOT NULL,
+	`marked_hope` integer DEFAULT 2 NOT NULL,
 	`marked_armor` integer DEFAULT 0 NOT NULL,
 	`loadout_domain_card_ids` text DEFAULT '[]' NOT NULL,
 	`bonus_max_loadout` integer DEFAULT 0 NOT NULL,
@@ -157,4 +170,8 @@ CREATE TABLE `__new_characters_table` (
 INSERT INTO `__new_characters_table`("id", "clerk_user_id", "name", "image_url", "settings", "derived_descriptors", "ancestry_card_id", "custom_top_ancestry", "custom_bottom_ancestry", "community_card_id", "experiences", "class_choices", "primary_class_id", "primary_subclass_id", "secondary_class_id", "secondary_subclass_id", "secondary_class_domain_id_choice", "chosen_beastform", "companion", "background_questions", "connections", "character_descriptions", "notes", "active_armor_id", "active_primary_weapon_id", "active_secondary_weapon_id", "inventory", "active_conditions", "transformation_card_id", "additional_domain_card_ids", "additional_ancestry_card_ids", "additional_community_card_ids", "additional_transformation_card_ids", "unarmed_attack_choices", "ancestry_card_choices", "community_card_tokens", "domain_card_choices", "domain_card_tokens", "selected_traits", "marked_hp", "marked_stress", "marked_hope", "marked_armor", "loadout_domain_card_ids", "bonus_max_loadout", "level", "level_up_domain_card_ids", "level_up_choices") SELECT "id", "clerk_user_id", "name", "image_url", "settings", "derived_descriptors", "ancestry_card_id", "custom_top_ancestry", "custom_bottom_ancestry", "community_card_id", "experiences", "class_choices", "primary_class_id", "primary_subclass_id", "secondary_class_id", "secondary_subclass_id", "secondary_class_domain_id_choice", "chosen_beastform", "companion", "background_questions", "connections", "character_descriptions", "notes", "active_armor_id", "active_primary_weapon_id", "active_secondary_weapon_id", "inventory", "active_conditions", "transformation_card_id", "additional_domain_card_ids", "additional_ancestry_card_ids", "additional_community_card_ids", "additional_transformation_card_ids", "unarmed_attack_choices", "ancestry_card_choices", "community_card_tokens", "domain_card_choices", "domain_card_tokens", "selected_traits", "marked_hp", "marked_stress", "marked_hope", "marked_armor", "loadout_domain_card_ids", "bonus_max_loadout", "level", "level_up_domain_card_ids", "level_up_choices" FROM `characters_table`;--> statement-breakpoint
 DROP TABLE `characters_table`;--> statement-breakpoint
 ALTER TABLE `__new_characters_table` RENAME TO `characters_table`;--> statement-breakpoint
-PRAGMA foreign_keys=ON;
+PRAGMA foreign_keys=ON;--> statement-breakpoint
+CREATE INDEX `characters_table_clerk_user_id_idx` ON `characters_table` (`clerk_user_id`);--> statement-breakpoint
+ALTER TABLE `users_table` DROP COLUMN `character_slot_1`;--> statement-breakpoint
+ALTER TABLE `users_table` DROP COLUMN `character_slot_2`;--> statement-breakpoint
+ALTER TABLE `users_table` DROP COLUMN `character_slot_3`;
