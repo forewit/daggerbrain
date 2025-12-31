@@ -123,7 +123,7 @@
 
 			<Dialog.Root>
 				<Dialog.Trigger
-					class={cn(buttonVariants({ variant: 'link' }), 'h-min w-min p-0 text-destructive')}
+					class={cn(buttonVariants({ variant: 'link' }), 'h-min w-min p-0 mt-4 text-destructive')}
 					>Delete Character</Dialog.Trigger
 				>
 				<Dialog.Content>
