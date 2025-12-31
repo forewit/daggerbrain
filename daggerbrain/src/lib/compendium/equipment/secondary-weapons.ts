@@ -181,8 +181,7 @@ export const TIER_1_SECONDARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Hooked',
-				description_html:
-					'On a successful attack, you can pull the target into Melee range.',
+				description_html: 'On a successful attack, you can pull the target into Melee range.',
 				character_modifiers: [] // positional effect, no numeric modifier
 			}
 		]
@@ -386,8 +385,7 @@ export const TIER_2_SECONDARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Hooked',
-				description_html:
-					'On a successful attack, you can pull the target into Melee range.',
+				description_html: 'On a successful attack, you can pull the target into Melee range.',
 				character_modifiers: []
 			}
 		]
@@ -436,8 +434,7 @@ export const TIER_2_SECONDARY_WEAPONS = {
 					}
 				],
 				title: 'Double Duty',
-				description_html:
-					'+1 to Armor Score; +1 to primary weapon damage within Melee range',
+				description_html: '+1 to Armor Score; +1 to primary weapon damage within Melee range',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -682,8 +679,7 @@ export const TIER_3_SECONDARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Hooked',
-				description_html:
-					'On a successful attack, you can pull the target into Melee range.',
+				description_html: 'On a successful attack, you can pull the target into Melee range.',
 				character_modifiers: []
 			}
 		]
@@ -962,8 +958,7 @@ export const TIER_4_SECONDARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Hooked',
-				description_html:
-					'On a successful attack, you can pull the target into Melee range.',
+				description_html: 'On a successful attack, you can pull the target into Melee range.',
 				character_modifiers: []
 			}
 		]

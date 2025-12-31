@@ -64,19 +64,23 @@
 
 	// Validation errors state
 	let errors = $state<WeaponFormErrors>({});
-	
+
 	// Feature validation state - track detailed errors for each feature
 	const featureErrors = new SvelteMap<number, FeatureValidationErrors>();
-	
+
 	// Track if validation has been attempted (to show errors only after first submit attempt)
 	let validationAttempted = $state(false);
-	
+
 	// Track which modifiers existed at the last validation attempt
 	// New modifiers added after validation should not show errors until next submit
 	const validatedModifierKeys = new SvelteMap<string, boolean>();
-	
+
 	// Generate a key for a modifier to track it
-	function getModifierKey(featureIndex: number, modifierType: 'character' | 'weapon', modifierIndex: number): string {
+	function getModifierKey(
+		featureIndex: number,
+		modifierType: 'character' | 'weapon',
+		modifierIndex: number
+	): string {
 		return `${featureIndex}-${modifierType}-${modifierIndex}`;
 	}
 
@@ -96,14 +100,14 @@
 	// Collect all error messages for display
 	let allErrorMessages = $derived.by(() => {
 		const messages: string[] = [];
-		
+
 		// Add form-level errors (exclude 'features' since individual feature errors are shown)
 		for (const [key, value] of Object.entries(errors)) {
 			if (value && key !== 'features') {
 				messages.push(`${key}: ${value}`);
 			}
 		}
-		
+
 		// Add feature errors
 		for (const [index, featureError] of featureErrors) {
 			const featureTitle = formFeatures[index]?.title || `Feature ${index + 1}`;
@@ -128,7 +132,7 @@
 				}
 			}
 		}
-		
+
 		return messages;
 	});
 
@@ -262,10 +266,10 @@
 	function validateFeatures() {
 		for (let i = 0; i < formFeatures.length; i++) {
 			const result = FeatureSchema.safeParse(formFeatures[i]);
-			
+
 			if (!result.success) {
 				const featureErrorsData = extractFeatureErrors(result.error);
-				
+
 				// Filter out errors for modifiers that weren't validated yet (newly added)
 				if (featureErrorsData.character_modifiers) {
 					const filteredCharModifiers = new Map<number, string[]>();
@@ -281,7 +285,7 @@
 						delete featureErrorsData.character_modifiers;
 					}
 				}
-				
+
 				if (featureErrorsData.weapon_modifiers) {
 					const filteredWeaponModifiers = new Map<number, string[]>();
 					for (const [modIndex, errors] of featureErrorsData.weapon_modifiers) {
@@ -296,14 +300,18 @@
 						delete featureErrorsData.weapon_modifiers;
 					}
 				}
-				
+
 				// Only set errors if there are any remaining after filtering
-				const hasCharModifierErrors = featureErrorsData.character_modifiers && featureErrorsData.character_modifiers.size > 0;
-				const hasWeaponModifierErrors = featureErrorsData.weapon_modifiers && featureErrorsData.weapon_modifiers.size > 0;
-				if (hasCharModifierErrors || 
-				    hasWeaponModifierErrors ||
-				    featureErrorsData.title || 
-				    featureErrorsData.description_html) {
+				const hasCharModifierErrors =
+					featureErrorsData.character_modifiers && featureErrorsData.character_modifiers.size > 0;
+				const hasWeaponModifierErrors =
+					featureErrorsData.weapon_modifiers && featureErrorsData.weapon_modifiers.size > 0;
+				if (
+					hasCharModifierErrors ||
+					hasWeaponModifierErrors ||
+					featureErrorsData.title ||
+					featureErrorsData.description_html
+				) {
 					featureErrors.set(i, featureErrorsData);
 				} else {
 					featureErrors.delete(i);
@@ -328,15 +336,15 @@
 	// Reactive validation - re-validate when form data changes (only after first validation attempt)
 	$effect(() => {
 		if (!validationAttempted) return;
-		
+
 		// Re-validate features when they change
 		validateFeatures();
 	});
-	
+
 	// Re-validate form fields when they change
 	$effect(() => {
 		if (!validationAttempted) return;
-		
+
 		// Track form field changes
 		formTitle;
 		formDescriptionHtml;
@@ -350,7 +358,7 @@
 		formDamageDice;
 		formDamageBonus;
 		formAttackRollBonus;
-		
+
 		validateFormFields();
 	});
 
@@ -362,7 +370,7 @@
 
 		// Mark that validation has been attempted
 		validationAttempted = true;
-		
+
 		// Mark all current modifiers as validated (so errors will show for them)
 		validatedModifierKeys.clear();
 		for (let i = 0; i < formFeatures.length; i++) {
@@ -490,7 +498,7 @@
 			weapon_modifiers: []
 		};
 		formFeatures = [...formFeatures, newFeature];
-		
+
 		tick().then(() => {
 			dropdownOpenIndex = -1;
 		});
@@ -520,274 +528,290 @@
 </script>
 
 <form onsubmit={handleSubmit} class="flex flex-col gap-4">
-	
-		<!-- Title -->
-		<div class="flex flex-col gap-1">
-			<label for="hb-weapon-title" class="text-xs font-medium text-muted-foreground">Name</label>
-			<Input
-				id="hb-weapon-title"
-				bind:value={formTitle}
-				placeholder="Weapon name"
-				aria-invalid={!!errors.title}
-			/>
-			{#if errors.title}
-				<p class="text-xs text-destructive">{errors.title}</p>
-			{/if}
-		</div>
+	<!-- Title -->
+	<div class="flex flex-col gap-1">
+		<label for="hb-weapon-title" class="text-xs font-medium text-muted-foreground">Name</label>
+		<Input
+			id="hb-weapon-title"
+			bind:value={formTitle}
+			placeholder="Weapon name"
+			aria-invalid={!!errors.title}
+		/>
+		{#if errors.title}
+			<p class="text-xs text-destructive">{errors.title}</p>
+		{/if}
+	</div>
 
-		<!-- Description -->
+	<!-- Description -->
+	<div class="flex flex-col gap-1">
+		<label for="hb-weapon-description" class="text-xs font-medium text-muted-foreground"
+			>Description</label
+		>
+		<Textarea
+			id="hb-weapon-description"
+			bind:value={formDescriptionHtml}
+			placeholder="Weapon description"
+			rows={3}
+		/>
+	</div>
+
+	<!-- Category & Tier Row -->
+	<div class="grid grid-cols-2 gap-3">
 		<div class="flex flex-col gap-1">
-			<label for="hb-weapon-description" class="text-xs font-medium text-muted-foreground"
-				>Description</label
+			<label for="hb-weapon-category" class="text-xs font-medium text-muted-foreground"
+				>Category</label
 			>
-			<Textarea
-				id="hb-weapon-description"
-				bind:value={formDescriptionHtml}
-				placeholder="Weapon description"
-				rows={3}
-			/>
+			<Select.Root type="single" bind:value={formCategory}>
+				<Select.Trigger id="hb-weapon-category" class="w-full">
+					<p class="truncate">{formCategory}</p>
+				</Select.Trigger>
+				<Select.Content>
+					{#each categoryOptions as category}
+						<Select.Item value={category}>{category}</Select.Item>
+					{/each}
+				</Select.Content>
+			</Select.Root>
 		</div>
-
-		<!-- Category & Tier Row -->
-		<div class="grid grid-cols-2 gap-3">
-			<div class="flex flex-col gap-1">
-				<label for="hb-weapon-category" class="text-xs font-medium text-muted-foreground"
-					>Category</label
-				>
-				<Select.Root type="single" bind:value={formCategory}>
-					<Select.Trigger id="hb-weapon-category" class="w-full">
-						<p class="truncate">{formCategory}</p>
-					</Select.Trigger>
-					<Select.Content>
-						{#each categoryOptions as category}
-							<Select.Item value={category}>{category}</Select.Item>
-						{/each}
-					</Select.Content>
-				</Select.Root>
-			</div>
-			<div class="flex flex-col gap-1">
-				<label for="hb-weapon-tier" class="text-xs font-medium text-muted-foreground">Tier</label>
-				<Select.Root type="single" bind:value={formTier}>
-					<Select.Trigger id="hb-weapon-tier" class="w-full">
-						<p class="truncate">{formTier || 'Select tier'}</p>
-					</Select.Trigger>
-					<Select.Content>
-						<Select.Item value="1">1</Select.Item>
-						<Select.Item value="2">2</Select.Item>
-						<Select.Item value="3">3</Select.Item>
-						<Select.Item value="4">4</Select.Item>
-					</Select.Content>
-				</Select.Root>
-			</div>
+		<div class="flex flex-col gap-1">
+			<label for="hb-weapon-tier" class="text-xs font-medium text-muted-foreground">Tier</label>
+			<Select.Root type="single" bind:value={formTier}>
+				<Select.Trigger id="hb-weapon-tier" class="w-full">
+					<p class="truncate">{formTier || 'Select tier'}</p>
+				</Select.Trigger>
+				<Select.Content>
+					<Select.Item value="1">1</Select.Item>
+					<Select.Item value="2">2</Select.Item>
+					<Select.Item value="3">3</Select.Item>
+					<Select.Item value="4">4</Select.Item>
+				</Select.Content>
+			</Select.Root>
 		</div>
+	</div>
 
-
-		<!-- Burden & Range Row -->
-		<div class="grid grid-cols-2 gap-3">
-			<div class="flex flex-col gap-1">
-				<label for="hb-weapon-burden" class="text-xs font-medium text-muted-foreground">Burden</label>
-				<Select.Root type="single" bind:value={formBurden}>
-					<Select.Trigger id="hb-weapon-burden" class="w-full">
-						<p class="truncate">{formBurden}</p>
-						<Hand class="mr-auto" />
-					</Select.Trigger>
-					<Select.Content>
-						{#each burdenOptions as burden}
-							<Select.Item value={burden}>{burden}</Select.Item>
-						{/each}
-					</Select.Content>
-				</Select.Root>
-			</div>
-			<div class="flex flex-col gap-1">
-				<label for="hb-weapon-range" class="text-xs font-medium text-muted-foreground">Range</label>
-				<Select.Root type="single" bind:value={formRange}>
-					<Select.Trigger id="hb-weapon-range" class="w-full">
-						<p class="truncate">{formRange}</p>
-					</Select.Trigger>
-					<Select.Content>
-						{#each rangeOptions as range}
-							<Select.Item value={range}>{range}</Select.Item>
-						{/each}
-					</Select.Content>
-				</Select.Root>
-			</div>
+	<!-- Burden & Range Row -->
+	<div class="grid grid-cols-2 gap-3">
+		<div class="flex flex-col gap-1">
+			<label for="hb-weapon-burden" class="text-xs font-medium text-muted-foreground">Burden</label>
+			<Select.Root type="single" bind:value={formBurden}>
+				<Select.Trigger id="hb-weapon-burden" class="w-full">
+					<p class="truncate">{formBurden}</p>
+					<Hand class="mr-auto" />
+				</Select.Trigger>
+				<Select.Content>
+					{#each burdenOptions as burden}
+						<Select.Item value={burden}>{burden}</Select.Item>
+					{/each}
+				</Select.Content>
+			</Select.Root>
 		</div>
+		<div class="flex flex-col gap-1">
+			<label for="hb-weapon-range" class="text-xs font-medium text-muted-foreground">Range</label>
+			<Select.Root type="single" bind:value={formRange}>
+				<Select.Trigger id="hb-weapon-range" class="w-full">
+					<p class="truncate">{formRange}</p>
+				</Select.Trigger>
+				<Select.Content>
+					{#each rangeOptions as range}
+						<Select.Item value={range}>{range}</Select.Item>
+					{/each}
+				</Select.Content>
+			</Select.Root>
+		</div>
+	</div>
 
-		<!-- Available Traits -->
+	<!-- Available Traits -->
+	<div class="flex flex-col gap-2">
+		<p
+			class={cn(
+				'text-xs font-medium text-muted-foreground',
+				errors.available_traits && 'text-destructive'
+			)}
+		>
+			Weapon Trait
+		</p>
+		<div class="flex flex-wrap gap-3">
+			{#each traitOptions as trait}
+				<label class="flex items-center gap-2 text-xs">
+					<input
+						type="checkbox"
+						checked={formAvailableTraits.includes(trait)}
+						onchange={() => toggleTrait(trait)}
+						class="accent-accent"
+					/>
+					{capitalize(trait)}
+				</label>
+			{/each}
+		</div>
+		{#if errors.available_traits}
+			<p class="text-xs text-destructive">{errors.available_traits}</p>
+		{/if}
+	</div>
+
+	<!-- Damage Type & Weapon Type Row -->
+	<div class="grid grid-cols-2 gap-3">
 		<div class="flex flex-col gap-2">
-			<p class={cn('text-xs font-medium text-muted-foreground', errors.available_traits && 'text-destructive')}>
-				Weapon Trait
+			<p
+				class={cn(
+					'text-xs font-medium text-muted-foreground',
+					errors.available_damage_types && 'text-destructive'
+				)}
+			>
+				Damage Type
 			</p>
-			<div class="flex flex-wrap gap-3">
-				{#each traitOptions as trait}
+			<div class="flex gap-4">
+				{#each damageTypeOptions as type}
 					<label class="flex items-center gap-2 text-xs">
 						<input
 							type="checkbox"
-							checked={formAvailableTraits.includes(trait)}
-							onchange={() => toggleTrait(trait)}
+							checked={formDamageTypes.includes(type)}
+							onchange={() => toggleDamageType(type)}
 							class="accent-accent"
 						/>
-						{capitalize(trait)}
+						{damageTypeMap[type]}
 					</label>
 				{/each}
 			</div>
-			{#if errors.available_traits}
-				<p class="text-xs text-destructive">{errors.available_traits}</p>
+			{#if errors.available_damage_types}
+				<p class="text-xs text-destructive">{errors.available_damage_types}</p>
 			{/if}
 		</div>
-
-		<!-- Damage Type & Weapon Type Row -->
-		<div class="grid grid-cols-2 gap-3">
-			<div class="flex flex-col gap-2">
-				<p class={cn('text-xs font-medium text-muted-foreground', errors.available_damage_types && 'text-destructive')}>
-					Damage Type
-				</p>
-				<div class="flex gap-4">
-					{#each damageTypeOptions as type}
-						<label class="flex items-center gap-2 text-xs">
-							<input
-								type="checkbox"
-								checked={formDamageTypes.includes(type)}
-								onchange={() => toggleDamageType(type)}
-								class="accent-accent"
-							/>
-							{damageTypeMap[type]}
-						</label>
+		<div class="flex flex-col gap-1">
+			<label for="hb-weapon-type" class="text-xs font-medium text-muted-foreground"
+				>Weapon Type</label
+			>
+			<Select.Root type="single" bind:value={formType}>
+				<Select.Trigger id="hb-weapon-type" class="w-full">
+					<p class="truncate">{formType}</p>
+				</Select.Trigger>
+				<Select.Content>
+					{#each typeOptions as type}
+						<Select.Item value={type}>{type}</Select.Item>
 					{/each}
-				</div>
-				{#if errors.available_damage_types}
-					<p class="text-xs text-destructive">{errors.available_damage_types}</p>
+				</Select.Content>
+			</Select.Root>
+		</div>
+	</div>
+
+	<!-- Damage Dice -->
+	<div class="flex flex-col gap-2">
+		<div class="flex items-center justify-between">
+			<div class="flex items-center gap-2">
+				<label for="hb-weapon-damage-dice" class="text-xs font-medium text-muted-foreground"
+					>Damage Dice</label
+				>
+				{#if formDamageDice}
+					<span class="text-xs text-muted-foreground">({formDamageDice})</span>
 				{/if}
 			</div>
-			<div class="flex flex-col gap-1">
-				<label for="hb-weapon-type" class="text-xs font-medium text-muted-foreground"
-					>Weapon Type</label
-				>
-				<Select.Root type="single" bind:value={formType}>
-					<Select.Trigger id="hb-weapon-type" class="w-full">
-						<p class="truncate">{formType}</p>
-					</Select.Trigger>
-					<Select.Content>
-						{#each typeOptions as type}
-							<Select.Item value={type}>{type}</Select.Item>
-						{/each}
-					</Select.Content>
-				</Select.Root>
-			</div>
+			<button
+				type="button"
+				disabled={formDamageDice === ''}
+				class="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground disabled:hidden"
+				onclick={() => (formDamageDice = '')}
+				title="Reset damage dice"
+			>
+				Reset
+				<RotateCcw class="size-3.5" />
+			</button>
 		</div>
+		<DicePicker value={formDamageDice} onChange={(v) => (formDamageDice = v)} />
+	</div>
 
-		<!-- Damage Dice -->
+	<!-- Damage Bonus & Attack Roll Bonus Row -->
+	<div class="grid grid-cols-2 gap-3">
+		<div class="flex flex-col gap-1">
+			<label for="hb-weapon-damage-bonus" class="text-xs font-medium text-muted-foreground"
+				>Damage Bonus</label
+			>
+			<Input
+				id="hb-weapon-damage-bonus"
+				type="number"
+				inputmode="numeric"
+				bind:value={formDamageBonus}
+				placeholder="0"
+			/>
+		</div>
+		<div class="flex flex-col gap-1">
+			<label for="hb-weapon-attack-roll-bonus" class="text-xs font-medium text-muted-foreground"
+				>Attack Roll Bonus</label
+			>
+			<Input
+				id="hb-weapon-attack-roll-bonus"
+				type="number"
+				inputmode="numeric"
+				bind:value={formAttackRollBonus}
+				placeholder="0"
+			/>
+		</div>
+	</div>
+
+	<!-- Features -->
+	<div class="flex flex-col gap-2">
+		<div class="flex items-center justify-between">
+			<p class="text-xs font-medium text-muted-foreground">Features</p>
+			<Button
+				type="button"
+				size="sm"
+				variant="outline"
+				onclick={() => addFeature(formFeatures.length)}
+			>
+				<Plus class="size-3.5" />
+				Add Feature
+			</Button>
+		</div>
 		<div class="flex flex-col gap-2">
-			<div class="flex items-center justify-between">
-				<div class="flex items-center gap-2">
-					<label for="hb-weapon-damage-dice" class="text-xs font-medium text-muted-foreground"
-						>Damage Dice</label
-					>
-					{#if formDamageDice}
-						<span class="text-xs text-muted-foreground">({formDamageDice})</span>
-					{/if}
-				</div>
-				<button
-					type="button"
-					disabled={formDamageDice === ''}
-					class="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground disabled:hidden"
-					onclick={() => (formDamageDice = '')}
-					title="Reset damage dice"
+			{#each formFeatures as feature, index (index)}
+				<Dropdown
+					title={feature.title || `Unnamed feature`}
+					class={featureErrors.has(index)
+						? 'data-[open=false]:border data-[open=false]:border-destructive'
+						: ''}
+					open={dropdownOpenIndex === index}
 				>
-					Reset
+					<HomebrewFeatureForm
+						bind:feature={formFeatures[index]}
+						onRemove={() => removeFeature(index)}
+						errors={featureErrors.get(index)}
+					/>
+				</Dropdown>
+			{:else}
+				<p class="text-xs italic text-muted-foreground">No features added</p>
+			{/each}
+		</div>
+	</div>
+
+	<!-- Actions -->
+	<div class="flex flex-col gap-2 pt-2">
+		<div class="flex justify-end gap-2">
+			{#if formHasChanges}
+				<Button type="button" size="sm" variant="link" onclick={handleReset} class="h-7">
 					<RotateCcw class="size-3.5" />
-				</button>
-			</div>
-			<DicePicker value={formDamageDice} onChange={(v) => (formDamageDice = v)} />
-		</div>
-
-		<!-- Damage Bonus & Attack Roll Bonus Row -->
-		<div class="grid grid-cols-2 gap-3">
-			<div class="flex flex-col gap-1">
-				<label for="hb-weapon-damage-bonus" class="text-xs font-medium text-muted-foreground"
-					>Damage Bonus</label
-				>
-				<Input
-					id="hb-weapon-damage-bonus"
-					type="number"
-					inputmode="numeric"
-					bind:value={formDamageBonus}
-					placeholder="0"
-				/>
-			</div>
-			<div class="flex flex-col gap-1">
-				<label for="hb-weapon-attack-roll-bonus" class="text-xs font-medium text-muted-foreground"
-					>Attack Roll Bonus</label
-				>
-				<Input
-					id="hb-weapon-attack-roll-bonus"
-					type="number"
-					inputmode="numeric"
-					bind:value={formAttackRollBonus}
-					placeholder="0"
-				/>
-			</div>
-		</div>
-
-		<!-- Features -->
-		<div class="flex flex-col gap-2">
-			<div class="flex items-center justify-between">
-				<p class="text-xs font-medium text-muted-foreground">
-					Features
-				</p>
-				<Button type="button" size="sm" variant="outline" onclick={()=>addFeature(formFeatures.length)}>
-					<Plus class="size-3.5" />
-					Add Feature
+					Discard
 				</Button>
-			</div>
-			<div class="flex flex-col gap-2">
-				{#each formFeatures as feature, index (index)}
-					<Dropdown
-						title={feature.title || `Unnamed feature`}
-						class={featureErrors.has(index) ? 'data-[open=false]:border-destructive data-[open=false]:border' : ''}
-						open={dropdownOpenIndex === index}
-						>
-						<HomebrewFeatureForm
-							bind:feature={formFeatures[index]}
-							onRemove={() => removeFeature(index)}
-							errors={featureErrors.get(index)}
-						/>
-					</Dropdown>
-				{:else}
-					<p class="text-xs italic text-muted-foreground">No features added</p>
-				{/each}
-			</div>
-		</div>
-
-		<!-- Actions -->
-		<div class="flex flex-col gap-2 pt-2">
-			<div class="flex gap-2 justify-end">
-				{#if formHasChanges}
-					<Button type="button" size="sm" variant="link" onclick={handleReset}>
-						<RotateCcw class="size-3.5" />
-						Discard
-					</Button>
-				{/if}
-				<Button
-					type="submit"
-					size="sm"
-					disabled={!formHasChanges || homebrew.saving}
-					class={hasValidationErrors ? 'border-destructive border' : ''}
-				>
-					{#if homebrew.saving}
-						<Loader2 class="size-3.5 animate-spin" />
-						Saving...
-					{:else}
-						Save
-					{/if}
-				</Button>
-			</div>
-			{#if hasValidationErrors && allErrorMessages.length > 0}
-					<ul class="list-disc list-inside space-y-1">
-						{#each allErrorMessages as error}
-							<li class="text-xs text-destructive">{error}</li>
-						{/each}
-					</ul>
 			{/if}
+			<Button
+				type="submit"
+				size="sm"
+				disabled={!formHasChanges || homebrew.saving}
+				class={cn(
+					'h-7',
+					hasValidationErrors && 'cursor-not-allowed border border-destructive hover:bg-primary'
+				)}
+			>
+				{#if homebrew.saving}
+					<Loader2 class="size-3.5 animate-spin" />
+					Saving...
+				{:else}
+					Save
+				{/if}
+			</Button>
 		</div>
+		{#if hasValidationErrors && allErrorMessages.length > 0}
+			<ul class="list-inside list-disc space-y-1">
+				{#each allErrorMessages as error}
+					<li class="text-xs text-destructive">{error}</li>
+				{/each}
+			</ul>
+		{/if}
+	</div>
 </form>

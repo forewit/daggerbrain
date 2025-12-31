@@ -227,8 +227,7 @@ export const BLADE_DOMAIN_CARDS = {
 			{
 				weapon_modifiers: [],
 				title: '',
-				description_html:
-					'While you are wearing armor, gain a +2 bonus to your damage thresholds.',
+				description_html: 'While you are wearing armor, gain a +2 bonus to your damage thresholds.',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',

@@ -1,55 +1,51 @@
 <script lang="ts">
 	import type { Loot } from '$lib/types/compendium-types';
+	import { renderMarkdown } from '$lib/utils/markdown';
 
 	let { loot }: { loot: Loot } = $props();
 </script>
 
-<div class="mx-auto flex w-[300px] flex-col gap-4 rounded-lg border p-4">
+<div class="flex max-w-[300px] min-w-[300px] flex-col gap-4 rounded-lg bg-background p-4 shadow">
 	<!-- Title -->
 	<div class="flex flex-col gap-1">
 		<h3 class="text-lg font-semibold">{loot.title}</h3>
+		<p class="text-xs text-muted-foreground italic">Loot</p>
 	</div>
 
 	<!-- Description -->
 	{#if loot.description_html.trim().length > 0}
-		<p class="py-4 text-sm">{@html loot.description_html}</p>
-	{/if}
-
-	<!-- Character Modifiers -->
-	{#if loot.character_modifiers.length > 0}
-		<div class="rounded-lg border bg-primary/5 px-4 py-3">
-			<div class="flex items-center justify-between">
-				<p class="text-sm font-medium">Character Modifiers</p>
-			</div>
-			<div class="mt-3 space-y-3">
-				{#each loot.character_modifiers as modifier}
-					<div class="border-l-2 border-accent/30 pl-3">
-						<p class="text-xs text-muted-foreground">
-							{modifier.behaviour} {modifier.target}
-							{#if modifier.type === 'flat'}: {modifier.value}{/if}
-						</p>
-					</div>
-				{/each}
-			</div>
-		</div>
-	{/if}
-
-	<!-- Weapon Modifiers -->
-	{#if loot.weapon_modifiers.length > 0}
-		<div class="rounded-lg border bg-primary/5 px-4 py-3">
-			<div class="flex items-center justify-between">
-				<p class="text-sm font-medium">Weapon Modifiers</p>
-			</div>
-			<div class="mt-3 space-y-3">
-				{#each loot.weapon_modifiers as modifier}
-					<div class="border-l-2 border-accent/30 pl-3">
-						<p class="text-xs text-muted-foreground">
-							{modifier.behaviour} {modifier.target_weapon} {modifier.target_stat}
-						</p>
-					</div>
-				{/each}
-			</div>
-		</div>
+		<p class="text-sm">{@html loot.description_html}</p>
 	{/if}
 </div>
 
+<!-- loot inventory row preview -->
+<div class="container h-min max-w-[500px] rounded-lg bg-background p-2 shadow">
+	<table class="w-full border-collapse">
+		<colgroup>
+			<col />
+			<col />
+		</colgroup>
+		<thead>
+			<tr class="border-b bg-primary-muted/50 text-xs text-muted-foreground">
+				<th class="px-4 py-2 text-left">Loot</th>
+				<th class="py-2 pr-4 text-right">Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr class="text-xs">
+				<td class="px-4 py-2">
+					{loot.title}
+				</td>
+				<td class="py-2 pr-4 text-right">
+					{#if loot.description_html}
+						<div class="text-muted-foreground">
+							{@html renderMarkdown(loot.description_html)}
+						</div>
+					{:else}
+						<span class="text-muted-foreground">—</span>
+					{/if}
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

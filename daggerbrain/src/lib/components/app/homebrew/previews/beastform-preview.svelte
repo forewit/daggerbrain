@@ -5,7 +5,6 @@
 	let { beastform }: { beastform: Beastform } = $props();
 </script>
 
-<div class="mx-auto w-[300px]">
-	<BeastformCard {beastform} />
+<div class="flex max-w-[400px] min-w-[300px] rounded-lg bg-background p-4 shadow">
+	<BeastformCard {beastform} preview show_choices />
 </div>
-

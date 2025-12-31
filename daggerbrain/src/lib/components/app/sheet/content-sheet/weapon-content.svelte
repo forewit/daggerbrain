@@ -12,6 +12,7 @@
 	import Hand from '@lucide/svelte/icons/hand';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import { getCharacterContext } from '$lib/state/character.svelte';
+	import HomebrewBadge from '../../homebrew/homebrew-badge.svelte';
 	import WeaponsRules from '../../rules/weapons-rules.svelte';
 	import DicePicker from '../../dice/dice-picker.svelte';
 	import { z } from 'zod';
@@ -329,7 +330,10 @@
 	<Sheet.Header>
 		<Sheet.Title>{weapon.title}</Sheet.Title>
 		{#if weapon.category !== 'Unarmed'}
-			<p class="text-xs text-muted-foreground italic">
+			<p class="flex items-center gap-1.5 text-xs text-muted-foreground italic">
+				{#if weapon.source_id === 'Homebrew'}
+					<HomebrewBadge type="weapon" id={weapon.compendium_id} />
+				{/if}
 				Tier {context.level_to_tier(weapon.level_requirement)}
 				{weapon.category} Weapon
 			</p>
@@ -385,7 +389,9 @@
 					{#each weapon.features as feature}
 						<div class="border-l-2 border-accent/30 pl-3">
 							<p class="text-sm font-medium text-muted-foreground">{feature.title}</p>
-							<p class="mt-0.5 text-xs text-muted-foreground">{@html renderMarkdown(feature.description_html)}</p>
+							<p class="mt-0.5 text-xs text-muted-foreground">
+								{@html renderMarkdown(feature.description_html)}
+							</p>
 						</div>
 					{/each}
 				</div>

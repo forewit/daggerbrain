@@ -20,4 +20,3 @@ export function renderMarkdown(markdown: string): string {
 
 	return sanitized;
 }
-

@@ -5,7 +5,6 @@
 	let { card }: { card: CommunityCard } = $props();
 </script>
 
-<div class="mx-auto w-[300px]">
+<div class="flex max-w-[300px] min-w-[300px]">
 	<CommunityCardComponent {card} variant="responsive" />
 </div>
-

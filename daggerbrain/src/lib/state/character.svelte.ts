@@ -441,18 +441,11 @@ function createCharacter(id: string) {
 		character_level: number,
 		exclude_ids: string[]
 	): Beastform[] => {
-		const special_case_ids = [
-			'legendary_beast',
-			'legendary_hybrid',
-			'mythic_beast',
-			'mythic_hybrid'
-		];
-		const all_exclude_ids = [...exclude_ids, ...special_case_ids];
-
 		return Object.values(compendium.beastforms).filter(
 			(beastform) =>
 				beastform.level_requirement <= character_level &&
-				!all_exclude_ids.includes(beastform.compendium_id)
+				!exclude_ids.includes(beastform.compendium_id) &&
+				beastform.special_case == null
 		);
 	};
 
@@ -604,6 +597,7 @@ function createCharacter(id: string) {
 
 		const chosen_beastform = character.chosen_beastform;
 		const base_compendium_id = chosen_beastform.compendium_id;
+		const base_beastform = compendium.beastforms[base_compendium_id];
 
 		// Initialize choices object if it doesn't exist
 		if (!chosen_beastform.choices) {
@@ -623,7 +617,7 @@ function createCharacter(id: string) {
 		}
 
 		// Handle special cases
-		if (base_compendium_id === 'legendary_beast') {
+		if (base_beastform?.special_case === 'legendary_beast') {
 			// Legendary Beast: Tier 3, level 5
 			// Requires 1 Tier 1 beastform (level_requirement === 1)
 			const legendary_beast_template = compendium.beastforms['legendary_beast'];
@@ -687,7 +681,7 @@ function createCharacter(id: string) {
 			if (!equivalent_beastform(derived_beastform, new_beastform)) {
 				derived_beastform = new_beastform;
 			}
-		} else if (base_compendium_id === 'legendary_hybrid') {
+		} else if (base_beastform?.special_case === 'legendary_hybrid') {
 			// Legendary Hybrid: Tier 3, level 5
 			// Requires 2 beastforms from Tiers 1-2 (level_requirement <= 4)
 			// User selects 4 advantages and 2 features total
@@ -815,7 +809,7 @@ function createCharacter(id: string) {
 			if (!equivalent_beastform(derived_beastform, new_beastform)) {
 				derived_beastform = new_beastform;
 			}
-		} else if (base_compendium_id === 'mythic_beast') {
+		} else if (base_beastform?.special_case === 'mythic_beast') {
 			// Mythic Beast: Tier 4, level 8
 			// Requires 1 beastform from Tiers 1-2 (level_requirement <= 4)
 			const mythic_beast_template = compendium.beastforms['mythic_beast'];
@@ -880,7 +874,7 @@ function createCharacter(id: string) {
 			if (!equivalent_beastform(derived_beastform, new_beastform)) {
 				derived_beastform = new_beastform;
 			}
-		} else if (base_compendium_id === 'mythic_hybrid') {
+		} else if (base_beastform?.special_case === 'mythic_hybrid') {
 			// Mythic Hybrid: Tier 4, level 8
 			// Requires 3 beastforms from Tiers 1-3 (level_requirement <= 7)
 			// User selects 5 advantages and 3 features total

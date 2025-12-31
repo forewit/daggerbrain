@@ -136,7 +136,7 @@
 				isExplicitlyNoneSelected = false;
 			}
 		} else if (!isExplicitlyNoneSelected && !currentTargetStatValue) {
-			// If modifier has no value and user hasn't explicitly selected "none", 
+			// If modifier has no value and user hasn't explicitly selected "none",
 			// keep UI in sync (but don't change isExplicitlyNoneSelected)
 			selectedTargetStat = '';
 		}
@@ -150,27 +150,31 @@
 		if (newTargetStat === '') {
 			return;
 		}
-		
+
 		// Get current modifier or create default base properties
-		const baseProps = effectiveModifier ? {
-			behaviour: effectiveModifier.behaviour,
-			character_conditions: effectiveModifier.character_conditions,
-			target_weapon: effectiveModifier.target_weapon
-		} : {
-			behaviour: 'bonus' as const,
-			character_conditions: [],
-			target_weapon: 'all' as const
-		};
+		const baseProps = effectiveModifier
+			? {
+					behaviour: effectiveModifier.behaviour,
+					character_conditions: effectiveModifier.character_conditions,
+					target_weapon: effectiveModifier.target_weapon
+				}
+			: {
+					behaviour: 'bonus' as const,
+					character_conditions: [],
+					target_weapon: 'all' as const
+				};
 
 		// Set target stat-specific properties
 		// Preserve existing values when compatible, otherwise use defaults
 		let newModifier: WeaponModifier;
 		if (newTargetStat === 'attack_roll' || newTargetStat === 'damage_bonus') {
 			// Preserve value if switching between attack_roll and damage_bonus
-			const existingValue = (effectiveModifier && 
-				(effectiveModifier.target_stat === 'attack_roll' || effectiveModifier.target_stat === 'damage_bonus'))
-				? effectiveModifier.value
-				: 0;
+			const existingValue =
+				effectiveModifier &&
+				(effectiveModifier.target_stat === 'attack_roll' ||
+					effectiveModifier.target_stat === 'damage_bonus')
+					? effectiveModifier.value
+					: 0;
 			newModifier = {
 				...baseProps,
 				target_stat: newTargetStat,
@@ -178,9 +182,10 @@
 			};
 		} else if (newTargetStat === 'damage_dice') {
 			// Preserve dice if already set
-			const existingDice = (effectiveModifier && effectiveModifier.target_stat === 'damage_dice')
-				? effectiveModifier.dice
-				: '';
+			const existingDice =
+				effectiveModifier && effectiveModifier.target_stat === 'damage_dice'
+					? effectiveModifier.dice
+					: '';
 			newModifier = {
 				...baseProps,
 				target_stat: 'damage_dice',
@@ -188,9 +193,10 @@
 			};
 		} else if (newTargetStat === 'damage_type') {
 			// Preserve damage_type if already set
-			const existingDamageType = (effectiveModifier && effectiveModifier.target_stat === 'damage_type')
-				? effectiveModifier.damage_type
-				: 'phy';
+			const existingDamageType =
+				effectiveModifier && effectiveModifier.target_stat === 'damage_type'
+					? effectiveModifier.damage_type
+					: 'phy';
 			newModifier = {
 				...baseProps,
 				target_stat: 'damage_type',
@@ -198,9 +204,10 @@
 			};
 		} else if (newTargetStat === 'range') {
 			// Preserve range if already set
-			const existingRange = (effectiveModifier && effectiveModifier.target_stat === 'range')
-				? effectiveModifier.range
-				: 'Melee';
+			const existingRange =
+				effectiveModifier && effectiveModifier.target_stat === 'range'
+					? effectiveModifier.range
+					: 'Melee';
 			newModifier = {
 				...baseProps,
 				target_stat: 'range',
@@ -208,9 +215,10 @@
 			};
 		} else if (newTargetStat === 'trait') {
 			// Preserve trait if already set
-			const existingTrait = (effectiveModifier && effectiveModifier.target_stat === 'trait')
-				? effectiveModifier.trait
-				: 'agility';
+			const existingTrait =
+				effectiveModifier && effectiveModifier.target_stat === 'trait'
+					? effectiveModifier.trait
+					: 'agility';
 			newModifier = {
 				...baseProps,
 				target_stat: 'trait',
@@ -219,7 +227,7 @@
 		} else {
 			return;
 		}
-		
+
 		updateModifier(newModifier);
 	}
 </script>
@@ -234,7 +242,11 @@
 			type="single"
 			value={effectiveModifier?.target_weapon ?? 'all'}
 			onValueChange={(value) => {
-				if (value && effectiveModifier && targetWeaponOptions.includes(value as ModifierTargetWeapon)) {
+				if (
+					value &&
+					effectiveModifier &&
+					targetWeaponOptions.includes(value as ModifierTargetWeapon)
+				) {
 					updateModifier({ ...effectiveModifier, target_weapon: value as ModifierTargetWeapon });
 				}
 			}}
@@ -256,8 +268,10 @@
 	<div class="flex flex-col gap-1">
 		<label
 			for="target-stat-select"
-			class={cn('text-xs font-medium text-muted-foreground', errors && errors.length > 0 && 'text-destructive')}
-			>Weapon stat to modify</label
+			class={cn(
+				'text-xs font-medium text-muted-foreground',
+				errors && errors.length > 0 && 'text-destructive'
+			)}>Weapon stat to modify</label
 		>
 		<Select.Root
 			type="single"

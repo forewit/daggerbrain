@@ -147,8 +147,7 @@
 			formTitle = item.title;
 			formImageUrl = item.image_url;
 			formDomainId = item.domain_id;
-			formLevelRequirement =
-				item.level_requirement === 0 ? '' : String(item.level_requirement);
+			formLevelRequirement = item.level_requirement === 0 ? '' : String(item.level_requirement);
 			formRecallCost = item.recall_cost === 0 ? '' : String(item.recall_cost);
 			formCategory = item.category;
 			formTokens = item.tokens;
@@ -263,8 +262,7 @@
 		formTitle = item.title;
 		formImageUrl = item.image_url;
 		formDomainId = item.domain_id;
-		formLevelRequirement =
-			item.level_requirement === 0 ? '' : String(item.level_requirement);
+		formLevelRequirement = item.level_requirement === 0 ? '' : String(item.level_requirement);
 		formRecallCost = item.recall_cost === 0 ? '' : String(item.recall_cost);
 		formCategory = item.category;
 		formTokens = item.tokens;
@@ -485,7 +483,7 @@
 
 	<!-- Actions -->
 	<div class="flex gap-2 pt-2">
-		<Button type="submit" size="sm" disabled={!formHasChanges || homebrew.saving}>
+		<Button type="submit" size="sm" disabled={!formHasChanges || homebrew.saving} class="h-7">
 			{#if homebrew.saving}
 				<Loader2 class="size-3.5 animate-spin" />
 				Saving...
@@ -494,7 +492,9 @@
 			{/if}
 		</Button>
 		{#if formHasChanges}
-			<Button type="button" size="sm" variant="link" onclick={handleReset}>Discard changes</Button>
+			<Button type="button" size="sm" variant="link" onclick={handleReset} class="h-7"
+				>Discard</Button
+			>
 		{/if}
 	</div>
 </form>

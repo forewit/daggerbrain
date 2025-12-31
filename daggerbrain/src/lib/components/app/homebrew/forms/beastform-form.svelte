@@ -26,6 +26,7 @@
 	} from '../form-schemas';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
+	import { tick } from 'svelte';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 
 	let {
@@ -58,12 +59,34 @@
 	let formAdvantages = $state<string[]>([]);
 	let formEvasionBonus = $state('');
 	let formFeatures = $state<Feature[]>([]);
+	let formSpecialCase = $state<
+		'legendary_beast' | 'legendary_hybrid' | 'mythic_beast' | 'mythic_hybrid' | ''
+	>('');
 
 	// Validation errors state
 	let errors = $state<BeastformFormErrors>({});
 
 	// Feature validation state - track detailed errors for each feature
 	const featureErrors = new SvelteMap<number, FeatureValidationErrors>();
+
+	// Track if validation has been attempted (to show errors only after first submit attempt)
+	let validationAttempted = $state(false);
+
+	// Track which modifiers existed at the last validation attempt
+	// New modifiers added after validation should not show errors until next submit
+	const validatedModifierKeys = new SvelteMap<string, boolean>();
+
+	// Generate a key for a modifier to track it
+	function getModifierKey(
+		featureIndex: number,
+		modifierType: 'character' | 'weapon',
+		modifierIndex: number
+	): string {
+		return `${featureIndex}-${modifierType}-${modifierIndex}`;
+	}
+
+	// svelte-ignore non_reactive_update
+	let dropdownOpenIndex = -1;
 
 	const rangeOptions: Ranges[] = ['Melee', 'Very Close', 'Close', 'Far', 'Very Far'];
 	const damageTypeOptions: DamageTypes[] = ['phy', 'mag'];
@@ -139,6 +162,10 @@
 		// Compare features (deep comparison)
 		const featuresMatch = JSON.stringify(formFeatures) === JSON.stringify(item.features);
 
+		// Compare special_case (normalize empty string to undefined for comparison)
+		const formSpecialCaseNormalized = formSpecialCase === '' ? undefined : formSpecialCase;
+		const specialCaseMatch = formSpecialCaseNormalized === item.special_case;
+
 		return !(
 			nameMatch &&
 			categoryMatch &&
@@ -147,7 +174,8 @@
 			attackMatch &&
 			advantagesMatch &&
 			evasionMatch &&
-			featuresMatch
+			featuresMatch &&
+			specialCaseMatch
 		);
 	});
 
@@ -156,14 +184,61 @@
 		hasChanges = formHasChanges;
 	});
 
-	// Check if there are validation errors
+	// Check if there are any validation errors
 	let hasValidationErrors = $derived.by(() => {
-		return Object.keys(errors).length > 0 || featureErrors.size > 0;
+		// Check form-level errors
+		if (Object.keys(errors).length > 0) {
+			return true;
+		}
+		// Check feature errors
+		if (featureErrors.size > 0) {
+			return true;
+		}
+		return false;
 	});
 
-	// Sync hasValidationErrors to bindable prop
+	// Collect all error messages for display
+	let allErrorMessages = $derived.by(() => {
+		const messages: string[] = [];
+
+		// Add form-level errors (exclude 'features' since individual feature errors are shown)
+		for (const [key, value] of Object.entries(errors)) {
+			if (value && key !== 'features') {
+				messages.push(`${key}: ${value}`);
+			}
+		}
+
+		// Add feature errors
+		for (const [index, featureError] of featureErrors) {
+			const featureTitle = formFeatures[index]?.title || `Feature ${index + 1}`;
+			if (featureError.title) {
+				messages.push(`${featureTitle}, Title: ${featureError.title}`);
+			}
+			if (featureError.description_html) {
+				messages.push(`${featureTitle}, Description: ${featureError.description_html}`);
+			}
+			if (featureError.character_modifiers) {
+				for (const [modIndex, modErrors] of featureError.character_modifiers) {
+					for (const error of modErrors) {
+						messages.push(`${featureTitle}, Character Modifier ${modIndex + 1}: ${error}`);
+					}
+				}
+			}
+			if (featureError.weapon_modifiers) {
+				for (const [modIndex, modErrors] of featureError.weapon_modifiers) {
+					for (const error of modErrors) {
+						messages.push(`${featureTitle}, Weapon Modifier ${modIndex + 1}: ${error}`);
+					}
+				}
+			}
+		}
+
+		return messages;
+	});
+
+	// Sync hasValidationErrors to bindable prop (only after validation attempted)
 	$effect(() => {
-		hasErrors = hasValidationErrors;
+		hasErrors = validationAttempted && hasValidationErrors;
 	});
 
 	// Sync form state when item prop changes
@@ -184,9 +259,12 @@
 			formAdvantages = [...item.advantages];
 			formEvasionBonus = item.evasion_bonus === 0 ? '' : String(item.evasion_bonus);
 			formFeatures = JSON.parse(JSON.stringify(item.features));
+			formSpecialCase = item.special_case ?? '';
 			// Clear errors when beastform changes
 			errors = {};
 			featureErrors.clear();
+			validationAttempted = false;
+			validatedModifierKeys.clear();
 		}
 	});
 
@@ -208,9 +286,110 @@
 			},
 			advantages: [...formAdvantages],
 			evasion_bonus: formEvasionBonus === '' ? 0 : Number(formEvasionBonus),
-			features: JSON.parse(JSON.stringify(formFeatures))
+			features: JSON.parse(JSON.stringify(formFeatures)),
+			special_case: formSpecialCase || undefined
 		};
 	}
+
+	// Validate features and update error state
+	function validateFeatures() {
+		for (let i = 0; i < formFeatures.length; i++) {
+			const result = FeatureSchema.safeParse(formFeatures[i]);
+
+			if (!result.success) {
+				const featureErrorsData = extractFeatureErrors(result.error);
+
+				// Filter out errors for modifiers that weren't validated yet (newly added)
+				if (featureErrorsData.character_modifiers) {
+					const filteredCharModifiers = new Map<number, string[]>();
+					for (const [modIndex, errors] of featureErrorsData.character_modifiers) {
+						const key = getModifierKey(i, 'character', modIndex);
+						if (validatedModifierKeys.has(key)) {
+							filteredCharModifiers.set(modIndex, errors);
+						}
+					}
+					if (filteredCharModifiers.size > 0) {
+						featureErrorsData.character_modifiers = filteredCharModifiers;
+					} else {
+						delete featureErrorsData.character_modifiers;
+					}
+				}
+
+				if (featureErrorsData.weapon_modifiers) {
+					const filteredWeaponModifiers = new Map<number, string[]>();
+					for (const [modIndex, errors] of featureErrorsData.weapon_modifiers) {
+						const key = getModifierKey(i, 'weapon', modIndex);
+						if (validatedModifierKeys.has(key)) {
+							filteredWeaponModifiers.set(modIndex, errors);
+						}
+					}
+					if (filteredWeaponModifiers.size > 0) {
+						featureErrorsData.weapon_modifiers = filteredWeaponModifiers;
+					} else {
+						delete featureErrorsData.weapon_modifiers;
+					}
+				}
+
+				// Only set errors if there are any remaining after filtering
+				const hasCharModifierErrors =
+					featureErrorsData.character_modifiers && featureErrorsData.character_modifiers.size > 0;
+				const hasWeaponModifierErrors =
+					featureErrorsData.weapon_modifiers && featureErrorsData.weapon_modifiers.size > 0;
+				if (
+					hasCharModifierErrors ||
+					hasWeaponModifierErrors ||
+					featureErrorsData.title ||
+					featureErrorsData.description_html
+				) {
+					featureErrors.set(i, featureErrorsData);
+				} else {
+					featureErrors.delete(i);
+				}
+			} else {
+				featureErrors.delete(i);
+			}
+		}
+	}
+
+	// Validate form-level fields
+	function validateFormFields() {
+		const formData = buildFormData();
+		const result = BeastformFormSchema.safeParse(formData);
+		if (!result.success) {
+			errors = extractFieldErrors(result.error);
+		} else {
+			errors = {};
+		}
+	}
+
+	// Reactive validation - re-validate when form data changes (only after first validation attempt)
+	$effect(() => {
+		if (!validationAttempted) return;
+
+		// Re-validate features when they change
+		validateFeatures();
+	});
+
+	// Re-validate form fields when they change
+	$effect(() => {
+		if (!validationAttempted) return;
+
+		// Track form field changes
+		formName;
+		formCategory;
+		formTier;
+		formCharacterTrait;
+		formCharacterTraitBonus;
+		formAttackRange;
+		formAttackTrait;
+		formAttackDamageDice;
+		formAttackDamageBonus;
+		formAttackDamageType;
+		formAdvantages;
+		formEvasionBonus;
+
+		validateFormFields();
+	});
 
 	export function handleSubmit(e?: SubmitEvent) {
 		if (e) {
@@ -218,48 +397,62 @@
 		}
 		if (!item) return;
 
-		// Clear previous errors
-		errors = {};
-		featureErrors.clear();
+		// Mark that validation has been attempted
+		validationAttempted = true;
 
-		// Validate all features directly and extract detailed errors
-		let allFeaturesValid = true;
+		// Mark all current modifiers as validated (so errors will show for them)
+		validatedModifierKeys.clear();
 		for (let i = 0; i < formFeatures.length; i++) {
-			const result = FeatureSchema.safeParse(formFeatures[i]);
-			if (!result.success) {
-				allFeaturesValid = false;
-				const featureErrorsData = extractFeatureErrors(result.error);
-				featureErrors.set(i, featureErrorsData);
-			} else {
-				featureErrors.delete(i);
+			const feature = formFeatures[i];
+			for (let j = 0; j < feature.character_modifiers.length; j++) {
+				validatedModifierKeys.set(getModifierKey(i, 'character', j), true);
+			}
+			for (let j = 0; j < feature.weapon_modifiers.length; j++) {
+				validatedModifierKeys.set(getModifierKey(i, 'weapon', j), true);
 			}
 		}
 
-		// Build form data
-		const formData = buildFormData();
+		// Validate all features
+		validateFeatures();
 
-		// Validate with Zod
-		const result = BeastformFormSchema.safeParse(formData);
+		// Validate form-level fields
+		validateFormFields();
 
-		if (!result.success) {
-			errors = extractFieldErrors(result.error);
-			return;
-		}
+		// Check if there are any validation errors
+		const hasFormErrors = Object.keys(errors).length > 0;
+		const hasFeatureErrors = featureErrors.size > 0;
 
-		if (!allFeaturesValid) {
+		if (hasFormErrors || hasFeatureErrors) {
 			// Don't set generic error message - errors are shown inline in each feature
 			return;
 		}
 
+		// Build form data (validation already passed, so we can use it)
+		const formData = buildFormData();
+
+		// Save the original beastform reference to find it in homebrew state
+		const originalBeastform = item;
 		// Update the beastform prop with validated form values
-		item = {
+		const updatedBeastform = {
 			...item,
-			...result.data
+			...formData
 		};
+		item = updatedBeastform;
+
+		// Update the homebrew state record so auto-save can detect the change
+		// Find the beastform's UID in the collection using the original reference
+		const newBeastformRef = JSON.parse(JSON.stringify(updatedBeastform));
+		for (const [uid, b] of Object.entries(homebrew.beastforms)) {
+			if (b === originalBeastform) {
+				homebrew.beastforms[uid] = newBeastformRef;
+				break;
+			}
+		}
 
 		// Clear errors on success
 		errors = {};
 		featureErrors.clear();
+		validationAttempted = false;
 
 		// Call callback if provided
 		if (onSubmit && e) {
@@ -279,20 +472,20 @@
 		formAttackRange = item.attack.range;
 		formAttackTrait = item.attack.trait;
 		formAttackDamageDice = item.attack.damage_dice;
-		formAttackDamageBonus =
-			item.attack.damage_bonus === 0 ? '' : String(item.attack.damage_bonus);
+		formAttackDamageBonus = item.attack.damage_bonus === 0 ? '' : String(item.attack.damage_bonus);
 		formAttackDamageType = item.attack.damage_type;
 		formAdvantages = [...item.advantages];
 		formEvasionBonus = item.evasion_bonus === 0 ? '' : String(item.evasion_bonus);
 		formFeatures = JSON.parse(JSON.stringify(item.features));
+		formSpecialCase = item.special_case ?? '';
 		// Clear errors on reset
 		errors = {};
 		featureErrors.clear();
+		validationAttempted = false;
+		validatedModifierKeys.clear();
 
-		// Call callback if provided
-		if (onReset) {
-			onReset();
-		}
+		// Note: onReset callback removed to prevent infinite recursion
+		// The parent component should handle any additional reset logic if needed
 	}
 
 	function addAdvantage() {
@@ -303,7 +496,8 @@
 		formAdvantages = formAdvantages.filter((_, i) => i !== index);
 	}
 
-	function addFeature() {
+	function addFeature(index: number) {
+		dropdownOpenIndex = index;
 		const newFeature: Feature = {
 			title: '',
 			description_html: '',
@@ -311,6 +505,10 @@
 			weapon_modifiers: []
 		};
 		formFeatures = [...formFeatures, newFeature];
+
+		tick().then(() => {
+			dropdownOpenIndex = -1;
+		});
 	}
 
 	function removeFeature(index: number) {
@@ -535,6 +733,35 @@
 		</div>
 	</div>
 
+	<!-- Special Case -->
+	<div class="flex flex-col gap-1">
+		<label for="hb-beastform-special-case" class="text-xs font-medium text-muted-foreground"
+			>Evolved Beast and Hybrid options</label
+		>
+		<Select.Root type="single" bind:value={formSpecialCase}>
+			<Select.Trigger id="hb-beastform-special-case" class="w-full">
+				<p class="truncate">
+					{formSpecialCase === 'legendary_beast'
+						? 'Legendary Beast'
+						: formSpecialCase === 'legendary_hybrid'
+							? 'Legendary Hybrid'
+							: formSpecialCase === 'mythic_beast'
+								? 'Mythic Beast'
+								: formSpecialCase === 'mythic_hybrid'
+									? 'Mythic Hybrid'
+									: 'None'}
+				</p>
+			</Select.Trigger>
+			<Select.Content>
+				<Select.Item value="">None</Select.Item>
+				<Select.Item value="legendary_beast">Legendary Beast</Select.Item>
+				<Select.Item value="legendary_hybrid">Legendary Hybrid</Select.Item>
+				<Select.Item value="mythic_beast">Mythic Beast</Select.Item>
+				<Select.Item value="mythic_hybrid">Mythic Hybrid</Select.Item>
+			</Select.Content>
+		</Select.Root>
+	</div>
+
 	<!-- Advantages -->
 	<div class="flex flex-col gap-2">
 		<div class="flex items-center justify-between">
@@ -565,10 +792,13 @@
 	<!-- Features -->
 	<div class="flex flex-col gap-2">
 		<div class="flex items-center justify-between">
-			<p class="text-xs font-medium text-muted-foreground">
-				Features
-			</p>
-			<Button type="button" size="sm" variant="outline" onclick={addFeature}>
+			<p class="text-xs font-medium text-muted-foreground">Features</p>
+			<Button
+				type="button"
+				size="sm"
+				variant="outline"
+				onclick={() => addFeature(formFeatures.length)}
+			>
 				<Plus class="size-3.5" />
 				Add Feature
 			</Button>
@@ -577,7 +807,10 @@
 			{#each formFeatures as feature, index (index)}
 				<Dropdown
 					title={feature.title || `Unnamed feature`}
-					class={featureErrors.has(index) ? 'border-destructive' : ''}
+					class={featureErrors.has(index)
+						? 'data-[open=false]:border data-[open=false]:border-destructive'
+						: ''}
+					open={dropdownOpenIndex === index}
 				>
 					<HomebrewFeatureForm
 						bind:feature={formFeatures[index]}
@@ -592,17 +825,37 @@
 	</div>
 
 	<!-- Actions -->
-	<div class="flex gap-2 pt-2">
-		<Button type="submit" size="sm" disabled={!formHasChanges || homebrew.saving}>
-			{#if homebrew.saving}
-				<Loader2 class="size-3.5 animate-spin" />
-				Saving...
-			{:else}
-				Save
+	<div class="flex flex-col gap-2 pt-2">
+		<div class="flex justify-end gap-2">
+			{#if formHasChanges}
+				<Button type="button" size="sm" variant="link" onclick={handleReset} class="h-7">
+					<RotateCcw class="size-3.5" />
+					Discard
+				</Button>
 			{/if}
-		</Button>
-		{#if formHasChanges}
-			<Button type="button" size="sm" variant="link" onclick={handleReset}>Discard changes</Button>
+			<Button
+				type="submit"
+				size="sm"
+				disabled={!formHasChanges || homebrew.saving}
+				class={cn(
+					'h-7',
+					hasValidationErrors && 'cursor-not-allowed border border-destructive hover:bg-primary'
+				)}
+			>
+				{#if homebrew.saving}
+					<Loader2 class="size-3.5 animate-spin" />
+					Saving...
+				{:else}
+					Save
+				{/if}
+			</Button>
+		</div>
+		{#if hasValidationErrors && allErrorMessages.length > 0}
+			<ul class="list-inside list-disc space-y-1">
+				{#each allErrorMessages as error}
+					<li class="text-xs text-destructive">{error}</li>
+				{/each}
+			</ul>
 		{/if}
 	</div>
 </form>

@@ -34,15 +34,15 @@
 	const formattedDamage = `${diceWithProficiency}${weapon.damage_bonus > 0 ? '+' + weapon.damage_bonus : ''}${currentDamageType ? ' ' + currentDamageType : ''}`;
 </script>
 
-
 <!-- weapon content preview -->
-<div class="flex min-w-[300px] max-w-[300px] flex-col gap-4 p-4 rounded-lg shadow bg-background">
+<div class="flex max-w-[300px] min-w-[300px] flex-col gap-4 rounded-lg bg-background p-4 shadow">
 	<!-- Title and Subtitle -->
 	<div class="flex flex-col gap-1">
 		<h3 class="text-lg font-semibold">{weapon.title}</h3>
 		{#if weapon.category !== 'Unarmed'}
 			<p class="text-xs text-muted-foreground italic">
-				Tier {levelToTier(weapon.level_requirement)} {weapon.category} Weapon
+				Tier {levelToTier(weapon.level_requirement)}
+				{weapon.category} Weapon
 			</p>
 		{/if}
 	</div>
@@ -94,7 +94,9 @@
 			<div class="mt-3 space-y-3">
 				{#each weapon.features as feature}
 					<div class="border-l-2 border-accent/30 pl-3">
-						<p class="text-sm font-medium text-muted-foreground">{feature.title || 'Unnamed feature'}</p>
+						<p class="text-sm font-medium text-muted-foreground">
+							{feature.title || 'Unnamed feature'}
+						</p>
 						<p class="mt-0.5 text-xs text-muted-foreground">{@html feature.description_html}</p>
 					</div>
 				{/each}
@@ -104,7 +106,7 @@
 </div>
 
 <!-- weapon inventory row preview -->
-<div class="container max-w-[500px] p-2 bg-background shadow rounded-lg h-min">
+<div class="container h-min max-w-[500px] rounded-lg bg-background p-2 shadow">
 	<table class="w-full border-collapse">
 		<colgroup>
 			<col />
@@ -130,7 +132,8 @@
 							<div class="-mb-1">
 								<p>{weapon.title}</p>
 								<p class="text-[10px] text-muted-foreground">
-									Tier {level_to_tier(weapon.level_requirement)} {weapon.category.toLocaleLowerCase()}
+									Tier {level_to_tier(weapon.level_requirement)}
+									{weapon.category.toLocaleLowerCase()}
 								</p>
 							</div>
 						{:else}
@@ -148,7 +151,9 @@
 					</div>
 				</td>
 				<td class="py-2 pr-4 text-right whitespace-nowrap @sm:text-center">
-					<div class="ml-auto w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs @sm:mx-auto">
+					<div
+						class="ml-auto w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs @sm:mx-auto"
+					>
 						{formattedDamage}
 					</div>
 				</td>
@@ -161,4 +166,3 @@
 		</tbody>
 	</table>
 </div>
-

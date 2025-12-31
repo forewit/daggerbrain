@@ -8,6 +8,7 @@
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import Shield from '@lucide/svelte/icons/shield';
+	import HomebrewBadge from '../../homebrew/homebrew-badge.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import ArmorRules from '../../rules/armor-rules.svelte';
 	import { z } from 'zod';
@@ -239,7 +240,10 @@
 	<Sheet.Header>
 		<Sheet.Title>{armor.title}</Sheet.Title>
 		{#if armor.compendium_id !== 'unarmored'}
-			<p class="text-xs text-muted-foreground italic">
+			<p class="flex items-center gap-1.5 text-xs text-muted-foreground italic">
+				{#if armor.source_id === 'Homebrew'}
+					<HomebrewBadge type="armor" id={armor.compendium_id} />
+				{/if}
 				Tier {context.level_to_tier(armor.level_requirement)}
 			</p>
 		{/if}
@@ -281,7 +285,9 @@
 					{#each armor.features as feature}
 						<div class="border-l-2 border-accent/30 pl-3">
 							<p class="text-sm font-medium text-muted-foreground">{feature.title}</p>
-							<p class="mt-0.5 text-xs text-muted-foreground">{@html renderMarkdown(feature.description_html)}</p>
+							<p class="mt-0.5 text-xs text-muted-foreground">
+								{@html renderMarkdown(feature.description_html)}
+							</p>
 						</div>
 					{/each}
 				</div>

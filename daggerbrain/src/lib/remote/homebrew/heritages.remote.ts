@@ -52,6 +52,7 @@ export const create_homebrew_ancestry_card = command(AncestryCardSchema, async (
 
 	const validatedData = AncestryCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
+	validatedData.compendium_id = id;
 	const now = Date.now();
 
 	await db.insert(homebrew_ancestry_cards).values({
@@ -81,6 +82,7 @@ export const update_homebrew_ancestry_card = command(
 		}
 
 		const validatedData = AncestryCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
+		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db
@@ -150,6 +152,7 @@ export const create_homebrew_community_card = command(CommunityCardSchema, async
 
 	const validatedData = CommunityCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
+	validatedData.compendium_id = id;
 	const now = Date.now();
 
 	await db.insert(homebrew_community_cards).values({
@@ -179,6 +182,7 @@ export const update_homebrew_community_card = command(
 		}
 
 		const validatedData = CommunityCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
+		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db
@@ -253,6 +257,7 @@ export const create_homebrew_transformation_card = command(
 			source_id: 'Homebrew' as const
 		});
 		const id = crypto.randomUUID();
+		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db.insert(homebrew_transformation_cards).values({
@@ -286,6 +291,7 @@ export const update_homebrew_transformation_card = command(
 			...data,
 			source_id: 'Homebrew' as const
 		});
+		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db

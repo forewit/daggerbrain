@@ -9,6 +9,7 @@
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ConsumableRules from '../../rules/consumable-rules.svelte';
+	import HomebrewBadge from '../../homebrew/homebrew-badge.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 
 	let { consumableId }: { consumableId: string } = $props();
@@ -86,7 +87,12 @@
 {#if consumable}
 	<Sheet.Header>
 		<Sheet.Title>{consumable.title}</Sheet.Title>
-		<p class="text-xs text-muted-foreground italic">Consumable</p>
+		<p class="flex items-center gap-1.5 text-xs text-muted-foreground italic">
+			{#if consumable.source_id === 'Homebrew'}
+				<HomebrewBadge type="consumable" id={consumable.compendium_id} />
+			{/if}
+			Consumable
+		</p>
 	</Sheet.Header>
 
 	<div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
@@ -96,7 +102,9 @@
 			{#if (consumable.description_html || '').trim().length > 0}
 				<div class="mt-3">
 					<div class="border-l-2 border-accent/30 pl-3">
-						<p class="text-xs text-muted-foreground">{@html renderMarkdown(consumable.description_html)}</p>
+						<p class="text-xs text-muted-foreground">
+							{@html renderMarkdown(consumable.description_html)}
+						</p>
 					</div>
 				</div>
 			{:else}

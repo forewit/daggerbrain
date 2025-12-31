@@ -45,6 +45,7 @@ export const create_homebrew_class = command(ClassSchema, async (data) => {
 	// Ensure source_id is Homebrew and validate
 	const validatedData = ClassSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
+	validatedData.compendium_id = id;
 	const now = Date.now();
 
 	await db.insert(homebrew_classes).values({
@@ -74,6 +75,7 @@ export const update_homebrew_class = command(
 		}
 
 		const validatedData = ClassSchema.parse({ ...data, source_id: 'Homebrew' as const });
+		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db
@@ -139,6 +141,28 @@ export const create_homebrew_subclass = command(SubclassSchema, async (data) => 
 
 	const validatedData = SubclassSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
+	validatedData.compendium_id = id;
+	// Set compendium_ids for nested cards (generate UUIDs if empty or missing)
+	if (
+		validatedData.foundation_card &&
+		(!validatedData.foundation_card.compendium_id ||
+			validatedData.foundation_card.compendium_id === '')
+	) {
+		validatedData.foundation_card.compendium_id = crypto.randomUUID();
+	}
+	if (
+		validatedData.specialization_card &&
+		(!validatedData.specialization_card.compendium_id ||
+			validatedData.specialization_card.compendium_id === '')
+	) {
+		validatedData.specialization_card.compendium_id = crypto.randomUUID();
+	}
+	if (
+		validatedData.mastery_card &&
+		(!validatedData.mastery_card.compendium_id || validatedData.mastery_card.compendium_id === '')
+	) {
+		validatedData.mastery_card.compendium_id = crypto.randomUUID();
+	}
 	const now = Date.now();
 
 	await db.insert(homebrew_subclasses).values({
@@ -168,6 +192,28 @@ export const update_homebrew_subclass = command(
 		}
 
 		const validatedData = SubclassSchema.parse({ ...data, source_id: 'Homebrew' as const });
+		validatedData.compendium_id = id;
+		// Ensure nested cards have compendium_ids set (preserve existing or generate new if empty)
+		if (
+			validatedData.foundation_card &&
+			(!validatedData.foundation_card.compendium_id ||
+				validatedData.foundation_card.compendium_id === '')
+		) {
+			validatedData.foundation_card.compendium_id = crypto.randomUUID();
+		}
+		if (
+			validatedData.specialization_card &&
+			(!validatedData.specialization_card.compendium_id ||
+				validatedData.specialization_card.compendium_id === '')
+		) {
+			validatedData.specialization_card.compendium_id = crypto.randomUUID();
+		}
+		if (
+			validatedData.mastery_card &&
+			(!validatedData.mastery_card.compendium_id || validatedData.mastery_card.compendium_id === '')
+		) {
+			validatedData.mastery_card.compendium_id = crypto.randomUUID();
+		}
 		const now = Date.now();
 
 		await db

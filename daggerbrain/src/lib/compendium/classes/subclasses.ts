@@ -27,8 +27,7 @@ export const SUBCLASSES = {
 				},
 				{
 					title: 'Ambush',
-					description_html:
-						'Your "Marked for Death" feature uses **d6s** instead of **d4s**.',
+					description_html: 'Your "Marked for Death" feature uses **d6s** instead of **d4s**.',
 					character_modifiers: [],
 					weapon_modifiers: []
 				}
@@ -77,8 +76,7 @@ export const SUBCLASSES = {
 				},
 				{
 					title: 'Backstab',
-					description_html:
-						'Your "Marked for Death" feature uses **d8s** instead of **d6s**.',
+					description_html: 'Your "Marked for Death" feature uses **d8s** instead of **d6s**.',
 					character_modifiers: [],
 					weapon_modifiers: []
 				}
@@ -184,8 +182,7 @@ export const SUBCLASSES = {
 		source_id: 'SRD',
 		class_id: 'bard',
 		name: 'Troubadour',
-		description_html:
-			'Play the Troubadour if you want to play music to bolster your allies.',
+		description_html: 'Play the Troubadour if you want to play music to bolster your allies.',
 		foundation_card: {
 			compendium_id: 'troubadour_foundation',
 			card_type: 'subclass_foundation',
@@ -250,8 +247,7 @@ export const SUBCLASSES = {
 		source_id: 'SRD',
 		class_id: 'bard',
 		name: 'Wordsmith',
-		description_html:
-			'Play the Wordsmith if you want to use clever wordplay and captivate crowds.',
+		description_html: 'Play the Wordsmith if you want to use clever wordplay and captivate crowds.',
 		foundation_card: {
 			compendium_id: 'wordsmith_foundation',
 			card_type: 'subclass_foundation',
@@ -323,8 +319,7 @@ export const SUBCLASSES = {
 		source_id: 'SRD',
 		class_id: 'druid',
 		name: 'Warden of Renewal',
-		description_html:
-			'Play the Warden of Renewal if you want to focus on healing and protection.',
+		description_html: 'Play the Warden of Renewal if you want to focus on healing and protection.',
 		foundation_card: {
 			compendium_id: 'warden_of_renewal_foundation',
 			card_type: 'subclass_foundation',
@@ -401,8 +396,7 @@ export const SUBCLASSES = {
 		source_id: 'SRD',
 		class_id: 'druid',
 		name: 'Warden of the Elements',
-		description_html:
-			'Play the Warden of the Elements if you want to channel elemental power.',
+		description_html: 'Play the Warden of the Elements if you want to channel elemental power.',
 		foundation_card: {
 			compendium_id: 'warden_of_the_elements_foundation',
 			card_type: 'subclass_foundation',
@@ -639,8 +633,7 @@ export const SUBCLASSES = {
 		source_id: 'SRD',
 		class_id: 'ranger',
 		name: 'Wayfinder',
-		description_html:
-			'Play the Wayfinder if you want to be a relentless tracker and hunter.',
+		description_html: 'Play the Wayfinder if you want to be a relentless tracker and hunter.',
 		foundation_card: {
 			compendium_id: 'ranger_wayfinder_foundation',
 			card_type: 'subclass_foundation',
@@ -710,8 +703,7 @@ export const SUBCLASSES = {
 		source_id: 'SRD',
 		class_id: 'ranger',
 		name: 'Beastbound',
-		description_html:
-			'Play the Beastbound if you want to fight alongside an animal companion.',
+		description_html: 'Play the Beastbound if you want to fight alongside an animal companion.',
 		foundation_card: {
 			compendium_id: 'ranger_beastbound_foundation',
 			card_type: 'subclass_foundation',
@@ -894,8 +886,7 @@ export const SUBCLASSES = {
 				},
 				{
 					title: 'Adrenaline',
-					description_html:
-						"While you're *Vulnerable*, add your level to your damage rolls.",
+					description_html: "While you're *Vulnerable*, add your level to your damage rolls.",
 					character_modifiers: [],
 					weapon_modifiers: []
 				}
@@ -1004,8 +995,7 @@ export const SUBCLASSES = {
 		source_id: 'SRD',
 		class_id: 'seraph',
 		name: 'Winged Sentinel',
-		description_html:
-			'Play the Winged Sentinel if you want to take flight and protect from above.',
+		description_html: 'Play the Winged Sentinel if you want to take flight and protect from above.',
 		foundation_card: {
 			compendium_id: 'seraph_winged_sentinel_foundation',
 			card_type: 'subclass_foundation',
@@ -1055,8 +1045,7 @@ export const SUBCLASSES = {
 			features: [
 				{
 					title: 'Ascendant',
-					description_html:
-						'Gain a permanent **+4** bonus to your Severe damage threshold.',
+					description_html: 'Gain a permanent **+4** bonus to your Severe damage threshold.',
 					character_modifiers: [],
 					weapon_modifiers: []
 				},

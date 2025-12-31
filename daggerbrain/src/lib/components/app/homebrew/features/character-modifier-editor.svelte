@@ -161,7 +161,7 @@
 				isExplicitlyNoneSelected = false;
 			}
 		} else if (!isExplicitlyNoneSelected && !currentTarget) {
-			// If modifier has no value and user hasn't explicitly selected "none", 
+			// If modifier has no value and user hasn't explicitly selected "none",
 			// keep UI in sync (but don't change isExplicitlyNoneSelected)
 			selectedTarget = '';
 		}
@@ -175,7 +175,7 @@
 		if (!effectiveModifier) {
 			return;
 		}
-		
+
 		// Preserve base properties
 		const baseProps = {
 			behaviour: effectiveModifier.behaviour,
@@ -213,7 +213,7 @@
 		} else {
 			return;
 		}
-		
+
 		updateModifier(newModifier);
 	}
 
@@ -230,20 +230,24 @@
 					character_conditions: effectiveModifier.character_conditions,
 					type: effectiveModifier.type,
 					...(effectiveModifier.type === 'flat' && { value: effectiveModifier.value }),
-					...(effectiveModifier.type === 'derived_from_trait' && { 
-						trait: effectiveModifier.trait, 
-						multiplier: effectiveModifier.multiplier 
+					...(effectiveModifier.type === 'derived_from_trait' && {
+						trait: effectiveModifier.trait,
+						multiplier: effectiveModifier.multiplier
 					}),
-					...(effectiveModifier.type === 'derived_from_proficiency' && { multiplier: effectiveModifier.multiplier }),
-					...(effectiveModifier.type === 'derived_from_level' && { multiplier: effectiveModifier.multiplier })
+					...(effectiveModifier.type === 'derived_from_proficiency' && {
+						multiplier: effectiveModifier.multiplier
+					}),
+					...(effectiveModifier.type === 'derived_from_level' && {
+						multiplier: effectiveModifier.multiplier
+					})
 					// Intentionally missing 'target' property - will fail CharacterModifierSchema validation
 				} as any as CharacterModifier;
-				
+
 				updateModifier(invalidModifier);
 			}
 			return;
 		}
-		
+
 		// Get current modifier or create default
 		const currentModifier = effectiveModifier || {
 			behaviour: 'bonus' as const,
@@ -251,7 +255,7 @@
 			type: 'flat' as const,
 			value: 0
 		};
-		
+
 		// Preserve base properties
 		const baseProps = {
 			behaviour: currentModifier.behaviour,
@@ -277,9 +281,10 @@
 		let newModifier: CharacterModifier;
 		if (newTarget === 'trait') {
 			// Preserve trait if already set, otherwise use default
-			const existingTrait = ('target' in currentModifier && currentModifier.target === 'trait') 
-				? (currentModifier as any).trait ?? 'agility' 
-				: 'agility';
+			const existingTrait =
+				'target' in currentModifier && currentModifier.target === 'trait'
+					? ((currentModifier as any).trait ?? 'agility')
+					: 'agility';
 			newModifier = {
 				...baseProps,
 				...typeProps,
@@ -294,7 +299,7 @@
 				target: newTarget
 			} as CharacterModifier;
 		}
-		
+
 		updateModifier(newModifier);
 	}
 </script>
@@ -304,8 +309,10 @@
 	<div class="flex flex-col gap-1">
 		<label
 			for="target-select"
-			class={cn('text-xs font-medium text-muted-foreground', errors && errors.length > 0 && 'text-destructive')}
-			>Character attribute to modify</label
+			class={cn(
+				'text-xs font-medium text-muted-foreground',
+				errors && errors.length > 0 && 'text-destructive'
+			)}>Character attribute to modify</label
 		>
 		<Select.Root
 			type="single"

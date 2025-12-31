@@ -329,7 +329,7 @@
 	<div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
 		<!-- Forge side image with fade effect - background -->
 		<div
-			class="forge-fade-container pointer-events-none absolute right-0 top-0 bottom-0 z-0 w-96 overflow-hidden"
+			class="forge-fade-container pointer-events-none absolute top-0 right-0 bottom-0 z-0 w-96 overflow-hidden"
 		>
 			<img
 				src="/images/art/forge.webp"
@@ -359,7 +359,7 @@
 
 						<div class="gap- flex">
 							{#if hasChanges}
-								<Button type="button" size="sm" class="h-auto" variant="link" onclick={handleReset}>
+								<Button type="button" size="sm" class="h-7" variant="link" onclick={handleReset}>
 									<RotateCcw class="size-3.5" />
 									<p class="hidden sm:block">Discard</p>
 								</Button>
@@ -367,7 +367,10 @@
 							<Button
 								type="button"
 								size="sm"
-								class={cn('h-7 ', hasErrors && 'border border-destructive')}
+								class={cn(
+									'h-7',
+									hasErrors && 'cursor-not-allowed border border-destructive hover:bg-primary'
+								)}
 								disabled={!hasChanges || homebrew.saving}
 								hidden={!hasChanges && !homebrew.saving}
 								onclick={handleSave}
@@ -387,11 +390,11 @@
 			<!-- Main Content: Preview and Edit Side by Side -->
 			<div class="w-full max-w-6xl sm:px-4 sm:py-8">
 				<div
-					class="relative grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-6 px-2 sm:px-6 py-8 sm:py-6 sm:rounded-3xl bg-accent/5 sm:border-x border-accent/10"
+					class="relative grid grid-cols-1 gap-8 border-accent/10 bg-accent/5 px-2 py-8 sm:gap-6 sm:rounded-3xl sm:border-x sm:px-6 sm:py-6 md:grid-cols-2"
 				>
 					<!-- edit -->
 					<div>
-						<p class="text-accent mb-4 text-center font-eveleth">Edit</p>
+						<p class="mb-4 text-center font-eveleth text-accent">Edit</p>
 						<div class="rounded-lg bg-background p-4">
 							{#if homebrewItem.type === 'weapon'}
 								<HomebrewWeaponForm
@@ -438,7 +441,7 @@
 									onSubmit={handleSave}
 									onReset={handleReset}
 								/>
-							{:else if homebrewItem.type === 'class'}
+								<!-- {:else if homebrewItem.type === 'class'}
 								<HomebrewClassForm
 									bind:this={formComponent}
 									bind:item={homebrewItem.item}
@@ -491,7 +494,7 @@
 									bind:hasErrors
 									onSubmit={handleSave}
 									onReset={handleReset}
-								/>
+								/> -->
 							{/if}
 						</div>
 					</div>
@@ -499,19 +502,19 @@
 					<!-- preview -->
 					<div>
 						<div class="sticky top-17">
-						<p class="text-accent mb-4 text-center font-eveleth">Preview</p>
-						<div class="  flex flex-col items-center gap-4">
-							{#if homebrewItem.type === 'weapon'}
-								<WeaponPreview weapon={homebrewItem.item} />
-							{:else if homebrewItem.type === 'armor'}
-								<ArmorPreview armor={homebrewItem.item} />
-							{:else if homebrewItem.type === 'beastform'}
-								<BeastformPreview beastform={homebrewItem.item} />
-							{:else if homebrewItem.type === 'loot'}
-								<LootPreview loot={homebrewItem.item} />
-							{:else if homebrewItem.type === 'consumable'}
-								<ConsumablePreview consumable={homebrewItem.item} />
-							{:else if homebrewItem.type === 'class'}
+							<p class="mb-4 text-center font-eveleth text-accent">Preview</p>
+							<div class="  flex flex-col items-center gap-4">
+								{#if homebrewItem.type === 'weapon'}
+									<WeaponPreview weapon={homebrewItem.item} />
+								{:else if homebrewItem.type === 'armor'}
+									<ArmorPreview armor={homebrewItem.item} />
+								{:else if homebrewItem.type === 'beastform'}
+									<BeastformPreview beastform={homebrewItem.item} />
+								{:else if homebrewItem.type === 'loot'}
+									<LootPreview loot={homebrewItem.item} />
+								{:else if homebrewItem.type === 'consumable'}
+									<ConsumablePreview consumable={homebrewItem.item} />
+									<!-- {:else if homebrewItem.type === 'class'}
 								<ClassPreview characterClass={homebrewItem.item} />
 							{:else if homebrewItem.type === 'subclass'}
 								<SubclassPreview subclass={homebrewItem.item} />
@@ -522,9 +525,9 @@
 							{:else if homebrewItem.type === 'transformation-cards'}
 								<TransformationCardPreview card={homebrewItem.item} />
 							{:else if homebrewItem.type === 'domain-cards'}
-								<DomainCardPreview card={homebrewItem.item} />
-							{/if}
-						</div>
+								<DomainCardPreview card={homebrewItem.item} /> -->
+								{/if}
+							</div>
 						</div>
 					</div>
 				</div>

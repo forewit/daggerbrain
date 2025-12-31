@@ -189,8 +189,7 @@ export const COMMUNITY_CARDS = {
 		image_url: '/images/art/placeholder-art.webp',
 		tokens: false,
 		title: 'Wildborne',
-		description_html:
-			'Being part of a wildborne community means you lived deep within the forest.',
+		description_html: 'Being part of a wildborne community means you lived deep within the forest.',
 		features: [
 			{
 				title: 'Lightfoot',

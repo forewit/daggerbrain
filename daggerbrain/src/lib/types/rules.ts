@@ -29,8 +29,7 @@ export const CONDITIONS: Record<ConditionIds, Condition> = {
 	vulnerable: {
 		id: 'vulnerable',
 		title: 'Vulnerable',
-		description_html:
-			'When a creature is Vulnerable, all rolls targeting them have advantage.'
+		description_html: 'When a creature is Vulnerable, all rolls targeting them have advantage.'
 	}
 } as const;
 
@@ -82,8 +81,8 @@ export const BASE_MIXED_ANCESTRY_CARD: AncestryCard = {
 	image_url: '/images/art/placeholder-art.webp',
 	title: 'Mixed Ancestry',
 	artist_name: '',
-		description_html:
-			"Anyone's appearance and abilities can be shaped by blood, magic, proximity, or a variety of other factors.",
+	description_html:
+		"Anyone's appearance and abilities can be shaped by blood, magic, proximity, or a variety of other factors.",
 	features: [],
 	choices: []
 };
@@ -338,8 +337,7 @@ export const TIER_3_BASE_OPTIONS = {
 		]
 	},
 	tier_3_subclass_upgrade: {
-		title_html:
-			'Take an upgraded subclass card. Disables the **Multiclass** option for this tier',
+		title_html: 'Take an upgraded subclass card. Disables the **Multiclass** option for this tier',
 		short_title: 'Upgrade Subclass',
 		max: 1,
 		costs_two_choices: false,
@@ -439,8 +437,7 @@ export const TIER_4_BASE_OPTIONS = {
 		]
 	},
 	tier_4_subclass_upgrade: {
-		title_html:
-			'Take an upgraded subclass card. Disables the **Multiclass** option for this tier',
+		title_html: 'Take an upgraded subclass card. Disables the **Multiclass** option for this tier',
 		short_title: 'Upgrade Subclass',
 		max: 1,
 		costs_two_choices: false,

@@ -5,7 +5,6 @@
 	let { characterClass }: { characterClass: CharacterClass } = $props();
 </script>
 
-<div class="mx-auto w-[300px]">
+<div class="flex max-w-[300px] min-w-[300px]">
 	<ClassSummary character_class={characterClass} />
 </div>
-

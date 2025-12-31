@@ -11,6 +11,7 @@
 	import LootRules from '../../rules/loot-rules.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import CircleMinus from '@lucide/svelte/icons/circle-minus';
+	import HomebrewBadge from '../../homebrew/homebrew-badge.svelte';
 
 	let { lootId }: { lootId: string } = $props();
 
@@ -87,7 +88,12 @@
 {#if loot}
 	<Sheet.Header>
 		<Sheet.Title>{loot.title}</Sheet.Title>
-		<p class="text-xs text-muted-foreground italic">Loot</p>
+		<p class="flex items-center gap-1.5 text-xs text-muted-foreground italic">
+			{#if loot.source_id === 'Homebrew'}
+				<HomebrewBadge type="loot" id={loot.compendium_id} />
+			{/if}
+			Loot
+		</p>
 	</Sheet.Header>
 
 	<div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
@@ -97,7 +103,9 @@
 			{#if (loot.description_html || '').trim().length > 0}
 				<div class="mt-3">
 					<div class="border-l-2 border-accent/30 pl-3">
-						<p class="text-xs text-muted-foreground">{@html renderMarkdown(loot.description_html)}</p>
+						<p class="text-xs text-muted-foreground">
+							{@html renderMarkdown(loot.description_html)}
+						</p>
 					</div>
 				</div>
 			{:else}

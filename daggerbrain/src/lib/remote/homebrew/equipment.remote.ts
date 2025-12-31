@@ -55,6 +55,7 @@ export const create_homebrew_primary_weapon = command(WeaponSchema, async (data)
 
 	const validatedData = WeaponSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
+	validatedData.compendium_id = id;
 	const now = Date.now();
 
 	await db.insert(homebrew_primary_weapons).values({
@@ -84,6 +85,7 @@ export const update_homebrew_primary_weapon = command(
 		}
 
 		const validatedData = WeaponSchema.parse({ ...data, source_id: 'Homebrew' as const });
+		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db
@@ -153,6 +155,7 @@ export const create_homebrew_secondary_weapon = command(WeaponSchema, async (dat
 
 	const validatedData = WeaponSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
+	validatedData.compendium_id = id;
 	const now = Date.now();
 
 	await db.insert(homebrew_secondary_weapons).values({
@@ -182,6 +185,7 @@ export const update_homebrew_secondary_weapon = command(
 		}
 
 		const validatedData = WeaponSchema.parse({ ...data, source_id: 'Homebrew' as const });
+		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db
@@ -257,6 +261,7 @@ export const create_homebrew_armor = command(ArmorSchema, async (data) => {
 
 	const validatedData = ArmorSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
+	validatedData.compendium_id = id;
 	const now = Date.now();
 
 	await db.insert(homebrew_armor).values({
@@ -286,6 +291,7 @@ export const update_homebrew_armor = command(
 		}
 
 		const validatedData = ArmorSchema.parse({ ...data, source_id: 'Homebrew' as const });
+		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db
@@ -351,6 +357,7 @@ export const create_homebrew_loot = command(LootSchema, async (data) => {
 
 	const validatedData = LootSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
+	validatedData.compendium_id = id;
 	const now = Date.now();
 
 	await db.insert(homebrew_loot).values({
@@ -380,6 +387,7 @@ export const update_homebrew_loot = command(
 		}
 
 		const validatedData = LootSchema.parse({ ...data, source_id: 'Homebrew' as const });
+		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db
@@ -445,6 +453,7 @@ export const create_homebrew_consumable = command(ConsumableSchema, async (data)
 
 	const validatedData = ConsumableSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
+	validatedData.compendium_id = id;
 	const now = Date.now();
 
 	await db.insert(homebrew_consumables).values({
@@ -474,6 +483,7 @@ export const update_homebrew_consumable = command(
 		}
 
 		const validatedData = ConsumableSchema.parse({ ...data, source_id: 'Homebrew' as const });
+		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db

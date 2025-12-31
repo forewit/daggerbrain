@@ -8,12 +8,14 @@
 	import { renderMarkdown } from '$lib/utils/markdown';
 
 	let {
-		bind_choice_select = false,
+		show_choices = false,
+		preview = false,
 		beastform = $bindable(),
 		class: className = '',
 		children
 	}: {
-		bind_choice_select?: boolean;
+		show_choices?: boolean;
+		preview?: boolean;
 		beastform: Beastform;
 		class?: string;
 		children?: Snippet;
@@ -24,17 +26,40 @@
 	let proficiency = $derived(context?.proficiency);
 	const compendium = getCompendiumContext();
 
+	// Local state for choices in preview mode
+	let preview_choices = $state<Record<string, any>>({});
+
+	// Helper functions to identify special beastform types by special_case field
+	function isLegendaryBeast(bf: Beastform): boolean {
+		return bf.special_case === 'legendary_beast';
+	}
+
+	function isLegendaryHybrid(bf: Beastform): boolean {
+		return bf.special_case === 'legendary_hybrid';
+	}
+
+	function isMythicBeast(bf: Beastform): boolean {
+		return bf.special_case === 'mythic_beast';
+	}
+
+	function isMythicHybrid(bf: Beastform): boolean {
+		return bf.special_case === 'mythic_hybrid';
+	}
+
 	// Apply proficiency to damage dice
 	let damageDiceWithProficiency = $derived.by(() => {
-		if (!proficiency) return beastform.attack.damage_dice;
-		return applyProficiencyToDice(beastform.attack.damage_dice, proficiency);
+		const prof = preview ? 1 : proficiency;
+		if (!prof) return beastform.attack.damage_dice;
+		return applyProficiencyToDice(beastform.attack.damage_dice, prof);
 	});
 
 	// Get choices for this beastform if they exist
 	let beastform_choices = $derived(
-		character?.chosen_beastform?.compendium_id === beastform.compendium_id
-			? character.chosen_beastform.choices || {}
-			: {}
+		preview
+			? preview_choices
+			: character?.chosen_beastform?.compendium_id === beastform.compendium_id
+				? character.chosen_beastform.choices || {}
+				: {}
 	);
 </script>
 
@@ -98,7 +123,7 @@
 	</div>
 
 	<!-- Choices (for special cases like legendary_hybrid, mythic_hybrid) -->
-	{#if bind_choice_select && character?.chosen_beastform?.compendium_id === beastform.compendium_id}
+	{#if show_choices && (preview || character?.chosen_beastform?.compendium_id === beastform.compendium_id)}
 		{@render legendary_beast_choices()}
 		{@render legendary_hybrid_choices()}
 		{@render mythic_beast_choices()}
@@ -109,10 +134,11 @@
 </div>
 
 {#snippet legendary_beast_choices()}
-	{#if beastform.compendium_id === 'legendary_beast' && character && context}
-		{@const available_forms = context
-			.get_available_beastforms(character.level, [])
-			.filter((bf) => bf.level_requirement === 1)}
+	{#if isLegendaryBeast(beastform) && (preview || (character && context))}
+		{@const level = preview ? 10 : character?.level || 10}
+		{@const available_forms = preview
+			? Object.values(compendium.beastforms).filter((bf) => bf.level_requirement === 1)
+			: context.get_available_beastforms(level, []).filter((bf) => bf.level_requirement === 1)}
 		{@const current_choice = beastform_choices.legendary_beast_base_form?.[0] || ''}
 
 		<div class="flex flex-col gap-2">
@@ -121,8 +147,11 @@
 				type="single"
 				value={current_choice}
 				onValueChange={(value: string) => {
-					if (!character?.chosen_beastform) return;
-					character.chosen_beastform.choices.legendary_beast_base_form = value ? [value] : [];
+					if (preview) {
+						preview_choices.legendary_beast_base_form = value ? [value] : [];
+					} else if (character?.chosen_beastform) {
+						character.chosen_beastform.choices.legendary_beast_base_form = value ? [value] : [];
+					}
 				}}
 			>
 				<Select.Trigger class="w-full">
@@ -148,10 +177,11 @@
 {/snippet}
 
 {#snippet legendary_hybrid_choices()}
-	{#if beastform.compendium_id === 'legendary_hybrid' && character && context && character.chosen_beastform}
-		{@const available_forms = context
-			.get_available_beastforms(character.level, [])
-			.filter((bf) => bf.level_requirement <= 4)}
+	{#if isLegendaryHybrid(beastform) && (preview || (character && context && character.chosen_beastform))}
+		{@const level = preview ? 10 : character?.level || 10}
+		{@const available_forms = preview
+			? Object.values(compendium.beastforms).filter((bf) => bf.level_requirement <= 4)
+			: context.get_available_beastforms(level, []).filter((bf) => bf.level_requirement <= 4)}
 		{@const base_forms = beastform_choices.legendary_hybrid_base_forms || []}
 		{@const base_form_0 = compendium.beastforms[base_forms[0] || '']}
 		{@const base_form_1 = compendium.beastforms[base_forms[1] || '']}
@@ -163,8 +193,12 @@
 					type="multiple"
 					value={base_forms.filter(Boolean)}
 					onValueChange={(value: string[]) => {
-						if (!character?.chosen_beastform) return;
-						character.chosen_beastform.choices.legendary_hybrid_base_forms = value.filter(Boolean);
+						if (preview) {
+							preview_choices.legendary_hybrid_base_forms = value.filter(Boolean);
+						} else if (character?.chosen_beastform) {
+							character.chosen_beastform.choices.legendary_hybrid_base_forms =
+								value.filter(Boolean);
+						}
 					}}
 				>
 					<Select.Trigger class="w-full text-muted-foreground">
@@ -173,7 +207,8 @@
 								? 'Select base forms (2 max)'
 								: base_forms
 										.map(
-											(id) => available_forms.find((f) => f.compendium_id === id)?.name || 'Unknown'
+											(id: string) =>
+												available_forms.find((f) => f.compendium_id === id)?.name || 'Unknown'
 										)
 										.join(', ')}
 							{#if base_forms.length < 2}
@@ -189,7 +224,9 @@
 							disabled={base_forms.length === 0}
 							class="justify-center text-destructive"
 							onclick={() => {
-								if (character?.chosen_beastform) {
+								if (preview) {
+									preview_choices.legendary_hybrid_base_forms = [];
+								} else if (character?.chosen_beastform) {
 									character.chosen_beastform.choices.legendary_hybrid_base_forms = [];
 								}
 							}}
@@ -238,12 +275,12 @@
 					{@const _unused = advantage_name_to_ids.set(adv.label, [...ids, adv.id])}
 				{/each}
 				{@const selected_advantages_0 =
-					character.chosen_beastform.choices.legendary_hybrid_base_forms_0_advantages || []}
+					beastform_choices.legendary_hybrid_base_forms_0_advantages || []}
 				{@const selected_advantages_1 =
-					character.chosen_beastform.choices.legendary_hybrid_base_forms_1_advantages || []}
+					beastform_choices.legendary_hybrid_base_forms_1_advantages || []}
 				{@const combined_advantage_selections = [
-					...selected_advantages_0.map((i) => `0_${i}`),
-					...selected_advantages_1.map((i) => `1_${i}`)
+					...selected_advantages_0.map((i: string) => `0_${i}`),
+					...selected_advantages_1.map((i: string) => `1_${i}`)
 				]}
 				{@const all_features = [
 					...base_form_0.features.map((feat, i) => ({
@@ -260,12 +297,12 @@
 					}))
 				]}
 				{@const selected_features_0 =
-					character.chosen_beastform.choices.legendary_hybrid_base_forms_0_features || []}
+					beastform_choices.legendary_hybrid_base_forms_0_features || []}
 				{@const selected_features_1 =
-					character.chosen_beastform.choices.legendary_hybrid_base_forms_1_features || []}
+					beastform_choices.legendary_hybrid_base_forms_1_features || []}
 				{@const combined_feature_selections = [
-					...selected_features_0.map((i) => `0_${i}`),
-					...selected_features_1.map((i) => `1_${i}`)
+					...selected_features_0.map((i: string) => `0_${i}`),
+					...selected_features_1.map((i: string) => `1_${i}`)
 				]}
 				<div class="mt-2 flex flex-col gap-2">
 					<div class="flex flex-col gap-1">
@@ -274,7 +311,6 @@
 							type="multiple"
 							value={combined_advantage_selections}
 							onValueChange={(value: string[]) => {
-								if (!character?.chosen_beastform) return;
 								const form_0_selections: string[] = [];
 								const form_1_selections: string[] = [];
 								for (const val of value) {
@@ -284,10 +320,15 @@
 										form_1_selections.push(val.replace('1_', ''));
 									}
 								}
-								character.chosen_beastform.choices.legendary_hybrid_base_forms_0_advantages =
-									form_0_selections;
-								character.chosen_beastform.choices.legendary_hybrid_base_forms_1_advantages =
-									form_1_selections;
+								if (preview) {
+									preview_choices.legendary_hybrid_base_forms_0_advantages = form_0_selections;
+									preview_choices.legendary_hybrid_base_forms_1_advantages = form_1_selections;
+								} else if (character?.chosen_beastform) {
+									character.chosen_beastform.choices.legendary_hybrid_base_forms_0_advantages =
+										form_0_selections;
+									character.chosen_beastform.choices.legendary_hybrid_base_forms_1_advantages =
+										form_1_selections;
+								}
 							}}
 						>
 							<Select.Trigger class="w-full text-muted-foreground">
@@ -310,7 +351,10 @@
 									disabled={combined_advantage_selections.length === 0}
 									class="justify-center text-destructive"
 									onclick={() => {
-										if (character?.chosen_beastform) {
+										if (preview) {
+											preview_choices.legendary_hybrid_base_forms_0_advantages = [];
+											preview_choices.legendary_hybrid_base_forms_1_advantages = [];
+										} else if (character?.chosen_beastform) {
 											character.chosen_beastform.choices.legendary_hybrid_base_forms_0_advantages =
 												[];
 											character.chosen_beastform.choices.legendary_hybrid_base_forms_1_advantages =
@@ -342,7 +386,6 @@
 							type="multiple"
 							value={combined_feature_selections}
 							onValueChange={(value: string[]) => {
-								if (!character?.chosen_beastform) return;
 								const form_0_selections: string[] = [];
 								const form_1_selections: string[] = [];
 								for (const val of value) {
@@ -352,10 +395,15 @@
 										form_1_selections.push(val.replace('1_', ''));
 									}
 								}
-								character.chosen_beastform.choices.legendary_hybrid_base_forms_0_features =
-									form_0_selections;
-								character.chosen_beastform.choices.legendary_hybrid_base_forms_1_features =
-									form_1_selections;
+								if (preview) {
+									preview_choices.legendary_hybrid_base_forms_0_features = form_0_selections;
+									preview_choices.legendary_hybrid_base_forms_1_features = form_1_selections;
+								} else if (character?.chosen_beastform) {
+									character.chosen_beastform.choices.legendary_hybrid_base_forms_0_features =
+										form_0_selections;
+									character.chosen_beastform.choices.legendary_hybrid_base_forms_1_features =
+										form_1_selections;
+								}
 							}}
 						>
 							<Select.Trigger class="w-full text-muted-foreground">
@@ -378,7 +426,10 @@
 									disabled={combined_feature_selections.length === 0}
 									class="justify-center text-destructive"
 									onclick={() => {
-										if (character?.chosen_beastform) {
+										if (preview) {
+											preview_choices.legendary_hybrid_base_forms_0_features = [];
+											preview_choices.legendary_hybrid_base_forms_1_features = [];
+										} else if (character?.chosen_beastform) {
 											character.chosen_beastform.choices.legendary_hybrid_base_forms_0_features =
 												[];
 											character.chosen_beastform.choices.legendary_hybrid_base_forms_1_features =
@@ -422,10 +473,11 @@
 {/snippet}
 
 {#snippet mythic_beast_choices()}
-	{#if beastform.compendium_id === 'mythic_beast' && character && context}
-		{@const available_forms = context
-			.get_available_beastforms(character.level, [])
-			.filter((bf) => bf.level_requirement <= 4)}
+	{#if isMythicBeast(beastform) && (preview || (character && context))}
+		{@const level = preview ? 10 : character?.level || 10}
+		{@const available_forms = preview
+			? Object.values(compendium.beastforms).filter((bf) => bf.level_requirement <= 4)
+			: context.get_available_beastforms(level, []).filter((bf) => bf.level_requirement <= 4)}
 		{@const current_choice = beastform_choices.mythic_beast_base_form?.[0] || ''}
 
 		<div class="flex flex-col gap-2">
@@ -434,8 +486,11 @@
 				type="single"
 				value={current_choice}
 				onValueChange={(value: string) => {
-					if (!character?.chosen_beastform) return;
-					character.chosen_beastform.choices.mythic_beast_base_form = value ? [value] : [];
+					if (preview) {
+						preview_choices.mythic_beast_base_form = value ? [value] : [];
+					} else if (character?.chosen_beastform) {
+						character.chosen_beastform.choices.mythic_beast_base_form = value ? [value] : [];
+					}
 				}}
 			>
 				<Select.Trigger class="w-full">
@@ -461,10 +516,11 @@
 {/snippet}
 
 {#snippet mythic_hybrid_choices()}
-	{#if beastform.compendium_id === 'mythic_hybrid' && character && context && character.chosen_beastform}
-		{@const available_forms = context
-			.get_available_beastforms(character.level, [])
-			.filter((bf) => bf.level_requirement <= 7)}
+	{#if isMythicHybrid(beastform) && (preview || (character && context && character.chosen_beastform))}
+		{@const level = preview ? 10 : character?.level || 10}
+		{@const available_forms = preview
+			? Object.values(compendium.beastforms).filter((bf) => bf.level_requirement <= 7)
+			: context.get_available_beastforms(level, []).filter((bf) => bf.level_requirement <= 7)}
 		{@const base_forms = beastform_choices.mythic_hybrid_base_forms || []}
 		{@const base_form_0 = compendium.beastforms[base_forms[0] || '']}
 		{@const base_form_1 = compendium.beastforms[base_forms[1] || '']}
@@ -477,8 +533,11 @@
 					type="multiple"
 					value={base_forms.filter(Boolean)}
 					onValueChange={(value: string[]) => {
-						if (!character?.chosen_beastform) return;
-						character.chosen_beastform.choices.mythic_hybrid_base_forms = value.filter(Boolean);
+						if (preview) {
+							preview_choices.mythic_hybrid_base_forms = value.filter(Boolean);
+						} else if (character?.chosen_beastform) {
+							character.chosen_beastform.choices.mythic_hybrid_base_forms = value.filter(Boolean);
+						}
 					}}
 				>
 					<Select.Trigger class="w-full text-muted-foreground">
@@ -487,7 +546,8 @@
 								? 'Select base forms (3 max)'
 								: base_forms
 										.map(
-											(id) => available_forms.find((f) => f.compendium_id === id)?.name || 'Unknown'
+											(id: string) =>
+												available_forms.find((f) => f.compendium_id === id)?.name || 'Unknown'
 										)
 										.join(', ')}
 							{#if base_forms.length < 3}
@@ -503,7 +563,9 @@
 							disabled={base_forms.length === 0}
 							class="justify-center text-destructive"
 							onclick={() => {
-								if (character?.chosen_beastform) {
+								if (preview) {
+									preview_choices.mythic_hybrid_base_forms = [];
+								} else if (character?.chosen_beastform) {
 									character.chosen_beastform.choices.mythic_hybrid_base_forms = [];
 								}
 							}}
@@ -558,15 +620,15 @@
 					{@const _unused = advantage_name_to_ids.set(adv.label, [...ids, adv.id])}
 				{/each}
 				{@const selected_advantages_0 =
-					character.chosen_beastform.choices.mythic_hybrid_base_forms_0_advantages || []}
+					beastform_choices.mythic_hybrid_base_forms_0_advantages || []}
 				{@const selected_advantages_1 =
-					character.chosen_beastform.choices.mythic_hybrid_base_forms_1_advantages || []}
+					beastform_choices.mythic_hybrid_base_forms_1_advantages || []}
 				{@const selected_advantages_2 =
-					character.chosen_beastform.choices.mythic_hybrid_base_forms_2_advantages || []}
+					beastform_choices.mythic_hybrid_base_forms_2_advantages || []}
 				{@const combined_advantage_selections = [
-					...selected_advantages_0.map((i) => `0_${i}`),
-					...selected_advantages_1.map((i) => `1_${i}`),
-					...selected_advantages_2.map((i) => `2_${i}`)
+					...selected_advantages_0.map((i: string) => `0_${i}`),
+					...selected_advantages_1.map((i: string) => `1_${i}`),
+					...selected_advantages_2.map((i: string) => `2_${i}`)
 				]}
 				{@const all_features = [
 					...base_form_0.features.map((feat, i) => ({
@@ -588,16 +650,13 @@
 						label: feat.title
 					}))
 				]}
-				{@const selected_features_0 =
-					character.chosen_beastform.choices.mythic_hybrid_base_forms_0_features || []}
-				{@const selected_features_1 =
-					character.chosen_beastform.choices.mythic_hybrid_base_forms_1_features || []}
-				{@const selected_features_2 =
-					character.chosen_beastform.choices.mythic_hybrid_base_forms_2_features || []}
+				{@const selected_features_0 = beastform_choices.mythic_hybrid_base_forms_0_features || []}
+				{@const selected_features_1 = beastform_choices.mythic_hybrid_base_forms_1_features || []}
+				{@const selected_features_2 = beastform_choices.mythic_hybrid_base_forms_2_features || []}
 				{@const combined_feature_selections = [
-					...selected_features_0.map((i) => `0_${i}`),
-					...selected_features_1.map((i) => `1_${i}`),
-					...selected_features_2.map((i) => `2_${i}`)
+					...selected_features_0.map((i: string) => `0_${i}`),
+					...selected_features_1.map((i: string) => `1_${i}`),
+					...selected_features_2.map((i: string) => `2_${i}`)
 				]}
 				<div class="mt-2 flex flex-col gap-2">
 					<div class="flex flex-col gap-1">
@@ -606,7 +665,6 @@
 							type="multiple"
 							value={combined_advantage_selections}
 							onValueChange={(value: string[]) => {
-								if (!character?.chosen_beastform) return;
 								const form_0_selections: string[] = [];
 								const form_1_selections: string[] = [];
 								const form_2_selections: string[] = [];
@@ -619,12 +677,18 @@
 										form_2_selections.push(val.replace('2_', ''));
 									}
 								}
-								character.chosen_beastform.choices.mythic_hybrid_base_forms_0_advantages =
-									form_0_selections;
-								character.chosen_beastform.choices.mythic_hybrid_base_forms_1_advantages =
-									form_1_selections;
-								character.chosen_beastform.choices.mythic_hybrid_base_forms_2_advantages =
-									form_2_selections;
+								if (preview) {
+									preview_choices.mythic_hybrid_base_forms_0_advantages = form_0_selections;
+									preview_choices.mythic_hybrid_base_forms_1_advantages = form_1_selections;
+									preview_choices.mythic_hybrid_base_forms_2_advantages = form_2_selections;
+								} else if (character?.chosen_beastform) {
+									character.chosen_beastform.choices.mythic_hybrid_base_forms_0_advantages =
+										form_0_selections;
+									character.chosen_beastform.choices.mythic_hybrid_base_forms_1_advantages =
+										form_1_selections;
+									character.chosen_beastform.choices.mythic_hybrid_base_forms_2_advantages =
+										form_2_selections;
+								}
 							}}
 						>
 							<Select.Trigger class="w-full text-muted-foreground">
@@ -647,7 +711,11 @@
 									disabled={combined_advantage_selections.length === 0}
 									class="justify-center text-destructive"
 									onclick={() => {
-										if (character?.chosen_beastform) {
+										if (preview) {
+											preview_choices.mythic_hybrid_base_forms_0_advantages = [];
+											preview_choices.mythic_hybrid_base_forms_1_advantages = [];
+											preview_choices.mythic_hybrid_base_forms_2_advantages = [];
+										} else if (character?.chosen_beastform) {
 											character.chosen_beastform.choices.mythic_hybrid_base_forms_0_advantages = [];
 											character.chosen_beastform.choices.mythic_hybrid_base_forms_1_advantages = [];
 											character.chosen_beastform.choices.mythic_hybrid_base_forms_2_advantages = [];
@@ -678,7 +746,6 @@
 							type="multiple"
 							value={combined_feature_selections}
 							onValueChange={(value: string[]) => {
-								if (!character?.chosen_beastform) return;
 								const form_0_selections: string[] = [];
 								const form_1_selections: string[] = [];
 								const form_2_selections: string[] = [];
@@ -691,12 +758,18 @@
 										form_2_selections.push(val.replace('2_', ''));
 									}
 								}
-								character.chosen_beastform.choices.mythic_hybrid_base_forms_0_features =
-									form_0_selections;
-								character.chosen_beastform.choices.mythic_hybrid_base_forms_1_features =
-									form_1_selections;
-								character.chosen_beastform.choices.mythic_hybrid_base_forms_2_features =
-									form_2_selections;
+								if (preview) {
+									preview_choices.mythic_hybrid_base_forms_0_features = form_0_selections;
+									preview_choices.mythic_hybrid_base_forms_1_features = form_1_selections;
+									preview_choices.mythic_hybrid_base_forms_2_features = form_2_selections;
+								} else if (character?.chosen_beastform) {
+									character.chosen_beastform.choices.mythic_hybrid_base_forms_0_features =
+										form_0_selections;
+									character.chosen_beastform.choices.mythic_hybrid_base_forms_1_features =
+										form_1_selections;
+									character.chosen_beastform.choices.mythic_hybrid_base_forms_2_features =
+										form_2_selections;
+								}
 							}}
 						>
 							<Select.Trigger class="w-full text-muted-foreground">
@@ -719,7 +792,11 @@
 									disabled={combined_feature_selections.length === 0}
 									class="justify-center text-destructive"
 									onclick={() => {
-										if (character?.chosen_beastform) {
+										if (preview) {
+											preview_choices.mythic_hybrid_base_forms_0_features = [];
+											preview_choices.mythic_hybrid_base_forms_1_features = [];
+											preview_choices.mythic_hybrid_base_forms_2_features = [];
+										} else if (character?.chosen_beastform) {
 											character.chosen_beastform.choices.mythic_hybrid_base_forms_0_features = [];
 											character.chosen_beastform.choices.mythic_hybrid_base_forms_1_features = [];
 											character.chosen_beastform.choices.mythic_hybrid_base_forms_2_features = [];

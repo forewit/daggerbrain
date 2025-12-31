@@ -4,6 +4,7 @@
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { cn } from '$lib/utils';
+	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import {
 		ConsumableFormSchema,
 		extractFieldErrors,
@@ -35,6 +36,9 @@
 	// Validation errors state
 	let errors = $state<ConsumableFormErrors>({});
 
+	// Track if validation has been attempted (to show errors only after first submit attempt)
+	let validationAttempted = $state(false);
+
 	// Check if form has changes compared to the item prop
 	let formHasChanges = $derived.by(() => {
 		if (!item) return false;
@@ -50,14 +54,28 @@
 		hasChanges = formHasChanges;
 	});
 
-	// Check if there are validation errors
+	// Check if there are any validation errors
 	let hasValidationErrors = $derived.by(() => {
 		return Object.keys(errors).length > 0;
 	});
 
-	// Sync hasValidationErrors to bindable prop
+	// Collect all error messages for display
+	let allErrorMessages = $derived.by(() => {
+		const messages: string[] = [];
+
+		// Add form-level errors
+		for (const [key, value] of Object.entries(errors)) {
+			if (value) {
+				messages.push(`${key}: ${value}`);
+			}
+		}
+
+		return messages;
+	});
+
+	// Sync hasValidationErrors to bindable prop (only after validation attempted)
 	$effect(() => {
-		hasErrors = hasValidationErrors;
+		hasErrors = validationAttempted && hasValidationErrors;
 	});
 
 	// Sync form state when consumable prop changes
@@ -67,6 +85,7 @@
 			formDescriptionHtml = item.description_html;
 			// Clear errors when consumable changes
 			errors = {};
+			validationAttempted = false;
 		}
 	});
 
@@ -78,34 +97,76 @@
 		};
 	}
 
+	// Validate form-level fields
+	function validateFormFields() {
+		const formData = buildFormData();
+		const result = ConsumableFormSchema.safeParse(formData);
+		if (!result.success) {
+			const allErrors = extractFieldErrors(result.error);
+			// Filter out rarity_roll errors since it's auto-generated
+			const { rarity_roll, ...formErrors } = allErrors;
+			errors = formErrors;
+		} else {
+			errors = {};
+		}
+	}
+
+	// Reactive validation - re-validate when form data changes (only after first validation attempt)
+	$effect(() => {
+		if (!validationAttempted) return;
+
+		// Track form field changes
+		formTitle;
+		formDescriptionHtml;
+
+		validateFormFields();
+	});
+
 	export function handleSubmit(e?: SubmitEvent) {
 		if (e) {
 			e.preventDefault();
 		}
 		if (!item) return;
 
-		// Clear previous errors
-		errors = {};
+		// Mark that validation has been attempted
+		validationAttempted = true;
 
-		// Build form data
-		const formData = buildFormData();
+		// Validate form-level fields
+		validateFormFields();
 
-		// Validate with Zod
-		const result = ConsumableFormSchema.safeParse(formData);
+		// Check if there are any validation errors
+		const hasFormErrors = Object.keys(errors).length > 0;
 
-		if (!result.success) {
-			errors = extractFieldErrors(result.error);
+		if (hasFormErrors) {
+			// Don't set generic error message - errors are shown inline
 			return;
 		}
 
+		// Build form data (validation already passed, so we can use it)
+		const formData = buildFormData();
+
+		// Save the original consumable reference to find it in homebrew state
+		const originalConsumable = item;
 		// Update the consumable prop with validated form values
-		item = {
+		const updatedConsumable = {
 			...item,
-			...result.data
+			...formData
 		};
+		item = updatedConsumable;
+
+		// Update the homebrew state record so auto-save can detect the change
+		// Find the consumable's UID in the collection using the original reference
+		const newConsumableRef = JSON.parse(JSON.stringify(updatedConsumable));
+		for (const [uid, c] of Object.entries(homebrew.consumables)) {
+			if (c === originalConsumable) {
+				homebrew.consumables[uid] = newConsumableRef;
+				break;
+			}
+		}
 
 		// Clear errors on success
 		errors = {};
+		validationAttempted = false;
 
 		// Call callback if provided
 		if (onSubmit && e) {
@@ -120,11 +181,10 @@
 		formDescriptionHtml = item.description_html;
 		// Clear errors on reset
 		errors = {};
+		validationAttempted = false;
 
-		// Call callback if provided
-		if (onReset) {
-			onReset();
-		}
+		// Note: onReset callback removed to prevent infinite recursion
+		// The parent component should handle any additional reset logic if needed
 	}
 </script>
 
@@ -161,17 +221,37 @@
 	</div>
 
 	<!-- Actions -->
-	<div class="flex gap-2 pt-2">
-		<Button type="submit" size="sm" disabled={!formHasChanges || homebrew.saving}>
-			{#if homebrew.saving}
-				<Loader2 class="size-3.5 animate-spin" />
-				Saving...
-			{:else}
-				Save
+	<div class="flex flex-col gap-2 pt-2">
+		<div class="flex justify-end gap-2">
+			{#if formHasChanges}
+				<Button type="button" size="sm" variant="link" onclick={handleReset} class="h-7">
+					<RotateCcw class="size-3.5" />
+					Discard
+				</Button>
 			{/if}
-		</Button>
-		{#if formHasChanges}
-			<Button type="button" size="sm" variant="link" onclick={handleReset}>Discard changes</Button>
+			<Button
+				type="submit"
+				size="sm"
+				disabled={!formHasChanges || homebrew.saving}
+				class={cn(
+					'h-7',
+					hasValidationErrors && 'cursor-not-allowed border border-destructive hover:bg-primary'
+				)}
+			>
+				{#if homebrew.saving}
+					<Loader2 class="size-3.5 animate-spin" />
+					Saving...
+				{:else}
+					Save
+				{/if}
+			</Button>
+		</div>
+		{#if hasValidationErrors && allErrorMessages.length > 0}
+			<ul class="list-inside list-disc space-y-1">
+				{#each allErrorMessages as error}
+					<li class="text-xs text-destructive">{error}</li>
+				{/each}
+			</ul>
 		{/if}
 	</div>
 </form>

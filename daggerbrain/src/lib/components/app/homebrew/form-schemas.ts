@@ -243,7 +243,7 @@ function processModifierError(
 	requiredMessage: string
 ): string {
 	const nestedPath = fieldPath.slice(2);
-	
+
 	if (nestedPath.length > 0) {
 		const fieldName = nestedPath.map(String).join('.');
 		if (fieldName === targetField || issue.message.includes(targetField)) {
@@ -251,25 +251,25 @@ function processModifierError(
 		}
 		return `${fieldName}: ${issue.message}`;
 	}
-	
+
 	// Handle discriminated union errors (missing target/target_stat)
 	if (issue.message.includes(targetField) || issue.code === 'invalid_union') {
 		return requiredMessage;
 	}
-	
+
 	return issue.message;
 }
 
 export function extractFeatureErrors(error: z.ZodError): FeatureValidationErrors {
 	const errors: FeatureValidationErrors = {};
-	
+
 	for (const issue of error.issues) {
 		const path = issue.path;
-		
+
 		if (path.length === 0) continue;
-		
+
 		const [firstPath, secondPath] = path;
-		
+
 		// Handle character_modifiers errors
 		if (firstPath === 'character_modifiers' && typeof secondPath === 'number') {
 			const modifierIndex = secondPath;
@@ -307,6 +307,6 @@ export function extractFeatureErrors(error: z.ZodError): FeatureValidationErrors
 			errors.description_html = issue.message;
 		}
 	}
-	
+
 	return errors;
 }

@@ -150,6 +150,7 @@ export const create_homebrew_domain_card = command(DomainCardSchema, async (data
 
 	const validatedData = DomainCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
+	validatedData.compendium_id = id;
 	const now = Date.now();
 
 	await db.insert(homebrew_domain_cards).values({
@@ -179,6 +180,7 @@ export const update_homebrew_domain_card = command(
 		}
 
 		const validatedData = DomainCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
+		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db

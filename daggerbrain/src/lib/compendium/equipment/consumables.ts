@@ -374,8 +374,7 @@ export const CONSUMABLES = {
 		source_id: 'SRD',
 		rarity_roll: 56,
 		title: 'Sweet Moss',
-		description_html:
-			'<p>You can consume this moss during a rest to clear 1d10 HP or 1d10 Stress'
+		description_html: '<p>You can consume this moss during a rest to clear 1d10 HP or 1d10 Stress'
 	},
 	blinding_orb: {
 		compendium_id: 'blinding_orb',

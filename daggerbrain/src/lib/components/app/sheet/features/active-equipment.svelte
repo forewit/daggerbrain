@@ -8,10 +8,12 @@
 	import { TRAITS } from '$lib/types/rules';
 	let {
 		class: className = '',
-		onItemClick = () => {}
+		onItemClick = () => {},
+		onBeastformClick = () => {}
 	}: {
 		class?: string;
 		onItemClick?: (type: 'weapon' | 'armor' | 'consumable' | 'loot', id: string) => void;
+		onBeastformClick?: () => void;
 	} = $props();
 
 	const context = getCharacterContext();
@@ -199,7 +201,26 @@
 					/>
 				{/if}
 				{#if showBeastformAttack && derivedBeastform}
-					<tr class="bg-accent/3 text-xs text-accent">
+					<tr
+						class="cursor-pointer bg-accent/3 text-xs text-accent"
+						onclick={(e) => {
+							// Don't trigger onclick if clicking on interactive elements (but allow the row itself)
+							const target = e.target as HTMLElement;
+							const interactive = target.closest('button, select, input');
+							if (interactive && interactive !== e.currentTarget) {
+								return;
+							}
+							onBeastformClick?.();
+						}}
+						role="button"
+						tabindex="0"
+						onkeydown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								onBeastformClick?.();
+							}
+						}}
+					>
 						<td class="px-4 py-2">
 							<div class="flex items-center gap-1">
 								<div class="-mb-1">

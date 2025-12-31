@@ -3,7 +3,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Collapsible from '$lib/components/ui/collapsible';
 	import * as Select from '$lib/components/ui/select';
-	import type { Weapon, Armor, Consumable, Loot } from '$lib/types/compendium-types';
+	import type { Weapon, Armor, Consumable, Loot, SourceIds } from '$lib/types/compendium-types';
 	import WeaponDetails from './weapon-details.svelte';
 	import ArmorDetails from './armor-details.svelte';
 	import ConsumableDetails from './consumable-details.svelte';
@@ -16,12 +16,14 @@
 	import Check from '@lucide/svelte/icons/check';
 	import { cn } from '$lib/utils';
 	import { SvelteSet } from 'svelte/reactivity';
+	import HomebrewBadge from '../homebrew/homebrew-badge.svelte';
 
 	let searchQuery = $state('');
 	let typeFilter = $state<'Weapons' | 'Armor' | 'Consumables' | 'Loot' | null>(null);
 	let tierFilter = $state<'1' | '2' | '3' | '4' | ''>('');
 	let weaponTypeFilter = $state<'Magical' | 'Physical' | ''>('');
 	let weaponCategoryFilter = $state<'Primary' | 'Secondary' | ''>('');
+	let sourceFilter = $state<SourceIds | ''>('');
 	const ADD_BUTTON_DISABLE_DELAY_MS = 1200;
 
 	let customItemOpen = $state(false);
@@ -38,10 +40,21 @@
 			weaponTypeFilter = '';
 			weaponCategoryFilter = '';
 		}
+		// Clear source filter when type filter changes for consistency
+		if (typeFilter === null) {
+			sourceFilter = '';
+		}
 	});
 
 	const context = getCharacterContext();
 	const compendium = getCompendiumContext();
+
+	// Get available sources from whitelist, sorted by short_title
+	let availableSources = $derived(
+		Object.values(compendium.sources)
+			.filter((source) => compendium.source_whitelist.has(source.source_id))
+			.sort((a, b) => a.short_title.localeCompare(b.short_title))
+	);
 
 	// Helper function to strip HTML tags for search
 	function stripHtml(html: string): string {
@@ -79,6 +92,9 @@
 				if (weapon.type !== weaponTypeFilter) return false;
 			}
 
+			// Source filter
+			if (sourceFilter !== '' && weapon.source_id !== sourceFilter) return false;
+
 			return true;
 		})
 	);
@@ -100,6 +116,9 @@
 				if (weapon.type !== weaponTypeFilter) return false;
 			}
 
+			// Source filter
+			if (sourceFilter !== '' && weapon.source_id !== sourceFilter) return false;
+
 			return true;
 		})
 	);
@@ -116,6 +135,9 @@
 				if (armorTier !== getTierNumber(tierFilter)) return false;
 			}
 
+			// Source filter
+			if (sourceFilter !== '' && armor.source_id !== sourceFilter) return false;
+
 			return true;
 		})
 	);
@@ -125,6 +147,10 @@
 		Object.values(compendium.consumables).filter((consumable) => {
 			// Search filter
 			if (!matchesSearch(consumable, searchQuery)) return false;
+
+			// Source filter
+			if (sourceFilter !== '' && consumable.source_id !== sourceFilter) return false;
+
 			return true;
 		})
 	);
@@ -134,13 +160,17 @@
 		Object.values(compendium.loot).filter((loot) => {
 			// Search filter
 			if (!matchesSearch(loot, searchQuery)) return false;
+
+			// Source filter
+			if (sourceFilter !== '' && loot.source_id !== sourceFilter) return false;
+
 			return true;
 		})
 	);
 
 	// Check if user has applied any filter or search
 	let hasActiveFilter = $derived(
-		searchQuery.trim() !== '' || typeFilter !== null || tierFilter !== ''
+		searchQuery.trim() !== '' || typeFilter !== null || tierFilter !== '' || sourceFilter !== ''
 	);
 
 	// Combined filtered items based on type filter
@@ -291,7 +321,7 @@
 					value={weaponCategoryFilter}
 					onValueChange={(v) => (weaponCategoryFilter = v as 'Primary' | 'Secondary' | '')}
 				>
-					<Select.Trigger class="w-32">
+					<Select.Trigger class="w-36">
 						{weaponCategoryFilter || 'All Categories'}
 					</Select.Trigger>
 					<Select.Content>
@@ -334,6 +364,25 @@
 						<Select.Item value="Magical">Magical</Select.Item>
 					</Select.Content>
 				</Select.Root>
+
+				<!-- Source Select -->
+				<Select.Root
+					type="single"
+					value={sourceFilter}
+					onValueChange={(v) => (sourceFilter = v as SourceIds | '')}
+				>
+					<Select.Trigger class="w-32">
+						{sourceFilter
+							? compendium.sources[sourceFilter]?.short_title || sourceFilter
+							: 'All Sources'}
+					</Select.Trigger>
+					<Select.Content>
+						<Select.Item value="">All Sources</Select.Item>
+						{#each availableSources as source}
+							<Select.Item value={source.source_id}>{source.short_title}</Select.Item>
+						{/each}
+					</Select.Content>
+				</Select.Root>
 			</div>
 		{/if}
 
@@ -357,6 +406,73 @@
 						<Select.Item value="4">Tier 4</Select.Item>
 					</Select.Content>
 				</Select.Root>
+
+				<!-- Source Select -->
+				<Select.Root
+					type="single"
+					value={sourceFilter}
+					onValueChange={(v) => (sourceFilter = v as SourceIds | '')}
+				>
+					<Select.Trigger class="w-32">
+						{sourceFilter
+							? compendium.sources[sourceFilter]?.short_title || sourceFilter
+							: 'All Sources'}
+					</Select.Trigger>
+					<Select.Content>
+						<Select.Item value="">All Sources</Select.Item>
+						{#each availableSources as source}
+							<Select.Item value={source.source_id}>{source.short_title}</Select.Item>
+						{/each}
+					</Select.Content>
+				</Select.Root>
+			</div>
+		{/if}
+
+		<!-- Subfilters for Consumables -->
+		{#if typeFilter === 'Consumables'}
+			<div class="flex flex-wrap justify-center gap-2">
+				<!-- Source Select -->
+				<Select.Root
+					type="single"
+					value={sourceFilter}
+					onValueChange={(v) => (sourceFilter = v as SourceIds | '')}
+				>
+					<Select.Trigger class="w-32">
+						{sourceFilter
+							? compendium.sources[sourceFilter]?.short_title || sourceFilter
+							: 'All Sources'}
+					</Select.Trigger>
+					<Select.Content>
+						<Select.Item value="">All Sources</Select.Item>
+						{#each availableSources as source}
+							<Select.Item value={source.source_id}>{source.short_title}</Select.Item>
+						{/each}
+					</Select.Content>
+				</Select.Root>
+			</div>
+		{/if}
+
+		<!-- Subfilters for Loot -->
+		{#if typeFilter === 'Loot'}
+			<div class="flex flex-wrap justify-center gap-2">
+				<!-- Source Select -->
+				<Select.Root
+					type="single"
+					value={sourceFilter}
+					onValueChange={(v) => (sourceFilter = v as SourceIds | '')}
+				>
+					<Select.Trigger class="w-32">
+						{sourceFilter
+							? compendium.sources[sourceFilter]?.short_title || sourceFilter
+							: 'All Sources'}
+					</Select.Trigger>
+					<Select.Content>
+						<Select.Item value="">All Sources</Select.Item>
+						{#each availableSources as source}
+							<Select.Item value={source.source_id}>{source.short_title}</Select.Item>
+						{/each}
+					</Select.Content>
+				</Select.Root>
 			</div>
 		{/if}
 	</div>
@@ -368,12 +484,17 @@
 		{:else if filteredItems.length === 0}
 			<p class="py-4 text-center text-sm text-muted-foreground">No results</p>
 		{:else}
-			{#each filteredItems as entry (entry.item.compendium_id)}
+			{#each filteredItems as entry}
 				{#if entry.type === 'weapon'}
 					{#snippet title_snippet()}
 						<div class="gap-4 text-left">
 							<p class="text-md font-medium">{entry.item.title}</p>
-							<p class="truncate text-[10px] leading-none text-muted-foreground italic">
+							<p
+								class="flex items-center gap-1.5 truncate text-[10px] leading-none text-muted-foreground italic"
+							>
+								{#if entry.item.source_id === 'Homebrew'}
+									<HomebrewBadge type="weapon" id={entry.item.compendium_id} class="size-3" />
+								{/if}
 								Tier {context.level_to_tier(entry.item.level_requirement)}
 								{entry.item.category} Weapon
 							</p>
@@ -408,7 +529,12 @@
 					{#snippet title_snippet()}
 						<div class="gap-4 text-left">
 							<p class="text-md font-medium">{entry.item.title}</p>
-							<p class="truncate text-[10px] leading-none text-muted-foreground italic">
+							<p
+								class="flex items-center gap-1.5 truncate text-[10px] leading-none text-muted-foreground italic"
+							>
+								{#if entry.item.source_id === 'Homebrew'}
+									<HomebrewBadge type="armor" id={entry.item.compendium_id} class="size-3" />
+								{/if}
 								Tier {context.level_to_tier(entry.item.level_requirement)} Armor
 							</p>
 						</div>

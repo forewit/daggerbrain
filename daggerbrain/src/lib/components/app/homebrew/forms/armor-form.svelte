@@ -13,7 +13,9 @@
 		ArmorFormSchema,
 		FeatureSchema,
 		extractFieldErrors,
-		type ArmorFormErrors
+		extractFeatureErrors,
+		type ArmorFormErrors,
+		type FeatureValidationErrors
 	} from '../form-schemas';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
@@ -48,8 +50,24 @@
 	// Validation errors state
 	let errors = $state<ArmorFormErrors>({});
 
-	// Feature validation state - track which features have errors
-	const featureErrors = new SvelteMap<number, boolean>();
+	// Feature validation state - track detailed errors for each feature
+	const featureErrors = new SvelteMap<number, FeatureValidationErrors>();
+
+	// Track if validation has been attempted (to show errors only after first submit attempt)
+	let validationAttempted = $state(false);
+
+	// Track which modifiers existed at the last validation attempt
+	// New modifiers added after validation should not show errors until next submit
+	const validatedModifierKeys = new SvelteMap<string, boolean>();
+
+	// Generate a key for a modifier to track it
+	function getModifierKey(
+		featureIndex: number,
+		modifierType: 'character' | 'weapon',
+		modifierIndex: number
+	): string {
+		return `${featureIndex}-${modifierType}-${modifierIndex}`;
+	}
 
 	// svelte-ignore non_reactive_update
 	let dropdownOpenIndex = -1;
@@ -94,14 +112,61 @@
 		hasChanges = formHasChanges;
 	});
 
-	// Check if there are validation errors
+	// Check if there are any validation errors
 	let hasValidationErrors = $derived.by(() => {
-		return Object.keys(errors).length > 0 || featureErrors.size > 0;
+		// Check form-level errors
+		if (Object.keys(errors).length > 0) {
+			return true;
+		}
+		// Check feature errors
+		if (featureErrors.size > 0) {
+			return true;
+		}
+		return false;
 	});
 
-	// Sync hasValidationErrors to bindable prop
+	// Collect all error messages for display
+	let allErrorMessages = $derived.by(() => {
+		const messages: string[] = [];
+
+		// Add form-level errors (exclude 'features' since individual feature errors are shown)
+		for (const [key, value] of Object.entries(errors)) {
+			if (value && key !== 'features') {
+				messages.push(`${key}: ${value}`);
+			}
+		}
+
+		// Add feature errors
+		for (const [index, featureError] of featureErrors) {
+			const featureTitle = formFeatures[index]?.title || `Feature ${index + 1}`;
+			if (featureError.title) {
+				messages.push(`${featureTitle}, Title: ${featureError.title}`);
+			}
+			if (featureError.description_html) {
+				messages.push(`${featureTitle}, Description: ${featureError.description_html}`);
+			}
+			if (featureError.character_modifiers) {
+				for (const [modIndex, modErrors] of featureError.character_modifiers) {
+					for (const error of modErrors) {
+						messages.push(`${featureTitle}, Character Modifier ${modIndex + 1}: ${error}`);
+					}
+				}
+			}
+			if (featureError.weapon_modifiers) {
+				for (const [modIndex, modErrors] of featureError.weapon_modifiers) {
+					for (const error of modErrors) {
+						messages.push(`${featureTitle}, Weapon Modifier ${modIndex + 1}: ${error}`);
+					}
+				}
+			}
+		}
+
+		return messages;
+	});
+
+	// Sync hasValidationErrors to bindable prop (only after validation attempted)
 	$effect(() => {
-		hasErrors = hasValidationErrors;
+		hasErrors = validationAttempted && hasValidationErrors;
 	});
 
 	// Sync form state when armor prop changes
@@ -119,6 +184,8 @@
 			// Clear errors when armor changes
 			errors = {};
 			featureErrors.clear();
+			validationAttempted = false;
+			validatedModifierKeys.clear();
 		}
 	});
 
@@ -136,48 +203,145 @@
 		};
 	}
 
+	// Validate features and update error state
+	function validateFeatures() {
+		for (let i = 0; i < formFeatures.length; i++) {
+			const result = FeatureSchema.safeParse(formFeatures[i]);
+
+			if (!result.success) {
+				const featureErrorsData = extractFeatureErrors(result.error);
+
+				// Filter out errors for modifiers that weren't validated yet (newly added)
+				if (featureErrorsData.character_modifiers) {
+					const filteredCharModifiers = new Map<number, string[]>();
+					for (const [modIndex, errors] of featureErrorsData.character_modifiers) {
+						const key = getModifierKey(i, 'character', modIndex);
+						if (validatedModifierKeys.has(key)) {
+							filteredCharModifiers.set(modIndex, errors);
+						}
+					}
+					if (filteredCharModifiers.size > 0) {
+						featureErrorsData.character_modifiers = filteredCharModifiers;
+					} else {
+						delete featureErrorsData.character_modifiers;
+					}
+				}
+
+				if (featureErrorsData.weapon_modifiers) {
+					const filteredWeaponModifiers = new Map<number, string[]>();
+					for (const [modIndex, errors] of featureErrorsData.weapon_modifiers) {
+						const key = getModifierKey(i, 'weapon', modIndex);
+						if (validatedModifierKeys.has(key)) {
+							filteredWeaponModifiers.set(modIndex, errors);
+						}
+					}
+					if (filteredWeaponModifiers.size > 0) {
+						featureErrorsData.weapon_modifiers = filteredWeaponModifiers;
+					} else {
+						delete featureErrorsData.weapon_modifiers;
+					}
+				}
+
+				// Only set errors if there are any remaining after filtering
+				const hasCharModifierErrors =
+					featureErrorsData.character_modifiers && featureErrorsData.character_modifiers.size > 0;
+				const hasWeaponModifierErrors =
+					featureErrorsData.weapon_modifiers && featureErrorsData.weapon_modifiers.size > 0;
+				if (
+					hasCharModifierErrors ||
+					hasWeaponModifierErrors ||
+					featureErrorsData.title ||
+					featureErrorsData.description_html
+				) {
+					featureErrors.set(i, featureErrorsData);
+				} else {
+					featureErrors.delete(i);
+				}
+			} else {
+				featureErrors.delete(i);
+			}
+		}
+	}
+
+	// Validate form-level fields
+	function validateFormFields() {
+		const formData = buildFormData();
+		const result = ArmorFormSchema.safeParse(formData);
+		if (!result.success) {
+			errors = extractFieldErrors(result.error);
+		} else {
+			errors = {};
+		}
+	}
+
+	// Reactive validation - re-validate when form data changes (only after first validation attempt)
+	$effect(() => {
+		if (!validationAttempted) return;
+
+		// Re-validate features when they change
+		validateFeatures();
+	});
+
+	// Re-validate form fields when they change
+	$effect(() => {
+		if (!validationAttempted) return;
+
+		// Track form field changes
+		formTitle;
+		formDescriptionHtml;
+		formTier;
+		formMaxArmor;
+		formMajorThreshold;
+		formSevereThreshold;
+
+		validateFormFields();
+	});
+
 	export function handleSubmit(e?: SubmitEvent) {
 		if (e) {
 			e.preventDefault();
 		}
 		if (!item) return;
 
-		// Clear previous errors
-		errors = {};
-		featureErrors.clear();
+		// Mark that validation has been attempted
+		validationAttempted = true;
 
-		// Validate all features directly
-		let allFeaturesValid = true;
+		// Mark all current modifiers as validated (so errors will show for them)
+		validatedModifierKeys.clear();
 		for (let i = 0; i < formFeatures.length; i++) {
-			const result = FeatureSchema.safeParse(formFeatures[i]);
-			if (!result.success) {
-				allFeaturesValid = false;
-				featureErrors.set(i, true);
+			const feature = formFeatures[i];
+			for (let j = 0; j < feature.character_modifiers.length; j++) {
+				validatedModifierKeys.set(getModifierKey(i, 'character', j), true);
+			}
+			for (let j = 0; j < feature.weapon_modifiers.length; j++) {
+				validatedModifierKeys.set(getModifierKey(i, 'weapon', j), true);
 			}
 		}
 
-		// Build form data
+		// Validate all features
+		validateFeatures();
+
+		// Validate form-level fields
+		validateFormFields();
+
+		// Check if there are any validation errors
+		const hasFormErrors = Object.keys(errors).length > 0;
+		const hasFeatureErrors = featureErrors.size > 0;
+
+		if (hasFormErrors || hasFeatureErrors) {
+			// Don't set generic error message - errors are shown inline in each feature
+			return;
+		}
+
+		// Build form data (validation already passed, so we can use it)
 		const formData = buildFormData();
-
-		// Validate with Zod
-		const result = ArmorFormSchema.safeParse(formData);
-
-		if (!result.success) {
-			errors = extractFieldErrors(result.error);
-			return;
-		}
-
-		if (!allFeaturesValid) {
-			errors = { ...errors, features: 'One or more features have validation errors' };
-			return;
-		}
 
 		// Save the original armor reference to find it in homebrew state
 		const originalArmor = item;
 		// Update the armor prop with validated form values
 		const updatedArmor = {
 			...item,
-			...result.data
+			...formData
 		};
 		item = updatedArmor;
 
@@ -194,6 +358,7 @@
 		// Clear errors on success
 		errors = {};
 		featureErrors.clear();
+		validationAttempted = false;
 
 		// Call callback if provided
 		if (onSubmit && e) {
@@ -216,16 +381,15 @@
 		// Clear errors on reset
 		errors = {};
 		featureErrors.clear();
+		validationAttempted = false;
+		validatedModifierKeys.clear();
 
-		// Call callback if provided
-		if (onReset) {
-			onReset();
-		}
+		// Note: onReset callback removed to prevent infinite recursion
+		// The parent component should handle any additional reset logic if needed
 	}
 
-	function addFeature() {
-		const newIndex = formFeatures.length;
-		dropdownOpenIndex = newIndex;
+	function addFeature(index: number) {
+		dropdownOpenIndex = index;
 		const newFeature: Feature = {
 			title: '',
 			description_html: '',
@@ -233,7 +397,7 @@
 			weapon_modifiers: []
 		};
 		formFeatures = [...formFeatures, newFeature];
-		
+
 		tick().then(() => {
 			dropdownOpenIndex = -1;
 		});
@@ -245,10 +409,10 @@
 		featureErrors.delete(index);
 
 		// Collect entries that need re-indexing
-		const errorsToReindex: [number, boolean][] = [];
-		for (const [i, hasError] of featureErrors) {
+		const errorsToReindex: [number, FeatureValidationErrors][] = [];
+		for (const [i, errorData] of featureErrors) {
 			if (i > index) {
-				errorsToReindex.push([i, hasError]);
+				errorsToReindex.push([i, errorData]);
 			}
 		}
 
@@ -256,8 +420,8 @@
 		for (const [i] of errorsToReindex) {
 			featureErrors.delete(i);
 		}
-		for (const [i, hasError] of errorsToReindex) {
-			featureErrors.set(i - 1, hasError);
+		for (const [i, errorData] of errorsToReindex) {
+			featureErrors.set(i - 1, errorData);
 		}
 	}
 </script>
@@ -364,32 +528,30 @@
 	<!-- Features -->
 	<div class="flex flex-col gap-2">
 		<div class="flex items-center justify-between">
-			<p
-				class={cn(
-					'text-xs font-medium text-muted-foreground',
-					errors.features && 'text-destructive'
-				)}
+			<p class="text-xs font-medium text-muted-foreground">Features</p>
+			<Button
+				type="button"
+				size="sm"
+				variant="outline"
+				onclick={() => addFeature(formFeatures.length)}
 			>
-				Features
-			</p>
-			<Button type="button" size="sm" variant="outline" onclick={addFeature}>
 				<Plus class="size-3.5" />
 				Add Feature
 			</Button>
 		</div>
-		{#if errors.features}
-			<p class="text-xs text-destructive">{errors.features}</p>
-		{/if}
 		<div class="flex flex-col gap-2">
 			{#each formFeatures as feature, index (index)}
 				<Dropdown
 					title={feature.title || `Unnamed feature`}
-					class={featureErrors.get(index) ? 'border-destructive' : ''}
+					class={featureErrors.has(index)
+						? 'data-[open=false]:border data-[open=false]:border-destructive'
+						: ''}
 					open={dropdownOpenIndex === index}
 				>
 					<HomebrewFeatureForm
 						bind:feature={formFeatures[index]}
 						onRemove={() => removeFeature(index)}
+						errors={featureErrors.get(index)}
 					/>
 				</Dropdown>
 			{:else}
@@ -399,21 +561,37 @@
 	</div>
 
 	<!-- Actions -->
-	<div class="flex gap-2 pt-2 justify-end">
-		{#if formHasChanges}
-			<Button type="button" size="sm" variant="link" onclick={handleReset}>
-				<RotateCcw class="size-3.5" />
-				Discard
-			</Button>
-		{/if}
-		<Button type="submit" size="sm" disabled={!formHasChanges || homebrew.saving}>
-			{#if homebrew.saving}
-				<Loader2 class="size-3.5 animate-spin" />
-				Saving...
-			{:else}
-				Save
+	<div class="flex flex-col gap-2 pt-2">
+		<div class="flex justify-end gap-2">
+			{#if formHasChanges}
+				<Button type="button" size="sm" variant="link" onclick={handleReset} class="h-7">
+					<RotateCcw class="size-3.5" />
+					Discard
+				</Button>
 			{/if}
-		</Button>
-		
+			<Button
+				type="submit"
+				size="sm"
+				disabled={!formHasChanges || homebrew.saving}
+				class={cn(
+					'h-7',
+					hasValidationErrors && 'cursor-not-allowed border border-destructive hover:bg-primary'
+				)}
+			>
+				{#if homebrew.saving}
+					<Loader2 class="size-3.5 animate-spin" />
+					Saving...
+				{:else}
+					Save
+				{/if}
+			</Button>
+		</div>
+		{#if hasValidationErrors && allErrorMessages.length > 0}
+			<ul class="list-inside list-disc space-y-1">
+				{#each allErrorMessages as error}
+					<li class="text-xs text-destructive">{error}</li>
+				{/each}
+			</ul>
+		{/if}
 	</div>
 </form>

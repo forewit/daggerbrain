@@ -749,8 +749,7 @@ export const TIER_4_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Burning',
-				description_html:
-					'When an adversary attacks you within Melee range, they mark a Stress.',
+				description_html: 'When an adversary attacks you within Melee range, they mark a Stress.',
 				character_modifiers: []
 			}
 		]
@@ -791,8 +790,7 @@ export const TIER_4_ARMOR = {
 			{
 				weapon_modifiers: [],
 				title: 'Truthseeking',
-				description_html:
-					'This armor glows when another creature within Close range tells a lie.',
+				description_html: 'This armor glows when another creature within Close range tells a lie.',
 				character_modifiers: []
 			}
 		]

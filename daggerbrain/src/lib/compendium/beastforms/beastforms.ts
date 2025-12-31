@@ -637,11 +637,12 @@ const TIER_3_BEASTFORMS = {
 			{
 				title: 'Evolved',
 				description_html:
-					'Pick a Tier 1 Beastform option and become a larger, more powerful version of that creature. While you\'re in this form, you retain all traits and features from the original form and gain the following bonuses:\n- A +6 bonus to damage rolls\n- A +1 bonus to the trait used by this form\n- A +2 bonus to Evasion',
+					"Pick a Tier 1 Beastform option and become a larger, more powerful version of that creature. While you're in this form, you retain all traits and features from the original form and gain the following bonuses:\n- A +6 bonus to damage rolls\n- A +1 bonus to the trait used by this form\n- A +2 bonus to Evasion",
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
-		]
+		],
+		special_case: 'legendary_beast'
 	},
 	legendary_hybrid: {
 		compendium_id: 'legendary_hybrid',
@@ -670,7 +671,8 @@ const TIER_3_BEASTFORMS = {
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
-		]
+		],
+		special_case: 'legendary_hybrid'
 	}
 } as const satisfies Record<string, Beastform>;
 
@@ -861,11 +863,12 @@ const TIER_4_BEASTFORMS = {
 			{
 				title: 'Evolved',
 				description_html:
-					'Pick a Tier 1 or Tier 2 Beastform option and become a larger, more powerful version of that creature. While you\'re in this form, you retain all traits and features from the original form and gain the following bonuses:\n- A +9 bonus to damage rolls\n- A +2 bonus to the trait used by this form\n- A +3 bonus to Evasion\n- Your damage die increases by one size (d6 becomes d8, d8 becomes d10, etc.)',
+					"Pick a Tier 1 or Tier 2 Beastform option and become a larger, more powerful version of that creature. While you're in this form, you retain all traits and features from the original form and gain the following bonuses:\n- A +9 bonus to damage rolls\n- A +2 bonus to the trait used by this form\n- A +3 bonus to Evasion\n- Your damage die increases by one size (d6 becomes d8, d8 becomes d10, etc.)",
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
-		]
+		],
+		special_case: 'mythic_beast'
 	},
 	mythic_hybrid: {
 		compendium_id: 'mythic_hybrid',
@@ -894,7 +897,8 @@ const TIER_4_BEASTFORMS = {
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
-		]
+		],
+		special_case: 'mythic_hybrid'
 	}
 } as const satisfies Record<string, Beastform>;
 

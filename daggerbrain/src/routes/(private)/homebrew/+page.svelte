@@ -27,12 +27,9 @@
 	import Shield from '@lucide/svelte/icons/shield';
 	import Swords from '@lucide/svelte/icons/swords';
 	import PawPrint from '@lucide/svelte/icons/paw-print';
-	import Chest from '@lucide/svelte/icons/package';
 	import FlaskConical from '@lucide/svelte/icons/flask-conical';
 	import GraduationCap from '@lucide/svelte/icons/graduation-cap';
 	import BookOpen from '@lucide/svelte/icons/book-open';
-	import Users from '@lucide/svelte/icons/users';
-	import Sparkles from '@lucide/svelte/icons/sparkles';
 	import Anvil from '@lucide/svelte/icons/anvil';
 	import Footer from '$lib/components/app/footer.svelte';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
@@ -170,13 +167,13 @@
 					} | null;
 					if (template) {
 						const cloned = deepClone(template.data);
-						cloned.compendium_id = '';
+						cloned.compendium_id = ''; // overwritten by the server
 						cloned.source_id = 'Homebrew';
 						cloned.title = newItemName.trim();
 						id = await homebrew.createPrimaryWeapon(cloned);
 					} else {
 						id = await homebrew.createPrimaryWeapon({
-							compendium_id: '',
+							compendium_id: '', // overwritten by the server
 							source_id: 'Homebrew',
 							title: newItemName.trim(),
 							description_html: '',
@@ -199,13 +196,13 @@
 					const template = selectedTemplate as Armor | null;
 					if (template) {
 						const cloned = deepClone(template);
-						cloned.compendium_id = '';
+						cloned.compendium_id = ''; // overwritten by the server
 						cloned.source_id = 'Homebrew';
 						cloned.title = newItemName.trim();
 						id = await homebrew.createArmor(cloned);
 					} else {
 						id = await homebrew.createArmor({
-							compendium_id: '',
+							compendium_id: '', // overwritten by the server
 							source_id: 'Homebrew',
 							title: newItemName.trim(),
 							description_html: '',
@@ -221,13 +218,13 @@
 					const template = selectedTemplate as Beastform | null;
 					if (template) {
 						const cloned = deepClone(template);
-						cloned.compendium_id = '';
+						cloned.compendium_id = ''; // overwritten by the server
 						cloned.source_id = 'Homebrew';
 						cloned.name = newItemName.trim();
 						id = await homebrew.createBeastform(cloned);
 					} else {
 						id = await homebrew.createBeastform({
-							compendium_id: '',
+							compendium_id: '', // overwritten by the server
 							source_id: 'Homebrew',
 							level_requirement: 1,
 							name: newItemName.trim(),
@@ -254,13 +251,13 @@
 					const template = selectedTemplate as Loot | null;
 					if (template) {
 						const cloned = deepClone(template);
-						cloned.compendium_id = '';
+						cloned.compendium_id = ''; // overwritten by the server
 						cloned.source_id = 'Homebrew';
 						cloned.title = newItemName.trim();
 						id = await homebrew.createLoot(cloned);
 					} else {
 						id = await homebrew.createLoot({
-							compendium_id: '',
+							compendium_id: '', // overwritten by the server
 							source_id: 'Homebrew',
 							title: newItemName.trim(),
 							description_html: '',
@@ -275,13 +272,13 @@
 					const template = selectedTemplate as Consumable | null;
 					if (template) {
 						const cloned = deepClone(template);
-						cloned.compendium_id = '';
+						cloned.compendium_id = ''; // overwritten by the server
 						cloned.source_id = 'Homebrew';
 						cloned.title = newItemName.trim();
 						id = await homebrew.createConsumable(cloned);
 					} else {
 						id = await homebrew.createConsumable({
-							compendium_id: '',
+							compendium_id: '', // overwritten by the server
 							source_id: 'Homebrew',
 							title: newItemName.trim(),
 							description_html: '',
@@ -294,13 +291,13 @@
 					const template = selectedTemplate as CharacterClass | null;
 					if (template) {
 						const cloned = deepClone(template);
-						cloned.compendium_id = '';
+						cloned.compendium_id = ''; // overwritten by the server
 						cloned.source_id = 'Homebrew';
 						cloned.name = newItemName.trim();
 						id = await homebrew.createClass(cloned);
 					} else {
 						id = await homebrew.createClass({
-							compendium_id: '',
+							compendium_id: '', // overwritten by the server
 							source_id: 'Homebrew',
 							name: newItemName.trim(),
 							image_url: '',
@@ -352,19 +349,19 @@
 					const template = selectedTemplate as Subclass | null;
 					if (template) {
 						const cloned = deepClone(template);
-						cloned.compendium_id = '';
+						cloned.compendium_id = ''; // overwritten by the server
 						cloned.source_id = 'Homebrew';
 						cloned.name = newItemName.trim();
 						id = await homebrew.createSubclass(cloned);
 					} else {
 						id = await homebrew.createSubclass({
-							compendium_id: '',
+							compendium_id: '', // overwritten by the server
 							source_id: 'Homebrew',
 							name: newItemName.trim(),
 							description_html: '',
 							class_id: '',
 							foundation_card: {
-								compendium_id: '',
+								compendium_id: '', // overwritten by the server
 								card_type: 'subclass_foundation',
 								title: '',
 								description_html: '',
@@ -375,7 +372,7 @@
 								class_id: ''
 							},
 							specialization_card: {
-								compendium_id: '',
+								compendium_id: '', // overwritten by the server
 								card_type: 'subclass_specialization',
 								title: '',
 								description_html: '',
@@ -385,7 +382,7 @@
 								class_id: ''
 							},
 							mastery_card: {
-								compendium_id: '',
+								compendium_id: '', // overwritten by the server
 								card_type: 'subclass_mastery',
 								title: '',
 								description_html: '',
@@ -402,13 +399,13 @@
 					const template = selectedTemplate as DomainCard | null;
 					if (template) {
 						const cloned = deepClone(template);
-						cloned.compendium_id = '';
+						cloned.compendium_id = ''; // overwritten by the server
 						cloned.source_id = 'Homebrew';
 						cloned.title = newItemName.trim();
 						id = await homebrew.createDomainCard(cloned);
 					} else {
 						id = await homebrew.createDomainCard({
-							compendium_id: '',
+							compendium_id: '', // overwritten by the server
 							source_id: 'Homebrew',
 							card_type: 'domain',
 							title: newItemName.trim(),
@@ -432,13 +429,13 @@
 					const template = selectedTemplate as AncestryCard | null;
 					if (template) {
 						const cloned = deepClone(template);
-						cloned.compendium_id = '';
+						cloned.compendium_id = ''; // overwritten by the server
 						cloned.source_id = 'Homebrew';
 						cloned.title = newItemName.trim();
 						id = await homebrew.createAncestryCard(cloned);
 					} else {
 						id = await homebrew.createAncestryCard({
-							compendium_id: '',
+							compendium_id: '', // overwritten by the server
 							source_id: 'Homebrew',
 							card_type: 'ancestry',
 							title: newItemName.trim(),
@@ -455,13 +452,13 @@
 					const template = selectedTemplate as CommunityCard | null;
 					if (template) {
 						const cloned = deepClone(template);
-						cloned.compendium_id = '';
+						cloned.compendium_id = ''; // overwritten by the server
 						cloned.source_id = 'Homebrew';
 						cloned.title = newItemName.trim();
 						id = await homebrew.createCommunityCard(cloned);
 					} else {
 						id = await homebrew.createCommunityCard({
-							compendium_id: '',
+							compendium_id: '', // overwritten by the server
 							source_id: 'Homebrew',
 							card_type: 'community',
 							title: newItemName.trim(),
@@ -478,13 +475,13 @@
 					const template = selectedTemplate as TransformationCard | null;
 					if (template) {
 						const cloned = deepClone(template);
-						cloned.compendium_id = '';
+						cloned.compendium_id = ''; // overwritten by the server
 						cloned.source_id = 'Homebrew';
 						cloned.title = newItemName.trim();
 						id = await homebrew.createTransformationCard(cloned);
 					} else {
 						id = await homebrew.createTransformationCard({
-							compendium_id: '',
+							compendium_id: '', // overwritten by the server
 							source_id: 'Homebrew',
 							card_type: 'transformation',
 							title: newItemName.trim(),
@@ -1011,11 +1008,11 @@
 			case 'armor':
 				return `Tier ${getItemTier(entry)} Armor`;
 			case 'beastform':
-				return entry.item.category;
+				return `Tier ${getItemTier(entry)} Beastform`;
 			case 'loot':
-				return `Rarity Roll: ${entry.item.rarity_roll}`;
+				return 'Loot';
 			case 'consumable':
-				return `Rarity Roll: ${entry.item.rarity_roll}`;
+				return 'Consumable';
 			case 'class':
 				return 'Character Class';
 			case 'subclass':
@@ -1103,6 +1100,52 @@
 			<Select.Item value="4">Tier 4</Select.Item>
 		</Select.Content>
 	</Select.Root>
+{/snippet}
+
+{#snippet lootIcon(sizeClass = 'size-4')}
+	<svg viewBox="0 0 24 24" class="{sizeClass} fill-current" aria-hidden="true">
+		<path
+			d="M18,0H6C2.691,0,0,2.691,0,6V24H24V6c0-3.309-2.691-6-6-6Zm4,6v3h-2V2.556c1.19,.694,2,1.97,2,3.444Zm-4-4v7h-3c0-1.654-1.346-3-3-3s-3,1.346-3,3h-3V2h12Zm-5,7v4h-2v-4c0-.551,.448-1,1-1s1,.449,1,1ZM4,2.556v6.444H2v-3c0-1.474,.81-2.75,2-3.444ZM20,22V13h-2v9H6V13h-2v9H2V11h7v4h6v-4h7v11h-2Z"
+		/>
+	</svg>
+{/snippet}
+
+{#snippet cardIcon(sizeClass = 'size-4')}
+	<svg
+		class={sizeClass}
+		width="800px"
+		height="800px"
+		viewBox="0 0 24 24"
+		fill="none"
+		xmlns="http://www.w3.org/2000/svg"
+	>
+		<!-- <path
+			d="M9.4 7.53333C9.2 7.26667 8.8 7.26667 8.6 7.53333L6.225 10.7C6.09167 10.8778 6.09167 11.1222 6.225 11.3L8.6 14.4667C8.8 14.7333 9.2 14.7333 9.4 14.4667L11.775 11.3C11.9083 11.1222 11.9083 10.8778 11.775 10.7L9.4 7.53333Z"
+			fill="currentColor"
+		/> -->
+		<!-- <path
+			d="M4.09245 5.63868C4.03647 5.5547 4.03647 5.4453 4.09245 5.36133L4.79199 4.31202C4.89094 4.16359 5.10906 4.16359 5.20801 4.31202L5.90755 5.36132C5.96353 5.4453 5.96353 5.5547 5.90755 5.63867L5.20801 6.68798C5.10906 6.83641 4.89094 6.83641 4.79199 6.68798L4.09245 5.63868Z"
+			fill="currentColor"
+		/> -->
+		<!-- <path
+			d="M13.208 15.312C13.1091 15.1636 12.8909 15.1636 12.792 15.312L12.0924 16.3613C12.0365 16.4453 12.0365 16.5547 12.0924 16.6387L12.792 17.688C12.8909 17.8364 13.1091 17.8364 13.208 17.688L13.9075 16.6387C13.9635 16.5547 13.9635 16.4453 13.9075 16.3613L13.208 15.312Z"
+			fill="currentColor"
+		/> -->
+		<path
+			fill-rule="evenodd"
+			clip-rule="evenodd"
+			d="M1 4C1 2.34315 2.34315 1 4 1H14C15.1323 1 16.1181 1.62732 16.6288 2.55337L20.839 3.68148C22.4394 4.11031 23.3891 5.75532 22.9603 7.35572L19.3368 20.8787C18.908 22.4791 17.263 23.4288 15.6626 23L8.19849 21H4C2.34315 21 1 19.6569 1 18V4ZM17 18V4.72339L20.3213 5.61334C20.8548 5.75628 21.1714 6.30461 21.0284 6.83808L17.405 20.361C17.262 20.8945 16.7137 21.2111 16.1802 21.0681L15.1198 20.784C16.222 20.3403 17 19.261 17 18ZM4 3C3.44772 3 3 3.44772 3 4V18C3 18.5523 3.44772 19 4 19H14C14.5523 19 15 18.5523 15 18V4C15 3.44772 14.5523 3 14 3H4Z"
+			fill="currentColor"
+		/>
+	</svg>
+{/snippet}
+
+{#snippet commingSoonBadge()}
+	<span
+		class="rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 text-[10px] text-accent"
+	>
+		Coming Soon
+	</span>
 {/snippet}
 
 <div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
@@ -1224,29 +1267,29 @@
 													<PawPrint class="size-4" />
 													Beastforms ({beastformCount})
 												{:else if activeTab === 'loot'}
-													<Chest class="size-4" />
+													{@render lootIcon('size-4')}
 													Loot ({lootCount})
 												{:else if activeTab === 'consumables'}
 													<FlaskConical class="size-4" />
 													Consumables ({consumableCount})
-												{:else if activeTab === 'classes'}
+													<!-- {:else if activeTab === 'classes'}
 													<GraduationCap class="size-4" />
 													Classes ({classCount})
 												{:else if activeTab === 'subclasses'}
 													<BookOpen class="size-4" />
 													Subclasses ({subclassCount})
 												{:else if activeTab === 'domain-cards'}
-													<BookOpen class="size-4" />
+													{@render cardIcon('size-4')}
 													Domain Cards ({domainCardCount})
 												{:else if activeTab === 'ancestry-cards'}
-													<Users class="size-4" />
+													{@render cardIcon('size-4')}
 													Ancestry Cards ({ancestryCardCount})
 												{:else if activeTab === 'community-cards'}
-													<Users class="size-4" />
+													{@render cardIcon('size-4')}
 													Community Cards ({communityCardCount})
 												{:else if activeTab === 'transformation-cards'}
-													<Sparkles class="size-4" />
-													Transformation Cards ({transformationCardCount})
+													{@render cardIcon('size-4')}
+													Transformation Cards ({transformationCardCount}) -->
 												{/if}
 											</div>
 										</Select.Trigger>
@@ -1276,7 +1319,7 @@
 											</Select.Item>
 											<Select.Item value="loot">
 												<div class="flex items-center gap-2">
-													<Chest class="size-4" />
+													{@render lootIcon('size-4')}
 													Loot ({lootCount})
 												</div>
 											</Select.Item>
@@ -1286,40 +1329,46 @@
 													Consumables ({consumableCount})
 												</div>
 											</Select.Item>
-											<Select.Item value="classes">
-												<div class="flex items-center gap-2">
+											<Select.Item value="classes" disabled>
+												<div class="flex grow items-center gap-2">
 													<GraduationCap class="size-4" />
 													Classes ({classCount})
+													<span class="ml-auto">{@render commingSoonBadge()}</span>
 												</div>
 											</Select.Item>
-											<Select.Item value="subclasses">
-												<div class="flex items-center gap-2">
+											<Select.Item value="subclasses" disabled>
+												<div class="flex grow items-center gap-2">
 													<BookOpen class="size-4" />
 													Subclasses ({subclassCount})
+													<span class="ml-auto">{@render commingSoonBadge()}</span>
 												</div>
 											</Select.Item>
-											<Select.Item value="domain-cards">
-												<div class="flex items-center gap-2">
-													<BookOpen class="size-4" />
+											<Select.Item value="domain-cards" disabled>
+												<div class="flex grow items-center gap-2">
+													{@render cardIcon('size-4')}
 													Domain Cards ({domainCardCount})
+													<span class="ml-auto">{@render commingSoonBadge()}</span>
 												</div>
 											</Select.Item>
-											<Select.Item value="ancestry-cards">
-												<div class="flex items-center gap-2">
-													<Users class="size-4" />
+											<Select.Item value="ancestry-cards" disabled>
+												<div class="flex grow items-center gap-2">
+													{@render cardIcon('size-4')}
 													Ancestry Cards ({ancestryCardCount})
+													<span class="ml-auto">{@render commingSoonBadge()}</span>
 												</div>
 											</Select.Item>
-											<Select.Item value="community-cards">
-												<div class="flex items-center gap-2">
-													<Users class="size-4" />
+											<Select.Item value="community-cards" disabled>
+												<div class="flex grow items-center gap-2">
+													{@render cardIcon('size-4')}
 													Community Cards ({communityCardCount})
+													<span class="ml-auto">{@render commingSoonBadge()}</span>
 												</div>
 											</Select.Item>
-											<Select.Item value="transformation-cards">
-												<div class="flex items-center gap-2">
-													<Sparkles class="size-4" />
+											<Select.Item value="transformation-cards" disabled>
+												<div class="flex grow items-center gap-2">
+													{@render cardIcon('size-4')}
 													Transformation Cards ({transformationCardCount})
+													<span class="ml-auto">{@render commingSoonBadge()}</span>
 												</div>
 											</Select.Item>
 										</Select.Content>
@@ -1411,7 +1460,7 @@
 											{:else if entry.type === 'beastform'}
 												<PawPrint class="size-6 text-muted-foreground" />
 											{:else if entry.type === 'loot'}
-												<Chest class="size-6 text-muted-foreground" />
+												{@render lootIcon('size-6 text-muted-foreground')}
 											{:else if entry.type === 'consumable'}
 												<FlaskConical class="size-6 text-muted-foreground" />
 											{:else if entry.type === 'class'}
@@ -1419,13 +1468,13 @@
 											{:else if entry.type === 'subclass'}
 												<BookOpen class="size-6 text-muted-foreground" />
 											{:else if entry.type === 'domain-cards'}
-												<BookOpen class="size-6 text-muted-foreground" />
+												{@render cardIcon('size-6 text-muted-foreground')}
 											{:else if entry.type === 'ancestry-cards'}
-												<Users class="size-6 text-muted-foreground" />
+												{@render cardIcon('size-6 text-muted-foreground')}
 											{:else if entry.type === 'community-cards'}
-												<Users class="size-6 text-muted-foreground" />
+												{@render cardIcon('size-6 text-muted-foreground')}
 											{:else if entry.type === 'transformation-cards'}
-												<Sparkles class="size-6 text-muted-foreground" />
+												{@render cardIcon('size-6 text-muted-foreground')}
 											{/if}
 										</div>
 										<div class="min-w-0 flex-1 truncate">
@@ -1546,7 +1595,7 @@
 								</div>
 							{:else if newItemType === 'loot'}
 								<div class="flex items-center gap-2">
-									<Chest class="size-4" />
+									{@render lootIcon('size-4')}
 									Loot
 								</div>
 							{:else if newItemType === 'consumable'}
@@ -1554,7 +1603,7 @@
 									<FlaskConical class="size-4" />
 									Consumable
 								</div>
-							{:else if newItemType === 'class'}
+								<!-- {:else if newItemType === 'class'}
 								<div class="flex items-center gap-2">
 									<GraduationCap class="size-4" />
 									Class
@@ -1566,24 +1615,24 @@
 								</div>
 							{:else if newItemType === 'domain-cards'}
 								<div class="flex items-center gap-2">
-									<BookOpen class="size-4" />
+									{@render cardIcon('size-4')}
 									Domain Card
 								</div>
 							{:else if newItemType === 'ancestry-cards'}
 								<div class="flex items-center gap-2">
-									<Users class="size-4" />
+									{@render cardIcon('size-4')}
 									Ancestry Card
 								</div>
 							{:else if newItemType === 'community-cards'}
 								<div class="flex items-center gap-2">
-									<Users class="size-4" />
+									{@render cardIcon('size-4')}
 									Community Card
 								</div>
 							{:else if newItemType === 'transformation-cards'}
 								<div class="flex items-center gap-2">
-									<Sparkles class="size-4" />
+									{@render cardIcon('size-4')}
 									Transformation Card
-								</div>
+								</div> -->
 							{:else}
 								<span class="text-muted-foreground">Select a type...</span>
 							{/if}
@@ -1609,11 +1658,7 @@
 							</Select.Item>
 							<Select.Item value="loot" disabled={atLimit}>
 								<div class="flex items-center gap-2">
-									<svg viewBox="0 0 24 24" class="size-4 fill-current" aria-hidden="true">
-										<path
-											d="M18,0H6C2.691,0,0,2.691,0,6V24H24V6c0-3.309-2.691-6-6-6Zm4,6v3h-2V2.556c1.19,.694,2,1.97,2,3.444Zm-4-4v7h-3c0-1.654-1.346-3-3-3s-3,1.346-3,3h-3V2h12Zm-5,7v4h-2v-4c0-.551,.448-1,1-1s1,.449,1,1ZM4,2.556v6.444H2v-3c0-1.474,.81-2.75,2-3.444ZM20,22V13h-2v9H6V13h-2v9H2V11h7v4h6v-4h7v11h-2Z"
-										/>
-									</svg>
+									{@render lootIcon('size-4')}
 									Loot
 								</div>
 							</Select.Item>
@@ -1623,141 +1668,46 @@
 									Consumable
 								</div>
 							</Select.Item>
-							<Select.Item value="class" disabled={atLimit}>
-								<div class="flex items-center gap-2">
+							<Select.Item value="class" disabled>
+								<div class="flex grow items-center gap-2">
 									<GraduationCap class="size-4" />
 									Class
+									<span class="ml-auto">{@render commingSoonBadge()}</span>
 								</div>
 							</Select.Item>
-							<Select.Item value="subclass" disabled={atLimit}>
-								<div class="flex items-center gap-2">
+							<Select.Item value="subclass" disabled>
+								<div class="flex grow items-center gap-2">
 									<BookOpen class="size-4" />
 									Subclass
+									<span class="ml-auto">{@render commingSoonBadge()}</span>
 								</div>
 							</Select.Item>
-							<Select.Item value="domain-cards" disabled={atLimit}>
-								<div class="flex items-center gap-2">
-									<svg
-										class="size-4"
-										width="800px"
-										height="800px"
-										viewBox="0 0 24 24"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path
-											d="M9.4 7.53333C9.2 7.26667 8.8 7.26667 8.6 7.53333L6.225 10.7C6.09167 10.8778 6.09167 11.1222 6.225 11.3L8.6 14.4667C8.8 14.7333 9.2 14.7333 9.4 14.4667L11.775 11.3C11.9083 11.1222 11.9083 10.8778 11.775 10.7L9.4 7.53333Z"
-											fill="currentColor"
-										/>
-										<path
-											d="M4.09245 5.63868C4.03647 5.5547 4.03647 5.4453 4.09245 5.36133L4.79199 4.31202C4.89094 4.16359 5.10906 4.16359 5.20801 4.31202L5.90755 5.36132C5.96353 5.4453 5.96353 5.5547 5.90755 5.63867L5.20801 6.68798C5.10906 6.83641 4.89094 6.83641 4.79199 6.68798L4.09245 5.63868Z"
-											fill="currentColor"
-										/>
-										<path
-											d="M13.208 15.312C13.1091 15.1636 12.8909 15.1636 12.792 15.312L12.0924 16.3613C12.0365 16.4453 12.0365 16.5547 12.0924 16.6387L12.792 17.688C12.8909 17.8364 13.1091 17.8364 13.208 17.688L13.9075 16.6387C13.9635 16.5547 13.9635 16.4453 13.9075 16.3613L13.208 15.312Z"
-											fill="currentColor"
-										/>
-										<path
-											fill-rule="evenodd"
-											clip-rule="evenodd"
-											d="M1 4C1 2.34315 2.34315 1 4 1H14C15.1323 1 16.1181 1.62732 16.6288 2.55337L20.839 3.68148C22.4394 4.11031 23.3891 5.75532 22.9603 7.35572L19.3368 20.8787C18.908 22.4791 17.263 23.4288 15.6626 23L8.19849 21H4C2.34315 21 1 19.6569 1 18V4ZM17 18V4.72339L20.3213 5.61334C20.8548 5.75628 21.1714 6.30461 21.0284 6.83808L17.405 20.361C17.262 20.8945 16.7137 21.2111 16.1802 21.0681L15.1198 20.784C16.222 20.3403 17 19.261 17 18ZM4 3C3.44772 3 3 3.44772 3 4V18C3 18.5523 3.44772 19 4 19H14C14.5523 19 15 18.5523 15 18V4C15 3.44772 14.5523 3 14 3H4Z"
-											fill="currentColor"
-										/>
-									</svg>
+							<Select.Item value="domain-cards" disabled>
+								<div class="flex grow items-center gap-2">
+									{@render cardIcon('size-4')}
 									Domain Card
+									<span class="ml-auto">{@render commingSoonBadge()}</span>
 								</div>
 							</Select.Item>
-							<Select.Item value="ancestry-cards" disabled={atLimit}>
-								<div class="flex items-center gap-2">
-									<svg
-										width="800px"
-										height="800px"
-										viewBox="0 0 24 24"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path
-											d="M9.4 7.53333C9.2 7.26667 8.8 7.26667 8.6 7.53333L6.225 10.7C6.09167 10.8778 6.09167 11.1222 6.225 11.3L8.6 14.4667C8.8 14.7333 9.2 14.7333 9.4 14.4667L11.775 11.3C11.9083 11.1222 11.9083 10.8778 11.775 10.7L9.4 7.53333Z"
-											fill="currentColor"
-										/>
-										<path
-											d="M4.09245 5.63868C4.03647 5.5547 4.03647 5.4453 4.09245 5.36133L4.79199 4.31202C4.89094 4.16359 5.10906 4.16359 5.20801 4.31202L5.90755 5.36132C5.96353 5.4453 5.96353 5.5547 5.90755 5.63867L5.20801 6.68798C5.10906 6.83641 4.89094 6.83641 4.79199 6.68798L4.09245 5.63868Z"
-											fill="currentColor"
-										/>
-										<path
-											d="M13.208 15.312C13.1091 15.1636 12.8909 15.1636 12.792 15.312L12.0924 16.3613C12.0365 16.4453 12.0365 16.5547 12.0924 16.6387L12.792 17.688C12.8909 17.8364 13.1091 17.8364 13.208 17.688L13.9075 16.6387C13.9635 16.5547 13.9635 16.4453 13.9075 16.3613L13.208 15.312Z"
-											fill="currentColor"
-										/>
-										<path
-											fill-rule="evenodd"
-											clip-rule="evenodd"
-											d="M1 4C1 2.34315 2.34315 1 4 1H14C15.1323 1 16.1181 1.62732 16.6288 2.55337L20.839 3.68148C22.4394 4.11031 23.3891 5.75532 22.9603 7.35572L19.3368 20.8787C18.908 22.4791 17.263 23.4288 15.6626 23L8.19849 21H4C2.34315 21 1 19.6569 1 18V4ZM17 18V4.72339L20.3213 5.61334C20.8548 5.75628 21.1714 6.30461 21.0284 6.83808L17.405 20.361C17.262 20.8945 16.7137 21.2111 16.1802 21.0681L15.1198 20.784C16.222 20.3403 17 19.261 17 18ZM4 3C3.44772 3 3 3.44772 3 4V18C3 18.5523 3.44772 19 4 19H14C14.5523 19 15 18.5523 15 18V4C15 3.44772 14.5523 3 14 3H4Z"
-											fill="currentColor"
-										/>
-									</svg>
+							<Select.Item value="ancestry-cards" disabled>
+								<div class="flex grow items-center gap-2">
+									{@render cardIcon('size-4')}
 									Ancestry Card
+									<span class="ml-auto">{@render commingSoonBadge()}</span>
 								</div>
 							</Select.Item>
-							<Select.Item value="community-cards" disabled={atLimit}>
-								<div class="flex items-center gap-2">
-									<svg
-										width="800px"
-										height="800px"
-										viewBox="0 0 24 24"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path
-											d="M9.4 7.53333C9.2 7.26667 8.8 7.26667 8.6 7.53333L6.225 10.7C6.09167 10.8778 6.09167 11.1222 6.225 11.3L8.6 14.4667C8.8 14.7333 9.2 14.7333 9.4 14.4667L11.775 11.3C11.9083 11.1222 11.9083 10.8778 11.775 10.7L9.4 7.53333Z"
-											fill="currentColor"
-										/>
-										<path
-											d="M4.09245 5.63868C4.03647 5.5547 4.03647 5.4453 4.09245 5.36133L4.79199 4.31202C4.89094 4.16359 5.10906 4.16359 5.20801 4.31202L5.90755 5.36132C5.96353 5.4453 5.96353 5.5547 5.90755 5.63867L5.20801 6.68798C5.10906 6.83641 4.89094 6.83641 4.79199 6.68798L4.09245 5.63868Z"
-											fill="currentColor"
-										/>
-										<path
-											d="M13.208 15.312C13.1091 15.1636 12.8909 15.1636 12.792 15.312L12.0924 16.3613C12.0365 16.4453 12.0365 16.5547 12.0924 16.6387L12.792 17.688C12.8909 17.8364 13.1091 17.8364 13.208 17.688L13.9075 16.6387C13.9635 16.5547 13.9635 16.4453 13.9075 16.3613L13.208 15.312Z"
-											fill="currentColor"
-										/>
-										<path
-											fill-rule="evenodd"
-											clip-rule="evenodd"
-											d="M1 4C1 2.34315 2.34315 1 4 1H14C15.1323 1 16.1181 1.62732 16.6288 2.55337L20.839 3.68148C22.4394 4.11031 23.3891 5.75532 22.9603 7.35572L19.3368 20.8787C18.908 22.4791 17.263 23.4288 15.6626 23L8.19849 21H4C2.34315 21 1 19.6569 1 18V4ZM17 18V4.72339L20.3213 5.61334C20.8548 5.75628 21.1714 6.30461 21.0284 6.83808L17.405 20.361C17.262 20.8945 16.7137 21.2111 16.1802 21.0681L15.1198 20.784C16.222 20.3403 17 19.261 17 18ZM4 3C3.44772 3 3 3.44772 3 4V18C3 18.5523 3.44772 19 4 19H14C14.5523 19 15 18.5523 15 18V4C15 3.44772 14.5523 3 14 3H4Z"
-											fill="currentColor"
-										/>
-									</svg>
+							<Select.Item value="community-cards" disabled>
+								<div class="flex grow items-center gap-2">
+									{@render cardIcon('size-4')}
 									Community Card
+									<span class="ml-auto">{@render commingSoonBadge()}</span>
 								</div>
 							</Select.Item>
-							<Select.Item value="transformation-cards" disabled={atLimit}>
-								<div class="flex items-center gap-2">
-									<svg
-										width="800px"
-										height="800px"
-										viewBox="0 0 24 24"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path
-											d="M9.4 7.53333C9.2 7.26667 8.8 7.26667 8.6 7.53333L6.225 10.7C6.09167 10.8778 6.09167 11.1222 6.225 11.3L8.6 14.4667C8.8 14.7333 9.2 14.7333 9.4 14.4667L11.775 11.3C11.9083 11.1222 11.9083 10.8778 11.775 10.7L9.4 7.53333Z"
-											fill="currentColor"
-										/>
-										<path
-											d="M4.09245 5.63868C4.03647 5.5547 4.03647 5.4453 4.09245 5.36133L4.79199 4.31202C4.89094 4.16359 5.10906 4.16359 5.20801 4.31202L5.90755 5.36132C5.96353 5.4453 5.96353 5.5547 5.90755 5.63867L5.20801 6.68798C5.10906 6.83641 4.89094 6.83641 4.79199 6.68798L4.09245 5.63868Z"
-											fill="currentColor"
-										/>
-										<path
-											d="M13.208 15.312C13.1091 15.1636 12.8909 15.1636 12.792 15.312L12.0924 16.3613C12.0365 16.4453 12.0365 16.5547 12.0924 16.6387L12.792 17.688C12.8909 17.8364 13.1091 17.8364 13.208 17.688L13.9075 16.6387C13.9635 16.5547 13.9635 16.4453 13.9075 16.3613L13.208 15.312Z"
-											fill="currentColor"
-										/>
-										<path
-											fill-rule="evenodd"
-											clip-rule="evenodd"
-											d="M1 4C1 2.34315 2.34315 1 4 1H14C15.1323 1 16.1181 1.62732 16.6288 2.55337L20.839 3.68148C22.4394 4.11031 23.3891 5.75532 22.9603 7.35572L19.3368 20.8787C18.908 22.4791 17.263 23.4288 15.6626 23L8.19849 21H4C2.34315 21 1 19.6569 1 18V4ZM17 18V4.72339L20.3213 5.61334C20.8548 5.75628 21.1714 6.30461 21.0284 6.83808L17.405 20.361C17.262 20.8945 16.7137 21.2111 16.1802 21.0681L15.1198 20.784C16.222 20.3403 17 19.261 17 18ZM4 3C3.44772 3 3 3.44772 3 4V18C3 18.5523 3.44772 19 4 19H14C14.5523 19 15 18.5523 15 18V4C15 3.44772 14.5523 3 14 3H4Z"
-											fill="currentColor"
-										/>
-									</svg>
+							<Select.Item value="transformation-cards" disabled>
+								<div class="flex grow items-center gap-2">
+									{@render cardIcon('size-4')}
 									Transformation Card
+									<span class="ml-auto">{@render commingSoonBadge()}</span>
 								</div>
 							</Select.Item>
 						</Select.Content>
@@ -1782,7 +1732,10 @@
 			</div>
 
 			<Dialog.Footer class="flex gap-3">
-				<Dialog.Close class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}>
+				<Dialog.Close
+					type="button"
+					class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
+				>
 					Cancel
 				</Dialog.Close>
 				<Button

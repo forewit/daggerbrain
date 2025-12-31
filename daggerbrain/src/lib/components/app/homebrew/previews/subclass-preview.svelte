@@ -5,7 +5,7 @@
 	let { subclass }: { subclass: Subclass } = $props();
 </script>
 
-<div class="mx-auto flex w-[300px] flex-col gap-4 rounded-lg border p-4">
+<div class="flex max-w-[300px] min-w-[300px] flex-col gap-4 rounded-lg bg-background p-4 shadow">
 	<!-- Title -->
 	<div class="flex flex-col gap-1">
 		<h3 class="text-lg font-semibold">{subclass.name}</h3>
@@ -18,20 +18,19 @@
 
 	<!-- Foundation Card -->
 	<div class="rounded-lg border bg-primary/5 px-4 py-3">
-		<p class="text-sm font-medium mb-2">Foundation Card</p>
+		<p class="mb-2 text-sm font-medium">Foundation Card</p>
 		<SubclassCard card={subclass.foundation_card} variant="responsive" />
 	</div>
 
 	<!-- Specialization Card -->
 	<div class="rounded-lg border bg-primary/5 px-4 py-3">
-		<p class="text-sm font-medium mb-2">Specialization Card</p>
+		<p class="mb-2 text-sm font-medium">Specialization Card</p>
 		<SubclassCard card={subclass.specialization_card} variant="responsive" />
 	</div>
 
 	<!-- Mastery Card -->
 	<div class="rounded-lg border bg-primary/5 px-4 py-3">
-		<p class="text-sm font-medium mb-2">Mastery Card</p>
+		<p class="mb-2 text-sm font-medium">Mastery Card</p>
 		<SubclassCard card={subclass.mastery_card} variant="responsive" />
 	</div>
 </div>
-

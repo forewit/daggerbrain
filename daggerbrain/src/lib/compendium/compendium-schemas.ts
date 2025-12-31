@@ -314,7 +314,11 @@ export const BeastformSchema = z.object({
 	}),
 	advantages: z.array(z.string()),
 	evasion_bonus: z.number(),
-	features: z.array(FeatureSchema)
+	features: z.array(FeatureSchema),
+	special_case: z
+		.enum(['legendary_beast', 'legendary_hybrid', 'mythic_beast', 'mythic_hybrid'])
+		.optional()
+		.nullable()
 });
 
 // ============================================================================

@@ -607,8 +607,7 @@ export const CLASSES = {
 			"As a seraph, you've taken a vow to a god who helps you channel sacred arcane power to keep your party on their feet.",
 		hope_feature: {
 			title: 'Life Support',
-			description_html:
-				'**Spend 3 Hope** to clear a Hit Point on an ally within Close range.',
+			description_html: '**Spend 3 Hope** to clear a Hit Point on an ally within Close range.',
 			character_modifiers: [],
 			weapon_modifiers: []
 		},

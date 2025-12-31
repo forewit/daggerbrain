@@ -108,7 +108,7 @@ export const CHARACTER_DEFAULTS = {
 	},
 	marked_hp: 0,
 	marked_stress: 0,
-	marked_hope: 0,
+	marked_hope: 2,
 	marked_armor: 0,
 	loadout_domain_card_ids: <DomainCardId[]>[],
 	bonus_max_loadout: 0,

@@ -11,6 +11,7 @@
 	import CircleMinus from '@lucide/svelte/icons/circle-minus';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
+	import HomebrewBadge from '../../homebrew/homebrew-badge.svelte';
 
 	const context = getCharacterContext();
 	const compendium = getCompendiumContext();
@@ -111,7 +112,10 @@
 							<td class="py-2 pr-4 text-left">
 								<div class="flex flex-col gap-0.5">
 									<span class="font-medium">{card.title}</span>
-									<span class="text-xs text-muted-foreground">
+									<span class="flex items-center gap-1.5 text-xs text-muted-foreground">
+										{#if card.source_id === 'Homebrew'}
+											<HomebrewBadge type="domain-cards" id={card.compendium_id} />
+										{/if}
 										{getDomainName(card.domain_id)} • Level {card.level_requirement}
 									</span>
 								</div>

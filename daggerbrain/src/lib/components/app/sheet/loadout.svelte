@@ -156,15 +156,15 @@
 
 						<!-- Rest Mode -->
 						<div class="flex flex-col items-center justify-center gap-3 px-6">
-								<Stress
-									class={cn(
-										'rounded-full bg-muted px-4 py-2',
-										restMode && 'opacity-30'
-										// character.ephemeral_stats.marked_stress >= character.derived_stats.max_stress &&
-										//"border-3 border-destructive"
-									)}
-									displayOnly
-								/>
+							<Stress
+								class={cn(
+									'rounded-full bg-muted px-4 py-2',
+									restMode && 'opacity-30'
+									// character.ephemeral_stats.marked_stress >= character.derived_stats.max_stress &&
+									//"border-3 border-destructive"
+								)}
+								displayOnly
+							/>
 							<Label
 								class={cn(
 									'flex h-10 w-min items-center rounded-full border px-3 text-nowrap hover:cursor-pointer',

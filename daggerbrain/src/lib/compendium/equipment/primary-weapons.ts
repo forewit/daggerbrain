@@ -479,8 +479,7 @@ export const TIER_1_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Versatile',
-				description_html:
-					'This weapon can also be used with these statistics—Presence, Melee, d8.',
+				description_html: 'This weapon can also be used with these statistics—Presence, Melee, d8.',
 				character_modifiers: []
 			}
 		]
@@ -2418,8 +2417,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Timebending',
-				description_html:
-					'You choose the target of your attack after making your attack roll.',
+				description_html: 'You choose the target of your attack after making your attack roll.',
 				character_modifiers: []
 			}
 		]
@@ -2467,8 +2465,7 @@ export const TIER_3_PRIMARY_WEAPONS = {
 			{
 				weapon_modifiers: [],
 				title: 'Burning',
-				description_html:
-					'When you roll a 6 on a damage die, the target must mark a Stress.',
+				description_html: 'When you roll a 6 on a damage die, the target must mark a Stress.',
 				character_modifiers: []
 			}
 		]

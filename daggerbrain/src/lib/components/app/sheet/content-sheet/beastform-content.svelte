@@ -43,7 +43,7 @@
 	<!-- Current Beastform -->
 	{#if chosenBeastform && derivedBeastform}
 		<div class="flex flex-col gap-2">
-			<BeastformComponent beastform={derivedBeastform} bind_choice_select={true} />
+			<BeastformComponent beastform={derivedBeastform} show_choices={true} />
 			<Button variant="link" size="sm" class="text-destructive" onclick={removeBeastform}>
 				Remove
 			</Button>

@@ -54,6 +54,10 @@
 		| 'beastform'
 		| 'companion';
 	let tab = $state<TabValue>('weapons');
+
+	function handleBeastformClick() {
+		tab = 'beastform';
+	}
 </script>
 
 <div class={cn('relative overflow-hidden rounded-xl border-3 py-4', className)}>
@@ -74,7 +78,7 @@
 		</Tabs.List>
 
 		<Tabs.Content value="weapons">
-			<ActiveEquipment {onItemClick} />
+			<ActiveEquipment {onItemClick} onBeastformClick={handleBeastformClick} />
 		</Tabs.Content>
 		<Tabs.Content value="features" class="px-4">
 			<ClassFeatures />

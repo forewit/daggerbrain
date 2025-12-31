@@ -9,6 +9,7 @@
 	} from '$lib/types/compendium-types';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import CircleMinus from '@lucide/svelte/icons/circle-minus';
+	import HomebrewBadge from '../../homebrew/homebrew-badge.svelte';
 
 	type HeritageCard = AncestryCard | CommunityCard | TransformationCard;
 
@@ -101,7 +102,17 @@
 							<td class="py-2 pr-4 text-left">
 								<div class="flex flex-col gap-0.5">
 									<span class="font-medium">{card.title}</span>
-									<span class="text-xs text-muted-foreground">
+									<span class="flex items-center gap-1.5 text-xs text-muted-foreground">
+										{#if card.source_id === 'Homebrew'}
+											<HomebrewBadge
+												type={card.card_type === 'ancestry'
+													? 'ancestry-cards'
+													: card.card_type === 'community'
+														? 'community-cards'
+														: 'transformation-cards'}
+												id={card.compendium_id}
+											/>
+										{/if}
 										{getCardTypeName(card)}
 									</span>
 								</div>

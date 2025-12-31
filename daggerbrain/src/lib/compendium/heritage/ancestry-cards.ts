@@ -259,8 +259,7 @@ export const ANCESTRY_CARDS = {
 		features: [
 			{
 				title: 'Shell',
-				description_html:
-					'Gain a bonus to your damage thresholds equal to your Proficiency.',
+				description_html: 'Gain a bonus to your damage thresholds equal to your Proficiency.',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',
@@ -361,8 +360,7 @@ export const ANCESTRY_CARDS = {
 		features: [
 			{
 				title: 'Luckbringer',
-				description_html:
-					'At the start of each session, everyone in your party gains a Hope.',
+				description_html: 'At the start of each session, everyone in your party gains a Hope.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			},
@@ -428,8 +426,7 @@ export const ANCESTRY_CARDS = {
 			},
 			{
 				title: 'Dread Visage',
-				description_html:
-					'You have advantage on rolls to intimidate hostile creatures.',
+				description_html: 'You have advantage on rolls to intimidate hostile creatures.',
 				character_modifiers: [],
 				weapon_modifiers: []
 			}
@@ -535,8 +532,7 @@ export const ANCESTRY_CARDS = {
 			},
 			{
 				title: 'Nimble',
-				description_html:
-					'Gain a permanent +1 bonus to your Evasion at character creation.',
+				description_html: 'Gain a permanent +1 bonus to your Evasion at character creation.',
 				character_modifiers: [
 					{
 						behaviour: 'bonus',

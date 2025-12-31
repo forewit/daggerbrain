@@ -18,16 +18,20 @@
 	import Dropdown from '../../leveling/dropdown.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
 	import X from '@lucide/svelte/icons/x';
+	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import ImageUrlInput from '../image-url-input.svelte';
 	import {
 		ClassFormSchema,
 		FeatureSchema,
 		extractFieldErrors,
-		type ClassFormErrors
+		extractFeatureErrors,
+		type ClassFormErrors,
+		type FeatureValidationErrors
 	} from '../form-schemas';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
+	import { tick } from 'svelte';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 
 	let {
@@ -88,9 +92,28 @@
 	// Validation errors state
 	let errors = $state<ClassFormErrors>({});
 
-	// Feature validation state
-	const featureErrors = new SvelteMap<number, boolean>();
-	let hopeFeatureError = $state(false);
+	// Feature validation state - track detailed errors for each feature
+	const featureErrors = new SvelteMap<number, FeatureValidationErrors>();
+	let hopeFeatureError = $state<FeatureValidationErrors | null>(null);
+
+	// Track if validation has been attempted (to show errors only after first submit attempt)
+	let validationAttempted = $state(false);
+
+	// Track which modifiers existed at the last validation attempt
+	// New modifiers added after validation should not show errors until next submit
+	const validatedModifierKeys = new SvelteMap<string, boolean>();
+
+	// Generate a key for a modifier to track it
+	function getModifierKey(
+		featureIndex: number | 'hope',
+		modifierType: 'character' | 'weapon',
+		modifierIndex: number
+	): string {
+		return `${featureIndex}-${modifierType}-${modifierIndex}`;
+	}
+
+	// svelte-ignore non_reactive_update
+	let dropdownOpenIndex = -1;
 
 	const domainOptions: DomainIds[] = [
 		'arcana',
@@ -175,14 +198,90 @@
 		hasChanges = formHasChanges;
 	});
 
-	// Check if there are validation errors
+	// Check if there are any validation errors
 	let hasValidationErrors = $derived.by(() => {
-		return Object.keys(errors).length > 0 || featureErrors.size > 0 || hopeFeatureError;
+		// Check form-level errors
+		if (Object.keys(errors).length > 0) {
+			return true;
+		}
+		// Check feature errors
+		if (featureErrors.size > 0) {
+			return true;
+		}
+		// Check hope feature error
+		if (hopeFeatureError) {
+			return true;
+		}
+		return false;
 	});
 
-	// Sync hasValidationErrors to bindable prop
+	// Collect all error messages for display
+	let allErrorMessages = $derived.by(() => {
+		const messages: string[] = [];
+
+		// Add form-level errors (exclude 'hope_feature' and 'class_features' since individual feature errors are shown)
+		for (const [key, value] of Object.entries(errors)) {
+			if (value && key !== 'hope_feature' && key !== 'class_features') {
+				messages.push(`${key}: ${value}`);
+			}
+		}
+
+		// Add hope feature errors
+		if (hopeFeatureError) {
+			const featureTitle = formHopeFeature?.title || 'Hope Feature';
+			if (hopeFeatureError.title) {
+				messages.push(`${featureTitle}, Title: ${hopeFeatureError.title}`);
+			}
+			if (hopeFeatureError.description_html) {
+				messages.push(`${featureTitle}, Description: ${hopeFeatureError.description_html}`);
+			}
+			if (hopeFeatureError.character_modifiers) {
+				for (const [modIndex, modErrors] of hopeFeatureError.character_modifiers) {
+					for (const error of modErrors) {
+						messages.push(`${featureTitle}, Character Modifier ${modIndex + 1}: ${error}`);
+					}
+				}
+			}
+			if (hopeFeatureError.weapon_modifiers) {
+				for (const [modIndex, modErrors] of hopeFeatureError.weapon_modifiers) {
+					for (const error of modErrors) {
+						messages.push(`${featureTitle}, Weapon Modifier ${modIndex + 1}: ${error}`);
+					}
+				}
+			}
+		}
+
+		// Add class feature errors
+		for (const [index, featureError] of featureErrors) {
+			const featureTitle = formClassFeatures[index]?.title || `Feature ${index + 1}`;
+			if (featureError.title) {
+				messages.push(`${featureTitle}, Title: ${featureError.title}`);
+			}
+			if (featureError.description_html) {
+				messages.push(`${featureTitle}, Description: ${featureError.description_html}`);
+			}
+			if (featureError.character_modifiers) {
+				for (const [modIndex, modErrors] of featureError.character_modifiers) {
+					for (const error of modErrors) {
+						messages.push(`${featureTitle}, Character Modifier ${modIndex + 1}: ${error}`);
+					}
+				}
+			}
+			if (featureError.weapon_modifiers) {
+				for (const [modIndex, modErrors] of featureError.weapon_modifiers) {
+					for (const error of modErrors) {
+						messages.push(`${featureTitle}, Weapon Modifier ${modIndex + 1}: ${error}`);
+					}
+				}
+			}
+		}
+
+		return messages;
+	});
+
+	// Sync hasValidationErrors to bindable prop (only after validation attempted)
 	$effect(() => {
-		hasErrors = hasValidationErrors;
+		hasErrors = validationAttempted && hasValidationErrors;
 	});
 
 	// Sync form state when item prop changes
@@ -204,12 +303,8 @@
 			formSuggestedArmorId = item.suggested_armor_id;
 			formGoldCoins = String(item.starting_inventory.gold_coins);
 			formFreeGear = JSON.parse(JSON.stringify(item.starting_inventory.free_gear));
-			formLootOrConsumableOptions = [
-				...item.starting_inventory.loot_or_consumable_options
-			];
-			formClassGearOptions = JSON.parse(
-				JSON.stringify(item.starting_inventory.class_gear_options)
-			);
+			formLootOrConsumableOptions = [...item.starting_inventory.loot_or_consumable_options];
+			formClassGearOptions = JSON.parse(JSON.stringify(item.starting_inventory.class_gear_options));
 			formSpellbookPrompt = item.starting_inventory.spellbook_prompt || '';
 			formBackgroundQuestions = [...item.background_questions];
 			formConnectionQuestions = [...item.connection_questions];
@@ -221,7 +316,9 @@
 			// Clear errors
 			errors = {};
 			featureErrors.clear();
-			hopeFeatureError = false;
+			hopeFeatureError = null;
+			validationAttempted = false;
+			validatedModifierKeys.clear();
 		}
 	});
 
@@ -260,16 +357,191 @@
 		};
 	}
 
+	// Validate features and update error state
+	function validateFeatures() {
+		// Validate hope feature
+		if (formHopeFeature) {
+			const result = FeatureSchema.safeParse(formHopeFeature);
+
+			if (!result.success) {
+				const featureErrorsData = extractFeatureErrors(result.error);
+
+				// Filter out errors for modifiers that weren't validated yet (newly added)
+				if (featureErrorsData.character_modifiers) {
+					const filteredCharModifiers = new Map<number, string[]>();
+					for (const [modIndex, errors] of featureErrorsData.character_modifiers) {
+						const key = getModifierKey('hope', 'character', modIndex);
+						if (validatedModifierKeys.has(key)) {
+							filteredCharModifiers.set(modIndex, errors);
+						}
+					}
+					if (filteredCharModifiers.size > 0) {
+						featureErrorsData.character_modifiers = filteredCharModifiers;
+					} else {
+						delete featureErrorsData.character_modifiers;
+					}
+				}
+
+				if (featureErrorsData.weapon_modifiers) {
+					const filteredWeaponModifiers = new Map<number, string[]>();
+					for (const [modIndex, errors] of featureErrorsData.weapon_modifiers) {
+						const key = getModifierKey('hope', 'weapon', modIndex);
+						if (validatedModifierKeys.has(key)) {
+							filteredWeaponModifiers.set(modIndex, errors);
+						}
+					}
+					if (filteredWeaponModifiers.size > 0) {
+						featureErrorsData.weapon_modifiers = filteredWeaponModifiers;
+					} else {
+						delete featureErrorsData.weapon_modifiers;
+					}
+				}
+
+				// Only set errors if there are any remaining after filtering
+				const hasCharModifierErrors =
+					featureErrorsData.character_modifiers && featureErrorsData.character_modifiers.size > 0;
+				const hasWeaponModifierErrors =
+					featureErrorsData.weapon_modifiers && featureErrorsData.weapon_modifiers.size > 0;
+				if (
+					hasCharModifierErrors ||
+					hasWeaponModifierErrors ||
+					featureErrorsData.title ||
+					featureErrorsData.description_html
+				) {
+					hopeFeatureError = featureErrorsData;
+				} else {
+					hopeFeatureError = null;
+				}
+			} else {
+				hopeFeatureError = null;
+			}
+		} else {
+			hopeFeatureError = null;
+		}
+
+		// Validate class features
+		for (let i = 0; i < formClassFeatures.length; i++) {
+			const result = FeatureSchema.safeParse(formClassFeatures[i]);
+
+			if (!result.success) {
+				const featureErrorsData = extractFeatureErrors(result.error);
+
+				// Filter out errors for modifiers that weren't validated yet (newly added)
+				if (featureErrorsData.character_modifiers) {
+					const filteredCharModifiers = new Map<number, string[]>();
+					for (const [modIndex, errors] of featureErrorsData.character_modifiers) {
+						const key = getModifierKey(i, 'character', modIndex);
+						if (validatedModifierKeys.has(key)) {
+							filteredCharModifiers.set(modIndex, errors);
+						}
+					}
+					if (filteredCharModifiers.size > 0) {
+						featureErrorsData.character_modifiers = filteredCharModifiers;
+					} else {
+						delete featureErrorsData.character_modifiers;
+					}
+				}
+
+				if (featureErrorsData.weapon_modifiers) {
+					const filteredWeaponModifiers = new Map<number, string[]>();
+					for (const [modIndex, errors] of featureErrorsData.weapon_modifiers) {
+						const key = getModifierKey(i, 'weapon', modIndex);
+						if (validatedModifierKeys.has(key)) {
+							filteredWeaponModifiers.set(modIndex, errors);
+						}
+					}
+					if (filteredWeaponModifiers.size > 0) {
+						featureErrorsData.weapon_modifiers = filteredWeaponModifiers;
+					} else {
+						delete featureErrorsData.weapon_modifiers;
+					}
+				}
+
+				// Only set errors if there are any remaining after filtering
+				const hasCharModifierErrors =
+					featureErrorsData.character_modifiers && featureErrorsData.character_modifiers.size > 0;
+				const hasWeaponModifierErrors =
+					featureErrorsData.weapon_modifiers && featureErrorsData.weapon_modifiers.size > 0;
+				if (
+					hasCharModifierErrors ||
+					hasWeaponModifierErrors ||
+					featureErrorsData.title ||
+					featureErrorsData.description_html
+				) {
+					featureErrors.set(i, featureErrorsData);
+				} else {
+					featureErrors.delete(i);
+				}
+			} else {
+				featureErrors.delete(i);
+			}
+		}
+	}
+
+	// Validate form-level fields
+	function validateFormFields() {
+		const formData = buildFormData();
+		const result = ClassFormSchema.safeParse(formData);
+		if (!result.success) {
+			const allErrors = extractFieldErrors(result.error);
+			// Filter out feature array errors since we handle individual feature errors separately
+			const { hope_feature, class_features, ...formErrors } = allErrors;
+			errors = formErrors;
+		} else {
+			errors = {};
+		}
+	}
+
+	// Reactive validation - re-validate when form data changes (only after first validation attempt)
+	$effect(() => {
+		if (!validationAttempted) return;
+
+		// Track feature changes
+		formHopeFeature;
+		formClassFeatures;
+
+		// Re-validate features when they change
+		validateFeatures();
+	});
+
+	// Re-validate form fields when they change
+	$effect(() => {
+		if (!validationAttempted) return;
+
+		// Track form field changes
+		formName;
+		formDescriptionHtml;
+		formImageUrl;
+		formStartingEvasion;
+		formStartingMaxHp;
+		formPrimaryDomainId;
+		formSecondaryDomainId;
+		formSubclassIds;
+		formSuggestedTraits;
+		formSuggestedPrimaryWeaponId;
+		formSuggestedSecondaryWeaponId;
+		formSuggestedArmorId;
+		formGoldCoins;
+		formFreeGear;
+		formLootOrConsumableOptions;
+		formClassGearOptions;
+		formSpellbookPrompt;
+		formBackgroundQuestions;
+		formConnectionQuestions;
+		formClothes;
+		formEyes;
+		formBody;
+		formSkin;
+		formAttitude;
+
+		validateFormFields();
+	});
+
 	export async function handleSubmit(e?: SubmitEvent) {
 		if (e) {
 			e.preventDefault();
 		}
 		if (!item) return;
-
-		// Clear previous errors
-		errors = {};
-		featureErrors.clear();
-		hopeFeatureError = false;
 
 		// Upload pending image if there is one
 		if (imageInput) {
@@ -285,50 +557,76 @@
 			}
 		}
 
-		// Validate hope feature
+		// Mark that validation has been attempted
+		validationAttempted = true;
+
+		// Mark all current modifiers as validated (so errors will show for them)
+		validatedModifierKeys.clear();
+
+		// Mark hope feature modifiers
 		if (formHopeFeature) {
-			const result = FeatureSchema.safeParse(formHopeFeature);
-			if (!result.success) {
-				hopeFeatureError = true;
+			for (let j = 0; j < formHopeFeature.character_modifiers.length; j++) {
+				validatedModifierKeys.set(getModifierKey('hope', 'character', j), true);
+			}
+			for (let j = 0; j < formHopeFeature.weapon_modifiers.length; j++) {
+				validatedModifierKeys.set(getModifierKey('hope', 'weapon', j), true);
 			}
 		}
 
-		// Validate all class features
-		let allFeaturesValid = true;
+		// Mark class feature modifiers
 		for (let i = 0; i < formClassFeatures.length; i++) {
-			const result = FeatureSchema.safeParse(formClassFeatures[i]);
-			if (!result.success) {
-				allFeaturesValid = false;
-				featureErrors.set(i, true);
+			const feature = formClassFeatures[i];
+			for (let j = 0; j < feature.character_modifiers.length; j++) {
+				validatedModifierKeys.set(getModifierKey(i, 'character', j), true);
+			}
+			for (let j = 0; j < feature.weapon_modifiers.length; j++) {
+				validatedModifierKeys.set(getModifierKey(i, 'weapon', j), true);
 			}
 		}
 
-		// Build form data
+		// Validate all features
+		validateFeatures();
+
+		// Validate form-level fields
+		validateFormFields();
+
+		// Check if there are any validation errors
+		const hasFormErrors = Object.keys(errors).length > 0;
+		const hasFeatureErrors = featureErrors.size > 0;
+		const hasHopeFeatureError = hopeFeatureError !== null;
+
+		if (hasFormErrors || hasFeatureErrors || hasHopeFeatureError) {
+			// Don't set generic error message - errors are shown inline in each feature
+			return;
+		}
+
+		// Build form data (validation already passed, so we can use it)
 		const formData = buildFormData();
 
-		// Validate with Zod
-		const result = ClassFormSchema.safeParse(formData);
-
-		if (!result.success) {
-			errors = extractFieldErrors(result.error);
-			return;
-		}
-
-		if (!allFeaturesValid || hopeFeatureError) {
-			errors = { ...errors, class_features: 'One or more features have validation errors' };
-			return;
-		}
-
-		// Update the characterClass prop with validated form values
-		item = {
+		// Save the original class reference to find it in homebrew state
+		const originalClass = item;
+		// Update the class prop with validated form values
+		const updatedClass = {
 			...item,
-			...result.data
+			...formData
 		};
+		item = updatedClass;
+
+		// Update the homebrew state record so auto-save can detect the change
+		// Find the class's UID in the collection using the original reference
+		const newClassRef = JSON.parse(JSON.stringify(updatedClass));
+		for (const [uid, c] of Object.entries(homebrew.classes)) {
+			if (c === originalClass) {
+				homebrew.classes[uid] = newClassRef;
+				break;
+			}
+		}
 
 		// Clear errors on success
 		errors = {};
 		featureErrors.clear();
-		hopeFeatureError = false;
+		hopeFeatureError = null;
+		validationAttempted = false;
 
 		// Call callback if provided
 		if (onSubmit && e) {
@@ -356,9 +654,7 @@
 		formGoldCoins = String(item.starting_inventory.gold_coins);
 		formFreeGear = JSON.parse(JSON.stringify(item.starting_inventory.free_gear));
 		formLootOrConsumableOptions = [...item.starting_inventory.loot_or_consumable_options];
-		formClassGearOptions = JSON.parse(
-			JSON.stringify(item.starting_inventory.class_gear_options)
-		);
+		formClassGearOptions = JSON.parse(JSON.stringify(item.starting_inventory.class_gear_options));
 		formSpellbookPrompt = item.starting_inventory.spellbook_prompt || '';
 		formBackgroundQuestions = [...item.background_questions];
 		formConnectionQuestions = [...item.connection_questions];
@@ -370,15 +666,17 @@
 		// Clear errors
 		errors = {};
 		featureErrors.clear();
-		hopeFeatureError = false;
+		hopeFeatureError = null;
+		validationAttempted = false;
+		validatedModifierKeys.clear();
 
-		// Call callback if provided
-		if (onReset) {
-			onReset();
-		}
+		// Note: onReset callback removed to prevent infinite recursion
+		// The parent component should handle any additional reset logic if needed
 	}
 
 	function addClassFeature() {
+		const index = formClassFeatures.length;
+		dropdownOpenIndex = index;
 		const newFeature: Feature = {
 			title: '',
 			description_html: '',
@@ -386,22 +684,31 @@
 			weapon_modifiers: []
 		};
 		formClassFeatures = [...formClassFeatures, newFeature];
+
+		tick().then(() => {
+			dropdownOpenIndex = -1;
+		});
 	}
 
 	function removeClassFeature(index: number) {
 		formClassFeatures = formClassFeatures.filter((_, i) => i !== index);
+		// Clean up errors and re-index for items after the removed one
 		featureErrors.delete(index);
-		const errorsToReindex: [number, boolean][] = [];
-		for (const [i, hasError] of featureErrors) {
+
+		// Collect entries that need re-indexing
+		const errorsToReindex: [number, FeatureValidationErrors][] = [];
+		for (const [i, errorData] of featureErrors) {
 			if (i > index) {
-				errorsToReindex.push([i, hasError]);
+				errorsToReindex.push([i, errorData]);
 			}
 		}
+
+		// Delete old keys and set new ones
 		for (const [i] of errorsToReindex) {
 			featureErrors.delete(i);
 		}
-		for (const [i, hasError] of errorsToReindex) {
-			featureErrors.set(i - 1, hasError);
+		for (const [i, errorData] of errorsToReindex) {
+			featureErrors.set(i - 1, errorData);
 		}
 	}
 
@@ -577,9 +884,14 @@
 		{#if formHopeFeature}
 			<Dropdown
 				title={formHopeFeature.title || 'Hope Feature'}
-				class={hopeFeatureError ? 'border-destructive' : ''}
+				class={hopeFeatureError
+					? 'data-[open=false]:border data-[open=false]:border-destructive'
+					: ''}
 			>
-				<HomebrewFeatureForm bind:feature={formHopeFeature} />
+				<HomebrewFeatureForm
+					bind:feature={formHopeFeature}
+					errors={hopeFeatureError ?? undefined}
+				/>
 			</Dropdown>
 		{:else}
 			<Button
@@ -624,11 +936,15 @@
 			{#each formClassFeatures as feature, index (index)}
 				<Dropdown
 					title={feature.title || `Unnamed feature`}
-					class={featureErrors.get(index) ? 'border-destructive' : ''}
+					class={featureErrors.has(index)
+						? 'data-[open=false]:border data-[open=false]:border-destructive'
+						: ''}
+					open={dropdownOpenIndex === index}
 				>
 					<HomebrewFeatureForm
 						bind:feature={formClassFeatures[index]}
 						onRemove={() => removeClassFeature(index)}
+						errors={featureErrors.get(index)}
 					/>
 				</Dropdown>
 			{:else}
@@ -972,17 +1288,37 @@
 	</div>
 
 	<!-- Actions -->
-	<div class="flex gap-2 pt-2">
-		<Button type="submit" size="sm" disabled={!formHasChanges || homebrew.saving}>
-			{#if homebrew.saving}
-				<Loader2 class="size-3.5 animate-spin" />
-				Saving...
-			{:else}
-				Save
+	<div class="flex flex-col gap-2 pt-2">
+		<div class="flex justify-end gap-2">
+			{#if formHasChanges}
+				<Button type="button" size="sm" variant="link" onclick={handleReset} class="h-7">
+					<RotateCcw class="size-3.5" />
+					Discard
+				</Button>
 			{/if}
-		</Button>
-		{#if formHasChanges}
-			<Button type="button" size="sm" variant="link" onclick={handleReset}>Discard changes</Button>
+			<Button
+				type="submit"
+				size="sm"
+				disabled={!formHasChanges || homebrew.saving}
+				class={cn(
+					'h-7',
+					hasValidationErrors && 'cursor-not-allowed border border-destructive hover:bg-primary'
+				)}
+			>
+				{#if homebrew.saving}
+					<Loader2 class="size-3.5 animate-spin" />
+					Saving...
+				{:else}
+					Save
+				{/if}
+			</Button>
+		</div>
+		{#if hasValidationErrors && allErrorMessages.length > 0}
+			<ul class="list-inside list-disc space-y-1">
+				{#each allErrorMessages as error}
+					<li class="text-xs text-destructive">{error}</li>
+				{/each}
+			</ul>
 		{/if}
 	</div>
 </form>

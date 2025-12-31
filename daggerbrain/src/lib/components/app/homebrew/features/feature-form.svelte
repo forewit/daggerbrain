@@ -109,8 +109,10 @@
 	<div class="flex flex-col gap-1">
 		<label
 			for="hb-feature-description"
-			class={cn('text-xs font-medium text-muted-foreground', errors?.description_html && 'text-destructive')}
-			>Description</label
+			class={cn(
+				'text-xs font-medium text-muted-foreground',
+				errors?.description_html && 'text-destructive'
+			)}>Description</label
 		>
 		<Textarea
 			id="hb-feature-description"

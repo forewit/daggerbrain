@@ -5,7 +5,6 @@
 	let { card }: { card: AncestryCard } = $props();
 </script>
 
-<div class="mx-auto w-[300px]">
+<div class="flex max-w-[300px] min-w-[300px]">
 	<AncestryCardComponent {card} variant="responsive" />
 </div>
-

@@ -5,7 +5,6 @@
 	let { card }: { card: TransformationCard } = $props();
 </script>
 
-<div class="mx-auto w-[300px]">
+<div class="flex max-w-[300px] min-w-[300px]">
 	<TransformationCardComponent {card} variant="responsive" />
 </div>
-

@@ -44,6 +44,7 @@ export const create_homebrew_beastform = command(BeastformSchema, async (data) =
 
 	const validatedData = BeastformSchema.parse({ ...data, source_id: 'Homebrew' as const });
 	const id = crypto.randomUUID();
+	validatedData.compendium_id = id;
 	const now = Date.now();
 
 	await db.insert(homebrew_beastforms).values({
@@ -73,6 +74,7 @@ export const update_homebrew_beastform = command(
 		}
 
 		const validatedData = BeastformSchema.parse({ ...data, source_id: 'Homebrew' as const });
+		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db
