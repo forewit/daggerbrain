@@ -25,10 +25,16 @@ import type {
 	CharacterModifier,
 	WeaponModifier,
 	DomainCard,
+	DomainIds,
 	Armor,
 	CommunityCard,
 	AncestryCard,
-	Beastform
+	Beastform,
+	CharacterClass,
+	Subclass,
+	Loot,
+	Consumable,
+	TransformationCard
 } from '$lib/types/compendium-types';
 import { BLANK_LEVEL_UP_CHOICE } from '$lib/types/constants';
 import { update_character } from '$lib/remote/characters.remote';
@@ -43,6 +49,10 @@ function createCharacter(id: string) {
 	});
 
 	const compendium = getCompendiumContext();
+	
+	// Campaign homebrew is now loaded directly by the compendium context
+	// No need to manage it here
+
 	// ! void and homebrew source whitelists
 	$effect(() => {
 		if (!character) return;
@@ -63,6 +73,13 @@ function createCharacter(id: string) {
 			compendium.source_whitelist.add('Homebrew');
 		} else {
 			compendium.source_whitelist.delete('Homebrew');
+		}
+
+		// campaign homebrew content
+		if (character.settings.campaign_homebrew_enabled && character.campaign_id) {
+			compendium.source_whitelist.add('Campaign');
+		} else {
+			compendium.source_whitelist.delete('Campaign');
 		}
 	});
 
@@ -3372,7 +3389,75 @@ function createCharacter(id: string) {
 		}
 	});
 
-	// Debounced auto-save effect
+	// Track last saved campaign stats for immediate updates
+	let lastSavedCampaignStats = $state<{
+		marked_hp: number;
+		marked_stress: number;
+		marked_hope: number;
+		active_conditions: string[];
+	} | null>(null);
+	let inFlightCampaignSave: Promise<void> | null = null;
+
+	// Immediate campaign stats update effect (for real-time campaign updates)
+	$effect(() => {
+		if (!character || !initialLoadComplete || !character.campaign_id) {
+			lastSavedCampaignStats = null;
+			return;
+		}
+
+		const currentStats = {
+			marked_hp: character.marked_hp,
+			marked_stress: character.marked_stress,
+			marked_hope: character.marked_hope,
+			active_conditions: character.active_conditions
+		};
+
+		// Check if campaign stats changed
+		if (
+			lastSavedCampaignStats &&
+			lastSavedCampaignStats.marked_hp === currentStats.marked_hp &&
+			lastSavedCampaignStats.marked_stress === currentStats.marked_stress &&
+			lastSavedCampaignStats.marked_hope === currentStats.marked_hope &&
+			JSON.stringify(lastSavedCampaignStats.active_conditions) ===
+				JSON.stringify(currentStats.active_conditions)
+		) {
+			return; // No change
+		}
+
+		// Prevent race conditions: don't start a new save if one is already in flight
+		if (inFlightCampaignSave) {
+			return;
+		}
+
+		// Update immediately (no debounce for campaign stats)
+		const savePromise = import('$lib/remote/characters.remote')
+			.then(({ update_character_campaign_stats }) => {
+				return update_character_campaign_stats({
+					character_id: character!.id,
+					marked_hp: currentStats.marked_hp,
+					marked_stress: currentStats.marked_stress,
+					marked_hope: currentStats.marked_hope,
+					active_conditions: currentStats.active_conditions
+				});
+			})
+			.then(() => {
+				// Update last saved stats after successful save
+				lastSavedCampaignStats = currentStats;
+			})
+			.catch((error) => {
+				console.error('Failed to update campaign stats:', error);
+			})
+			.finally(() => {
+				// Clear the in-flight save promise when done
+				if (inFlightCampaignSave === savePromise) {
+					inFlightCampaignSave = null;
+				}
+			});
+
+		inFlightCampaignSave = savePromise;
+	});
+
+	// Debounced auto-save effect (for full character save)
 	$effect(() => {
 		if (!character || !initialLoadComplete) return;
 
@@ -3398,11 +3483,25 @@ function createCharacter(id: string) {
 
 			// Use JSON serialization for deep clone to avoid structuredClone issues
 			const cloned = JSON.parse(JSON.stringify(character));
-			const savePromise = update_character(cloned)
+			const derived = buildDerivedCharacter();
+			const savePromise = update_character({
+				...cloned,
+				derived_character: derived
+			})
 				.then(() => {
 					if (!character) return; // Guard against null character
 					// Only update lastSavedCharacter after successful save
 					lastSavedCharacter = JSON.stringify(character);
+
+					// Also update last saved campaign stats if in campaign
+					if (character.campaign_id) {
+						lastSavedCampaignStats = {
+							marked_hp: character.marked_hp,
+							marked_stress: character.marked_stress,
+							marked_hope: character.marked_hope,
+							active_conditions: character.active_conditions
+						};
+					}
 				})
 				.catch((error) => {
 					if (!character) return; // Guard against null character
@@ -3672,6 +3771,60 @@ function createCharacter(id: string) {
 
 	const destroy = () => {};
 
+	/**
+	 * Build a fully derived character object for public/shared views.
+	 * This serializes all the computed derived state into a single object.
+	 */
+	function buildDerivedCharacter(): import('../types/derived-character-types').DerivedCharacter | null {
+		if (!character) return null;
+
+		// Use JSON serialization to create a deep copy and flatten all derived values
+		const derived = JSON.parse(
+			JSON.stringify(character)
+		) as import('../types/derived-character-types').DerivedCharacter;
+
+		// Add all derived values
+		derived.derived_ancestry_card = ancestry_card;
+		derived.derived_community_card = community_card;
+		derived.derived_transformation_card = transformation_card;
+		derived.derived_primary_class = primary_class;
+		derived.derived_primary_subclass = primary_subclass;
+		derived.derived_secondary_class = secondary_class;
+		derived.derived_secondary_subclass = secondary_subclass;
+
+		derived.derived_armor = derived_armor;
+		derived.derived_primary_weapon = derived_primary_weapon;
+		derived.derived_secondary_weapon = derived_secondary_weapon;
+		derived.derived_unarmed_attack = derived_unarmed_attack;
+		derived.derived_beastform = derived_beastform;
+		derived.derived_companion = derived_companion;
+
+		derived.derived_traits = traits;
+		derived.derived_proficiency = proficiency;
+		derived.derived_experience_modifiers = experience_modifiers;
+		derived.derived_max_experiences = max_experiences;
+		derived.derived_max_loadout = max_loadout;
+		derived.derived_max_hope = max_hope;
+		derived.derived_max_armor = max_armor;
+		derived.derived_max_hp = max_hp;
+		derived.derived_max_stress = max_stress;
+		derived.derived_max_burden = max_burden;
+		derived.derived_max_short_rest_actions = max_short_rest_actions;
+		derived.derived_max_long_rest_actions = max_long_rest_actions;
+		derived.derived_max_consumables = max_consumables;
+		derived.derived_consumable_count = consumable_count;
+		derived.derived_evasion = evasion;
+		derived.derived_damage_thresholds = damage_thresholds;
+		derived.derived_primary_class_mastery_level = primary_class_mastery_level;
+		derived.derived_secondary_class_mastery_level = secondary_class_mastery_level;
+		derived.derived_spellcast_roll_bonus = spellcast_roll_bonus;
+
+		derived.derived_domain_card_vault = domain_card_vault;
+		derived.derived_domain_card_loadout = domain_card_loadout;
+
+		return derived;
+	}
+
 	return {
 		// read only
 		get tier_2_marked_traits() {
@@ -3852,7 +4005,10 @@ function createCharacter(id: string) {
 
 		// condition helper functions
 		addCondition,
-		removeCondition
+		removeCondition,
+
+		// derived character builder
+		buildDerivedCharacter
 	};
 }
 

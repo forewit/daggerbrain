@@ -24,6 +24,9 @@
 	// Calculate title with character count
 	let titleText = $derived(`${user.all_characters.length}/3`);
 
+	// Create campaign lookup map for O(1) campaign name lookups
+	let campaignMap = $derived(new Map(user.all_campaigns.map(c => [c.id, c.name])));
+
 	async function handleCreateCharacter() {
 		creatingCharacter = true;
 		try {
@@ -114,7 +117,7 @@
 										href={`/characters/${char.id}/`}
 										class="flex gap-2 border bg-primary-muted p-1 hover:bg-primary-muted/80"
 									>
-										<div class=" h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2">
+										<div class=" size-22 shrink-0 overflow-hidden rounded-lg border-2">
 											<img
 												src={char.image_url || '/images/portrait-placeholder.png'}
 												alt={char.name.trim() || 'Unnamed Character'}
@@ -133,6 +136,26 @@
 												&ensp;•&ensp;
 												{char.derived_descriptors.primary_subclass_name || 'No subclass'}
 											</p>
+											{#if char.campaign_id && campaignMap.has(char.campaign_id)}
+												<p class="mt-1 truncate text-xs text-muted-foreground">
+													Campaign: <span
+														class="underline hover:text-foreground cursor-pointer"
+														onclick={(e) => {
+															e.stopPropagation();
+															goto(`/campaigns/${char.campaign_id}`);
+														}}
+														role="link"
+														tabindex="0"
+														onkeydown={(e) => {
+															if (e.key === 'Enter' || e.key === ' ') {
+																e.preventDefault();
+																e.stopPropagation();
+																goto(`/campaigns/${char.campaign_id}`);
+															}
+														}}
+													>{campaignMap.get(char.campaign_id)}</span>
+												</p>
+											{/if}
 										</div>
 									</a>
 									<div class="flex bg-muted">

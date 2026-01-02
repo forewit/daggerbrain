@@ -32,6 +32,8 @@ export const characters_table = sqliteTable(
 		clerk_user_id: text('clerk_user_id').notNull(),
 		name: text('name').notNull().default(CHARACTER_DEFAULTS.name),
 		image_url: text('image_url').notNull().default(CHARACTER_DEFAULTS.image_url),
+		visibility: text('visibility').notNull().default('private'),
+		campaign_id: text('campaign_id'),
 		settings: text('settings', { mode: 'json' })
 			.notNull()
 			.default(CHARACTER_DEFAULTS.settings)
@@ -168,7 +170,10 @@ export const characters_table = sqliteTable(
 			.default(CHARACTER_DEFAULTS.level_up_choices)
 			.$type<LevelUpChoices>()
 	},
-	(table) => [index('characters_table_clerk_user_id_idx').on(table.clerk_user_id)]
+	(table) => [
+		index('characters_table_clerk_user_id_idx').on(table.clerk_user_id),
+		index('characters_table_campaign_id_idx').on(table.campaign_id)
+	]
 );
 
 export const ChosenBeastformSchema = z.object({

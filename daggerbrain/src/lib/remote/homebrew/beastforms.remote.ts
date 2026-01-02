@@ -2,7 +2,8 @@ import { query, command, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
-import { get_db, get_auth } from '../utils';
+import { get_db, get_auth, get_kv } from '../utils';
+import { campaign_homebrew_vault_table } from '../../server/db/campaigns.schema';
 import { BeastformSchema } from '$lib/compendium/compendium-schemas';
 import type { Beastform } from '$lib/types/compendium-types';
 import { homebrew_beastforms } from '$lib/server/db/homebrew.schema';
@@ -63,15 +64,26 @@ export const create_homebrew_beastform = command(BeastformSchema, async (data) =
 });
 
 export const update_homebrew_beastform = command(
-	z.object({ id: z.string(), data: BeastformSchema }),
-	async ({ id, data }) => {
+	z.object({ id: z.string(), data: BeastformSchema, visibility: z.enum(['private', 'public']).optional() }),
+	async ({ id, data, visibility }) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
+		const kv = get_kv(event);
 
-		if (!(await verifyOwnership(db, homebrew_beastforms, id, userId))) {
+		// Get existing item to check previous visibility
+		const [existing] = await db
+			.select()
+			.from(homebrew_beastforms)
+			.where(eq(homebrew_beastforms.id, id))
+			.limit(1);
+
+		if (!existing || existing.clerk_user_id !== userId) {
 			throw error(403, 'Not authorized to update this beastform');
 		}
+
+		const previousVisibility = existing.visibility;
+		const newVisibility = visibility ?? previousVisibility;
 
 		const validatedData = BeastformSchema.parse({ ...data, source_id: 'Homebrew' as const });
 		validatedData.compendium_id = id;
@@ -79,8 +91,17 @@ export const update_homebrew_beastform = command(
 
 		await db
 			.update(homebrew_beastforms)
-			.set({ data: validatedData, updated_at: now })
+			.set({ data: validatedData, visibility: newVisibility, updated_at: now })
 			.where(and(eq(homebrew_beastforms.id, id), eq(homebrew_beastforms.clerk_user_id, userId)));
+
+		// KV Materialization for public homebrew
+		if (newVisibility === 'public') {
+			await kv.put(`homebrew:beastform:${id}:public`, JSON.stringify({ type: 'beastform', data: validatedData, clerk_user_id: userId }), {
+				expirationTtl: undefined
+			});
+		} else if (previousVisibility === 'public' && newVisibility !== 'public') {
+			await kv.delete(`homebrew:beastform:${id}:public`);
+		}
 
 		console.log('updated homebrew beastform in D1');
 	}
@@ -90,14 +111,37 @@ export const delete_homebrew_beastform = command(z.string(), async (id) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
+	const kv = get_kv(event);
 
-	if (!(await verifyOwnership(db, homebrew_beastforms, id, userId))) {
+	// Get existing item to check visibility before deleting
+	const [existing] = await db
+		.select()
+		.from(homebrew_beastforms)
+		.where(eq(homebrew_beastforms.id, id))
+		.limit(1);
+
+	if (!existing || existing.clerk_user_id !== userId) {
 		throw error(403, 'Not authorized to delete this beastform');
 	}
 
 	await db
 		.delete(homebrew_beastforms)
 		.where(and(eq(homebrew_beastforms.id, id), eq(homebrew_beastforms.clerk_user_id, userId)));
+
+	// Clean up KV if it was public
+	if (existing.visibility === 'public') {
+		await kv.delete(`homebrew:beastform:${id}:public`);
+	}
+
+	// Remove from all campaign vaults
+	await db
+		.delete(campaign_homebrew_vault_table)
+		.where(
+			and(
+				eq(campaign_homebrew_vault_table.homebrew_type, 'beastform'),
+				eq(campaign_homebrew_vault_table.homebrew_id, id)
+			)
+		);
 
 	// refresh the beastforms query
 	get_homebrew_beastforms().refresh();

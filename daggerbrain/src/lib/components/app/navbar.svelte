@@ -125,7 +125,7 @@
 						href="/characters"
 						class="h-10 w-full justify-start rounded-none border-b pl-0"
 					>
-						My Characters
+						Characters
 					</Button>
 					<Button
 						variant="link"
@@ -133,7 +133,15 @@
 						href="/homebrew"
 						class="h-10 w-full justify-start rounded-none border-b pl-0"
 					>
-						My Homebrew
+						Homebrew
+					</Button>
+					<Button
+						variant="link"
+						onclick={() => (open = false)}
+						href="/campaigns"
+						class="h-10 w-full justify-start rounded-none border-b pl-0"
+					>
+						Campaigns
 					</Button>
 				</div>
 				<Sheet.Footer>
@@ -146,8 +154,9 @@
 
 		<div class="hidden items-center gap-2 sm:flex">
 			<Button variant="ghost" class="px-2" href="/roadmap">Roadmap</Button>
-			<Button variant="ghost" class="px-2" href="/characters">My Characters</Button>
-			<Button variant="ghost" class="px-2" href="/homebrew">My Homebrew</Button>
+			<Button variant="ghost" class="px-2" href="/characters">Characters</Button>
+			<Button variant="ghost" class="px-2" href="/homebrew">Homebrew</Button>
+			<Button variant="ghost" class="px-2" href="/campaigns">Campaigns</Button>
 
 			<SignedOut>
 				<SignInButton class={buttonVariants({ size: 'sm' })}>Sign In</SignInButton>

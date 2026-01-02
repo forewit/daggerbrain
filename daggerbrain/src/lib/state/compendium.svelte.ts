@@ -34,6 +34,8 @@ import {
 } from '$lib/remote/equipment.remote';
 import { get_all_sources } from '$lib/remote/sources.remote';
 import { getHomebrewContext } from './homebrew.svelte';
+import { getCharacterContext } from './character.svelte';
+import { get_campaign_homebrew_items } from '$lib/remote/campaign-homebrew.remote';
 
 function createCompendium() {
 	let all_ancestry_cards: Record<string, AncestryCard> = $state({});
@@ -388,6 +390,93 @@ function createCompendium() {
 			Object.entries(all_consumables).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
 	);
+
+	// Campaign homebrew state (loaded reactively from character context)
+	let campaign_homebrew = $state<{
+		primary_weapons: Record<string, Weapon>;
+		secondary_weapons: Record<string, Weapon>;
+		armor: Record<string, Armor>;
+		loot: Record<string, Loot>;
+		consumables: Record<string, Consumable>;
+		beastforms: Record<string, Beastform>;
+		classes: Record<string, CharacterClass>;
+		subclasses: Record<string, Subclass>;
+		domain_cards: Record<DomainIds, Record<string, DomainCard>>;
+		ancestry_cards: Record<string, AncestryCard>;
+		community_cards: Record<string, CommunityCard>;
+		transformation_cards: Record<string, TransformationCard>;
+	} | null>(null);
+
+	// Load campaign homebrew reactively from character context
+	$effect(() => {
+		try {
+			const characterContext = getCharacterContext();
+			const character = characterContext?.character;
+			
+			if (!character?.campaign_id || !character.settings.campaign_homebrew_enabled) {
+				campaign_homebrew = null;
+				return;
+			}
+
+			// Load campaign homebrew
+			get_campaign_homebrew_items(character.campaign_id)
+				.then((items) => {
+					// Convert to the format expected by compendium
+					campaign_homebrew = {
+						primary_weapons: items.primary_weapons || {},
+						secondary_weapons: items.secondary_weapons || {},
+						armor: items.armor || {},
+						loot: items.loot || {},
+						consumables: items.consumables || {},
+						beastforms: items.beastforms || {},
+						classes: items.classes || {},
+						subclasses: items.subclasses || {},
+						domain_cards: (items.domain_cards || {}) as Record<DomainIds, Record<string, DomainCard>>,
+						ancestry_cards: items.ancestry_cards || {},
+						community_cards: items.community_cards || {},
+						transformation_cards: items.transformation_cards || {}
+					};
+				})
+				.catch((err) => {
+					console.error('Failed to load campaign homebrew:', err);
+					campaign_homebrew = null;
+				});
+		} catch {
+			// No character context available
+			campaign_homebrew = null;
+		}
+	});
+
+	// Merge campaign homebrew into all_* collections
+	$effect(() => {
+		if (!campaign_homebrew) return;
+
+		// Merge campaign homebrew (takes precedence over base compendium)
+		all_classes = { ...all_classes, ...campaign_homebrew.classes };
+		all_subclasses = { ...all_subclasses, ...campaign_homebrew.subclasses };
+		all_primary_weapons = { ...all_primary_weapons, ...campaign_homebrew.primary_weapons };
+		all_secondary_weapons = { ...all_secondary_weapons, ...campaign_homebrew.secondary_weapons };
+		all_armor = { ...all_armor, ...campaign_homebrew.armor };
+		all_loot = { ...all_loot, ...campaign_homebrew.loot };
+		all_consumables = { ...all_consumables, ...campaign_homebrew.consumables };
+		all_beastforms = { ...all_beastforms, ...campaign_homebrew.beastforms };
+		all_ancestry_cards = { ...all_ancestry_cards, ...campaign_homebrew.ancestry_cards };
+		all_community_cards = { ...all_community_cards, ...campaign_homebrew.community_cards };
+		all_transformation_cards = {
+			...all_transformation_cards,
+			...campaign_homebrew.transformation_cards
+		};
+
+		// Merge domain cards by domain
+		for (const domainId of Object.keys(campaign_homebrew.domain_cards) as DomainIds[]) {
+			if (campaign_homebrew.domain_cards[domainId]) {
+				all_domain_cards[domainId] = {
+					...all_domain_cards[domainId],
+					...campaign_homebrew.domain_cards[domainId]
+				};
+			}
+		}
+	});
 
 	const destroy = () => {};
 

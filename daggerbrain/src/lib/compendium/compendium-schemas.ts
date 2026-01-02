@@ -43,7 +43,7 @@ export const CardTypesSchema = z.enum([
 	'subclass_mastery'
 ]);
 
-export const SourceIdsSchema = z.enum(['Void 1.5', 'SRD', 'Homebrew']);
+export const SourceIdsSchema = z.enum(['Void 1.5', 'SRD', 'Homebrew', 'Campaign']);
 
 export const SourcesSchema = z.object({
 	source_id: SourceIdsSchema,

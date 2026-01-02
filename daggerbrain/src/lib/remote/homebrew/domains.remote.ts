@@ -2,10 +2,11 @@ import { query, command, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
-import { get_db, get_auth } from '../utils';
+import { get_db, get_auth, get_kv } from '../utils';
 import { DomainSchema, DomainCardSchema } from '$lib/compendium/compendium-schemas';
 import type { Domain, DomainCard, DomainIds } from '$lib/types/compendium-types';
 import { homebrew_domains, homebrew_domain_cards } from '$lib/server/db/homebrew.schema';
+import { campaign_homebrew_vault_table } from '../../server/db/campaigns.schema';
 import { verifyOwnership, getTotalHomebrewCount, HOMEBREW_LIMIT } from './utils';
 
 // ============================================================================
@@ -62,23 +63,43 @@ export const create_homebrew_domain = command(DomainSchema, async (data) => {
 });
 
 export const update_homebrew_domain = command(
-	z.object({ id: z.string(), data: DomainSchema }),
-	async ({ id, data }) => {
+	z.object({ id: z.string(), data: DomainSchema, visibility: z.enum(['private', 'public']).optional() }),
+	async ({ id, data, visibility }) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
+		const kv = get_kv(event);
 
-		if (!(await verifyOwnership(db, homebrew_domains, id, userId))) {
+		// Get existing item to check previous visibility
+		const [existing] = await db
+			.select()
+			.from(homebrew_domains)
+			.where(eq(homebrew_domains.id, id))
+			.limit(1);
+
+		if (!existing || existing.clerk_user_id !== userId) {
 			throw error(403, 'Not authorized to update this domain');
 		}
+
+		const previousVisibility = existing.visibility;
+		const newVisibility = visibility ?? previousVisibility;
 
 		const validatedData = DomainSchema.parse({ ...data, source_id: 'Homebrew' as const });
 		const now = Date.now();
 
 		await db
 			.update(homebrew_domains)
-			.set({ data: validatedData, updated_at: now })
+			.set({ data: validatedData, visibility: newVisibility, updated_at: now })
 			.where(and(eq(homebrew_domains.id, id), eq(homebrew_domains.clerk_user_id, userId)));
+
+		// KV Materialization for public homebrew
+		if (newVisibility === 'public') {
+			await kv.put(`homebrew:domain:${id}:public`, JSON.stringify({ type: 'domain', data: validatedData, clerk_user_id: userId }), {
+				expirationTtl: undefined
+			});
+		} else if (previousVisibility === 'public' && newVisibility !== 'public') {
+			await kv.delete(`homebrew:domain:${id}:public`);
+		}
 
 		console.log('updated homebrew domain in D1');
 	}
@@ -88,14 +109,27 @@ export const delete_homebrew_domain = command(z.string(), async (id) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
+	const kv = get_kv(event);
 
-	if (!(await verifyOwnership(db, homebrew_domains, id, userId))) {
+	// Get existing item to check visibility before deleting
+	const [existing] = await db
+		.select()
+		.from(homebrew_domains)
+		.where(eq(homebrew_domains.id, id))
+		.limit(1);
+
+	if (!existing || existing.clerk_user_id !== userId) {
 		throw error(403, 'Not authorized to delete this domain');
 	}
 
 	await db
 		.delete(homebrew_domains)
 		.where(and(eq(homebrew_domains.id, id), eq(homebrew_domains.clerk_user_id, userId)));
+
+	// Clean up KV if it was public
+	if (existing.visibility === 'public') {
+		await kv.delete(`homebrew:domain:${id}:public`);
+	}
 
 	// refresh the domains query
 	get_homebrew_domains().refresh();
@@ -169,15 +203,26 @@ export const create_homebrew_domain_card = command(DomainCardSchema, async (data
 });
 
 export const update_homebrew_domain_card = command(
-	z.object({ id: z.string(), data: DomainCardSchema }),
-	async ({ id, data }) => {
+	z.object({ id: z.string(), data: DomainCardSchema, visibility: z.enum(['private', 'public']).optional() }),
+	async ({ id, data, visibility }) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
+		const kv = get_kv(event);
 
-		if (!(await verifyOwnership(db, homebrew_domain_cards, id, userId))) {
+		// Get existing item to check previous visibility
+		const [existing] = await db
+			.select()
+			.from(homebrew_domain_cards)
+			.where(eq(homebrew_domain_cards.id, id))
+			.limit(1);
+
+		if (!existing || existing.clerk_user_id !== userId) {
 			throw error(403, 'Not authorized to update this domain card');
 		}
+
+		const previousVisibility = existing.visibility;
+		const newVisibility = visibility ?? previousVisibility;
 
 		const validatedData = DomainCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
 		validatedData.compendium_id = id;
@@ -185,10 +230,19 @@ export const update_homebrew_domain_card = command(
 
 		await db
 			.update(homebrew_domain_cards)
-			.set({ data: validatedData, updated_at: now })
+			.set({ data: validatedData, visibility: newVisibility, updated_at: now })
 			.where(
 				and(eq(homebrew_domain_cards.id, id), eq(homebrew_domain_cards.clerk_user_id, userId))
 			);
+
+		// KV Materialization for public homebrew
+		if (newVisibility === 'public') {
+			await kv.put(`homebrew:domain-cards:${id}:public`, JSON.stringify({ type: 'domain-cards', data: validatedData, domain_id: validatedData.domain_id, clerk_user_id: userId }), {
+				expirationTtl: undefined
+			});
+		} else if (previousVisibility === 'public' && newVisibility !== 'public') {
+			await kv.delete(`homebrew:domain-cards:${id}:public`);
+		}
 
 		console.log('updated homebrew domain card in D1');
 	}
@@ -198,8 +252,9 @@ export const delete_homebrew_domain_card = command(z.string(), async (id) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
+	const kv = get_kv(event);
 
-	// Get the card to know which domain it belongs to
+	// Get the card to know which domain it belongs to and check visibility
 	const [entry] = await db
 		.select()
 		.from(homebrew_domain_cards)
@@ -213,6 +268,21 @@ export const delete_homebrew_domain_card = command(z.string(), async (id) => {
 	await db
 		.delete(homebrew_domain_cards)
 		.where(and(eq(homebrew_domain_cards.id, id), eq(homebrew_domain_cards.clerk_user_id, userId)));
+
+	// Clean up KV if it was public
+	if (entry.visibility === 'public') {
+		await kv.delete(`homebrew:domain-cards:${id}:public`);
+	}
+
+	// Remove from all campaign vaults
+	await db
+		.delete(campaign_homebrew_vault_table)
+		.where(
+			and(
+				eq(campaign_homebrew_vault_table.homebrew_type, 'domain-cards'),
+				eq(campaign_homebrew_vault_table.homebrew_id, id)
+			)
+		);
 
 	// refresh the domain cards query
 	get_homebrew_domain_cards().refresh();

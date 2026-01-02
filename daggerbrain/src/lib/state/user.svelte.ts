@@ -4,13 +4,16 @@ import {
 	delete_character
 } from '$lib/remote/characters.remote';
 import { get_user, update_user } from '$lib/remote/users.remote';
+import { get_user_campaigns } from '$lib/remote/campaigns.remote';
 import type { User } from '$lib/types/user-types';
 import type { Character } from '$lib/types/character-types';
+import type { Campaign } from '$lib/types/campaign-types';
 import { getContext, setContext } from 'svelte';
 import { error } from '@sveltejs/kit';
 
 function userContext() {
 	let all_characters = $state<Character[]>([]);
+	let all_campaigns = $state<Campaign[]>([]);
 	let loading = $state(true);
 	let user = $state<User | null>(null);
 
@@ -28,10 +31,11 @@ function userContext() {
 	// Initial data fetch
 	$effect(() => {
 		loading = true;
-		Promise.all([get_all_characters(), get_user()])
-			.then(([chars, fetchedUser]) => {
+		Promise.all([get_all_characters(), get_user(), get_user_campaigns()])
+			.then(([chars, fetchedUser, campaigns]) => {
 				all_characters = chars;
 				user = fetchedUser;
+				all_campaigns = campaigns;
 			})
 			.catch((err) => {
 				error(500, err.message);
@@ -106,9 +110,16 @@ function userContext() {
 		}
 	};
 
+	const create_character_in_campaign = async (campaign_id?: string) => {
+		return create_character(campaign_id ? { campaign_id } : undefined);
+	};
+
 	return {
 		get all_characters() {
 			return all_characters;
+		},
+		get all_campaigns() {
+			return all_campaigns;
 		},
 		get loading() {
 			return loading;
@@ -120,7 +131,7 @@ function userContext() {
 			user = value;
 		},
 		isPopupDismissed,
-		create_character,
+		create_character: create_character_in_campaign,
 		delete_character,
 		destroy
 	};

@@ -15,5 +15,10 @@ export const SOURCES = {
 		source_id: 'Homebrew',
 		name: 'Homebrew',
 		short_title: 'Homebrew'
+	},
+	Campaign: {
+		source_id: 'Campaign',
+		name: 'Campaign',
+		short_title: 'Campaign'
 	}
 } as const satisfies Record<SourceIds, Source>;
