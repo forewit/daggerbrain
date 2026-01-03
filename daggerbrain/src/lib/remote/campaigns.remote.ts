@@ -113,22 +113,19 @@ export const get_campaign_state = query(z.string(), async (campaignId): Promise<
 	const kv = get_kv(event);
 	const db = get_db(event);
 
-	// Try to get from KV first (for polling)
-	const kvState = await kv.get(`campaign:${campaignId}:state`, 'json');
-	if (kvState) {
-		console.log('fetched campaign state from KV');
-		return kvState as CampaignState;
-	}
-
-	// Fallback to D1
-	const [state] = await db
+	// Try KV first (write-through cache) - it's updated immediately after writes
+	// This helps work around D1 eventual consistency by using KV as a fast, consistent cache
+	const kvState = await kv.get(`campaign:${campaignId}:state`, 'json') as CampaignState | null;
+	
+	// Also read from D1 in parallel to compare
+	const [dbState] = await db
 		.select()
 		.from(campaign_state_table)
 		.where(eq(campaign_state_table.campaign_id, campaignId))
 		.limit(1);
 
-	if (!state) {
-		// Create default state if it doesn't exist
+	// If no state exists in D1, create default
+	if (!dbState) {
 		const now = Date.now();
 		await db.insert(campaign_state_table).values({
 			campaign_id: campaignId,
@@ -152,20 +149,27 @@ export const get_campaign_state = query(z.string(), async (campaignId): Promise<
 		return defaultState;
 	}
 
-	const campaignState: CampaignState = {
-		campaign_id: state.campaign_id,
-		fear_track: state.fear_track,
-		notes: state.notes,
-		updated_at: state.updated_at
+	const d1State: CampaignState = {
+		campaign_id: dbState.campaign_id,
+		fear_track: dbState.fear_track,
+		notes: dbState.notes,
+		updated_at: dbState.updated_at
 	};
 
-	// Store in KV for future reads
-	await kv.put(`campaign:${campaignId}:state`, JSON.stringify(campaignState), {
+	// Use KV if it exists and is newer or equal to D1 (KV is updated immediately after writes)
+	// Otherwise use D1 and update KV
+	if (kvState && kvState.updated_at && kvState.updated_at >= d1State.updated_at) {
+		console.log('fetched campaign state from KV (newer than D1)');
+		return kvState;
+	}
+
+	// D1 is newer or KV is missing - use D1 and update KV
+	await kv.put(`campaign:${campaignId}:state`, JSON.stringify(d1State), {
 		expirationTtl: undefined
 	});
 
 	console.log('fetched campaign state from D1');
-	return campaignState;
+	return d1State;
 });
 
 // Helper function to validate and rebuild campaign character summaries
@@ -492,22 +496,74 @@ export const update_campaign_state = command(
 			})
 			.where(eq(campaign_state_table.campaign_id, campaign_id));
 
-		// Update KV
-		const kv = get_kv(event);
+		// Verify the update by reading it back from D1 (handles eventual consistency)
+		const [updatedState] = await db
+			.select()
+			.from(campaign_state_table)
+			.where(eq(campaign_state_table.campaign_id, campaign_id))
+			.limit(1);
+
+		if (!updatedState) {
+			throw error(500, 'Failed to verify campaign state update');
+		}
+
 		const state: CampaignState = {
-			campaign_id,
-			fear_track: fear_track !== undefined ? fear_track : currentState.fear_track,
-			notes: notes !== undefined ? notes : currentState.notes,
-			updated_at: now
+			campaign_id: updatedState.campaign_id,
+			fear_track: updatedState.fear_track,
+			notes: updatedState.notes,
+			updated_at: updatedState.updated_at
 		};
+
+		// Update KV - delete first to invalidate cache, then write new value
+		// This ensures next read will check D1 if KV hasn't propagated yet
+		const kv = get_kv(event);
+		// Delete KV entry to force next read to use D1 (handles eventual consistency)
+		await kv.delete(`campaign:${campaign_id}:state`);
+		// Then write the new value
 		await kv.put(`campaign:${campaign_id}:state`, JSON.stringify(state), {
 			expirationTtl: undefined
+		});
+
+		// Refresh the query cache to invalidate it for all clients
+		// This causes all clients to refetch on their next query call
+		// Then set the new value so the current request gets it immediately
+		await get_campaign_state(campaign_id).refresh();
+		await get_campaign_state(campaign_id).set(state);
+
+		// Notify Durable Object of the update
+		await notify_campaign_do(campaign_id, {
+			fear_track: state.fear_track,
+			notes: state.notes,
+			updated_at: state.updated_at
 		});
 
 		console.log('updated campaign state in D1 and KV');
 		return state;
 	}
 );
+
+// Helper function to notify Durable Object of state updates
+async function notify_campaign_do(campaignId: string, updates: Partial<CampaignState>) {
+	const event = getRequestEvent();
+	if (!event.platform?.env?.CAMPAIGN_LIVE) {
+		console.warn('CAMPAIGN_LIVE not available, skipping DO notification');
+		return;
+	}
+	
+	try {
+		const id = event.platform.env.CAMPAIGN_LIVE.idFromName(campaignId);
+		const stub = event.platform.env.CAMPAIGN_LIVE.get(id);
+		
+		await stub.fetch('http://do/update', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(updates)
+		});
+	} catch (error) {
+		// Log but don't throw - D1 is source of truth
+		console.error('Failed to notify DO:', error);
+	}
+}
 
 export const assign_character_to_campaign = command(
 	z.object({

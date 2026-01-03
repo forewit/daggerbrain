@@ -150,4 +150,3 @@ Implement feature flag checking using Clerk's `has()` function to gate the `unli
 - Maximum of 3 active slots for non-premium users
 - Dialog should show all characters, not just inactive ones
 - Visual badges should indicate active status
-- Character creation should be blocked at the limit (3 active slots)

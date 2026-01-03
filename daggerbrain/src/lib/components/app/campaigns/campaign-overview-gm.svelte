@@ -14,16 +14,14 @@
 	import { error } from '@sveltejs/kit';
 	import { page } from '$app/stores';
 	import {
-		update_campaign_state,
-		assign_character_to_campaign,
-		get_campaign_characters
+		assign_character_to_campaign
 	} from '$lib/remote/campaigns.remote';
 	import {
-		get_campaign_homebrew_vault,
 		add_homebrew_to_vault,
 		remove_homebrew_from_vault
 	} from '$lib/remote/campaign-homebrew.remote';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
+	import { getCampaignContext } from '$lib/state/campaigns.svelte';
 	import type { Campaign, CampaignState, CampaignCharacterSummary, CampaignMember } from '$lib/types/campaign-types';
 	import type { HomebrewType } from '$lib/types/homebrew-types';
 
@@ -34,10 +32,7 @@
 		vaultItems,
 		campaignId,
 		user,
-		members,
-		charactersRef,
-		campaignStateRef,
-		vaultItemsRef
+		members
 	}: {
 		campaign: Campaign;
 		characters: Record<string, CampaignCharacterSummary>;
@@ -46,10 +41,9 @@
 		campaignId: string;
 		user: ReturnType<typeof import('$lib/state/user.svelte').getUserContext>;
 		members: CampaignMember[];
-		charactersRef: { value: Record<string, CampaignCharacterSummary> };
-		campaignStateRef: { value: CampaignState | null };
-		vaultItemsRef: { value: Array<{ id: string; homebrew_type: HomebrewType; homebrew_id: string }> };
 	} = $props();
+
+	const campaignContext = getCampaignContext();
 
 	const homebrew = getHomebrewContext();
 	const clipboard = new UseClipboard();
@@ -81,11 +75,9 @@
 
 		saving = true;
 		try {
-			const updated = await update_campaign_state({
-				campaign_id: campaignId,
+			const updated = await campaignContext.updateState({
 				notes: localNotes || null
 			});
-			campaignStateRef.value = updated;
 			localNotes = updated.notes ?? '';
 			toast.success('Changes saved');
 		} catch (err) {
@@ -98,7 +90,6 @@
 	function handleReset() {
 		if (!campaignState) return;
 		localNotes = campaignState.notes ?? '';
-		localFear = campaignState.fear_track ?? 0;
 	}
 
 	async function handleCopyCampaignId() {
@@ -118,9 +109,8 @@
 				character_id: characterId,
 				campaign_id: null
 			});
-			// Refresh characters query to get updated data
-			const updated = await get_campaign_characters(campaignId);
-			charactersRef.value = updated;
+			// Refresh characters
+			await campaignContext.refreshCharacters();
 		} catch (err) {
 			error(500, err instanceof Error ? err.message : 'Failed to remove character');
 		}
@@ -136,8 +126,7 @@
 				homebrew_id: selectedHomebrewId
 			});
 			// Refresh vault
-			const updated = await get_campaign_homebrew_vault(campaignId);
-			vaultItemsRef.value = updated;
+			await campaignContext.refreshVault();
 			showAddVaultDialog = false;
 			selectedHomebrewType = '';
 			selectedHomebrewId = '';
@@ -155,8 +144,7 @@
 				vault_id: vaultId
 			});
 			// Refresh vault
-			const updated = await get_campaign_homebrew_vault(campaignId);
-			vaultItemsRef.value = updated;
+			await campaignContext.refreshVault();
 		} catch (err) {
 			error(500, err instanceof Error ? err.message : 'Failed to remove item from vault');
 		}
@@ -328,16 +316,14 @@
 						>
 							View
 						</Button>
-						{#if char.owner_user_id === user.user?.clerk_id}
-							<Button
-								variant="ghost"
-								size="sm"
-								class="hover:text-text grow rounded-none border border-x-0"
-								href={`/characters/${char.id}/edit`}
-							>
-								Edit
-							</Button>
-						{/if}
+						<Button
+							variant="ghost"
+							size="sm"
+							class="hover:text-text grow rounded-none border border-x-0"
+							href={`/characters/${char.id}/edit`}
+						>
+							Edit
+						</Button>
 						<Button
 							variant="ghost"
 							size="sm"

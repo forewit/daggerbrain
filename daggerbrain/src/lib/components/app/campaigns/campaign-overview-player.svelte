@@ -7,7 +7,8 @@
 	import { cn } from '$lib/utils';
 	import { goto } from '$app/navigation';
 	import { error } from '@sveltejs/kit';
-	import { assign_character_to_campaign, leave_campaign, get_campaign_characters } from '$lib/remote/campaigns.remote';
+	import { assign_character_to_campaign, leave_campaign } from '$lib/remote/campaigns.remote';
+	import { getCampaignContext } from '$lib/state/campaigns.svelte';
 	import type { Campaign, CampaignCharacterSummary, CampaignMember } from '$lib/types/campaign-types';
 
 	let {
@@ -16,8 +17,7 @@
 		availableCharacters,
 		userMembership,
 		user,
-		campaignId,
-		charactersRef
+		campaignId
 	}: {
 		campaign: Campaign;
 		characters: Record<string, CampaignCharacterSummary>;
@@ -25,8 +25,9 @@
 		userMembership: CampaignMember | null;
 		user: ReturnType<typeof import('$lib/state/user.svelte').getUserContext>;
 		campaignId: string;
-		charactersRef: { value: Record<string, CampaignCharacterSummary> };
 	} = $props();
+
+	const campaignContext = getCampaignContext();
 
 	// Character assignment dialog
 	let showAssignDialog = $state(false);
@@ -46,9 +47,8 @@
 				character_id: selectedCharacterId,
 				campaign_id: campaignId
 			});
-			// Refresh characters query to get updated data
-			const updated = await get_campaign_characters(campaignId);
-			charactersRef.value = updated;
+			// Refresh characters
+			await campaignContext.refreshCharacters();
 			showAssignDialog = false;
 			selectedCharacterId = '';
 		} catch (err) {

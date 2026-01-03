@@ -5,8 +5,9 @@
 	"type": "module",
 	"scripts": {
 		"dev": "NODE_TLS_REJECT_UNAUTHORIZED=0 vite dev",
+		"dev:wrangler": "bun run build && wrangler dev --local -c wrangler.jsonc -c ../campaigns-do/wrangler.jsonc",
 		"build": "vite build",
-		"preview": "bun run build && wrangler dev",
+		"preview": "bun run build && wrangler dev --local -c wrangler.jsonc -c ../campaigns-do/wrangler.jsonc",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "rm -rf .svelte-kit/output .svelte-kit/cloudflare .svelte-kit/cloudflare-tmp && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "rm -rf .svelte-kit/output .svelte-kit/cloudflare .svelte-kit/cloudflare-tmp && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",

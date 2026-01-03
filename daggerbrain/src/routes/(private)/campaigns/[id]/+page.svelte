@@ -16,18 +16,10 @@
 	import Footer from '$lib/components/app/footer.svelte';
 	import { update_campaign, delete_campaign } from '$lib/remote/campaigns.remote';
 	import { page } from '$app/state';
-	import {
-		get_campaign,
-		get_campaign_members,
-		get_campaign_state,
-		get_campaign_characters
-	} from '$lib/remote/campaigns.remote';
-	import { get_campaign_homebrew_vault } from '$lib/remote/campaign-homebrew.remote';
 	import { getUserContext } from '$lib/state/user.svelte';
+	import { setCampaignContext, getCampaignContext } from '$lib/state/campaigns.svelte';
 	import { UseClipboard } from '$lib/hooks/use-clipboard.svelte';
 	import { toast } from 'svelte-sonner';
-	import type { Campaign, CampaignState, CampaignCharacterSummary, CampaignMember } from '$lib/types/campaign-types';
-	import type { HomebrewType } from '$lib/types/homebrew-types';
 	import CampaignOverviewPlayer from '$lib/components/app/campaigns/campaign-overview-player.svelte';
 	import CampaignOverviewGm from '$lib/components/app/campaigns/campaign-overview-gm.svelte';
 	import CampaignLivePlayer from '$lib/components/app/campaigns/campaign-live-player.svelte';
@@ -39,14 +31,8 @@
 	const campaignId = $derived(page.params.id);
 	const clipboard = new UseClipboard();
 
-	let campaign = $state<Campaign | null>(null);
-	let members = $state<CampaignMember[]>([]);
-	let campaignState = $state<CampaignState | null>(null);
-	let characters = $state<Record<string, CampaignCharacterSummary>>({});
-	let vaultItems = $state<Array<{ id: string; homebrew_type: HomebrewType; homebrew_id: string }>>([]);
-	let loading = $state(true);
-
-	// Note: Fear tracker is now in the live view, not here
+	// Set up campaign context (reactive to campaignId changes)
+	const campaignContext = setCampaignContext(() => campaignId);
 
 	// View switcher - true for live, false for overview
 	// Initialize from URL parameter, default to false
@@ -72,103 +58,6 @@
 		goto(url.pathname + url.search, { keepFocus: true, noScroll: true, invalidateAll: false });
 	}
 
-	// Create refs for reactive updates from child components
-	const charactersRef = $state<{ value: Record<string, CampaignCharacterSummary> }>({ value: {} });
-	let campaignStateRef = $state<{ value: CampaignState | null }>({ value: null });
-	const vaultItemsRef = $state<{ value: Array<{ id: string; homebrew_type: HomebrewType; homebrew_id: string }> }>({ value: [] });
-
-	// Sync refs with state
-	$effect(() => {
-		charactersRef.value = characters;
-	});
-	$effect(() => {
-		// Only sync campaignState to ref if they're different and ref is not newer
-		// This prevents overwriting child component updates
-		if (campaignState !== campaignStateRef.value) {
-			// Only update ref if campaignState is newer (has updated_at) or if ref is null
-			if (!campaignStateRef.value || !campaignState || 
-			    campaignState.updated_at >= (campaignStateRef.value.updated_at || 0)) {
-				campaignStateRef.value = campaignState;
-			}
-		}
-	});
-	$effect(() => {
-		vaultItemsRef.value = vaultItems;
-	});
-
-	// Sync state with refs (for updates from child components)
-	$effect(() => {
-		if (charactersRef.value !== characters) {
-			characters = charactersRef.value;
-		}
-	});
-	$effect(() => {
-		if (campaignStateRef.value !== campaignState) {
-			campaignState = campaignStateRef.value;
-		}
-	});
-	$effect(() => {
-		if (vaultItemsRef.value !== vaultItems) {
-			vaultItems = vaultItemsRef.value;
-		}
-	});
-
-	// Load initial data
-	$effect(() => {
-		if (!campaignId) return;
-
-		loading = true;
-		Promise.all([
-			get_campaign(campaignId),
-			get_campaign_members(campaignId),
-			get_campaign_state(campaignId),
-			get_campaign_characters(campaignId),
-			get_campaign_homebrew_vault(campaignId)
-		])
-			.then(([camp, mems, state, chars, vault]) => {
-				campaign = camp;
-				members = mems;
-				campaignState = state;
-				characters = chars;
-				vaultItems = vault;
-
-			})
-			.catch((err) => {
-				error(500, err.message);
-			})
-			.finally(() => {
-				loading = false;
-			});
-	});
-
-	// Set up polling for real-time updates (every 2 seconds)
-	$effect(() => {
-		if (!campaignId || loading) return;
-
-		const pollingInterval = setInterval(async () => {
-			// Pause polling when tab is hidden
-			if (document.hidden) {
-				return;
-			}
-
-			try {
-				const [state, chars] = await Promise.all([
-					get_campaign_state(campaignId),
-					get_campaign_characters(campaignId)
-				]);
-				campaignState = state;
-				characters = chars;
-			} catch (err) {
-				console.error('Polling error:', err);
-			}
-		}, 2000);
-
-		// Cleanup on unmount
-		return () => {
-			clearInterval(pollingInterval);
-		};
-	});
-
 
 
 	// Get available characters for assignment (user's characters not in this campaign)
@@ -179,6 +68,14 @@
 	);
 
 	const isGM = $derived(data.role === 'gm');
+
+	// Derived state from context
+	const campaign = $derived(campaignContext.campaign);
+	const members = $derived(campaignContext.members);
+	const campaignState = $derived(campaignContext.campaignState);
+	const characters = $derived(campaignContext.characters);
+	const vaultItems = $derived(campaignContext.vaultItems);
+	const loading = $derived(campaignContext.loading);
 
 	// Settings dialog state
 	let showSettingsDialog = $state(false);
@@ -207,7 +104,7 @@
 				description: campaignDescription.trim() || null
 			});
 			// Refresh campaign data
-			campaign = await get_campaign(campaignId);
+			await campaignContext.refreshCampaign();
 			showSettingsDialog = false;
 			toast.success('Campaign updated');
 		} catch (err) {
@@ -303,7 +200,6 @@
 							{campaign}
 							campaignId={campaignId}
 							{campaignState}
-							bind:campaignStateRef={campaignStateRef}
 						/>
 					{:else if campaignId}
 						<CampaignLivePlayer {campaign} campaignId={campaignId} {campaignState} />
@@ -318,9 +214,6 @@
 							campaignId={campaignId}
 							{user}
 							{members}
-							charactersRef={charactersRef}
-							campaignStateRef={campaignStateRef}
-							vaultItemsRef={vaultItemsRef}
 						/>
 					{:else if campaignId}
 						<CampaignOverviewPlayer
@@ -330,7 +223,6 @@
 							userMembership={data.userMembership}
 							{user}
 							campaignId={campaignId}
-							charactersRef={charactersRef}
 						/>
 					{/if}
 				{/if}

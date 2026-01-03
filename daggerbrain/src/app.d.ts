@@ -2,7 +2,7 @@
 // for information about these interfaces
 /// <reference types="svelte-clerk/env" />
 
-import type { KVNamespace, D1Database, R2Bucket } from '@cloudflare/workers-types';
+import type { KVNamespace, D1Database, R2Bucket, DurableObjectNamespace } from '@cloudflare/workers-types';
 
 declare global {
 	namespace App {
@@ -12,6 +12,7 @@ declare global {
 				R2_USERCONTENT: R2Bucket;
 				DB: D1Database;
 				KV: KVNamespace;
+				CAMPAIGN_LIVE: DurableObjectNamespace;
 			};
 			cf: CfProperties;
 			ctx: ExecutionContext;

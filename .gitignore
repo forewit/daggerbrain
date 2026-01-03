@@ -29,9 +29,9 @@ Thumbs.db
 *key.json
 
 #wrangler
-**/wrangler.toml
-**/wrangler.jsonc
-**/wrangler.**.jsonc
+# **/wrangler.toml
+# **/wrangler.jsonc
+# **/wrangler.**.jsonc
 
 # Vite
 vite.config.js.timestamp-*

@@ -185,8 +185,21 @@ export const update_character = command(
 			throw error(404, 'Character not found');
 		}
 
-		// Check permissions - only owner can edit
-		if (existingCharacter.clerk_user_id !== userId) {
+		// Check permissions - owner or GM of campaign can edit
+		const isOwner = existingCharacter.clerk_user_id === userId;
+		let isGM = false;
+		
+		if (!isOwner && existingCharacter.campaign_id) {
+			const members = await db
+				.select()
+				.from(campaign_members_table)
+				.where(eq(campaign_members_table.campaign_id, existingCharacter.campaign_id));
+			
+			const member = members.find((m) => m.user_id === userId && m.campaign_id === existingCharacter.campaign_id);
+			isGM = member?.role === 'gm';
+		}
+		
+		if (!isOwner && !isGM) {
 			throw error(403, 'You do not have permission to edit this character');
 		}
 
@@ -228,12 +241,43 @@ export const update_character = command(
 		// Update campaign character summary if character is in a campaign
 		if (campaignId) {
 			await updateCampaignCharacterSummary(kv, db, campaignId, character.id);
+			
+			// Notify Durable Object of character update
+			await notify_campaign_do_character(campaignId, character.id, {
+				marked_hp: character.marked_hp,
+				marked_stress: character.marked_stress,
+				marked_hope: character.marked_hope,
+				active_conditions: character.active_conditions
+			});
 		}
 
 		console.log('updated character in D1');
 		return character.id;
 	}
 );
+
+// Helper function to notify Durable Object of character updates
+async function notify_campaign_do_character(campaignId: string, characterId: string, updates: Partial<CampaignCharacterSummary>) {
+	const event = getRequestEvent();
+	if (!event.platform?.env?.CAMPAIGN_LIVE) {
+		console.warn('CAMPAIGN_LIVE not available, skipping DO notification');
+		return;
+	}
+	
+	try {
+		const id = event.platform.env.CAMPAIGN_LIVE.idFromName(campaignId);
+		const stub = event.platform.env.CAMPAIGN_LIVE.get(id);
+		
+		await stub.fetch('http://do/update-character', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ characterId, updates })
+		});
+	} catch (error) {
+		// Log but don't throw - D1 is source of truth
+		console.error('Failed to notify DO of character update:', error);
+	}
+}
 
 // Helper function to update campaign character summary
 async function updateCampaignCharacterSummary(
@@ -534,8 +578,21 @@ export const update_character_campaign_stats = command(
 			throw error(404, 'Character not found');
 		}
 
-		// Check permissions - only owner can edit
-		if (character.clerk_user_id !== userId) {
+		// Check permissions - owner or GM of campaign can edit
+		const isOwner = character.clerk_user_id === userId;
+		let isGM = false;
+		
+		if (!isOwner && character.campaign_id) {
+			const members = await db
+				.select()
+				.from(campaign_members_table)
+				.where(eq(campaign_members_table.campaign_id, character.campaign_id));
+			
+			const member = members.find((m) => m.user_id === userId && m.campaign_id === character.campaign_id);
+			isGM = member?.role === 'gm';
+		}
+		
+		if (!isOwner && !isGM) {
 			throw error(403, 'You do not have permission to edit this character');
 		}
 

@@ -95,8 +95,19 @@ export const can_edit_character = query(z.string(), async (characterId): Promise
 		return true;
 	}
 
-	// GMs can view but not edit (per plan: GM can only view)
-	// So we return false for non-owners
+	// GMs can edit characters in their campaigns
+	if (character.campaign_id) {
+		const members = await db
+			.select()
+			.from(campaign_members_table)
+			.where(eq(campaign_members_table.campaign_id, character.campaign_id));
+
+		const member = members.find((m) => m.user_id === userId && m.campaign_id === character.campaign_id);
+		if (member?.role === 'gm') {
+			return true;
+		}
+	}
+
 	return false;
 });
 
