@@ -2,7 +2,8 @@ import { DurableObject } from "cloudflare:workers";
 import type { CampaignState, CampaignCharacterLiveUpdate } from "$lib/types/campaign-types";
 
 interface Env {
-  // Environment bindings if needed
+  // Main worker URL for fetching initial state (optional - falls back to default if not set)
+  MAIN_WORKER_URL?: string;
 }
 
 export class CampaignLiveDO extends DurableObject<Env> {
@@ -49,7 +50,8 @@ export class CampaignLiveDO extends DurableObject<Env> {
     }
     
     // Initialize state if needed (do this before accepting WebSocket)
-    await this.ensureInitialized();
+    // Pass request URL so we can construct API endpoint
+    await this.ensureInitialized(request.url);
     
     // Use ctx.acceptWebSocket() for hibernation support
     this.ctx.acceptWebSocket(server);
@@ -109,7 +111,7 @@ export class CampaignLiveDO extends DurableObject<Env> {
     }
   }
 
-  private async ensureInitialized(): Promise<void> {
+  private async ensureInitialized(requestUrl?: string): Promise<void> {
     if (this.initialized) return;
     
     // Use a promise to prevent concurrent initialization
@@ -123,23 +125,61 @@ export class CampaignLiveDO extends DurableObject<Env> {
           characters: Record<string, CampaignCharacterLiveUpdate>;
         }>('data');
         
-        if (stored) {
+        if (stored && stored.state.campaign_id) {
           this.campaignState = stored.state;
           this.characters = stored.characters;
           this.initialized = true;
           return;
         }
         
-        // If storage is empty, we need the campaign ID to load from main worker
-        // The campaign ID is derived from the DO's ID (idFromName)
-        // For now, initialize with defaults - the WebSocket connection will provide the campaign ID
-        // and we can load from the main worker's API endpoint
-        // Note: We can't easily get the campaign ID here without it being passed in
-        // So we'll initialize with defaults and let the first update/WebSocket connection
-        // provide the actual state
-        // Note: campaign_id will be set when we receive the first update
+        // If storage is empty, load initial state from main worker API
+        // The campaign ID is the DO's name (set via idFromName)
+        const campaignId = this.ctx.id.name;
+        if (campaignId && requestUrl) {
+          try {
+            // Construct API URL from request origin
+            const url = new URL(requestUrl);
+            const baseUrl = `${url.protocol}//${url.host}`;
+            const apiUrl = `${baseUrl}/api/campaigns/${campaignId}/state/initial`;
+            
+            const response = await fetch(apiUrl);
+            if (response.ok) {
+              const data = await response.json() as {
+                state: CampaignState;
+                characters: Record<string, { marked_hp?: number; marked_stress?: number; marked_hope?: number; active_conditions?: string[] }>;
+              };
+              
+              this.campaignState = data.state;
+              // Convert full character summaries to live updates (only keep live-updated fields)
+              this.characters = {};
+              for (const [id, char] of Object.entries(data.characters || {})) {
+                this.characters[id] = {
+                  marked_hp: char.marked_hp ?? 0,
+                  marked_stress: char.marked_stress ?? 0,
+                  marked_hope: char.marked_hope ?? 0,
+                  active_conditions: char.active_conditions ?? []
+                };
+              }
+              
+              // Persist to storage
+              await this.ctx.storage.put('data', {
+                state: this.campaignState,
+                characters: this.characters
+              });
+              
+              this.initialized = true;
+              return;
+            }
+          } catch (error) {
+            console.error('Failed to load initial state from API:', error);
+            // Fall through to default initialization
+          }
+        }
+        
+        // Fallback: initialize with defaults if API fetch fails or campaign ID unavailable
+        // The first update will set the correct state
         this.campaignState = {
-          campaign_id: '',
+          campaign_id: campaignId || '',
           fear_track: 0,
           notes: null,
           updated_at: Date.now()

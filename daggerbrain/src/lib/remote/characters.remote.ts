@@ -362,51 +362,39 @@ async function updateCampaignCharacterSummary(
 		return;
 	}
 
-	// Get all characters in campaign to rebuild summary
-	const characters = await db
-		.select()
-		.from(characters_table)
-		.where(eq(characters_table.campaign_id, campaignId));
+	// Get existing summary and update only this character (more efficient than full rebuild)
+	const existing = (await kv.get(`campaign:${campaignId}:characters`, 'json')) as
+		| Record<string, CampaignCharacterSummary>
+		| null;
+	
+	const summaries = existing || {};
+	
+	// Get derived character from KV (try campaign first, then public)
+	const [derivedCharCampaign, derivedCharPublic] = await Promise.all([
+		kv.get(`character:${characterId}:campaign`, 'json'),
+		kv.get(`character:${characterId}:public`, 'json')
+	]);
+	
+	const derivedChar = (derivedCharCampaign || derivedCharPublic) as DerivedCharacter | null;
+	const max_hp = derivedChar?.derived_max_hp ?? 0;
+	const max_stress = derivedChar?.derived_max_stress ?? 6;
+	const max_hope = derivedChar?.derived_max_hope ?? 6;
 
-	const summaries: Record<string, CampaignCharacterSummary> = {};
-	for (const c of characters) {
-		// Note: Characters are already validated by the query filter (campaign_id)
-		// Try to get derived character from KV (public or campaign)
-		let max_hp = 0;
-		let max_stress = 6;
-		let max_hope = 6;
-
-		// Try public KV first, then campaign KV
-		let derivedChar = (await kv.get(`character:${c.id}:public`, 'json')) as
-			| DerivedCharacter
-			| null;
-		if (!derivedChar) {
-			derivedChar = (await kv.get(`character:${c.id}:campaign`, 'json')) as
-				| DerivedCharacter
-				| null;
-		}
-
-		if (derivedChar) {
-			max_hp = derivedChar.derived_max_hp;
-			max_stress = derivedChar.derived_max_stress;
-			max_hope = derivedChar.derived_max_hope;
-		}
-
-		summaries[c.id] = {
-			id: c.id,
-			name: c.name,
-			image_url: c.image_url,
-			level: c.level,
-			marked_hp: c.marked_hp,
-			max_hp,
-			marked_stress: c.marked_stress,
-			max_stress,
-			marked_hope: c.marked_hope,
-			max_hope,
-			active_conditions: c.active_conditions,
-			owner_user_id: c.clerk_user_id
-		};
-	}
+	// Update only this character in the summary
+	summaries[characterId] = {
+		id: char.id,
+		name: char.name,
+		image_url: char.image_url,
+		level: char.level,
+		marked_hp: char.marked_hp,
+		max_hp,
+		marked_stress: char.marked_stress,
+		max_stress,
+		marked_hope: char.marked_hope,
+		max_hope,
+		active_conditions: char.active_conditions,
+		owner_user_id: char.clerk_user_id
+	};
 
 	// Update KV
 	await kv.put(`campaign:${campaignId}:characters`, JSON.stringify(summaries), {
@@ -448,110 +436,9 @@ export const get_character_public = query(
 	}
 );
 
-// Helper function to validate and rebuild campaign character summaries
-async function validateAndRebuildCampaignCharacters(
-	kv: ReturnType<typeof get_kv>,
-	db: ReturnType<typeof get_db>,
-	campaignId: string
-): Promise<Record<string, CampaignCharacterSummary>> {
-	// Get all characters in campaign from D1
-	const characters = await db
-		.select()
-		.from(characters_table)
-		.where(eq(characters_table.campaign_id, campaignId));
-
-	// Convert to summaries
-	const summaries: Record<string, CampaignCharacterSummary> = {};
-	for (const char of characters) {
-		// Try to get derived character from KV (public or campaign)
-		let max_hp = 0;
-		let max_stress = 6;
-		let max_hope = 6;
-
-		// Try public KV first, then campaign KV
-		let derivedChar = (await kv.get(`character:${char.id}:public`, 'json')) as
-			| DerivedCharacter
-			| null;
-		if (!derivedChar) {
-			derivedChar = (await kv.get(`character:${char.id}:campaign`, 'json')) as
-				| DerivedCharacter
-				| null;
-		}
-
-		if (derivedChar) {
-			max_hp = derivedChar.derived_max_hp;
-			max_stress = derivedChar.derived_max_stress;
-			max_hope = derivedChar.derived_max_hope;
-		}
-
-		summaries[char.id] = {
-			id: char.id,
-			name: char.name,
-			image_url: char.image_url,
-			level: char.level,
-			marked_hp: char.marked_hp,
-			max_hp,
-			marked_stress: char.marked_stress,
-			max_stress,
-			marked_hope: char.marked_hope,
-			max_hope,
-			active_conditions: char.active_conditions,
-			owner_user_id: char.clerk_user_id
-		};
-	}
-
-	// Store in KV for future reads
-	await kv.put(`campaign:${campaignId}:characters`, JSON.stringify(summaries), {
-		expirationTtl: undefined
-	});
-
-	return summaries;
-}
-
-export const get_campaign_characters = query(z.string(), async (campaignId) => {
-	const event = getRequestEvent();
-	get_auth(event); // Validate authentication
-	const kv = get_kv(event);
-	const db = get_db(event);
-
-	// Try to get from KV first (for polling)
-	const kvCharacters = await kv.get(`campaign:${campaignId}:characters`, 'json');
-	if (kvCharacters) {
-		// Validate that all characters in cache still exist in D1 and belong to this campaign
-		const cachedCharacterIds = Object.keys(kvCharacters as Record<string, CampaignCharacterSummary>);
-		
-		if (cachedCharacterIds.length > 0) {
-			// Check if all cached characters still exist and belong to this campaign
-			const existingCharacters = await db
-				.select({ id: characters_table.id })
-				.from(characters_table)
-				.where(
-					and(
-						eq(characters_table.campaign_id, campaignId),
-						inArray(characters_table.id, cachedCharacterIds)
-					)
-				);
-
-			const existingCharacterIds = new Set(existingCharacters.map((c) => c.id));
-			const allValid = cachedCharacterIds.every((id) => existingCharacterIds.has(id));
-
-			if (allValid && existingCharacters.length === cachedCharacterIds.length) {
-				// All cached characters are valid
-				console.log('fetched campaign characters from KV (validated)');
-				return kvCharacters as Record<string, CampaignCharacterSummary>;
-			}
-		}
-		
-		// Cache is invalid or empty, rebuild from D1
-		console.log('KV cache invalid, rebuilding from D1');
-	}
-
-	// Fallback to D1 or rebuild if cache was invalid
-	const summaries = await validateAndRebuildCampaignCharacters(kv, db, campaignId);
-
-	console.log('fetched campaign characters from D1');
-	return summaries;
-});
+// Import the shared function from campaigns.remote instead of duplicating
+// This function is now only defined in campaigns.remote.ts
+export { get_campaign_characters } from './campaigns.remote';
 
 export const update_character_campaign_stats = command(
 	z.object({

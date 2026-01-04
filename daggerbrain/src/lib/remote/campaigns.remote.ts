@@ -72,7 +72,7 @@ export const get_user_campaigns = query(async () => {
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Get campaigns where user is a member
+	// Get campaigns where user is a member using inArray for efficient batch query
 	const memberships = await db
 		.select()
 		.from(campaign_members_table)
@@ -84,27 +84,14 @@ export const get_user_campaigns = query(async () => {
 		return [];
 	}
 
-	// Get campaign details
+	// Fetch all campaigns in a single query using inArray
 	const campaigns = await db
 		.select()
 		.from(campaigns_table)
-		.where(eq(campaigns_table.id, campaignIds[0])); // TODO: Use inArray when drizzle supports it
-
-	// For now, fetch one by one (inefficient but works)
-	const allCampaigns = [];
-	for (const id of campaignIds) {
-		const [campaign] = await db
-			.select()
-			.from(campaigns_table)
-			.where(eq(campaigns_table.id, id))
-			.limit(1);
-		if (campaign) {
-			allCampaigns.push(campaign);
-		}
-	}
+		.where(inArray(campaigns_table.id, campaignIds));
 
 	console.log('fetched user campaigns from D1');
-	return allCampaigns;
+	return campaigns;
 });
 
 export const get_campaign_state = query(z.string(), async (campaignId): Promise<CampaignState> => {
@@ -117,7 +104,13 @@ export const get_campaign_state = query(z.string(), async (campaignId): Promise<
 	// This helps work around D1 eventual consistency by using KV as a fast, consistent cache
 	const kvState = await kv.get(`campaign:${campaignId}:state`, 'json') as CampaignState | null;
 	
-	// Also read from D1 in parallel to compare
+	// If KV has valid state, use it (no need to read D1)
+	if (kvState && kvState.updated_at) {
+		console.log('fetched campaign state from KV');
+		return kvState;
+	}
+
+	// KV is missing or invalid - read from D1
 	const [dbState] = await db
 		.select()
 		.from(campaign_state_table)
@@ -156,14 +149,7 @@ export const get_campaign_state = query(z.string(), async (campaignId): Promise<
 		updated_at: dbState.updated_at
 	};
 
-	// Use KV if it exists and is newer or equal to D1 (KV is updated immediately after writes)
-	// Otherwise use D1 and update KV
-	if (kvState && kvState.updated_at && kvState.updated_at >= d1State.updated_at) {
-		console.log('fetched campaign state from KV (newer than D1)');
-		return kvState;
-	}
-
-	// D1 is newer or KV is missing - use D1 and update KV
+	// Update KV with D1 state
 	await kv.put(`campaign:${campaignId}:state`, JSON.stringify(d1State), {
 		expirationTtl: undefined
 	});
@@ -184,29 +170,40 @@ async function validateAndRebuildCampaignCharacters(
 		.from(characters_table)
 		.where(eq(characters_table.campaign_id, campaignId));
 
-	// Convert to summaries
+	// Convert to summaries - use parallel KV lookups for better performance
 	const summaries: Record<string, CampaignCharacterSummary> = {};
-	for (const char of characters) {
-		// Try to get derived character from KV (public or campaign)
-		let max_hp = 0;
-		let max_stress = 6;
-		let max_hope = 6;
-
-		// Try public KV first, then campaign KV
-		let derivedChar = (await kv.get(`character:${char.id}:public`, 'json')) as
-			| DerivedCharacter
-			| null;
-		if (!derivedChar) {
-			derivedChar = (await kv.get(`character:${char.id}:campaign`, 'json')) as
-				| DerivedCharacter
-				| null;
-		}
-
+	
+	// Build list of KV keys to fetch in parallel
+	const kvKeys = characters.map(char => [
+		`character:${char.id}:campaign`,
+		`character:${char.id}:public`
+	]).flat();
+	
+	// Fetch all KV entries in parallel
+	const kvResults = await Promise.all(
+		kvKeys.map(key => kv.get(key, 'json'))
+	);
+	
+	// Create a map of character ID to derived character data
+	const derivedCharMap = new Map<string, DerivedCharacter>();
+	for (let i = 0; i < characters.length; i++) {
+		const char = characters[i];
+		const campaignIdx = i * 2;
+		const publicIdx = i * 2 + 1;
+		
+		// Prefer campaign KV over public KV (more likely for campaign characters)
+		const derivedChar = (kvResults[campaignIdx] || kvResults[publicIdx]) as DerivedCharacter | null;
 		if (derivedChar) {
-			max_hp = derivedChar.derived_max_hp;
-			max_stress = derivedChar.derived_max_stress;
-			max_hope = derivedChar.derived_max_hope;
+			derivedCharMap.set(char.id, derivedChar);
 		}
+	}
+	
+	// Build summaries
+	for (const char of characters) {
+		const derivedChar = derivedCharMap.get(char.id);
+		const max_hp = derivedChar?.derived_max_hp ?? 0;
+		const max_stress = derivedChar?.derived_max_stress ?? 6;
+		const max_hope = derivedChar?.derived_max_hope ?? 6;
 
 		summaries[char.id] = {
 			id: char.id,
@@ -240,39 +237,14 @@ export const get_campaign_characters = query(
 		const kv = get_kv(event);
 		const db = get_db(event);
 
-		// Try to get from KV first (for polling)
+		// Try to get from KV first - trust the cache, SvelteKit query invalidation handles updates
 		const kvCharacters = await kv.get(`campaign:${campaignId}:characters`, 'json');
 		if (kvCharacters) {
-			// Validate that all characters in cache still exist in D1 and belong to this campaign
-			const cachedCharacterIds = Object.keys(kvCharacters as Record<string, CampaignCharacterSummary>);
-			
-			if (cachedCharacterIds.length > 0) {
-				// Check if all cached characters still exist and belong to this campaign
-				const existingCharacters = await db
-					.select({ id: characters_table.id })
-					.from(characters_table)
-					.where(
-						and(
-							eq(characters_table.campaign_id, campaignId),
-							inArray(characters_table.id, cachedCharacterIds)
-						)
-					);
-
-				const existingCharacterIds = new Set(existingCharacters.map((c) => c.id));
-				const allValid = cachedCharacterIds.every((id) => existingCharacterIds.has(id));
-
-				if (allValid && existingCharacters.length === cachedCharacterIds.length) {
-					// All cached characters are valid
-					console.log('fetched campaign characters from KV (validated)');
-					return kvCharacters as Record<string, CampaignCharacterSummary>;
-				}
-			}
-			
-			// Cache is invalid or empty, rebuild from D1
-			console.log('KV cache invalid, rebuilding from D1');
+			console.log('fetched campaign characters from KV');
+			return kvCharacters as Record<string, CampaignCharacterSummary>;
 		}
 
-		// Fallback to D1 or rebuild if cache was invalid
+		// Cache miss - rebuild from D1
 		const summaries = await validateAndRebuildCampaignCharacters(kv, db, campaignId);
 
 		console.log('fetched campaign characters from D1');
@@ -514,20 +486,13 @@ export const update_campaign_state = command(
 			updated_at: updatedState.updated_at
 		};
 
-		// Update KV - delete first to invalidate cache, then write new value
-		// This ensures next read will check D1 if KV hasn't propagated yet
+		// Update KV write-through cache
 		const kv = get_kv(event);
-		// Delete KV entry to force next read to use D1 (handles eventual consistency)
-		await kv.delete(`campaign:${campaign_id}:state`);
-		// Then write the new value
 		await kv.put(`campaign:${campaign_id}:state`, JSON.stringify(state), {
 			expirationTtl: undefined
 		});
 
-		// Refresh the query cache to invalidate it for all clients
-		// This causes all clients to refetch on their next query call
-		// Then set the new value so the current request gets it immediately
-		await get_campaign_state(campaign_id).refresh();
+		// Update the query cache with the new value
 		await get_campaign_state(campaign_id).set(state);
 
 		// Notify Durable Object of the update
@@ -657,50 +622,39 @@ export const assign_character_to_campaign = command(
 				return;
 			}
 
-			// Get all characters in campaign to rebuild summary
-			const characters = await db
-				.select()
-				.from(characters_table)
-				.where(eq(characters_table.campaign_id, campaignId));
+			// Character is in campaign - update/add to existing summary (more efficient than full rebuild)
+			const existing = (await kv.get(`campaign:${campaignId}:characters`, 'json')) as
+				| Record<string, CampaignCharacterSummary>
+				| null;
+			
+			const summaries = existing || {};
+			
+			// Get derived character from KV (try campaign first, then public) - parallel lookup
+			const [derivedCharCampaign, derivedCharPublic] = await Promise.all([
+				kv.get(`character:${characterId}:campaign`, 'json'),
+				kv.get(`character:${characterId}:public`, 'json')
+			]);
+			
+			const derivedChar = (derivedCharCampaign || derivedCharPublic) as DerivedCharacter | null;
+			const max_hp = derivedChar?.derived_max_hp ?? 0;
+			const max_stress = derivedChar?.derived_max_stress ?? 6;
+			const max_hope = derivedChar?.derived_max_hope ?? 6;
 
-			const summaries: Record<string, CampaignCharacterSummary> = {};
-			for (const c of characters) {
-				// Try to get derived character from KV (public or campaign)
-				let max_hp = 0;
-				let max_stress = 6;
-				let max_hope = 6;
-
-				// Try public KV first, then campaign KV
-				let derivedChar = (await kv.get(`character:${c.id}:public`, 'json')) as
-					| DerivedCharacter
-					| null;
-				if (!derivedChar) {
-					derivedChar = (await kv.get(`character:${c.id}:campaign`, 'json')) as
-						| DerivedCharacter
-						| null;
-				}
-
-				if (derivedChar) {
-					max_hp = derivedChar.derived_max_hp;
-					max_stress = derivedChar.derived_max_stress;
-					max_hope = derivedChar.derived_max_hope;
-				}
-
-				summaries[c.id] = {
-					id: c.id,
-					name: c.name,
-					image_url: c.image_url,
-					level: c.level,
-					marked_hp: c.marked_hp,
-					max_hp,
-					marked_stress: c.marked_stress,
-					max_stress,
-					marked_hope: c.marked_hope,
-					max_hope,
-					active_conditions: c.active_conditions,
-					owner_user_id: c.clerk_user_id
-				};
-			}
+			// Update/add this character to the summary
+			summaries[characterId] = {
+				id: char.id,
+				name: char.name,
+				image_url: char.image_url,
+				level: char.level,
+				marked_hp: char.marked_hp,
+				max_hp,
+				marked_stress: char.marked_stress,
+				max_stress,
+				marked_hope: char.marked_hope,
+				max_hope,
+				active_conditions: char.active_conditions,
+				owner_user_id: char.clerk_user_id
+			};
 
 			await kv.put(`campaign:${campaignId}:characters`, JSON.stringify(summaries), {
 				expirationTtl: undefined

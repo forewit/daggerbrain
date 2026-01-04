@@ -82,22 +82,8 @@ function campaignContext(getCampaignId: () => string | undefined) {
 			});
 
 			// Update local state immediately with the verified state from server
+			// WebSocket updates from DO will handle syncing across tabs
 			campaignState = updated;
-			
-			// Force refresh the query cache on the client side to ensure all tabs get the update
-			await get_campaign_state(id).set(updated);
-			
-			// Also send via WebSocket if connected (for immediate feedback)
-			if (wsConnection?.connected) {
-				wsConnection.send({
-					type: 'update_state',
-					updates: {
-						fear_track: updates.fear_track,
-						notes: updates.notes,
-						updated_at: updated.updated_at
-					}
-				});
-			}
 			
 			return updated;
 		} catch (err) {
