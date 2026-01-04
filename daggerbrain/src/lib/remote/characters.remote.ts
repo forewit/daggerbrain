@@ -284,27 +284,35 @@ async function updateCampaignCharacterSummary(
 					| null;
 			}
 
-			if (derivedChar) {
-				max_hp = derivedChar.derived_max_hp;
-				max_stress = derivedChar.derived_max_stress;
-				max_hope = derivedChar.derived_max_hope;
-			}
+		const evasion = derivedChar?.derived_evasion ?? 0;
+		const max_armor = derivedChar?.derived_max_armor ?? 0;
+		const damage_thresholds = derivedChar?.derived_damage_thresholds ?? { major: 0, severe: 0 };
 
-			summaries[c.id] = {
-				id: c.id,
-				name: c.name,
-				image_url: c.image_url,
-				level: c.level,
-				marked_hp: c.marked_hp,
-				max_hp,
-				marked_stress: c.marked_stress,
-				max_stress,
-				marked_hope: c.marked_hope,
-				max_hope,
-				active_conditions: c.active_conditions,
-				owner_user_id: c.clerk_user_id,
-				derived_descriptors: c.derived_descriptors
-			};
+		if (derivedChar) {
+			max_hp = derivedChar.derived_max_hp;
+			max_stress = derivedChar.derived_max_stress;
+			max_hope = derivedChar.derived_max_hope;
+		}
+
+		summaries[c.id] = {
+			id: c.id,
+			name: c.name,
+			image_url: c.image_url,
+			level: c.level,
+			marked_hp: c.marked_hp,
+			max_hp,
+			marked_stress: c.marked_stress,
+			max_stress,
+			marked_hope: c.marked_hope,
+			max_hope,
+			active_conditions: c.active_conditions,
+			owner_user_id: c.clerk_user_id,
+			derived_descriptors: c.derived_descriptors,
+			evasion,
+			max_armor,
+			marked_armor: c.marked_armor,
+			damage_thresholds
+		};
 		}
 
 		// Update KV
@@ -352,6 +360,9 @@ async function updateCampaignCharacterSummary(
 	const max_hp = derivedChar?.derived_max_hp ?? 0;
 	const max_stress = derivedChar?.derived_max_stress ?? 6;
 	const max_hope = derivedChar?.derived_max_hope ?? 6;
+	const evasion = derivedChar?.derived_evasion ?? 0;
+	const max_armor = derivedChar?.derived_max_armor ?? 0;
+	const damage_thresholds = derivedChar?.derived_damage_thresholds ?? { major: 0, severe: 0 };
 
 	// Update only this character in the summary
 	summaries[characterId] = {
@@ -367,7 +378,11 @@ async function updateCampaignCharacterSummary(
 		max_hope,
 		active_conditions: char.active_conditions,
 		owner_user_id: char.clerk_user_id,
-		derived_descriptors: char.derived_descriptors
+		derived_descriptors: char.derived_descriptors,
+		evasion,
+		max_armor,
+		marked_armor: char.marked_armor,
+		damage_thresholds
 	};
 
 	// Update KV

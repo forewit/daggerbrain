@@ -241,6 +241,7 @@ export class CampaignLiveDO extends DurableObject<Env> {
         marked_hp: updates.marked_hp ?? 0,
         marked_stress: updates.marked_stress ?? 0,
         marked_hope: updates.marked_hope ?? 0,
+        marked_armor: updates.marked_armor ?? 0,
         active_conditions: updates.active_conditions ?? []
       };
     } else {

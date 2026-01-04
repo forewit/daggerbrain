@@ -204,6 +204,9 @@ async function validateAndRebuildCampaignCharacters(
 		const max_hp = derivedChar?.derived_max_hp ?? 0;
 		const max_stress = derivedChar?.derived_max_stress ?? 6;
 		const max_hope = derivedChar?.derived_max_hope ?? 6;
+		const evasion = derivedChar?.derived_evasion ?? 0;
+		const max_armor = derivedChar?.derived_max_armor ?? 0;
+		const damage_thresholds = derivedChar?.derived_damage_thresholds ?? { major: 0, severe: 0 };
 
 		summaries[char.id] = {
 			id: char.id,
@@ -217,7 +220,12 @@ async function validateAndRebuildCampaignCharacters(
 			marked_hope: char.marked_hope,
 			max_hope,
 			active_conditions: char.active_conditions,
-			owner_user_id: char.clerk_user_id
+			owner_user_id: char.clerk_user_id,
+			derived_descriptors: char.derived_descriptors,
+			evasion,
+			max_armor,
+			marked_armor: char.marked_armor,
+			damage_thresholds
 		};
 	}
 
@@ -609,27 +617,34 @@ export const assign_character_to_campaign = command(
 				kv.get(`character:${characterId}:public`, 'json')
 			]);
 			
-			const derivedChar = (derivedCharCampaign || derivedCharPublic) as DerivedCharacter | null;
-			const max_hp = derivedChar?.derived_max_hp ?? 0;
-			const max_stress = derivedChar?.derived_max_stress ?? 6;
-			const max_hope = derivedChar?.derived_max_hope ?? 6;
+		const derivedChar = (derivedCharCampaign || derivedCharPublic) as DerivedCharacter | null;
+		const max_hp = derivedChar?.derived_max_hp ?? 0;
+		const max_stress = derivedChar?.derived_max_stress ?? 6;
+		const max_hope = derivedChar?.derived_max_hope ?? 6;
+		const evasion = derivedChar?.derived_evasion ?? 0;
+		const max_armor = derivedChar?.derived_max_armor ?? 0;
+		const damage_thresholds = derivedChar?.derived_damage_thresholds ?? { major: 0, severe: 0 };
 
-			// Update/add this character to the summary
-			summaries[characterId] = {
-				id: char.id,
-				name: char.name,
-				image_url: char.image_url,
-				level: char.level,
-				marked_hp: char.marked_hp,
-				max_hp,
-				marked_stress: char.marked_stress,
-				max_stress,
-				marked_hope: char.marked_hope,
-				max_hope,
-				active_conditions: char.active_conditions,
-				owner_user_id: char.clerk_user_id,
-				derived_descriptors: char.derived_descriptors
-			};
+		// Update/add this character to the summary
+		summaries[characterId] = {
+			id: char.id,
+			name: char.name,
+			image_url: char.image_url,
+			level: char.level,
+			marked_hp: char.marked_hp,
+			max_hp,
+			marked_stress: char.marked_stress,
+			max_stress,
+			marked_hope: char.marked_hope,
+			max_hope,
+			active_conditions: char.active_conditions,
+			owner_user_id: char.clerk_user_id,
+			derived_descriptors: char.derived_descriptors,
+			evasion,
+			max_armor,
+			marked_armor: char.marked_armor,
+			damage_thresholds
+		};
 
 			await kv.put(`campaign:${campaignId}:characters`, JSON.stringify(summaries), {
 				expirationTtl: undefined

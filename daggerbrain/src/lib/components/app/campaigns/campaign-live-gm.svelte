@@ -1,6 +1,7 @@
 <!-- src/lib/components/app/campaigns/campaign-live-gm.svelte -->
 <script lang="ts">
 	import Fear from '$lib/components/app/sheet/fear.svelte';
+	import CharacterPreview from './character-preview.svelte';
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
 	import { toast } from 'svelte-sonner';
 	import { error } from '@sveltejs/kit';
@@ -20,6 +21,10 @@
 
 	// Local state for fear (for change tracking)
 	let localFear = $state(campaignState?.fear_track ?? 0);
+
+	// Get characters from campaign context
+	let characters = $derived(campaignContext.characters);
+	let characterList = $derived(Object.values(characters));
 
 	// Update local state when campaignState changes
 	$effect(() => {
@@ -49,5 +54,19 @@
 	// No need to manually start/stop polling
 </script>
 
-<!-- Fear Tracker -->
-<Fear bind:fearValue={localFear} onUpdate={handleUpdateFear} isGM={true} />
+<div class="flex flex-col gap-6">
+	<!-- Fear Tracker -->
+	<Fear bind:fearValue={localFear} onUpdate={handleUpdateFear} isGM={true} />
+
+	<!-- Character Previews -->
+	{#if characterList.length > 0}
+		<div>
+			<h2 class="mb-4 text-lg font-semibold">Characters</h2>
+			<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+				{#each characterList as character}
+					<CharacterPreview {character} {campaignId} />
+				{/each}
+			</div>
+		</div>
+	{/if}
+</div>
