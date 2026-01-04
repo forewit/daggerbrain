@@ -33,13 +33,13 @@
 		
 		localFear = newValue;
 
-		// Auto-save fear changes
+		// Auto-save fear changes via WebSocket
 		try {
-			const updated = await campaignContext.updateState({
+			await campaignContext.updateState({
 				fear_track: newValue
 			});
-			
-			localFear = updated.fear_track;
+			// State will be updated via WebSocket message handler
+			// The $effect watching campaignState will sync localFear automatically
 		} catch (err) {
 			error(500, err instanceof Error ? err.message : 'Failed to update fear track');
 		}

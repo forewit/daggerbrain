@@ -1,6 +1,7 @@
 <!-- src/lib/components/app/campaigns/campaign-overview-player.svelte -->
 <script lang="ts">
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
+	import ExternalLink from '@lucide/svelte/icons/external-link';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Label from '$lib/components/ui/label';
 	import * as Select from '$lib/components/ui/select';
@@ -76,6 +77,12 @@
 			<p class="text-sm text-muted-foreground">{campaign.description}</p>
 		{/if}
 	</div>
+	<div class="flex items-center gap-2">
+		<Button variant="outline" size="sm" href={`/campaigns/${campaignId}/live`}>
+			Launch
+			<ExternalLink class="size-3.5" />
+		</Button>
+	</div>
 </div>
 
 <!-- Characters Section -->
@@ -128,8 +135,11 @@
 								{char.name.trim() || 'Unnamed Character'}
 							</p>
 							<p class="mt-1 truncate text-xs text-muted-foreground">
-								Level {char.level} • HP: {char.marked_hp}/{char.max_hp || '?'} • Stress:
-								{char.marked_stress}/{char.max_stress || '?'}
+								{char.derived_descriptors.ancestry_name || 'No ancestry'}
+								&ensp;•&ensp;
+								{char.derived_descriptors.primary_class_name || 'No class'}
+								&ensp;•&ensp;
+								{char.derived_descriptors.primary_subclass_name || 'No subclass'}
 							</p>
 						</div>
 					</a>

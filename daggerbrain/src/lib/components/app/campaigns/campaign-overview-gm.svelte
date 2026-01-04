@@ -9,6 +9,8 @@
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import Copy from '@lucide/svelte/icons/copy';
+	import ExternalLink from '@lucide/svelte/icons/external-link';
+	import Settings from '@lucide/svelte/icons/settings';
 	import { UseClipboard } from '$lib/hooks/use-clipboard.svelte';
 	import { toast } from 'svelte-sonner';
 	import { error } from '@sveltejs/kit';
@@ -32,7 +34,8 @@
 		vaultItems,
 		campaignId,
 		user,
-		members
+		members,
+		onOpenSettings
 	}: {
 		campaign: Campaign;
 		characters: Record<string, CampaignCharacterSummary>;
@@ -41,6 +44,7 @@
 		campaignId: string;
 		user: ReturnType<typeof import('$lib/state/user.svelte').getUserContext>;
 		members: CampaignMember[];
+		onOpenSettings?: () => void;
 	} = $props();
 
 	const campaignContext = getCampaignContext();
@@ -75,10 +79,11 @@
 
 		saving = true;
 		try {
-			const updated = await campaignContext.updateState({
+			await campaignContext.updateState({
 				notes: localNotes || null
 			});
-			localNotes = updated.notes ?? '';
+			// State will be updated via WebSocket message handler
+			// The $effect watching campaignState will sync localNotes automatically
 			toast.success('Changes saved');
 		} catch (err) {
 			error(500, err instanceof Error ? err.message : 'Failed to save changes');
@@ -262,6 +267,23 @@
 			<p class="text-sm text-muted-foreground">{campaign.description}</p>
 		{/if}
 	</div>
+	<div class="flex items-center gap-2">
+		<Button variant="outline" size="sm" href={`/campaigns/${campaignId}/live`}>
+			Launch
+			<ExternalLink class="size-3.5" />
+		</Button>
+		{#if onOpenSettings}
+			<Button
+				variant="outline"
+				size="sm"
+				onclick={() => onOpenSettings?.()}
+				class="h-7"
+			>
+				<Settings class="size-3.5" />
+				<p class="hidden sm:block">Settings</p>
+			</Button>
+		{/if}
+	</div>
 </div>
 
 <!-- Characters Section -->
@@ -302,8 +324,11 @@
 								{char.name.trim() || 'Unnamed Character'}
 							</p>
 							<p class="mt-1 truncate text-xs text-muted-foreground">
-								Level {char.level} • HP: {char.marked_hp}/{char.max_hp || '?'} • Stress:
-								{char.marked_stress}/{char.max_stress || '?'}
+								{char.derived_descriptors.ancestry_name || 'No ancestry'}
+								&ensp;•&ensp;
+								{char.derived_descriptors.primary_class_name || 'No class'}
+								&ensp;•&ensp;
+								{char.derived_descriptors.primary_subclass_name || 'No subclass'}
 							</p>
 						</div>
 					</a>

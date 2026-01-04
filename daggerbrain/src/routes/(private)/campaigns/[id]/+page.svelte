@@ -2,11 +2,9 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
-	import Switch from '$lib/components/ui/switch/switch.svelte';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
-	import Settings from '@lucide/svelte/icons/settings';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Label from '$lib/components/ui/label';
@@ -17,48 +15,18 @@
 	import { update_campaign, delete_campaign } from '$lib/remote/campaigns.remote';
 	import { page } from '$app/state';
 	import { getUserContext } from '$lib/state/user.svelte';
-	import { setCampaignContext, getCampaignContext } from '$lib/state/campaigns.svelte';
-	import { UseClipboard } from '$lib/hooks/use-clipboard.svelte';
+	import { setCampaignContext } from '$lib/state/campaigns.svelte';
 	import { toast } from 'svelte-sonner';
 	import CampaignOverviewPlayer from '$lib/components/app/campaigns/campaign-overview-player.svelte';
 	import CampaignOverviewGm from '$lib/components/app/campaigns/campaign-overview-gm.svelte';
-	import CampaignLivePlayer from '$lib/components/app/campaigns/campaign-live-player.svelte';
-	import CampaignLiveGm from '$lib/components/app/campaigns/campaign-live-gm.svelte';
 
 	let { data }: { data: import('./$types').PageData } = $props();
 
 	const user = getUserContext();
 	const campaignId = $derived(page.params.id);
-	const clipboard = new UseClipboard();
 
 	// Set up campaign context (reactive to campaignId changes)
 	const campaignContext = setCampaignContext(() => campaignId);
-
-	// View switcher - true for live, false for overview
-	// Initialize from URL parameter, default to false
-	let isLive = $state(page.url.searchParams.get('live') === 'true');
-
-	// Sync with URL changes (e.g., browser back/forward)
-	$effect(() => {
-		const urlLive = page.url.searchParams.get('live') === 'true';
-		if (isLive !== urlLive) {
-			isLive = urlLive;
-		}
-	});
-
-	// Handler for toggle changes - updates both state and URL
-	function handleLiveToggle(checked: boolean) {
-		isLive = checked;
-		const url = new URL(page.url);
-		if (checked) {
-			url.searchParams.set('live', 'true');
-		} else {
-			url.searchParams.delete('live');
-		}
-		goto(url.pathname + url.search, { keepFocus: true, noScroll: true, invalidateAll: false });
-	}
-
-
 
 	// Get available characters for assignment (user's characters not in this campaign)
 	const availableCharacters = $derived(
@@ -156,75 +124,31 @@
 							<ChevronLeft />
 							Back to Campaigns
 						</Button>
-
-						<div class="grow"></div>
-
-						<div class="flex items-center gap-2">
-							<!-- Live Toggle -->
-							<label
-								class={cn(
-									buttonVariants({ variant: 'outline', size: 'sm' }),
-									'cursor-pointer gap-3 rounded-full px-4 h-7',
-									isLive &&
-										'border-accent/10 bg-accent/5 text-accent hover:bg-accent/10 hover:text-accent'
-								)}
-							>
-								Live
-								<Switch
-									class="data-[state=checked]:bg-accent/50"
-									checked={isLive}
-									onCheckedChange={handleLiveToggle}
-								/>
-							</label>
-
-							{#if isGM}
-								<Button
-									variant="outline"
-									size="sm"
-									onclick={() => (showSettingsDialog = true)}
-									class="h-7"
-								>
-									<Settings class="size-3.5" />
-									<p class="hidden sm:block">Settings</p>
-								</Button>
-							{/if}
-						</div>
 					</div>
 				</div>
 			</div>
 
 			<div class="flex w-full max-w-6xl flex-col space-y-6 px-4 py-4">
-				{#if isLive}
-					{#if data.role === 'gm' && campaignId}
-						<CampaignLiveGm
-							{campaign}
-							campaignId={campaignId}
-							{campaignState}
-						/>
-					{:else if campaignId}
-						<CampaignLivePlayer {campaign} campaignId={campaignId} {campaignState} />
-					{/if}
-				{:else}
-					{#if data.role === 'gm' && campaignId}
-						<CampaignOverviewGm
-							{campaign}
-							{characters}
-							{campaignState}
-							{vaultItems}
-							campaignId={campaignId}
-							{user}
-							{members}
-						/>
-					{:else if campaignId}
-						<CampaignOverviewPlayer
-							{campaign}
-							{characters}
-							{availableCharacters}
-							userMembership={data.userMembership}
-							{user}
-							campaignId={campaignId}
-						/>
-					{/if}
+				{#if data.role === 'gm' && campaignId}
+					<CampaignOverviewGm
+						{campaign}
+						{characters}
+						{campaignState}
+						{vaultItems}
+						campaignId={campaignId}
+						{user}
+						{members}
+						onOpenSettings={() => (showSettingsDialog = true)}
+					/>
+				{:else if campaignId}
+					<CampaignOverviewPlayer
+						{campaign}
+						{characters}
+						{availableCharacters}
+						userMembership={data.userMembership}
+						{user}
+						campaignId={campaignId}
+					/>
 				{/if}
 			</div>
 		</div>

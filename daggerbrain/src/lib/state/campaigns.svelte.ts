@@ -5,7 +5,6 @@ import {
 	get_campaign_characters
 } from '$lib/remote/campaigns.remote';
 import { get_campaign_homebrew_vault } from '$lib/remote/campaign-homebrew.remote';
-import { update_campaign_state } from '$lib/remote/campaigns.remote';
 import { error } from '@sveltejs/kit';
 import { getContext, setContext } from 'svelte';
 import { createCampaignLiveConnection } from './campaign-live.svelte';
@@ -68,28 +67,27 @@ function campaignContext(getCampaignId: () => string | undefined) {
 
 
 	// Update campaign state
-	async function updateState(updates: { fear_track?: number; notes?: string | null }): Promise<CampaignState> {
+	async function updateState(updates: { fear_track?: number; notes?: string | null }): Promise<void> {
 		const id = getCampaignId();
 		if (!id) {
 			throw new Error('Campaign ID is required');
 		}
 
-		try {
-			// Update via HTTP (which will notify DO, and DO will broadcast via WebSocket)
-			const updated = await update_campaign_state({
-				campaign_id: id,
-				...updates
-			});
-
-			// Update local state immediately with the verified state from server
-			// WebSocket updates from DO will handle syncing across tabs
-			campaignState = updated;
-			
-			return updated;
-		} catch (err) {
-			error(500, err instanceof Error ? err.message : 'Failed to update campaign state');
-			throw err;
+		if (!wsConnection || !wsConnection.connected) {
+			throw new Error('WebSocket not connected. Cannot update campaign state.');
 		}
+
+		// Send update via WebSocket - DO will validate, update, and broadcast
+		wsConnection.send({
+			type: 'update_state',
+			updates: {
+				...updates,
+				updated_at: Date.now()
+			}
+		});
+
+		// Local state will be updated via WebSocket message handler
+		// No need to update immediately - wait for DO's broadcast
 	}
 
 	// Refresh characters
@@ -158,7 +156,8 @@ function campaignContext(getCampaignId: () => string | undefined) {
 					wsConnection.onMessage((message) => {
 						switch (message.type) {
 							case 'connected':
-								// Initial state sync
+							case 'state_sync':
+								// Initial state sync or rejoin sync
 								if (message.state) {
 									campaignState = message.state;
 								}
@@ -173,6 +172,9 @@ function campaignContext(getCampaignId: () => string | undefined) {
 									}
 									characters = merged;
 								}
+								break;
+							case 'already_synced':
+								// Client is already in sync, no action needed
 								break;
 							case 'state_update':
 								if (message.state) {

@@ -9,6 +9,7 @@ export function createCampaignLiveConnection(campaignId: string) {
   let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
   let isConnecting = $state(false);
   let messageHandler: ((message: CampaignLiveWebSocketMessage) => void) | null = null;
+  let lastKnownVersion = $state<number | undefined>(undefined);
   const maxReconnectDelay = 30000; // 30 seconds
 
   function connect() {
@@ -32,12 +33,30 @@ export function createCampaignLiveConnection(campaignId: string) {
         reconnectAttempts = 0;
         ws = websocket;
         
+        // Send rejoin message if we have a last known version
+        if (lastKnownVersion !== undefined) {
+          ws.send(JSON.stringify({
+            type: 'rejoin',
+            lastKnownVersion
+          }));
+        }
+        
         // Attach message handler if it was set before connection
         if (messageHandler) {
-          const handler = messageHandler; // Store in local variable for type safety
+          // Store in local variable for type narrowing (messageHandler could be reassigned)
+          const handler = messageHandler;
           ws.onmessage = (event) => {
             try {
-              const message = JSON.parse(event.data) as CampaignLiveWebSocketMessage;
+              const parsed = JSON.parse(event.data);
+              // Type assertion is necessary here as JSON.parse returns 'any'
+              // Runtime validation happens via the message handler's type checking
+              const message = parsed as CampaignLiveWebSocketMessage;
+              
+              // Update last known version from versioned messages
+              if ('version' in message && typeof message.version === 'number') {
+                lastKnownVersion = message.version;
+              }
+              
               handler(message);
             } catch (error) {
               console.error('Failed to parse WebSocket message:', error);
@@ -91,6 +110,7 @@ export function createCampaignLiveConnection(campaignId: string) {
     ws = null;
     status = 'disconnected';
     reconnectAttempts = 0;
+    // Keep lastKnownVersion on disconnect for rejoin
   }
 
   function send(message: CampaignLiveClientMessage) {
@@ -109,7 +129,16 @@ export function createCampaignLiveConnection(campaignId: string) {
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.onmessage = (event) => {
         try {
-          const message = JSON.parse(event.data) as CampaignLiveWebSocketMessage;
+          const parsed = JSON.parse(event.data);
+          // Type assertion is necessary here as JSON.parse returns 'any'
+          // Runtime validation happens via the message handler's type checking
+          const message = parsed as CampaignLiveWebSocketMessage;
+          
+          // Update last known version from versioned messages
+          if ('version' in message && typeof message.version === 'number') {
+            lastKnownVersion = message.version;
+          }
+          
           handler(message);
         } catch (error) {
           console.error('Failed to parse WebSocket message:', error);

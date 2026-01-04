@@ -486,7 +486,8 @@ export const update_campaign_state = command(
 			updated_at: updatedState.updated_at
 		};
 
-		// Update KV write-through cache
+		// Update KV cache for read-only views (browse, lobby, etc.)
+		// Note: During live sessions, DO storage is authoritative, not KV
 		const kv = get_kv(event);
 		await kv.put(`campaign:${campaign_id}:state`, JSON.stringify(state), {
 			expirationTtl: undefined
@@ -495,40 +496,13 @@ export const update_campaign_state = command(
 		// Update the query cache with the new value
 		await get_campaign_state(campaign_id).set(state);
 
-		// Notify Durable Object of the update
-		await notify_campaign_do(campaign_id, {
-			fear_track: state.fear_track,
-			notes: state.notes,
-			updated_at: state.updated_at
-		});
+		// Note: Live session updates should go through WebSocket to the Durable Object
+		// This HTTP endpoint is for non-live updates or initial state setup
 
 		console.log('updated campaign state in D1 and KV');
 		return state;
 	}
 );
-
-// Helper function to notify Durable Object of state updates
-async function notify_campaign_do(campaignId: string, updates: Partial<CampaignState>) {
-	const event = getRequestEvent();
-	if (!event.platform?.env?.CAMPAIGN_LIVE) {
-		console.warn('CAMPAIGN_LIVE not available, skipping DO notification');
-		return;
-	}
-	
-	try {
-		const id = event.platform.env.CAMPAIGN_LIVE.idFromName(campaignId);
-		const stub = event.platform.env.CAMPAIGN_LIVE.get(id);
-		
-		await stub.fetch('http://do/update', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(updates)
-		});
-	} catch (error) {
-		// Log but don't throw - D1 is source of truth
-		console.error('Failed to notify DO:', error);
-	}
-}
 
 export const assign_character_to_campaign = command(
 	z.object({
@@ -653,7 +627,8 @@ export const assign_character_to_campaign = command(
 				marked_hope: char.marked_hope,
 				max_hope,
 				active_conditions: char.active_conditions,
-				owner_user_id: char.clerk_user_id
+				owner_user_id: char.clerk_user_id,
+				derived_descriptors: char.derived_descriptors
 			};
 
 			await kv.put(`campaign:${campaignId}:characters`, JSON.stringify(summaries), {

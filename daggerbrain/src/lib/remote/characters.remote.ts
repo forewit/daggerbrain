@@ -242,42 +242,14 @@ export const update_character = command(
 		if (campaignId) {
 			await updateCampaignCharacterSummary(kv, db, campaignId, character.id);
 			
-			// Notify Durable Object of character update
-			await notify_campaign_do_character(campaignId, character.id, {
-				marked_hp: character.marked_hp,
-				marked_stress: character.marked_stress,
-				marked_hope: character.marked_hope,
-				active_conditions: character.active_conditions
-			});
+			// Note: Live character updates should go through WebSocket to the Durable Object
+			// This HTTP endpoint is for non-live updates or initial character setup
 		}
 
 		console.log('updated character in D1');
 		return character.id;
 	}
 );
-
-// Helper function to notify Durable Object of character updates
-async function notify_campaign_do_character(campaignId: string, characterId: string, updates: Partial<CampaignCharacterSummary>) {
-	const event = getRequestEvent();
-	if (!event.platform?.env?.CAMPAIGN_LIVE) {
-		console.warn('CAMPAIGN_LIVE not available, skipping DO notification');
-		return;
-	}
-	
-	try {
-		const id = event.platform.env.CAMPAIGN_LIVE.idFromName(campaignId);
-		const stub = event.platform.env.CAMPAIGN_LIVE.get(id);
-		
-		await stub.fetch('http://do/update-character', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ characterId, updates })
-		});
-	} catch (error) {
-		// Log but don't throw - D1 is source of truth
-		console.error('Failed to notify DO of character update:', error);
-	}
-}
 
 // Helper function to update campaign character summary
 async function updateCampaignCharacterSummary(
@@ -330,7 +302,8 @@ async function updateCampaignCharacterSummary(
 				marked_hope: c.marked_hope,
 				max_hope,
 				active_conditions: c.active_conditions,
-				owner_user_id: c.clerk_user_id
+				owner_user_id: c.clerk_user_id,
+				derived_descriptors: c.derived_descriptors
 			};
 		}
 
@@ -393,7 +366,8 @@ async function updateCampaignCharacterSummary(
 		marked_hope: char.marked_hope,
 		max_hope,
 		active_conditions: char.active_conditions,
-		owner_user_id: char.clerk_user_id
+		owner_user_id: char.clerk_user_id,
+		derived_descriptors: char.derived_descriptors
 	};
 
 	// Update KV
