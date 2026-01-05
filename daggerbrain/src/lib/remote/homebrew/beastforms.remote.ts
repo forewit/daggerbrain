@@ -64,14 +64,13 @@ export const create_homebrew_beastform = command(BeastformSchema, async (data) =
 });
 
 export const update_homebrew_beastform = command(
-	z.object({ id: z.string(), data: BeastformSchema, visibility: z.enum(['private', 'public']).optional() }),
-	async ({ id, data, visibility }) => {
+	z.object({ id: z.string(), data: BeastformSchema }),
+	async ({ id, data }) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
-		// Get existing item to check previous visibility
+		// Verify ownership
 		const [existing] = await db
 			.select()
 			.from(homebrew_beastforms)
@@ -82,26 +81,14 @@ export const update_homebrew_beastform = command(
 			throw error(403, 'Not authorized to update this beastform');
 		}
 
-		const previousVisibility = existing.visibility;
-		const newVisibility = visibility ?? previousVisibility;
-
 		const validatedData = BeastformSchema.parse({ ...data, source_id: 'Homebrew' as const });
 		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db
 			.update(homebrew_beastforms)
-			.set({ data: validatedData, visibility: newVisibility, updated_at: now })
+			.set({ data: validatedData, updated_at: now })
 			.where(and(eq(homebrew_beastforms.id, id), eq(homebrew_beastforms.clerk_user_id, userId)));
-
-		// KV Materialization for public homebrew
-		if (newVisibility === 'public') {
-			await kv.put(`homebrew:beastform:${id}:public`, JSON.stringify({ type: 'beastform', data: validatedData, clerk_user_id: userId }), {
-				expirationTtl: undefined
-			});
-		} else if (previousVisibility === 'public' && newVisibility !== 'public') {
-			await kv.delete(`homebrew:beastform:${id}:public`);
-		}
 
 		console.log('updated homebrew beastform in D1');
 	}
@@ -111,9 +98,8 @@ export const delete_homebrew_beastform = command(z.string(), async (id) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
-	// Get existing item to check visibility before deleting
+	// Verify ownership
 	const [existing] = await db
 		.select()
 		.from(homebrew_beastforms)
@@ -127,11 +113,6 @@ export const delete_homebrew_beastform = command(z.string(), async (id) => {
 	await db
 		.delete(homebrew_beastforms)
 		.where(and(eq(homebrew_beastforms.id, id), eq(homebrew_beastforms.clerk_user_id, userId)));
-
-	// Clean up KV if it was public
-	if (existing.visibility === 'public') {
-		await kv.delete(`homebrew:beastform:${id}:public`);
-	}
 
 	// Remove from all campaign vaults
 	await db

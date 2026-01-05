@@ -37,7 +37,8 @@ import type {
 	TransformationCard
 } from '$lib/types/compendium-types';
 import { BLANK_LEVEL_UP_CHOICE } from '$lib/types/constants';
-import { update_character } from '$lib/remote/characters.remote';
+import { update_character, get_character_by_id } from '$lib/remote/characters.remote';
+import { can_edit_character, can_view_character } from '$lib/remote/permissions.remote';
 import { getCompendiumContext } from './compendium.svelte';
 import { increaseDie, increase_range } from '$lib/utils';
 import { createCampaignLiveConnection } from './campaign-live.svelte';
@@ -46,8 +47,98 @@ import type { CampaignLiveWebSocketMessage } from '$lib/types/campaign-types';
 function createCharacter(id: string) {
 	const user = getUserContext();
 	let character = <Character | null>$state(null);
+	// Initialize loadingCharacter to true by default to prevent race condition
+	// where page component computes isLoading=false before effect sets it to true
+	// It will be set to false when character is found or when we know we don't need to load
+	let loadingCharacter = $state(true);
+	let characterLoadSource = $state<'owned' | 'permission' | null>(null);
+	let loadingPromise = $state<Promise<void> | null>(null);
+	// Track if we've already failed to load with a permission error (403) to prevent infinite retries
+	let loadFailedWithPermissionError = $state(false);
+
+	// Load character: first try user.all_characters (fast path), then try get_character_by_id if not found
 	$effect(() => {
-		character = user.all_characters.find((c) => c.id === id) || null;
+		// Fast path: check if character is in user's owned characters
+		const ownedCharacter = user.all_characters.find((c) => c.id === id);
+		if (ownedCharacter) {
+			// Character is owned - always use this (may have been updated)
+			character = ownedCharacter;
+			characterLoadSource = 'owned';
+			loadFailedWithPermissionError = false; // Reset failure flag if character becomes owned
+			loadingCharacter = false; // Character found, no longer loading
+			return;
+		}
+
+		// If character is already loaded via permission and still not owned, don't reload
+		if (character && character.id === id && characterLoadSource === 'permission') {
+			loadingCharacter = false; // Character already loaded, no longer loading
+			return; // Keep existing character, don't reload
+		}
+
+		// If not found in owned characters and user is done loading, try to load with permission check
+		const needsLoad = !character || character.id !== id;
+		const userReady = !user.loading;
+		// Don't check loadingCharacter in shouldLoad - we initialize it to true to prevent race condition
+		// Check if we're already loading to prevent duplicate calls
+		const alreadyLoading = loadingPromise !== null;
+		// Don't retry if we've already failed with a permission error (403)
+		const shouldLoad = userReady && needsLoad && !alreadyLoading && !loadFailedWithPermissionError;
+		
+		if (shouldLoad) {
+			// loadingCharacter is already true by default, but ensure it's true here
+			// in case it was set to false in a previous run
+			loadingCharacter = true;
+			const promise = get_character_by_id(id)
+				.then((loadedCharacter) => {
+					character = loadedCharacter;
+					characterLoadSource = 'permission';
+					// Set loadingCharacter to false IMMEDIATELY after setting character
+					// This prevents race condition where page computes characterNotFound=true
+					// between character being set and loadingCharacter being set to false
+					loadingCharacter = false;
+				})
+				.catch((err) => {
+					// Character not found or user doesn't have permission
+					character = null;
+					characterLoadSource = null;
+					loadingCharacter = false;
+					// If it's a 403 (permission denied), mark that we've failed to prevent infinite retries
+					if (err?.status === 403) {
+						loadFailedWithPermissionError = true;
+					}
+				})
+				.finally(() => {
+					loadingPromise = null;
+				});
+			loadingPromise = promise;
+		}
+	});
+
+	// Permission checks
+	const canEditQuery = $derived.by(() => {
+		if (!id) return null;
+		return can_edit_character(id);
+	});
+
+	const canEdit = $derived.by(() => {
+		const query = canEditQuery;
+		if (!query) return null;
+		if (query.loading) return null;
+		if (query.error) return false;
+		return query.current ?? false;
+	});
+
+	const canViewQuery = $derived.by(() => {
+		if (!id) return null;
+		return can_view_character(id);
+	});
+
+	const canView = $derived.by(() => {
+		const query = canViewQuery;
+		if (!query) return null;
+		if (query.loading) return null;
+		if (query.error) return false;
+		return query.current ?? false;
 	});
 
 	const compendium = getCompendiumContext();
@@ -3520,7 +3611,6 @@ function createCharacter(id: string) {
 		}
 
 		// Update D1/KV via update_character (handles persistence)
-		// Note: derived_character is not required for campaign characters, only for public
 		// The server will update the campaign summary using existing derived_character from KV
 		if (!character) return;
 		
@@ -3878,8 +3968,9 @@ function createCharacter(id: string) {
 	const destroy = () => {};
 
 	/**
-	 * Build a fully derived character object for public/shared views.
+	 * Build a fully derived character object.
 	 * This serializes all the computed derived state into a single object.
+	 * Used for campaign character summaries and other contexts where fully computed character data is needed.
 	 */
 	function buildDerivedCharacter(): import('../types/derived-character-types').DerivedCharacter | null {
 		if (!character) return null;
@@ -4094,6 +4185,19 @@ function createCharacter(id: string) {
 		// set character(value) {
 		// 	character = value;
 		// },
+
+		// loading state
+		get loading() {
+			return loadingCharacter;
+		},
+
+		// permissions
+		get canEdit() {
+			return canEdit;
+		},
+		get canView() {
+			return canView;
+		},
 
 		// helper functions
 		destroy,

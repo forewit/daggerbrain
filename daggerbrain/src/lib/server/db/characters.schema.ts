@@ -32,8 +32,8 @@ export const characters_table = sqliteTable(
 		clerk_user_id: text('clerk_user_id').notNull(),
 		name: text('name').notNull().default(CHARACTER_DEFAULTS.name),
 		image_url: text('image_url').notNull().default(CHARACTER_DEFAULTS.image_url),
-		visibility: text('visibility').notNull().default('private'),
 		campaign_id: text('campaign_id'),
+		claimable: integer('claimable').notNull().default(0),
 		settings: text('settings', { mode: 'json' })
 			.notNull()
 			.default(CHARACTER_DEFAULTS.settings)

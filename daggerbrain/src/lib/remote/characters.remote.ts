@@ -1,6 +1,6 @@
 import { query, command, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
-import { eq, and, or, inArray } from 'drizzle-orm';
+import { eq, and, or } from 'drizzle-orm';
 import { z } from 'zod';
 import {
 	characters_table,
@@ -19,40 +19,63 @@ export const get_all_characters = query(async () => {
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Get user's own characters
+	// Get user's own characters only
+	// This ensures GMs don't see characters they created but were claimed by players
 	const ownCharacters = await db
 		.select()
 		.from(characters_table)
 		.where(eq(characters_table.clerk_user_id, userId));
 
-	// Get campaign memberships to find campaign characters
-	const campaignMemberships = await db
+	console.log('fetched characters from D1');
+	return ownCharacters;
+});
+
+/**
+ * Get a character by ID if the user has permission to view it
+ * Uses can_view_character permission check internally
+ */
+export const get_character_by_id = query(z.string(), async (characterId): Promise<Character> => {
+	const event = getRequestEvent();
+	const { userId } = get_auth(event);
+	const db = get_db(event);
+
+	// Get the character
+	const [character] = await db
 		.select()
-		.from(campaign_members_table)
-		.where(eq(campaign_members_table.user_id, userId));
+		.from(characters_table)
+		.where(eq(characters_table.id, characterId))
+		.limit(1);
 
-	const campaignIds = campaignMemberships.map((m) => m.campaign_id);
-
-	// Get characters from campaigns user is a member of
-	let campaignCharacters: typeof ownCharacters = [];
-	if (campaignIds.length > 0) {
-		campaignCharacters = await db
-			.select()
-			.from(characters_table)
-			.where(inArray(characters_table.campaign_id, campaignIds));
+	if (!character) {
+		throw error(404, 'Character not found');
 	}
 
-	// Combine and deduplicate (in case user owns a character in a campaign)
-	const allCharacters = [...ownCharacters];
-	const ownCharacterIds = new Set(ownCharacters.map((c) => c.id));
-	for (const char of campaignCharacters) {
-		if (!ownCharacterIds.has(char.id)) {
-			allCharacters.push(char);
+	// Check view permissions
+	// Owner can always view
+	if (character.clerk_user_id === userId) {
+		return character;
+	}
+
+	// Campaign members can view characters in their campaign
+	if (character.campaign_id) {
+		const [campaignMembership] = await db
+			.select()
+			.from(campaign_members_table)
+			.where(
+				and(
+					eq(campaign_members_table.campaign_id, character.campaign_id),
+					eq(campaign_members_table.user_id, userId)
+				)
+			)
+			.limit(1);
+
+		if (campaignMembership) {
+			return character;
 		}
 	}
 
-	console.log('fetched characters from D1');
-	return allCharacters;
+	// User doesn't have permission to view this character
+	throw error(403, 'You do not have permission to view this character');
 });
 
 export const delete_character = command(z.string(), async (characterId) => {
@@ -72,12 +95,7 @@ export const delete_character = command(z.string(), async (characterId) => {
 		throw error(404, 'Character not found');
 	}
 
-	// Clean up KV entries
-	if (character.visibility === 'public') {
-		await kv.delete(`character:${characterId}:public`);
-	}
-
-	// Also clean up campaign KV entry if it exists
+	// Clean up campaign KV entry if it exists
 	if (character.campaign_id) {
 		await kv.delete(`character:${characterId}:campaign`);
 		await updateCampaignCharacterSummary(kv, db, character.campaign_id, characterId, true);
@@ -96,24 +114,18 @@ export const delete_character = command(z.string(), async (characterId) => {
 export const create_character = command(
 	z
 		.object({
-			campaign_id: z.string().optional()
+			campaign_id: z.string().optional(),
+			claimable: z.boolean().optional()
 		})
 		.optional(),
-	async (options?: { campaign_id?: string }) => {
+	async (options?: { campaign_id?: string; claimable?: boolean }) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		if (!userId) throw error(401, 'Unauthorized');
 		const db = get_db(event);
 
-		// Check if user has reached the character limit
-		const existingCharacters = await db
-			.select()
-			.from(characters_table)
-			.where(eq(characters_table.clerk_user_id, userId));
-
-		if (existingCharacters.length >= 3) {
-			throw error(403, 'Character limit reached. You can only have 3 characters.');
-		}
+		const isClaimable = options?.claimable === true;
+		let isGM = false;
 
 		// If campaign_id is provided, verify user is a member
 		if (options?.campaign_id) {
@@ -132,9 +144,28 @@ export const create_character = command(
 				throw error(403, 'You must be a member of the campaign to create a character in it.');
 			}
 
-			// GMs cannot create characters in campaigns
-			if (membership.role === 'gm') {
+			isGM = membership.role === 'gm';
+
+			// If creating a claimable character, user must be GM
+			if (isClaimable && !isGM) {
+				throw error(403, 'Only GMs can create claimable characters.');
+			}
+
+			// Non-GMs cannot create characters in campaigns (unless claimable, which is GM-only)
+			if (!isGM && !isClaimable) {
 				throw error(403, 'GMs cannot create characters in campaigns');
+			}
+		}
+
+		// Check character limit - skip for GMs creating claimable characters
+		if (!isClaimable) {
+			const existingCharacters = await db
+				.select()
+				.from(characters_table)
+				.where(eq(characters_table.clerk_user_id, userId));
+
+			if (existingCharacters.length >= 3) {
+				throw error(403, 'Character limit reached. You can only have 3 characters.');
 			}
 		}
 
@@ -143,7 +174,8 @@ export const create_character = command(
 		await db.insert(characters_table).values({
 			id: characterId,
 			clerk_user_id: userId,
-			campaign_id: options?.campaign_id || null
+			campaign_id: options?.campaign_id || null,
+			claimable: isClaimable ? 1 : 0
 		});
 
 		// Refresh the characters list
@@ -203,34 +235,17 @@ export const update_character = command(
 			throw error(403, 'You do not have permission to edit this character');
 		}
 
-		// Get previous visibility to check if it changed
-		const previousVisibility = existingCharacter.visibility;
-		const newVisibility = character.visibility ?? previousVisibility;
-
 		// Update character (without derived_character field)
 		await db
 			.update(characters_table)
 			.set(character)
 			.where(eq(characters_table.id, character.id));
 
-		// Handle KV materialization for public characters and campaign characters
+		// Handle KV materialization for campaign characters
 		const kv = get_kv(event);
 		const campaignId = character.campaign_id ?? existingCharacter.campaign_id;
-		
-		if (newVisibility === 'public') {
-			// Require derived_character from client for public characters
-			if (!derived_character) {
-				throw error(400, 'derived_character is required when setting visibility to public');
-			}
-			await kv.put(`character:${character.id}:public`, JSON.stringify(derived_character), {
-				expirationTtl: undefined // No expiration
-			});
-		} else if (previousVisibility === 'public' && newVisibility !== 'public') {
-			// Remove from KV if visibility changed from public to private
-			await kv.delete(`character:${character.id}:public`);
-		}
 
-		// Store derived_character in KV for campaign characters (even if private)
+		// Store derived_character in KV for campaign characters
 		// This is needed for campaign summaries
 		if (campaignId && derived_character) {
 			await kv.put(`character:${character.id}:campaign`, JSON.stringify(derived_character), {
@@ -269,20 +284,15 @@ async function updateCampaignCharacterSummary(
 		const summaries: Record<string, CampaignCharacterSummary> = {};
 		for (const c of characters) {
 			// Note: Characters are already validated by the query filter (campaign_id)
-			// Try to get derived character from KV (public or campaign)
+			// Try to get derived character from KV (campaign)
 			let max_hp = 0;
 			let max_stress = 6;
 			let max_hope = 6;
 
-			// Try public KV first, then campaign KV
-			let derivedChar = (await kv.get(`character:${c.id}:public`, 'json')) as
+			// Try campaign KV
+			let derivedChar = (await kv.get(`character:${c.id}:campaign`, 'json')) as
 				| DerivedCharacter
 				| null;
-			if (!derivedChar) {
-				derivedChar = (await kv.get(`character:${c.id}:campaign`, 'json')) as
-					| DerivedCharacter
-					| null;
-			}
 
 		const evasion = derivedChar?.derived_evasion ?? 0;
 		const max_armor = derivedChar?.derived_max_armor ?? 0;
@@ -311,7 +321,8 @@ async function updateCampaignCharacterSummary(
 			evasion,
 			max_armor,
 			marked_armor: c.marked_armor,
-			damage_thresholds
+			damage_thresholds,
+			claimable: c.claimable === 1
 		};
 		}
 
@@ -350,13 +361,10 @@ async function updateCampaignCharacterSummary(
 	
 	const summaries = existing || {};
 	
-	// Get derived character from KV (try campaign first, then public)
-	const [derivedCharCampaign, derivedCharPublic] = await Promise.all([
-		kv.get(`character:${characterId}:campaign`, 'json'),
-		kv.get(`character:${characterId}:public`, 'json')
-	]);
-	
-	const derivedChar = (derivedCharCampaign || derivedCharPublic) as DerivedCharacter | null;
+	// Get derived character from KV (campaign)
+	const derivedChar = (await kv.get(`character:${characterId}:campaign`, 'json')) as
+		| DerivedCharacter
+		| null;
 	const max_hp = derivedChar?.derived_max_hp ?? 0;
 	const max_stress = derivedChar?.derived_max_stress ?? 6;
 	const max_hope = derivedChar?.derived_max_hope ?? 6;
@@ -382,7 +390,8 @@ async function updateCampaignCharacterSummary(
 		evasion,
 		max_armor,
 		marked_armor: char.marked_armor,
-		damage_thresholds
+		damage_thresholds,
+		claimable: char.claimable === 1
 	};
 
 	// Update KV
@@ -391,43 +400,8 @@ async function updateCampaignCharacterSummary(
 	});
 }
 
-export const get_character_public = query(
-	z.string(),
-	async (characterId): Promise<typeof characters_table.$inferSelect> => {
-		const event = getRequestEvent();
-		const kv = get_kv(event);
-		const db = get_db(event);
-
-		// Try to get from KV first
-		const kvCharacter = await kv.get(`character:${characterId}:public`, 'json');
-		if (kvCharacter) {
-			console.log('fetched public character from KV');
-			return kvCharacter as typeof characters_table.$inferSelect;
-		}
-
-		// Fallback to D1 if not in KV
-		const [character] = await db
-			.select()
-			.from(characters_table)
-			.where(eq(characters_table.id, characterId))
-			.limit(1);
-
-		if (!character) {
-			throw error(404, 'Character not found');
-		}
-
-		if (character.visibility !== 'public') {
-			throw error(404, 'Character is not public');
-		}
-
-		console.log('fetched public character from D1');
-		return character;
-	}
-);
-
-// Import the shared function from campaigns.remote instead of duplicating
-// This function is now only defined in campaigns.remote.ts
-export { get_campaign_characters } from './campaigns.remote';
+// Note: get_campaign_characters is defined in campaigns.remote.ts
+// Import it directly where needed instead of re-exporting
 
 export const update_character_campaign_stats = command(
 	z.object({

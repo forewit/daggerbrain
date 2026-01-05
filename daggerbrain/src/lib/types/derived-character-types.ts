@@ -16,8 +16,8 @@ import { z } from 'zod';
 
 /**
  * Fully derived character state - includes base character plus all computed derived values.
- * This is used for public/shared views where we need a fully baked character object.
  * The derived values are computed client-side and serialized for storage in KV.
+ * Used for campaign character summaries and other contexts where fully computed character data is needed.
  */
 export type DerivedCharacter = Character & {
 	// Derived compendium references

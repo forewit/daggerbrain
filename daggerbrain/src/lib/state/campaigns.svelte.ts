@@ -6,13 +6,18 @@ import {
 	update_campaign,
 	delete_campaign,
 	assign_character_to_campaign,
-	leave_campaign
+	leave_campaign,
+	claim_character
 } from '$lib/remote/campaigns.remote';
 import {
 	get_campaign_homebrew_vault,
 	add_homebrew_to_vault,
 	remove_homebrew_from_vault
 } from '$lib/remote/campaign-homebrew.remote';
+import {
+	can_claim_character,
+	has_character_in_campaign
+} from '$lib/remote/permissions.remote';
 import { error } from '@sveltejs/kit';
 import { getContext, setContext } from 'svelte';
 import { goto } from '$app/navigation';
@@ -135,6 +140,24 @@ function campaignContext(campaignId: string | undefined) {
 		}
 	}
 
+	// Claim a claimable character
+	async function claimCharacter(characterId: string): Promise<void> {
+		const id = campaignId;
+		if (!id || !characterId) return;
+
+		try {
+			await claim_character({
+				character_id: characterId,
+				campaign_id: id
+			});
+			// Query refresh is handled by the remote command
+			// Reload to get fresh data
+			await load();
+		} catch (err) {
+			error(500, err instanceof Error ? err.message : 'Failed to claim character');
+		}
+	}
+
 	// Leave campaign
 	async function leaveCampaign(): Promise<void> {
 		const id = campaignId;
@@ -182,6 +205,35 @@ function campaignContext(campaignId: string | undefined) {
 			await load();
 		} catch (err) {
 			error(500, err instanceof Error ? err.message : 'Failed to remove item from vault');
+		}
+	}
+
+	// Check if user can claim a character
+	async function canClaimCharacter(characterId: string): Promise<boolean> {
+		const id = campaignId;
+		if (!id || !characterId) return false;
+
+		try {
+			return await can_claim_character({
+				characterId,
+				campaignId: id
+			});
+		} catch (err) {
+			return false;
+		}
+	}
+
+	// Check if user already has a character in this campaign
+	async function hasCharacterInCampaign(): Promise<boolean> {
+		const id = campaignId;
+		if (!id) return false;
+
+		try {
+			return await has_character_in_campaign({
+				campaignId: id
+			});
+		} catch (err) {
+			return false;
 		}
 	}
 
@@ -383,9 +435,12 @@ function campaignContext(campaignId: string | undefined) {
 		updateState,
 		deleteCampaign,
 		assignCharacter,
+		claimCharacter,
 		leaveCampaign,
 		addToVault,
-		removeFromVault
+		removeFromVault,
+		canClaimCharacter,
+		hasCharacterInCampaign
 	};
 }
 

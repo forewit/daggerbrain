@@ -25,7 +25,6 @@ export const homebrew_classes = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<CharacterClass>(),
-		visibility: text('visibility').notNull().default('private'),
 		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
@@ -50,7 +49,6 @@ export const homebrew_subclasses = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<Subclass>(),
-		visibility: text('visibility').notNull().default('private'),
 		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
@@ -75,7 +73,6 @@ export const homebrew_domains = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<Domain>(),
-		visibility: text('visibility').notNull().default('private'),
 		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
@@ -100,7 +97,6 @@ export const homebrew_domain_cards = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<DomainCard>(),
-		visibility: text('visibility').notNull().default('private'),
 		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
@@ -125,7 +121,6 @@ export const homebrew_primary_weapons = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<Weapon>(),
-		visibility: text('visibility').notNull().default('private'),
 		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
@@ -150,7 +145,6 @@ export const homebrew_secondary_weapons = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<Weapon>(),
-		visibility: text('visibility').notNull().default('private'),
 		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
@@ -179,7 +173,6 @@ export const homebrew_armor = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<Armor>(),
-		visibility: text('visibility').notNull().default('private'),
 		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
@@ -204,7 +197,6 @@ export const homebrew_loot = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<Loot>(),
-		visibility: text('visibility').notNull().default('private'),
 		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
@@ -229,7 +221,6 @@ export const homebrew_consumables = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<Consumable>(),
-		visibility: text('visibility').notNull().default('private'),
 		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
@@ -254,7 +245,6 @@ export const homebrew_ancestry_cards = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<AncestryCard>(),
-		visibility: text('visibility').notNull().default('private'),
 		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
@@ -279,7 +269,6 @@ export const homebrew_community_cards = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<CommunityCard>(),
-		visibility: text('visibility').notNull().default('private'),
 		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
@@ -304,7 +293,6 @@ export const homebrew_transformation_cards = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<TransformationCard>(),
-		visibility: text('visibility').notNull().default('private'),
 		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
@@ -335,7 +323,6 @@ export const homebrew_beastforms = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<Beastform>(),
-		visibility: text('visibility').notNull().default('private'),
 		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()

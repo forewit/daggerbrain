@@ -2,11 +2,10 @@
 <script lang="ts">
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import * as Label from '$lib/components/ui/label';
-	import * as Select from '$lib/components/ui/select';
 	import { cn } from '$lib/utils';
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
 	import type { CampaignMember } from '$lib/types/campaign-types';
+	import CampaignCharacters from './campaign-characters.svelte';
 
 	let {
 		availableCharacters,
@@ -24,29 +23,9 @@
 
 	// Get data from context
 	const campaign = $derived(campaignContext.campaign);
-	const characters = $derived(campaignContext.characters);
-
-	// Character assignment dialog
-	let showAssignDialog = $state(false);
-	let selectedCharacterId = $state('');
 
 	// Leave campaign confirmation dialog
 	let showLeaveDialog = $state(false);
-
-	// Get characters in this campaign
-	const campaignCharacters = $derived(Object.values(characters));
-
-	async function handleAssignCharacter() {
-		if (!selectedCharacterId || !campaignId) return;
-
-		try {
-			await campaignContext.assignCharacter(selectedCharacterId, campaignId);
-			showAssignDialog = false;
-			selectedCharacterId = '';
-		} catch (err) {
-			// Error handling is done in assignCharacter
-		}
-	}
 
 	async function handleLeaveCampaign() {
 		if (!campaignId) return;
@@ -61,88 +40,7 @@
 
 {#if campaign}
 <!-- Characters Section -->
-<div class="rounded border bg-card p-3 pb-6">
-	<div class="mb-4 flex items-center justify-between">
-		<h2 class="text-lg font-semibold">Characters</h2>
-		<div class="flex gap-2">
-			<Button
-				variant="default"
-				size="sm"
-				disabled={user.all_characters.length >= 3}
-				onclick={async () => {
-					try {
-						const id = await user.create_character(campaignId);
-						await goto(`/characters/${id}/edit/`);
-					} catch (err) {
-						error(500, err instanceof Error ? err.message : 'Failed to create character');
-					}
-				}}
-			>
-				Create Character
-			</Button>
-			{#if availableCharacters.length > 0}
-				<Button variant="outline" size="sm" onclick={() => (showAssignDialog = true)}>
-					Assign Character
-				</Button>
-			{/if}
-		</div>
-	</div>
-
-	{#if campaignCharacters.length === 0}
-		<p class="text-sm text-muted-foreground">No characters assigned yet.</p>
-	{:else}
-		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-			{#each campaignCharacters as char}
-				<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
-					<a
-						href={`/characters/${char.id}/`}
-						class="flex gap-2 border bg-primary-muted p-1 hover:bg-primary-muted/80"
-					>
-						<div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2">
-							<img
-								src={char.image_url || '/images/portrait-placeholder.png'}
-								alt={char.name.trim() || 'Unnamed Character'}
-								class="h-full w-full object-cover"
-							/>
-						</div>
-						<div class="truncate">
-							<p class="mt-1 truncate text-lg font-bold">
-								{char.name.trim() || 'Unnamed Character'}
-							</p>
-							<p class="mt-1 truncate text-xs text-muted-foreground">
-								{char.derived_descriptors.ancestry_name || 'No ancestry'}
-								&ensp;•&ensp;
-								{char.derived_descriptors.primary_class_name || 'No class'}
-								&ensp;•&ensp;
-								{char.derived_descriptors.primary_subclass_name || 'No subclass'}
-							</p>
-						</div>
-					</a>
-					<div class="flex bg-muted">
-						<Button
-							variant="ghost"
-							size="sm"
-							class="hover:text-text grow rounded-none border"
-							href={`/characters/${char.id}/`}
-						>
-							View
-						</Button>
-						{#if char.owner_user_id === user.user?.clerk_id}
-							<Button
-								variant="ghost"
-								size="sm"
-								class="hover:text-text grow rounded-none border border-x-0"
-								href={`/characters/${char.id}/edit`}
-							>
-								Edit
-							</Button>
-						{/if}
-					</div>
-				</div>
-			{/each}
-		</div>
-	{/if}
-</div>
+<CampaignCharacters />
 
 {#if userMembership && userMembership.role !== 'gm'}
 	<Button
@@ -153,62 +51,6 @@
 		Leave Campaign
 	</Button>
 {/if}
-
-<!-- Assign Character Dialog -->
-<Dialog.Root bind:open={showAssignDialog}>
-	<Dialog.Content class="sm:max-w-md">
-		<Dialog.Header>
-			<Dialog.Title>Assign Character</Dialog.Title>
-			<Dialog.Description>Select a character to add to this campaign.</Dialog.Description>
-		</Dialog.Header>
-
-		<form
-			onsubmit={(e) => {
-				e.preventDefault();
-				if (selectedCharacterId) {
-					handleAssignCharacter();
-				}
-			}}
-		>
-			<div class="flex flex-col gap-4 py-4">
-				<div class="flex flex-col gap-2">
-					<Label.Root>Character</Label.Root>
-					<Select.Root
-						type="single"
-						value={selectedCharacterId}
-						onValueChange={(v) => (selectedCharacterId = v || '')}
-					>
-						<Select.Trigger class="w-full">
-							<p class="truncate">
-								{selectedCharacterId
-									? availableCharacters.find((c) => c.id === selectedCharacterId)?.name ||
-										'Unnamed Character'
-									: 'Select a character...'}
-							</p>
-						</Select.Trigger>
-						<Select.Content>
-							{#each availableCharacters as char}
-								<Select.Item value={char.id}>{char.name || 'Unnamed Character'}</Select.Item>
-							{/each}
-						</Select.Content>
-					</Select.Root>
-				</div>
-			</div>
-
-			<Dialog.Footer class="flex gap-3">
-				<Dialog.Close
-					type="button"
-					class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
-				>
-					Cancel
-				</Dialog.Close>
-				<Button type="submit" disabled={!selectedCharacterId}>
-					Assign
-				</Button>
-			</Dialog.Footer>
-		</form>
-	</Dialog.Content>
-</Dialog.Root>
 
 <!-- Leave Campaign Confirmation Dialog -->
 <Dialog.Root bind:open={showLeaveDialog}>

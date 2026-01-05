@@ -8,6 +8,7 @@ import type {
 	campaign_state_table
 } from '$lib/server/db/campaigns.schema';
 import type { DerivedDescriptors } from './character-types';
+import type { DerivedCharacter } from './derived-character-types';
 
 export type Campaign = typeof campaigns_table.$inferSelect;
 export type CampaignMember = typeof campaign_members_table.$inferSelect;
@@ -38,6 +39,7 @@ export type CampaignCharacterSummary = {
 	max_armor: number;
 	marked_armor: number;
 	damage_thresholds: { major: number; severe: number };
+	claimable: boolean;
 };
 
 // Type for character updates - only the live-updated fields

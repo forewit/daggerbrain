@@ -72,14 +72,13 @@ export const create_homebrew_ancestry_card = command(AncestryCardSchema, async (
 });
 
 export const update_homebrew_ancestry_card = command(
-	z.object({ id: z.string(), data: AncestryCardSchema, visibility: z.enum(['private', 'public']).optional() }),
-	async ({ id, data, visibility }) => {
+	z.object({ id: z.string(), data: AncestryCardSchema }),
+	async ({ id, data }) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
-		// Get existing item to check previous visibility
+		// Verify ownership
 		const [existing] = await db
 			.select()
 			.from(homebrew_ancestry_cards)
@@ -90,28 +89,16 @@ export const update_homebrew_ancestry_card = command(
 			throw error(403, 'Not authorized to update this ancestry card');
 		}
 
-		const previousVisibility = existing.visibility;
-		const newVisibility = visibility ?? previousVisibility;
-
 		const validatedData = AncestryCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
 		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db
 			.update(homebrew_ancestry_cards)
-			.set({ data: validatedData, visibility: newVisibility, updated_at: now })
+			.set({ data: validatedData, updated_at: now })
 			.where(
 				and(eq(homebrew_ancestry_cards.id, id), eq(homebrew_ancestry_cards.clerk_user_id, userId))
 			);
-
-		// KV Materialization for public homebrew
-		if (newVisibility === 'public') {
-			await kv.put(`homebrew:ancestry-cards:${id}:public`, JSON.stringify({ type: 'ancestry-cards', data: validatedData, clerk_user_id: userId }), {
-				expirationTtl: undefined
-			});
-		} else if (previousVisibility === 'public' && newVisibility !== 'public') {
-			await kv.delete(`homebrew:ancestry-cards:${id}:public`);
-		}
 
 		console.log('updated homebrew ancestry card in D1');
 	}
@@ -121,9 +108,8 @@ export const delete_homebrew_ancestry_card = command(z.string(), async (id) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
-	// Get existing item to check visibility before deleting
+	// Verify ownership
 	const [existing] = await db
 		.select()
 		.from(homebrew_ancestry_cards)
@@ -139,11 +125,6 @@ export const delete_homebrew_ancestry_card = command(z.string(), async (id) => {
 		.where(
 			and(eq(homebrew_ancestry_cards.id, id), eq(homebrew_ancestry_cards.clerk_user_id, userId))
 		);
-
-	// Clean up KV if it was public
-	if (existing.visibility === 'public') {
-		await kv.delete(`homebrew:ancestry-cards:${id}:public`);
-	}
 
 	// Remove from all campaign vaults
 	await db
@@ -215,14 +196,13 @@ export const create_homebrew_community_card = command(CommunityCardSchema, async
 });
 
 export const update_homebrew_community_card = command(
-	z.object({ id: z.string(), data: CommunityCardSchema, visibility: z.enum(['private', 'public']).optional() }),
-	async ({ id, data, visibility }) => {
+	z.object({ id: z.string(), data: CommunityCardSchema }),
+	async ({ id, data }) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
-		// Get existing item to check previous visibility
+		// Verify ownership
 		const [existing] = await db
 			.select()
 			.from(homebrew_community_cards)
@@ -233,28 +213,16 @@ export const update_homebrew_community_card = command(
 			throw error(403, 'Not authorized to update this community card');
 		}
 
-		const previousVisibility = existing.visibility;
-		const newVisibility = visibility ?? previousVisibility;
-
 		const validatedData = CommunityCardSchema.parse({ ...data, source_id: 'Homebrew' as const });
 		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db
 			.update(homebrew_community_cards)
-			.set({ data: validatedData, visibility: newVisibility, updated_at: now })
+			.set({ data: validatedData, updated_at: now })
 			.where(
 				and(eq(homebrew_community_cards.id, id), eq(homebrew_community_cards.clerk_user_id, userId))
 			);
-
-		// KV Materialization for public homebrew
-		if (newVisibility === 'public') {
-			await kv.put(`homebrew:community-cards:${id}:public`, JSON.stringify({ type: 'community-cards', data: validatedData, clerk_user_id: userId }), {
-				expirationTtl: undefined
-			});
-		} else if (previousVisibility === 'public' && newVisibility !== 'public') {
-			await kv.delete(`homebrew:community-cards:${id}:public`);
-		}
 
 		console.log('updated homebrew community card in D1');
 	}
@@ -264,9 +232,8 @@ export const delete_homebrew_community_card = command(z.string(), async (id) => 
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
-	// Get existing item to check visibility before deleting
+	// Verify ownership
 	const [existing] = await db
 		.select()
 		.from(homebrew_community_cards)
@@ -282,11 +249,6 @@ export const delete_homebrew_community_card = command(z.string(), async (id) => 
 		.where(
 			and(eq(homebrew_community_cards.id, id), eq(homebrew_community_cards.clerk_user_id, userId))
 		);
-
-	// Clean up KV if it was public
-	if (existing.visibility === 'public') {
-		await kv.delete(`homebrew:community-cards:${id}:public`);
-	}
 
 	// Remove from all campaign vaults
 	await db
@@ -364,14 +326,13 @@ export const create_homebrew_transformation_card = command(
 );
 
 export const update_homebrew_transformation_card = command(
-	z.object({ id: z.string(), data: TransformationCardSchema, visibility: z.enum(['private', 'public']).optional() }),
-	async ({ id, data, visibility }) => {
+	z.object({ id: z.string(), data: TransformationCardSchema }),
+	async ({ id, data }) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
-		// Get existing item to check previous visibility
+		// Verify ownership
 		const [existing] = await db
 			.select()
 			.from(homebrew_transformation_cards)
@@ -382,9 +343,6 @@ export const update_homebrew_transformation_card = command(
 			throw error(403, 'Not authorized to update this transformation card');
 		}
 
-		const previousVisibility = existing.visibility;
-		const newVisibility = visibility ?? previousVisibility;
-
 		const validatedData = TransformationCardSchema.parse({
 			...data,
 			source_id: 'Homebrew' as const
@@ -394,22 +352,13 @@ export const update_homebrew_transformation_card = command(
 
 		await db
 			.update(homebrew_transformation_cards)
-			.set({ data: validatedData, visibility: newVisibility, updated_at: now })
+			.set({ data: validatedData, updated_at: now })
 			.where(
 				and(
 					eq(homebrew_transformation_cards.id, id),
 					eq(homebrew_transformation_cards.clerk_user_id, userId)
 				)
 			);
-
-		// KV Materialization for public homebrew
-		if (newVisibility === 'public') {
-			await kv.put(`homebrew:transformation-cards:${id}:public`, JSON.stringify({ type: 'transformation-cards', data: validatedData, clerk_user_id: userId }), {
-				expirationTtl: undefined
-			});
-		} else if (previousVisibility === 'public' && newVisibility !== 'public') {
-			await kv.delete(`homebrew:transformation-cards:${id}:public`);
-		}
 
 		console.log('updated homebrew transformation card in D1');
 	}
@@ -419,9 +368,8 @@ export const delete_homebrew_transformation_card = command(z.string(), async (id
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
-	// Get existing item to check visibility before deleting
+	// Verify ownership
 	const [existing] = await db
 		.select()
 		.from(homebrew_transformation_cards)
@@ -440,11 +388,6 @@ export const delete_homebrew_transformation_card = command(z.string(), async (id
 				eq(homebrew_transformation_cards.clerk_user_id, userId)
 			)
 		);
-
-	// Clean up KV if it was public
-	if (existing.visibility === 'public') {
-		await kv.delete(`homebrew:transformation-cards:${id}:public`);
-	}
 
 	// Remove from all campaign vaults
 	await db

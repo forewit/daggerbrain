@@ -12,13 +12,23 @@
 	const user = getUserContext();
 	const characterId = $derived($page.params.uid);
 
+	// Check both user loading and character context loading
+	const isLoading = $derived.by(() => {
+		const userLoading = user.loading;
+		const contextLoading = context.loading;
+		return userLoading || contextLoading;
+	});
+
+	// Character context handles permission checking, so we just check if character is null
+	// Wait for both user and character context to finish loading before showing "not found"
 	let characterNotFound = $derived.by(() => {
-		if (user.loading) return false;
-		return !user.all_characters.some((c) => c.id === characterId);
+		const loading = isLoading;
+		const hasCharacter = character !== null;
+		return !loading && !hasCharacter;
 	});
 </script>
 
-{#if user.loading}
+{#if isLoading}
 	<div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
 		<!-- Keep the page height so the footer doesn't jump while loading -->
 		<div class="absolute inset-0 flex items-center justify-center">

@@ -20,14 +20,6 @@
 	let showHomebrewDisableDialog = $state(false);
 	let homebrewCheckboxState = $state(false);
 
-	let showPublicDialog = $state(false);
-	let publicCheckboxState = $state(false);
-	let publicUrl = $derived(
-		character?.visibility === 'public'
-			? `${$page.url.origin}/shared/characters/${character.id}`
-			: ''
-	);
-
 	// Sync checkbox state with character's void_enabled, homebrew_enabled, and visibility
 	$effect(() => {
 		if (character) {
@@ -37,11 +29,6 @@
 	$effect(() => {
 		if (character) {
 			homebrewCheckboxState = character.settings.homebrew_enabled;
-		}
-	});
-	$effect(() => {
-		if (character) {
-			publicCheckboxState = character.visibility === 'public';
 		}
 	});
 
@@ -92,30 +79,6 @@
 		homebrewCheckboxState = character?.settings.homebrew_enabled ?? false;
 		showHomebrewDisableDialog = false;
 	}
-
-	function handlePublicCheckboxChange(checked: boolean) {
-		if (checked && character?.visibility !== 'public') {
-			// User is trying to make public - show confirmation
-			publicCheckboxState = false; // Keep it unchecked until confirmed
-			showPublicDialog = true;
-		} else if (character) {
-			// User is making private - allow it directly
-			character.visibility = 'private';
-		}
-	}
-
-	function confirmMakePublic() {
-		if (character) {
-			character.visibility = 'public';
-		}
-		showPublicDialog = false;
-	}
-
-	function cancelMakePublic() {
-		// Reset checkbox to previous state
-		publicCheckboxState = character ? character.visibility === 'public' : false;
-		showPublicDialog = false;
-	}
 </script>
 
 {#if character}
@@ -158,39 +121,6 @@
 				/>
 				Enable Homebrew
 			</Label>
-
-			<!-- Make Public -->
-			<div class="flex flex-col gap-2">
-				<Label class="cursor-pointer">
-					<Checkbox
-						bind:checked={publicCheckboxState}
-						onCheckedChange={(checked) => handlePublicCheckboxChange(checked ?? false)}
-					/>
-					Make Public
-				</Label>
-				{#if character?.visibility === 'public' && publicUrl}
-					<div class="ml-6 rounded border bg-muted p-2">
-						<p class="text-xs font-medium text-muted-foreground mb-1">Public URL:</p>
-						<div class="flex items-center gap-2">
-							<code class="flex-1 rounded bg-background px-2 py-1 text-xs break-all">{publicUrl}</code>
-							<button
-								type="button"
-								class={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'shrink-0')}
-								onclick={async () => {
-									try {
-										await navigator.clipboard.writeText(publicUrl);
-										// Could add toast notification here
-									} catch (err) {
-										console.error('Failed to copy URL:', err);
-									}
-								}}
-							>
-								Copy
-							</button>
-						</div>
-					</div>
-				{/if}
-			</div>
 
 			<Dialog.Root>
 				<Dialog.Trigger
@@ -267,28 +197,6 @@
 			<Dialog.Close
 				class={buttonVariants({ variant: 'destructive' })}
 				onclick={confirmDisableHomebrew}>Disable Homebrew</Dialog.Close
-			>
-		</Dialog.Footer>
-	</Dialog.Content>
-</Dialog.Root>
-
-<!-- Make Public Confirmation Dialog -->
-<Dialog.Root bind:open={showPublicDialog}>
-	<Dialog.Content class="sm:max-w-md">
-		<Dialog.Header>
-			<Dialog.Title>Make Character Public</Dialog.Title>
-			<Dialog.Description>
-				Making this character public will allow anyone with the link to view it without logging in.
-				The character will be accessible at a public URL that you can share.
-			</Dialog.Description>
-		</Dialog.Header>
-		<Dialog.Footer class="flex gap-3 pt-4">
-			<Dialog.Close
-				class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
-				onclick={cancelMakePublic}>Cancel</Dialog.Close
-			>
-			<Dialog.Close class={buttonVariants({ variant: 'default' })} onclick={confirmMakePublic}
-				>Make Public</Dialog.Close
 			>
 		</Dialog.Footer>
 	</Dialog.Content>

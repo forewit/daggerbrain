@@ -12,6 +12,7 @@
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
 	import type { HomebrewType } from '$lib/types/homebrew-types';
+	import CampaignCharacters from './campaign-characters.svelte';
 
 	let {
 		campaignId,
@@ -25,10 +26,8 @@
 
 	// Get data from context
 	const campaign = $derived(campaignContext.campaign);
-	const characters = $derived(campaignContext.characters);
 	const campaignState = $derived(campaignContext.campaignState);
 	const vaultItems = $derived(campaignContext.vaultItems);
-	const members = $derived(campaignContext.members);
 
 	const homebrew = getHomebrewContext();
 
@@ -49,9 +48,6 @@
 	let showAddVaultDialog = $state(false);
 	let selectedHomebrewType = $state<HomebrewType | ''>('');
 	let selectedHomebrewId = $state('');
-
-	// Get characters in this campaign
-	const campaignCharacters = $derived(Object.values(characters));
 
 
 	async function handleSave() {
@@ -75,16 +71,6 @@
 	function handleReset() {
 		if (!campaignState) return;
 		localNotes = campaignState.notes ?? '';
-	}
-
-	async function handleRemoveCharacter(characterId: string) {
-		if (!campaignId) return;
-
-		try {
-			await campaignContext.assignCharacter(characterId, null);
-		} catch (err) {
-			// Error handling is done in assignCharacter
-		}
 	}
 
 	async function handleAddToVault() {
@@ -216,72 +202,7 @@
 
 {#if campaign}
 <!-- Characters Section -->
-<div class="rounded border bg-card p-3 pb-6">
-	<div class="mb-4 flex items-center justify-between">
-		<h2 class="text-lg font-semibold">Characters</h2>
-	</div>
-
-	{#if campaignCharacters.length === 0}
-		<p class="text-sm text-muted-foreground">No characters assigned yet.</p>
-	{:else}
-		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-			{#each campaignCharacters as char}
-				<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
-					<a
-						href={`/characters/${char.id}/`}
-						class="flex gap-2 border bg-primary-muted p-1 hover:bg-primary-muted/80"
-					>
-						<div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2">
-							<img
-								src={char.image_url || '/images/portrait-placeholder.png'}
-								alt={char.name.trim() || 'Unnamed Character'}
-								class="h-full w-full object-cover"
-							/>
-						</div>
-						<div class="truncate">
-							<p class="mt-1 truncate text-lg font-bold">
-								{char.name.trim() || 'Unnamed Character'}
-							</p>
-							<p class="mt-1 truncate text-xs text-muted-foreground">
-								{char.derived_descriptors.ancestry_name || 'No ancestry'}
-								&ensp;•&ensp;
-								{char.derived_descriptors.primary_class_name || 'No class'}
-								&ensp;•&ensp;
-								{char.derived_descriptors.primary_subclass_name || 'No subclass'}
-							</p>
-						</div>
-					</a>
-					<div class="flex bg-muted">
-						<Button
-							variant="ghost"
-							size="sm"
-							class="hover:text-text grow rounded-none border"
-							href={`/characters/${char.id}/`}
-						>
-							View
-						</Button>
-						<Button
-							variant="ghost"
-							size="sm"
-							class="hover:text-text grow rounded-none border border-x-0"
-							href={`/characters/${char.id}/edit`}
-						>
-							Edit
-						</Button>
-						<Button
-							variant="ghost"
-							size="sm"
-							class="grow rounded-none border text-destructive hover:text-destructive"
-							onclick={() => handleRemoveCharacter(char.id)}
-						>
-							Remove
-						</Button>
-					</div>
-				</div>
-			{/each}
-		</div>
-	{/if}
-</div>
+<CampaignCharacters />
 
 <!-- Notes Section -->
 <div class="rounded border bg-card p-4">

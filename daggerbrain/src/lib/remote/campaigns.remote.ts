@@ -10,6 +10,7 @@ import {
 } from '../server/db/campaigns.schema';
 import { characters_table } from '../server/db/characters.schema';
 import { get_db, get_auth, get_kv } from './utils';
+import { get_all_characters } from './characters.remote';
 import type { CampaignState, CampaignCharacterSummary, CampaignWithDetails } from '../types/campaign-types';
 import type { Character } from '../types/character-types';
 import type { DerivedCharacter } from '../types/derived-character-types';
@@ -231,10 +232,7 @@ async function validateAndRebuildCampaignCharacters(
 	const summaries: Record<string, CampaignCharacterSummary> = {};
 	
 	// Build list of KV keys to fetch in parallel
-	const kvKeys = characters.map(char => [
-		`character:${char.id}:campaign`,
-		`character:${char.id}:public`
-	]).flat();
+	const kvKeys = characters.map(char => `character:${char.id}:campaign`);
 	
 	// Fetch all KV entries in parallel
 	const kvResults = await Promise.all(
@@ -245,11 +243,7 @@ async function validateAndRebuildCampaignCharacters(
 	const derivedCharMap = new Map<string, DerivedCharacter>();
 	for (let i = 0; i < characters.length; i++) {
 		const char = characters[i];
-		const campaignIdx = i * 2;
-		const publicIdx = i * 2 + 1;
-		
-		// Prefer campaign KV over public KV (more likely for campaign characters)
-		const derivedChar = (kvResults[campaignIdx] || kvResults[publicIdx]) as DerivedCharacter | null;
+		const derivedChar = kvResults[i] as DerivedCharacter | null;
 		if (derivedChar) {
 			derivedCharMap.set(char.id, derivedChar);
 		}
@@ -282,7 +276,8 @@ async function validateAndRebuildCampaignCharacters(
 			evasion,
 			max_armor,
 			marked_armor: char.marked_armor,
-			damage_thresholds
+			damage_thresholds,
+			claimable: char.claimable === 1
 		};
 	}
 
@@ -436,9 +431,172 @@ export const join_campaign = command(z.string(), async (campaignId) => {
 		throw err;
 	}
 
+	// Refresh the query
+	get_user_campaigns().refresh();
+
 	console.log('joined campaign in D1');
 	return { success: true };
 });
+
+export const claim_character = command(
+	z.object({
+		character_id: z.string(),
+		campaign_id: z.string()
+	}),
+	async ({ character_id, campaign_id }) => {
+		const event = getRequestEvent();
+		const { userId } = get_auth(event);
+		const db = get_db(event);
+
+		// Get character
+		const [character] = await db
+			.select()
+			.from(characters_table)
+			.where(eq(characters_table.id, character_id))
+			.limit(1);
+
+		if (!character) {
+			throw error(404, 'Character not found');
+		}
+
+		// Verify character is claimable
+		if (character.claimable !== 1) {
+			throw error(403, 'This character is not claimable');
+		}
+
+		// Verify character is in the specified campaign
+		if (character.campaign_id !== campaign_id) {
+			throw error(400, 'Character is not in this campaign');
+		}
+
+		// Verify user is a member of the campaign
+		const members = await get_campaign_members(campaign_id);
+		const member = members.find((m) => m.user_id === userId && m.campaign_id === campaign_id);
+		if (!member) {
+			throw error(403, 'You must be a member of the campaign to claim characters');
+		}
+
+		// Verify user is a player (not GM)
+		if (member.role === 'gm') {
+			throw error(403, 'GMs cannot claim characters');
+		}
+
+		// Check if player already has a character in this campaign
+		const existingCampaignCharacters = await db
+			.select()
+			.from(characters_table)
+			.where(
+				and(
+					eq(characters_table.campaign_id, campaign_id),
+					eq(characters_table.clerk_user_id, userId),
+					eq(characters_table.claimable, 0)
+				)
+			)
+			.limit(1);
+
+		if (existingCampaignCharacters.length > 0) {
+			throw error(403, 'You can only claim one character per campaign');
+		}
+
+		// Check if user has reached the character limit
+		const existingCharacters = await db
+			.select()
+			.from(characters_table)
+			.where(eq(characters_table.clerk_user_id, userId));
+
+		if (existingCharacters.length >= 3) {
+			throw error(403, 'Character limit reached. You can only have 3 characters.');
+		}
+
+		const kv = get_kv(event);
+
+		// Update character ownership and set claimable to false
+		await db
+			.update(characters_table)
+			.set({
+				clerk_user_id: userId,
+				claimable: 0
+			})
+			.where(eq(characters_table.id, character_id));
+
+		// Helper to update campaign summary (reuse from assign_character_to_campaign)
+		async function updateCampaignSummary(campaignId: string, characterId: string) {
+			const [char] = await db
+				.select()
+				.from(characters_table)
+				.where(eq(characters_table.id, characterId))
+				.limit(1);
+
+			if (!char || char.campaign_id !== campaignId) {
+				// Character not in this campaign, remove from summary
+				const existing = (await kv.get(`campaign:${campaignId}:characters`, 'json')) as
+					| Record<string, CampaignCharacterSummary>
+					| null;
+				if (existing) {
+					delete existing[characterId];
+					await kv.put(`campaign:${campaignId}:characters`, JSON.stringify(existing), {
+						expirationTtl: undefined
+					});
+				}
+				return;
+			}
+
+			// Character is in campaign - update/add to existing summary
+			const existing = (await kv.get(`campaign:${campaignId}:characters`, 'json')) as
+				| Record<string, CampaignCharacterSummary>
+				| null;
+
+			const summaries = existing || {};
+
+			// Get derived character from KV (campaign)
+			const derivedChar = (await kv.get(`character:${characterId}:campaign`, 'json')) as
+				| DerivedCharacter
+				| null;
+			const max_hp = derivedChar?.derived_max_hp ?? 0;
+			const max_stress = derivedChar?.derived_max_stress ?? 6;
+			const max_hope = derivedChar?.derived_max_hope ?? 6;
+			const evasion = derivedChar?.derived_evasion ?? 0;
+			const max_armor = derivedChar?.derived_max_armor ?? 0;
+			const damage_thresholds = derivedChar?.derived_damage_thresholds ?? { major: 0, severe: 0 };
+
+			// Update/add this character to the summary
+			summaries[characterId] = {
+				id: char.id,
+				name: char.name,
+				image_url: char.image_url,
+				level: char.level,
+				marked_hp: char.marked_hp,
+				max_hp,
+				marked_stress: char.marked_stress,
+				max_stress,
+				marked_hope: char.marked_hope,
+				max_hope,
+				active_conditions: char.active_conditions,
+				owner_user_id: char.clerk_user_id,
+				derived_descriptors: char.derived_descriptors,
+				evasion,
+				max_armor,
+				marked_armor: char.marked_armor,
+				damage_thresholds,
+				claimable: char.claimable === 1
+			};
+
+			await kv.put(`campaign:${campaignId}:characters`, JSON.stringify(summaries), {
+				expirationTtl: undefined
+			});
+		}
+
+		// Update campaign summary
+		await updateCampaignSummary(campaign_id, character_id);
+
+		// Refresh the queries
+		get_campaign_characters(campaign_id).refresh();
+		get_all_characters().refresh();
+
+		console.log('claimed character in D1');
+		return { success: true };
+	}
+);
 
 export const leave_campaign = command(z.string(), async (campaignId) => {
 	const event = getRequestEvent();
@@ -490,6 +648,9 @@ export const leave_campaign = command(z.string(), async (campaignId) => {
 	// Update campaign character summary KV cache to reflect removed characters
 	const kv = get_kv(event);
 	await validateAndRebuildCampaignCharacters(kv, db, campaignId);
+
+	// Refresh the query
+	get_user_campaigns().refresh();
 
 	console.log('left campaign in D1');
 	return { success: true };
@@ -575,9 +736,10 @@ export const update_campaign_state = command(
 export const assign_character_to_campaign = command(
 	z.object({
 		character_id: z.string(),
-		campaign_id: z.string().nullable()
+		campaign_id: z.string().nullable(),
+		claimable: z.boolean().optional()
 	}),
-	async ({ character_id, campaign_id }) => {
+	async ({ character_id, campaign_id, claimable }) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
@@ -609,7 +771,7 @@ export const assign_character_to_campaign = command(
 			}
 		} else {
 			// Assigning character to campaign
-			// Only character owner can assign their character to a campaign
+			// Only character owner can assign their character to a campaign (unless GM is making it claimable)
 			if (!isOwner) {
 				throw error(403, 'Only the character owner can assign characters to campaigns');
 			}
@@ -621,9 +783,9 @@ export const assign_character_to_campaign = command(
 				throw error(403, 'You must be a member of the campaign to assign characters');
 			}
 
-			// GMs cannot assign characters to campaigns
+			// GMs cannot assign characters to campaigns (unless making them claimable)
 			const isGM = await checkIsGM(campaign_id, userId, db);
-			if (isGM) {
+			if (isGM && claimable !== true) {
 				throw error(403, 'GMs cannot assign characters to campaigns');
 			}
 
@@ -636,10 +798,31 @@ export const assign_character_to_campaign = command(
 		const kv = get_kv(event);
 		const oldCampaignId = character.campaign_id;
 
+		// Determine if character should be claimable
+		// If claimable is explicitly set, use that value
+		// Otherwise, preserve existing claimable status if character is already claimable
+		// If character is not claimable and we're assigning to a campaign, check if user is GM
+		let shouldBeClaimable = false;
+		if (claimable !== undefined) {
+			shouldBeClaimable = claimable;
+		} else if (character.claimable === 1) {
+			// Preserve existing claimable status
+			shouldBeClaimable = true;
+		} else if (campaign_id && !isOwner) {
+			// If GM is assigning someone else's character, make it claimable
+			const isGM = await checkIsGM(campaign_id, userId, db);
+			if (isGM) {
+				shouldBeClaimable = true;
+			}
+		}
+
 		// Update character
 		await db
 			.update(characters_table)
-			.set({ campaign_id })
+			.set({ 
+				campaign_id,
+				claimable: shouldBeClaimable ? 1 : 0
+			})
 			.where(eq(characters_table.id, character_id));
 
 		// Helper to update campaign summary (avoid circular import)
@@ -671,13 +854,10 @@ export const assign_character_to_campaign = command(
 			
 			const summaries = existing || {};
 			
-			// Get derived character from KV (try campaign first, then public) - parallel lookup
-			const [derivedCharCampaign, derivedCharPublic] = await Promise.all([
-				kv.get(`character:${characterId}:campaign`, 'json'),
-				kv.get(`character:${characterId}:public`, 'json')
-			]);
-			
-		const derivedChar = (derivedCharCampaign || derivedCharPublic) as DerivedCharacter | null;
+			// Get derived character from KV (campaign)
+			const derivedChar = (await kv.get(`character:${characterId}:campaign`, 'json')) as
+				| DerivedCharacter
+				| null;
 		const max_hp = derivedChar?.derived_max_hp ?? 0;
 		const max_stress = derivedChar?.derived_max_stress ?? 6;
 		const max_hope = derivedChar?.derived_max_hope ?? 6;
@@ -703,7 +883,8 @@ export const assign_character_to_campaign = command(
 			evasion,
 			max_armor,
 			marked_armor: char.marked_armor,
-			damage_thresholds
+			damage_thresholds,
+			claimable: char.claimable === 1
 		};
 
 			await kv.put(`campaign:${campaignId}:characters`, JSON.stringify(summaries), {
@@ -728,6 +909,9 @@ export const assign_character_to_campaign = command(
 		if (campaign_id) {
 			get_campaign_characters(campaign_id).refresh();
 		}
+
+		// Refresh get_all_characters since campaign_id changed, affecting which characters appear in user's list
+		get_all_characters().refresh();
 
 		console.log('assigned character to campaign in D1');
 		return { success: true };

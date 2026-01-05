@@ -65,14 +65,13 @@ export const create_homebrew_class = command(ClassSchema, async (data) => {
 });
 
 export const update_homebrew_class = command(
-	z.object({ id: z.string(), data: ClassSchema, visibility: z.enum(['private', 'public']).optional() }),
-	async ({ id, data, visibility }) => {
+	z.object({ id: z.string(), data: ClassSchema }),
+	async ({ id, data }) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
-		// Get existing item to check previous visibility
+		// Verify ownership
 		const [existing] = await db
 			.select()
 			.from(homebrew_classes)
@@ -83,26 +82,14 @@ export const update_homebrew_class = command(
 			throw error(403, 'Not authorized to update this class');
 		}
 
-		const previousVisibility = existing.visibility;
-		const newVisibility = visibility ?? previousVisibility;
-
 		const validatedData = ClassSchema.parse({ ...data, source_id: 'Homebrew' as const });
 		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db
 			.update(homebrew_classes)
-			.set({ data: validatedData, visibility: newVisibility, updated_at: now })
+			.set({ data: validatedData, updated_at: now })
 			.where(and(eq(homebrew_classes.id, id), eq(homebrew_classes.clerk_user_id, userId)));
-
-		// KV Materialization for public homebrew
-		if (newVisibility === 'public') {
-			await kv.put(`homebrew:class:${id}:public`, JSON.stringify({ type: 'class', data: validatedData, clerk_user_id: userId }), {
-				expirationTtl: undefined
-			});
-		} else if (previousVisibility === 'public' && newVisibility !== 'public') {
-			await kv.delete(`homebrew:class:${id}:public`);
-		}
 
 		console.log('updated homebrew class in D1');
 	}
@@ -112,9 +99,8 @@ export const delete_homebrew_class = command(z.string(), async (id) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
-	// Get existing item to check visibility before deleting
+	// Verify ownership
 	const [existing] = await db
 		.select()
 		.from(homebrew_classes)
@@ -128,11 +114,6 @@ export const delete_homebrew_class = command(z.string(), async (id) => {
 	await db
 		.delete(homebrew_classes)
 		.where(and(eq(homebrew_classes.id, id), eq(homebrew_classes.clerk_user_id, userId)));
-
-	// Clean up KV if it was public
-	if (existing.visibility === 'public') {
-		await kv.delete(`homebrew:class:${id}:public`);
-	}
 
 	// Remove from all campaign vaults
 	await db
@@ -225,14 +206,13 @@ export const create_homebrew_subclass = command(SubclassSchema, async (data) => 
 });
 
 export const update_homebrew_subclass = command(
-	z.object({ id: z.string(), data: SubclassSchema, visibility: z.enum(['private', 'public']).optional() }),
-	async ({ id, data, visibility }) => {
+	z.object({ id: z.string(), data: SubclassSchema }),
+	async ({ id, data }) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
-		// Get existing item to check previous visibility
+		// Verify ownership
 		const [existing] = await db
 			.select()
 			.from(homebrew_subclasses)
@@ -242,9 +222,6 @@ export const update_homebrew_subclass = command(
 		if (!existing || existing.clerk_user_id !== userId) {
 			throw error(403, 'Not authorized to update this subclass');
 		}
-
-		const previousVisibility = existing.visibility;
-		const newVisibility = visibility ?? previousVisibility;
 
 		const validatedData = SubclassSchema.parse({ ...data, source_id: 'Homebrew' as const });
 		validatedData.compendium_id = id;
@@ -273,17 +250,8 @@ export const update_homebrew_subclass = command(
 
 		await db
 			.update(homebrew_subclasses)
-			.set({ data: validatedData, visibility: newVisibility, updated_at: now })
+			.set({ data: validatedData, updated_at: now })
 			.where(and(eq(homebrew_subclasses.id, id), eq(homebrew_subclasses.clerk_user_id, userId)));
-
-		// KV Materialization for public homebrew
-		if (newVisibility === 'public') {
-			await kv.put(`homebrew:subclass:${id}:public`, JSON.stringify({ type: 'subclass', data: validatedData, clerk_user_id: userId }), {
-				expirationTtl: undefined
-			});
-		} else if (previousVisibility === 'public' && newVisibility !== 'public') {
-			await kv.delete(`homebrew:subclass:${id}:public`);
-		}
 
 		console.log('updated homebrew subclass in D1');
 	}
@@ -293,9 +261,8 @@ export const delete_homebrew_subclass = command(z.string(), async (id) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
-	// Get existing item to check visibility before deleting
+	// Verify ownership
 	const [existing] = await db
 		.select()
 		.from(homebrew_subclasses)
@@ -309,11 +276,6 @@ export const delete_homebrew_subclass = command(z.string(), async (id) => {
 	await db
 		.delete(homebrew_subclasses)
 		.where(and(eq(homebrew_subclasses.id, id), eq(homebrew_subclasses.clerk_user_id, userId)));
-
-	// Clean up KV if it was public
-	if (existing.visibility === 'public') {
-		await kv.delete(`homebrew:subclass:${id}:public`);
-	}
 
 	// Remove from all campaign vaults
 	await db

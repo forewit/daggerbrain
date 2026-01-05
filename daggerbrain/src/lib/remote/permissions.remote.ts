@@ -45,11 +45,6 @@ export const can_view_character = query(z.string(), async (characterId): Promise
 		return true;
 	}
 
-	// Public characters can be viewed by anyone
-	if (character.visibility === 'public') {
-		return true;
-	}
-
 	// Campaign members can view characters in their campaign
 	if (character.campaign_id) {
 		const [campaignMembership] = await db
@@ -141,8 +136,7 @@ export const can_view_homebrew = query(
 		const db = get_db(event);
 
 		// Fetch homebrew based on type
-		let homebrew: { clerk_user_id: string; visibility: string; campaign_id: string | null } | null =
-			null;
+		let homebrew: { clerk_user_id: string; campaign_id: string | null } | null = null;
 
 		switch (homebrewType) {
 			case 'classes': {
@@ -270,11 +264,6 @@ export const can_view_homebrew = query(
 
 		// Owner can always view
 		if (homebrew.clerk_user_id === userId) {
-			return true;
-		}
-
-		// Public homebrew can be viewed by anyone
-		if (homebrew.visibility === 'public') {
 			return true;
 		}
 
@@ -509,6 +498,109 @@ export const is_campaign_member = query(
 			.where(eq(campaign_members_table.campaign_id, campaignId));
 
 		return members.some((m) => m.user_id === userId && m.campaign_id === campaignId);
+	}
+);
+
+/**
+ * Check if a user already has a character in a campaign
+ */
+export const has_character_in_campaign = query(
+	z.object({
+		campaignId: z.string(),
+		userId: z.string().optional() // Optional, will use authenticated user if not provided
+	}),
+	async ({ campaignId, userId: providedUserId }): Promise<boolean> => {
+		const event = getRequestEvent();
+		const { userId: authUserId } = get_auth(event);
+		const userId = providedUserId || authUserId;
+		const db = get_db(event);
+
+		if (!userId) return false;
+
+		const existingCharacters = await db
+			.select()
+			.from(characters_table)
+			.where(
+				and(
+					eq(characters_table.campaign_id, campaignId),
+					eq(characters_table.clerk_user_id, userId),
+					eq(characters_table.claimable, 0)
+				)
+			)
+			.limit(1);
+
+		return existingCharacters.length > 0;
+	}
+);
+
+/**
+ * Check if a user can claim a character
+ */
+export const can_claim_character = query(
+	z.object({
+		characterId: z.string(),
+		campaignId: z.string()
+	}),
+	async ({ characterId, campaignId }): Promise<boolean> => {
+		const event = getRequestEvent();
+		const { userId } = get_auth(event);
+		const db = get_db(event);
+
+		// Get the character
+		const [character] = await db
+			.select()
+			.from(characters_table)
+			.where(eq(characters_table.id, characterId))
+			.limit(1);
+
+		if (!character) {
+			return false;
+		}
+
+		// Character must be claimable
+		if (character.claimable !== 1) {
+			return false;
+		}
+
+		// Character must be in the specified campaign
+		if (character.campaign_id !== campaignId) {
+			return false;
+		}
+
+		// Verify user is a member of the campaign
+		const members = await db
+			.select()
+			.from(campaign_members_table)
+			.where(eq(campaign_members_table.campaign_id, campaignId));
+
+		const member = members.find((m) => m.user_id === userId && m.campaign_id === campaignId);
+		if (!member) {
+			return false;
+		}
+
+		// User must be a player (not GM)
+		if (member.role === 'gm') {
+			return false;
+		}
+
+		// Player must not already have a character in this campaign
+		const existingCharacters = await db
+			.select()
+			.from(characters_table)
+			.where(
+				and(
+					eq(characters_table.campaign_id, campaignId),
+					eq(characters_table.clerk_user_id, userId),
+					eq(characters_table.claimable, 0)
+				)
+			)
+			.limit(1);
+
+		if (existingCharacters.length > 0) {
+			return false;
+		}
+
+		return true;
 	}
 );
 

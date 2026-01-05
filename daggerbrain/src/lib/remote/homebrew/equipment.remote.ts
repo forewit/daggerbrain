@@ -60,7 +60,6 @@ export const create_homebrew_primary_weapon = command(WeaponSchema, async (data)
 		validatedData.compendium_id = id;
 		const now = Date.now();
 
-		// Visibility defaults to 'private' per schema
 		await db.insert(homebrew_primary_weapons).values({
 			id,
 			clerk_user_id: userId,
@@ -68,8 +67,6 @@ export const create_homebrew_primary_weapon = command(WeaponSchema, async (data)
 			created_at: now,
 			updated_at: now
 		});
-
-		// Note: KV materialization happens in update function when visibility is set to 'public'
 
 		// refresh the primary weapons query
 		get_homebrew_primary_weapons().refresh();
@@ -80,14 +77,13 @@ export const create_homebrew_primary_weapon = command(WeaponSchema, async (data)
 );
 
 export const update_homebrew_primary_weapon = command(
-	z.object({ id: z.string(), data: WeaponSchema, visibility: z.enum(['private', 'public']).optional() }),
-	async ({ id, data, visibility }) => {
+	z.object({ id: z.string(), data: WeaponSchema }),
+	async ({ id, data }) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
-		// Get existing item to check previous visibility
+		// Verify ownership
 		const [existing] = await db
 			.select()
 			.from(homebrew_primary_weapons)
@@ -98,29 +94,16 @@ export const update_homebrew_primary_weapon = command(
 			throw error(403, 'Not authorized to update this weapon');
 		}
 
-		const previousVisibility = existing.visibility;
-		const newVisibility = visibility ?? previousVisibility;
-
 		const validatedData = WeaponSchema.parse({ ...data, source_id: 'Homebrew' as const });
 		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db
 			.update(homebrew_primary_weapons)
-			.set({ data: validatedData, visibility: newVisibility, updated_at: now })
+			.set({ data: validatedData, updated_at: now })
 			.where(
 				and(eq(homebrew_primary_weapons.id, id), eq(homebrew_primary_weapons.clerk_user_id, userId))
 			);
-
-		// KV Materialization for public homebrew
-		if (newVisibility === 'public') {
-			await kv.put(`homebrew:weapon:${id}:public`, JSON.stringify({ type: 'weapon', data: validatedData, is_primary: true, clerk_user_id: userId }), {
-				expirationTtl: undefined
-			});
-		} else if (previousVisibility === 'public' && newVisibility !== 'public') {
-			// Remove from KV if visibility changed from public to private
-			await kv.delete(`homebrew:weapon:${id}:public`);
-		}
 
 		console.log('updated homebrew primary weapon in D1');
 	}
@@ -130,9 +113,8 @@ export const delete_homebrew_primary_weapon = command(z.string(), async (id) => 
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
-	// Get existing item to check visibility before deleting
+	// Verify ownership
 	const [existing] = await db
 		.select()
 		.from(homebrew_primary_weapons)
@@ -148,11 +130,6 @@ export const delete_homebrew_primary_weapon = command(z.string(), async (id) => 
 		.where(
 			and(eq(homebrew_primary_weapons.id, id), eq(homebrew_primary_weapons.clerk_user_id, userId))
 		);
-
-	// Clean up KV if it was public
-	if (existing.visibility === 'public') {
-		await kv.delete(`homebrew:weapon:${id}:public`);
-	}
 
 	// Remove from all campaign vaults
 	await db
@@ -224,14 +201,13 @@ export const create_homebrew_secondary_weapon = command(WeaponSchema, async (dat
 });
 
 export const update_homebrew_secondary_weapon = command(
-	z.object({ id: z.string(), data: WeaponSchema, visibility: z.enum(['private', 'public']).optional() }),
-	async ({ id, data, visibility }) => {
+	z.object({ id: z.string(), data: WeaponSchema }),
+	async ({ id, data }) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
-		// Get existing item to check previous visibility
+		// Verify ownership
 		const [existing] = await db
 			.select()
 			.from(homebrew_secondary_weapons)
@@ -242,32 +218,19 @@ export const update_homebrew_secondary_weapon = command(
 			throw error(403, 'Not authorized to update this weapon');
 		}
 
-		const previousVisibility = existing.visibility;
-		const newVisibility = visibility ?? previousVisibility;
-
 		const validatedData = WeaponSchema.parse({ ...data, source_id: 'Homebrew' as const });
 		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db
 			.update(homebrew_secondary_weapons)
-			.set({ data: validatedData, visibility: newVisibility, updated_at: now })
+			.set({ data: validatedData, updated_at: now })
 			.where(
 				and(
 					eq(homebrew_secondary_weapons.id, id),
 					eq(homebrew_secondary_weapons.clerk_user_id, userId)
 				)
 			);
-
-		// KV Materialization for public homebrew
-		if (newVisibility === 'public') {
-			await kv.put(`homebrew:weapon:${id}:public`, JSON.stringify({ type: 'weapon', data: validatedData, is_primary: false, clerk_user_id: userId }), {
-				expirationTtl: undefined
-			});
-		} else if (previousVisibility === 'public' && newVisibility !== 'public') {
-			// Remove from KV if visibility changed from public to private
-			await kv.delete(`homebrew:weapon:${id}:public`);
-		}
 
 		console.log('updated homebrew secondary weapon in D1');
 	}
@@ -277,9 +240,8 @@ export const delete_homebrew_secondary_weapon = command(z.string(), async (id) =
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
-	// Get existing item to check visibility before deleting
+	// Verify ownership
 	const [existing] = await db
 		.select()
 		.from(homebrew_secondary_weapons)
@@ -298,11 +260,6 @@ export const delete_homebrew_secondary_weapon = command(z.string(), async (id) =
 				eq(homebrew_secondary_weapons.clerk_user_id, userId)
 			)
 		);
-
-	// Clean up KV if it was public
-	if (existing.visibility === 'public') {
-		await kv.delete(`homebrew:weapon:${id}:public`);
-	}
 
 	// Remove from all campaign vaults
 	await db
@@ -374,14 +331,13 @@ export const create_homebrew_armor = command(ArmorSchema, async (data) => {
 });
 
 export const update_homebrew_armor = command(
-	z.object({ id: z.string(), data: ArmorSchema, visibility: z.enum(['private', 'public']).optional() }),
-	async ({ id, data, visibility }) => {
+	z.object({ id: z.string(), data: ArmorSchema }),
+	async ({ id, data }) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
-		// Get existing item to check previous visibility
+		// Verify ownership
 		const [existing] = await db
 			.select()
 			.from(homebrew_armor)
@@ -392,26 +348,14 @@ export const update_homebrew_armor = command(
 			throw error(403, 'Not authorized to update this armor');
 		}
 
-		const previousVisibility = existing.visibility;
-		const newVisibility = visibility ?? previousVisibility;
-
 		const validatedData = ArmorSchema.parse({ ...data, source_id: 'Homebrew' as const });
 		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db
 			.update(homebrew_armor)
-			.set({ data: validatedData, visibility: newVisibility, updated_at: now })
+			.set({ data: validatedData, updated_at: now })
 			.where(and(eq(homebrew_armor.id, id), eq(homebrew_armor.clerk_user_id, userId)));
-
-		// KV Materialization for public homebrew
-		if (newVisibility === 'public') {
-			await kv.put(`homebrew:armor:${id}:public`, JSON.stringify({ type: 'armor', data: validatedData, clerk_user_id: userId }), {
-				expirationTtl: undefined
-			});
-		} else if (previousVisibility === 'public' && newVisibility !== 'public') {
-			await kv.delete(`homebrew:armor:${id}:public`);
-		}
 
 		console.log('updated homebrew armor in D1');
 	}
@@ -421,9 +365,8 @@ export const delete_homebrew_armor = command(z.string(), async (id) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
-	// Get existing item to check visibility before deleting
+	// Verify ownership
 	const [existing] = await db
 		.select()
 		.from(homebrew_armor)
@@ -437,11 +380,6 @@ export const delete_homebrew_armor = command(z.string(), async (id) => {
 	await db
 		.delete(homebrew_armor)
 		.where(and(eq(homebrew_armor.id, id), eq(homebrew_armor.clerk_user_id, userId)));
-
-	// Clean up KV if it was public
-	if (existing.visibility === 'public') {
-		await kv.delete(`homebrew:armor:${id}:public`);
-	}
 
 	// Remove from all campaign vaults
 	await db
@@ -513,14 +451,13 @@ export const create_homebrew_loot = command(LootSchema, async (data) => {
 });
 
 export const update_homebrew_loot = command(
-	z.object({ id: z.string(), data: LootSchema, visibility: z.enum(['private', 'public']).optional() }),
-	async ({ id, data, visibility }) => {
+	z.object({ id: z.string(), data: LootSchema }),
+	async ({ id, data }) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
-		// Get existing item to check previous visibility
+		// Verify ownership
 		const [existing] = await db
 			.select()
 			.from(homebrew_loot)
@@ -531,26 +468,14 @@ export const update_homebrew_loot = command(
 			throw error(403, 'Not authorized to update this loot');
 		}
 
-		const previousVisibility = existing.visibility;
-		const newVisibility = visibility ?? previousVisibility;
-
 		const validatedData = LootSchema.parse({ ...data, source_id: 'Homebrew' as const });
 		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db
 			.update(homebrew_loot)
-			.set({ data: validatedData, visibility: newVisibility, updated_at: now })
+			.set({ data: validatedData, updated_at: now })
 			.where(and(eq(homebrew_loot.id, id), eq(homebrew_loot.clerk_user_id, userId)));
-
-		// KV Materialization for public homebrew
-		if (newVisibility === 'public') {
-			await kv.put(`homebrew:loot:${id}:public`, JSON.stringify({ type: 'loot', data: validatedData, clerk_user_id: userId }), {
-				expirationTtl: undefined
-			});
-		} else if (previousVisibility === 'public' && newVisibility !== 'public') {
-			await kv.delete(`homebrew:loot:${id}:public`);
-		}
 
 		console.log('updated homebrew loot');
 	}
@@ -560,9 +485,8 @@ export const delete_homebrew_loot = command(z.string(), async (id) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
-	// Get existing item to check visibility before deleting
+	// Verify ownership
 	const [existing] = await db
 		.select()
 		.from(homebrew_loot)
@@ -576,11 +500,6 @@ export const delete_homebrew_loot = command(z.string(), async (id) => {
 	await db
 		.delete(homebrew_loot)
 		.where(and(eq(homebrew_loot.id, id), eq(homebrew_loot.clerk_user_id, userId)));
-
-	// Clean up KV if it was public
-	if (existing.visibility === 'public') {
-		await kv.delete(`homebrew:loot:${id}:public`);
-	}
 
 	// Remove from all campaign vaults
 	await db
@@ -652,14 +571,13 @@ export const create_homebrew_consumable = command(ConsumableSchema, async (data)
 });
 
 export const update_homebrew_consumable = command(
-	z.object({ id: z.string(), data: ConsumableSchema, visibility: z.enum(['private', 'public']).optional() }),
-	async ({ id, data, visibility }) => {
+	z.object({ id: z.string(), data: ConsumableSchema }),
+	async ({ id, data }) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
-		// Get existing item to check previous visibility
+		// Verify ownership
 		const [existing] = await db
 			.select()
 			.from(homebrew_consumables)
@@ -670,26 +588,14 @@ export const update_homebrew_consumable = command(
 			throw error(403, 'Not authorized to update this consumable');
 		}
 
-		const previousVisibility = existing.visibility;
-		const newVisibility = visibility ?? previousVisibility;
-
 		const validatedData = ConsumableSchema.parse({ ...data, source_id: 'Homebrew' as const });
 		validatedData.compendium_id = id;
 		const now = Date.now();
 
 		await db
 			.update(homebrew_consumables)
-			.set({ data: validatedData, visibility: newVisibility, updated_at: now })
+			.set({ data: validatedData, updated_at: now })
 			.where(and(eq(homebrew_consumables.id, id), eq(homebrew_consumables.clerk_user_id, userId)));
-
-		// KV Materialization for public homebrew
-		if (newVisibility === 'public') {
-			await kv.put(`homebrew:consumable:${id}:public`, JSON.stringify({ type: 'consumable', data: validatedData, clerk_user_id: userId }), {
-				expirationTtl: undefined
-			});
-		} else if (previousVisibility === 'public' && newVisibility !== 'public') {
-			await kv.delete(`homebrew:consumable:${id}:public`);
-		}
 
 		console.log('updated homebrew consumable');
 	}
@@ -699,9 +605,8 @@ export const delete_homebrew_consumable = command(z.string(), async (id) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
-	// Get existing item to check visibility before deleting
+	// Verify ownership
 	const [existing] = await db
 		.select()
 		.from(homebrew_consumables)
@@ -715,11 +620,6 @@ export const delete_homebrew_consumable = command(z.string(), async (id) => {
 	await db
 		.delete(homebrew_consumables)
 		.where(and(eq(homebrew_consumables.id, id), eq(homebrew_consumables.clerk_user_id, userId)));
-
-	// Clean up KV if it was public
-	if (existing.visibility === 'public') {
-		await kv.delete(`homebrew:consumable:${id}:public`);
-	}
 
 	// Remove from all campaign vaults
 	await db
