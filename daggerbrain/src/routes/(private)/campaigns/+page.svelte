@@ -135,67 +135,73 @@
 						Create your first campaign!
 					</Button>
 				{:else}
-					<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 items-end">
+					<div class="grid grid-cols-1 items-end gap-6 sm:grid-cols-2 lg:grid-cols-3">
 						{#each campaigns as campaign}
-							
-						<div class="mx-auto w-full max-w-[500px]">
-						<!-- Character Images -->
-							{#if campaign.character_images.length > 0}
-								<a href={`/campaigns/${campaign.id}/`} class="-mb-6 flex mx-auto flex-wrap justify-center gap-2">
-									{#each campaign.character_images as imageUrl}
-										<div class="z-10 h-12 w-12 shrink-0 overflow-hidden rounded border-2 bg-card">
-											<img
-												src={imageUrl || '/images/portrait-placeholder.png'}
-												alt="Character"
-												class="h-full w-full object-cover"
-											/>
-										</div>
-									{/each}
+							<div class="mx-auto w-full max-w-[500px]">
+								<!-- Character Images -->
+								{#if campaign.character_images.length > 0}
+									<a
+										href={`/campaigns/${campaign.id}/`}
+										class="mx-auto -mb-6 flex flex-wrap justify-center gap-2"
+									>
+										{#each campaign.character_images as imageUrl}
+											<div class="z-10 h-12 w-12 shrink-0 overflow-hidden rounded border-2 bg-card">
+												<img
+													src={imageUrl || '/images/portrait-placeholder.png'}
+													alt="Character"
+													class="h-full w-full object-cover"
+												/>
+											</div>
+										{/each}
 									</a>
-							{/if}
+								{/if}
 
-							<a href={`/campaigns/${campaign.id}/`} class="block w-full rounded border bg-card hover:bg-card/80 h-[180px] overflow-hidden flex flex-col">
-								
-								<div class="grow">
-								<!-- Campaign Title -->
-								<div
-									class={cn(
-										'px-4 pb-1.5 text-center',
-										campaign.character_images.length > 0 ? 'pt-8' : 'pt-6'
-									)}
+								<a
+									href={`/campaigns/${campaign.id}/`}
+									class="block flex h-[148px] w-full flex-col overflow-hidden rounded-t border bg-card hover:bg-card/80"
 								>
-									<p class="text-xl font-bold truncate">{campaign.name}</p>
-								</div>
+									<div class="grow">
+										<!-- Campaign Title -->
+										<div
+											class={cn(
+												'px-4 pb-1.5 text-center',
+												campaign.character_images.length > 0 ? 'pt-8' : 'pt-6'
+											)}
+										>
+											<p class="truncate text-xl font-bold">{campaign.name}</p>
+										</div>
 
-								<!-- Start Date -->
-								<div class="px-4 pb-5 text-center">
-									<p class="text-xs font-medium text-muted-foreground">
-										Campaign Started {formatDate(campaign.created_at)}
-									</p>
-								</div>
-							</div>
-
-								<div class="flex items-center justify-center gap-4 px-4 pb-5">
-									<!-- Player Count -->
-									<div class="flex items-center gap-2 text-center">
-										<p class="text-[10px] font-medium text-muted-foreground uppercase">Players</p>
-
-										<p class="text- flex font-eveleth">
-											{campaign.player_count}
-										</p>
+										<!-- Start Date -->
+										<div class="px-4 pb-5 text-center">
+											<p class="text-xs font-medium text-muted-foreground">
+												Campaign Started {formatDate(campaign.created_at)}
+											</p>
+										</div>
 									</div>
 
-									<!-- role -->
-									<div class="flex items-center gap-2 text-center">
-										<p class="text-[10px] font-medium text-muted-foreground uppercase">Role</p>
-										<p class="flex font-eveleth text-xs">
-											{campaign.user_role === 'gm' ? 'Game Master' : 'Player'}
-										</p>
-									</div>
-								</div>
+									<div class="flex items-center justify-center gap-4 px-4 pb-5">
+										<!-- Player Count -->
+										<div class="flex items-center gap-2 text-center">
+											<p class="text-[10px] font-medium text-muted-foreground uppercase">Players</p>
 
+											<p class="text- flex font-eveleth">
+												{campaign.player_count}
+											</p>
+										</div>
+
+										<!-- role -->
+										<div class="flex items-center gap-2 text-center">
+											<p class="text-[10px] font-medium text-muted-foreground uppercase">Role</p>
+											<p class="flex font-eveleth text-xs">
+												{campaign.user_role === 'gm' ? 'Game Master' : 'Player'}
+											</p>
+										</div>
+									</div>
+
+									
+								</a>
 								<!-- Action Buttons -->
-								<div class="flex border-t bg-muted">
+								<div class="flex border-t bg-muted rounded-b overflow-hidden">
 									<Button
 										variant="ghost"
 										size="sm"
@@ -226,7 +232,6 @@
 										</Button>
 									{/if}
 								</div>
-							</a>
 							</div>
 						{/each}
 					</div>
