@@ -40,6 +40,8 @@ import { BLANK_LEVEL_UP_CHOICE } from '$lib/types/constants';
 import { update_character } from '$lib/remote/characters.remote';
 import { getCompendiumContext } from './compendium.svelte';
 import { increaseDie, increase_range } from '$lib/utils';
+import { createCampaignLiveConnection } from './campaign-live.svelte';
+import type { CampaignLiveWebSocketMessage } from '$lib/types/campaign-types';
 
 function createCharacter(id: string) {
 	const user = getUserContext();
@@ -3398,6 +3400,94 @@ function createCharacter(id: string) {
 	} | null>(null);
 	let inFlightCampaignSave: Promise<void> | null = null;
 
+	// WebSocket connection for campaign live updates
+	let wsConnection = $state<ReturnType<typeof createCampaignLiveConnection> | null>(null);
+	let currentCampaignId = $state<string | null>(null);
+
+	// WebSocket connection lifecycle management
+	$effect(() => {
+		if (!character || !initialLoadComplete) {
+			// Disconnect if character is not loaded
+			if (wsConnection) {
+				wsConnection.disconnect();
+				wsConnection = null;
+				currentCampaignId = null;
+			}
+			return;
+		}
+
+		const campaignId = character.campaign_id;
+		const existingConnection = wsConnection; // Store reference before potential nullification
+
+		// Only connect if character is in a campaign
+		if (campaignId) {
+			// Check if connection already exists and is active (similar to campaign context)
+			// This check must happen FIRST to prevent duplicate connections
+			if (existingConnection && (existingConnection.connected || existingConnection.status === 'connecting' || existingConnection.status === 'reconnecting')) {
+				// Update currentCampaignId to match (in case it was out of sync)
+				if (currentCampaignId !== campaignId) {
+					currentCampaignId = campaignId;
+				}
+				return;
+			}
+		}
+
+		// If campaign_id changed, disconnect old connection and connect to new one
+		if (campaignId !== currentCampaignId) {
+			// Disconnect old connection if it exists
+			if (existingConnection) {
+				existingConnection.disconnect();
+				wsConnection = null;
+			}
+
+			// Update current campaign ID IMMEDIATELY (before creating connection) to prevent cleanup from resetting it
+			currentCampaignId = campaignId;
+
+			// Only connect if character is in a campaign
+			if (campaignId) {
+				wsConnection = createCampaignLiveConnection(campaignId);
+				
+				// Handle incoming messages (for multi-user sync) - set this before connecting
+				wsConnection.onMessage((message: CampaignLiveWebSocketMessage) => {
+					if (!character) return;
+					
+					if (message.type === 'character_update' && message.characterId === character.id) {
+						// Update character stats from live update (for multi-user scenarios)
+						// Only update if the character exists and we're not the one making the change
+						if (message.character) {
+							// Merge live updates into character state
+							if (message.character.marked_hp !== undefined) {
+								character.marked_hp = message.character.marked_hp;
+							}
+							if (message.character.marked_stress !== undefined) {
+								character.marked_stress = message.character.marked_stress;
+							}
+							if (message.character.marked_hope !== undefined) {
+								character.marked_hope = message.character.marked_hope;
+							}
+							if (message.character.marked_armor !== undefined) {
+								character.marked_armor = message.character.marked_armor;
+							}
+							if (message.character.active_conditions !== undefined) {
+								character.active_conditions = message.character.active_conditions as typeof character.active_conditions;
+							}
+						}
+					}
+				});
+				
+				// Connect after setting up message handler
+				wsConnection.connect();
+			} else {
+				// Character is not in a campaign, ensure we're disconnected
+				currentCampaignId = null;
+			}
+		}
+
+		// No cleanup function - we handle disconnection explicitly in the effect body
+		// The cleanup function was causing a loop because it runs on every effect re-run
+		// and was resetting currentCampaignId before it could be used
+	});
+
 	// Immediate campaign stats update effect (for real-time campaign updates)
 	$effect(() => {
 		if (!character || !initialLoadComplete || !character.campaign_id) {
@@ -3429,20 +3519,36 @@ function createCharacter(id: string) {
 			return;
 		}
 
-		// Update immediately (no debounce for campaign stats)
-		const savePromise = import('$lib/remote/characters.remote')
-			.then(({ update_character_campaign_stats }) => {
-				return update_character_campaign_stats({
-					character_id: character!.id,
+		// Update D1/KV via update_character (handles persistence)
+		// Note: derived_character is not required for campaign characters, only for public
+		// The server will update the campaign summary using existing derived_character from KV
+		if (!character) return;
+		
+		const savePromise = update_character({
+			...character,
 					marked_hp: currentStats.marked_hp,
 					marked_stress: currentStats.marked_stress,
 					marked_hope: currentStats.marked_hope,
 					active_conditions: currentStats.active_conditions
-				});
 			})
 			.then(() => {
 				// Update last saved stats after successful save
 				lastSavedCampaignStats = currentStats;
+
+				// Send WebSocket update for real-time sync (if connected)
+				if (wsConnection && wsConnection.connected && character && character.campaign_id && user.user?.clerk_id) {
+					wsConnection.send({
+						type: 'update_character',
+						characterId: character.id,
+						userId: user.user.clerk_id,
+						updates: {
+							marked_hp: currentStats.marked_hp,
+							marked_stress: currentStats.marked_stress,
+							marked_hope: currentStats.marked_hope,
+							active_conditions: currentStats.active_conditions
+						}
+					});
+				}
 			})
 			.catch((error) => {
 				console.error('Failed to update campaign stats:', error);

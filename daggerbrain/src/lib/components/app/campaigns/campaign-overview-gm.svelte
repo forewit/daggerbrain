@@ -9,7 +9,7 @@
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import Copy from '@lucide/svelte/icons/copy';
-	import ExternalLink from '@lucide/svelte/icons/external-link';
+	import Rocket from '@lucide/svelte/icons/rocket';
 	import Settings from '@lucide/svelte/icons/settings';
 	import { UseClipboard } from '$lib/hooks/use-clipboard.svelte';
 	import { toast } from 'svelte-sonner';
@@ -270,7 +270,7 @@
 	<div class="flex items-center gap-2">
 		<Button variant="outline" size="sm" href={`/campaigns/${campaignId}/live`}>
 			Launch
-			<ExternalLink class="size-3.5" />
+			<Rocket class="size-3.5" />
 		</Button>
 		{#if onOpenSettings}
 			<Button

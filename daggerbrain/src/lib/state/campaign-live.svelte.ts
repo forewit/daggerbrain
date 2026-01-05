@@ -10,17 +10,27 @@ export function createCampaignLiveConnection(campaignId: string) {
   let isConnecting = $state(false);
   let messageHandler: ((message: CampaignLiveWebSocketMessage) => void) | null = null;
   let lastKnownVersion = $state<number | undefined>(undefined);
+  let shouldReconnect = $state(true); // Flag to prevent reconnection after explicit disconnect
   const maxReconnectDelay = 30000; // 30 seconds
 
   function connect() {
     // Prevent multiple simultaneous connection attempts
-    if (ws?.readyState === WebSocket.OPEN) return;
+    if (ws?.readyState === WebSocket.OPEN) {
+      return;
+    }
     if (isConnecting) {
+      return;
+    }
+    
+    // Don't connect if we've been explicitly disconnected
+    if (!shouldReconnect) {
       return;
     }
     
     isConnecting = true;
     status = 'connecting';
+    shouldReconnect = true; // Allow reconnection when connecting
+    
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const url = `${protocol}//${window.location.host}/api/campaigns/${campaignId}/live`;
     
@@ -69,13 +79,19 @@ export function createCampaignLiveConnection(campaignId: string) {
         isConnecting = false;
         status = 'disconnected';
         ws = null;
-        scheduleReconnect();
+        // Only reconnect if we haven't been explicitly disconnected
+        if (shouldReconnect) {
+          scheduleReconnect();
+        }
       };
       
       websocket.onerror = (event) => {
         isConnecting = false;
         status = 'disconnected';
-        scheduleReconnect();
+        // Only reconnect if we haven't been explicitly disconnected
+        if (shouldReconnect) {
+          scheduleReconnect();
+        }
       };
       
       ws = websocket;
@@ -83,12 +99,16 @@ export function createCampaignLiveConnection(campaignId: string) {
       isConnecting = false;
       console.error('Failed to create WebSocket:', error);
       status = 'disconnected';
-      scheduleReconnect();
+      // Only reconnect if we haven't been explicitly disconnected
+      if (shouldReconnect) {
+        scheduleReconnect();
+      }
     }
   }
 
   function scheduleReconnect() {
     if (reconnectTimeout) return;
+    if (!shouldReconnect) return; // Don't reconnect if explicitly disconnected
     
     const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), maxReconnectDelay);
     reconnectAttempts++;
@@ -96,11 +116,14 @@ export function createCampaignLiveConnection(campaignId: string) {
     
     reconnectTimeout = setTimeout(() => {
       reconnectTimeout = null;
-      connect();
+      if (shouldReconnect) {
+        connect();
+      }
     }, delay);
   }
 
   function disconnect() {
+    shouldReconnect = false; // Prevent reconnection
     if (reconnectTimeout) {
       clearTimeout(reconnectTimeout);
       reconnectTimeout = null;

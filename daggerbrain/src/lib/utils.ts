@@ -143,3 +143,21 @@ export function tier_to_min_level(tier: number): number {
 	if (tier === 3) return 5;
 	return 8; // tier 4
 }
+
+/**
+ * Formats a timestamp (milliseconds since epoch) as "Jan 4, 2026"
+ *
+ * @param timestamp - The timestamp in milliseconds
+ * @returns The formatted date string (e.g., "Jan 4, 2026")
+ *
+ * @example
+ * formatDate(1573516800000) // "Nov 12, 2019"
+ */
+export function formatDate(timestamp: number): string {
+	const date = new Date(timestamp);
+	const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+	const month = monthNames[date.getMonth()];
+	const day = date.getDate();
+	const year = date.getFullYear();
+	return `${month} ${day}, ${year}`;
+}

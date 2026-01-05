@@ -7,6 +7,7 @@
 	import * as Label from '$lib/components/ui/label';
 	import Plus from '@lucide/svelte/icons/plus';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
+	import Rocket from '@lucide/svelte/icons/rocket';
 	import { goto } from '$app/navigation';
 	import { error } from '@sveltejs/kit';
 	import Footer from '$lib/components/app/footer.svelte';
@@ -16,11 +17,12 @@
 		delete_campaign
 	} from '$lib/remote/campaigns.remote';
 	import { getUserContext } from '$lib/state/user.svelte';
-	import type { Campaign } from '$lib/types/campaign-types';
+	import type { CampaignWithDetails } from '$lib/types/campaign-types';
+	import { formatDate } from '$lib/utils';
 
 	const user = getUserContext();
 
-	let campaigns = $state<Campaign[]>([]);
+	let campaigns = $state<CampaignWithDetails[]>([]);
 	let loading = $state(true);
 	let creatingCampaign = $state(false);
 
@@ -97,8 +99,8 @@
 	}
 
 	// Helper to check if user is GM of a campaign
-	function isGM(campaign: Campaign): boolean {
-		return user.user?.clerk_id === campaign.gm_user_id;
+	function isGM(campaign: CampaignWithDetails): boolean {
+		return campaign.user_role === 'gm';
 	}
 </script>
 
@@ -133,50 +135,98 @@
 						Create your first campaign!
 					</Button>
 				{:else}
-					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+					<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 items-end">
 						{#each campaigns as campaign}
-							<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
-								<a
-									href={`/campaigns/${campaign.id}/`}
-									class="flex gap-2 border bg-primary-muted p-1 hover:bg-primary-muted/80"
+							
+						<div class="mx-auto w-full max-w-[500px]">
+						<!-- Character Images -->
+							{#if campaign.character_images.length > 0}
+								<a href={`/campaigns/${campaign.id}/`} class="-mb-6 flex mx-auto flex-wrap justify-center gap-2">
+									{#each campaign.character_images as imageUrl}
+										<div class="z-10 h-12 w-12 shrink-0 overflow-hidden rounded border-2 bg-card">
+											<img
+												src={imageUrl || '/images/portrait-placeholder.png'}
+												alt="Character"
+												class="h-full w-full object-cover"
+											/>
+										</div>
+									{/each}
+									</a>
+							{/if}
+
+							<a href={`/campaigns/${campaign.id}/`} class="block w-full rounded border bg-card hover:bg-card/80 h-[180px] overflow-hidden flex flex-col">
+								
+								<div class="grow">
+								<!-- Campaign Title -->
+								<div
+									class={cn(
+										'px-4 pb-1.5 text-center',
+										campaign.character_images.length > 0 ? 'pt-8' : 'pt-6'
+									)}
 								>
-									<div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-muted flex items-center justify-center">
-										<span class="text-2xl">📜</span>
-									</div>
-									<div class="truncate">
-										<p class="mt-1 truncate text-lg font-bold">
-											{campaign.name}
+									<p class="text-xl font-bold truncate">{campaign.name}</p>
+								</div>
+
+								<!-- Start Date -->
+								<div class="px-4 pb-5 text-center">
+									<p class="text-xs font-medium text-muted-foreground">
+										Campaign Started {formatDate(campaign.created_at)}
+									</p>
+								</div>
+							</div>
+
+								<div class="flex items-center justify-center gap-4 px-4 pb-5">
+									<!-- Player Count -->
+									<div class="flex items-center gap-2 text-center">
+										<p class="text-[10px] font-medium text-muted-foreground uppercase">Players</p>
+
+										<p class="text- flex font-eveleth">
+											{campaign.player_count}
 										</p>
-										{#if campaign.description}
-											<p class="mt-1 truncate text-xs text-muted-foreground line-clamp-2">
-												{campaign.description}
-											</p>
-										{:else}
-											<p class="mt-1 truncate text-xs text-muted-foreground">
-												No description
-											</p>
-										{/if}
 									</div>
-								</a>
-								<div class="flex bg-muted">
+
+									<!-- role -->
+									<div class="flex items-center gap-2 text-center">
+										<p class="text-[10px] font-medium text-muted-foreground uppercase">Role</p>
+										<p class="flex font-eveleth text-xs">
+											{campaign.user_role === 'gm' ? 'Game Master' : 'Player'}
+										</p>
+									</div>
+								</div>
+
+								<!-- Action Buttons -->
+								<div class="flex border-t bg-muted">
+									<Button
+										variant="ghost"
+										size="sm"
+										class="hover:text-text grow rounded-none border"
+										href={`/campaigns/${campaign.id}/`}
+									>
+										View
+									</Button>
 									<Button
 										variant="ghost"
 										size="sm"
 										class={cn(
 											'hover:text-text grow rounded-none border',
-											isGM(campaign) && 'border-r-0'
+											isGM(campaign) ? 'border-x-0' : 'border-l-0'
 										)}
-										href={`/campaigns/${campaign.id}/`}>View</Button
+										href={`/campaigns/${campaign.id}/live`}
 									>
+										Launch
+									</Button>
 									{#if isGM(campaign)}
 										<Button
 											variant="ghost"
 											size="sm"
-											class="grow rounded-none border border-l-0 text-destructive hover:text-destructive"
-											onclick={() => handleDeleteCampaign(campaign.id, campaign.name)}>Delete</Button
+											class="grow rounded-none border text-destructive hover:text-destructive"
+											onclick={() => handleDeleteCampaign(campaign.id, campaign.name)}
 										>
+											Delete
+										</Button>
 									{/if}
 								</div>
+							</a>
 							</div>
 						{/each}
 					</div>
@@ -210,11 +260,7 @@
 				<!-- Name Input -->
 				<div class="flex flex-col gap-2">
 					<Label.Root>Campaign Name</Label.Root>
-					<Input
-						bind:value={newCampaignName}
-						placeholder="Enter campaign name..."
-						required
-					/>
+					<Input bind:value={newCampaignName} placeholder="Enter campaign name..." required />
 				</div>
 			</div>
 
@@ -244,15 +290,13 @@
 			</Dialog.Description>
 		</Dialog.Header>
 		<Dialog.Footer class="flex gap-3 pt-4">
-			<Dialog.Close
-				class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
+			<Dialog.Close class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
 				>Cancel</Dialog.Close
 			>
 			<Dialog.Close
 				class={buttonVariants({ variant: 'destructive' })}
 				onclick={confirmDelete}
-				disabled={deletingCampaign}
-				>{deletingCampaign ? 'Deleting...' : 'Delete'}</Dialog.Close
+				disabled={deletingCampaign}>{deletingCampaign ? 'Deleting...' : 'Delete'}</Dialog.Close
 			>
 		</Dialog.Footer>
 	</Dialog.Content>

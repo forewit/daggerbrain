@@ -1,7 +1,7 @@
 <!-- src/lib/components/app/campaigns/campaign-overview-player.svelte -->
 <script lang="ts">
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
-	import ExternalLink from '@lucide/svelte/icons/external-link';
+	import Rocket from '@lucide/svelte/icons/rocket';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Label from '$lib/components/ui/label';
 	import * as Select from '$lib/components/ui/select';
@@ -80,7 +80,7 @@
 	<div class="flex items-center gap-2">
 		<Button variant="outline" size="sm" href={`/campaigns/${campaignId}/live`}>
 			Launch
-			<ExternalLink class="size-3.5" />
+			<Rocket class="size-3.5" />
 		</Button>
 	</div>
 </div>

@@ -7,13 +7,13 @@ import { get_user, update_user } from '$lib/remote/users.remote';
 import { get_user_campaigns } from '$lib/remote/campaigns.remote';
 import type { User } from '$lib/types/user-types';
 import type { Character } from '$lib/types/character-types';
-import type { Campaign } from '$lib/types/campaign-types';
+import type { CampaignWithDetails } from '$lib/types/campaign-types';
 import { getContext, setContext } from 'svelte';
 import { error } from '@sveltejs/kit';
 
 function userContext() {
 	let all_characters = $state<Character[]>([]);
-	let all_campaigns = $state<Campaign[]>([]);
+	let all_campaigns = $state<CampaignWithDetails[]>([]);
 	let loading = $state(true);
 	let user = $state<User | null>(null);
 

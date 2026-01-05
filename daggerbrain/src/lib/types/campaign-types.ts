@@ -13,6 +13,12 @@ export type Campaign = typeof campaigns_table.$inferSelect;
 export type CampaignMember = typeof campaign_members_table.$inferSelect;
 export type CampaignState = typeof campaign_state_table.$inferSelect;
 
+export type CampaignWithDetails = Campaign & {
+	user_role: 'gm' | 'player';
+	player_count: number;
+	character_images: string[];
+};
+
 export type CampaignCharacterSummary = {
 	id: string;
 	name: string;
@@ -92,6 +98,7 @@ export type CampaignLiveClientMessage =
 	| {
 			type: 'update_character';
 			characterId: string;
+			userId: string;
 			updates: Partial<CampaignCharacterLiveUpdate>;
 	  };
 

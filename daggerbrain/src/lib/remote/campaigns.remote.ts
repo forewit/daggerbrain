@@ -10,7 +10,7 @@ import {
 } from '../server/db/campaigns.schema';
 import { characters_table } from '../server/db/characters.schema';
 import { get_db, get_auth, get_kv } from './utils';
-import type { CampaignState, CampaignCharacterSummary } from '../types/campaign-types';
+import type { CampaignState, CampaignCharacterSummary, CampaignWithDetails } from '../types/campaign-types';
 import type { Character } from '../types/character-types';
 import type { DerivedCharacter } from '../types/derived-character-types';
 
@@ -67,7 +67,7 @@ async function checkIsGM(campaignId: string, userId: string, db: ReturnType<type
 	return member?.role === 'gm';
 }
 
-export const get_user_campaigns = query(async () => {
+export const get_user_campaigns = query(async (): Promise<CampaignWithDetails[]> => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -90,8 +90,65 @@ export const get_user_campaigns = query(async () => {
 		.from(campaigns_table)
 		.where(inArray(campaigns_table.id, campaignIds));
 
+	// Create a map of campaign_id to user's role
+	const userRoleMap = new Map<string, 'gm' | 'player'>();
+	for (const membership of memberships) {
+		userRoleMap.set(membership.campaign_id, membership.role as 'gm' | 'player');
+	}
+
+	// Get all members for all campaigns to count players
+	const allMembers = await db
+		.select()
+		.from(campaign_members_table)
+		.where(inArray(campaign_members_table.campaign_id, campaignIds));
+
+	// Count players per campaign (excluding GM)
+	const playerCountMap = new Map<string, number>();
+	for (const member of allMembers) {
+		if (member.role === 'player') {
+			const currentCount = playerCountMap.get(member.campaign_id) || 0;
+			playerCountMap.set(member.campaign_id, currentCount + 1);
+		}
+	}
+
+	// Get all characters for all campaigns
+	const allCharacters = await db
+		.select({
+			campaign_id: characters_table.campaign_id,
+			image_url: characters_table.image_url
+		})
+		.from(characters_table)
+		.where(inArray(characters_table.campaign_id, campaignIds));
+
+	// Group character images by campaign_id
+	const characterImagesMap = new Map<string, string[]>();
+	for (const char of allCharacters) {
+		if (char.campaign_id && char.image_url) {
+			const existing = characterImagesMap.get(char.campaign_id) || [];
+			existing.push(char.image_url);
+			characterImagesMap.set(char.campaign_id, existing);
+		}
+	}
+
+	// Build enriched campaigns
+	const enrichedCampaigns: CampaignWithDetails[] = campaigns.map((campaign) => {
+		const userRole = userRoleMap.get(campaign.id) || 'player';
+		const playerCount = playerCountMap.get(campaign.id) || 0;
+		const characterImages = characterImagesMap.get(campaign.id) || [];
+		
+		// Limit character images to first 6 to avoid cluttering
+		const limitedImages = characterImages.slice(0, 6);
+
+		return {
+			...campaign,
+			user_role: userRole,
+			player_count: playerCount,
+			character_images: limitedImages
+		};
+	});
+
 	console.log('fetched user campaigns from D1');
-	return campaigns;
+	return enrichedCampaigns;
 });
 
 export const get_campaign_state = query(z.string(), async (campaignId): Promise<CampaignState> => {
