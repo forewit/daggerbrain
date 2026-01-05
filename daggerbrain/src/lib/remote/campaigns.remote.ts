@@ -372,6 +372,9 @@ export const create_campaign = command(
 			expirationTtl: undefined
 		});
 
+		// Refresh the query
+		get_user_campaigns().refresh();
+
 		console.log('created campaign in D1');
 		return campaignId;
 	}

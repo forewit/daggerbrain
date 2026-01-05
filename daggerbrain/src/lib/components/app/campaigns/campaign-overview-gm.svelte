@@ -8,52 +8,32 @@
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
-	import Copy from '@lucide/svelte/icons/copy';
-	import Rocket from '@lucide/svelte/icons/rocket';
-	import Settings from '@lucide/svelte/icons/settings';
-	import { UseClipboard } from '$lib/hooks/use-clipboard.svelte';
 	import { toast } from 'svelte-sonner';
-	import { error } from '@sveltejs/kit';
-	import { page } from '$app/stores';
-	import {
-		assign_character_to_campaign
-	} from '$lib/remote/campaigns.remote';
-	import {
-		add_homebrew_to_vault,
-		remove_homebrew_from_vault
-	} from '$lib/remote/campaign-homebrew.remote';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
-	import type { Campaign, CampaignState, CampaignCharacterSummary, CampaignMember } from '$lib/types/campaign-types';
 	import type { HomebrewType } from '$lib/types/homebrew-types';
 
 	let {
-		campaign,
-		characters,
-		campaignState,
-		vaultItems,
 		campaignId,
-		user,
-		members,
-		onOpenSettings
+		user
 	}: {
-		campaign: Campaign;
-		characters: Record<string, CampaignCharacterSummary>;
-		campaignState: CampaignState | null;
-		vaultItems: Array<{ id: string; homebrew_type: HomebrewType; homebrew_id: string }>;
 		campaignId: string;
 		user: ReturnType<typeof import('$lib/state/user.svelte').getUserContext>;
-		members: CampaignMember[];
-		onOpenSettings?: () => void;
 	} = $props();
 
 	const campaignContext = getCampaignContext();
 
+	// Get data from context
+	const campaign = $derived(campaignContext.campaign);
+	const characters = $derived(campaignContext.characters);
+	const campaignState = $derived(campaignContext.campaignState);
+	const vaultItems = $derived(campaignContext.vaultItems);
+	const members = $derived(campaignContext.members);
+
 	const homebrew = getHomebrewContext();
-	const clipboard = new UseClipboard();
 
 	// Local state for notes (for change tracking)
-	let localNotes = $state(campaignState?.notes ?? '');
+	let localNotes = $state('');
 	let saving = $state(false);
 
 	// Update local state when campaignState changes
@@ -86,7 +66,7 @@
 			// The $effect watching campaignState will sync localNotes automatically
 			toast.success('Changes saved');
 		} catch (err) {
-			error(500, err instanceof Error ? err.message : 'Failed to save changes');
+			toast.error(err instanceof Error ? err.message : 'Failed to save changes');
 		} finally {
 			saving = false;
 		}
@@ -97,27 +77,13 @@
 		localNotes = campaignState.notes ?? '';
 	}
 
-	async function handleCopyCampaignId() {
-		if (!campaignId) return;
-		const inviteLink = `${$page.url.origin}/campaigns/join/${campaignId}`;
-		await clipboard.copy(inviteLink);
-		if (clipboard.copied) {
-			toast.success('Invite link copied');
-		}
-	}
-
 	async function handleRemoveCharacter(characterId: string) {
 		if (!campaignId) return;
 
 		try {
-			await assign_character_to_campaign({
-				character_id: characterId,
-				campaign_id: null
-			});
-			// Refresh characters
-			await campaignContext.refreshCharacters();
+			await campaignContext.assignCharacter(characterId, null);
 		} catch (err) {
-			error(500, err instanceof Error ? err.message : 'Failed to remove character');
+			// Error handling is done in assignCharacter
 		}
 	}
 
@@ -125,18 +91,12 @@
 		if (!campaignId || !selectedHomebrewType || !selectedHomebrewId) return;
 
 		try {
-			await add_homebrew_to_vault({
-				campaign_id: campaignId,
-				homebrew_type: selectedHomebrewType,
-				homebrew_id: selectedHomebrewId
-			});
-			// Refresh vault
-			await campaignContext.refreshVault();
+			await campaignContext.addToVault(selectedHomebrewType, selectedHomebrewId);
 			showAddVaultDialog = false;
 			selectedHomebrewType = '';
 			selectedHomebrewId = '';
 		} catch (err) {
-			error(500, err instanceof Error ? err.message : 'Failed to add item to vault');
+			// Error handling is done in addToVault
 		}
 	}
 
@@ -144,14 +104,9 @@
 		if (!campaignId) return;
 
 		try {
-			await remove_homebrew_from_vault({
-				campaign_id: campaignId,
-				vault_id: vaultId
-			});
-			// Refresh vault
-			await campaignContext.refreshVault();
+			await campaignContext.removeFromVault(vaultId);
 		} catch (err) {
-			error(500, err instanceof Error ? err.message : 'Failed to remove item from vault');
+			// Error handling is done in removeFromVault
 		}
 	}
 
@@ -259,47 +214,11 @@
 	}
 </script>
 
-<!-- Title -->
-<div class="flex items-center justify-between gap-2">
-	<div>
-		<h1 class="text-2xl font-bold">{campaign.name}</h1>
-		{#if campaign.description}
-			<p class="text-sm text-muted-foreground">{campaign.description}</p>
-		{/if}
-	</div>
-	<div class="flex items-center gap-2">
-		<Button variant="outline" size="sm" href={`/campaigns/${campaignId}/live`}>
-			Launch
-			<Rocket class="size-3.5" />
-		</Button>
-		{#if onOpenSettings}
-			<Button
-				variant="outline"
-				size="sm"
-				onclick={() => onOpenSettings?.()}
-				class="h-7"
-			>
-				<Settings class="size-3.5" />
-				<p class="hidden sm:block">Settings</p>
-			</Button>
-		{/if}
-	</div>
-</div>
-
+{#if campaign}
 <!-- Characters Section -->
 <div class="rounded border bg-card p-3 pb-6">
 	<div class="mb-4 flex items-center justify-between">
 		<h2 class="text-lg font-semibold">Characters</h2>
-		<div class="flex gap-2">
-			<Button
-				variant="outline"
-				size="sm"
-				onclick={handleCopyCampaignId}
-			>
-				<Copy class="size-3.5" />
-				Copy Invite Link
-			</Button>
-		</div>
 	</div>
 
 	{#if campaignCharacters.length === 0}
@@ -495,4 +414,4 @@
 		</form>
 	</Dialog.Content>
 </Dialog.Root>
-
+{/if}

@@ -4,21 +4,23 @@
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+
 	import Loader2 from '@lucide/svelte/icons/loader-2';
-	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import * as Label from '$lib/components/ui/label';
+	import { Label } from '$lib/components/ui/label';
 	import Input from '$lib/components/ui/input/input.svelte';
-	import { error } from '@sveltejs/kit';
-	import { goto } from '$app/navigation';
 	import Footer from '$lib/components/app/footer.svelte';
-	import { update_campaign, delete_campaign } from '$lib/remote/campaigns.remote';
-	import { page } from '$app/state';
 	import { getUserContext } from '$lib/state/user.svelte';
-	import { setCampaignContext } from '$lib/state/campaigns.svelte';
+	import { getCampaignContext } from '$lib/state/campaigns.svelte';
 	import { toast } from 'svelte-sonner';
 	import CampaignOverviewPlayer from '$lib/components/app/campaigns/campaign-overview-player.svelte';
 	import CampaignOverviewGm from '$lib/components/app/campaigns/campaign-overview-gm.svelte';
+	import { UseClipboard } from '$lib/hooks/use-clipboard.svelte';
+	import Copy from '@lucide/svelte/icons/copy';
+	import Settings from '@lucide/svelte/icons/settings';
+	import Play from '@lucide/svelte/icons/play';
+	import { page } from '$app/state';
 
 	let { data }: { data: import('./$types').PageData } = $props();
 
@@ -26,7 +28,7 @@
 	const campaignId = $derived(page.params.id);
 
 	// Set up campaign context (reactive to campaignId changes)
-	const campaignContext = setCampaignContext(() => campaignId);
+	const campaign = getCampaignContext();
 
 	// Get available characters for assignment (user's characters not in this campaign)
 	const availableCharacters = $derived(
@@ -35,51 +37,39 @@
 			.map((char) => ({ id: char.id, name: char.name || 'Unnamed Character' }))
 	);
 
-	const isGM = $derived(data.role === 'gm');
-
-	// Derived state from context
-	const campaign = $derived(campaignContext.campaign);
-	const members = $derived(campaignContext.members);
-	const campaignState = $derived(campaignContext.campaignState);
-	const characters = $derived(campaignContext.characters);
-	const vaultItems = $derived(campaignContext.vaultItems);
-	const loading = $derived(campaignContext.loading);
+	const loading = $derived(campaign.loading);
 
 	// Settings dialog state
 	let showSettingsDialog = $state(false);
 	let campaignName = $state('');
 	let campaignDescription = $state('');
-	let isRenaming = $state(false);
-	let showDeleteDialog = $state(false);
 	let isDeleting = $state(false);
+
+	const clipboard = new UseClipboard();
+	const joinUrl = $derived(campaignId ? `${page.url.origin}/campaigns/join/${campaignId}` : '');
 
 	// Initialize settings dialog values
 	$effect(() => {
-		if (campaign) {
-			campaignName = campaign.name;
-			campaignDescription = campaign.description || '';
+		if (campaign.campaign) {
+			campaignName = campaign.campaign.name;
+			campaignDescription = campaign.campaign.description || '';
 		}
 	});
 
-	async function handleRename() {
-		if (!campaignId || !campaignName.trim() || isRenaming) return;
+	// Check if there are any changes
+	const hasChanges = $derived(
+		campaign.campaign &&
+			(campaignName.trim() !== campaign.campaign.name ||
+				(campaignDescription.trim() || null) !== (campaign.campaign.description || null))
+	);
 
-		isRenaming = true;
-		try {
-			await update_campaign({
-				campaign_id: campaignId,
-				name: campaignName.trim(),
-				description: campaignDescription.trim() || null
-			});
-			// Refresh campaign data
-			await campaignContext.refreshCampaign();
-			showSettingsDialog = false;
-			toast.success('Campaign updated');
-		} catch (err) {
-			error(500, err instanceof Error ? err.message : 'Failed to update campaign');
-		} finally {
-			isRenaming = false;
-		}
+	function handleSave() {
+		if (!campaignId || !campaignName.trim() || !campaign.campaign) return;
+
+		// Update state directly - auto-save will handle persistence
+		campaign.campaign.name = campaignName.trim();
+		campaign.campaign.description = campaignDescription.trim() || null;
+		showSettingsDialog = false;
 	}
 
 	async function handleDelete() {
@@ -87,14 +77,38 @@
 
 		isDeleting = true;
 		try {
-			await delete_campaign(campaignId);
-			await goto('/campaigns');
+			await campaign.deleteCampaign();
 		} catch (err) {
-			error(500, err instanceof Error ? err.message : 'Failed to delete campaign');
-		} finally {
+			// Error handling is done in deleteCampaign
 			isDeleting = false;
 		}
 	}
+
+	async function handleCopyJoinUrl() {
+		if (!joinUrl) return;
+		await clipboard.copy(joinUrl);
+		if (clipboard.copied) {
+			toast.success('Join link copied');
+		}
+	}
+
+	async function handleCopyCampaignId() {
+		if (!campaignId) return;
+		const inviteLink = `${page.url.origin}/campaigns/join/${campaignId}`;
+		await clipboard.copy(inviteLink);
+		if (clipboard.copied) {
+			toast.success('Invite link copied');
+		}
+	}
+
+	const isGM = $derived(data.role === 'gm');
+
+	let deleteConfirmation = $state('');
+	$effect(() => {
+		if (!showSettingsDialog) {
+			deleteConfirmation = '';
+		}
+	});
 </script>
 
 <div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
@@ -102,52 +116,71 @@
 		<div class="absolute inset-0 flex items-center justify-center">
 			<LoaderCircle class="h-8 w-8 animate-spin text-muted-foreground" />
 		</div>
-	{:else if !campaign}
+	{:else if !campaign.campaign}
 		<div class="flex flex-col items-center justify-center gap-4 px-4 py-12">
 			<p class="text-sm text-muted-foreground italic">Campaign not found</p>
-			<Button href="/campaigns">Back to Campaigns</Button>
+			<Button href="/campaigns">Campaigns</Button>
 		</div>
 	{:else}
+		<!-- Header -->
+		<div
+			class="sticky top-[calc(var(--navbar-height,3.5rem)-1px)] z-20 w-full bg-background sm:top-0"
+		>
+			<div class="w-full bg-primary/50">
+				<div
+					class="relative mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-2 px-4"
+				>
+					<div class="flex items-center gap-2">
+						<Button
+							href="/campaigns"
+							variant="link"
+							class="hidden px-0 text-muted-foreground sm:flex"
+						>
+							Campaigns
+						</Button>
+						<ChevronRight class="hidden size-3.5 text-muted-foreground sm:block" />
+						<p class="truncate text-sm font-medium">
+							{campaign.campaign?.name || 'unnamed campaign'}
+						</p>
+					</div>
+					<div class="flex shrink-0 items-center gap-2">
+						{#if isGM}
+							<Button variant="outline" size="sm" onclick={handleCopyCampaignId} class="h-7">
+								<Copy class="size-3.5" />
+							</Button>
+							<Button
+								variant="outline"
+								size="sm"
+								onclick={() => (showSettingsDialog = true)}
+								class="h-7"
+							>
+								<Settings class="size-3.5" />
+								<p class="hidden sm:block">Settings</p>
+							</Button>
+						{/if}
+						<Button size="sm" href={`/campaigns/${campaignId}/live`}>
+							<p class="hidden sm:block">Launch</p>
+							<Play class="size-3.5" />
+						</Button>
+					</div>
+				</div>
+			</div>
+		</div>
 		<div
 			class={cn(
 				'relative z-10 flex h-full w-full flex-col items-center justify-start ',
 				'pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]'
 			)}
 		>
-			<!-- Header -->
-			<div
-				class="sticky top-[calc(var(--navbar-height,3.5rem)-1px)] z-20 w-full bg-background sm:top-0"
-			>
-				<div class="w-full bg-primary/50">
-					<div class="relative mx-auto flex w-full max-w-6xl items-center gap-2 py-2 pr-4">
-						<Button href="/campaigns" variant="link">
-							<ChevronLeft />
-							Back to Campaigns
-						</Button>
-					</div>
-				</div>
-			</div>
-
-			<div class="flex w-full max-w-6xl flex-col space-y-6 px-4 py-4">
+			<div class="flex w-full max-w-6xl flex-col gap-6 px-4 py-4">
 				{#if data.role === 'gm' && campaignId}
-					<CampaignOverviewGm
-						{campaign}
-						{characters}
-						{campaignState}
-						{vaultItems}
-						campaignId={campaignId}
-						{user}
-						{members}
-						onOpenSettings={() => (showSettingsDialog = true)}
-					/>
+					<CampaignOverviewGm {campaignId} {user} />
 				{:else if campaignId}
 					<CampaignOverviewPlayer
-						{campaign}
-						{characters}
 						{availableCharacters}
 						userMembership={data.userMembership}
 						{user}
-						campaignId={campaignId}
+						{campaignId}
 					/>
 				{/if}
 			</div>
@@ -159,88 +192,85 @@
 
 <!-- Settings Dialog -->
 <Dialog.Root bind:open={showSettingsDialog}>
-	<Dialog.Content class="sm:max-w-md">
+	<Dialog.Content class="flex max-h-[90%] flex-col">
 		<Dialog.Header>
 			<Dialog.Title>Campaign Settings</Dialog.Title>
 			<!-- <Dialog.Description>Manage your campaign settings and information.</Dialog.Description> -->
 		</Dialog.Header>
 
 		<form
+			class="flex flex-col gap-6 overflow-y-auto py-4"
 			onsubmit={(e) => {
 				e.preventDefault();
-				handleRename();
+				handleSave();
 			}}
 		>
-			<div class="flex flex-col gap-4 py-4">
-				<div class="flex flex-col gap-2">
-					<Label.Root>Campaign Name</Label.Root>
-					<Input bind:value={campaignName} placeholder="Campaign name" required />
-				</div>
-				<div class="flex flex-col gap-2">
-					<Label.Root>Subtitle</Label.Root>
-					<Input bind:value={campaignDescription} placeholder="In a world full of wonder..." />
+			<div class="flex flex-col gap-2">
+				<Label>Campaign Name</Label>
+				<Input bind:value={campaignName} placeholder="Campaign name" required />
+			</div>
+			<div class="flex flex-col gap-2">
+				<Label>Subtitle</Label>
+				<Input bind:value={campaignDescription} placeholder="In a world full of wonder..." />
+			</div>
+			<div class="flex flex-col gap-2">
+				<Label>Invite Link</Label>
+				<div class="flex gap-2">
+					<Input value={joinUrl} readonly class="flex-1" />
+					<Button type="button" variant="outline" onclick={handleCopyJoinUrl}>
+						<Copy class="size-4" />
+					</Button>
 				</div>
 			</div>
 
-			<Dialog.Footer class="flex gap-3">
-				<Button
-					type="button"
-					variant="link"
-					class="text-destructive"
-					onclick={() => {
-						showSettingsDialog = false;
-						showDeleteDialog = true;
-					}}
-				>
-					Delete Campaign
-				</Button>
-				<div class="grow"></div>
-				<Dialog.Close
-					type="button"
-					class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
-				>
-					Cancel
-				</Dialog.Close>
-				<Button type="submit" disabled={!campaignName.trim() || isRenaming}>
-					{#if isRenaming}
-						<Loader2 class="size-4 animate-spin" />
-						Saving...
-					{:else}
-						Save
-					{/if}
-				</Button>
-			</Dialog.Footer>
-		</form>
-	</Dialog.Content>
-</Dialog.Root>
+			<div
+				class="my-2 flex flex-col gap-2 rounded border border-destructive/20 bg-destructive/5 p-2"
+			>
+				<Label class="font-bold text-destructive">Danger Zone</Label>
+				<p class="text-xs text-destructive">
+					Type "delete" to delete <strong>{campaign.campaign?.name || 'Campaign'}</strong>.
+				</p>
+				<div class="flex gap-2">
+					<Input
+						bind:value={deleteConfirmation}
+						class=" border-destructive/20 bg-card/50"
+						onkeydown={(e) => {
+							if (e.key === 'Enter' && deleteConfirmation === 'delete' && !isDeleting) {
+								e.preventDefault();
+								handleDelete();
+							}
+						}}
+					/>
+					<Button
+						type="button"
+						variant="destructive"
+						size="sm"
+						class="w-min"
+						disabled={deleteConfirmation !== 'delete' || isDeleting}
+						onclick={handleDelete}
+					>
+						{#if isDeleting}
+							<Loader2 class="size-4 animate-spin" />
+							Deleting...
+						{:else}
+							Delete Campaign
+						{/if}
+					</Button>
+				</div>
+			</div>
 
-<!-- Delete Campaign Confirmation Dialog -->
-<Dialog.Root bind:open={showDeleteDialog}>
-	<Dialog.Content class="sm:max-w-md">
-		<Dialog.Header>
-			<Dialog.Title>Delete Campaign</Dialog.Title>
-			<Dialog.Description>
-				Are you sure you want to delete <strong>{campaign?.name}</strong>? This action cannot be undone
-				and will remove all campaign data, including characters and notes.
-			</Dialog.Description>
-		</Dialog.Header>
-		<Dialog.Footer class="flex gap-3 pt-4">
-			<Dialog.Close class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}>
+			<button type="submit" class="hidden">Save</button>
+		</form>
+
+		<Dialog.Footer class="flex gap-3">
+			<div class="grow"></div>
+			<Dialog.Close
+				type="button"
+				class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
+			>
 				Cancel
 			</Dialog.Close>
-			<Dialog.Close
-				class={buttonVariants({ variant: 'destructive' })}
-				onclick={handleDelete}
-				disabled={isDeleting}
-			>
-				{#if isDeleting}
-					<Loader2 class="size-4 animate-spin" />
-					Deleting...
-				{:else}
-					<Trash2 class="size-4" />
-					Delete Campaign
-				{/if}
-			</Dialog.Close>
+			<Button onclick={handleSave} disabled={!hasChanges || !campaignName.trim()}>Save</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

@@ -3,28 +3,23 @@
 	import Fear from '$lib/components/app/sheet/fear.svelte';
 	import CharacterPreview from './character-preview.svelte';
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
-	import { toast } from 'svelte-sonner';
 	import { error } from '@sveltejs/kit';
-	import type { Campaign, CampaignState } from '$lib/types/campaign-types';
 
 	let {
-		campaign,
-		campaignId,
-		campaignState
+		campaignId
 	}: {
-		campaign: Campaign;
 		campaignId: string;
-		campaignState: CampaignState | null;
 	} = $props();
 
 	const campaignContext = getCampaignContext();
 
-	// Local state for fear (for change tracking)
-	let localFear = $state(campaignState?.fear_track ?? 0);
+	// Get data from context
+	const campaignState = $derived(campaignContext.campaignState);
+	const characters = $derived(campaignContext.characters);
+	const characterList = $derived(Object.values(characters));
 
-	// Get characters from campaign context
-	let characters = $derived(campaignContext.characters);
-	let characterList = $derived(Object.values(characters));
+	// Local state for fear (for change tracking)
+	let localFear = $state(0);
 
 	// Update local state when campaignState changes
 	$effect(() => {

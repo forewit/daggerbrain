@@ -2,11 +2,20 @@ import {
 	get_campaign,
 	get_campaign_members,
 	get_campaign_state,
-	get_campaign_characters
+	get_campaign_characters,
+	update_campaign,
+	delete_campaign,
+	assign_character_to_campaign,
+	leave_campaign
 } from '$lib/remote/campaigns.remote';
-import { get_campaign_homebrew_vault } from '$lib/remote/campaign-homebrew.remote';
+import {
+	get_campaign_homebrew_vault,
+	add_homebrew_to_vault,
+	remove_homebrew_from_vault
+} from '$lib/remote/campaign-homebrew.remote';
 import { error } from '@sveltejs/kit';
 import { getContext, setContext } from 'svelte';
+import { goto } from '$app/navigation';
 import { createCampaignLiveConnection } from './campaign-live.svelte';
 import type { Campaign, CampaignState, CampaignCharacterSummary, CampaignMember, CampaignCharacterLiveUpdate } from '$lib/types/campaign-types';
 import type { HomebrewType } from '$lib/types/homebrew-types';
@@ -29,7 +38,7 @@ function mergeCharacterLiveUpdate(
 	};
 }
 
-function campaignContext(getCampaignId: () => string | undefined) {
+function campaignContext(campaignId: string | undefined) {
 	// State
 	let campaign = $state<Campaign | null>(null);
 	let members = $state<CampaignMember[]>([]);
@@ -39,9 +48,15 @@ function campaignContext(getCampaignId: () => string | undefined) {
 	let loading = $state(true);
 	let wsConnection = $state<ReturnType<typeof createCampaignLiveConnection> | null>(null);
 
+	// Auto-save state tracking
+	let initialLoadComplete = $state(false);
+	let lastSavedCampaign = $state<string | null>(null);
+	let inFlightSave: Promise<void> | null = null;
+	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
 	// Load all campaign data
 	async function load() {
-		const id = getCampaignId();
+		const id = campaignId;
 		if (!id) return;
 
 		loading = true;
@@ -68,7 +83,7 @@ function campaignContext(getCampaignId: () => string | undefined) {
 
 	// Update campaign state
 	async function updateState(updates: { fear_track?: number; notes?: string | null }): Promise<void> {
-		const id = getCampaignId();
+		const id = campaignId;
 		if (!id) {
 			throw new Error('Campaign ID is required');
 		}
@@ -90,48 +105,89 @@ function campaignContext(getCampaignId: () => string | undefined) {
 		// No need to update immediately - wait for DO's broadcast
 	}
 
-	// Refresh characters
-	async function refreshCharacters() {
-		const id = getCampaignId();
+	// Delete campaign
+	async function deleteCampaign(): Promise<void> {
+		const id = campaignId;
 		if (!id) return;
 
 		try {
-			const chars = await get_campaign_characters(id);
-			characters = chars;
+			await delete_campaign(id);
+			await goto('/campaigns');
 		} catch (err) {
-			error(500, err instanceof Error ? err.message : 'Failed to refresh characters');
+			error(500, err instanceof Error ? err.message : 'Failed to delete campaign');
 		}
 	}
 
-	// Refresh vault items
-	async function refreshVault() {
-		const id = getCampaignId();
-		if (!id) return;
+	// Assign character to campaign (or remove from campaign if campaignId is null)
+	async function assignCharacter(characterId: string, targetCampaignId: string | null): Promise<void> {
+		if (!characterId) return;
 
 		try {
-			const vault = await get_campaign_homebrew_vault(id);
-			vaultItems = vault;
+			await assign_character_to_campaign({
+				character_id: characterId,
+				campaign_id: targetCampaignId
+			});
+			// Query refresh is handled by the remote command
+			// Reload to get fresh data
+			await load();
 		} catch (err) {
-			error(500, err instanceof Error ? err.message : 'Failed to refresh vault');
+			error(500, err instanceof Error ? err.message : 'Failed to assign character');
 		}
 	}
 
-	// Refresh campaign data
-	async function refreshCampaign() {
-		const id = getCampaignId();
+	// Leave campaign
+	async function leaveCampaign(): Promise<void> {
+		const id = campaignId;
 		if (!id) return;
 
 		try {
-			const camp = await get_campaign(id);
-			campaign = camp;
+			await leave_campaign(id);
+			await goto('/campaigns');
 		} catch (err) {
-			error(500, err instanceof Error ? err.message : 'Failed to refresh campaign');
+			error(500, err instanceof Error ? err.message : 'Failed to leave campaign');
+		}
+	}
+
+	// Add homebrew item to vault
+	async function addToVault(homebrewType: HomebrewType, homebrewId: string): Promise<void> {
+		const id = campaignId;
+		if (!id || !homebrewType || !homebrewId) return;
+
+		try {
+			await add_homebrew_to_vault({
+				campaign_id: id,
+				homebrew_type: homebrewType,
+				homebrew_id: homebrewId
+			});
+			// Query refresh is handled by the remote command
+			// Reload to get fresh data
+			await load();
+		} catch (err) {
+			error(500, err instanceof Error ? err.message : 'Failed to add item to vault');
+		}
+	}
+
+	// Remove homebrew item from vault
+	async function removeFromVault(vaultId: string): Promise<void> {
+		const id = campaignId;
+		if (!id || !vaultId) return;
+
+		try {
+			await remove_homebrew_from_vault({
+				campaign_id: id,
+				vault_id: vaultId
+			});
+			// Query refresh is handled by the remote command
+			// Reload to get fresh data
+			await load();
+		} catch (err) {
+			error(500, err instanceof Error ? err.message : 'Failed to remove item from vault');
 		}
 	}
 
 	// Auto-load when campaign ID changes
 	$effect(() => {
-		const id = getCampaignId();
+		const id = campaignId;
 		if (id) {
 			load().then(() => {
 				// After initial load, connect WebSocket
@@ -236,6 +292,74 @@ function campaignContext(getCampaignId: () => string | undefined) {
 		};
 	});
 
+	// Track when campaign is first loaded
+	$effect(() => {
+		if (campaign && !initialLoadComplete) {
+			initialLoadComplete = true;
+			lastSavedCampaign = JSON.stringify({ name: campaign.name, description: campaign.description });
+		}
+	});
+
+	// Debounced auto-save effect for campaign name and description
+	$effect(() => {
+		if (!campaign || !initialLoadComplete) return;
+
+		const currentJson = JSON.stringify({ name: campaign.name, description: campaign.description });
+		// Only save if the campaign actually changed from the last saved state
+		if (currentJson === lastSavedCampaign) return;
+
+		// Clear any existing debounce timer
+		if (debounceTimer) {
+			clearTimeout(debounceTimer);
+			debounceTimer = null;
+		}
+
+		// Debounce: wait 300ms before triggering save
+		debounceTimer = setTimeout(() => {
+			debounceTimer = null;
+			if (!campaign) return; // Guard against null campaign
+
+			// Don't start a new save if one is already in flight
+			if (inFlightSave) {
+				return;
+			}
+
+			const id = campaignId;
+			if (!id) return;
+
+			const savePromise = update_campaign({
+				campaign_id: id,
+				name: campaign.name,
+				description: campaign.description
+			})
+				.then(() => {
+					if (!campaign) return; // Guard against null campaign
+					// Only update lastSavedCampaign after successful save
+					lastSavedCampaign = JSON.stringify({ name: campaign.name, description: campaign.description });
+				})
+				.catch((err) => {
+					if (!campaign) return; // Guard against null campaign
+					console.error('Failed to auto-save campaign:', err);
+					// Leave lastSavedCampaign unchanged so the next debounced change will retry
+				})
+				.finally(() => {
+					// Clear the in-flight save promise when done
+					if (inFlightSave === savePromise) {
+						inFlightSave = null;
+					}
+				});
+
+			inFlightSave = savePromise;
+		}, 300);
+
+		return () => {
+			if (debounceTimer) {
+				clearTimeout(debounceTimer);
+				debounceTimer = null;
+			}
+		};
+	});
+
 	return {
 		get campaign() {
 			return campaign;
@@ -257,16 +381,18 @@ function campaignContext(getCampaignId: () => string | undefined) {
 		},
 		load,
 		updateState,
-		refreshCharacters,
-		refreshVault,
-		refreshCampaign
+		deleteCampaign,
+		assignCharacter,
+		leaveCampaign,
+		addToVault,
+		removeFromVault
 	};
 }
 
 const CAMPAIGN_CONTEXT_KEY = Symbol('CampaignContext');
 
-export const setCampaignContext = (getCampaignId: () => string | undefined) => {
-	const newCampaignContext = campaignContext(getCampaignId);
+export const setCampaignContext = (campaignId: string | undefined) => {
+	const newCampaignContext = campaignContext(campaignId);
 	return setContext(CAMPAIGN_CONTEXT_KEY, newCampaignContext);
 };
 

@@ -1,27 +1,19 @@
 <!-- src/lib/components/app/campaigns/campaign-overview-player.svelte -->
 <script lang="ts">
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
-	import Rocket from '@lucide/svelte/icons/rocket';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Label from '$lib/components/ui/label';
 	import * as Select from '$lib/components/ui/select';
 	import { cn } from '$lib/utils';
-	import { goto } from '$app/navigation';
-	import { error } from '@sveltejs/kit';
-	import { assign_character_to_campaign, leave_campaign } from '$lib/remote/campaigns.remote';
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
-	import type { Campaign, CampaignCharacterSummary, CampaignMember } from '$lib/types/campaign-types';
+	import type { CampaignMember } from '$lib/types/campaign-types';
 
 	let {
-		campaign,
-		characters,
 		availableCharacters,
 		userMembership,
 		user,
 		campaignId
 	}: {
-		campaign: Campaign;
-		characters: Record<string, CampaignCharacterSummary>;
 		availableCharacters: Array<{ id: string; name: string }>;
 		userMembership: CampaignMember | null;
 		user: ReturnType<typeof import('$lib/state/user.svelte').getUserContext>;
@@ -29,6 +21,10 @@
 	} = $props();
 
 	const campaignContext = getCampaignContext();
+
+	// Get data from context
+	const campaign = $derived(campaignContext.campaign);
+	const characters = $derived(campaignContext.characters);
 
 	// Character assignment dialog
 	let showAssignDialog = $state(false);
@@ -44,16 +40,11 @@
 		if (!selectedCharacterId || !campaignId) return;
 
 		try {
-			await assign_character_to_campaign({
-				character_id: selectedCharacterId,
-				campaign_id: campaignId
-			});
-			// Refresh characters
-			await campaignContext.refreshCharacters();
+			await campaignContext.assignCharacter(selectedCharacterId, campaignId);
 			showAssignDialog = false;
 			selectedCharacterId = '';
 		} catch (err) {
-			error(500, err instanceof Error ? err.message : 'Failed to assign character');
+			// Error handling is done in assignCharacter
 		}
 	}
 
@@ -61,30 +52,14 @@
 		if (!campaignId) return;
 
 		try {
-			await leave_campaign(campaignId);
-			await goto('/campaigns');
+			await campaignContext.leaveCampaign();
 		} catch (err) {
-			error(500, err instanceof Error ? err.message : 'Failed to leave campaign');
+			// Error handling is done in leaveCampaign
 		}
 	}
 </script>
 
-<!-- Title -->
-<div class="flex items-center justify-between gap-2">
-	<div>
-		<h1 class="text-2xl font-bold">{campaign.name}</h1>
-		{#if campaign.description}
-			<p class="text-sm text-muted-foreground">{campaign.description}</p>
-		{/if}
-	</div>
-	<div class="flex items-center gap-2">
-		<Button variant="outline" size="sm" href={`/campaigns/${campaignId}/live`}>
-			Launch
-			<Rocket class="size-3.5" />
-		</Button>
-	</div>
-</div>
-
+{#if campaign}
 <!-- Characters Section -->
 <div class="rounded border bg-card p-3 pb-6">
 	<div class="mb-4 flex items-center justify-between">
@@ -254,4 +229,4 @@
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
-
+{/if}

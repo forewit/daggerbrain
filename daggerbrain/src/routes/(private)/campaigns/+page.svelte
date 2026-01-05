@@ -4,9 +4,10 @@
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import Input from '$lib/components/ui/input/input.svelte';
-	import * as Label from '$lib/components/ui/label';
+	import { Label } from '$lib/components/ui/label';
 	import Plus from '@lucide/svelte/icons/plus';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import Rocket from '@lucide/svelte/icons/rocket';
 	import { goto } from '$app/navigation';
 	import { error } from '@sveltejs/kit';
@@ -34,6 +35,7 @@
 	let campaignToDelete = $state<{ id: string; name: string } | null>(null);
 	let showDeleteDialog = $state(false);
 	let deletingCampaign = $state(false);
+	let deleteConfirmation = $state('');
 
 	// Load campaigns
 	$effect(() => {
@@ -74,6 +76,9 @@
 		if (!showCreateDialog) {
 			newCampaignName = '';
 		}
+		if (!showDeleteDialog) {
+			deleteConfirmation = '';
+		}
 	});
 
 	function handleDeleteCampaign(campaignId: string, campaignName: string) {
@@ -82,7 +87,7 @@
 	}
 
 	async function confirmDelete() {
-		if (campaignToDelete && !deletingCampaign) {
+		if (campaignToDelete && !deletingCampaign && deleteConfirmation === 'delete') {
 			deletingCampaign = true;
 			try {
 				await delete_campaign(campaignToDelete.id);
@@ -158,7 +163,7 @@
 
 								<a
 									href={`/campaigns/${campaign.id}/`}
-									class="block flex h-[148px] w-full flex-col overflow-hidden rounded-t border bg-card hover:bg-card/80"
+									class="block flex h-[148px] w-full flex-col overflow-hidden rounded-t border border-b-0 bg-card hover:bg-card/80"
 								>
 									<div class="grow">
 										<!-- Campaign Title -->
@@ -264,7 +269,7 @@
 			<div class="flex flex-col gap-4 py-4">
 				<!-- Name Input -->
 				<div class="flex flex-col gap-2">
-					<Label.Root>Campaign Name</Label.Root>
+					<Label>Campaign Name</Label>
 					<Input bind:value={newCampaignName} placeholder="Enter campaign name..." required />
 				</div>
 			</div>
@@ -290,18 +295,41 @@
 		<Dialog.Header>
 			<Dialog.Title>Delete Campaign</Dialog.Title>
 			<Dialog.Description>
-				Are you sure you want to delete <strong>{campaignToDelete?.name}</strong>? This action
+				Are you sure you want to delete <strong>{campaignToDelete?.name || 'Campaign'}</strong>? This action
 				cannot be undone.
 			</Dialog.Description>
 		</Dialog.Header>
+
+		<form
+			class="flex flex-col gap-2"
+			onsubmit={(e) => {
+				e.preventDefault();
+				confirmDelete();
+			}}
+		>
+			<p class="text-sm text-muted-foreground">Type "delete" to delete <strong>{campaignToDelete?.name}</strong>.</p>
+			<div class="flex gap-2">
+				<Input bind:value={deleteConfirmation}/>
+				<Button
+					type="submit"
+					variant="destructive"
+					size="sm"
+					class="w-min"
+					disabled={deleteConfirmation !== 'delete' || deletingCampaign}
+				>
+					{#if deletingCampaign}
+						<Loader2 class="size-4 animate-spin" />
+						Deleting...
+					{:else}
+						Delete Campaign
+					{/if}
+				</Button>
+			</div>
+		</form>
+
 		<Dialog.Footer class="flex gap-3 pt-4">
 			<Dialog.Close class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
 				>Cancel</Dialog.Close
-			>
-			<Dialog.Close
-				class={buttonVariants({ variant: 'destructive' })}
-				onclick={confirmDelete}
-				disabled={deletingCampaign}>{deletingCampaign ? 'Deleting...' : 'Delete'}</Dialog.Close
 			>
 		</Dialog.Footer>
 	</Dialog.Content>
