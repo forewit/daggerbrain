@@ -14,13 +14,13 @@ import type {
 import type { ConditionIds, LevelUpChoice } from '$lib/types/rule-types';
 import type { Traits } from './compendium-types';
 
-export const BLANK_LEVEL_UP_CHOICE = {
+export const BLANK_LEVEL_UP_CHOICE: LevelUpChoice = {
 	option_id: null,
 	marked_traits: { A: null, B: null },
 	selected_experiences: [],
 	selected_domain_card_id: null,
 	selected_subclass_upgrade: null
-} as const satisfies LevelUpChoice;
+};
 
 export const CHARACTER_DEFAULTS = {
 	// core

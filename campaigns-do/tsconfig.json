@@ -3,7 +3,7 @@
     // Environment setup & latest features
     "lib": ["ESNext"],
     "target": "ESNext",
-    "module": "Preserve",
+    "module": "ESNext",
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "allowJs": true,
@@ -18,7 +18,8 @@
     "baseUrl": ".",
     "paths": {
       "$lib/types/*": ["../daggerbrain/src/lib/types/*"],
-      "$lib/server/*": ["../daggerbrain/src/lib/server/*"]
+      "$lib/server/*": ["../daggerbrain/src/lib/server/*"],
+      "$lib/*": ["../daggerbrain/src/lib/*"]
     },
 
     // Best practices

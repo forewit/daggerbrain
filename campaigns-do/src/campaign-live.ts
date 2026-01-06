@@ -7,6 +7,29 @@ interface Env {
   KV: KVNamespace;
 }
 
+// HTTP notification body types
+type CharacterAddedNotification = {
+  type: 'character_added';
+  character: DerivedCharacter;
+};
+
+type CharacterUpdatedNotification = {
+  type: 'character_updated';
+  characterId: string;
+  character?: DerivedCharacter;
+  updates?: Partial<DerivedCharacter>;
+};
+
+type CharacterRemovedNotification = {
+  type: 'character_removed' | 'character_deleted';
+  characterId: string;
+};
+
+type HttpNotificationBody = 
+  | CharacterAddedNotification 
+  | CharacterUpdatedNotification 
+  | CharacterRemovedNotification;
+
 interface StoredData {
   state: CampaignState;
   characters: Record<string, DerivedCharacter>;
@@ -54,7 +77,7 @@ export class CampaignLiveDO extends DurableObject<Env> {
       // Ensure state is initialized before processing any notifications
       await this.ensureInitialized();
       
-      const body = await request.json();
+      const body = await request.json() as HttpNotificationBody;
       
       switch (body.type) {
         case 'character_added':
@@ -78,12 +101,33 @@ export class CampaignLiveDO extends DurableObject<Env> {
           // The server already verified permissions before sending the notification,
           // so we just do a basic sanity check here
           const characterInState = this.characters[body.characterId];
+          
+          // Fix empty campaign_id: if state has empty campaign_id, use character's campaign_id to fix it
+          if (this.campaignState && !this.campaignState.campaign_id) {
+            let campaignIdToUse: string | undefined;
+            if (body.character?.campaign_id) {
+              campaignIdToUse = body.character.campaign_id;
+            } else if (this.env.KV) {
+              const kvChar = await this.env.KV.get<DerivedCharacter>(
+                `character:${body.characterId}:campaign`,
+                'json'
+              );
+              if (kvChar?.campaign_id) {
+                campaignIdToUse = kvChar.campaign_id;
+              }
+            }
+            if (campaignIdToUse) {
+              this.campaignState.campaign_id = campaignIdToUse;
+              await this.persistState();
+            }
+          }
+          
           if (!characterInState) {
             // Character not in DO state - if we have a full character, add it
             // Otherwise check KV to verify it belongs to this campaign
             if (body.character) {
-              // Full character update - add to state if campaign matches
-              if (body.character.campaign_id === this.campaignState?.campaign_id) {
+              // Full character update - add to state if campaign matches (or if state campaign_id was empty, we just fixed it)
+              if (!this.campaignState?.campaign_id || body.character.campaign_id === this.campaignState.campaign_id) {
                 await this.addCharacter(body.character);
                 break;
               }
@@ -95,7 +139,9 @@ export class CampaignLiveDO extends DurableObject<Env> {
                 `character:${body.characterId}:campaign`,
                 'json'
               );
-              if (kvChar && kvChar.campaign_id === this.campaignState?.campaign_id) {
+              
+              // Allow if campaign matches, or if state campaign_id is empty (we trust KV as source of truth)
+              if (kvChar && (!this.campaignState?.campaign_id || kvChar.campaign_id === this.campaignState.campaign_id)) {
                 // Character belongs to this campaign, add it to state first
                 this.characters[body.characterId] = kvChar;
               } else {
@@ -106,11 +152,28 @@ export class CampaignLiveDO extends DurableObject<Env> {
                   headers: { 'Content-Type': 'application/json' }
                 });
               }
+            } else {
+              return new Response(JSON.stringify({ 
+                error: 'Character not in this campaign' 
+              }), { 
+                status: 403,
+                headers: { 'Content-Type': 'application/json' }
+              });
             }
           }
           
           // body.character is full character, body.updates is partial diff
-          await this.updateCharacterFromNotification(body.characterId, body.character || body.updates);
+          // At least one should be provided, but handle the case where both might be undefined
+          if (body.character) {
+            await this.updateCharacterFromNotification(body.characterId, body.character);
+          } else if (body.updates) {
+            await this.updateCharacterFromNotification(body.characterId, body.updates);
+          } else {
+            return new Response(JSON.stringify({ error: 'character or updates is required for character_updated' }), { 
+              status: 400,
+              headers: { 'Content-Type': 'application/json' }
+            });
+          }
           break;
         case 'character_removed':
         case 'character_deleted':
@@ -255,6 +318,24 @@ export class CampaignLiveDO extends DurableObject<Env> {
       this.characters = stored.characters;
       this.version = stored.version ?? 0;
       this.initialized = true;
+      
+      // Fix empty campaign_id: derive from DO name or from first character
+      if (!this.campaignState.campaign_id) {
+        const campaignIdFromName = this.ctx.id.name || '';
+        if (campaignIdFromName) {
+          this.campaignState.campaign_id = campaignIdFromName;
+        } else if (Object.keys(this.characters).length > 0) {
+          // Derive from first character's campaign_id
+          const firstChar = Object.values(this.characters)[0];
+          if (firstChar?.campaign_id) {
+            this.campaignState.campaign_id = firstChar.campaign_id;
+          }
+        }
+        // Persist the fix if we updated it
+        if (this.campaignState.campaign_id) {
+          await this.persistState();
+        }
+      }
     } else {
       // Initialize with defaults if no stored data exists
       const campaignId = this.ctx.id.name || '';
@@ -485,21 +566,28 @@ export class CampaignLiveDO extends DurableObject<Env> {
       
       await this.persistState();
       
+      const updatedCharacter = this.characters[characterId];
+      if (!updatedCharacter) {
+        console.warn(`Character ${characterId} not found after full update`);
+        return;
+      }
+      
       this.broadcast({
         type: 'character_full_update',
         version: this.version,
         characterId,
-        character: this.characters[characterId]
+        character: updatedCharacter
       });
     } else {
       // Partial diff update - deep merge
-      if (!this.characters[characterId]) {
+      const existingCharacter = this.characters[characterId];
+      if (!existingCharacter) {
         // Character doesn't exist yet - can't apply diff
         console.warn(`Cannot apply diff update to non-existent character: ${characterId}`);
         return;
       }
       
-      this.characters[characterId] = this.deepMerge(this.characters[characterId], updates);
+      this.characters[characterId] = this.deepMerge(existingCharacter, updates);
       
       this.version++;
       this.updateCount++;
