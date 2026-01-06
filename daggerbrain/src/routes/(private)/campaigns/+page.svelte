@@ -20,8 +20,11 @@
 	import { getUserContext } from '$lib/state/user.svelte';
 	import type { CampaignWithDetails } from '$lib/types/campaign-types';
 	import { formatDate } from '$lib/utils';
+	import { useClerkContext } from 'svelte-clerk';
 
 	const user = getUserContext();
+	const clerkCtx = useClerkContext();
+	const clerkUser = $derived(clerkCtx.user);
 
 	let campaigns = $state<CampaignWithDetails[]>([]);
 	let loading = $state(true);
@@ -30,6 +33,7 @@
 	// Create campaign dialog state
 	let showCreateDialog = $state(false);
 	let newCampaignName = $state('');
+	let gmDisplayName = $state('');
 
 	// Delete campaign dialog state
 	let campaignToDelete = $state<{ id: string; name: string } | null>(null);
@@ -58,10 +62,12 @@
 		creatingCampaign = true;
 		try {
 			const id = await create_campaign({
-				name: newCampaignName.trim()
+				name: newCampaignName.trim(),
+				display_name: gmDisplayName.trim() || undefined
 			});
 			// Reset form
 			newCampaignName = '';
+			gmDisplayName = '';
 			showCreateDialog = false;
 			// Navigate to campaign
 			await goto(`/campaigns/${id}`);
@@ -71,10 +77,19 @@
 		}
 	}
 
+	// Initialize GM display name when dialog opens
+	$effect(() => {
+		if (showCreateDialog && !gmDisplayName) {
+			// Only initialize if field is empty (when dialog first opens)
+			gmDisplayName = clerkUser?.username || '';
+		}
+	});
+
 	// Clear dialog fields when dialogs close
 	$effect(() => {
 		if (!showCreateDialog) {
 			newCampaignName = '';
+			gmDisplayName = '';
 		}
 		if (!showDeleteDialog) {
 			deleteConfirmation = '';
@@ -271,6 +286,17 @@
 				<div class="flex flex-col gap-2">
 					<Label>Campaign Name</Label>
 					<Input bind:value={newCampaignName} placeholder="Enter campaign name..." required />
+				</div>
+				<!-- GM Display Name Input -->
+				<div class="flex flex-col gap-2">
+					<Label>Your Display Name (GM)</Label>
+					<Input
+						bind:value={gmDisplayName}
+						placeholder="Enter your display name (optional)"
+					/>
+					<p class="text-xs text-muted-foreground">
+						This is how other players will see your name in this campaign.
+					</p>
 				</div>
 			</div>
 

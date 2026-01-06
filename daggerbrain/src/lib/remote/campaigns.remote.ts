@@ -6,7 +6,8 @@ import {
 	campaigns_table,
 	campaign_members_table,
 	campaign_state_table,
-	campaign_homebrew_vault_table
+	campaign_homebrew_vault_table,
+	campaign_characters_table
 } from '../server/db/campaigns.schema';
 import { characters_table } from '../server/db/characters.schema';
 import { get_db, get_auth, get_kv } from './utils';
@@ -18,7 +19,7 @@ import {
 	removeCharacterFromSummary,
 	KV_TTL_24H
 } from './cache.service';
-import type { CampaignState, CampaignCharacterSummary, CampaignWithDetails } from '../types/campaign-types';
+import type { CampaignState, CampaignCharacterSummary, CampaignWithDetails, Countdown } from '../types/campaign-types';
 import type { Character } from '../types/character-types';
 import type { DerivedCharacter } from '../types/derived-character-types';
 import type { RequestEvent } from '@sveltejs/kit';
@@ -29,7 +30,7 @@ async function notifyDurableObject(
 	event: RequestEvent,
 	campaignId: string,
 	type: 'character_added' | 'character_updated' | 'character_removed' | 'character_deleted',
-	data: { characterId: string; character?: DerivedCharacter; updates?: Partial<DerivedCharacter> }
+	data: { characterId: string; character?: DerivedCharacter; updates?: Partial<DerivedCharacter>; claimable?: boolean }
 ): Promise<void> {
 	if (!campaignId || !event.platform?.env?.CAMPAIGN_LIVE) {
 		console.log('Skipping DO notification: no campaignId or CAMPAIGN_LIVE not available');
@@ -63,6 +64,46 @@ async function notifyDurableObject(
 	} catch (err) {
 		// Log error but don't fail the operation
 		console.error(`Failed to notify DO for ${type}:`, err);
+	}
+}
+
+// Helper function to notify Durable Object about member name changes
+async function notifyDurableObjectMemberUpdate(
+	event: RequestEvent,
+	campaignId: string,
+	userId: string,
+	displayName: string | null
+): Promise<void> {
+	if (!campaignId || !event.platform?.env?.CAMPAIGN_LIVE) {
+		console.log('Skipping DO member notification: no campaignId or CAMPAIGN_LIVE not available');
+		return;
+	}
+
+	try {
+		const doNamespace = event.platform.env.CAMPAIGN_LIVE;
+		const id = doNamespace.idFromName(campaignId);
+		const stub = doNamespace.get(id);
+		
+		const response = await stub.fetch('https://do-internal/notify', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				type: 'member_updated',
+				userId,
+				displayName
+			})
+		});
+		
+		if (!response.ok) {
+			const errorText = await response.text();
+			console.error(`DO member notification failed with status ${response.status}: ${errorText}`);
+		} else {
+			console.log(`DO member notification sent successfully for user ${userId}`);
+		}
+	} catch (err) {
+		console.error('Failed to notify DO for member_updated:', err);
 	}
 }
 
@@ -147,14 +188,24 @@ export const get_user_campaigns = query(async (): Promise<CampaignWithDetails[]>
 		}
 	}
 
-	// Get all characters for all campaigns
+	// Get all active (non-claimable) characters for all campaigns
+	// Join with campaign_characters_table to filter by claimable status
 	const allCharacters = await db
 		.select({
 			campaign_id: characters_table.campaign_id,
 			image_url: characters_table.image_url
 		})
 		.from(characters_table)
-		.where(inArray(characters_table.campaign_id, campaignIds));
+		.innerJoin(
+			campaign_characters_table,
+			eq(characters_table.id, campaign_characters_table.character_id)
+		)
+		.where(
+			and(
+				inArray(characters_table.campaign_id, campaignIds),
+				eq(campaign_characters_table.claimable, 0)
+			)
+		);
 
 	// Group character images by campaign_id
 	const characterImagesMap = new Map<string, string[]>();
@@ -199,6 +250,10 @@ export const get_campaign_state = query(z.string(), async (campaignId): Promise<
 	
 	// If KV has valid state, use it (no need to read D1)
 	if (kvState && kvState.updated_at) {
+		// Backward compatibility: ensure countdowns exists
+		if (!kvState.countdowns) {
+			kvState.countdowns = [];
+		}
 		console.log('fetched campaign state from KV');
 		return kvState;
 	}
@@ -217,6 +272,7 @@ export const get_campaign_state = query(z.string(), async (campaignId): Promise<
 			campaign_id: campaignId,
 			fear_track: 0,
 			notes: null,
+			countdowns: [],
 			updated_at: now
 		});
 
@@ -224,6 +280,7 @@ export const get_campaign_state = query(z.string(), async (campaignId): Promise<
 			campaign_id: campaignId,
 			fear_track: 0,
 			notes: null,
+			countdowns: [],
 			updated_at: now
 		};
 
@@ -239,6 +296,7 @@ export const get_campaign_state = query(z.string(), async (campaignId): Promise<
 		campaign_id: dbState.campaign_id,
 		fear_track: dbState.fear_track,
 		notes: dbState.notes,
+		countdowns: dbState.countdowns ?? [],
 		updated_at: dbState.updated_at
 	};
 
@@ -291,9 +349,10 @@ export const get_campaign_characters = query(
 export const create_campaign = command(
 	z.object({
 		name: z.string().min(1),
-		description: z.string().optional()
+		description: z.string().optional(),
+		display_name: z.string().optional()
 	}),
-	async ({ name, description }) => {
+	async ({ name, description, display_name }) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
@@ -316,6 +375,7 @@ export const create_campaign = command(
 			campaign_id: campaignId,
 			user_id: userId,
 			role: 'gm',
+			display_name: display_name || null,
 			joined_at: now
 		});
 
@@ -324,6 +384,7 @@ export const create_campaign = command(
 			campaign_id: campaignId,
 			fear_track: 0,
 			notes: null,
+			countdowns: [],
 			updated_at: now
 		});
 
@@ -333,6 +394,7 @@ export const create_campaign = command(
 			campaign_id: campaignId,
 			fear_track: 0,
 			notes: null,
+			countdowns: [],
 			updated_at: now
 		};
 		await kv.put(`campaign:${campaignId}:state`, JSON.stringify(initialState), {
@@ -347,68 +409,150 @@ export const create_campaign = command(
 	}
 );
 
-export const join_campaign = command(z.string(), async (campaignId) => {
-	const event = getRequestEvent();
-	const { userId } = get_auth(event);
-	const db = get_db(event);
+export const join_campaign = command(
+	z.object({
+		campaign_id: z.string(),
+		display_name: z.string().optional(),
+		character_id: z.string().optional()
+	}),
+	async ({ campaign_id, display_name, character_id }) => {
+		const event = getRequestEvent();
+		const { userId } = get_auth(event);
+		const db = get_db(event);
 
-	// Check if campaign exists
-	const [campaign] = await db
-		.select()
-		.from(campaigns_table)
-		.where(eq(campaigns_table.id, campaignId))
-		.limit(1);
+		// Check if campaign exists
+		const [campaign] = await db
+			.select()
+			.from(campaigns_table)
+			.where(eq(campaigns_table.id, campaign_id))
+			.limit(1);
 
-	if (!campaign) {
-		throw error(404, 'Campaign not found');
-	}
+		if (!campaign) {
+			throw error(404, 'Campaign not found');
+		}
 
-	// Check if user is already a member
-	const [existingMembership] = await db
-		.select()
-		.from(campaign_members_table)
-		.where(
-			and(
-				eq(campaign_members_table.campaign_id, campaignId),
-				eq(campaign_members_table.user_id, userId)
+		// Check if user is already a member
+		const [existingMembership] = await db
+			.select()
+			.from(campaign_members_table)
+			.where(
+				and(
+					eq(campaign_members_table.campaign_id, campaign_id),
+					eq(campaign_members_table.user_id, userId)
+				)
 			)
-		)
-		.limit(1);
+			.limit(1);
 
-	if (existingMembership) {
-		throw error(400, 'You are already a member of this campaign');
-	}
-
-	// Add user as player
-	try {
-		await db.insert(campaign_members_table).values({
-			campaign_id: campaignId,
-			user_id: userId,
-			role: 'player',
-			joined_at: Date.now()
-		});
-	} catch (err) {
-		// Handle race condition: if user clicks join link multiple times quickly,
-		// the check might pass but the insert fails due to primary key constraint
-		const errorMessage = err instanceof Error ? err.message : String(err);
-		if (
-			errorMessage.includes('UNIQUE constraint') ||
-			errorMessage.includes('PRIMARY KEY constraint') ||
-			errorMessage.includes('Failed query')
-		) {
-			// User is already a member (race condition)
+		if (existingMembership) {
 			throw error(400, 'You are already a member of this campaign');
 		}
-		// Re-throw other errors
-		throw err;
+
+		// If character_id is provided, validate it
+		if (character_id) {
+			const [character] = await db
+				.select()
+				.from(characters_table)
+				.where(eq(characters_table.id, character_id))
+				.limit(1);
+
+			if (!character) {
+				throw error(404, 'Character not found');
+			}
+
+			// Verify character belongs to user
+			if (character.clerk_user_id !== userId) {
+				throw error(403, 'You can only join with your own characters');
+			}
+
+			// Verify character is not already in a campaign
+			if (character.campaign_id) {
+				throw error(400, 'Character is already in a campaign');
+			}
+
+			// Check if user has reached the character limit
+			const existingCharacters = await db
+				.select()
+				.from(characters_table)
+				.where(eq(characters_table.clerk_user_id, userId));
+
+			if (existingCharacters.length >= 3) {
+				throw error(403, 'Character limit reached. You can only have 3 characters.');
+			}
+		}
+
+		// Add user as player
+		try {
+			await db.insert(campaign_members_table).values({
+				campaign_id,
+				user_id: userId,
+				role: 'player',
+				display_name: display_name || null,
+				joined_at: Date.now()
+			});
+		} catch (err) {
+			// Handle race condition: if user clicks join link multiple times quickly,
+			// the check might pass but the insert fails due to primary key constraint
+			const errorMessage = err instanceof Error ? err.message : String(err);
+			if (
+				errorMessage.includes('UNIQUE constraint') ||
+				errorMessage.includes('PRIMARY KEY constraint') ||
+				errorMessage.includes('Failed query')
+			) {
+				// User is already a member (race condition)
+				throw error(400, 'You are already a member of this campaign');
+			}
+			// Re-throw other errors
+			throw err;
+		}
+
+		// If character_id is provided, assign it to the campaign
+		if (character_id) {
+			const kv = get_kv(event);
+			const now = Date.now();
+			
+			// Update character's campaign_id
+			await db
+				.update(characters_table)
+				.set({ campaign_id })
+				.where(eq(characters_table.id, character_id));
+
+			// Insert into campaign_characters join table (not claimable since player is joining with it)
+			await db.insert(campaign_characters_table).values({
+				campaign_id,
+				character_id,
+				claimable: 0,
+				added_at: now
+			});
+
+			// Update campaign summary
+			await upsertCharacterSummary(kv, db, campaign_id, character_id);
+
+			// Notify DO about character being added with claimable status
+			const derivedChar = (await kv.get(`character:${character_id}:campaign`, 'json')) as
+				| DerivedCharacter
+				| null;
+
+			if (derivedChar) {
+				await notifyDurableObject(event, campaign_id, 'character_added', {
+					characterId: character_id,
+					character: derivedChar,
+					claimable: false
+				});
+			}
+
+			// Refresh character queries
+			get_campaign_characters(campaign_id).refresh();
+			get_all_characters().refresh();
+		}
+
+		// Refresh the query
+		get_user_campaigns().refresh();
+		get_campaign_members(campaign_id).refresh();
+
+		console.log('joined campaign in D1');
+		return { success: true };
 	}
-
-	// Refresh the query
-	get_user_campaigns().refresh();
-
-	console.log('joined campaign in D1');
-	return { success: true };
-});
+);
 
 export const claim_character = command(
 	z.object({
@@ -431,14 +575,30 @@ export const claim_character = command(
 			throw error(404, 'Character not found');
 		}
 
-		// Verify character is claimable
-		if (character.claimable !== 1) {
-			throw error(403, 'This character is not claimable');
-		}
-
 		// Verify character is in the specified campaign
 		if (character.campaign_id !== campaign_id) {
 			throw error(400, 'Character is not in this campaign');
+		}
+
+		// Get campaign_characters entry to check claimable status
+		const [campaignChar] = await db
+			.select()
+			.from(campaign_characters_table)
+			.where(
+				and(
+					eq(campaign_characters_table.campaign_id, campaign_id),
+					eq(campaign_characters_table.character_id, character_id)
+				)
+			)
+			.limit(1);
+
+		if (!campaignChar) {
+			throw error(400, 'Character is not registered in this campaign');
+		}
+
+		// Verify character is claimable
+		if (campaignChar.claimable !== 1) {
+			throw error(403, 'This character is not claimable');
 		}
 
 		// Verify user is a member of the campaign and get their role
@@ -452,15 +612,22 @@ export const claim_character = command(
 			throw error(403, 'GMs cannot claim characters');
 		}
 
-		// Check if player already has a character in this campaign
+		// Check if player already has a non-claimable character in this campaign
 		const existingCampaignCharacters = await db
 			.select()
 			.from(characters_table)
+			.innerJoin(
+				campaign_characters_table,
+				and(
+					eq(characters_table.id, campaign_characters_table.character_id),
+					eq(campaign_characters_table.campaign_id, campaign_id)
+				)
+			)
 			.where(
 				and(
 					eq(characters_table.campaign_id, campaign_id),
 					eq(characters_table.clerk_user_id, userId),
-					eq(characters_table.claimable, 0)
+					eq(campaign_characters_table.claimable, 0)
 				)
 			)
 			.limit(1);
@@ -481,28 +648,39 @@ export const claim_character = command(
 
 		const kv = get_kv(event);
 
-		// Update character ownership and set claimable to false
+		// Update character ownership
 		await db
 			.update(characters_table)
-			.set({
-				clerk_user_id: userId,
-				claimable: 0
-			})
+			.set({ clerk_user_id: userId })
 			.where(eq(characters_table.id, character_id));
+
+		// Update campaign_characters to set claimable to false
+		await db
+			.update(campaign_characters_table)
+			.set({ claimable: 0 })
+			.where(
+				and(
+					eq(campaign_characters_table.campaign_id, campaign_id),
+					eq(campaign_characters_table.character_id, character_id)
+				)
+			);
 
 		// Update campaign summary using cache service
 		await upsertCharacterSummary(kv, db, campaign_id, character_id);
 
 		// Notify DO about character being updated (ownership changed)
-		// Fetch full DerivedCharacter from KV
+		// Fetch full DerivedCharacter from KV and update with new owner
 		const derivedChar = (await kv.get(`character:${character_id}:campaign`, 'json')) as
 			| DerivedCharacter
 			| null;
 		
 		if (derivedChar) {
+			// Update the derived character with the new owner before sending
+			derivedChar.clerk_user_id = userId;
 			await notifyDurableObject(event, campaign_id, 'character_updated', {
 				characterId: character_id,
-				character: derivedChar
+				character: derivedChar,
+				claimable: false
 			});
 		}
 
@@ -511,6 +689,103 @@ export const claim_character = command(
 		get_all_characters().refresh();
 
 		console.log('claimed character in D1');
+		return { success: true };
+	}
+);
+
+export const unassign_character = command(
+	z.object({
+		character_id: z.string(),
+		campaign_id: z.string()
+	}),
+	async ({ character_id, campaign_id }) => {
+		const event = getRequestEvent();
+		const { userId } = get_auth(event);
+		const db = get_db(event);
+
+		// Get character
+		const [character] = await db
+			.select()
+			.from(characters_table)
+			.where(eq(characters_table.id, character_id))
+			.limit(1);
+
+		if (!character) {
+			throw error(404, 'Character not found');
+		}
+
+		// Verify user owns the character
+		if (character.clerk_user_id !== userId) {
+			throw error(403, 'You can only unassign your own characters');
+		}
+
+		// Verify character is in the specified campaign
+		if (character.campaign_id !== campaign_id) {
+			throw error(400, 'Character is not in this campaign');
+		}
+
+		// Get campaign_characters entry to check claimable status
+		const [campaignChar] = await db
+			.select()
+			.from(campaign_characters_table)
+			.where(
+				and(
+					eq(campaign_characters_table.campaign_id, campaign_id),
+					eq(campaign_characters_table.character_id, character_id)
+				)
+			)
+			.limit(1);
+
+		if (!campaignChar) {
+			throw error(400, 'Character is not registered in this campaign');
+		}
+
+		// Verify character is not already claimable
+		if (campaignChar.claimable === 1) {
+			throw error(400, 'Character is already unassigned');
+		}
+
+		// Verify user is a member of the campaign
+		const access = await getCampaignAccessInternal(db, userId, campaign_id);
+		if (!access.membership) {
+			throw error(403, 'You must be a member of the campaign to unassign characters');
+		}
+
+		const kv = get_kv(event);
+
+		// Set character as claimable (unassign) in campaign_characters table
+		await db
+			.update(campaign_characters_table)
+			.set({ claimable: 1 })
+			.where(
+				and(
+					eq(campaign_characters_table.campaign_id, campaign_id),
+					eq(campaign_characters_table.character_id, character_id)
+				)
+			);
+
+		// Update campaign summary using cache service
+		await upsertCharacterSummary(kv, db, campaign_id, character_id);
+
+		// Notify DO about character being updated (now claimable)
+		// Fetch full DerivedCharacter from KV
+		const derivedChar = (await kv.get(`character:${character_id}:campaign`, 'json')) as
+			| DerivedCharacter
+			| null;
+		
+		if (derivedChar) {
+			await notifyDurableObject(event, campaign_id, 'character_updated', {
+				characterId: character_id,
+				character: derivedChar,
+				claimable: true
+			});
+		}
+
+		// Refresh the queries
+		get_campaign_characters(campaign_id).refresh();
+		get_all_characters().refresh();
+
+		console.log('unassigned character in D1');
 		return { success: true };
 	}
 );
@@ -562,6 +837,18 @@ export const leave_campaign = command(z.string(), async (campaignId) => {
 			)
 		);
 
+	// Remove characters from campaign_characters join table
+	for (const char of charactersToRemove) {
+		await db
+			.delete(campaign_characters_table)
+			.where(
+				and(
+					eq(campaign_characters_table.campaign_id, campaignId),
+					eq(campaign_characters_table.character_id, char.id)
+				)
+			);
+	}
+
 	// Remove any characters from campaign
 	await db
 		.update(characters_table)
@@ -591,13 +878,33 @@ export const leave_campaign = command(z.string(), async (campaignId) => {
 	return { success: true };
 });
 
+// Zod schema for countdown validation
+const countdownSchema = z.object({
+	id: z.string(),
+	name: z.string().min(1, 'Countdown name cannot be empty'),
+	min: z.number(),
+	max: z.number().optional(),
+	current: z.number(),
+	visibleToPlayers: z.boolean()
+}).refine((data) => data.current >= data.min, {
+	message: 'Current value must be greater than or equal to min',
+	path: ['current']
+}).refine((data) => !data.max || data.current <= data.max, {
+	message: 'Current value must be less than or equal to max (if max is set)',
+	path: ['current']
+}).refine((data) => !data.max || data.min <= data.max, {
+	message: 'Min value must be less than or equal to max value (if max is set)',
+	path: ['min']
+});
+
 export const update_campaign_state = command(
 	z.object({
 		campaign_id: z.string(),
 		fear_track: z.number().optional(),
-		notes: z.string().nullable().optional()
+		notes: z.string().nullable().optional(),
+		countdowns: z.array(countdownSchema).optional()
 	}),
-	async ({ campaign_id, fear_track, notes }) => {
+	async ({ campaign_id, fear_track, notes, countdowns }) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
@@ -627,6 +934,7 @@ export const update_campaign_state = command(
 			.set({
 				fear_track: fear_track !== undefined ? fear_track : currentState.fear_track,
 				notes: notes !== undefined ? notes : currentState.notes,
+				countdowns: countdowns !== undefined ? countdowns : (currentState.countdowns ?? []),
 				updated_at: now
 			})
 			.where(eq(campaign_state_table.campaign_id, campaign_id));
@@ -646,6 +954,7 @@ export const update_campaign_state = command(
 			campaign_id: updatedState.campaign_id,
 			fear_track: updatedState.fear_track,
 			notes: updatedState.notes,
+			countdowns: updatedState.countdowns ?? [],
 			updated_at: updatedState.updated_at
 		};
 
@@ -690,6 +999,23 @@ export const assign_character_to_campaign = command(
 		}
 
 		const isOwner = character.clerk_user_id === userId;
+		const oldCampaignId = character.campaign_id;
+
+		// Get existing campaign_characters entry if any
+		let existingCampaignChar: { claimable: number } | undefined;
+		if (oldCampaignId) {
+			const [entry] = await db
+				.select({ claimable: campaign_characters_table.claimable })
+				.from(campaign_characters_table)
+				.where(
+					and(
+						eq(campaign_characters_table.campaign_id, oldCampaignId),
+						eq(campaign_characters_table.character_id, character_id)
+					)
+				)
+				.limit(1);
+			existingCampaignChar = entry;
+		}
 
 		// Permission checks based on action
 		if (campaign_id === null) {
@@ -728,47 +1054,85 @@ export const assign_character_to_campaign = command(
 		}
 
 		const kv = get_kv(event);
-		const oldCampaignId = character.campaign_id;
+		const now = Date.now();
 
 		// Determine if character should be claimable
 		// If claimable is explicitly set, use that value
-		// Otherwise, preserve existing claimable status if character is already claimable
+		// Otherwise, preserve existing claimable status from campaign_characters
 		// If character is not claimable and we're assigning to a campaign, check if user is GM
 		let shouldBeClaimable = false;
 		if (claimable !== undefined) {
 			shouldBeClaimable = claimable;
-		} else if (character.claimable === 1) {
+		} else if (existingCampaignChar?.claimable === 1) {
 			// Preserve existing claimable status
 			shouldBeClaimable = true;
 		} else if (campaign_id && !isOwner) {
 			// If GM is assigning someone else's character, make it claimable
-			// Note: We already fetched access above if campaign_id is not null
 			const gmAccess = await getCampaignAccessInternal(db, userId, campaign_id);
 			if (gmAccess.canEdit) {
 				shouldBeClaimable = true;
 			}
 		}
 
-		// Update character
+		// Update character's campaign_id
 		await db
 			.update(characters_table)
-			.set({ 
-				campaign_id,
-				claimable: shouldBeClaimable ? 1 : 0
-			})
+			.set({ campaign_id })
 			.where(eq(characters_table.id, character_id));
 
-		// If character was in another campaign, update old campaign summary
+		// Handle campaign_characters join table
 		if (oldCampaignId && oldCampaignId !== campaign_id) {
+			// Remove from old campaign's join table
+			await db
+				.delete(campaign_characters_table)
+				.where(
+					and(
+						eq(campaign_characters_table.campaign_id, oldCampaignId),
+						eq(campaign_characters_table.character_id, character_id)
+					)
+				);
+			// Update old campaign summary
 			await upsertCharacterSummary(kv, db, oldCampaignId, character_id);
 		}
 
-		// If assigned to campaign, update new campaign summary
+		// If assigned to campaign, insert/update join table
 		if (campaign_id) {
+			// Check if entry already exists
+			const [existing] = await db
+				.select()
+				.from(campaign_characters_table)
+				.where(
+					and(
+						eq(campaign_characters_table.campaign_id, campaign_id),
+						eq(campaign_characters_table.character_id, character_id)
+					)
+				)
+				.limit(1);
+
+			if (existing) {
+				// Update existing entry
+				await db
+					.update(campaign_characters_table)
+					.set({ claimable: shouldBeClaimable ? 1 : 0 })
+					.where(
+						and(
+							eq(campaign_characters_table.campaign_id, campaign_id),
+							eq(campaign_characters_table.character_id, character_id)
+						)
+					);
+			} else {
+				// Insert new entry
+				await db.insert(campaign_characters_table).values({
+					campaign_id,
+					character_id,
+					claimable: shouldBeClaimable ? 1 : 0,
+					added_at: now
+				});
+			}
+
 			await upsertCharacterSummary(kv, db, campaign_id, character_id);
 			
 			// Notify DO about character being added to campaign
-			// Fetch full DerivedCharacter from KV
 			const derivedChar = (await kv.get(`character:${character_id}:campaign`, 'json')) as
 				| DerivedCharacter
 				| null;
@@ -776,7 +1140,8 @@ export const assign_character_to_campaign = command(
 			if (derivedChar) {
 				await notifyDurableObject(event, campaign_id, 'character_added', {
 					characterId: character_id,
-					character: derivedChar
+					character: derivedChar,
+					claimable: shouldBeClaimable
 				});
 			}
 		}
@@ -853,6 +1218,61 @@ export const update_campaign = command(
 	}
 );
 
+export const update_campaign_member = command(
+	z.object({
+		campaign_id: z.string(),
+		display_name: z.string().optional()
+	}),
+	async ({ campaign_id, display_name }) => {
+		const event = getRequestEvent();
+		const { userId } = get_auth(event);
+		const db = get_db(event);
+
+		// Check if user is a member
+		const [membership] = await db
+			.select()
+			.from(campaign_members_table)
+			.where(
+				and(
+					eq(campaign_members_table.campaign_id, campaign_id),
+					eq(campaign_members_table.user_id, userId)
+				)
+			)
+			.limit(1);
+
+		if (!membership) {
+			throw error(404, 'You are not a member of this campaign');
+		}
+
+		const newDisplayName = display_name !== undefined ? display_name : null;
+
+		// Update display name
+		await db
+			.update(campaign_members_table)
+			.set({ display_name: newDisplayName })
+			.where(
+				and(
+					eq(campaign_members_table.campaign_id, campaign_id),
+					eq(campaign_members_table.user_id, userId)
+				)
+			);
+
+		// Refresh queries
+		get_campaign_members(campaign_id).refresh();
+		
+		// Rebuild character cache to update owner_name fields
+		const kv = get_kv(event);
+		await validateAndRebuildCampaignCharacters(kv, db, campaign_id);
+		get_campaign_characters(campaign_id).refresh();
+
+		// Notify DO about member name update
+		await notifyDurableObjectMemberUpdate(event, campaign_id, userId, newDisplayName);
+
+		console.log('updated campaign member in D1');
+		return { success: true };
+	}
+);
+
 export const delete_campaign = command(z.string(), async (campaignId) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
@@ -879,6 +1299,11 @@ export const delete_campaign = command(z.string(), async (campaignId) => {
 		.update(characters_table)
 		.set({ campaign_id: null })
 		.where(eq(characters_table.campaign_id, campaignId));
+
+	// Delete campaign_characters entries
+	await db
+		.delete(campaign_characters_table)
+		.where(eq(campaign_characters_table.campaign_id, campaignId));
 
 	// Delete campaign members
 	await db.delete(campaign_members_table).where(eq(campaign_members_table.campaign_id, campaignId));

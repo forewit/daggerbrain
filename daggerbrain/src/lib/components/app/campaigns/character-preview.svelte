@@ -10,6 +10,11 @@
 	import StressPreview from '$lib/components/app/sheet/character-previews/stress-preview.svelte';
 	import HopePreview from '$lib/components/app/sheet/character-previews/hope-preview.svelte';
 	import { getUserContext } from '$lib/state/user.svelte';
+	import Banner from '../cards/class-banner.svelte';
+	import Pencil from '@lucide/svelte/icons/pencil';
+	import { getCompendiumContext } from '$lib/state/compendium.svelte';
+	import type { CharacterClass } from '$lib/types/compendium-types';
+	import ExternalLink from '@lucide/svelte/icons/external-link';
 
 	let {
 		character,
@@ -21,78 +26,113 @@
 
 	const user = getUserContext();
 	const isOwner = $derived(user.user?.clerk_id === character.owner_user_id);
+	
+	const compendium = getCompendiumContext();
+	
+	// Find the primary class by name from compendium
+	const primary_class = $derived.by(() => {
+		if (!character.derived_descriptors.primary_class_name) return null;
+		const classes = compendium.classes;
+		return Object.values(classes).find(
+			(cls: CharacterClass) => cls.name === character.derived_descriptors.primary_class_name
+		) || null;
+	});
 </script>
 
-<div class="rounded-lg border bg-card p-4">
+<div class="rounded-xl shadow bg-background flex flex-col max-w-[400px] w-full">
 	<!-- Header -->
-	<div class="mb-4 flex gap-3">
-		<!-- Character image -->
-		<div class="aspect-square h-20 w-20 shrink-0 overflow-hidden rounded-lg border-2">
-			<img
-				class="h-full w-full object-cover"
-				src={character.image_url}
-				alt={character.name}
+	<div class="mb-2 flex gap-3 px-2">
+		<div class="relative grow min-w-0">
+			<!-- level class subclass -->
+			<div class="mt-3 mb-2.5 flex h-9 max-w-[400px] min-w-0 items-center truncate overflow-hidden">
+				<a
+					href={`/characters/${character.id}/class/`}
+					class="group relative grid h-full min-w-[72px] place-items-center overflow-hidden rounded-l-full border-b border-accent/10 bg-accent/10 pr-3 pl-4 text-xs font-medium text-accent hover:bg-accent/20"
+				>
+					<span class="transition-transform duration-200 group-hover:-translate-y-[150%]">
+						Level {character.level}
+					</span>
+					<span
+						class="absolute inset-0 grid translate-y-full place-items-center text-xs font-medium transition-transform duration-200 group-hover:translate-y-0"
+					>
+						Level up?
+					</span>
+				</a>
+				<Button
+					href={`/characters/${character.id}/class/`}
+					class={cn(
+						'h-full  justify-start gap-2 truncate  rounded-l-none rounded-r-full',
+						'border-0 border-b'
+					)}
+					variant="outline"
+				>
+					<p class="truncate text-left text-xs">
+						{character.derived_descriptors.primary_class_name || 'No class'}
+						&ensp;•&ensp;
+						{character.derived_descriptors.primary_subclass_name || 'No subclass'}
+					</p>
+					<div class="grow"></div>
+					<Pencil class="mr-1 size-3 stroke-3" />
+				</Button>
+			</div>
+
+			<div class="flex gap-3 min-w-0">
+				<!-- character image -->
+				<div class="aspect-square h-[90px] w-[90px] shrink-0 overflow-hidden rounded-lg border-2">
+					<img
+						class="h-full w-full rounded-md object-cover"
+						src={character.image_url}
+						alt={character.name}
+					/>
+				</div>
+
+				<!-- name and heritage -->
+				<div class="flex grow flex-col gap-1 min-w-0">
+					<p class="truncate text-2xl font-bold">{character.name}</p>
+					<p class="mt-1 truncate text-xs text-muted-foreground">
+						{character.derived_descriptors.ancestry_name || 'No ancestry'}
+					</p>
+					<p class="truncate text-xs text-muted-foreground">
+						No community
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- class banner -->
+		{#if primary_class}
+			<Banner character_class={primary_class} />
+		{/if}
+	</div>
+
+
+
+	<!-- Evasion and Armor -->
+	<div class="mb-4 flex justify-center gap-4">
+		<EvasionPreview evasion={character.evasion} />
+		<ArmorPreview max_armor={character.max_armor} marked_armor={character.marked_armor} />
+	</div>
+
+		<!-- Damage Thresholds -->
+		<div class="mx-auto mb-4">
+			<DamageThresholdsPreview
+				damage_thresholds={character.damage_thresholds}
+				class="scale-92"
 			/>
 		</div>
 
-		<!-- Name and info -->
-		<div class="flex grow flex-col gap-1 truncate">
-			<div class="flex items-center gap-2">
-				<p class="truncate text-xl font-bold">{character.name}</p>
-				<span class="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
-					Level {character.level}
-				</span>
-			</div>
-			<p class="truncate text-xs text-muted-foreground">
-				{character.derived_descriptors.primary_class_name || 'No class'}
-				&ensp;•&ensp;
-				{character.derived_descriptors.primary_subclass_name || 'No subclass'}
-			</p>
-			<p class="truncate text-xs text-muted-foreground">
-				{character.derived_descriptors.ancestry_name || 'No ancestry'}
-			</p>
-		</div>
-	</div>
-
-	<!-- Stats Grid -->
-	<div class="mb-4 grid grid-cols-2 gap-4">
-		<!-- Evasion and Armor -->
-		<div class="flex gap-4">
-			<EvasionPreview evasion={character.evasion} />
-			<ArmorPreview max_armor={character.max_armor} marked_armor={character.marked_armor} />
-		</div>
-
-		<!-- Damage Thresholds -->
-		<DamageThresholdsPreview damage_thresholds={character.damage_thresholds} class="mx-auto" />
-	</div>
-
 	<!-- HP, Stress, Hope -->
-	<div class="mb-4 flex flex-col gap-3">
+	<div class="mb-4 flex flex-col items-center gap-3">
 		<HpPreview max_hp={character.max_hp} marked_hp={character.marked_hp} />
 		<StressPreview max_stress={character.max_stress} marked_stress={character.marked_stress} />
 		<HopePreview max_hope={character.max_hope} marked_hope={character.marked_hope} />
 	</div>
 
 	<!-- Action Button -->
-	<div class="flex gap-2">
-		<Button
-			variant="outline"
-			size="sm"
-			href={`/characters/${character.id}/`}
-			class="grow"
-		>
-			View
+	<div class="flex gap-2 p-2">
+		<Button variant="outline" size="sm" href={`/characters/${character.id}/`} class="grow">
+			View Character Sheet
+			<ExternalLink/>
 		</Button>
-		{#if isOwner}
-			<Button
-				variant="outline"
-				size="sm"
-				href={`/characters/${character.id}/edit`}
-				class="grow"
-			>
-				Edit
-			</Button>
-		{/if}
 	</div>
 </div>
-

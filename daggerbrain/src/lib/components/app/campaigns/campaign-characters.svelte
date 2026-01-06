@@ -8,8 +8,9 @@
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
 	import { getUserContext } from '$lib/state/user.svelte';
 	import { toast } from 'svelte-sonner';
-	import { goto } from '$app/navigation';
 	import { error } from '@sveltejs/kit';
+	import { goto } from '$app/navigation';
+	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 
 	const campaignContext = getCampaignContext();
 	const user = getUserContext();
@@ -35,29 +36,19 @@
 	// Get characters in this campaign
 	const campaignCharacters = $derived(Object.values(characters));
 
-	// Separate characters into assigned and unassigned (claimable)
-	// For GMs: unassigned = all claimable characters (regardless of owner, since they're for players to claim)
-	// For Players: unassigned = claimable characters not owned by the player
+	// Separate characters into assigned and unassigned
+	// Assigned = characters that are not claimable (have an owner assigned)
+	// Unassigned = characters that are claimable (available to be claimed)
 	const assignedCharacters = $derived(
 		campaignCharacters.filter((char) => {
-			if (isGM) {
-				// GMs see non-claimable characters as assigned, and claimable characters as unassigned
-				return !char.claimable;
-			} else {
-				// Players see non-claimable or their own characters as assigned
-				return !char.claimable || char.owner_user_id === user.user?.clerk_id;
-			}
+			// Both GMs and players see non-claimable characters as assigned
+			return !char.claimable;
 		})
 	);
 	const unassignedCharacters = $derived(
 		campaignCharacters.filter((char) => {
-			if (isGM) {
-				// GMs see all claimable characters as unassigned
-				return char.claimable;
-			} else {
-				// Players see claimable characters not owned by them as unassigned
-				return char.claimable && char.owner_user_id !== user.user?.clerk_id;
-			}
+			// Both GMs and players see all claimable characters as unassigned
+			return char.claimable;
 		})
 	);
 
@@ -65,6 +56,20 @@
 	let showAddCharacterDialog = $state(false);
 	let addCharacterMode = $state<'create' | 'existing'>('create');
 	let selectedCharacterId = $state('');
+
+	// Unassign character dialog state
+	let showUnassignDialog = $state(false);
+	let characterToUnassign = $state<string | null>(null);
+
+	// Remove character dialog state
+	let showRemoveDialog = $state(false);
+	let characterToRemove = $state<string | null>(null);
+
+	// Leave campaign dialog state
+	let showLeaveCampaignDialog = $state(false);
+
+	// Character limit warning dialog state
+	let showCharacterLimitDialog = $state(false);
 
 	// Get available characters for assignment
 	const availableCharacters = $derived(
@@ -91,7 +96,7 @@
 			return;
 		}
 
-		// Check if player owns any non-claimable character in this campaign
+		// Check if player owns any non-unassigned character in this campaign
 		// Note: campaignCharacters is already filtered to this campaign, so we don't need to check campaign_id
 		const hasCharacter = campaignCharacters.some(
 			(char) =>
@@ -106,20 +111,20 @@
 		if (!campaignId) return;
 
 		try {
+			let characterId: string;
 			if (isGM) {
-				// GM creates claimable character
+				// GM creates unassigned character
 				const { create_character } = await import('$lib/remote/characters.remote');
-				const id = await create_character({ campaign_id: campaignId, claimable: true });
-				showAddCharacterDialog = false;
-				addCharacterMode = 'create';
-				await goto(`/characters/${id}/edit/`);
+				characterId = await create_character({ campaign_id: campaignId, claimable: true });
 			} else {
 				// Player creates regular character
-				const id = await user.create_character(campaignId);
-				showAddCharacterDialog = false;
-				addCharacterMode = 'create';
-				await goto(`/characters/${id}/edit/`);
+				characterId = await user.create_character(campaignId);
 			}
+			showAddCharacterDialog = false;
+			addCharacterMode = 'create';
+			await campaignContext.load();
+			// Navigate to character edit screen
+			await goto(`/characters/${characterId}/edit`);
 		} catch (err) {
 			toast.error(err instanceof Error ? err.message : 'Failed to create character');
 		}
@@ -130,7 +135,7 @@
 
 		try {
 			if (isGM) {
-				// GM adds existing character as claimable
+				// GM adds existing character as unassigned
 				const { assign_character_to_campaign } = await import('$lib/remote/campaigns.remote');
 				await assign_character_to_campaign({
 					character_id: selectedCharacterId,
@@ -150,11 +155,13 @@
 		}
 	}
 
-	async function handleRemoveCharacter(characterId: string) {
-		if (!campaignId) return;
+	async function handleRemoveCharacter() {
+		if (!characterToRemove || !campaignId) return;
 
 		try {
-			await campaignContext.assignCharacter(characterId, null);
+			await campaignContext.assignCharacter(characterToRemove, null);
+			showRemoveDialog = false;
+			characterToRemove = null;
 		} catch (err) {
 			// Error handling is done in assignCharacter
 		}
@@ -163,11 +170,40 @@
 	async function handleClaimCharacter(characterId: string) {
 		if (!characterId || !campaignId) return;
 
+		// Check if player has reached character limit
+		if (user.all_characters.length >= 3) {
+			showCharacterLimitDialog = true;
+			return;
+		}
+
 		try {
 			await campaignContext.claimCharacter(characterId);
-			toast.success('Character claimed successfully');
 		} catch (err) {
 			toast.error(err instanceof Error ? err.message : 'Failed to claim character');
+		}
+	}
+
+	async function handleUnassignCharacter() {
+		if (!characterToUnassign || !campaignId) return;
+
+		try {
+			await campaignContext.unassignCharacter(characterToUnassign);
+			showUnassignDialog = false;
+			characterToUnassign = null;
+		} catch (err) {
+			toast.error(err instanceof Error ? err.message : 'Failed to unassign character');
+		}
+	}
+
+	async function handleLeaveCampaign() {
+		if (!campaignId) return;
+
+		try {
+			await campaignContext.leaveCampaign();
+			// leaveCampaign already navigates away, so we don't need to close dialog
+		} catch (err) {
+			// Error handling is done in leaveCampaign
+			showLeaveCampaignDialog = false;
 		}
 	}
 
@@ -178,15 +214,123 @@
 			selectedCharacterId = '';
 		}
 	});
+
 </script>
+
+{#snippet characterCard(char: (typeof campaignCharacters)[number], showClaimButton: boolean = false)}
+	{@const playerName = char.owner_name || (char.owner_user_id === user.user?.clerk_id ? 'you' : 'Anonymous')}
+	
+	<div
+		class="mx- w-full overflow-hidden rounded"
+	>
+		<a
+			href={`/characters/${char.id}/`}
+			class="flex gap-2 border bg-primary-muted p-1 hover:bg-primary-muted/80"
+		>
+			<div class="size-19 shrink-0 overflow-hidden rounded-lg border-2">
+				<img
+					src={char.image_url || '/images/portrait-placeholder.png'}
+					alt={char.name.trim() || 'Unnamed Character'}
+					class="h-full w-full object-cover"
+				/>
+			</div>
+			<div class="truncate grow">
+				<p class=" truncate text-lg font-bold">
+					{char.name.trim() || 'Unnamed Character'}
+				</p>
+				<p class=" truncate text-xs text-muted-foreground">
+					{char.derived_descriptors.ancestry_name || 'No ancestry'}
+					&ensp;•&ensp;
+					{char.derived_descriptors.primary_class_name || 'No class'}
+					&ensp;•&ensp;
+					{char.derived_descriptors.primary_subclass_name || 'No subclass'}
+				</p>
+				{#if !char.claimable}
+					<div class="mt-1.5 truncate text-center py-0.5 px-2 text-accent text-xs bg-accent/10 border border-accent/20 rounded-full w-min">
+						Player: {playerName}
+					</div>
+				{/if}
+			</div>
+		</a>
+		<div class="flex bg-muted">
+			<Button
+				variant="ghost"
+				size="sm"
+				class="hover:text-text grow rounded-none border"
+				href={`/characters/${char.id}/`}
+			>
+				View
+			</Button>
+			{#if isGM}
+				<Button
+					variant="ghost"
+					size="sm"
+					class="hover:text-text grow rounded-none border border-x-0"
+					href={`/characters/${char.id}/edit`}
+				>
+					Edit
+				</Button>
+				<Button
+					variant="ghost"
+					size="sm"
+					class="grow rounded-none border text-destructive hover:text-destructive"
+					onclick={() => {
+						characterToRemove = char.id;
+						showRemoveDialog = true;
+					}}
+				>
+					Remove
+				</Button>
+			{:else if char.owner_user_id === user.user?.clerk_id && !char.claimable}
+				<Button
+					variant="ghost"
+					size="sm"
+					class="hover:text-text grow rounded-none border border-x-0"
+					href={`/characters/${char.id}/edit`}
+				>
+					Edit
+				</Button>
+				<Button
+					variant="ghost"
+					size="sm"
+					class="grow rounded-none border border-x-0 text-destructive hover:text-destructive"
+					onclick={() => {
+						characterToUnassign = char.id;
+						showUnassignDialog = true;
+					}}
+				>
+					Unassign
+				</Button>
+				<Button
+					variant="ghost"
+					size="sm"
+					class="grow rounded-none border text-destructive hover:text-destructive"
+					onclick={() => (showLeaveCampaignDialog = true)}
+				>
+					Leave
+				</Button>
+			{/if}
+			{#if showClaimButton && isPlayer && !playerHasCharacterInCampaign}
+				<Button
+					variant="default"
+					size="sm"
+					class="grow rounded-none border border-x-0"
+					onclick={() => handleClaimCharacter(char.id)}
+				>
+					Claim
+				</Button>
+			{/if}
+		</div>
+	</div>
+{/snippet}
 
 {#if campaign}
 	<!-- Characters Section -->
-	<div class="rounded border bg-card p-3 pb-6">
+	<div>
 		<div class="mb-4 flex items-center justify-between">
-			<h2 class="text-lg font-semibold">Characters</h2>
-			<Button variant="default" size="sm" onclick={() => (showAddCharacterDialog = true)}>
-				Add Character
+			<h2 class="text-lg font-semibold">Active Characters</h2>
+			<Button variant="outline" size="sm" onclick={() => (showAddCharacterDialog = true)}>
+				{isGM ? 'Add Unassigned Character' : 'Add Character'}
 			</Button>
 		</div>
 
@@ -196,137 +340,20 @@
 			{#if assignedCharacters.length > 0}
 				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 					{#each assignedCharacters as char}
-						<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
-							<a
-								href={`/characters/${char.id}/`}
-								class="flex gap-2 border bg-primary-muted p-1 hover:bg-primary-muted/80"
-							>
-								<div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2">
-									<img
-										src={char.image_url || '/images/portrait-placeholder.png'}
-										alt={char.name.trim() || 'Unnamed Character'}
-										class="h-full w-full object-cover"
-									/>
-								</div>
-								<div class="truncate">
-									<p class="mt-1 truncate text-lg font-bold">
-										{char.name.trim() || 'Unnamed Character'}
-									</p>
-									<p class="mt-1 truncate text-xs text-muted-foreground">
-										{char.derived_descriptors.ancestry_name || 'No ancestry'}
-										&ensp;•&ensp;
-										{char.derived_descriptors.primary_class_name || 'No class'}
-										&ensp;•&ensp;
-										{char.derived_descriptors.primary_subclass_name || 'No subclass'}
-									</p>
-								</div>
-							</a>
-							<div class="flex bg-muted">
-								<Button
-									variant="ghost"
-									size="sm"
-									class="hover:text-text grow rounded-none border"
-									href={`/characters/${char.id}/`}
-								>
-									View
-								</Button>
-								{#if isGM}
-									<Button
-										variant="ghost"
-										size="sm"
-										class="hover:text-text grow rounded-none border border-x-0"
-										href={`/characters/${char.id}/edit`}
-									>
-										Edit
-									</Button>
-									<Button
-										variant="ghost"
-										size="sm"
-										class="grow rounded-none border text-destructive hover:text-destructive"
-										onclick={() => handleRemoveCharacter(char.id)}
-									>
-										Remove
-									</Button>
-								{:else if char.owner_user_id === user.user?.clerk_id}
-									<Button
-										variant="ghost"
-										size="sm"
-										class="hover:text-text grow rounded-none border border-x-0"
-										href={`/characters/${char.id}/edit`}
-									>
-										Edit
-									</Button>
-								{/if}
-							</div>
-						</div>
+						{@render characterCard(char, false)}
 					{/each}
 				</div>
 			{/if}
 
 			{#if unassignedCharacters.length > 0}
 				<div class="mt-6">
-					<h3 class="mb-4 text-md font-semibold">Unassigned Characters</h3>
-					<p class="mb-4 text-sm text-muted-foreground">
-						{isGM
-							? 'These characters are available for players to claim.'
-							: 'These characters are available for you to claim.'}
+					<h3 class="mb-1 text-md font-semibold">Unassigned Characters</h3>
+					<p class="mb-4 text-xs text-muted-foreground">
+							These characters are available for players in the campaign to claim.
 					</p>
 					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 						{#each unassignedCharacters as char}
-							<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
-								<a
-									href={`/characters/${char.id}/`}
-									class="flex gap-2 border bg-primary-muted p-1 hover:bg-primary-muted/80"
-								>
-									<div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2">
-										<img
-											src={char.image_url || '/images/portrait-placeholder.png'}
-											alt={char.name.trim() || 'Unnamed Character'}
-											class="h-full w-full object-cover"
-										/>
-									</div>
-									<div class="truncate">
-										<p class="mt-1 truncate text-lg font-bold">
-											{char.name.trim() || 'Unnamed Character'}
-										</p>
-										<p class="mt-1 truncate text-xs text-muted-foreground">
-											{char.derived_descriptors.ancestry_name || 'No ancestry'}
-											&ensp;•&ensp;
-											{char.derived_descriptors.primary_class_name || 'No class'}
-											&ensp;•&ensp;
-											{char.derived_descriptors.primary_subclass_name || 'No subclass'}
-										</p>
-									</div>
-								</a>
-								<div class="flex bg-muted">
-									<Button
-										variant="ghost"
-										size="sm"
-										class="hover:text-text grow rounded-none border"
-										href={`/characters/${char.id}/`}
-									>
-										View
-									</Button>
-									{#if isPlayer}
-										<Button
-											variant="default"
-											size="sm"
-											class="grow rounded-none border border-x-0"
-											onclick={() => handleClaimCharacter(char.id)}
-											disabled={user.all_characters.length >= 3 || playerHasCharacterInCampaign}
-											title={
-												playerHasCharacterInCampaign
-													? 'You can only claim one character per campaign'
-													: user.all_characters.length >= 3
-														? 'Character limit reached. You can only have 3 characters.'
-														: ''
-											}
-										>
-											Claim
-										</Button>
-									{/if}
-								</div>
-							</div>
+							{@render characterCard(char, true)}
 						{/each}
 					</div>
 				</div>
@@ -341,7 +368,7 @@
 				<Dialog.Title>Add Character</Dialog.Title>
 				<Dialog.Description>
 					{isGM
-						? 'Create a claimable character or add an existing character for players to claim.'
+						? 'Create an unassigned character or add an existing character for players to claim.'
 						: 'Create a new character or assign an existing character to this campaign.'}
 				</Dialog.Description>
 			</Dialog.Header>
@@ -362,7 +389,7 @@
 							selectedCharacterId = '';
 						}}
 					>
-						{isGM ? 'Create Claimable Character' : 'Create Character'}
+						{isGM ? 'Create Unassigned Character' : 'Create Character'}
 					</button>
 					<button
 						type="button"
@@ -441,7 +468,7 @@
 						onclick={handleCreateCharacter}
 						disabled={!isGM && user.all_characters.length >= 3}
 					>
-						{isGM ? 'Create Claimable Character' : 'Create Character'}
+						{isGM ? 'Create Unassigned Character' : 'Create Character'}
 					</Button>
 				{:else}
 					<Button
@@ -451,6 +478,116 @@
 						{isGM ? 'Add Character' : 'Assign Character'}
 					</Button>
 				{/if}
+			</Dialog.Footer>
+		</Dialog.Content>
+	</Dialog.Root>
+
+	<!-- Unassign Character Confirmation Dialog -->
+	<Dialog.Root bind:open={showUnassignDialog}>
+		<Dialog.Content class="sm:max-w-md">
+			<Dialog.Header>
+				<Dialog.Title>Unassign Character</Dialog.Title>
+				<Dialog.Description>
+					Are you sure you want to unassign this character? If the character is claimed by another player in your campaign, you will no longer be able to edit that character unless you are the GM of that character's campaign.
+				</Dialog.Description>
+			</Dialog.Header>
+			<Dialog.Footer class="flex gap-3">
+				<Dialog.Close
+					type="button"
+					class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
+					onclick={() => {
+						characterToUnassign = null;
+					}}
+				>
+					Cancel
+				</Dialog.Close>
+				<Button
+					variant="destructive"
+					onclick={handleUnassignCharacter}
+				>
+					Unassign
+				</Button>
+			</Dialog.Footer>
+		</Dialog.Content>
+	</Dialog.Root>
+
+	<!-- Remove Character Confirmation Dialog -->
+	<Dialog.Root bind:open={showRemoveDialog}>
+		<Dialog.Content class="sm:max-w-md">
+			<Dialog.Header>
+				<Dialog.Title>Remove Character</Dialog.Title>
+				<Dialog.Description>
+					Are you sure you want to remove this character from the campaign? This will remove the character from the campaign but will not delete the character.
+				</Dialog.Description>
+			</Dialog.Header>
+			<Dialog.Footer class="flex gap-3">
+				<Dialog.Close
+					type="button"
+					class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
+					onclick={() => {
+						characterToRemove = null;
+					}}
+				>
+					Cancel
+				</Dialog.Close>
+				<Button
+					variant="destructive"
+					onclick={handleRemoveCharacter}
+				>
+					Remove
+				</Button>
+			</Dialog.Footer>
+		</Dialog.Content>
+	</Dialog.Root>
+
+	<!-- Leave Campaign Confirmation Dialog -->
+	<Dialog.Root bind:open={showLeaveCampaignDialog}>
+		<Dialog.Content class="sm:max-w-md">
+			<Dialog.Header>
+				<Dialog.Title>Leave Campaign</Dialog.Title>
+				<Dialog.Description>
+					Are you sure you want to leave <strong>{campaign?.name}</strong>? This action cannot be undone.
+				</Dialog.Description>
+			</Dialog.Header>
+			<Dialog.Footer class="flex gap-3">
+				<Dialog.Close
+					type="button"
+					class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
+				>
+					Cancel
+				</Dialog.Close>
+				<Dialog.Close
+					type="button"
+					class={cn(buttonVariants({ variant: 'destructive' }))}
+					onclick={handleLeaveCampaign}
+				>
+					Leave Campaign
+				</Dialog.Close>
+			</Dialog.Footer>
+		</Dialog.Content>
+	</Dialog.Root>
+
+	<!-- Character Limit Warning Dialog -->
+	<Dialog.Root bind:open={showCharacterLimitDialog}>
+		<Dialog.Content class="sm:max-w-md">
+			<Dialog.Header>
+				<Dialog.Title>Character Limit Reached</Dialog.Title>
+				<Dialog.Description>
+					<p class="mb-2">You cannot claim a character until you have an empty character slot.</p>
+			
+					<Button variant="link" href="/characters" class="pl-0 text-accent">
+					 <ArrowRight/>
+						Manage Characters
+					</Button>
+				</Dialog.Description>
+			</Dialog.Header>
+			<Dialog.Footer class="flex gap-3">
+				<Dialog.Close
+					type="button"
+					class={cn(buttonVariants({ variant: 'default' }))}
+				>
+					OK
+				</Dialog.Close>
 			</Dialog.Footer>
 		</Dialog.Content>
 	</Dialog.Root>

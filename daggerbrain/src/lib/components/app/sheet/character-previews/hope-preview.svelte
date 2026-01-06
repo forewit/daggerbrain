@@ -12,9 +12,9 @@
 	} = $props();
 </script>
 
-<div class={cn('flex flex-col justify-center gap-2 text-center', className)}>
+<div class={cn('flex items-center  gap-5 text-center', className)}>
 	<p class="mx-auto w-min text-sm font-medium text-accent">HOPE</p>
-	<div class="mb-2 flex flex-wrap justify-center gap-4">
+	<div class="flex flex-wrap justify-center gap-4">
 		{#each Array(max_hope) as _, index}
 			<div
 				aria-label="hope-slot"

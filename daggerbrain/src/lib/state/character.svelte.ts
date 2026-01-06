@@ -3656,8 +3656,11 @@ function createCharacter(id: string) {
 			derived_character: derived
 		})
 			.then(() => {
+				if (!character) return; // Guard against null character
 				// Update last saved stats after successful save
 				lastSavedCampaignStats = currentStats;
+				// Also update lastSavedCharacter to prevent debounced effect from triggering duplicate save
+				lastSavedCharacter = JSON.stringify(character);
 				// Server notifies DO via HTTP - no need for client WebSocket notification
 			})
 			.catch((error) => {
@@ -4260,5 +4263,5 @@ export const setCharacterContext = (uid: string) => {
 };
 
 export const getCharacterContext = (): ReturnType<typeof setCharacterContext> => {
-	return getContext(CHARACTER_KEY);
+	return getContext(CHARACTER_KEY) as ReturnType<typeof setCharacterContext>;
 };

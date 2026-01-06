@@ -3,17 +3,31 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import * as Select from '$lib/components/ui/select';
+	import { Label } from '$lib/components/ui/label';
+	import Input from '$lib/components/ui/input/input.svelte';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { get_campaign, join_campaign } from '$lib/remote/campaigns.remote';
+	import { getUserContext } from '$lib/state/user.svelte';
 	import Footer from '$lib/components/app/footer.svelte';
 	import { toast } from 'svelte-sonner';
 	import type { Campaign } from '$lib/types/campaign-types';
 
 	const campaignId = $derived($page.params.uid);
+	const user = getUserContext();
 	let loading = $state(true);
 	let campaign = $state<Campaign | null>(null);
 	let errorMessage = $state<string | null>(null);
 	let joining = $state(false);
+	let playerName = $state('');
+	let selectedCharacterId = $state<string>('');
+
+	// Get available characters (not in any campaign)
+	const availableCharacters = $derived(
+		user.all_characters
+			.filter((char) => !char.campaign_id)
+			.map((char) => ({ id: char.id, name: char.name || 'Unnamed Character' }))
+	);
 
 	// Validate campaign on mount
 	$effect(() => {
@@ -44,7 +58,11 @@
 
 		joining = true;
 		try {
-			await join_campaign(campaignId);
+			await join_campaign({
+				campaign_id: campaignId,
+				display_name: playerName.trim() || undefined,
+				character_id: selectedCharacterId || undefined
+			});
 			toast.success('Successfully joined campaign');
 			await goto(`/campaigns/${campaignId}`);
 		} catch (err) {
@@ -87,14 +105,53 @@
 						<p class="text-sm text-muted-foreground">{campaign.description}</p>
 					{/if}
 				</div>
-				<Button onclick={handleJoin} disabled={joining} class="w-full">
-					{#if joining}
-						<LoaderCircle class="h-4 w-4 animate-spin mr-2" />
-						Joining...
-					{:else}
-						Join Campaign
-					{/if}
-				</Button>
+				<form
+					class="flex w-full flex-col gap-4"
+					onsubmit={(e) => {
+						e.preventDefault();
+						handleJoin();
+					}}
+				>
+					<div class="flex flex-col gap-2">
+						<Label for="player-name">Player Name (optional)</Label>
+						<Input
+							id="player-name"
+							bind:value={playerName}
+							placeholder="Enter your display name"
+						/>
+					</div>
+					<div class="flex flex-col gap-2">
+						<Label for="character-select">Character (optional)</Label>
+						<Select.Root
+							type="single"
+							value={selectedCharacterId}
+							onValueChange={(v) => (selectedCharacterId = v || '')}
+						>
+							<Select.Trigger id="character-select" class="w-full">
+								<p class="truncate">
+									{selectedCharacterId
+										? availableCharacters.find((c) => c.id === selectedCharacterId)?.name ||
+											'Unnamed Character'
+										: 'Join without character'}
+								</p>
+							</Select.Trigger>
+							<Select.Content>
+								<Select.Item value="">Join without character</Select.Item>
+								{#each availableCharacters as char}
+									<Select.Item value={char.id}>{char.name}</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+					</div>
+					<Button type="submit" disabled={joining} class="w-full">
+						{#if joining}
+							<LoaderCircle class="h-4 w-4 animate-spin mr-2" />
+							Joining...
+						{:else}
+							Join Campaign
+						{/if}
+					</Button>
+				</form>
 			</div>
 		{/if}
 	</div>

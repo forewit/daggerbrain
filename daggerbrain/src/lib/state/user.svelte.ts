@@ -145,5 +145,5 @@ export const setUserContext = () => {
 };
 
 export const getUserContext = (): ReturnType<typeof setUserContext> => {
-	return getContext(USER_CONTEXT_KEY);
+	return getContext(USER_CONTEXT_KEY) as ReturnType<typeof setUserContext>;
 };

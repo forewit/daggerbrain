@@ -17,9 +17,9 @@
 	let { data, children } = $props();
 
 	const context = getCharacterContext();
-	const character = $derived(context.character);
+	const character = $derived(context?.character);
 	const characterId = $derived(page.params.uid);
-	const canEdit = $derived(context.canEdit);
+	const canEdit = $derived(context?.canEdit);
 	const checkingPermission = $derived(canEdit === null);
 	const user = getUserContext();
 
@@ -27,8 +27,8 @@
 	// This prevents race condition where "Character not found" is shown briefly
 	// when loading a character accessible via GM permissions
 	const isLoading = $derived.by(() => {
-		const userLoading = user.loading;
-		const contextLoading = context.loading;
+		const userLoading = user?.loading;
+		const contextLoading = context?.loading;
 		return userLoading || contextLoading;
 	});
 

@@ -112,52 +112,41 @@
 					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 						{#each user.all_characters as char}
 							{#if char.id !== redirecting_to_character}
-								<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
+								<div class="relative mx-auto w-full max-w-[500px] overflow-hidden rounded">
 									<a
 										href={`/characters/${char.id}/`}
 										class="flex gap-2 border bg-primary-muted p-1 hover:bg-primary-muted/80"
 									>
-										<div class=" size-22 shrink-0 overflow-hidden rounded-lg border-2">
+										<div class=" size-19 shrink-0 overflow-hidden rounded-lg border-2">
 											<img
 												src={char.image_url || '/images/portrait-placeholder.png'}
 												alt={char.name.trim() || 'Unnamed Character'}
 												class="h-full w-full object-cover"
 											/>
 										</div>
-										<div class="truncate">
-											<p class="mt-1 truncate text-lg font-bold">
+										<div class="truncate grow">
+											<p class=" truncate text-lg font-bold">
 												{char.name.trim() || 'Unnamed Character'}
 											</p>
 
-											<p class="mt-1 truncate text-xs text-muted-foreground">
+											<p class="truncate text-xs text-muted-foreground">
 												{char.derived_descriptors.ancestry_name || 'No ancestry'}
 												&ensp;•&ensp;
 												{char.derived_descriptors.primary_class_name || 'No class'}
 												&ensp;•&ensp;
 												{char.derived_descriptors.primary_subclass_name || 'No subclass'}
 											</p>
-											{#if char.campaign_id && campaignMap.has(char.campaign_id)}
-												<p class="mt-1 truncate text-xs text-muted-foreground">
-													Campaign: <span
-														class="underline hover:text-foreground cursor-pointer"
-														onclick={(e) => {
-															e.stopPropagation();
-															goto(`/campaigns/${char.campaign_id}`);
-														}}
-														role="link"
-														tabindex="0"
-														onkeydown={(e) => {
-															if (e.key === 'Enter' || e.key === ' ') {
-																e.preventDefault();
-																e.stopPropagation();
-																goto(`/campaigns/${char.campaign_id}`);
-															}
-														}}
-													>{campaignMap.get(char.campaign_id)}</span>
-												</p>
-											{/if}
+											
 										</div>
 									</a>
+									{#if char.campaign_id && campaignMap.has(char.campaign_id)}
+									<div class="truncate absolute bottom-10 left-22 right-2 flex">
+
+												<a href={`/campaigns/${char.campaign_id}`} class="max-w-full hover:underline py-0.5 px-2 truncate text-center text-accent text-xs bg-accent/10 border border-accent/20 rounded-full w-min">
+													Campaign: {campaignMap.get(char.campaign_id)}
+												</a>
+												</div>
+											{/if}
 									<div class="flex bg-muted">
 										<Button
 											variant="ghost"

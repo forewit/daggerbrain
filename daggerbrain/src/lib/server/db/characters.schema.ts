@@ -33,7 +33,7 @@ export const characters_table = sqliteTable(
 		name: text('name').notNull().default(CHARACTER_DEFAULTS.name),
 		image_url: text('image_url').notNull().default(CHARACTER_DEFAULTS.image_url),
 		campaign_id: text('campaign_id'),
-		claimable: integer('claimable').notNull().default(0),
+		// Note: claimable status is now stored in campaign_characters_table
 		settings: text('settings', { mode: 'json' })
 			.notNull()
 			.default(CHARACTER_DEFAULTS.settings)
@@ -224,7 +224,7 @@ export const characters_table_update_schema = createUpdateSchema(characters_tabl
 	companion: CompanionSchema.nullable()
 }).omit({
 	campaign_id: true,      // Only via assign_character_to_campaign
-	clerk_user_id: true,    // Immutable
-	claimable: true         // Only via GM operations
+	clerk_user_id: true     // Immutable
 	// Note: id is not omitted here because it's needed for WHERE clauses, but it won't be updated
+	// Note: claimable status is now stored in campaign_characters_table
 });

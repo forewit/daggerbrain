@@ -1,5 +1,6 @@
 import { integer, sqliteTable, text, index, primaryKey } from 'drizzle-orm/sqlite-core';
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from 'drizzle-zod';
+import type { Countdown } from '../../types/campaign-types';
 
 // ============================================================================
 // Campaigns
@@ -32,6 +33,7 @@ export const campaign_members_table = sqliteTable(
 		campaign_id: text('campaign_id').notNull(),
 		user_id: text('user_id').notNull(),
 		role: text('role').notNull(), // 'gm' | 'player'
+		display_name: text('display_name'), // nullable, player's display name
 		joined_at: integer('joined_at').notNull()
 	},
 	(table) => [
@@ -53,12 +55,39 @@ export const campaign_state_table = sqliteTable('campaign_state_table', {
 	campaign_id: text('campaign_id').primaryKey().notNull(),
 	fear_track: integer('fear_track').notNull().default(0),
 	notes: text('notes'),
+	countdowns: text('countdowns', { mode: 'json' })
+		.notNull()
+		.default('[]')
+		.$type<Countdown[]>(),
 	updated_at: integer('updated_at').notNull()
 });
 
 export const campaign_state_table_schema = createSelectSchema(campaign_state_table);
 export const campaign_state_table_insert_schema = createInsertSchema(campaign_state_table);
 export const campaign_state_table_update_schema = createUpdateSchema(campaign_state_table);
+
+// ============================================================================
+// Campaign Characters (Join Table)
+// ============================================================================
+
+export const campaign_characters_table = sqliteTable(
+	'campaign_characters_table',
+	{
+		campaign_id: text('campaign_id').notNull(),
+		character_id: text('character_id').notNull(),
+		claimable: integer('claimable').notNull().default(0),
+		added_at: integer('added_at').notNull()
+	},
+	(table) => [
+		primaryKey({ columns: [table.campaign_id, table.character_id] }),
+		index('campaign_characters_table_campaign_id_idx').on(table.campaign_id),
+		index('campaign_characters_table_character_id_idx').on(table.character_id)
+	]
+);
+
+export const campaign_characters_table_schema = createSelectSchema(campaign_characters_table);
+export const campaign_characters_table_insert_schema = createInsertSchema(campaign_characters_table);
+export const campaign_characters_table_update_schema = createUpdateSchema(campaign_characters_table);
 
 // ============================================================================
 // Campaign Homebrew Vault

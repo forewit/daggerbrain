@@ -13,7 +13,7 @@ import { error } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 import { characters_table } from '../server/db/characters.schema';
-import { campaigns_table, campaign_members_table } from '../server/db/campaigns.schema';
+import { campaigns_table, campaign_members_table, campaign_characters_table } from '../server/db/campaigns.schema';
 import {
 	homebrew_classes,
 	homebrew_subclasses,
@@ -241,14 +241,26 @@ export const getClaimCharacterAccess = query(
 			throw error(404, 'Character not found');
 		}
 
-		// Character must be claimable
-		if (character.claimable !== 1) {
-			return { character, canClaim: false, reason: 'Character is not claimable' };
-		}
-
 		// Character must be in the specified campaign
 		if (character.campaign_id !== campaignId) {
 			return { character, canClaim: false, reason: 'Character is not in this campaign' };
+		}
+
+		// Get claimable status from campaign_characters table
+		const [campaignChar] = await db
+			.select({ claimable: campaign_characters_table.claimable })
+			.from(campaign_characters_table)
+			.where(
+				and(
+					eq(campaign_characters_table.campaign_id, campaignId),
+					eq(campaign_characters_table.character_id, characterId)
+				)
+			)
+			.limit(1);
+
+		// Character must be claimable
+		if (!campaignChar || campaignChar.claimable !== 1) {
+			return { character, canClaim: false, reason: 'Character is not claimable' };
 		}
 
 		// Check user's campaign membership
@@ -272,20 +284,24 @@ export const getClaimCharacterAccess = query(
 			return { character, canClaim: false, reason: 'GMs cannot claim characters' };
 		}
 
-		// Player must not already have a character in this campaign
-		const [existingCharacter] = await db
-			.select()
-			.from(characters_table)
+		// Player must not already have a non-claimable character in this campaign
+		const existingCharacters = await db
+			.select({ character_id: campaign_characters_table.character_id })
+			.from(campaign_characters_table)
+			.innerJoin(
+				characters_table,
+				eq(characters_table.id, campaign_characters_table.character_id)
+			)
 			.where(
 				and(
-					eq(characters_table.campaign_id, campaignId),
+					eq(campaign_characters_table.campaign_id, campaignId),
 					eq(characters_table.clerk_user_id, userId),
-					eq(characters_table.claimable, 0)
+					eq(campaign_characters_table.claimable, 0)
 				)
 			)
 			.limit(1);
 
-		if (existingCharacter) {
+		if (existingCharacters.length > 0) {
 			return { character, canClaim: false, reason: 'You already have a character in this campaign' };
 		}
 
@@ -303,19 +319,24 @@ export const hasCharacterInCampaign = query(
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		const [existingCharacter] = await db
-			.select()
-			.from(characters_table)
+		// Join characters with campaign_characters to check claimable status
+		const existingCharacters = await db
+			.select({ character_id: campaign_characters_table.character_id })
+			.from(campaign_characters_table)
+			.innerJoin(
+				characters_table,
+				eq(characters_table.id, campaign_characters_table.character_id)
+			)
 			.where(
 				and(
-					eq(characters_table.campaign_id, campaignId),
+					eq(campaign_characters_table.campaign_id, campaignId),
 					eq(characters_table.clerk_user_id, userId),
-					eq(characters_table.claimable, 0)
+					eq(campaign_characters_table.claimable, 0)
 				)
 			)
 			.limit(1);
 
-		return !!existingCharacter;
+		return existingCharacters.length > 0;
 	}
 );
 

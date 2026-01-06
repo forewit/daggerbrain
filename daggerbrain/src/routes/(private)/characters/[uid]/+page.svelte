@@ -8,14 +8,14 @@
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 
 	const context = getCharacterContext();
-	let character = $derived(context.character);
+	let character = $derived(context?.character);
 	const user = getUserContext();
 	const characterId = $derived($page.params.uid);
 
 	// Check both user loading and character context loading
 	const isLoading = $derived.by(() => {
-		const userLoading = user.loading;
-		const contextLoading = context.loading;
+		const userLoading = user?.loading;
+		const contextLoading = context?.loading;
 		return userLoading || contextLoading;
 	});
 

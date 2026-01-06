@@ -16,8 +16,7 @@
 	const MAX_FEAR = 12;
 </script>
 
-<div class={cn('flex flex-col justify-center gap-2 text-center', className)}>
-	<div class={cn('flex flex-col justify-center gap-2 text-center', className)}>
+	<div class={cn('flex items-center justify-center gap-2 text-center', className)}>
 		<button
 			onclick={() => {
 				if (!isGM) return;
@@ -27,7 +26,7 @@
 			disabled={!isGM}
 			class={cn(
 				'mx-auto w-min text-sm font-medium text-destructive',
-				!isGM && 'cursor-not-allowed opacity-50'
+				!isGM && 'cursor-pointer opacity-50'
 			)}
 		>
 			FEAR
@@ -42,7 +41,7 @@
 						index < fearValue ? 'bg-destructive' : 'bg-transparent',
 						fearValue === MAX_FEAR &&
 							'shadow-[0_0_8px_rgba(239,68,68,0.4),0_0_16px_rgba(239,68,68,0.2)]',
-						!isGM && 'cursor-not-allowed'
+						!isGM && 'cursor-pointer'
 					)}
 					onclick={() => {
 						if (!isGM) return;
@@ -58,4 +57,3 @@
 			{/each}
 		</div>
 	</div>
-</div>

@@ -1,7 +1,8 @@
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import type { KVNamespace } from '@cloudflare/workers-types';
 import type { get_db } from './utils';
 import { characters_table } from '../server/db/characters.schema';
+import { campaign_members_table, campaign_characters_table } from '../server/db/campaigns.schema';
 import type { CampaignCharacterSummary } from '../types/campaign-types';
 import type { DerivedCharacter } from '../types/derived-character-types';
 
@@ -36,6 +37,32 @@ export async function upsertCharacterSummary(
 		return;
 	}
 
+	// Get claimable status from campaign_characters join table
+	const [campaignChar] = await db
+		.select({ claimable: campaign_characters_table.claimable })
+		.from(campaign_characters_table)
+		.where(
+			and(
+				eq(campaign_characters_table.campaign_id, campaignId),
+				eq(campaign_characters_table.character_id, characterId)
+			)
+		)
+		.limit(1);
+	const isClaimable = campaignChar?.claimable === 1;
+
+	// Get member display name for owner (must be in the same campaign)
+	const [member] = await db
+		.select()
+		.from(campaign_members_table)
+		.where(
+			and(
+				eq(campaign_members_table.campaign_id, campaignId),
+				eq(campaign_members_table.user_id, char.clerk_user_id)
+			)
+		)
+		.limit(1);
+	const owner_name = member?.display_name || undefined;
+
 	// Get existing summary and update only this character (more efficient than full rebuild)
 	const existing = (await kv.get(`campaign:${campaignId}:characters`, 'json')) as
 		| Record<string, CampaignCharacterSummary>
@@ -68,12 +95,13 @@ export async function upsertCharacterSummary(
 		max_hope,
 		active_conditions: char.active_conditions,
 		owner_user_id: char.clerk_user_id,
+		owner_name,
 		derived_descriptors: char.derived_descriptors,
 		evasion,
 		max_armor,
 		marked_armor: char.marked_armor,
 		damage_thresholds,
-		claimable: char.claimable === 1
+		claimable: isClaimable
 	};
 
 	// Update KV with TTL safety net
@@ -117,6 +145,30 @@ export async function rebuildCampaignCharacterCache(
 		.from(characters_table)
 		.where(eq(characters_table.campaign_id, campaignId));
 
+	// Get all campaign_characters entries for claimable status
+	const campaignChars = await db
+		.select()
+		.from(campaign_characters_table)
+		.where(eq(campaign_characters_table.campaign_id, campaignId));
+
+	// Build a map of character_id -> claimable
+	const claimableMap = new Map<string, boolean>();
+	for (const cc of campaignChars) {
+		claimableMap.set(cc.character_id, cc.claimable === 1);
+	}
+
+	// Get all campaign members with display names
+	const members = await db
+		.select()
+		.from(campaign_members_table)
+		.where(eq(campaign_members_table.campaign_id, campaignId));
+
+	// Build a map of user_id -> display_name
+	const displayNameMap = new Map<string, string | null>();
+	for (const member of members) {
+		displayNameMap.set(member.user_id, member.display_name || null);
+	}
+
 	// Convert to summaries - use parallel KV lookups for better performance
 	const summaries: Record<string, CampaignCharacterSummary> = {};
 
@@ -146,6 +198,12 @@ export async function rebuildCampaignCharacterCache(
 		const max_armor = derivedChar?.derived_max_armor ?? 0;
 		const damage_thresholds = derivedChar?.derived_damage_thresholds ?? { major: 0, severe: 0 };
 
+		// Get owner display name from member map
+		const owner_name = displayNameMap.get(char.clerk_user_id) || undefined;
+
+		// Get claimable status from join table
+		const isClaimable = claimableMap.get(char.id) ?? false;
+
 		summaries[char.id] = {
 			id: char.id,
 			name: char.name,
@@ -159,12 +217,13 @@ export async function rebuildCampaignCharacterCache(
 			max_hope,
 			active_conditions: char.active_conditions,
 			owner_user_id: char.clerk_user_id,
+			owner_name,
 			derived_descriptors: char.derived_descriptors,
 			evasion,
 			max_armor,
 			marked_armor: char.marked_armor,
 			damage_thresholds,
-			claimable: char.claimable === 1
+			claimable: isClaimable
 		};
 	}
 

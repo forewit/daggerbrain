@@ -11,6 +11,7 @@ interface Env {
 type CharacterAddedNotification = {
   type: 'character_added';
   character: DerivedCharacter;
+  claimable?: boolean;
 };
 
 type CharacterUpdatedNotification = {
@@ -18,6 +19,7 @@ type CharacterUpdatedNotification = {
   characterId: string;
   character?: DerivedCharacter;
   updates?: Partial<DerivedCharacter>;
+  claimable?: boolean;
 };
 
 type CharacterRemovedNotification = {
@@ -25,14 +27,22 @@ type CharacterRemovedNotification = {
   characterId: string;
 };
 
+type MemberUpdatedNotification = {
+  type: 'member_updated';
+  userId: string;
+  displayName: string | null;
+};
+
 type HttpNotificationBody = 
   | CharacterAddedNotification 
   | CharacterUpdatedNotification 
-  | CharacterRemovedNotification;
+  | CharacterRemovedNotification
+  | MemberUpdatedNotification;
 
 interface StoredData {
   state: CampaignState;
   characters: Record<string, DerivedCharacter>;
+  characterClaimable: Record<string, boolean>; // character_id -> claimable status
   version: number;
 }
 
@@ -46,6 +56,8 @@ export class CampaignLiveDO extends DurableObject<Env> {
   private campaignState: CampaignState | null = null;
   // Store full DerivedCharacter objects
   private characters: Record<string, DerivedCharacter> = {};
+  // Store claimable status separately (from campaign_characters table)
+  private characterClaimable: Record<string, boolean> = {};
   private version = 0;
   private initialized = false;
   private initPromise: Promise<void> | null = null;
@@ -87,7 +99,7 @@ export class CampaignLiveDO extends DurableObject<Env> {
               headers: { 'Content-Type': 'application/json' }
             });
           }
-          await this.addCharacter(body.character);
+          await this.addCharacter(body.character, body.claimable ?? false);
           break;
         case 'character_updated':
           if (!body.characterId) {
@@ -165,9 +177,9 @@ export class CampaignLiveDO extends DurableObject<Env> {
           // body.character is full character, body.updates is partial diff
           // At least one should be provided, but handle the case where both might be undefined
           if (body.character) {
-            await this.updateCharacterFromNotification(body.characterId, body.character);
+            await this.updateCharacterFromNotification(body.characterId, body.character, body.claimable);
           } else if (body.updates) {
-            await this.updateCharacterFromNotification(body.characterId, body.updates);
+            await this.updateCharacterFromNotification(body.characterId, body.updates, body.claimable);
           } else {
             return new Response(JSON.stringify({ error: 'character or updates is required for character_updated' }), { 
               status: 400,
@@ -184,6 +196,10 @@ export class CampaignLiveDO extends DurableObject<Env> {
             });
           }
           await this.removeCharacter(body.characterId);
+          break;
+        case 'member_updated':
+          // Broadcast member update to all clients
+          this.broadcastMemberUpdate(body.userId, body.displayName);
           break;
         default:
           return new Response(JSON.stringify({ error: 'Unknown notification type' }), { 
@@ -241,7 +257,8 @@ export class CampaignLiveDO extends DurableObject<Env> {
           type: 'connected',
           version: this.version,
           state: this.campaignState,
-          characters: this.characters
+          characters: this.characters,
+          characterClaimable: this.characterClaimable
         }));
       } catch (error) {
         console.error('Failed to send initial WebSocket message:', error);
@@ -315,7 +332,12 @@ export class CampaignLiveDO extends DurableObject<Env> {
     
     if (stored) {
       this.campaignState = stored.state;
+      // Backward compatibility: ensure countdowns exists
+      if (!this.campaignState.countdowns) {
+        this.campaignState.countdowns = [];
+      }
       this.characters = stored.characters;
+      this.characterClaimable = stored.characterClaimable ?? {};
       this.version = stored.version ?? 0;
       this.initialized = true;
       
@@ -343,9 +365,11 @@ export class CampaignLiveDO extends DurableObject<Env> {
         campaign_id: campaignId,
         fear_track: 0,
         notes: null,
+        countdowns: [],
         updated_at: Date.now()
       };
       this.characters = {};
+      this.characterClaimable = {};
       this.version = 0;
       this.initialized = true;
       
@@ -364,8 +388,8 @@ export class CampaignLiveDO extends DurableObject<Env> {
     if (!campaignId || !this.env.KV) return;
 
     try {
-      // Get campaign character summaries from KV
-      const summaries = await this.env.KV.get<Record<string, any>>(
+      // Get campaign character summaries from KV (includes claimable status)
+      const summaries = await this.env.KV.get<Record<string, { claimable?: boolean }>>(
         `campaign:${campaignId}:characters`,
         'json'
       );
@@ -387,6 +411,8 @@ export class CampaignLiveDO extends DurableObject<Env> {
       for (const { characterId, derivedChar } of characterResults) {
         if (derivedChar) {
           this.characters[characterId] = derivedChar;
+          // Get claimable from summary
+          this.characterClaimable[characterId] = summaries[characterId]?.claimable ?? false;
         }
       }
     } catch (error) {
@@ -415,7 +441,8 @@ export class CampaignLiveDO extends DurableObject<Env> {
         type: 'state_sync',
         version: this.version,
         state: this.campaignState,
-        characters: this.characters
+        characters: this.characters,
+        characterClaimable: this.characterClaimable
       }));
     } else if (lastKnownVersion === this.version) {
       // Client is already in sync
@@ -500,21 +527,23 @@ export class CampaignLiveDO extends DurableObject<Env> {
     return output;
   }
 
-  private async addCharacter(character: DerivedCharacter): Promise<void> {
+  private async addCharacter(character: DerivedCharacter, claimable: boolean = false): Promise<void> {
     await this.ensureInitialized();
     
     this.characters[character.id] = character;
+    this.characterClaimable[character.id] = claimable;
     
     this.version++;
     this.updateCount++;
     
     await this.persistState();
     
-    // Broadcast character added
+    // Broadcast character added with claimable status
     this.broadcast({
       type: 'character_added',
       version: this.version,
-      character
+      character,
+      claimable
     });
     
     if (this.updateCount >= this.FLUSH_INTERVAL) {
@@ -531,6 +560,7 @@ export class CampaignLiveDO extends DurableObject<Env> {
     }
     
     delete this.characters[characterId];
+    delete this.characterClaimable[characterId];
     
     this.version++;
     this.updateCount++;
@@ -550,8 +580,13 @@ export class CampaignLiveDO extends DurableObject<Env> {
     }
   }
 
-  private async updateCharacterFromNotification(characterId: string, updates: Partial<DerivedCharacter> | DerivedCharacter): Promise<void> {
+  private async updateCharacterFromNotification(characterId: string, updates: Partial<DerivedCharacter> | DerivedCharacter, claimable?: boolean): Promise<void> {
     await this.ensureInitialized();
+    
+    // Update claimable status if provided
+    if (claimable !== undefined) {
+      this.characterClaimable[characterId] = claimable;
+    }
     
     // Check if updates is a full character object (has id and other required fields)
     const isFullUpdate = 'id' in updates && updates.id === characterId && 
@@ -576,7 +611,8 @@ export class CampaignLiveDO extends DurableObject<Env> {
         type: 'character_full_update',
         version: this.version,
         characterId,
-        character: updatedCharacter
+        character: updatedCharacter,
+        claimable: this.characterClaimable[characterId]
       });
     } else {
       // Partial diff update - deep merge
@@ -598,7 +634,8 @@ export class CampaignLiveDO extends DurableObject<Env> {
         type: 'character_diff_update',
         version: this.version,
         characterId,
-        updates: updates as CampaignCharacterLiveUpdate
+        updates: updates as CampaignCharacterLiveUpdate,
+        claimable: this.characterClaimable[characterId]
       });
     }
     
@@ -622,6 +659,7 @@ export class CampaignLiveDO extends DurableObject<Env> {
     const data: StoredData = {
       state: this.campaignState,
       characters: this.characters,
+      characterClaimable: this.characterClaimable,
       version: this.version
     };
     
@@ -658,14 +696,26 @@ export class CampaignLiveDO extends DurableObject<Env> {
     }
   }
 
+  private broadcastMemberUpdate(userId: string, displayName: string | null): void {
+    this.version++;
+    
+    this.broadcast({
+      type: 'member_updated',
+      version: this.version,
+      userId,
+      displayName
+    });
+  }
+
   private broadcast(message: 
     | { type: 'state_update'; version: number; state: CampaignState }
-    | { type: 'character_update'; version: number; characterId: string; character: CampaignCharacterLiveUpdate }
+    | { type: 'character_update'; version: number; characterId: string; character: CampaignCharacterLiveUpdate; claimable?: boolean }
     | { type: 'characters_update'; version: number; characters: Record<string, CampaignCharacterLiveUpdate> }
-    | { type: 'character_added'; version: number; character: DerivedCharacter }
+    | { type: 'character_added'; version: number; character: DerivedCharacter; claimable?: boolean }
     | { type: 'character_removed'; version: number; characterId: string }
-    | { type: 'character_full_update'; version: number; characterId: string; character: DerivedCharacter }
-    | { type: 'character_diff_update'; version: number; characterId: string; updates: CampaignCharacterLiveUpdate }
+    | { type: 'character_full_update'; version: number; characterId: string; character: DerivedCharacter; claimable?: boolean }
+    | { type: 'character_diff_update'; version: number; characterId: string; updates: CampaignCharacterLiveUpdate; claimable?: boolean }
+    | { type: 'member_updated'; version: number; userId: string; displayName: string | null }
   ): void {
     const websockets = this.ctx.getWebSockets();
     for (const ws of websockets) {

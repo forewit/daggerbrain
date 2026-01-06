@@ -7,7 +7,8 @@ import {
 	delete_campaign,
 	assign_character_to_campaign,
 	leave_campaign,
-	claim_character
+	claim_character,
+	unassign_character
 } from '$lib/remote/campaigns.remote';
 import {
 	get_campaign_homebrew_vault,
@@ -22,13 +23,14 @@ import { error } from '@sveltejs/kit';
 import { getContext, setContext } from 'svelte';
 import { goto } from '$app/navigation';
 import { createCampaignLiveConnection } from './campaign-live.svelte';
-import type { Campaign, CampaignState, CampaignCharacterSummary, CampaignMember, CampaignCharacterLiveUpdate } from '$lib/types/campaign-types';
+import type { Campaign, CampaignState, CampaignCharacterSummary, CampaignMember, CampaignCharacterLiveUpdate, Countdown } from '$lib/types/campaign-types';
 import type { DerivedCharacter } from '$lib/types/derived-character-types';
 import type { HomebrewType } from '$lib/types/homebrew-types';
 
 // Helper function to merge live character updates with existing character data
 // Helper to convert DerivedCharacter to CampaignCharacterSummary
-function derivedCharacterToSummary(derived: DerivedCharacter): CampaignCharacterSummary {
+// claimable is now passed separately since it's stored in campaign_characters table
+function derivedCharacterToSummary(derived: DerivedCharacter, claimable: boolean = false): CampaignCharacterSummary {
 	return {
 		id: derived.id,
 		name: derived.name,
@@ -47,7 +49,7 @@ function derivedCharacterToSummary(derived: DerivedCharacter): CampaignCharacter
 		max_armor: derived.derived_max_armor,
 		marked_armor: derived.marked_armor,
 		damage_thresholds: derived.derived_damage_thresholds,
-		claimable: derived.claimable === 1
+		claimable
 	};
 }
 
@@ -116,6 +118,9 @@ function campaignContext(campaignId: string | undefined) {
 	let vaultItems = $state<Array<{ id: string; homebrew_type: HomebrewType; homebrew_id: string }>>([]);
 	let loading = $state(true);
 	let wsConnection = $state<ReturnType<typeof createCampaignLiveConnection> | null>(null);
+	let initialSyncComplete = $state(false);
+	let syncTimeout: ReturnType<typeof setTimeout> | null = null;
+	let currentCampaignIdForSync = $state<string | undefined>(undefined);
 
 	// Auto-save state tracking
 	let initialLoadComplete = $state(false);
@@ -128,7 +133,12 @@ function campaignContext(campaignId: string | undefined) {
 		const id = campaignId;
 		if (!id) return;
 
-		loading = true;
+		// Only show loading spinner during initial load, not during refreshes
+		// If initialSyncComplete is false, we're still in initial load phase
+		const isInitialLoad = !initialSyncComplete;
+		if (isInitialLoad) {
+			loading = true;
+		}
 		try {
 			const [camp, mems, state, chars, vault] = await Promise.all([
 				get_campaign(id),
@@ -145,13 +155,15 @@ function campaignContext(campaignId: string | undefined) {
 		} catch (err) {
 			error(500, err instanceof Error ? err.message : 'Failed to load campaign');
 		} finally {
-			loading = false;
+			if (isInitialLoad) {
+				loading = false;
+			}
 		}
 	}
 
 
 	// Update campaign state
-	async function updateState(updates: { fear_track?: number; notes?: string | null }): Promise<void> {
+	async function updateState(updates: { fear_track?: number; notes?: string | null; countdowns?: Countdown[] }): Promise<void> {
 		const id = campaignId;
 		if (!id) {
 			throw new Error('Campaign ID is required');
@@ -219,6 +231,24 @@ function campaignContext(campaignId: string | undefined) {
 			await load();
 		} catch (err) {
 			error(500, err instanceof Error ? err.message : 'Failed to claim character');
+		}
+	}
+
+	// Unassign a character (make it claimable)
+	async function unassignCharacter(characterId: string): Promise<void> {
+		const id = campaignId;
+		if (!id || !characterId) return;
+
+		try {
+			await unassign_character({
+				character_id: characterId,
+				campaign_id: id
+			});
+			// Query refresh is handled by the remote command
+			// Reload to get fresh data
+			await load();
+		} catch (err) {
+			error(500, err instanceof Error ? err.message : 'Failed to unassign character');
 		}
 	}
 
@@ -303,6 +333,16 @@ function campaignContext(campaignId: string | undefined) {
 	// Auto-load when campaign ID changes
 	$effect(() => {
 		const id = campaignId;
+		// Only reset sync state when campaign ID actually changes
+		if (id !== currentCampaignIdForSync) {
+			initialSyncComplete = false;
+			currentCampaignIdForSync = id;
+			// Clear any existing sync timeout
+			if (syncTimeout) {
+				clearTimeout(syncTimeout);
+				syncTimeout = null;
+			}
+		}
 		if (id) {
 			load().then(() => {
 				// After initial load, connect WebSocket
@@ -332,20 +372,32 @@ function campaignContext(campaignId: string | undefined) {
 								if (message.state) {
 									campaignState = message.state;
 								}
-								// Convert full DerivedCharacter objects to summaries
+								// Convert full DerivedCharacter objects to summaries with claimable status
 								if (message.characters) {
+									const claimableMap = message.characterClaimable ?? {};
 									const merged: Record<string, CampaignCharacterSummary> = { ...characters };
 									for (const [id, derivedChar] of Object.entries(message.characters)) {
-										const summary = mergeCharacterLiveUpdate(characters[id], derivedChar as DerivedCharacter);
-										if (summary) {
-											merged[id] = summary;
-										}
+										const claimable = claimableMap[id] ?? false;
+										const summary = derivedCharacterToSummary(derivedChar as DerivedCharacter, claimable);
+										merged[id] = summary;
 									}
 									characters = merged;
+								}
+								initialSyncComplete = true;
+								// Clear timeout since sync completed successfully
+								if (syncTimeout) {
+									clearTimeout(syncTimeout);
+									syncTimeout = null;
 								}
 								break;
 							case 'already_synced':
 								// Client is already in sync, no action needed
+								initialSyncComplete = true;
+								// Clear timeout since sync completed successfully
+								if (syncTimeout) {
+									clearTimeout(syncTimeout);
+									syncTimeout = null;
+								}
 								break;
 							case 'state_update':
 								if (message.state) {
@@ -373,6 +425,10 @@ function campaignContext(campaignId: string | undefined) {
 										message.character
 									);
 									if (mergedChar) {
+										// Update claimable if provided
+										if (message.claimable !== undefined) {
+											mergedChar.claimable = message.claimable;
+										}
 										characters = {
 											...characters,
 											[message.characterId]: mergedChar
@@ -381,9 +437,9 @@ function campaignContext(campaignId: string | undefined) {
 								}
 								break;
 							case 'character_added':
-								// Add new character to state
+								// Add new character to state with claimable status
 								if (message.character) {
-									const summary = derivedCharacterToSummary(message.character);
+									const summary = derivedCharacterToSummary(message.character, message.claimable ?? false);
 									characters = {
 										...characters,
 										[message.character.id]: summary
@@ -398,9 +454,9 @@ function campaignContext(campaignId: string | undefined) {
 								}
 								break;
 							case 'character_full_update':
-								// Replace entire character object
+								// Replace entire character object with claimable status
 								if (message.characterId && message.character) {
-									const summary = derivedCharacterToSummary(message.character);
+									const summary = derivedCharacterToSummary(message.character, message.claimable ?? false);
 									characters = {
 										...characters,
 										[message.characterId]: summary
@@ -415,6 +471,10 @@ function campaignContext(campaignId: string | undefined) {
 										message.updates
 									);
 									if (mergedChar) {
+										// Update claimable if provided
+										if (message.claimable !== undefined) {
+											mergedChar.claimable = message.claimable;
+										}
 										characters = {
 											...characters,
 											[message.characterId]: mergedChar
@@ -422,14 +482,62 @@ function campaignContext(campaignId: string | undefined) {
 									}
 								}
 								break;
+							case 'member_updated':
+								// Update member display name and refresh character owner_name
+								if (message.userId) {
+									// Update members list
+									members = members.map(m => 
+										m.user_id === message.userId 
+											? { ...m, display_name: message.displayName }
+											: m
+									);
+									// Update owner_name in characters owned by this user
+									const updatedChars = { ...characters };
+									for (const [charId, char] of Object.entries(updatedChars)) {
+										if (char.owner_user_id === message.userId) {
+											updatedChars[charId] = {
+												...char,
+												owner_name: message.displayName ?? undefined
+											};
+										}
+									}
+									characters = updatedChars;
+								}
+								break;
 							case 'error':
 								console.error('WebSocket error:', message.message);
+								// If we get an error and haven't synced yet, mark as complete to prevent infinite loading
+								// This handles cases where the Durable Object is unreachable
+								if (!initialSyncComplete) {
+									console.warn('WebSocket error before sync - marking as complete');
+									initialSyncComplete = true;
+									if (syncTimeout) {
+										clearTimeout(syncTimeout);
+										syncTimeout = null;
+									}
+								}
 								break;
 						}
 					});
 					
 					// Connect
 					wsConnection.connect();
+					
+					// Set a timeout to mark sync as complete if WebSocket doesn't connect/sync within 15 seconds
+					// This prevents the page from loading forever if the Durable Object is unreachable
+					// Only set timeout if sync isn't already complete and we don't already have a timeout
+					if (!initialSyncComplete && !syncTimeout) {
+						syncTimeout = setTimeout(() => {
+							if (!initialSyncComplete) {
+								console.warn('WebSocket sync timeout - marking as complete to prevent infinite loading');
+								initialSyncComplete = true;
+							}
+							syncTimeout = null;
+						}, 2000);
+					}
+				} else {
+					// Not in browser environment (SSR), mark sync as complete
+					initialSyncComplete = true;
 				}
 			});
 		} else {
@@ -438,6 +546,13 @@ function campaignContext(campaignId: string | undefined) {
 				wsConnection.disconnect();
 				wsConnection = null;
 			}
+			// Clear sync timeout
+			if (syncTimeout) {
+				clearTimeout(syncTimeout);
+				syncTimeout = null;
+			}
+			// Reset tracking when campaign ID is cleared
+			currentCampaignIdForSync = undefined;
 		}
 		
 		// Cleanup on unmount
@@ -445,6 +560,10 @@ function campaignContext(campaignId: string | undefined) {
 			if (wsConnection) {
 				wsConnection.disconnect();
 				wsConnection = null;
+			}
+			if (syncTimeout) {
+				clearTimeout(syncTimeout);
+				syncTimeout = null;
 			}
 		};
 	});
@@ -534,13 +653,14 @@ function campaignContext(campaignId: string | undefined) {
 			return vaultItems;
 		},
 		get loading() {
-			return loading;
+			return loading || !initialSyncComplete;
 		},
 		load,
 		updateState,
 		deleteCampaign,
 		assignCharacter,
 		claimCharacter,
+		unassignCharacter,
 		leaveCampaign,
 		addToVault,
 		removeFromVault,

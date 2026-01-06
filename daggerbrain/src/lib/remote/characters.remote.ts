@@ -1,6 +1,6 @@
 import { query, command, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
-import { eq, and, or } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 import {
 	characters_table,
@@ -197,9 +197,19 @@ export const create_character = command(
 	await db.insert(characters_table).values({
 		id: characterId,
 		clerk_user_id: userId,
-		campaign_id: options?.campaign_id || null,
-		claimable: isClaimable ? 1 : 0
+		campaign_id: options?.campaign_id || null
 	});
+
+	// If character is being created in a campaign, also insert into campaign_characters table
+	if (options?.campaign_id) {
+		const { campaign_characters_table } = await import('../server/db/campaigns.schema');
+		await db.insert(campaign_characters_table).values({
+			campaign_id: options.campaign_id,
+			character_id: characterId,
+			claimable: isClaimable ? 1 : 0,
+			added_at: Date.now()
+		});
+	}
 
 	// Refresh the characters list
 	get_all_characters().refresh();
@@ -232,7 +242,11 @@ export const update_character = command(
 
 		// Extract derived_character and id before updating DB
 		// id is in the schema but won't be updated (it's only used for WHERE clause)
-		const { derived_character, id, ...character } = data;
+		// Exclude sensitive fields that should only be modified through dedicated endpoints:
+		// - campaign_id: modified via assign_character_to_campaign
+		// - clerk_user_id: immutable, determines ownership
+		// Note: claimable is now stored in campaign_characters_table, not characters_table
+		const { derived_character, id, campaign_id: _campaignId, clerk_user_id: _clerkUserId, ...character } = data;
 
 		if (!id) {
 			throw error(400, 'Character id missing');
@@ -254,7 +268,7 @@ export const update_character = command(
 
 		// Handle KV materialization for campaign characters
 		const kv = get_kv(event);
-		// Always use DB's campaign_id as source of truth (client-provided campaign_id is stripped by schema)
+		// Always use DB's campaign_id as source of truth (client-provided campaign_id is explicitly excluded above)
 		const campaignId = existingCharacter.campaign_id;
 
 		// Store derived_character in KV for campaign characters

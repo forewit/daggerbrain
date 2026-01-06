@@ -14,6 +14,15 @@ export type Campaign = typeof campaigns_table.$inferSelect;
 export type CampaignMember = typeof campaign_members_table.$inferSelect;
 export type CampaignState = typeof campaign_state_table.$inferSelect;
 
+export type Countdown = {
+	id: string; // Unique identifier for each countdown
+	name: string;
+	min: number;
+	max?: number; // Optional - if not set, countdown can go as high as needed
+	current: number;
+	visibleToPlayers: boolean;
+};
+
 export type CampaignWithDetails = Campaign & {
 	user_role: 'gm' | 'player';
 	player_count: number;
@@ -53,6 +62,7 @@ export type CampaignLiveWebSocketMessage =
 			version: number;
 			state: CampaignState | null;
 			characters: Record<string, DerivedCharacter>;
+			characterClaimable?: Record<string, boolean>;
 	  }
 	| {
 			type: 'state_update';
@@ -69,12 +79,14 @@ export type CampaignLiveWebSocketMessage =
 			version: number;
 			characterId: string;
 			character: CampaignCharacterLiveUpdate;
+			claimable?: boolean;
 	  }
 	| {
 			type: 'state_sync';
 			version: number;
 			state: CampaignState | null;
 			characters: Record<string, DerivedCharacter>;
+			characterClaimable?: Record<string, boolean>;
 	  }
 	| {
 			type: 'already_synced';
@@ -84,6 +96,7 @@ export type CampaignLiveWebSocketMessage =
 			type: 'character_added';
 			version: number;
 			character: DerivedCharacter;
+			claimable?: boolean;
 	  }
 	| {
 			type: 'character_removed';
@@ -95,12 +108,20 @@ export type CampaignLiveWebSocketMessage =
 			version: number;
 			characterId: string;
 			character: DerivedCharacter;
+			claimable?: boolean;
 	  }
 	| {
 			type: 'character_diff_update';
 			version: number;
 			characterId: string;
 			updates: CampaignCharacterLiveUpdate;
+			claimable?: boolean;
+	  }
+	| {
+			type: 'member_updated';
+			version: number;
+			userId: string;
+			displayName: string | null;
 	  }
 	| {
 			type: 'error';
@@ -115,7 +136,7 @@ export type CampaignLiveClientMessage =
 	  }
 	| {
 			type: 'update_state';
-			updates: Partial<Pick<CampaignState, 'fear_track' | 'notes' | 'updated_at'>>;
+			updates: Partial<Pick<CampaignState, 'fear_track' | 'notes' | 'countdowns' | 'updated_at'>>;
 	  }
 	| {
 			type: 'update_character';

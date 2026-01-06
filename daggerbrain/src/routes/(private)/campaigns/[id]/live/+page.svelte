@@ -51,7 +51,7 @@
 				'pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]'
 			)}
 		>
-			<div class="flex w-full max-w-6xl flex-col gap-6 px-4 py-4">
+			<div class="flex w-full ">
 				{#if data.role === 'gm' && campaignId}
 					<CampaignLiveGm {campaignId} />
 				{:else if campaignId}

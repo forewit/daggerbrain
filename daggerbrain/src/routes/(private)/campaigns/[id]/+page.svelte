@@ -13,6 +13,7 @@
 	import Footer from '$lib/components/app/footer.svelte';
 	import { getUserContext } from '$lib/state/user.svelte';
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
+	import { update_campaign_member } from '$lib/remote/campaigns.remote';
 	import { toast } from 'svelte-sonner';
 	import CampaignOverviewPlayer from '$lib/components/app/campaigns/campaign-overview-player.svelte';
 	import CampaignOverviewGm from '$lib/components/app/campaigns/campaign-overview-gm.svelte';
@@ -43,7 +44,14 @@
 	let showSettingsDialog = $state(false);
 	let campaignName = $state('');
 	let campaignDescription = $state('');
+	let gmDisplayName = $state('');
 	let isDeleting = $state(false);
+
+	// Player settings dialog state
+	let showPlayerSettingsDialog = $state(false);
+	let playerDisplayName = $state('');
+	let isLeaving = $state(false);
+	let showLeaveConfirmation = $state(false);
 
 	const clipboard = new UseClipboard();
 	const joinUrl = $derived(campaignId ? `${page.url.origin}/campaigns/join/${campaignId}` : '');
@@ -56,20 +64,40 @@
 		}
 	});
 
+	// Initialize GM display name when settings dialog opens
+	$effect(() => {
+		if (data.userMembership && showSettingsDialog) {
+			gmDisplayName = data.userMembership.display_name || '';
+		}
+	});
+
 	// Check if there are any changes
 	const hasChanges = $derived(
 		campaign.campaign &&
 			(campaignName.trim() !== campaign.campaign.name ||
-				(campaignDescription.trim() || null) !== (campaign.campaign.description || null))
+				(gmDisplayName.trim() || '') !== (data.userMembership?.display_name || ''))
 	);
 
-	function handleSave() {
+	async function handleSave() {
 		if (!campaignId || !campaignName.trim() || !campaign.campaign) return;
 
-		// Update state directly - auto-save will handle persistence
-		campaign.campaign.name = campaignName.trim();
-		campaign.campaign.description = campaignDescription.trim() || null;
-		showSettingsDialog = false;
+		try {
+			// Update campaign name - auto-save will handle persistence
+			campaign.campaign.name = campaignName.trim();
+			
+			// Update GM display name if it changed
+			if (gmDisplayName.trim() !== (data.userMembership?.display_name || '')) {
+				await update_campaign_member({
+					campaign_id: campaignId,
+					display_name: gmDisplayName.trim() || undefined
+				});
+			}
+			
+			showSettingsDialog = false;
+		} catch (err) {
+			const message = err instanceof Error ? err.message : 'Failed to save settings';
+			toast.error(message);
+		}
 	}
 
 	async function handleDelete() {
@@ -107,8 +135,51 @@
 	$effect(() => {
 		if (!showSettingsDialog) {
 			deleteConfirmation = '';
+			gmDisplayName = '';
 		}
 	});
+
+	// Initialize player settings dialog values
+	$effect(() => {
+		if (data.userMembership && showPlayerSettingsDialog) {
+			playerDisplayName = data.userMembership.display_name || '';
+		}
+	});
+
+	// Check if player display name has changed
+	const hasPlayerChanges = $derived(
+		data.userMembership &&
+			playerDisplayName.trim() !== (data.userMembership.display_name || '')
+	);
+
+	async function handleSavePlayerSettings() {
+		if (!campaignId || !data.userMembership) return;
+
+		try {
+			await update_campaign_member({
+				campaign_id: campaignId,
+				display_name: playerDisplayName.trim() || undefined
+			});
+			toast.success('Settings saved');
+			showPlayerSettingsDialog = false;
+		} catch (err) {
+			const message = err instanceof Error ? err.message : 'Failed to save settings';
+			toast.error(message);
+		}
+	}
+
+	async function handleLeaveCampaign() {
+		if (!campaignId || isLeaving) return;
+
+		isLeaving = true;
+		try {
+			await campaign.leaveCampaign();
+			// leaveCampaign already navigates away, so we don't need to close dialog
+		} catch (err) {
+			isLeaving = false;
+			// Error handling is done in leaveCampaign
+		}
+	}
 </script>
 
 <div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
@@ -152,6 +223,16 @@
 								variant="outline"
 								size="sm"
 								onclick={() => (showSettingsDialog = true)}
+								class="h-7"
+							>
+								<Settings class="size-3.5" />
+								<p class="hidden sm:block">Settings</p>
+							</Button>
+						{:else}
+							<Button
+								variant="outline"
+								size="sm"
+								onclick={() => (showPlayerSettingsDialog = true)}
 								class="h-7"
 							>
 								<Settings class="size-3.5" />
@@ -210,8 +291,14 @@
 				<Input bind:value={campaignName} placeholder="Campaign name" required />
 			</div>
 			<div class="flex flex-col gap-2">
-				<Label>Subtitle</Label>
-				<Input bind:value={campaignDescription} placeholder="In a world full of wonder..." />
+				<Label>Your Display Name (GM)</Label>
+				<Input
+					bind:value={gmDisplayName}
+					placeholder="Enter your display name (optional)"
+				/>
+				<p class="text-xs text-muted-foreground">
+					This is how other players will see your name in this campaign.
+				</p>
 			</div>
 			<div class="flex flex-col gap-2">
 				<Label>Invite Link</Label>
@@ -271,6 +358,93 @@
 				Cancel
 			</Dialog.Close>
 			<Button onclick={handleSave} disabled={!hasChanges || !campaignName.trim()}>Save</Button>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
+
+<!-- Player Settings Dialog -->
+<Dialog.Root bind:open={showPlayerSettingsDialog}>
+	<Dialog.Content class="flex max-h-[90%] flex-col">
+		<Dialog.Header>
+			<Dialog.Title>Player Settings</Dialog.Title>
+		</Dialog.Header>
+
+		<form
+			class="flex flex-col gap-6 overflow-y-auto py-4"
+			onsubmit={(e) => {
+				e.preventDefault();
+				handleSavePlayerSettings();
+			}}
+		>
+			<div class="flex flex-col gap-2">
+				<Label for="player-display-name">Display Name</Label>
+				<Input
+					id="player-display-name"
+					bind:value={playerDisplayName}
+					placeholder="Enter your display name"
+				/>
+			</div>
+
+			<Button
+				type="button"
+				variant="link"
+				class="text-destructive justify-start p-0 h-auto"
+				onclick={() => (showLeaveConfirmation = true)}
+			>
+				Leave Campaign
+			</Button>
+
+			<button type="submit" class="hidden">Save</button>
+		</form>
+
+		<Dialog.Footer class="flex gap-3">
+			<div class="grow"></div>
+			<Dialog.Close
+				type="button"
+				class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
+				onclick={() => {
+					showLeaveConfirmation = false;
+				}}
+			>
+				Cancel
+			</Dialog.Close>
+			<Button onclick={handleSavePlayerSettings} disabled={!hasPlayerChanges}>
+				Save
+			</Button>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
+
+<!-- Leave Campaign Confirmation Dialog -->
+<Dialog.Root bind:open={showLeaveConfirmation}>
+	<Dialog.Content class="sm:max-w-md">
+		<Dialog.Header>
+			<Dialog.Title>Leave Campaign</Dialog.Title>
+			<Dialog.Description>
+				Are you sure you want to leave <strong>{campaign.campaign?.name || 'this campaign'}</strong>? This action cannot be undone.
+			</Dialog.Description>
+		</Dialog.Header>
+		<Dialog.Footer class="flex gap-3">
+			<Dialog.Close
+				type="button"
+				class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
+				onclick={() => (showLeaveConfirmation = false)}
+			>
+				Cancel
+			</Dialog.Close>
+			<Button
+				type="button"
+				variant="destructive"
+				disabled={isLeaving}
+				onclick={handleLeaveCampaign}
+			>
+				{#if isLeaving}
+					<Loader2 class="size-4 animate-spin" />
+					Leaving...
+				{:else}
+					Leave Campaign
+				{/if}
+			</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
