@@ -3,6 +3,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+	import Hourglass from '@lucide/svelte/icons/hourglass';
 	import Footer from '$lib/components/app/footer.svelte';
 	import { page } from '$app/state';
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
@@ -15,6 +16,9 @@
 	const campaignId = $derived(page.params.id);
 	const campaign = getCampaignContext();
 	const loading = $derived(campaign.loading);
+
+	// Countdown sheet state
+	let countdownSheetOpen = $state(false);
 </script>
 
 <div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
@@ -42,6 +46,19 @@
 							{campaign.campaign?.name}
 						</Button>
 					</div>
+					{#if data.role === 'gm'}
+						<div class="flex shrink-0 items-center gap-2">
+							<Button
+								variant="outline"
+								size="sm"
+								onclick={() => (countdownSheetOpen = true)}
+								class="h-7"
+							>
+								<Hourglass class="size-3.5" />
+								<p class="hidden sm:block">Countdowns</p>
+							</Button>
+						</div>
+					{/if}
 				</div>
 			</div>
 		</div>
@@ -53,7 +70,7 @@
 		>
 			<div class="flex w-full ">
 				{#if data.role === 'gm' && campaignId}
-					<CampaignLiveGm {campaignId} />
+					<CampaignLiveGm {campaignId} bind:countdownSheetOpen />
 				{:else if campaignId}
 					<CampaignLivePlayer {campaignId} />
 				{/if}

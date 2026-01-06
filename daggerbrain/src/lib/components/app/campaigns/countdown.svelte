@@ -10,11 +10,13 @@
 	let {
 		countdown = $bindable<Countdown>(),
 		isGM = false,
+		onUpdate = () => {},
 		class: className = '',
 		onClickCountdown = () => {}
 	}: {
 		countdown: Countdown;
 		isGM?: boolean;
+		onUpdate?: (value: number) => void;
 		class?: string;
 		onClickCountdown?: () => void;
 	} = $props();
@@ -33,6 +35,8 @@
 		if (countdown.current < countdown.min) {
 			countdown.current = countdown.min;
 		}
+		onUpdate(countdown.current);
+
 	});
 </script>
 
@@ -57,7 +61,6 @@
 				type="number"
 				inputmode="numeric"
 				min={countdown.min}
-				
 				class="grow text-center font-eveleth text-xl w-20"
 			/>
 
