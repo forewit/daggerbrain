@@ -217,8 +217,14 @@ export const characters_table_insert_schema = createInsertSchema(characters_tabl
 	chosen_beastform: ChosenBeastformSchema.nullable(),
 	companion: CompanionSchema.nullable()
 });
+// Base update schema - omits sensitive fields that should only be changed via specific commands
 export const characters_table_update_schema = createUpdateSchema(characters_table, {
 	secondary_class_domain_id_choice: DomainIdsSchema.nullable(),
 	chosen_beastform: ChosenBeastformSchema.nullable(),
 	companion: CompanionSchema.nullable()
+}).omit({
+	campaign_id: true,      // Only via assign_character_to_campaign
+	clerk_user_id: true,    // Immutable
+	claimable: true         // Only via GM operations
+	// Note: id is not omitted here because it's needed for WHERE clauses, but it won't be updated
 });

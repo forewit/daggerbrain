@@ -1,13 +1,11 @@
 import { query, command, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, inArray } from 'drizzle-orm';
 import { z } from 'zod';
-import {
-	campaign_homebrew_vault_table,
-	campaign_members_table,
-	campaigns_table
-} from '../server/db/campaigns.schema';
+import { campaign_homebrew_vault_table } from '../server/db/campaigns.schema';
 import { get_db, get_auth } from './utils';
+import { getCampaignAccess } from './permissions.remote';
+import { getCampaignAccessInternal } from '../server/permissions';
 import type { HomebrewType } from '../types/homebrew-types';
 import type { DomainIds } from '../types/compendium-types';
 import {
@@ -19,7 +17,6 @@ import {
 	homebrew_beastforms,
 	homebrew_classes,
 	homebrew_subclasses,
-	homebrew_domains,
 	homebrew_domain_cards,
 	homebrew_ancestry_cards,
 	homebrew_community_cards,
@@ -34,23 +31,11 @@ export const get_campaign_homebrew_vault = query(
 	z.string(),
 	async (campaignId): Promise<Array<{ id: string; homebrew_type: HomebrewType; homebrew_id: string }>> => {
 		const event = getRequestEvent();
-		get_auth(event); // Validate authentication
 		const db = get_db(event);
 
 		// Verify user is a member of the campaign
-		const { userId } = get_auth(event);
-		const [membership] = await db
-			.select()
-			.from(campaign_members_table)
-			.where(
-				and(
-					eq(campaign_members_table.campaign_id, campaignId),
-					eq(campaign_members_table.user_id, userId)
-				)
-			)
-			.limit(1);
-
-		if (!membership) {
+		const access = await getCampaignAccess(campaignId);
+		if (!access.canView) {
 			throw error(403, 'Forbidden: Not a member of this campaign.');
 		}
 
@@ -73,23 +58,11 @@ export const get_campaign_homebrew_items = query(
 	z.string(),
 	async (campaignId) => {
 		const event = getRequestEvent();
-		get_auth(event); // Validate authentication
 		const db = get_db(event);
 
 		// Verify user is a member of the campaign
-		const { userId } = get_auth(event);
-		const [membership] = await db
-			.select()
-			.from(campaign_members_table)
-			.where(
-				and(
-					eq(campaign_members_table.campaign_id, campaignId),
-					eq(campaign_members_table.user_id, userId)
-				)
-			)
-			.limit(1);
-
-		if (!membership) {
+		const access = await getCampaignAccess(campaignId);
+		if (!access.canView) {
 			throw error(403, 'Forbidden: Not a member of this campaign.');
 		}
 
@@ -140,166 +113,174 @@ export const get_campaign_homebrew_items = query(
 			transformation_cards: {}
 		};
 
-		// Fetch items by type
+		// Group vault items by type for batch fetching
+		const itemsByType: Record<string, string[]> = {};
 		for (const vaultItem of vaultItems) {
-			let item: any = null;
+			const type = vaultItem.homebrew_type;
+			if (!itemsByType[type]) itemsByType[type] = [];
+			itemsByType[type].push(vaultItem.homebrew_id);
+		}
 
-			switch (vaultItem.homebrew_type) {
-				case 'weapon': {
-					// Check if primary or secondary
-					const [primary] = await db
-						.select()
-						.from(homebrew_primary_weapons)
-						.where(eq(homebrew_primary_weapons.id, vaultItem.homebrew_id))
-						.limit(1);
-					if (primary) {
-						item = primary.data;
-						result.primary_weapons[vaultItem.homebrew_id] = item;
-					} else {
-						const [secondary] = await db
-							.select()
-							.from(homebrew_secondary_weapons)
-							.where(eq(homebrew_secondary_weapons.id, vaultItem.homebrew_id))
-							.limit(1);
-						if (secondary) {
-							item = secondary.data;
-							result.secondary_weapons[vaultItem.homebrew_id] = item;
-						}
-					}
-					break;
-				}
-				case 'armor': {
-					const [armor] = await db
-						.select()
-						.from(homebrew_armor)
-						.where(eq(homebrew_armor.id, vaultItem.homebrew_id))
-						.limit(1);
-					if (armor) {
-						item = armor.data;
-						result.armor[vaultItem.homebrew_id] = item;
-					}
-					break;
-				}
-				case 'loot': {
-					const [loot] = await db
-						.select()
-						.from(homebrew_loot)
-						.where(eq(homebrew_loot.id, vaultItem.homebrew_id))
-						.limit(1);
-					if (loot) {
-						item = loot.data;
-						result.loot[vaultItem.homebrew_id] = item;
-					}
-					break;
-				}
-				case 'consumable': {
-					const [consumable] = await db
-						.select()
-						.from(homebrew_consumables)
-						.where(eq(homebrew_consumables.id, vaultItem.homebrew_id))
-						.limit(1);
-					if (consumable) {
-						item = consumable.data;
-						result.consumables[vaultItem.homebrew_id] = item;
-					}
-					break;
-				}
-				case 'beastform': {
-					const [beastform] = await db
-						.select()
-						.from(homebrew_beastforms)
-						.where(eq(homebrew_beastforms.id, vaultItem.homebrew_id))
-						.limit(1);
-					if (beastform) {
-						item = beastform.data;
-						result.beastforms[vaultItem.homebrew_id] = item;
-					}
-					break;
-				}
-				case 'class': {
-					const [classItem] = await db
-						.select()
-						.from(homebrew_classes)
-						.where(eq(homebrew_classes.id, vaultItem.homebrew_id))
-						.limit(1);
-					if (classItem) {
-						item = classItem.data;
-						result.classes[vaultItem.homebrew_id] = item;
-					}
-					break;
-				}
-				case 'subclass': {
-					const [subclass] = await db
-						.select()
-						.from(homebrew_subclasses)
-						.where(eq(homebrew_subclasses.id, vaultItem.homebrew_id))
-						.limit(1);
-					if (subclass) {
-						item = subclass.data;
-						result.subclasses[vaultItem.homebrew_id] = item;
-					}
-					break;
-				}
-				// Note: 'domain' is not a valid HomebrewType, domains are not added to vault
-				// case 'domain': {
-				// 	break;
-				// }
-				case 'domain-cards': {
-					const [domainCard] = await db
-						.select()
-						.from(homebrew_domain_cards)
-						.where(eq(homebrew_domain_cards.id, vaultItem.homebrew_id))
-						.limit(1);
-					if (domainCard) {
-						item = domainCard.data;
-						const domainId = item.domain_id as DomainIds;
-						if (domainId && result.domain_cards[domainId]) {
-							result.domain_cards[domainId][vaultItem.homebrew_id] = item;
-						}
-					}
-					break;
-				}
-				case 'ancestry-cards': {
-					const [ancestryCard] = await db
-						.select()
-						.from(homebrew_ancestry_cards)
-						.where(eq(homebrew_ancestry_cards.id, vaultItem.homebrew_id))
-						.limit(1);
-					if (ancestryCard) {
-						item = ancestryCard.data;
-						result.ancestry_cards[vaultItem.homebrew_id] = item;
-					}
-					break;
-				}
-				case 'community-cards': {
-					const [communityCard] = await db
-						.select()
-						.from(homebrew_community_cards)
-						.where(eq(homebrew_community_cards.id, vaultItem.homebrew_id))
-						.limit(1);
-					if (communityCard) {
-						item = communityCard.data;
-						result.community_cards[vaultItem.homebrew_id] = item;
-					}
-					break;
-				}
-				case 'transformation-cards': {
-					const [transformationCard] = await db
-						.select()
-						.from(homebrew_transformation_cards)
-						.where(eq(homebrew_transformation_cards.id, vaultItem.homebrew_id))
-						.limit(1);
-					if (transformationCard) {
-						item = transformationCard.data;
-						result.transformation_cards[vaultItem.homebrew_id] = item;
-					}
-					break;
+		// Batch fetch all types in parallel (only query types that have items)
+		const [
+			primaryWeapons,
+			secondaryWeapons,
+			armors,
+			loots,
+			consumables,
+			beastforms,
+			classes,
+			subclasses,
+			domainCards,
+			ancestryCards,
+			communityCards,
+			transformationCards
+		] = await Promise.all([
+			// Primary weapons (weapon type checks both tables)
+			itemsByType['weapon']?.length
+				? db.select().from(homebrew_primary_weapons)
+						.where(inArray(homebrew_primary_weapons.id, itemsByType['weapon']))
+				: Promise.resolve([]),
+			// Secondary weapons (same IDs, different table)
+			itemsByType['weapon']?.length
+				? db.select().from(homebrew_secondary_weapons)
+						.where(inArray(homebrew_secondary_weapons.id, itemsByType['weapon']))
+				: Promise.resolve([]),
+			// Armor
+			itemsByType['armor']?.length
+				? db.select().from(homebrew_armor)
+						.where(inArray(homebrew_armor.id, itemsByType['armor']))
+				: Promise.resolve([]),
+			// Loot
+			itemsByType['loot']?.length
+				? db.select().from(homebrew_loot)
+						.where(inArray(homebrew_loot.id, itemsByType['loot']))
+				: Promise.resolve([]),
+			// Consumables
+			itemsByType['consumable']?.length
+				? db.select().from(homebrew_consumables)
+						.where(inArray(homebrew_consumables.id, itemsByType['consumable']))
+				: Promise.resolve([]),
+			// Beastforms
+			itemsByType['beastform']?.length
+				? db.select().from(homebrew_beastforms)
+						.where(inArray(homebrew_beastforms.id, itemsByType['beastform']))
+				: Promise.resolve([]),
+			// Classes
+			itemsByType['class']?.length
+				? db.select().from(homebrew_classes)
+						.where(inArray(homebrew_classes.id, itemsByType['class']))
+				: Promise.resolve([]),
+			// Subclasses
+			itemsByType['subclass']?.length
+				? db.select().from(homebrew_subclasses)
+						.where(inArray(homebrew_subclasses.id, itemsByType['subclass']))
+				: Promise.resolve([]),
+			// Domain cards
+			itemsByType['domain-cards']?.length
+				? db.select().from(homebrew_domain_cards)
+						.where(inArray(homebrew_domain_cards.id, itemsByType['domain-cards']))
+				: Promise.resolve([]),
+			// Ancestry cards
+			itemsByType['ancestry-cards']?.length
+				? db.select().from(homebrew_ancestry_cards)
+						.where(inArray(homebrew_ancestry_cards.id, itemsByType['ancestry-cards']))
+				: Promise.resolve([]),
+			// Community cards
+			itemsByType['community-cards']?.length
+				? db.select().from(homebrew_community_cards)
+						.where(inArray(homebrew_community_cards.id, itemsByType['community-cards']))
+				: Promise.resolve([]),
+			// Transformation cards
+			itemsByType['transformation-cards']?.length
+				? db.select().from(homebrew_transformation_cards)
+						.where(inArray(homebrew_transformation_cards.id, itemsByType['transformation-cards']))
+				: Promise.resolve([])
+		]);
+
+		// Helper to set source_id on item data
+		const withCampaignSource = <T extends { source_id?: string }>(data: T): T => {
+			if (data && typeof data === 'object' && 'source_id' in data) {
+				data.source_id = 'Campaign';
+			}
+			return data;
+		};
+
+		// Populate result from batched queries
+		for (const weapon of primaryWeapons) {
+			if (weapon.data) {
+				result.primary_weapons[weapon.id] = withCampaignSource(weapon.data as any);
+			}
+		}
+
+		for (const weapon of secondaryWeapons) {
+			if (weapon.data) {
+				result.secondary_weapons[weapon.id] = withCampaignSource(weapon.data as any);
+			}
+		}
+
+		for (const armor of armors) {
+			if (armor.data) {
+				result.armor[armor.id] = withCampaignSource(armor.data as any);
+			}
+		}
+
+		for (const loot of loots) {
+			if (loot.data) {
+				result.loot[loot.id] = withCampaignSource(loot.data as any);
+			}
+		}
+
+		for (const consumable of consumables) {
+			if (consumable.data) {
+				result.consumables[consumable.id] = withCampaignSource(consumable.data as any);
+			}
+		}
+
+		for (const beastform of beastforms) {
+			if (beastform.data) {
+				result.beastforms[beastform.id] = withCampaignSource(beastform.data as any);
+			}
+		}
+
+		for (const classItem of classes) {
+			if (classItem.data) {
+				result.classes[classItem.id] = withCampaignSource(classItem.data as any);
+			}
+		}
+
+		for (const subclass of subclasses) {
+			if (subclass.data) {
+				result.subclasses[subclass.id] = withCampaignSource(subclass.data as any);
+			}
+		}
+
+		// Domain cards have special handling (nested by domain_id)
+		for (const domainCard of domainCards) {
+			if (domainCard.data) {
+				const data = withCampaignSource(domainCard.data as any);
+				const domainId = data.domain_id as DomainIds;
+				if (domainId && result.domain_cards[domainId]) {
+					result.domain_cards[domainId][domainCard.id] = data;
 				}
 			}
+		}
 
-			// Update source_id to 'Campaign' if item exists
-			if (item && typeof item === 'object' && 'source_id' in item) {
-				item.source_id = 'Campaign';
+		for (const ancestryCard of ancestryCards) {
+			if (ancestryCard.data) {
+				result.ancestry_cards[ancestryCard.id] = withCampaignSource(ancestryCard.data as any);
+			}
+		}
+
+		for (const communityCard of communityCards) {
+			if (communityCard.data) {
+				result.community_cards[communityCard.id] = withCampaignSource(communityCard.data as any);
+			}
+		}
+
+		for (const transformationCard of transformationCards) {
+			if (transformationCard.data) {
+				result.transformation_cards[transformationCard.id] = withCampaignSource(transformationCard.data as any);
 			}
 		}
 
@@ -324,13 +305,8 @@ export const add_homebrew_to_vault = command(
 		const db = get_db(event);
 
 		// Verify user is GM
-		const members = await db
-			.select()
-			.from(campaign_members_table)
-			.where(eq(campaign_members_table.campaign_id, campaign_id));
-
-		const member = members.find((m) => m.user_id === userId && m.campaign_id === campaign_id);
-		if (member?.role !== 'gm') {
+		const access = await getCampaignAccessInternal(db, userId, campaign_id);
+		if (!access.canEdit) {
 			throw error(403, 'Only the GM can add items to the vault');
 		}
 
@@ -542,13 +518,8 @@ export const remove_homebrew_from_vault = command(
 		const db = get_db(event);
 
 		// Verify user is GM
-		const members = await db
-			.select()
-			.from(campaign_members_table)
-			.where(eq(campaign_members_table.campaign_id, campaign_id));
-
-		const member = members.find((m) => m.user_id === userId && m.campaign_id === campaign_id);
-		if (member?.role !== 'gm') {
+		const access = await getCampaignAccessInternal(db, userId, campaign_id);
+		if (!access.canEdit) {
 			throw error(403, 'Only the GM can remove items from the vault');
 		}
 

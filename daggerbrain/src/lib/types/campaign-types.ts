@@ -42,11 +42,9 @@ export type CampaignCharacterSummary = {
 	claimable: boolean;
 };
 
-// Type for character updates - only the live-updated fields
-export type CampaignCharacterLiveUpdate = Pick<
-	CampaignCharacterSummary,
-	'marked_hp' | 'marked_stress' | 'marked_hope' | 'marked_armor' | 'active_conditions'
->;
+// Type for character updates - partial diff of DerivedCharacter (all fields optional)
+// Represents only the changed fields when updating a character
+export type CampaignCharacterLiveUpdate = Partial<DerivedCharacter>;
 
 // WebSocket message types for live campaign updates
 export type CampaignLiveWebSocketMessage =
@@ -54,7 +52,7 @@ export type CampaignLiveWebSocketMessage =
 			type: 'connected';
 			version: number;
 			state: CampaignState | null;
-			characters: Record<string, CampaignCharacterLiveUpdate>;
+			characters: Record<string, DerivedCharacter>;
 	  }
 	| {
 			type: 'state_update';
@@ -76,11 +74,33 @@ export type CampaignLiveWebSocketMessage =
 			type: 'state_sync';
 			version: number;
 			state: CampaignState | null;
-			characters: Record<string, CampaignCharacterLiveUpdate>;
+			characters: Record<string, DerivedCharacter>;
 	  }
 	| {
 			type: 'already_synced';
 			version: number;
+	  }
+	| {
+			type: 'character_added';
+			version: number;
+			character: DerivedCharacter;
+	  }
+	| {
+			type: 'character_removed';
+			version: number;
+			characterId: string;
+	  }
+	| {
+			type: 'character_full_update';
+			version: number;
+			characterId: string;
+			character: DerivedCharacter;
+	  }
+	| {
+			type: 'character_diff_update';
+			version: number;
+			characterId: string;
+			updates: CampaignCharacterLiveUpdate;
 	  }
 	| {
 			type: 'error';

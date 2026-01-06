@@ -1,24 +1,28 @@
 import { DurableObject } from "cloudflare:workers";
 import type { CampaignState, CampaignCharacterLiveUpdate } from "$lib/types/campaign-types";
+import type { DerivedCharacter } from "$lib/types/derived-character-types";
 
 interface Env {
   DB: D1Database;
+  KV: KVNamespace;
 }
 
 interface StoredData {
   state: CampaignState;
-  characters: Record<string, CampaignCharacterLiveUpdate>;
+  characters: Record<string, DerivedCharacter>;
   version: number;
 }
 
 interface WebSocketAttachment {
   connectedAt: number;
+  userId: string;
+  userRole: 'gm' | 'player';
 }
 
 export class CampaignLiveDO extends DurableObject<Env> {
   private campaignState: CampaignState | null = null;
-  // Store only the live-updated fields for characters
-  private characters: Record<string, CampaignCharacterLiveUpdate> = {};
+  // Store full DerivedCharacter objects
+  private characters: Record<string, DerivedCharacter> = {};
   private version = 0;
   private initialized = false;
   private initPromise: Promise<void> | null = null;
@@ -37,8 +41,107 @@ export class CampaignLiveDO extends DurableObject<Env> {
       return this.handleWebSocketUpgrade(request);
     }
 
-    // Only WebSocket upgrades are supported
-    return new Response('Expected WebSocket upgrade', { status: 426 });
+    // Handle HTTP POST requests for notifications
+    if (request.method === 'POST') {
+      return this.handleHttpNotification(request);
+    }
+
+    return new Response('Method not allowed', { status: 405 });
+  }
+
+  private async handleHttpNotification(request: Request): Promise<Response> {
+    try {
+      // Ensure state is initialized before processing any notifications
+      await this.ensureInitialized();
+      
+      const body = await request.json();
+      
+      switch (body.type) {
+        case 'character_added':
+          if (!body.character) {
+            return new Response(JSON.stringify({ error: 'character is required for character_added' }), { 
+              status: 400,
+              headers: { 'Content-Type': 'application/json' }
+            });
+          }
+          await this.addCharacter(body.character);
+          break;
+        case 'character_updated':
+          if (!body.characterId) {
+            return new Response(JSON.stringify({ error: 'characterId is required' }), { 
+              status: 400,
+              headers: { 'Content-Type': 'application/json' }
+            });
+          }
+          
+          // Verify character should be in this campaign
+          // The server already verified permissions before sending the notification,
+          // so we just do a basic sanity check here
+          const characterInState = this.characters[body.characterId];
+          if (!characterInState) {
+            // Character not in DO state - if we have a full character, add it
+            // Otherwise check KV to verify it belongs to this campaign
+            if (body.character) {
+              // Full character update - add to state if campaign matches
+              if (body.character.campaign_id === this.campaignState?.campaign_id) {
+                await this.addCharacter(body.character);
+                break;
+              }
+            }
+            
+            // Check KV as fallback
+            if (this.env.KV) {
+              const kvChar = await this.env.KV.get<DerivedCharacter>(
+                `character:${body.characterId}:campaign`,
+                'json'
+              );
+              if (kvChar && kvChar.campaign_id === this.campaignState?.campaign_id) {
+                // Character belongs to this campaign, add it to state first
+                this.characters[body.characterId] = kvChar;
+              } else {
+                return new Response(JSON.stringify({ 
+                  error: 'Character not in this campaign' 
+                }), { 
+                  status: 403,
+                  headers: { 'Content-Type': 'application/json' }
+                });
+              }
+            }
+          }
+          
+          // body.character is full character, body.updates is partial diff
+          await this.updateCharacterFromNotification(body.characterId, body.character || body.updates);
+          break;
+        case 'character_removed':
+        case 'character_deleted':
+          if (!body.characterId) {
+            return new Response(JSON.stringify({ error: 'characterId is required' }), { 
+              status: 400,
+              headers: { 'Content-Type': 'application/json' }
+            });
+          }
+          await this.removeCharacter(body.characterId);
+          break;
+        default:
+          return new Response(JSON.stringify({ error: 'Unknown notification type' }), { 
+            status: 400,
+            headers: { 'Content-Type': 'application/json' }
+          });
+      }
+      
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    } catch (error) {
+      console.error('Error handling HTTP notification:', error);
+      return new Response(JSON.stringify({ 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
   }
 
   private async handleWebSocketUpgrade(request: Request): Promise<Response> {
@@ -52,9 +155,15 @@ export class CampaignLiveDO extends DurableObject<Env> {
     // Ensure state is initialized before accepting WebSocket
     await this.ensureInitialized();
     
+    // Extract user context from headers (set by live/+server.ts)
+    const userId = request.headers.get('X-User-Id') || '';
+    const userRole = (request.headers.get('X-User-Role') || 'player') as 'gm' | 'player';
+    
     // Store connection metadata in WebSocket attachment for hibernation
     const attachment: WebSocketAttachment = {
-      connectedAt: Date.now()
+      connectedAt: Date.now(),
+      userId,
+      userRole
     };
     server.serializeAttachment(attachment);
     
@@ -95,6 +204,19 @@ export class CampaignLiveDO extends DurableObject<Env> {
           await this.updateState(data.updates);
           break;
         case 'update_character':
+          // Get user context from WebSocket attachment
+          const attachment = ws.deserializeAttachment() as WebSocketAttachment;
+          const character = this.characters[data.characterId];
+          
+          // Verify user can edit this character (owner or GM)
+          if (character && character.clerk_user_id !== attachment.userId && attachment.userRole !== 'gm') {
+            ws.send(JSON.stringify({ 
+              type: 'error', 
+              message: 'Not authorized to edit this character' 
+            }));
+            return;
+          }
+          
           await this.updateCharacter(data.characterId, data.updates);
           break;
         default:
@@ -146,8 +268,49 @@ export class CampaignLiveDO extends DurableObject<Env> {
       this.version = 0;
       this.initialized = true;
       
+      // Try to initialize characters from KV
+      await this.initializeCharacters();
+      
       // Persist initial state
       await this.persistState();
+    }
+  }
+
+  private async initializeCharacters(): Promise<void> {
+    if (!this.campaignState) return;
+    
+    const campaignId = this.campaignState.campaign_id;
+    if (!campaignId || !this.env.KV) return;
+
+    try {
+      // Get campaign character summaries from KV
+      const summaries = await this.env.KV.get<Record<string, any>>(
+        `campaign:${campaignId}:characters`,
+        'json'
+      );
+
+      if (!summaries) return;
+
+      // Load full DerivedCharacter objects from KV for each character
+      const characterIds = Object.keys(summaries);
+      const characterPromises = characterIds.map(async (characterId) => {
+        const derivedChar = await this.env.KV!.get<DerivedCharacter>(
+          `character:${characterId}:campaign`,
+          'json'
+        );
+        return { characterId, derivedChar };
+      });
+
+      const characterResults = await Promise.all(characterPromises);
+      
+      for (const { characterId, derivedChar } of characterResults) {
+        if (derivedChar) {
+          this.characters[characterId] = derivedChar;
+        }
+      }
+    } catch (error) {
+      console.error('Failed to initialize characters from KV:', error);
+      // Don't throw - continue with empty characters
     }
   }
 
@@ -230,47 +393,139 @@ export class CampaignLiveDO extends DurableObject<Env> {
     }
   }
 
-  private async updateCharacter(characterId: string, updates: Partial<CampaignCharacterLiveUpdate>): Promise<void> {
-    await this.ensureInitialized();
+  // Deep merge helper function
+  private deepMerge<T extends Record<string, any>>(target: T, source: Partial<T>): T {
+    const output = { ...target };
     
-    // Merge updates with existing character data (or create new if doesn't exist)
-    if (!this.characters[characterId]) {
-      // Character doesn't exist yet - create with updates
-      // Only store the live-updated fields
-      this.characters[characterId] = {
-        marked_hp: updates.marked_hp ?? 0,
-        marked_stress: updates.marked_stress ?? 0,
-        marked_hope: updates.marked_hope ?? 0,
-        marked_armor: updates.marked_armor ?? 0,
-        active_conditions: updates.active_conditions ?? []
-      };
-    } else {
-      this.characters[characterId] = {
-        ...this.characters[characterId],
-        ...updates
-      };
+    for (const key in source) {
+      if (source[key] === undefined) continue;
+      
+      if (
+        source[key] !== null &&
+        typeof source[key] === 'object' &&
+        !Array.isArray(source[key]) &&
+        target[key] !== null &&
+        typeof target[key] === 'object' &&
+        !Array.isArray(target[key])
+      ) {
+        // Recursively merge nested objects
+        output[key] = this.deepMerge(target[key], source[key] as Partial<T[Extract<keyof T, string>]>);
+      } else {
+        // Replace primitive values, arrays, or null
+        output[key] = source[key] as T[Extract<keyof T, string>];
+      }
     }
     
-    // Increment version on character update
+    return output;
+  }
+
+  private async addCharacter(character: DerivedCharacter): Promise<void> {
+    await this.ensureInitialized();
+    
+    this.characters[character.id] = character;
+    
     this.version++;
     this.updateCount++;
     
-    // Persist to storage (batched - only when characters change)
     await this.persistState();
     
-    // Broadcast to all connected WebSockets
+    // Broadcast character added
     this.broadcast({
-      type: 'character_update',
+      type: 'character_added',
       version: this.version,
-      characterId,
-      character: this.characters[characterId]
+      character
     });
     
-    // Flush to D1 periodically
     if (this.updateCount >= this.FLUSH_INTERVAL) {
       await this.flushToD1();
       this.updateCount = 0;
     }
+  }
+
+  private async removeCharacter(characterId: string): Promise<void> {
+    await this.ensureInitialized();
+    
+    if (!this.characters[characterId]) {
+      return; // Character doesn't exist, nothing to remove
+    }
+    
+    delete this.characters[characterId];
+    
+    this.version++;
+    this.updateCount++;
+    
+    await this.persistState();
+    
+    // Broadcast character removed
+    this.broadcast({
+      type: 'character_removed',
+      version: this.version,
+      characterId
+    });
+    
+    if (this.updateCount >= this.FLUSH_INTERVAL) {
+      await this.flushToD1();
+      this.updateCount = 0;
+    }
+  }
+
+  private async updateCharacterFromNotification(characterId: string, updates: Partial<DerivedCharacter> | DerivedCharacter): Promise<void> {
+    await this.ensureInitialized();
+    
+    // Check if updates is a full character object (has id and other required fields)
+    const isFullUpdate = 'id' in updates && updates.id === characterId && 
+                         'name' in updates && 'clerk_user_id' in updates;
+    
+    if (isFullUpdate) {
+      // Full character replacement
+      this.characters[characterId] = updates as DerivedCharacter;
+      
+      this.version++;
+      this.updateCount++;
+      
+      await this.persistState();
+      
+      this.broadcast({
+        type: 'character_full_update',
+        version: this.version,
+        characterId,
+        character: this.characters[characterId]
+      });
+    } else {
+      // Partial diff update - deep merge
+      if (!this.characters[characterId]) {
+        // Character doesn't exist yet - can't apply diff
+        console.warn(`Cannot apply diff update to non-existent character: ${characterId}`);
+        return;
+      }
+      
+      this.characters[characterId] = this.deepMerge(this.characters[characterId], updates);
+      
+      this.version++;
+      this.updateCount++;
+      
+      await this.persistState();
+      
+      this.broadcast({
+        type: 'character_diff_update',
+        version: this.version,
+        characterId,
+        updates: updates as CampaignCharacterLiveUpdate
+      });
+    }
+    
+    if (this.updateCount >= this.FLUSH_INTERVAL) {
+      await this.flushToD1();
+      this.updateCount = 0;
+    }
+  }
+
+  private async updateCharacter(characterId: string, updates: Partial<CampaignCharacterLiveUpdate>): Promise<void> {
+    await this.ensureInitialized();
+    
+    // This is called from WebSocket messages (live updates during session)
+    // Apply as diff update
+    await this.updateCharacterFromNotification(characterId, updates);
   }
 
   private async persistState(): Promise<void> {
@@ -319,6 +574,10 @@ export class CampaignLiveDO extends DurableObject<Env> {
     | { type: 'state_update'; version: number; state: CampaignState }
     | { type: 'character_update'; version: number; characterId: string; character: CampaignCharacterLiveUpdate }
     | { type: 'characters_update'; version: number; characters: Record<string, CampaignCharacterLiveUpdate> }
+    | { type: 'character_added'; version: number; character: DerivedCharacter }
+    | { type: 'character_removed'; version: number; characterId: string }
+    | { type: 'character_full_update'; version: number; characterId: string; character: DerivedCharacter }
+    | { type: 'character_diff_update'; version: number; characterId: string; updates: CampaignCharacterLiveUpdate }
   ): void {
     const websockets = this.ctx.getWebSockets();
     for (const ws of websockets) {

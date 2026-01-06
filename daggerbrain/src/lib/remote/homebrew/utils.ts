@@ -1,4 +1,4 @@
-import { eq, and } from 'drizzle-orm';
+import { eq, and, count } from 'drizzle-orm';
 import type { get_db } from '../utils';
 import {
 	homebrew_primary_weapons,
@@ -38,60 +38,81 @@ export async function getTotalHomebrewCount(
 	userId: string
 ): Promise<number> {
 	const [
-		primary,
-		secondary,
-		armor,
-		loot,
-		consumables,
-		beastforms,
-		classes,
-		subclasses,
-		domainCards,
-		ancestryCards,
-		communityCards,
-		transformationCards
+		primaryResult,
+		secondaryResult,
+		armorResult,
+		lootResult,
+		consumablesResult,
+		beastformsResult,
+		classesResult,
+		subclassesResult,
+		domainCardsResult,
+		ancestryCardsResult,
+		communityCardsResult,
+		transformationCardsResult
 	] = await Promise.all([
 		db
-			.select()
+			.select({ count: count() })
 			.from(homebrew_primary_weapons)
 			.where(eq(homebrew_primary_weapons.clerk_user_id, userId)),
 		db
-			.select()
+			.select({ count: count() })
 			.from(homebrew_secondary_weapons)
 			.where(eq(homebrew_secondary_weapons.clerk_user_id, userId)),
-		db.select().from(homebrew_armor).where(eq(homebrew_armor.clerk_user_id, userId)),
-		db.select().from(homebrew_loot).where(eq(homebrew_loot.clerk_user_id, userId)),
-		db.select().from(homebrew_consumables).where(eq(homebrew_consumables.clerk_user_id, userId)),
-		db.select().from(homebrew_beastforms).where(eq(homebrew_beastforms.clerk_user_id, userId)),
-		db.select().from(homebrew_classes).where(eq(homebrew_classes.clerk_user_id, userId)),
-		db.select().from(homebrew_subclasses).where(eq(homebrew_subclasses.clerk_user_id, userId)),
-		db.select().from(homebrew_domain_cards).where(eq(homebrew_domain_cards.clerk_user_id, userId)),
 		db
-			.select()
+			.select({ count: count() })
+			.from(homebrew_armor)
+			.where(eq(homebrew_armor.clerk_user_id, userId)),
+		db
+			.select({ count: count() })
+			.from(homebrew_loot)
+			.where(eq(homebrew_loot.clerk_user_id, userId)),
+		db
+			.select({ count: count() })
+			.from(homebrew_consumables)
+			.where(eq(homebrew_consumables.clerk_user_id, userId)),
+		db
+			.select({ count: count() })
+			.from(homebrew_beastforms)
+			.where(eq(homebrew_beastforms.clerk_user_id, userId)),
+		db
+			.select({ count: count() })
+			.from(homebrew_classes)
+			.where(eq(homebrew_classes.clerk_user_id, userId)),
+		db
+			.select({ count: count() })
+			.from(homebrew_subclasses)
+			.where(eq(homebrew_subclasses.clerk_user_id, userId)),
+		db
+			.select({ count: count() })
+			.from(homebrew_domain_cards)
+			.where(eq(homebrew_domain_cards.clerk_user_id, userId)),
+		db
+			.select({ count: count() })
 			.from(homebrew_ancestry_cards)
 			.where(eq(homebrew_ancestry_cards.clerk_user_id, userId)),
 		db
-			.select()
+			.select({ count: count() })
 			.from(homebrew_community_cards)
 			.where(eq(homebrew_community_cards.clerk_user_id, userId)),
 		db
-			.select()
+			.select({ count: count() })
 			.from(homebrew_transformation_cards)
 			.where(eq(homebrew_transformation_cards.clerk_user_id, userId))
 	]);
 
 	return (
-		primary.length +
-		secondary.length +
-		armor.length +
-		loot.length +
-		consumables.length +
-		beastforms.length +
-		classes.length +
-		subclasses.length +
-		domainCards.length +
-		ancestryCards.length +
-		communityCards.length +
-		transformationCards.length
+		Number(primaryResult[0]?.count ?? 0) +
+		Number(secondaryResult[0]?.count ?? 0) +
+		Number(armorResult[0]?.count ?? 0) +
+		Number(lootResult[0]?.count ?? 0) +
+		Number(consumablesResult[0]?.count ?? 0) +
+		Number(beastformsResult[0]?.count ?? 0) +
+		Number(classesResult[0]?.count ?? 0) +
+		Number(subclassesResult[0]?.count ?? 0) +
+		Number(domainCardsResult[0]?.count ?? 0) +
+		Number(ancestryCardsResult[0]?.count ?? 0) +
+		Number(communityCardsResult[0]?.count ?? 0) +
+		Number(transformationCardsResult[0]?.count ?? 0)
 	);
 }

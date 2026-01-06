@@ -38,7 +38,7 @@ import type {
 } from '$lib/types/compendium-types';
 import { BLANK_LEVEL_UP_CHOICE } from '$lib/types/constants';
 import { update_character, get_character_by_id } from '$lib/remote/characters.remote';
-import { can_edit_character, can_view_character } from '$lib/remote/permissions.remote';
+import { getCharacterAccess } from '$lib/remote/permissions.remote';
 import { getCompendiumContext } from './compendium.svelte';
 import { increaseDie, increase_range } from '$lib/utils';
 import { createCampaignLiveConnection } from './campaign-live.svelte';
@@ -114,31 +114,26 @@ function createCharacter(id: string) {
 		}
 	});
 
-	// Permission checks
-	const canEditQuery = $derived.by(() => {
+	// Permission checks - use single query to get both canEdit and canView
+	const characterAccessQuery = $derived.by(() => {
 		if (!id) return null;
-		return can_edit_character(id);
+		return getCharacterAccess(id);
 	});
 
 	const canEdit = $derived.by(() => {
-		const query = canEditQuery;
+		const query = characterAccessQuery;
 		if (!query) return null;
 		if (query.loading) return null;
 		if (query.error) return false;
-		return query.current ?? false;
-	});
-
-	const canViewQuery = $derived.by(() => {
-		if (!id) return null;
-		return can_view_character(id);
+		return query.current?.canEdit ?? false;
 	});
 
 	const canView = $derived.by(() => {
-		const query = canViewQuery;
+		const query = characterAccessQuery;
 		if (!query) return null;
 		if (query.loading) return null;
 		if (query.error) return false;
-		return query.current ?? false;
+		return query.current?.canView ?? false;
 	});
 
 	const compendium = getCompendiumContext();
@@ -3542,11 +3537,11 @@ function createCharacter(id: string) {
 				wsConnection.onMessage((message: CampaignLiveWebSocketMessage) => {
 					if (!character) return;
 					
-					if (message.type === 'character_update' && message.characterId === character.id) {
-						// Update character stats from live update (for multi-user scenarios)
-						// Only update if the character exists and we're not the one making the change
+					// Handle full character updates from DO (sent when server notifies DO)
+					if (message.type === 'character_full_update' && message.characterId === character.id) {
+						// Full character replacement - update all campaign-relevant fields
 						if (message.character) {
-							// Merge live updates into character state
+							// Update campaign stats
 							if (message.character.marked_hp !== undefined) {
 								character.marked_hp = message.character.marked_hp;
 							}
@@ -3561,6 +3556,41 @@ function createCharacter(id: string) {
 							}
 							if (message.character.active_conditions !== undefined) {
 								character.active_conditions = message.character.active_conditions as typeof character.active_conditions;
+							}
+							// Update other derived fields that might have changed
+							if (message.character.name !== undefined) {
+								character.name = message.character.name;
+							}
+							if (message.character.level !== undefined) {
+								character.level = message.character.level;
+							}
+						}
+					}
+					
+					// Handle diff updates from DO (partial updates)
+					if (message.type === 'character_diff_update' && message.characterId === character.id) {
+						// Merge partial updates into character state
+						if (message.updates) {
+							if (message.updates.marked_hp !== undefined) {
+								character.marked_hp = message.updates.marked_hp;
+							}
+							if (message.updates.marked_stress !== undefined) {
+								character.marked_stress = message.updates.marked_stress;
+							}
+							if (message.updates.marked_hope !== undefined) {
+								character.marked_hope = message.updates.marked_hope;
+							}
+							if (message.updates.marked_armor !== undefined) {
+								character.marked_armor = message.updates.marked_armor;
+							}
+							if (message.updates.active_conditions !== undefined) {
+								character.active_conditions = message.updates.active_conditions as typeof character.active_conditions;
+							}
+							if (message.updates.name !== undefined) {
+								character.name = message.updates.name;
+							}
+							if (message.updates.level !== undefined) {
+								character.level = message.updates.level;
 							}
 						}
 					}
@@ -3611,34 +3641,24 @@ function createCharacter(id: string) {
 		}
 
 		// Update D1/KV via update_character (handles persistence)
-		// The server will update the campaign summary using existing derived_character from KV
+		// Include derived_character so server can propagate full character to DO
 		if (!character) return;
 		
+		// Use JSON serialization for deep clone to avoid structuredClone issues (matches debounced save)
+		const cloned = JSON.parse(JSON.stringify(character));
+		const derived = buildDerivedCharacter();
 		const savePromise = update_character({
-			...character,
-					marked_hp: currentStats.marked_hp,
-					marked_stress: currentStats.marked_stress,
-					marked_hope: currentStats.marked_hope,
-					active_conditions: currentStats.active_conditions
-			})
+			...cloned,
+			marked_hp: currentStats.marked_hp,
+			marked_stress: currentStats.marked_stress,
+			marked_hope: currentStats.marked_hope,
+			active_conditions: currentStats.active_conditions,
+			derived_character: derived
+		})
 			.then(() => {
 				// Update last saved stats after successful save
 				lastSavedCampaignStats = currentStats;
-
-				// Send WebSocket update for real-time sync (if connected)
-				if (wsConnection && wsConnection.connected && character && character.campaign_id && user.user?.clerk_id) {
-					wsConnection.send({
-						type: 'update_character',
-						characterId: character.id,
-						userId: user.user.clerk_id,
-						updates: {
-							marked_hp: currentStats.marked_hp,
-							marked_stress: currentStats.marked_stress,
-							marked_hope: currentStats.marked_hope,
-							active_conditions: currentStats.active_conditions
-						}
-					});
-				}
+				// Server notifies DO via HTTP - no need for client WebSocket notification
 			})
 			.catch((error) => {
 				console.error('Failed to update campaign stats:', error);
@@ -4018,6 +4038,16 @@ function createCharacter(id: string) {
 
 		derived.derived_domain_card_vault = domain_card_vault;
 		derived.derived_domain_card_loadout = domain_card_loadout;
+
+		// Update derived_descriptors with current class/subclass names
+		// Note: ancestry_card uses 'title', classes/subclasses use 'name'
+		derived.derived_descriptors = {
+			ancestry_name: ancestry_card?.title ?? '',
+			primary_class_name: primary_class?.name ?? '',
+			primary_subclass_name: primary_subclass?.name ?? '',
+			secondary_class_name: secondary_class?.name ?? '',
+			secondary_subclass_name: secondary_subclass?.name ?? ''
+		};
 
 		return derived;
 	}

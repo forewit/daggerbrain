@@ -1,7 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { get_auth } from '$lib/remote/utils';
-import { get_campaign_members } from '$lib/remote/campaigns.remote';
-import { getRequestEvent } from '$app/server';
+import { getCampaignAccess } from '$lib/remote/permissions.remote';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params, platform, request }) => {
@@ -10,22 +8,18 @@ export const GET: RequestHandler = async ({ params, platform, request }) => {
     return new Response('Expected WebSocket upgrade', { status: 426 });
   }
   
-  // Authenticate user
-  const event = getRequestEvent();
-  const { userId } = get_auth(event);
-  
   // Verify campaign membership
   const campaignId = params.id;
   if (!campaignId) {
     throw error(400, 'Campaign ID required');
   }
   
-  const members = await get_campaign_members(campaignId);
-  const isMember = members.some(m => m.user_id === userId);
-  if (!isMember) {
+  // Get campaign access - handles auth and membership check
+  const access = await getCampaignAccess(campaignId);
+  if (!access.membership) {
     throw error(403, 'Not a member of this campaign');
   }
-  
+
   // Get DO instance via DurableObjectNamespace
   if (!platform?.env?.CAMPAIGN_LIVE) {
     // In development with vite dev, DO binding may not be available
@@ -33,10 +27,10 @@ export const GET: RequestHandler = async ({ params, platform, request }) => {
     console.error('CAMPAIGN_LIVE Durable Object binding not available. Make sure to run with wrangler dev or deploy both workers.');
     throw error(503, 'Durable Object service unavailable. Please use wrangler dev for local development.');
   }
-  
+
   const id = platform.env.CAMPAIGN_LIVE.idFromName(campaignId);
   const stub = platform.env.CAMPAIGN_LIVE.get(id);
-  
+
   // Forward the WebSocket upgrade request to the Durable Object
   // For WebSocket upgrades, body is null, so we can safely reconstruct the request
   // stub.fetch accepts RequestInfo (string | Request | URL)
@@ -45,9 +39,14 @@ export const GET: RequestHandler = async ({ params, platform, request }) => {
   // due to missing getSetCookie in Cloudflare's Headers type. This is a known type
   // incompatibility that doesn't affect runtime behavior.
   try {
+    // Pass user context to DO via headers for permission checks
+    const headers = new Headers(request.headers);
+    headers.set('X-User-Id', access.membership.user_id);
+    headers.set('X-User-Role', access.role!);
+    
     const response = await stub.fetch(request.url, {
       method: request.method,
-      headers: request.headers,
+      headers: headers,
       // WebSocket upgrade requests don't have a body, so we can omit it
       cf: request.cf
     });
@@ -58,4 +57,3 @@ export const GET: RequestHandler = async ({ params, platform, request }) => {
     throw err;
   }
 };
-

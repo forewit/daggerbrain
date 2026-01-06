@@ -1,6 +1,11 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
+/**
+ * User content images (character portraits) are intentionally public.
+ * URLs contain user ID + random UUID making them effectively unguessable.
+ * This allows easy sharing in campaigns without complex auth flows.
+ */
 // Serves images from the daggerbrain-usercontent R2 bucket (user-uploaded images)
 export const GET: RequestHandler = async ({ params, platform }) => {
 	const { key } = params;

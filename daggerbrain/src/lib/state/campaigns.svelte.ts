@@ -15,32 +15,96 @@ import {
 	remove_homebrew_from_vault
 } from '$lib/remote/campaign-homebrew.remote';
 import {
-	can_claim_character,
-	has_character_in_campaign
+	getClaimCharacterAccess,
+	hasCharacterInCampaign as hasCharacterInCampaignCheck
 } from '$lib/remote/permissions.remote';
 import { error } from '@sveltejs/kit';
 import { getContext, setContext } from 'svelte';
 import { goto } from '$app/navigation';
 import { createCampaignLiveConnection } from './campaign-live.svelte';
 import type { Campaign, CampaignState, CampaignCharacterSummary, CampaignMember, CampaignCharacterLiveUpdate } from '$lib/types/campaign-types';
+import type { DerivedCharacter } from '$lib/types/derived-character-types';
 import type { HomebrewType } from '$lib/types/homebrew-types';
 
 // Helper function to merge live character updates with existing character data
-function mergeCharacterLiveUpdate(
-	existing: CampaignCharacterSummary | undefined,
-	liveUpdate: CampaignCharacterLiveUpdate
-): CampaignCharacterSummary | null {
-	// If character doesn't exist, we can't create a full summary from just live updates
-	// Return null to indicate we should ignore this update or fetch the full character
-	if (!existing) {
-		return null;
+// Helper to convert DerivedCharacter to CampaignCharacterSummary
+function derivedCharacterToSummary(derived: DerivedCharacter): CampaignCharacterSummary {
+	return {
+		id: derived.id,
+		name: derived.name,
+		image_url: derived.image_url,
+		level: derived.level,
+		marked_hp: derived.marked_hp,
+		max_hp: derived.derived_max_hp,
+		marked_stress: derived.marked_stress,
+		max_stress: derived.derived_max_stress,
+		marked_hope: derived.marked_hope,
+		max_hope: derived.derived_max_hope,
+		active_conditions: derived.active_conditions,
+		owner_user_id: derived.clerk_user_id,
+		derived_descriptors: derived.derived_descriptors,
+		evasion: derived.derived_evasion,
+		max_armor: derived.derived_max_armor,
+		marked_armor: derived.marked_armor,
+		damage_thresholds: derived.derived_damage_thresholds,
+		claimable: derived.claimable === 1
+	};
+}
+
+// Deep merge helper for nested objects
+function deepMerge<T extends Record<string, any>>(target: T, source: Partial<T>): T {
+	const output = { ...target };
+	
+	for (const key in source) {
+		if (source[key] === undefined) continue;
+		
+		if (
+			source[key] !== null &&
+			typeof source[key] === 'object' &&
+			!Array.isArray(source[key]) &&
+			target[key] !== null &&
+			typeof target[key] === 'object' &&
+			!Array.isArray(target[key])
+		) {
+			// Recursively merge nested objects
+			output[key] = deepMerge(target[key], source[key] as Partial<T[Extract<keyof T, string>]>);
+		} else {
+			// Replace primitive values, arrays, or null
+			output[key] = source[key] as T[Extract<keyof T, string>];
+		}
 	}
 	
-	// Merge live update fields into existing character
-	return {
-		...existing,
-		...liveUpdate
-	};
+	return output;
+}
+
+function mergeCharacterLiveUpdate(
+	existing: CampaignCharacterSummary | undefined,
+	liveUpdate: CampaignCharacterLiveUpdate | DerivedCharacter
+): CampaignCharacterSummary | null {
+	// Check if liveUpdate is a full DerivedCharacter
+	if ('id' in liveUpdate && 'clerk_user_id' in liveUpdate && 'derived_max_hp' in liveUpdate) {
+		// Full character object - convert to summary
+		return derivedCharacterToSummary(liveUpdate as DerivedCharacter);
+	}
+	
+	// Partial update - need existing character to merge into
+	if (!existing) {
+		return null; // Can't apply partial update without existing character
+	}
+	
+	// Deep merge the partial update
+	const merged = deepMerge(existing, liveUpdate as Partial<CampaignCharacterSummary>);
+	
+	// Update derived fields if they're in the update
+	if ('derived_max_hp' in liveUpdate) merged.max_hp = (liveUpdate as any).derived_max_hp;
+	if ('derived_max_stress' in liveUpdate) merged.max_stress = (liveUpdate as any).derived_max_stress;
+	if ('derived_max_hope' in liveUpdate) merged.max_hope = (liveUpdate as any).derived_max_hope;
+	if ('derived_evasion' in liveUpdate) merged.evasion = (liveUpdate as any).derived_evasion;
+	if ('derived_max_armor' in liveUpdate) merged.max_armor = (liveUpdate as any).derived_max_armor;
+	if ('derived_damage_thresholds' in liveUpdate) merged.damage_thresholds = (liveUpdate as any).derived_damage_thresholds;
+	if ('derived_descriptors' in liveUpdate) merged.derived_descriptors = (liveUpdate as any).derived_descriptors;
+	
+	return merged;
 }
 
 function campaignContext(campaignId: string | undefined) {
@@ -214,10 +278,11 @@ function campaignContext(campaignId: string | undefined) {
 		if (!id || !characterId) return false;
 
 		try {
-			return await can_claim_character({
+			const access = await getClaimCharacterAccess({
 				characterId,
 				campaignId: id
 			});
+			return access.canClaim;
 		} catch (err) {
 			return false;
 		}
@@ -229,9 +294,7 @@ function campaignContext(campaignId: string | undefined) {
 		if (!id) return false;
 
 		try {
-			return await has_character_in_campaign({
-				campaignId: id
-			});
+			return await hasCharacterInCampaignCheck(id);
 		} catch (err) {
 			return false;
 		}
@@ -265,17 +328,17 @@ function campaignContext(campaignId: string | undefined) {
 						switch (message.type) {
 							case 'connected':
 							case 'state_sync':
-								// Initial state sync or rejoin sync
+								// Initial state sync or rejoin sync - now receives full DerivedCharacter objects
 								if (message.state) {
 									campaignState = message.state;
 								}
-								// Merge live character updates with existing character data
+								// Convert full DerivedCharacter objects to summaries
 								if (message.characters) {
 									const merged: Record<string, CampaignCharacterSummary> = { ...characters };
-									for (const [id, liveUpdate] of Object.entries(message.characters)) {
-										const mergedChar = mergeCharacterLiveUpdate(characters[id], liveUpdate);
-										if (mergedChar) {
-											merged[id] = mergedChar;
+									for (const [id, derivedChar] of Object.entries(message.characters)) {
+										const summary = mergeCharacterLiveUpdate(characters[id], derivedChar as DerivedCharacter);
+										if (summary) {
+											merged[id] = summary;
 										}
 									}
 									characters = merged;
@@ -308,6 +371,48 @@ function campaignContext(campaignId: string | undefined) {
 									const mergedChar = mergeCharacterLiveUpdate(
 										characters[message.characterId],
 										message.character
+									);
+									if (mergedChar) {
+										characters = {
+											...characters,
+											[message.characterId]: mergedChar
+										};
+									}
+								}
+								break;
+							case 'character_added':
+								// Add new character to state
+								if (message.character) {
+									const summary = derivedCharacterToSummary(message.character);
+									characters = {
+										...characters,
+										[message.character.id]: summary
+									};
+								}
+								break;
+							case 'character_removed':
+								// Remove character from state
+								if (message.characterId) {
+									const { [message.characterId]: removed, ...rest } = characters;
+									characters = rest;
+								}
+								break;
+							case 'character_full_update':
+								// Replace entire character object
+								if (message.characterId && message.character) {
+									const summary = derivedCharacterToSummary(message.character);
+									characters = {
+										...characters,
+										[message.characterId]: summary
+									};
+								}
+								break;
+							case 'character_diff_update':
+								// Merge diff into existing character
+								if (message.characterId && message.updates) {
+									const mergedChar = mergeCharacterLiveUpdate(
+										characters[message.characterId],
+										message.updates
 									);
 									if (mergedChar) {
 										characters = {

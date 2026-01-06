@@ -1,9 +1,19 @@
+/**
+ * Centralized Permission Remote Functions
+ *
+ * Remote query functions for permission checking. These run on the server
+ * and can safely access server-only modules.
+ * 
+ * For internal helpers used within commands, see $lib/server/permissions.ts
+ * For types, see $lib/types/permissions-types.ts
+ */
+
 import { query, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 import { characters_table } from '../server/db/characters.schema';
-import { campaign_members_table } from '../server/db/campaigns.schema';
+import { campaigns_table, campaign_members_table } from '../server/db/campaigns.schema';
 import {
 	homebrew_classes,
 	homebrew_subclasses,
@@ -20,533 +30,129 @@ import {
 	homebrew_beastforms
 } from '../server/db/homebrew.schema';
 import { get_db, get_auth } from './utils';
+import type { CampaignMember } from '../types/campaign-types';
+import type {
+	CampaignAccess,
+	CharacterAccess,
+	HomebrewAccess,
+	ClaimCharacterAccess,
+	HomebrewTableType
+} from '../types/permissions-types';
+
+// Homebrew type enum for validation (internal use only, not exported)
+const HomebrewTypeSchema = z.enum([
+	'classes',
+	'subclasses',
+	'domains',
+	'domain_cards',
+	'primary_weapons',
+	'secondary_weapons',
+	'armor',
+	'loot',
+	'consumables',
+	'ancestry_cards',
+	'community_cards',
+	'transformation_cards',
+	'beastforms'
+]);
+
+// Map of homebrew types to their database tables
+const homebrewTables = {
+	classes: homebrew_classes,
+	subclasses: homebrew_subclasses,
+	domains: homebrew_domains,
+	domain_cards: homebrew_domain_cards,
+	primary_weapons: homebrew_primary_weapons,
+	secondary_weapons: homebrew_secondary_weapons,
+	armor: homebrew_armor,
+	loot: homebrew_loot,
+	consumables: homebrew_consumables,
+	ancestry_cards: homebrew_ancestry_cards,
+	community_cards: homebrew_community_cards,
+	transformation_cards: homebrew_transformation_cards,
+	beastforms: homebrew_beastforms
+} as const;
+
+// ============================================================================
+// Campaign Access
+// ============================================================================
 
 /**
- * Check if a user can view a character
+ * Get campaign with access permissions for the current user.
+ * Returns the campaign, membership info, and permission flags.
  */
-export const can_view_character = query(z.string(), async (characterId): Promise<boolean> => {
+export const getCampaignAccess = query(z.string(), async (campaignId): Promise<CampaignAccess> => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Get the character
-	const [character] = await db
+	// Fetch campaign
+	const [campaign] = await db
 		.select()
-		.from(characters_table)
-		.where(eq(characters_table.id, characterId))
+		.from(campaigns_table)
+		.where(eq(campaigns_table.id, campaignId))
 		.limit(1);
 
-	if (!character) {
-		throw error(404, 'Character not found');
+	if (!campaign) {
+		throw error(404, 'Campaign not found');
 	}
 
-	// Owner can always view
-	if (character.clerk_user_id === userId) {
-		return true;
-	}
-
-	// Campaign members can view characters in their campaign
-	if (character.campaign_id) {
-		const [campaignMembership] = await db
-			.select()
-			.from(campaign_members_table)
-			.where(
-				and(
-					eq(campaign_members_table.campaign_id, character.campaign_id),
-					eq(campaign_members_table.user_id, userId)
-				)
+	// Fetch user's membership in this campaign
+	const [membership] = await db
+		.select()
+		.from(campaign_members_table)
+		.where(
+			and(
+				eq(campaign_members_table.campaign_id, campaignId),
+				eq(campaign_members_table.user_id, userId)
 			)
-			.limit(1);
+		)
+		.limit(1);
 
-		if (campaignMembership) {
-			return campaignMembership.campaign_id === character.campaign_id;
-		}
-	}
+	const role = (membership?.role as 'gm' | 'player') ?? null;
 
-	return false;
+	return {
+		campaign,
+		membership: membership ?? null,
+		role,
+		canView: !!membership,
+		canEdit: role === 'gm'
+	};
 });
 
 /**
- * Check if a user can edit a character
+ * Get all members of a campaign (for cases where we need the full member list).
+ * This is separate from getCampaignAccess since fetching all members is more expensive.
  */
-export const can_edit_character = query(z.string(), async (characterId): Promise<boolean> => {
+export const getCampaignMembers = query(z.string(), async (campaignId): Promise<CampaignMember[]> => {
 	const event = getRequestEvent();
-	const { userId } = get_auth(event);
+	get_auth(event); // Validate authentication
 	const db = get_db(event);
 
-	// Get the character
-	const [character] = await db
+	const members = await db
 		.select()
-		.from(characters_table)
-		.where(eq(characters_table.id, characterId))
-		.limit(1);
+		.from(campaign_members_table)
+		.where(eq(campaign_members_table.campaign_id, campaignId));
 
-	if (!character) {
-		throw error(404, 'Character not found');
-	}
-
-	// Owner can always edit
-	if (character.clerk_user_id === userId) {
-		return true;
-	}
-
-	// GMs can edit characters in their campaigns
-	if (character.campaign_id) {
-		const members = await db
-			.select()
-			.from(campaign_members_table)
-			.where(eq(campaign_members_table.campaign_id, character.campaign_id));
-
-		const member = members.find((m) => m.user_id === userId && m.campaign_id === character.campaign_id);
-		if (member?.role === 'gm') {
-			return true;
-		}
-	}
-
-	return false;
+	return members;
 });
 
+// ============================================================================
+// Character Access
+// ============================================================================
+
 /**
- * Check if a user can view homebrew content
- * @param homebrewType - The type of homebrew (e.g., 'classes', 'domains', 'primary_weapons', etc.)
- * @param homebrewId - The ID of the homebrew item
+ * Get character with access permissions for the current user.
+ * Returns the character, ownership info, and permission flags.
  */
-export const can_view_homebrew = query(
-	z.object({
-		homebrewType: z.enum([
-			'classes',
-			'subclasses',
-			'domains',
-			'domain_cards',
-			'primary_weapons',
-			'secondary_weapons',
-			'armor',
-			'loot',
-			'consumables',
-			'ancestry_cards',
-			'community_cards',
-			'transformation_cards',
-			'beastforms'
-		]),
-		homebrewId: z.string()
-	}),
-	async ({ homebrewType, homebrewId }): Promise<boolean> => {
+export const getCharacterAccess = query(
+	z.string(),
+	async (characterId): Promise<CharacterAccess> => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		// Fetch homebrew based on type
-		let homebrew: { clerk_user_id: string; campaign_id: string | null } | null = null;
-
-		switch (homebrewType) {
-			case 'classes': {
-				const [result] = await db
-					.select()
-					.from(homebrew_classes)
-					.where(eq(homebrew_classes.id, homebrewId))
-					.limit(1);
-				if (result) homebrew = result;
-				break;
-			}
-			case 'subclasses': {
-				const [result] = await db
-					.select()
-					.from(homebrew_subclasses)
-					.where(eq(homebrew_subclasses.id, homebrewId))
-					.limit(1);
-				if (result) homebrew = result;
-				break;
-			}
-			case 'domains': {
-				const [result] = await db
-					.select()
-					.from(homebrew_domains)
-					.where(eq(homebrew_domains.id, homebrewId))
-					.limit(1);
-				if (result) homebrew = result;
-				break;
-			}
-			case 'domain_cards': {
-				const [result] = await db
-					.select()
-					.from(homebrew_domain_cards)
-					.where(eq(homebrew_domain_cards.id, homebrewId))
-					.limit(1);
-				if (result) homebrew = result;
-				break;
-			}
-			case 'primary_weapons': {
-				const [result] = await db
-					.select()
-					.from(homebrew_primary_weapons)
-					.where(eq(homebrew_primary_weapons.id, homebrewId))
-					.limit(1);
-				if (result) homebrew = result;
-				break;
-			}
-			case 'secondary_weapons': {
-				const [result] = await db
-					.select()
-					.from(homebrew_secondary_weapons)
-					.where(eq(homebrew_secondary_weapons.id, homebrewId))
-					.limit(1);
-				if (result) homebrew = result;
-				break;
-			}
-			case 'armor': {
-				const [result] = await db
-					.select()
-					.from(homebrew_armor)
-					.where(eq(homebrew_armor.id, homebrewId))
-					.limit(1);
-				if (result) homebrew = result;
-				break;
-			}
-			case 'loot': {
-				const [result] = await db
-					.select()
-					.from(homebrew_loot)
-					.where(eq(homebrew_loot.id, homebrewId))
-					.limit(1);
-				if (result) homebrew = result;
-				break;
-			}
-			case 'consumables': {
-				const [result] = await db
-					.select()
-					.from(homebrew_consumables)
-					.where(eq(homebrew_consumables.id, homebrewId))
-					.limit(1);
-				if (result) homebrew = result;
-				break;
-			}
-			case 'ancestry_cards': {
-				const [result] = await db
-					.select()
-					.from(homebrew_ancestry_cards)
-					.where(eq(homebrew_ancestry_cards.id, homebrewId))
-					.limit(1);
-				if (result) homebrew = result;
-				break;
-			}
-			case 'community_cards': {
-				const [result] = await db
-					.select()
-					.from(homebrew_community_cards)
-					.where(eq(homebrew_community_cards.id, homebrewId))
-					.limit(1);
-				if (result) homebrew = result;
-				break;
-			}
-			case 'transformation_cards': {
-				const [result] = await db
-					.select()
-					.from(homebrew_transformation_cards)
-					.where(eq(homebrew_transformation_cards.id, homebrewId))
-					.limit(1);
-				if (result) homebrew = result;
-				break;
-			}
-			case 'beastforms': {
-				const [result] = await db
-					.select()
-					.from(homebrew_beastforms)
-					.where(eq(homebrew_beastforms.id, homebrewId))
-					.limit(1);
-				if (result) homebrew = result;
-				break;
-			}
-		}
-
-		if (!homebrew) {
-			throw error(404, 'Homebrew not found');
-		}
-
-		// Owner can always view
-		if (homebrew.clerk_user_id === userId) {
-			return true;
-		}
-
-		// Campaign members can view homebrew in their campaign vault
-		if (homebrew.campaign_id) {
-			const [campaignMembership] = await db
-				.select()
-				.from(campaign_members_table)
-				.where(
-					and(
-						eq(campaign_members_table.campaign_id, homebrew.campaign_id),
-						eq(campaign_members_table.user_id, userId)
-					)
-				)
-				.limit(1);
-
-			if (campaignMembership) {
-				return campaignMembership.campaign_id === homebrew.campaign_id;
-			}
-		}
-
-		return false;
-	}
-);
-
-/**
- * Check if a user can edit homebrew content
- * @param homebrewType - The type of homebrew (e.g., 'classes', 'domains', 'primary_weapons', etc.)
- * @param homebrewId - The ID of the homebrew item
- */
-export const can_edit_homebrew = query(
-	z.object({
-		homebrewType: z.enum([
-			'classes',
-			'subclasses',
-			'domains',
-			'domain_cards',
-			'primary_weapons',
-			'secondary_weapons',
-			'armor',
-			'loot',
-			'consumables',
-			'ancestry_cards',
-			'community_cards',
-			'transformation_cards',
-			'beastforms'
-		]),
-		homebrewId: z.string()
-	}),
-	async ({ homebrewType, homebrewId }): Promise<boolean> => {
-		const event = getRequestEvent();
-		const { userId } = get_auth(event);
-		const db = get_db(event);
-
-		// Fetch homebrew based on type
-		let clerkUserId: string | null = null;
-
-		switch (homebrewType) {
-			case 'classes': {
-				const [result] = await db
-					.select({ clerk_user_id: homebrew_classes.clerk_user_id })
-					.from(homebrew_classes)
-					.where(eq(homebrew_classes.id, homebrewId))
-					.limit(1);
-				if (result) clerkUserId = result.clerk_user_id;
-				break;
-			}
-			case 'subclasses': {
-				const [result] = await db
-					.select({ clerk_user_id: homebrew_subclasses.clerk_user_id })
-					.from(homebrew_subclasses)
-					.where(eq(homebrew_subclasses.id, homebrewId))
-					.limit(1);
-				if (result) clerkUserId = result.clerk_user_id;
-				break;
-			}
-			case 'domains': {
-				const [result] = await db
-					.select({ clerk_user_id: homebrew_domains.clerk_user_id })
-					.from(homebrew_domains)
-					.where(eq(homebrew_domains.id, homebrewId))
-					.limit(1);
-				if (result) clerkUserId = result.clerk_user_id;
-				break;
-			}
-			case 'domain_cards': {
-				const [result] = await db
-					.select({ clerk_user_id: homebrew_domain_cards.clerk_user_id })
-					.from(homebrew_domain_cards)
-					.where(eq(homebrew_domain_cards.id, homebrewId))
-					.limit(1);
-				if (result) clerkUserId = result.clerk_user_id;
-				break;
-			}
-			case 'primary_weapons': {
-				const [result] = await db
-					.select({ clerk_user_id: homebrew_primary_weapons.clerk_user_id })
-					.from(homebrew_primary_weapons)
-					.where(eq(homebrew_primary_weapons.id, homebrewId))
-					.limit(1);
-				if (result) clerkUserId = result.clerk_user_id;
-				break;
-			}
-			case 'secondary_weapons': {
-				const [result] = await db
-					.select({ clerk_user_id: homebrew_secondary_weapons.clerk_user_id })
-					.from(homebrew_secondary_weapons)
-					.where(eq(homebrew_secondary_weapons.id, homebrewId))
-					.limit(1);
-				if (result) clerkUserId = result.clerk_user_id;
-				break;
-			}
-			case 'armor': {
-				const [result] = await db
-					.select({ clerk_user_id: homebrew_armor.clerk_user_id })
-					.from(homebrew_armor)
-					.where(eq(homebrew_armor.id, homebrewId))
-					.limit(1);
-				if (result) clerkUserId = result.clerk_user_id;
-				break;
-			}
-			case 'loot': {
-				const [result] = await db
-					.select({ clerk_user_id: homebrew_loot.clerk_user_id })
-					.from(homebrew_loot)
-					.where(eq(homebrew_loot.id, homebrewId))
-					.limit(1);
-				if (result) clerkUserId = result.clerk_user_id;
-				break;
-			}
-			case 'consumables': {
-				const [result] = await db
-					.select({ clerk_user_id: homebrew_consumables.clerk_user_id })
-					.from(homebrew_consumables)
-					.where(eq(homebrew_consumables.id, homebrewId))
-					.limit(1);
-				if (result) clerkUserId = result.clerk_user_id;
-				break;
-			}
-			case 'ancestry_cards': {
-				const [result] = await db
-					.select({ clerk_user_id: homebrew_ancestry_cards.clerk_user_id })
-					.from(homebrew_ancestry_cards)
-					.where(eq(homebrew_ancestry_cards.id, homebrewId))
-					.limit(1);
-				if (result) clerkUserId = result.clerk_user_id;
-				break;
-			}
-			case 'community_cards': {
-				const [result] = await db
-					.select({ clerk_user_id: homebrew_community_cards.clerk_user_id })
-					.from(homebrew_community_cards)
-					.where(eq(homebrew_community_cards.id, homebrewId))
-					.limit(1);
-				if (result) clerkUserId = result.clerk_user_id;
-				break;
-			}
-			case 'transformation_cards': {
-				const [result] = await db
-					.select({ clerk_user_id: homebrew_transformation_cards.clerk_user_id })
-					.from(homebrew_transformation_cards)
-					.where(eq(homebrew_transformation_cards.id, homebrewId))
-					.limit(1);
-				if (result) clerkUserId = result.clerk_user_id;
-				break;
-			}
-			case 'beastforms': {
-				const [result] = await db
-					.select({ clerk_user_id: homebrew_beastforms.clerk_user_id })
-					.from(homebrew_beastforms)
-					.where(eq(homebrew_beastforms.id, homebrewId))
-					.limit(1);
-				if (result) clerkUserId = result.clerk_user_id;
-				break;
-			}
-		}
-
-		if (!clerkUserId) {
-			throw error(404, 'Homebrew not found');
-		}
-
-		// Only owner can edit
-		return clerkUserId === userId;
-	}
-);
-
-/**
- * Check if a user is a GM of a campaign
- */
-export const is_campaign_gm = query(
-	z.object({
-		campaignId: z.string(),
-		userId: z.string().optional() // Optional, will use authenticated user if not provided
-	}),
-	async ({ campaignId, userId: providedUserId }): Promise<boolean> => {
-		const event = getRequestEvent();
-		const { userId: authUserId } = get_auth(event);
-		const userId = providedUserId || authUserId;
-		const db = get_db(event);
-
-		if (!userId) return false;
-
-		const members = await db
-			.select()
-			.from(campaign_members_table)
-			.where(eq(campaign_members_table.campaign_id, campaignId));
-
-		const member = members.find((m) => m.user_id === userId && m.campaign_id === campaignId);
-		return member?.role === 'gm';
-	}
-);
-
-/**
- * Check if a user is a member of a campaign
- */
-export const is_campaign_member = query(
-	z.object({
-		campaignId: z.string(),
-		userId: z.string().optional() // Optional, will use authenticated user if not provided
-	}),
-	async ({ campaignId, userId: providedUserId }): Promise<boolean> => {
-		const event = getRequestEvent();
-		const { userId: authUserId } = get_auth(event);
-		const userId = providedUserId || authUserId;
-		const db = get_db(event);
-
-		if (!userId) return false;
-
-		const members = await db
-			.select()
-			.from(campaign_members_table)
-			.where(eq(campaign_members_table.campaign_id, campaignId));
-
-		return members.some((m) => m.user_id === userId && m.campaign_id === campaignId);
-	}
-);
-
-/**
- * Check if a user already has a character in a campaign
- */
-export const has_character_in_campaign = query(
-	z.object({
-		campaignId: z.string(),
-		userId: z.string().optional() // Optional, will use authenticated user if not provided
-	}),
-	async ({ campaignId, userId: providedUserId }): Promise<boolean> => {
-		const event = getRequestEvent();
-		const { userId: authUserId } = get_auth(event);
-		const userId = providedUserId || authUserId;
-		const db = get_db(event);
-
-		if (!userId) return false;
-
-		const existingCharacters = await db
-			.select()
-			.from(characters_table)
-			.where(
-				and(
-					eq(characters_table.campaign_id, campaignId),
-					eq(characters_table.clerk_user_id, userId),
-					eq(characters_table.claimable, 0)
-				)
-			)
-			.limit(1);
-
-		return existingCharacters.length > 0;
-	}
-);
-
-/**
- * Check if a user can claim a character
- */
-export const can_claim_character = query(
-	z.object({
-		characterId: z.string(),
-		campaignId: z.string()
-	}),
-	async ({ characterId, campaignId }): Promise<boolean> => {
-		const event = getRequestEvent();
-		const { userId } = get_auth(event);
-		const db = get_db(event);
-
-		// Get the character
+		// Fetch character
 		const [character] = await db
 			.select()
 			.from(characters_table)
@@ -554,37 +160,120 @@ export const can_claim_character = query(
 			.limit(1);
 
 		if (!character) {
-			return false;
+			throw error(404, 'Character not found');
+		}
+
+		const isOwner = character.clerk_user_id === userId;
+
+		// If owner, they have full access
+		if (isOwner) {
+			return {
+				character,
+				canView: true,
+				canEdit: true,
+				isOwner: true,
+				campaignRole: null
+			};
+		}
+
+		// Check campaign membership if character is in a campaign
+		if (character.campaign_id) {
+			const [membership] = await db
+				.select()
+				.from(campaign_members_table)
+				.where(
+					and(
+						eq(campaign_members_table.campaign_id, character.campaign_id),
+						eq(campaign_members_table.user_id, userId)
+					)
+				)
+				.limit(1);
+
+			if (membership) {
+				const campaignRole = membership.role as 'gm' | 'player';
+				return {
+					character,
+					canView: true, // All campaign members can view
+					canEdit: campaignRole === 'gm', // Only GM can edit non-owned characters
+					isOwner: false,
+					campaignRole
+				};
+			}
+		}
+
+		// No access
+		return {
+			character,
+			canView: false,
+			canEdit: false,
+			isOwner: false,
+			campaignRole: null
+		};
+	}
+);
+
+// ============================================================================
+// Character Claim Access
+// ============================================================================
+
+/**
+ * Check if the current user can claim a character.
+ * Returns detailed info about why claiming is or isn't possible.
+ */
+export const getClaimCharacterAccess = query(
+	z.object({
+		characterId: z.string(),
+		campaignId: z.string()
+	}),
+	async ({ characterId, campaignId }): Promise<ClaimCharacterAccess> => {
+		const event = getRequestEvent();
+		const { userId } = get_auth(event);
+		const db = get_db(event);
+
+		// Fetch character
+		const [character] = await db
+			.select()
+			.from(characters_table)
+			.where(eq(characters_table.id, characterId))
+			.limit(1);
+
+		if (!character) {
+			throw error(404, 'Character not found');
 		}
 
 		// Character must be claimable
 		if (character.claimable !== 1) {
-			return false;
+			return { character, canClaim: false, reason: 'Character is not claimable' };
 		}
 
 		// Character must be in the specified campaign
 		if (character.campaign_id !== campaignId) {
-			return false;
+			return { character, canClaim: false, reason: 'Character is not in this campaign' };
 		}
 
-		// Verify user is a member of the campaign
-		const members = await db
+		// Check user's campaign membership
+		const [membership] = await db
 			.select()
 			.from(campaign_members_table)
-			.where(eq(campaign_members_table.campaign_id, campaignId));
+			.where(
+				and(
+					eq(campaign_members_table.campaign_id, campaignId),
+					eq(campaign_members_table.user_id, userId)
+				)
+			)
+			.limit(1);
 
-		const member = members.find((m) => m.user_id === userId && m.campaign_id === campaignId);
-		if (!member) {
-			return false;
+		if (!membership) {
+			return { character, canClaim: false, reason: 'You must be a member of the campaign' };
 		}
 
 		// User must be a player (not GM)
-		if (member.role === 'gm') {
-			return false;
+		if (membership.role === 'gm') {
+			return { character, canClaim: false, reason: 'GMs cannot claim characters' };
 		}
 
 		// Player must not already have a character in this campaign
-		const existingCharacters = await db
+		const [existingCharacter] = await db
 			.select()
 			.from(characters_table)
 			.where(
@@ -596,11 +285,112 @@ export const can_claim_character = query(
 			)
 			.limit(1);
 
-		if (existingCharacters.length > 0) {
-			return false;
+		if (existingCharacter) {
+			return { character, canClaim: false, reason: 'You already have a character in this campaign' };
 		}
 
-		return true;
+		return { character, canClaim: true, reason: null };
 	}
 );
 
+/**
+ * Check if the current user has a (non-claimable) character in a campaign.
+ */
+export const hasCharacterInCampaign = query(
+	z.string(),
+	async (campaignId): Promise<boolean> => {
+		const event = getRequestEvent();
+		const { userId } = get_auth(event);
+		const db = get_db(event);
+
+		const [existingCharacter] = await db
+			.select()
+			.from(characters_table)
+			.where(
+				and(
+					eq(characters_table.campaign_id, campaignId),
+					eq(characters_table.clerk_user_id, userId),
+					eq(characters_table.claimable, 0)
+				)
+			)
+			.limit(1);
+
+		return !!existingCharacter;
+	}
+);
+
+// ============================================================================
+// Homebrew Access
+// ============================================================================
+
+/**
+ * Get homebrew item with access permissions for the current user.
+ * Uses a generic approach to handle all homebrew types with a single implementation.
+ */
+export const getHomebrewAccess = query(
+	z.object({
+		homebrewType: HomebrewTypeSchema,
+		homebrewId: z.string()
+	}),
+	async ({ homebrewType, homebrewId }): Promise<HomebrewAccess<unknown>> => {
+		const event = getRequestEvent();
+		const { userId } = get_auth(event);
+		const db = get_db(event);
+
+		const table = homebrewTables[homebrewType];
+
+		// Fetch the homebrew item
+		const [item] = await db
+			.select()
+			.from(table)
+			.where(eq(table.id, homebrewId))
+			.limit(1);
+
+		if (!item) {
+			throw error(404, 'Homebrew item not found');
+		}
+
+		const isOwner = item.clerk_user_id === userId;
+
+		// Owner always has full access
+		if (isOwner) {
+			return {
+				item,
+				canView: true,
+				canEdit: true,
+				isOwner: true
+			};
+		}
+
+		// Check if homebrew is in a campaign the user belongs to
+		if (item.campaign_id) {
+			const [membership] = await db
+				.select()
+				.from(campaign_members_table)
+				.where(
+					and(
+						eq(campaign_members_table.campaign_id, item.campaign_id),
+						eq(campaign_members_table.user_id, userId)
+					)
+				)
+				.limit(1);
+
+			if (membership) {
+				return {
+					item,
+					canView: true,
+					canEdit: false, // Only owner can edit
+					isOwner: false
+				};
+			}
+		}
+
+		// No access
+		return {
+			item,
+			canView: false,
+			canEdit: false,
+			isOwner: false
+		};
+	}
+);
