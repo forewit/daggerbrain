@@ -55,10 +55,7 @@ export const campaign_state_table = sqliteTable('campaign_state_table', {
 	campaign_id: text('campaign_id').primaryKey().notNull(),
 	fear_track: integer('fear_track').notNull().default(0),
 	notes: text('notes'),
-	countdowns: text('countdowns', { mode: 'json' })
-		.notNull()
-		.default('[]')
-		.$type<Countdown[]>(),
+	countdowns: text('countdowns', { mode: 'json' }).notNull().default('[]').$type<Countdown[]>(),
 	updated_at: integer('updated_at').notNull()
 });
 
@@ -86,8 +83,10 @@ export const campaign_characters_table = sqliteTable(
 );
 
 export const campaign_characters_table_schema = createSelectSchema(campaign_characters_table);
-export const campaign_characters_table_insert_schema = createInsertSchema(campaign_characters_table);
-export const campaign_characters_table_update_schema = createUpdateSchema(campaign_characters_table);
+export const campaign_characters_table_insert_schema =
+	createInsertSchema(campaign_characters_table);
+export const campaign_characters_table_update_schema =
+	createUpdateSchema(campaign_characters_table);
 
 // ============================================================================
 // Campaign Homebrew Vault
@@ -102,16 +101,15 @@ export const campaign_homebrew_vault_table = sqliteTable(
 		homebrew_id: text('homebrew_id').notNull(),
 		added_at: integer('added_at').notNull()
 	},
-	(table) => [
-		index('campaign_homebrew_vault_table_campaign_id_idx').on(table.campaign_id)
-	]
+	(table) => [index('campaign_homebrew_vault_table_campaign_id_idx').on(table.campaign_id)]
 );
 
-export const campaign_homebrew_vault_table_schema = createSelectSchema(campaign_homebrew_vault_table);
+export const campaign_homebrew_vault_table_schema = createSelectSchema(
+	campaign_homebrew_vault_table
+);
 export const campaign_homebrew_vault_table_insert_schema = createInsertSchema(
 	campaign_homebrew_vault_table
 );
 export const campaign_homebrew_vault_table_update_schema = createUpdateSchema(
 	campaign_homebrew_vault_table
 );
-

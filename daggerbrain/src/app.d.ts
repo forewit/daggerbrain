@@ -2,7 +2,12 @@
 // for information about these interfaces
 /// <reference types="svelte-clerk/env" />
 
-import type { KVNamespace, D1Database, R2Bucket, DurableObjectNamespace } from '@cloudflare/workers-types';
+import type {
+	KVNamespace,
+	D1Database,
+	R2Bucket,
+	DurableObjectNamespace
+} from '@cloudflare/workers-types';
 
 declare global {
 	namespace App {

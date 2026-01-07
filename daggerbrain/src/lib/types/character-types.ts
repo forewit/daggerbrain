@@ -18,6 +18,7 @@ export type CharacterSettings = {
 	use_gold_coins: boolean;
 	homebrew_enabled: boolean;
 	campaign_homebrew_enabled: boolean;
+	show_campaign_info: boolean;
 };
 
 export type DomainCardId = {

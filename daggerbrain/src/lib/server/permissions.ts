@@ -1,6 +1,6 @@
 /**
  * Server-only Permission Helpers
- * 
+ *
  * Internal helpers for permission checking within command contexts.
  * These are NOT remote functions - they're for use within other remote commands
  * where you already have db and userId from the calling context.
@@ -124,4 +124,3 @@ export async function getCharacterAccessInternal(
 		campaignRole: null
 	};
 }
-

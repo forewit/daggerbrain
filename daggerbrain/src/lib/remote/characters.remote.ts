@@ -2,10 +2,7 @@ import { query, command, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
-import {
-	characters_table,
-	characters_table_update_schema
-} from '../server/db/characters.schema';
+import { characters_table, characters_table_update_schema } from '../server/db/characters.schema';
 import { get_db, get_auth, get_kv } from './utils';
 import { get_user_campaigns } from './campaigns.remote';
 import { getCharacterAccess } from './permissions.remote';
@@ -41,19 +38,19 @@ async function notifyDurableObject(
 		const doNamespace = event.platform.env.CAMPAIGN_LIVE;
 		const id = doNamespace.idFromName(campaignId);
 		const stub = doNamespace.get(id);
-		
+
 		// Send POST request directly to the DO
 		const response = await stub.fetch('https://do-internal/notify', {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json',
+				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
 				type,
 				...data
 			})
 		});
-		
+
 		if (!response.ok) {
 			const errorText = await response.text();
 			console.error(`DO notification failed with status ${response.status}: ${errorText}`);
@@ -88,7 +85,7 @@ export const get_all_characters = query(async () => {
  */
 export const get_character_by_id = query(z.string(), async (characterId): Promise<Character> => {
 	const access = await getCharacterAccess(characterId);
-	
+
 	if (!access.canView) {
 		throw error(403, 'You do not have permission to view this character');
 	}
@@ -115,12 +112,12 @@ export const delete_character = command(z.string(), async (characterId) => {
 
 	// Track if character was in a campaign (for refreshing queries)
 	const wasInCampaign = !!character.campaign_id;
-	
+
 	// Clean up campaign KV entry if it exists
 	if (character.campaign_id) {
 		await kv.delete(`character:${characterId}:campaign`);
 		await removeCharacterFromSummary(kv, character.campaign_id, characterId);
-		
+
 		// Notify DO that character was deleted
 		await notifyDurableObject(event, character.campaign_id, 'character_deleted', {
 			characterId
@@ -134,12 +131,12 @@ export const delete_character = command(z.string(), async (characterId) => {
 
 	// Refresh the characters list
 	get_all_characters().refresh();
-	
+
 	// Refresh campaign list if character was in a campaign (to update character_images)
 	if (wasInCampaign) {
 		get_user_campaigns().refresh();
 	}
-	
+
 	console.log('deleted character from D1');
 });
 
@@ -194,36 +191,36 @@ export const create_character = command(
 
 		const characterId = crypto.randomUUID();
 
-	await db.insert(characters_table).values({
-		id: characterId,
-		clerk_user_id: userId,
-		campaign_id: options?.campaign_id || null
-	});
-
-	// If character is being created in a campaign, also insert into campaign_characters table
-	if (options?.campaign_id) {
-		const { campaign_characters_table } = await import('../server/db/campaigns.schema');
-		await db.insert(campaign_characters_table).values({
-			campaign_id: options.campaign_id,
-			character_id: characterId,
-			claimable: isClaimable ? 1 : 0,
-			added_at: Date.now()
+		await db.insert(characters_table).values({
+			id: characterId,
+			clerk_user_id: userId,
+			campaign_id: options?.campaign_id || null
 		});
-	}
 
-	// Refresh the characters list
-	get_all_characters().refresh();
-	
-	// Refresh campaign list if character was created in a campaign (to update character_images)
-	if (options?.campaign_id) {
-		get_user_campaigns().refresh();
-	}
+		// If character is being created in a campaign, also insert into campaign_characters table
+		if (options?.campaign_id) {
+			const { campaign_characters_table } = await import('../server/db/campaigns.schema');
+			await db.insert(campaign_characters_table).values({
+				campaign_id: options.campaign_id,
+				character_id: characterId,
+				claimable: isClaimable ? 1 : 0,
+				added_at: Date.now()
+			});
+		}
 
-	// Note: We don't notify DO on character creation because derived_character is not available yet.
-	// The first update_character call with derived_character will notify the DO with the full character.
+		// Refresh the characters list
+		get_all_characters().refresh();
 
-	console.log('created character in D1');
-	return characterId;
+		// Refresh campaign list if character was created in a campaign (to update character_images)
+		if (options?.campaign_id) {
+			get_user_campaigns().refresh();
+		}
+
+		// Note: We don't notify DO on character creation because derived_character is not available yet.
+		// The first update_character call with derived_character will notify the DO with the full character.
+
+		console.log('created character in D1');
+		return characterId;
 	}
 );
 
@@ -246,7 +243,13 @@ export const update_character = command(
 		// - campaign_id: modified via assign_character_to_campaign
 		// - clerk_user_id: immutable, determines ownership
 		// Note: claimable is now stored in campaign_characters_table, not characters_table
-		const { derived_character, id, campaign_id: _campaignId, clerk_user_id: _clerkUserId, ...character } = data;
+		const {
+			derived_character,
+			id,
+			campaign_id: _campaignId,
+			clerk_user_id: _clerkUserId,
+			...character
+		} = data;
 
 		if (!id) {
 			throw error(400, 'Character id missing');
@@ -255,16 +258,13 @@ export const update_character = command(
 		// Get character with permissions
 		const access = await getCharacterAccessInternal(db, userId, id);
 		const existingCharacter = access.character;
-		
+
 		if (!access.canEdit) {
 			throw error(403, 'You do not have permission to edit this character');
 		}
 
 		// Update character (without derived_character and id fields - id is immutable)
-		await db
-			.update(characters_table)
-			.set(character)
-			.where(eq(characters_table.id, id));
+		await db.update(characters_table).set(character).where(eq(characters_table.id, id));
 
 		// Handle KV materialization for campaign characters
 		const kv = get_kv(event);
@@ -282,7 +282,7 @@ export const update_character = command(
 		// Update campaign character summary if character is in a campaign
 		if (campaignId) {
 			await upsertCharacterSummary(kv, db, campaignId, id);
-			
+
 			// Notify DO about character update
 			// If derived_character is provided, send full character (first update or major change)
 			// Otherwise, send partial update with changed fields
@@ -298,11 +298,12 @@ export const update_character = command(
 				if (character.marked_stress !== undefined) updates.marked_stress = character.marked_stress;
 				if (character.marked_hope !== undefined) updates.marked_hope = character.marked_hope;
 				if (character.marked_armor !== undefined) updates.marked_armor = character.marked_armor;
-				if (character.active_conditions !== undefined) updates.active_conditions = character.active_conditions;
+				if (character.active_conditions !== undefined)
+					updates.active_conditions = character.active_conditions;
 				if (character.name !== undefined) updates.name = character.name;
 				if (character.level !== undefined) updates.level = character.level;
 				// Add other fields as needed
-				
+
 				if (Object.keys(updates).length > 0) {
 					await notifyDurableObject(event, campaignId, 'character_updated', {
 						characterId: id,
@@ -357,7 +358,7 @@ export const update_character_campaign_stats = command(
 		// Get character with permissions
 		const access = await getCharacterAccessInternal(db, userId, character_id);
 		const character = access.character;
-		
+
 		if (!access.canEdit) {
 			throw error(403, 'You do not have permission to edit this character');
 		}

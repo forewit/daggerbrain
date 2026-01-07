@@ -67,31 +67,32 @@ export type DerivedCharacter = Character & {
  * Zod schema for validating DerivedCharacter.
  * This validates that all required derived fields are present.
  */
-export const DerivedCharacterSchema = z.object({
-	// Validate key derived stats exist (we don't validate the full nested structure)
-	derived_max_hp: z.number(),
-	derived_max_stress: z.number(),
-	derived_max_hope: z.number(),
-	derived_traits: z.record(z.string(), z.number()),
-	derived_proficiency: z.number(),
-	derived_experience_modifiers: z.array(z.number()),
-	derived_max_experiences: z.number(),
-	derived_max_loadout: z.number(),
-	derived_max_armor: z.number(),
-	derived_max_burden: z.number(),
-	derived_max_short_rest_actions: z.number(),
-	derived_max_long_rest_actions: z.number(),
-	derived_max_consumables: z.number(),
-	derived_consumable_count: z.number(),
-	derived_evasion: z.number(),
-	derived_damage_thresholds: z.object({
-		major: z.number(),
-		severe: z.number()
-	}),
-	derived_primary_class_mastery_level: z.number(),
-	derived_secondary_class_mastery_level: z.number(),
-	derived_spellcast_roll_bonus: z.number(),
-	derived_domain_card_vault: z.array(z.any()),
-	derived_domain_card_loadout: z.array(z.any())
-}).passthrough(); // Allow other fields from Character type
-
+export const DerivedCharacterSchema = z
+	.object({
+		// Validate key derived stats exist (we don't validate the full nested structure)
+		derived_max_hp: z.number(),
+		derived_max_stress: z.number(),
+		derived_max_hope: z.number(),
+		derived_traits: z.record(z.string(), z.number()),
+		derived_proficiency: z.number(),
+		derived_experience_modifiers: z.array(z.number()),
+		derived_max_experiences: z.number(),
+		derived_max_loadout: z.number(),
+		derived_max_armor: z.number(),
+		derived_max_burden: z.number(),
+		derived_max_short_rest_actions: z.number(),
+		derived_max_long_rest_actions: z.number(),
+		derived_max_consumables: z.number(),
+		derived_consumable_count: z.number(),
+		derived_evasion: z.number(),
+		derived_damage_thresholds: z.object({
+			major: z.number(),
+			severe: z.number()
+		}),
+		derived_primary_class_mastery_level: z.number(),
+		derived_secondary_class_mastery_level: z.number(),
+		derived_spellcast_roll_bonus: z.number(),
+		derived_domain_card_vault: z.array(z.any()),
+		derived_domain_card_loadout: z.array(z.any())
+	})
+	.passthrough(); // Allow other fields from Character type

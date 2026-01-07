@@ -23,6 +23,6 @@
 </script>
 
 {#if campaign}
-<!-- Characters Section -->
-<CampaignCharacters />
+	<!-- Characters Section -->
+	<CampaignCharacters />
 {/if}

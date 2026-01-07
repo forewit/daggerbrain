@@ -64,16 +64,18 @@ export async function upsertCharacterSummary(
 	const owner_name = member?.display_name || undefined;
 
 	// Get existing summary and update only this character (more efficient than full rebuild)
-	const existing = (await kv.get(`campaign:${campaignId}:characters`, 'json')) as
-		| Record<string, CampaignCharacterSummary>
-		| null;
+	const existing = (await kv.get(`campaign:${campaignId}:characters`, 'json')) as Record<
+		string,
+		CampaignCharacterSummary
+	> | null;
 
 	const summaries = existing || {};
 
 	// Get derived character from KV (campaign)
-	const derivedChar = (await kv.get(`character:${characterId}:campaign`, 'json')) as
-		| DerivedCharacter
-		| null;
+	const derivedChar = (await kv.get(
+		`character:${characterId}:campaign`,
+		'json'
+	)) as DerivedCharacter | null;
 	const max_hp = derivedChar?.derived_max_hp ?? 0;
 	const max_stress = derivedChar?.derived_max_stress ?? 6;
 	const max_hope = derivedChar?.derived_max_hope ?? 6;
@@ -119,9 +121,10 @@ export async function removeCharacterFromSummary(
 	campaignId: string,
 	characterId: string
 ): Promise<void> {
-	const existing = (await kv.get(`campaign:${campaignId}:characters`, 'json')) as
-		| Record<string, CampaignCharacterSummary>
-		| null;
+	const existing = (await kv.get(`campaign:${campaignId}:characters`, 'json')) as Record<
+		string,
+		CampaignCharacterSummary
+	> | null;
 	if (existing) {
 		delete existing[characterId];
 		await kv.put(`campaign:${campaignId}:characters`, JSON.stringify(existing), {
@@ -234,4 +237,3 @@ export async function rebuildCampaignCharacterCache(
 
 	return summaries;
 }
-

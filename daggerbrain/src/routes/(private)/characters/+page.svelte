@@ -25,7 +25,7 @@
 	let titleText = $derived(`${user.all_characters.length}/3`);
 
 	// Create campaign lookup map for O(1) campaign name lookups
-	let campaignMap = $derived(new Map(user.all_campaigns.map(c => [c.id, c.name])));
+	let campaignMap = $derived(new Map(user.all_campaigns.map((c) => [c.id, c.name])));
 
 	async function handleCreateCharacter() {
 		creatingCharacter = true;
@@ -124,7 +124,7 @@
 												class="h-full w-full object-cover"
 											/>
 										</div>
-										<div class="truncate grow">
+										<div class="grow truncate">
 											<p class=" truncate text-lg font-bold">
 												{char.name.trim() || 'Unnamed Character'}
 											</p>
@@ -136,17 +136,18 @@
 												&ensp;•&ensp;
 												{char.derived_descriptors.primary_subclass_name || 'No subclass'}
 											</p>
-											
 										</div>
 									</a>
 									{#if char.campaign_id && campaignMap.has(char.campaign_id)}
-									<div class="truncate absolute bottom-10 left-22 right-2 flex">
-
-												<a href={`/campaigns/${char.campaign_id}`} class="max-w-full hover:underline py-0.5 px-2 truncate text-center text-accent text-xs bg-accent/10 border border-accent/20 rounded-full w-min">
-													Campaign: {campaignMap.get(char.campaign_id)}
-												</a>
-												</div>
-											{/if}
+										<div class="absolute right-2 bottom-10 left-22 flex truncate">
+											<a
+												href={`/campaigns/${char.campaign_id}`}
+												class="w-min max-w-full truncate rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 text-center text-xs text-accent hover:underline"
+											>
+												Campaign: {campaignMap.get(char.campaign_id)}
+											</a>
+										</div>
+									{/if}
 									<div class="flex bg-muted">
 										<Button
 											variant="ghost"

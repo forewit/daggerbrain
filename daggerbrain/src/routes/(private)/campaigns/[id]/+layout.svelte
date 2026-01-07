@@ -4,7 +4,12 @@
 
 	let { children } = $props();
 
-	setCampaignContext(page.params.id);
+	const campaignCtx = setCampaignContext(); // Initialize without ID
+
+	// Set campaign ID from route params
+	$effect(() => {
+		campaignCtx.campaignId = page.params.id;
+	});
 </script>
 
 {@render children?.()}

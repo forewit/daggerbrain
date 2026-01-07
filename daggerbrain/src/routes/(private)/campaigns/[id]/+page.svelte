@@ -84,7 +84,7 @@
 		try {
 			// Update campaign name - auto-save will handle persistence
 			campaign.campaign.name = campaignName.trim();
-			
+
 			// Update GM display name if it changed
 			if (gmDisplayName.trim() !== (data.userMembership?.display_name || '')) {
 				await update_campaign_member({
@@ -92,7 +92,7 @@
 					display_name: gmDisplayName.trim() || undefined
 				});
 			}
-			
+
 			showSettingsDialog = false;
 		} catch (err) {
 			const message = err instanceof Error ? err.message : 'Failed to save settings';
@@ -148,8 +148,7 @@
 
 	// Check if player display name has changed
 	const hasPlayerChanges = $derived(
-		data.userMembership &&
-			playerDisplayName.trim() !== (data.userMembership.display_name || '')
+		data.userMembership && playerDisplayName.trim() !== (data.userMembership.display_name || '')
 	);
 
 	async function handleSavePlayerSettings() {
@@ -292,10 +291,7 @@
 			</div>
 			<div class="flex flex-col gap-2">
 				<Label>Your Display Name (GM)</Label>
-				<Input
-					bind:value={gmDisplayName}
-					placeholder="Enter your display name (optional)"
-				/>
+				<Input bind:value={gmDisplayName} placeholder="Enter your display name (optional)" />
 				<p class="text-xs text-muted-foreground">
 					This is how other players will see your name in this campaign.
 				</p>
@@ -388,7 +384,7 @@
 			<Button
 				type="button"
 				variant="link"
-				class="text-destructive justify-start p-0 h-auto"
+				class="h-auto justify-start p-0 text-destructive"
 				onclick={() => (showLeaveConfirmation = true)}
 			>
 				Leave Campaign
@@ -408,9 +404,7 @@
 			>
 				Cancel
 			</Dialog.Close>
-			<Button onclick={handleSavePlayerSettings} disabled={!hasPlayerChanges}>
-				Save
-			</Button>
+			<Button onclick={handleSavePlayerSettings} disabled={!hasPlayerChanges}>Save</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
@@ -421,7 +415,8 @@
 		<Dialog.Header>
 			<Dialog.Title>Leave Campaign</Dialog.Title>
 			<Dialog.Description>
-				Are you sure you want to leave <strong>{campaign.campaign?.name || 'this campaign'}</strong>? This action cannot be undone.
+				Are you sure you want to leave <strong>{campaign.campaign?.name || 'this campaign'}</strong
+				>? This action cannot be undone.
 			</Dialog.Description>
 		</Dialog.Header>
 		<Dialog.Footer class="flex gap-3">

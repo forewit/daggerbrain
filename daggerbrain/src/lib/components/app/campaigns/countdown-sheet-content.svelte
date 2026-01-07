@@ -88,13 +88,7 @@
 				}
 			}}
 		/>
-		<Button
-			size="sm"
-			disabled={!newCountdownName.trim()}
-			onclick={handleAddCountdown}
-		>
-			Add
-		</Button>
+		<Button size="sm" disabled={!newCountdownName.trim()} onclick={handleAddCountdown}>Add</Button>
 	</div>
 
 	{#if countdowns.length > 0}
@@ -139,4 +133,3 @@
 		<p class="py-4 text-center text-sm text-muted-foreground italic">No countdowns</p>
 	{/if}
 </div>
-

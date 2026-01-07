@@ -44,37 +44,36 @@ export const get_homebrew_primary_weapons = query(async () => {
 });
 
 export const create_homebrew_primary_weapon = command(WeaponSchema, async (data) => {
-		const event = getRequestEvent();
-		const { userId } = get_auth(event);
-		const db = get_db(event);
-		const kv = get_kv(event);
+	const event = getRequestEvent();
+	const { userId } = get_auth(event);
+	const db = get_db(event);
+	const kv = get_kv(event);
 
-		// Check if user has reached the global homebrew limit
-		const totalCount = await getTotalHomebrewCount(db, userId);
-		if (totalCount >= HOMEBREW_LIMIT) {
-			throw error(403, `Homebrew limit reached. You can only have ${HOMEBREW_LIMIT} custom items.`);
-		}
-
-		const validatedData = WeaponSchema.parse({ ...data, source_id: 'Homebrew' as const });
-		const id = crypto.randomUUID();
-		validatedData.compendium_id = id;
-		const now = Date.now();
-
-		await db.insert(homebrew_primary_weapons).values({
-			id,
-			clerk_user_id: userId,
-			data: validatedData,
-			created_at: now,
-			updated_at: now
-		});
-
-		// refresh the primary weapons query
-		get_homebrew_primary_weapons().refresh();
-
-		console.log('created homebrew primary weapon in D1');
-		return id;
+	// Check if user has reached the global homebrew limit
+	const totalCount = await getTotalHomebrewCount(db, userId);
+	if (totalCount >= HOMEBREW_LIMIT) {
+		throw error(403, `Homebrew limit reached. You can only have ${HOMEBREW_LIMIT} custom items.`);
 	}
-);
+
+	const validatedData = WeaponSchema.parse({ ...data, source_id: 'Homebrew' as const });
+	const id = crypto.randomUUID();
+	validatedData.compendium_id = id;
+	const now = Date.now();
+
+	await db.insert(homebrew_primary_weapons).values({
+		id,
+		clerk_user_id: userId,
+		data: validatedData,
+		created_at: now,
+		updated_at: now
+	});
+
+	// refresh the primary weapons query
+	get_homebrew_primary_weapons().refresh();
+
+	console.log('created homebrew primary weapon in D1');
+	return id;
+});
 
 export const update_homebrew_primary_weapon = command(
 	z.object({ id: z.string(), data: WeaponSchema }),
@@ -487,11 +486,7 @@ export const delete_homebrew_loot = command(z.string(), async (id) => {
 	const db = get_db(event);
 
 	// Verify ownership
-	const [existing] = await db
-		.select()
-		.from(homebrew_loot)
-		.where(eq(homebrew_loot.id, id))
-		.limit(1);
+	const [existing] = await db.select().from(homebrew_loot).where(eq(homebrew_loot.id, id)).limit(1);
 
 	if (!existing || existing.clerk_user_id !== userId) {
 		throw error(403, 'Not authorized to delete this loot');

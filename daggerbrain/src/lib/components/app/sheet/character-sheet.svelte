@@ -29,6 +29,7 @@
 	import Features from './features/features.svelte';
 	import ContentSheet, { type SheetContent } from './content-sheet/content-sheet.svelte';
 	import Tent from '@lucide/svelte/icons/tent';
+	import CampaignInfo from './campaign-info.svelte';
 
 	let sheetOpen = $state(false);
 	let sheetContent = $state<SheetContent>(null);
@@ -152,6 +153,11 @@
 </script>
 
 {#if character}
+	<!-- Campaign Info Section - displayed at the very top when enabled -->
+	{#if character.campaign_id && character.settings.show_campaign_info}
+		<CampaignInfo />
+	{/if}
+
 	<div class={cn('flex flex-col gap-6', className)}>
 		<!-- hidden file input for image upload -->
 		<input

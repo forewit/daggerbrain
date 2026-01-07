@@ -123,7 +123,9 @@
 	</div>
 {:else if !canEdit}
 	<div class="flex flex-col items-center justify-center gap-4 px-4 py-12">
-		<p class="text-sm text-muted-foreground italic">You do not have permission to edit this character</p>
+		<p class="text-sm text-muted-foreground italic">
+			You do not have permission to edit this character
+		</p>
 		<Button href={`/characters/${characterId}/`}>View Character</Button>
 	</div>
 {:else if character}

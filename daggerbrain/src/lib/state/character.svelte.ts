@@ -41,8 +41,7 @@ import { update_character, get_character_by_id } from '$lib/remote/characters.re
 import { getCharacterAccess } from '$lib/remote/permissions.remote';
 import { getCompendiumContext } from './compendium.svelte';
 import { increaseDie, increase_range } from '$lib/utils';
-import { createCampaignLiveConnection } from './campaign-live.svelte';
-import type { CampaignLiveWebSocketMessage } from '$lib/types/campaign-types';
+import { getCampaignContext } from './campaigns.svelte';
 
 function createCharacter(id: string) {
 	const user = getUserContext();
@@ -83,7 +82,7 @@ function createCharacter(id: string) {
 		const alreadyLoading = loadingPromise !== null;
 		// Don't retry if we've already failed with a permission error (403)
 		const shouldLoad = userReady && needsLoad && !alreadyLoading && !loadFailedWithPermissionError;
-		
+
 		if (shouldLoad) {
 			// loadingCharacter is already true by default, but ensure it's true here
 			// in case it was set to false in a previous run
@@ -137,7 +136,7 @@ function createCharacter(id: string) {
 	});
 
 	const compendium = getCompendiumContext();
-	
+
 	// Campaign homebrew is now loaded directly by the compendium context
 	// No need to manage it here
 
@@ -3477,203 +3476,43 @@ function createCharacter(id: string) {
 		}
 	});
 
-	// Track last saved campaign stats for immediate updates
-	let lastSavedCampaignStats = $state<{
-		marked_hp: number;
-		marked_stress: number;
-		marked_hope: number;
-		active_conditions: string[];
-	} | null>(null);
-	let inFlightCampaignSave: Promise<void> | null = null;
-
-	// WebSocket connection for campaign live updates
-	let wsConnection = $state<ReturnType<typeof createCampaignLiveConnection> | null>(null);
-	let currentCampaignId = $state<string | null>(null);
-
-	// WebSocket connection lifecycle management
+	// Sync character updates from campaign context (when character is in a campaign)
+	// This replaces the old WebSocket connection in character context
 	$effect(() => {
-		if (!character || !initialLoadComplete) {
-			// Disconnect if character is not loaded
-			if (wsConnection) {
-				wsConnection.disconnect();
-				wsConnection = null;
-				currentCampaignId = null;
+		if (!character || !character.campaign_id) return;
+
+		// Try to get campaign context (may not exist if not set up yet)
+		try {
+			const campaignCtx = getCampaignContext();
+			if (!campaignCtx) return;
+
+			const campaignCharacter = campaignCtx.characters[character.id];
+			if (!campaignCharacter) return;
+
+			// Sync campaign-relevant fields from campaign context
+			// Only update if values differ to avoid loops
+			if (campaignCharacter.marked_hp !== character.marked_hp) {
+				character.marked_hp = campaignCharacter.marked_hp;
 			}
-			return;
-		}
-
-		const campaignId = character.campaign_id;
-		const existingConnection = wsConnection; // Store reference before potential nullification
-
-		// Only connect if character is in a campaign
-		if (campaignId) {
-			// Check if connection already exists and is active (similar to campaign context)
-			// This check must happen FIRST to prevent duplicate connections
-			if (existingConnection && (existingConnection.connected || existingConnection.status === 'connecting' || existingConnection.status === 'reconnecting')) {
-				// Update currentCampaignId to match (in case it was out of sync)
-				if (currentCampaignId !== campaignId) {
-					currentCampaignId = campaignId;
-				}
-				return;
+			if (campaignCharacter.marked_stress !== character.marked_stress) {
+				character.marked_stress = campaignCharacter.marked_stress;
 			}
-		}
-
-		// If campaign_id changed, disconnect old connection and connect to new one
-		if (campaignId !== currentCampaignId) {
-			// Disconnect old connection if it exists
-			if (existingConnection) {
-				existingConnection.disconnect();
-				wsConnection = null;
+			if (campaignCharacter.marked_hope !== character.marked_hope) {
+				character.marked_hope = campaignCharacter.marked_hope;
 			}
-
-			// Update current campaign ID IMMEDIATELY (before creating connection) to prevent cleanup from resetting it
-			currentCampaignId = campaignId;
-
-			// Only connect if character is in a campaign
-			if (campaignId) {
-				wsConnection = createCampaignLiveConnection(campaignId);
-				
-				// Handle incoming messages (for multi-user sync) - set this before connecting
-				wsConnection.onMessage((message: CampaignLiveWebSocketMessage) => {
-					if (!character) return;
-					
-					// Handle full character updates from DO (sent when server notifies DO)
-					if (message.type === 'character_full_update' && message.characterId === character.id) {
-						// Full character replacement - update all campaign-relevant fields
-						if (message.character) {
-							// Update campaign stats
-							if (message.character.marked_hp !== undefined) {
-								character.marked_hp = message.character.marked_hp;
-							}
-							if (message.character.marked_stress !== undefined) {
-								character.marked_stress = message.character.marked_stress;
-							}
-							if (message.character.marked_hope !== undefined) {
-								character.marked_hope = message.character.marked_hope;
-							}
-							if (message.character.marked_armor !== undefined) {
-								character.marked_armor = message.character.marked_armor;
-							}
-							if (message.character.active_conditions !== undefined) {
-								character.active_conditions = message.character.active_conditions as typeof character.active_conditions;
-							}
-							// Update other derived fields that might have changed
-							if (message.character.name !== undefined) {
-								character.name = message.character.name;
-							}
-							if (message.character.level !== undefined) {
-								character.level = message.character.level;
-							}
-						}
-					}
-					
-					// Handle diff updates from DO (partial updates)
-					if (message.type === 'character_diff_update' && message.characterId === character.id) {
-						// Merge partial updates into character state
-						if (message.updates) {
-							if (message.updates.marked_hp !== undefined) {
-								character.marked_hp = message.updates.marked_hp;
-							}
-							if (message.updates.marked_stress !== undefined) {
-								character.marked_stress = message.updates.marked_stress;
-							}
-							if (message.updates.marked_hope !== undefined) {
-								character.marked_hope = message.updates.marked_hope;
-							}
-							if (message.updates.marked_armor !== undefined) {
-								character.marked_armor = message.updates.marked_armor;
-							}
-							if (message.updates.active_conditions !== undefined) {
-								character.active_conditions = message.updates.active_conditions as typeof character.active_conditions;
-							}
-							if (message.updates.name !== undefined) {
-								character.name = message.updates.name;
-							}
-							if (message.updates.level !== undefined) {
-								character.level = message.updates.level;
-							}
-						}
-					}
-				});
-				
-				// Connect after setting up message handler
-				wsConnection.connect();
-			} else {
-				// Character is not in a campaign, ensure we're disconnected
-				currentCampaignId = null;
+			if (campaignCharacter.marked_armor !== character.marked_armor) {
+				character.marked_armor = campaignCharacter.marked_armor;
 			}
+			if (
+				JSON.stringify(campaignCharacter.active_conditions) !==
+				JSON.stringify(character.active_conditions)
+			) {
+				character.active_conditions =
+					campaignCharacter.active_conditions as typeof character.active_conditions;
+			}
+		} catch {
+			// Campaign context not available - this is expected when not in a campaign
 		}
-
-		// No cleanup function - we handle disconnection explicitly in the effect body
-		// The cleanup function was causing a loop because it runs on every effect re-run
-		// and was resetting currentCampaignId before it could be used
-	});
-
-	// Immediate campaign stats update effect (for real-time campaign updates)
-	$effect(() => {
-		if (!character || !initialLoadComplete || !character.campaign_id) {
-			lastSavedCampaignStats = null;
-			return;
-		}
-
-		const currentStats = {
-			marked_hp: character.marked_hp,
-			marked_stress: character.marked_stress,
-			marked_hope: character.marked_hope,
-			active_conditions: character.active_conditions
-		};
-
-		// Check if campaign stats changed
-		if (
-			lastSavedCampaignStats &&
-			lastSavedCampaignStats.marked_hp === currentStats.marked_hp &&
-			lastSavedCampaignStats.marked_stress === currentStats.marked_stress &&
-			lastSavedCampaignStats.marked_hope === currentStats.marked_hope &&
-			JSON.stringify(lastSavedCampaignStats.active_conditions) ===
-				JSON.stringify(currentStats.active_conditions)
-		) {
-			return; // No change
-		}
-
-		// Prevent race conditions: don't start a new save if one is already in flight
-		if (inFlightCampaignSave) {
-			return;
-		}
-
-		// Update D1/KV via update_character (handles persistence)
-		// Include derived_character so server can propagate full character to DO
-		if (!character) return;
-		
-		// Use JSON serialization for deep clone to avoid structuredClone issues (matches debounced save)
-		const cloned = JSON.parse(JSON.stringify(character));
-		const derived = buildDerivedCharacter();
-		const savePromise = update_character({
-			...cloned,
-			marked_hp: currentStats.marked_hp,
-			marked_stress: currentStats.marked_stress,
-			marked_hope: currentStats.marked_hope,
-			active_conditions: currentStats.active_conditions,
-			derived_character: derived
-		})
-			.then(() => {
-				if (!character) return; // Guard against null character
-				// Update last saved stats after successful save
-				lastSavedCampaignStats = currentStats;
-				// Also update lastSavedCharacter to prevent debounced effect from triggering duplicate save
-				lastSavedCharacter = JSON.stringify(character);
-				// Server notifies DO via HTTP - no need for client WebSocket notification
-			})
-			.catch((error) => {
-				console.error('Failed to update campaign stats:', error);
-			})
-			.finally(() => {
-				// Clear the in-flight save promise when done
-				if (inFlightCampaignSave === savePromise) {
-					inFlightCampaignSave = null;
-				}
-			});
-
-		inFlightCampaignSave = savePromise;
 	});
 
 	// Debounced auto-save effect (for full character save)
@@ -3711,16 +3550,6 @@ function createCharacter(id: string) {
 					if (!character) return; // Guard against null character
 					// Only update lastSavedCharacter after successful save
 					lastSavedCharacter = JSON.stringify(character);
-
-					// Also update last saved campaign stats if in campaign
-					if (character.campaign_id) {
-						lastSavedCampaignStats = {
-							marked_hp: character.marked_hp,
-							marked_stress: character.marked_stress,
-							marked_hope: character.marked_hope,
-							active_conditions: character.active_conditions
-						};
-					}
 				})
 				.catch((error) => {
 					if (!character) return; // Guard against null character
@@ -3995,7 +3824,9 @@ function createCharacter(id: string) {
 	 * This serializes all the computed derived state into a single object.
 	 * Used for campaign character summaries and other contexts where fully computed character data is needed.
 	 */
-	function buildDerivedCharacter(): import('../types/derived-character-types').DerivedCharacter | null {
+	function buildDerivedCharacter():
+		| import('../types/derived-character-types').DerivedCharacter
+		| null {
 		if (!character) return null;
 
 		// Use JSON serialization to create a deep copy and flatten all derived values

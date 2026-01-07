@@ -23,14 +23,13 @@
 		)
 	);
 
-
 	// WebSocket connection is now handled automatically by campaigns.svelte.ts
 	// No need to manually start/stop polling
 </script>
 
 <div class="flex flex-col gap-6">
 	<!-- Fear Tracker -->
-	<Fear fearValue={fearValue} onUpdate={() => {}} isGM={false} />
+	<Fear {fearValue} onUpdate={() => {}} isGM={false} />
 
 	<!-- Visible Countdowns (Read-only) -->
 	{#if visibleCountdowns.length > 0}

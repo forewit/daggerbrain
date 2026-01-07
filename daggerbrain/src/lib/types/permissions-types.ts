@@ -1,6 +1,6 @@
 /**
  * Permission Types
- * 
+ *
  * Types for the centralized permission service.
  */
 
@@ -50,4 +50,3 @@ export type HomebrewTableType =
 	| 'community_cards'
 	| 'transformation_cards'
 	| 'beastforms';
-

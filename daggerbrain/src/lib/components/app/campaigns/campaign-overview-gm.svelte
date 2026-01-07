@@ -49,7 +49,6 @@
 	let selectedHomebrewType = $state<HomebrewType | ''>('');
 	let selectedHomebrewId = $state('');
 
-
 	async function handleSave() {
 		if (!campaignId || !hasChanges) return;
 
@@ -201,138 +200,142 @@
 </script>
 
 {#if campaign}
-<!-- Characters Section -->
-<CampaignCharacters />
+	<!-- Characters Section -->
+	<CampaignCharacters />
 
-<!-- Notes Section -->
-<div class="rounded border bg-card p-4">
-	<h2 class="mb-4 text-lg font-semibold">Notes</h2>
-	<Textarea bind:value={localNotes} class="min-h-[200px]" placeholder="Add campaign notes..." />
-</div>
-
-<!-- Homebrew Vault Section -->
-<div class="rounded border bg-card p-4">
-	<div class="mb-4 flex items-center justify-between">
-		<h2 class="text-lg font-semibold">Homebrew Vault</h2>
-		<Button variant="outline" size="sm" onclick={() => (showAddVaultDialog = true)}>
-			Add Item
-		</Button>
+	<!-- Notes Section -->
+	<div class="rounded border bg-card p-4">
+		<h2 class="mb-4 text-lg font-semibold">Notes</h2>
+		<Textarea bind:value={localNotes} class="min-h-[200px]" placeholder="Add campaign notes..." />
 	</div>
 
-	{#if vaultItems.length === 0}
-		<p class="text-sm text-muted-foreground">No items in vault yet.</p>
-	{:else}
-		<div class="flex flex-col gap-2">
-			{#each vaultItems as item}
-				<div class="flex items-center justify-between rounded border bg-muted p-2">
-					<div>
-						<span class="font-medium">{getHomebrewTypeName(item.homebrew_type)}</span>
-						<span class="ml-2 text-sm text-muted-foreground">{item.homebrew_id}</span>
-					</div>
-					<Button variant="ghost" size="sm" onclick={() => handleRemoveFromVault(item.id)}>
-						Remove
-					</Button>
-				</div>
-			{/each}
+	<!-- Homebrew Vault Section -->
+	<div class="rounded border bg-card p-4">
+		<div class="mb-4 flex items-center justify-between">
+			<h2 class="text-lg font-semibold">Homebrew Vault</h2>
+			<Button variant="outline" size="sm" onclick={() => (showAddVaultDialog = true)}>
+				Add Item
+			</Button>
 		</div>
-	{/if}
-</div>
 
-<!-- Add to Vault Dialog -->
-<Dialog.Root bind:open={showAddVaultDialog}>
-	<Dialog.Content class="sm:max-w-md">
-		<Dialog.Header>
-			<Dialog.Title>Add Homebrew to Vault</Dialog.Title>
-			<Dialog.Description>
-				Select a homebrew item from your collection to add to the campaign vault.
-			</Dialog.Description>
-		</Dialog.Header>
+		{#if vaultItems.length === 0}
+			<p class="text-sm text-muted-foreground">No items in vault yet.</p>
+		{:else}
+			<div class="flex flex-col gap-2">
+				{#each vaultItems as item}
+					<div class="flex items-center justify-between rounded border bg-muted p-2">
+						<div>
+							<span class="font-medium">{getHomebrewTypeName(item.homebrew_type)}</span>
+							<span class="ml-2 text-sm text-muted-foreground">{item.homebrew_id}</span>
+						</div>
+						<Button variant="ghost" size="sm" onclick={() => handleRemoveFromVault(item.id)}>
+							Remove
+						</Button>
+					</div>
+				{/each}
+			</div>
+		{/if}
+	</div>
 
-		<form
-			onsubmit={(e) => {
-				e.preventDefault();
-				if (selectedHomebrewType && selectedHomebrewId) {
-					handleAddToVault();
-				}
-			}}
-		>
-			<div class="flex flex-col gap-4 py-4">
-				<div class="flex flex-col gap-2">
-					<Label.Root>Homebrew Type</Label.Root>
-					<Select.Root
-						type="single"
-						value={selectedHomebrewType}
-						onValueChange={(v) => {
-							selectedHomebrewType = (v || '') as HomebrewType | '';
-							selectedHomebrewId = ''; // Reset selection when type changes
-						}}
-					>
-						<Select.Trigger class="w-full">
-							<p class="truncate">
-								{selectedHomebrewType ? getHomebrewTypeName(selectedHomebrewType) : 'Select type...'}
-							</p>
-						</Select.Trigger>
-						<Select.Content>
-							<Select.Item value="weapon">Weapon</Select.Item>
-							<Select.Item value="armor">Armor</Select.Item>
-							<Select.Item value="loot">Loot</Select.Item>
-							<Select.Item value="consumable">Consumable</Select.Item>
-							<Select.Item value="beastform">Beastform</Select.Item>
-							<Select.Item value="class">Class</Select.Item>
-							<Select.Item value="subclass">Subclass</Select.Item>
-							<Select.Item value="domain-cards">Domain Card</Select.Item>
-							<Select.Item value="ancestry-cards">Ancestry Card</Select.Item>
-							<Select.Item value="community-cards">Community Card</Select.Item>
-							<Select.Item value="transformation-cards">Transformation Card</Select.Item>
-						</Select.Content>
-					</Select.Root>
-				</div>
+	<!-- Add to Vault Dialog -->
+	<Dialog.Root bind:open={showAddVaultDialog}>
+		<Dialog.Content class="sm:max-w-md">
+			<Dialog.Header>
+				<Dialog.Title>Add Homebrew to Vault</Dialog.Title>
+				<Dialog.Description>
+					Select a homebrew item from your collection to add to the campaign vault.
+				</Dialog.Description>
+			</Dialog.Header>
 
-				{#if selectedHomebrewType && availableHomebrewItems.length > 0}
+			<form
+				onsubmit={(e) => {
+					e.preventDefault();
+					if (selectedHomebrewType && selectedHomebrewId) {
+						handleAddToVault();
+					}
+				}}
+			>
+				<div class="flex flex-col gap-4 py-4">
 					<div class="flex flex-col gap-2">
-						<Label.Root>Item</Label.Root>
+						<Label.Root>Homebrew Type</Label.Root>
 						<Select.Root
 							type="single"
-							value={selectedHomebrewId}
-							onValueChange={(v) => (selectedHomebrewId = v || '')}
+							value={selectedHomebrewType}
+							onValueChange={(v) => {
+								selectedHomebrewType = (v || '') as HomebrewType | '';
+								selectedHomebrewId = ''; // Reset selection when type changes
+							}}
 						>
 							<Select.Trigger class="w-full">
 								<p class="truncate">
-									{selectedHomebrewId
-										? availableHomebrewItems.find((i) => i.id === selectedHomebrewId)?.name ||
-											'Unknown'
-										: 'Select item...'}
+									{selectedHomebrewType
+										? getHomebrewTypeName(selectedHomebrewType)
+										: 'Select type...'}
 								</p>
 							</Select.Trigger>
 							<Select.Content>
-								{#each availableHomebrewItems as item}
-									<Select.Item value={item.id}>{item.name}</Select.Item>
-								{/each}
+								<Select.Item value="weapon">Weapon</Select.Item>
+								<Select.Item value="armor">Armor</Select.Item>
+								<Select.Item value="loot">Loot</Select.Item>
+								<Select.Item value="consumable">Consumable</Select.Item>
+								<Select.Item value="beastform">Beastform</Select.Item>
+								<Select.Item value="class">Class</Select.Item>
+								<Select.Item value="subclass">Subclass</Select.Item>
+								<Select.Item value="domain-cards">Domain Card</Select.Item>
+								<Select.Item value="ancestry-cards">Ancestry Card</Select.Item>
+								<Select.Item value="community-cards">Community Card</Select.Item>
+								<Select.Item value="transformation-cards">Transformation Card</Select.Item>
 							</Select.Content>
 						</Select.Root>
 					</div>
-				{:else if selectedHomebrewType && availableHomebrewItems.length === 0}
-					<p class="text-sm text-muted-foreground">
-						No {getHomebrewTypeName(selectedHomebrewType).toLowerCase()}s available.
-					</p>
-				{/if}
-			</div>
 
-			<Dialog.Footer class="flex gap-3">
-				<Dialog.Close
-					type="button"
-					class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
-				>
-					Cancel
-				</Dialog.Close>
-				<Button
-					type="submit"
-					disabled={!selectedHomebrewType || !selectedHomebrewId || availableHomebrewItems.length === 0}
-				>
-					Add
-				</Button>
-			</Dialog.Footer>
-		</form>
-	</Dialog.Content>
-</Dialog.Root>
+					{#if selectedHomebrewType && availableHomebrewItems.length > 0}
+						<div class="flex flex-col gap-2">
+							<Label.Root>Item</Label.Root>
+							<Select.Root
+								type="single"
+								value={selectedHomebrewId}
+								onValueChange={(v) => (selectedHomebrewId = v || '')}
+							>
+								<Select.Trigger class="w-full">
+									<p class="truncate">
+										{selectedHomebrewId
+											? availableHomebrewItems.find((i) => i.id === selectedHomebrewId)?.name ||
+												'Unknown'
+											: 'Select item...'}
+									</p>
+								</Select.Trigger>
+								<Select.Content>
+									{#each availableHomebrewItems as item}
+										<Select.Item value={item.id}>{item.name}</Select.Item>
+									{/each}
+								</Select.Content>
+							</Select.Root>
+						</div>
+					{:else if selectedHomebrewType && availableHomebrewItems.length === 0}
+						<p class="text-sm text-muted-foreground">
+							No {getHomebrewTypeName(selectedHomebrewType).toLowerCase()}s available.
+						</p>
+					{/if}
+				</div>
+
+				<Dialog.Footer class="flex gap-3">
+					<Dialog.Close
+						type="button"
+						class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
+					>
+						Cancel
+					</Dialog.Close>
+					<Button
+						type="submit"
+						disabled={!selectedHomebrewType ||
+							!selectedHomebrewId ||
+							availableHomebrewItems.length === 0}
+					>
+						Add
+					</Button>
+				</Dialog.Footer>
+			</form>
+		</Dialog.Content>
+	</Dialog.Root>
 {/if}

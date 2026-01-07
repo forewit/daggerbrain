@@ -217,11 +217,9 @@
 											</p>
 										</div>
 									</div>
-
-									
 								</a>
 								<!-- Action Buttons -->
-								<div class="flex border-t bg-muted rounded-b overflow-hidden">
+								<div class="flex overflow-hidden rounded-b border-t bg-muted">
 									<Button
 										variant="ghost"
 										size="sm"
@@ -290,10 +288,7 @@
 				<!-- GM Display Name Input -->
 				<div class="flex flex-col gap-2">
 					<Label>Your Display Name (GM)</Label>
-					<Input
-						bind:value={gmDisplayName}
-						placeholder="Enter your display name (optional)"
-					/>
+					<Input bind:value={gmDisplayName} placeholder="Enter your display name (optional)" />
 					<p class="text-xs text-muted-foreground">
 						This is how other players will see your name in this campaign.
 					</p>
@@ -321,8 +316,8 @@
 		<Dialog.Header>
 			<Dialog.Title>Delete Campaign</Dialog.Title>
 			<Dialog.Description>
-				Are you sure you want to delete <strong>{campaignToDelete?.name || 'Campaign'}</strong>? This action
-				cannot be undone.
+				Are you sure you want to delete <strong>{campaignToDelete?.name || 'Campaign'}</strong>?
+				This action cannot be undone.
 			</Dialog.Description>
 		</Dialog.Header>
 
@@ -333,9 +328,11 @@
 				confirmDelete();
 			}}
 		>
-			<p class="text-sm text-muted-foreground">Type "delete" to delete <strong>{campaignToDelete?.name}</strong>.</p>
+			<p class="text-sm text-muted-foreground">
+				Type "delete" to delete <strong>{campaignToDelete?.name}</strong>.
+			</p>
 			<div class="flex gap-2">
-				<Input bind:value={deleteConfirmation}/>
+				<Input bind:value={deleteConfirmation} />
 				<Button
 					type="submit"
 					variant="destructive"

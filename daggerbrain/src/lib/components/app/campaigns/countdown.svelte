@@ -36,33 +36,38 @@
 			countdown.current = countdown.min;
 		}
 		onUpdate(countdown.current);
-
 	});
 </script>
 
 <div class={cn('flex flex-col items-center gap-1', className)}>
 	<!-- Countdown Name -->
-	<Button variant="ghost" class="p-0" size="icon" onclick={onClickCountdown}> 
+	<Button variant="ghost" class="p-0" size="icon" onclick={onClickCountdown}>
 		<span class="font-eveleth">{countdown.name}</span>
 	</Button>
 
 	<!-- Token-style counter with +/- buttons -->
 	<div class="flex items-center justify-center gap-2">
 		<!-- Minus Button -->
-		<Button variant="ghost" class="p-0" size="icon" onclick={handleDecrement} disabled={!isGM || countdown.current <= countdown.min}>
+		<Button
+			variant="ghost"
+			class="p-0"
+			size="icon"
+			onclick={handleDecrement}
+			disabled={!isGM || countdown.current <= countdown.min}
+		>
 			<CircleMinus class="size-5" />
 		</Button>
 
 		<!-- Counter Circle -->
-	
-			<Input 
-				bind:value={countdown.current}
-				placeholder="Countdown Current"
-				type="number"
-				inputmode="numeric"
-				min={countdown.min}
-				class="grow text-center font-eveleth text-xl w-20"
-			/>
+
+		<Input
+			bind:value={countdown.current}
+			placeholder="Countdown Current"
+			type="number"
+			inputmode="numeric"
+			min={countdown.min}
+			class="w-20 grow text-center font-eveleth text-xl"
+		/>
 
 		<!-- Plus Button -->
 		<Button variant="ghost" class="p-0" size="icon" onclick={handleIncrement} disabled={!isGM}>
@@ -70,4 +75,3 @@
 		</Button>
 	</div>
 </div>
-

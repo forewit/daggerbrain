@@ -144,4 +144,3 @@ export type CampaignLiveClientMessage =
 			userId: string;
 			updates: Partial<CampaignCharacterLiveUpdate>;
 	  };
-

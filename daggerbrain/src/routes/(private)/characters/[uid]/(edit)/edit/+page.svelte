@@ -122,9 +122,24 @@
 				Enable Homebrew
 			</Label>
 
+			<!-- Show Campaign Information - only visible when character is in a campaign -->
+			{#if character.campaign_id}
+				<Label class="cursor-pointer items-start">
+					<Checkbox bind:checked={character.settings.show_campaign_info} />
+
+					<div class="space-y-1">
+						<p class="whitespace-nowrap">Show Campaign Information</p>
+						<p class="text-xs font-normal text-muted-foreground">
+							Display the campaign's Fear tracker and visible countdowns at the top of your
+							character sheet.
+						</p>
+					</div>
+				</Label>
+			{/if}
+
 			<Dialog.Root>
 				<Dialog.Trigger
-					class={cn(buttonVariants({ variant: 'link' }), 'h-min w-min p-0 mt-4 text-destructive')}
+					class={cn(buttonVariants({ variant: 'link' }), 'mt-4 h-min w-min p-0 text-destructive')}
 					>Delete Character</Dialog.Trigger
 				>
 				<Dialog.Content>

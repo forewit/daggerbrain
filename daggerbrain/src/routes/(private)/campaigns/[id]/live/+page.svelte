@@ -68,7 +68,7 @@
 				'pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]'
 			)}
 		>
-			<div class="flex w-full ">
+			<div class="flex w-full">
 				{#if data.role === 'gm' && campaignId}
 					<CampaignLiveGm {campaignId} bind:countdownSheetOpen />
 				{:else if campaignId}

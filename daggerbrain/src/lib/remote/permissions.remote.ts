@@ -3,7 +3,7 @@
  *
  * Remote query functions for permission checking. These run on the server
  * and can safely access server-only modules.
- * 
+ *
  * For internal helpers used within commands, see $lib/server/permissions.ts
  * For types, see $lib/types/permissions-types.ts
  */
@@ -13,7 +13,11 @@ import { error } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 import { characters_table } from '../server/db/characters.schema';
-import { campaigns_table, campaign_members_table, campaign_characters_table } from '../server/db/campaigns.schema';
+import {
+	campaigns_table,
+	campaign_members_table,
+	campaign_characters_table
+} from '../server/db/campaigns.schema';
 import {
 	homebrew_classes,
 	homebrew_subclasses,
@@ -124,18 +128,21 @@ export const getCampaignAccess = query(z.string(), async (campaignId): Promise<C
  * Get all members of a campaign (for cases where we need the full member list).
  * This is separate from getCampaignAccess since fetching all members is more expensive.
  */
-export const getCampaignMembers = query(z.string(), async (campaignId): Promise<CampaignMember[]> => {
-	const event = getRequestEvent();
-	get_auth(event); // Validate authentication
-	const db = get_db(event);
+export const getCampaignMembers = query(
+	z.string(),
+	async (campaignId): Promise<CampaignMember[]> => {
+		const event = getRequestEvent();
+		get_auth(event); // Validate authentication
+		const db = get_db(event);
 
-	const members = await db
-		.select()
-		.from(campaign_members_table)
-		.where(eq(campaign_members_table.campaign_id, campaignId));
+		const members = await db
+			.select()
+			.from(campaign_members_table)
+			.where(eq(campaign_members_table.campaign_id, campaignId));
 
-	return members;
-});
+		return members;
+	}
+);
 
 // ============================================================================
 // Character Access
@@ -288,10 +295,7 @@ export const getClaimCharacterAccess = query(
 		const existingCharacters = await db
 			.select({ character_id: campaign_characters_table.character_id })
 			.from(campaign_characters_table)
-			.innerJoin(
-				characters_table,
-				eq(characters_table.id, campaign_characters_table.character_id)
-			)
+			.innerJoin(characters_table, eq(characters_table.id, campaign_characters_table.character_id))
 			.where(
 				and(
 					eq(campaign_characters_table.campaign_id, campaignId),
@@ -302,7 +306,11 @@ export const getClaimCharacterAccess = query(
 			.limit(1);
 
 		if (existingCharacters.length > 0) {
-			return { character, canClaim: false, reason: 'You already have a character in this campaign' };
+			return {
+				character,
+				canClaim: false,
+				reason: 'You already have a character in this campaign'
+			};
 		}
 
 		return { character, canClaim: true, reason: null };
@@ -312,33 +320,27 @@ export const getClaimCharacterAccess = query(
 /**
  * Check if the current user has a (non-claimable) character in a campaign.
  */
-export const hasCharacterInCampaign = query(
-	z.string(),
-	async (campaignId): Promise<boolean> => {
-		const event = getRequestEvent();
-		const { userId } = get_auth(event);
-		const db = get_db(event);
+export const hasCharacterInCampaign = query(z.string(), async (campaignId): Promise<boolean> => {
+	const event = getRequestEvent();
+	const { userId } = get_auth(event);
+	const db = get_db(event);
 
-		// Join characters with campaign_characters to check claimable status
-		const existingCharacters = await db
-			.select({ character_id: campaign_characters_table.character_id })
-			.from(campaign_characters_table)
-			.innerJoin(
-				characters_table,
-				eq(characters_table.id, campaign_characters_table.character_id)
+	// Join characters with campaign_characters to check claimable status
+	const existingCharacters = await db
+		.select({ character_id: campaign_characters_table.character_id })
+		.from(campaign_characters_table)
+		.innerJoin(characters_table, eq(characters_table.id, campaign_characters_table.character_id))
+		.where(
+			and(
+				eq(campaign_characters_table.campaign_id, campaignId),
+				eq(characters_table.clerk_user_id, userId),
+				eq(campaign_characters_table.claimable, 0)
 			)
-			.where(
-				and(
-					eq(campaign_characters_table.campaign_id, campaignId),
-					eq(characters_table.clerk_user_id, userId),
-					eq(campaign_characters_table.claimable, 0)
-				)
-			)
-			.limit(1);
+		)
+		.limit(1);
 
-		return existingCharacters.length > 0;
-	}
-);
+	return existingCharacters.length > 0;
+});
 
 // ============================================================================
 // Homebrew Access
@@ -361,11 +363,7 @@ export const getHomebrewAccess = query(
 		const table = homebrewTables[homebrewType];
 
 		// Fetch the homebrew item
-		const [item] = await db
-			.select()
-			.from(table)
-			.where(eq(table.id, homebrewId))
-			.limit(1);
+		const [item] = await db.select().from(table).where(eq(table.id, homebrewId)).limit(1);
 
 		if (!item) {
 			throw error(404, 'Homebrew item not found');

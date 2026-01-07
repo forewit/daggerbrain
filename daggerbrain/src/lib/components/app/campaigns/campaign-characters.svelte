@@ -99,9 +99,7 @@
 		// Check if player owns any non-unassigned character in this campaign
 		// Note: campaignCharacters is already filtered to this campaign, so we don't need to check campaign_id
 		const hasCharacter = campaignCharacters.some(
-			(char) =>
-				char.owner_user_id === user.user?.clerk_id &&
-				!char.claimable
+			(char) => char.owner_user_id === user.user?.clerk_id && !char.claimable
 		);
 
 		playerHasCharacterInCampaign = hasCharacter;
@@ -214,15 +212,16 @@
 			selectedCharacterId = '';
 		}
 	});
-
 </script>
 
-{#snippet characterCard(char: (typeof campaignCharacters)[number], showClaimButton: boolean = false)}
-	{@const playerName = char.owner_name || (char.owner_user_id === user.user?.clerk_id ? 'you' : 'Anonymous')}
-	
-	<div
-		class="mx- w-full overflow-hidden rounded"
-	>
+{#snippet characterCard(
+	char: (typeof campaignCharacters)[number],
+	showClaimButton: boolean = false
+)}
+	{@const playerName =
+		char.owner_name || (char.owner_user_id === user.user?.clerk_id ? 'you' : 'Anonymous')}
+
+	<div class="mx- w-full overflow-hidden rounded">
 		<a
 			href={`/characters/${char.id}/`}
 			class="flex gap-2 border bg-primary-muted p-1 hover:bg-primary-muted/80"
@@ -234,7 +233,7 @@
 					class="h-full w-full object-cover"
 				/>
 			</div>
-			<div class="truncate grow">
+			<div class="grow truncate">
 				<p class=" truncate text-lg font-bold">
 					{char.name.trim() || 'Unnamed Character'}
 				</p>
@@ -246,7 +245,9 @@
 					{char.derived_descriptors.primary_subclass_name || 'No subclass'}
 				</p>
 				{#if !char.claimable}
-					<div class="mt-1.5 truncate text-center py-0.5 px-2 text-accent text-xs bg-accent/10 border border-accent/20 rounded-full w-min">
+					<div
+						class="mt-1.5 w-min truncate rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 text-center text-xs text-accent"
+					>
 						Player: {playerName}
 					</div>
 				{/if}
@@ -347,9 +348,9 @@
 
 			{#if unassignedCharacters.length > 0}
 				<div class="mt-6">
-					<h3 class="mb-1 text-md font-semibold">Unassigned Characters</h3>
+					<h3 class="text-md mb-1 font-semibold">Unassigned Characters</h3>
 					<p class="mb-4 text-xs text-muted-foreground">
-							These characters are available for players in the campaign to claim.
+						These characters are available for players in the campaign to claim.
 					</p>
 					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 						{#each unassignedCharacters as char}
@@ -413,7 +414,7 @@
 					<div class="flex flex-col gap-2">
 						<p class="text-sm text-muted-foreground">
 							{isGM
-								? 'This will create an unassigned character that players can claim. You will be able to edit the character before it\'s claimed.'
+								? "This will create an unassigned character that players can claim. You will be able to edit the character before it's claimed."
 								: 'This will create a new character and assign it to this campaign.'}
 						</p>
 						{#if !isGM && user.all_characters.length >= 3}
@@ -433,16 +434,16 @@
 							<Select.Trigger class="w-full">
 								<p class="truncate">
 									{selectedCharacterId
-										? (isGM
-												? availableGmCharacters.find((c) => c.id === selectedCharacterId)?.name ||
-													'Unnamed Character'
-												: availableCharacters.find((c) => c.id === selectedCharacterId)?.name ||
-													'Unnamed Character')
+										? isGM
+											? availableGmCharacters.find((c) => c.id === selectedCharacterId)?.name ||
+												'Unnamed Character'
+											: availableCharacters.find((c) => c.id === selectedCharacterId)?.name ||
+												'Unnamed Character'
 										: 'Select a character...'}
 								</p>
 							</Select.Trigger>
 							<Select.Content>
-								{#each (isGM ? availableGmCharacters : availableCharacters) as char}
+								{#each isGM ? availableGmCharacters : availableCharacters as char}
 									<Select.Item value={char.id}>{char.name || 'Unnamed Character'}</Select.Item>
 								{/each}
 							</Select.Content>
@@ -471,10 +472,7 @@
 						{isGM ? 'Create Unassigned Character' : 'Create Character'}
 					</Button>
 				{:else}
-					<Button
-						onclick={handleAddExistingCharacter}
-						disabled={!selectedCharacterId}
-					>
+					<Button onclick={handleAddExistingCharacter} disabled={!selectedCharacterId}>
 						{isGM ? 'Add Character' : 'Assign Character'}
 					</Button>
 				{/if}
@@ -488,7 +486,9 @@
 			<Dialog.Header>
 				<Dialog.Title>Unassign Character</Dialog.Title>
 				<Dialog.Description>
-					Are you sure you want to unassign this character? If the character is claimed by another player in your campaign, you will no longer be able to edit that character unless you are the GM of that character's campaign.
+					Are you sure you want to unassign this character? If the character is claimed by another
+					player in your campaign, you will no longer be able to edit that character unless you are
+					the GM of that character's campaign.
 				</Dialog.Description>
 			</Dialog.Header>
 			<Dialog.Footer class="flex gap-3">
@@ -501,12 +501,7 @@
 				>
 					Cancel
 				</Dialog.Close>
-				<Button
-					variant="destructive"
-					onclick={handleUnassignCharacter}
-				>
-					Unassign
-				</Button>
+				<Button variant="destructive" onclick={handleUnassignCharacter}>Unassign</Button>
 			</Dialog.Footer>
 		</Dialog.Content>
 	</Dialog.Root>
@@ -517,7 +512,8 @@
 			<Dialog.Header>
 				<Dialog.Title>Remove Character</Dialog.Title>
 				<Dialog.Description>
-					Are you sure you want to remove this character from the campaign? This will remove the character from the campaign but will not delete the character.
+					Are you sure you want to remove this character from the campaign? This will remove the
+					character from the campaign but will not delete the character.
 				</Dialog.Description>
 			</Dialog.Header>
 			<Dialog.Footer class="flex gap-3">
@@ -530,12 +526,7 @@
 				>
 					Cancel
 				</Dialog.Close>
-				<Button
-					variant="destructive"
-					onclick={handleRemoveCharacter}
-				>
-					Remove
-				</Button>
+				<Button variant="destructive" onclick={handleRemoveCharacter}>Remove</Button>
 			</Dialog.Footer>
 		</Dialog.Content>
 	</Dialog.Root>
@@ -546,7 +537,8 @@
 			<Dialog.Header>
 				<Dialog.Title>Leave Campaign</Dialog.Title>
 				<Dialog.Description>
-					Are you sure you want to leave <strong>{campaign?.name}</strong>? This action cannot be undone.
+					Are you sure you want to leave <strong>{campaign?.name}</strong>? This action cannot be
+					undone.
 				</Dialog.Description>
 			</Dialog.Header>
 			<Dialog.Footer class="flex gap-3">
@@ -574,22 +566,18 @@
 				<Dialog.Title>Character Limit Reached</Dialog.Title>
 				<Dialog.Description>
 					<p class="mb-2">You cannot claim a character until you have an empty character slot.</p>
-			
+
 					<Button variant="link" href="/characters" class="pl-0 text-accent">
-					 <ArrowRight/>
+						<ArrowRight />
 						Manage Characters
 					</Button>
 				</Dialog.Description>
 			</Dialog.Header>
 			<Dialog.Footer class="flex gap-3">
-				<Dialog.Close
-					type="button"
-					class={cn(buttonVariants({ variant: 'default' }))}
-				>
+				<Dialog.Close type="button" class={cn(buttonVariants({ variant: 'default' }))}>
 					OK
 				</Dialog.Close>
 			</Dialog.Footer>
 		</Dialog.Content>
 	</Dialog.Root>
 {/if}
-

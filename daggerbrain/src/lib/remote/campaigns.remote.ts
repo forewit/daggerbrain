@@ -19,7 +19,12 @@ import {
 	removeCharacterFromSummary,
 	KV_TTL_24H
 } from './cache.service';
-import type { CampaignState, CampaignCharacterSummary, CampaignWithDetails, Countdown } from '../types/campaign-types';
+import type {
+	CampaignState,
+	CampaignCharacterSummary,
+	CampaignWithDetails,
+	Countdown
+} from '../types/campaign-types';
 import type { Character } from '../types/character-types';
 import type { DerivedCharacter } from '../types/derived-character-types';
 import type { RequestEvent } from '@sveltejs/kit';
@@ -30,7 +35,12 @@ async function notifyDurableObject(
 	event: RequestEvent,
 	campaignId: string,
 	type: 'character_added' | 'character_updated' | 'character_removed' | 'character_deleted',
-	data: { characterId: string; character?: DerivedCharacter; updates?: Partial<DerivedCharacter>; claimable?: boolean }
+	data: {
+		characterId: string;
+		character?: DerivedCharacter;
+		updates?: Partial<DerivedCharacter>;
+		claimable?: boolean;
+	}
 ): Promise<void> {
 	if (!campaignId || !event.platform?.env?.CAMPAIGN_LIVE) {
 		console.log('Skipping DO notification: no campaignId or CAMPAIGN_LIVE not available');
@@ -42,19 +52,19 @@ async function notifyDurableObject(
 		const doNamespace = event.platform.env.CAMPAIGN_LIVE;
 		const id = doNamespace.idFromName(campaignId);
 		const stub = doNamespace.get(id);
-		
+
 		// Send POST request directly to the DO
 		const response = await stub.fetch('https://do-internal/notify', {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json',
+				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
 				type,
 				...data
 			})
 		});
-		
+
 		if (!response.ok) {
 			const errorText = await response.text();
 			console.error(`DO notification failed with status ${response.status}: ${errorText}`);
@@ -83,11 +93,11 @@ async function notifyDurableObjectMemberUpdate(
 		const doNamespace = event.platform.env.CAMPAIGN_LIVE;
 		const id = doNamespace.idFromName(campaignId);
 		const stub = doNamespace.get(id);
-		
+
 		const response = await stub.fetch('https://do-internal/notify', {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json',
+				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
 				type: 'member_updated',
@@ -95,7 +105,7 @@ async function notifyDurableObjectMemberUpdate(
 				displayName
 			})
 		});
-		
+
 		if (!response.ok) {
 			const errorText = await response.text();
 			console.error(`DO member notification failed with status ${response.status}: ${errorText}`);
@@ -222,7 +232,7 @@ export const get_user_campaigns = query(async (): Promise<CampaignWithDetails[]>
 		const userRole = userRoleMap.get(campaign.id) || 'player';
 		const playerCount = playerCountMap.get(campaign.id) || 0;
 		const characterImages = characterImagesMap.get(campaign.id) || [];
-		
+
 		// Limit character images to first 6 to avoid cluttering
 		const limitedImages = characterImages.slice(0, 6);
 
@@ -246,8 +256,8 @@ export const get_campaign_state = query(z.string(), async (campaignId): Promise<
 
 	// Try KV first (write-through cache) - it's updated immediately after writes
 	// This helps work around D1 eventual consistency by using KV as a fast, consistent cache
-	const kvState = await kv.get(`campaign:${campaignId}:state`, 'json') as CampaignState | null;
-	
+	const kvState = (await kv.get(`campaign:${campaignId}:state`, 'json')) as CampaignState | null;
+
 	// If KV has valid state, use it (no need to read D1)
 	if (kvState && kvState.updated_at) {
 		// Backward compatibility: ensure countdowns exists
@@ -509,7 +519,7 @@ export const join_campaign = command(
 		if (character_id) {
 			const kv = get_kv(event);
 			const now = Date.now();
-			
+
 			// Update character's campaign_id
 			await db
 				.update(characters_table)
@@ -528,9 +538,10 @@ export const join_campaign = command(
 			await upsertCharacterSummary(kv, db, campaign_id, character_id);
 
 			// Notify DO about character being added with claimable status
-			const derivedChar = (await kv.get(`character:${character_id}:campaign`, 'json')) as
-				| DerivedCharacter
-				| null;
+			const derivedChar = (await kv.get(
+				`character:${character_id}:campaign`,
+				'json'
+			)) as DerivedCharacter | null;
 
 			if (derivedChar) {
 				await notifyDurableObject(event, campaign_id, 'character_added', {
@@ -670,10 +681,11 @@ export const claim_character = command(
 
 		// Notify DO about character being updated (ownership changed)
 		// Fetch full DerivedCharacter from KV and update with new owner
-		const derivedChar = (await kv.get(`character:${character_id}:campaign`, 'json')) as
-			| DerivedCharacter
-			| null;
-		
+		const derivedChar = (await kv.get(
+			`character:${character_id}:campaign`,
+			'json'
+		)) as DerivedCharacter | null;
+
 		if (derivedChar) {
 			// Update the derived character with the new owner before sending
 			derivedChar.clerk_user_id = userId;
@@ -769,10 +781,11 @@ export const unassign_character = command(
 
 		// Notify DO about character being updated (now claimable)
 		// Fetch full DerivedCharacter from KV
-		const derivedChar = (await kv.get(`character:${character_id}:campaign`, 'json')) as
-			| DerivedCharacter
-			| null;
-		
+		const derivedChar = (await kv.get(
+			`character:${character_id}:campaign`,
+			'json'
+		)) as DerivedCharacter | null;
+
 		if (derivedChar) {
 			await notifyDurableObject(event, campaign_id, 'character_updated', {
 				characterId: character_id,
@@ -831,10 +844,7 @@ export const leave_campaign = command(z.string(), async (campaignId) => {
 		.select({ id: characters_table.id })
 		.from(characters_table)
 		.where(
-			and(
-				eq(characters_table.campaign_id, campaignId),
-				eq(characters_table.clerk_user_id, userId)
-			)
+			and(eq(characters_table.campaign_id, campaignId), eq(characters_table.clerk_user_id, userId))
 		);
 
 	// Remove characters from campaign_characters join table
@@ -854,10 +864,7 @@ export const leave_campaign = command(z.string(), async (campaignId) => {
 		.update(characters_table)
 		.set({ campaign_id: null })
 		.where(
-			and(
-				eq(characters_table.campaign_id, campaignId),
-				eq(characters_table.clerk_user_id, userId)
-			)
+			and(eq(characters_table.campaign_id, campaignId), eq(characters_table.clerk_user_id, userId))
 		);
 
 	// Update campaign character summary KV cache to reflect removed characters
@@ -879,23 +886,27 @@ export const leave_campaign = command(z.string(), async (campaignId) => {
 });
 
 // Zod schema for countdown validation
-const countdownSchema = z.object({
-	id: z.string(),
-	name: z.string().min(1, 'Countdown name cannot be empty'),
-	min: z.number(),
-	max: z.number().optional(),
-	current: z.number(),
-	visibleToPlayers: z.boolean()
-}).refine((data) => data.current >= data.min, {
-	message: 'Current value must be greater than or equal to min',
-	path: ['current']
-}).refine((data) => !data.max || data.current <= data.max, {
-	message: 'Current value must be less than or equal to max (if max is set)',
-	path: ['current']
-}).refine((data) => !data.max || data.min <= data.max, {
-	message: 'Min value must be less than or equal to max value (if max is set)',
-	path: ['min']
-});
+const countdownSchema = z
+	.object({
+		id: z.string(),
+		name: z.string().min(1, 'Countdown name cannot be empty'),
+		min: z.number(),
+		max: z.number().optional(),
+		current: z.number(),
+		visibleToPlayers: z.boolean()
+	})
+	.refine((data) => data.current >= data.min, {
+		message: 'Current value must be greater than or equal to min',
+		path: ['current']
+	})
+	.refine((data) => !data.max || data.current <= data.max, {
+		message: 'Current value must be less than or equal to max (if max is set)',
+		path: ['current']
+	})
+	.refine((data) => !data.max || data.min <= data.max, {
+		message: 'Min value must be less than or equal to max value (if max is set)',
+		path: ['min']
+	});
 
 export const update_campaign_state = command(
 	z.object({
@@ -1024,7 +1035,10 @@ export const assign_character_to_campaign = command(
 			if (!isOwner && character.campaign_id) {
 				const access = await getCampaignAccessInternal(db, userId, character.campaign_id);
 				if (!access.canEdit) {
-					throw error(403, 'Only the character owner or campaign GM can remove characters from campaigns');
+					throw error(
+						403,
+						'Only the character owner or campaign GM can remove characters from campaigns'
+					);
 				}
 			} else if (!isOwner) {
 				throw error(403, 'Only the character owner can remove characters from campaigns');
@@ -1131,12 +1145,13 @@ export const assign_character_to_campaign = command(
 			}
 
 			await upsertCharacterSummary(kv, db, campaign_id, character_id);
-			
+
 			// Notify DO about character being added to campaign
-			const derivedChar = (await kv.get(`character:${character_id}:campaign`, 'json')) as
-				| DerivedCharacter
-				| null;
-			
+			const derivedChar = (await kv.get(
+				`character:${character_id}:campaign`,
+				'json'
+			)) as DerivedCharacter | null;
+
 			if (derivedChar) {
 				await notifyDurableObject(event, campaign_id, 'character_added', {
 					characterId: character_id,
@@ -1163,7 +1178,7 @@ export const assign_character_to_campaign = command(
 
 		// Refresh get_all_characters since campaign_id changed, affecting which characters appear in user's list
 		get_all_characters().refresh();
-		
+
 		// Refresh get_user_campaigns since character_images may have changed
 		get_user_campaigns().refresh();
 
@@ -1259,7 +1274,7 @@ export const update_campaign_member = command(
 
 		// Refresh queries
 		get_campaign_members(campaign_id).refresh();
-		
+
 		// Rebuild character cache to update owner_name fields
 		const kv = get_kv(event);
 		await validateAndRebuildCampaignCharacters(kv, db, campaign_id);
@@ -1329,4 +1344,3 @@ export const delete_campaign = command(z.string(), async (campaignId) => {
 	console.log('deleted campaign from D1 and KV');
 	return { success: true };
 });
-

@@ -68,7 +68,7 @@
 		} catch (err) {
 			joining = false;
 			const message = err instanceof Error ? err.message : 'Failed to join campaign';
-			
+
 			if (message.includes('already a member')) {
 				toast.info('You are already a member of this campaign');
 				// Redirect to campaign page since they're already a member
@@ -83,24 +83,22 @@
 </script>
 
 <div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
-	<div
-		class="flex h-full w-full flex-col items-center justify-center gap-4 px-4 py-12"
-	>
+	<div class="flex h-full w-full flex-col items-center justify-center gap-4 px-4 py-12">
 		{#if loading}
 			<LoaderCircle class="h-8 w-8 animate-spin text-muted-foreground" />
 			<p class="text-sm text-muted-foreground">Loading campaign...</p>
 		{:else if errorMessage}
 			<div class="flex w-full flex-col items-center justify-center py-16">
 				<p class="text-sm text-muted-foreground italic">{errorMessage}</p>
-				<p class="text-sm text-muted-foreground italic mt-4">
+				<p class="mt-4 text-sm text-muted-foreground italic">
 					If the issue persists <a href="/contact" class="underline">let us know</a>.
 				</p>
 				<Button href="/campaigns" class="mt-4">Back to Campaigns</Button>
 			</div>
 		{:else if campaign}
-			<div class="flex flex-col items-center gap-4 max-w-md w-full">
+			<div class="flex w-full max-w-md flex-col items-center gap-4">
 				<div class="text-center">
-					<h1 class="text-2xl font-bold mb-2">{campaign.name}</h1>
+					<h1 class="mb-2 text-2xl font-bold">{campaign.name}</h1>
 					{#if campaign.description}
 						<p class="text-sm text-muted-foreground">{campaign.description}</p>
 					{/if}
@@ -114,11 +112,7 @@
 				>
 					<div class="flex flex-col gap-2">
 						<Label for="player-name">Player Name (optional)</Label>
-						<Input
-							id="player-name"
-							bind:value={playerName}
-							placeholder="Enter your display name"
-						/>
+						<Input id="player-name" bind:value={playerName} placeholder="Enter your display name" />
 					</div>
 					<div class="flex flex-col gap-2">
 						<Label for="character-select">Character (optional)</Label>
@@ -145,7 +139,7 @@
 					</div>
 					<Button type="submit" disabled={joining} class="w-full">
 						{#if joining}
-							<LoaderCircle class="h-4 w-4 animate-spin mr-2" />
+							<LoaderCircle class="mr-2 h-4 w-4 animate-spin" />
 							Joining...
 						{:else}
 							Join Campaign
@@ -158,4 +152,3 @@
 </div>
 
 <Footer />
-

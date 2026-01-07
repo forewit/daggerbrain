@@ -65,10 +65,7 @@
 	<p class="absolute top-5 left-1/2 -translate-x-1/2 text-2xl font-bold">
 		{evasion}
 	</p>
-	<p
-		class="absolute bottom-[9.5px] left-1/2 -translate-x-1/2 text-[11px] leading-none font-medium"
-	>
+	<p class="absolute bottom-[9.5px] left-1/2 -translate-x-1/2 text-[11px] leading-none font-medium">
 		EVASION
 	</p>
 </div>
-

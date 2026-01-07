@@ -155,7 +155,20 @@ export function tier_to_min_level(tier: number): number {
  */
 export function formatDate(timestamp: number): string {
 	const date = new Date(timestamp);
-	const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+	const monthNames = [
+		'Jan',
+		'Feb',
+		'Mar',
+		'Apr',
+		'May',
+		'Jun',
+		'Jul',
+		'Aug',
+		'Sep',
+		'Oct',
+		'Nov',
+		'Dec'
+	];
 	const month = monthNames[date.getMonth()];
 	const day = date.getDate();
 	const year = date.getFullYear();

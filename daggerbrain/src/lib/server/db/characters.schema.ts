@@ -223,8 +223,8 @@ export const characters_table_update_schema = createUpdateSchema(characters_tabl
 	chosen_beastform: ChosenBeastformSchema.nullable(),
 	companion: CompanionSchema.nullable()
 }).omit({
-	campaign_id: true,      // Only via assign_character_to_campaign
-	clerk_user_id: true     // Immutable
+	campaign_id: true, // Only via assign_character_to_campaign
+	clerk_user_id: true // Immutable
 	// Note: id is not omitted here because it's needed for WHERE clauses, but it won't be updated
 	// Note: claimable status is now stored in campaign_characters_table
 });

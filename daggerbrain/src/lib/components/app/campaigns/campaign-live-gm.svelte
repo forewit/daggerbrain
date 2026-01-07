@@ -62,7 +62,7 @@
 
 	async function handleUpdateCountdown() {
 		if (!campaignId) return;
-		
+
 		try {
 			await campaignContext.updateState({
 				countdowns: countdowns
@@ -70,26 +70,25 @@
 		} catch (err) {
 			error(500, err instanceof Error ? err.message : 'Failed to update countdown');
 		}
-	}	
+	}
 </script>
 
-<div class="mb-6 flex w-full flex-col gap-6">
+<div class="mb-6 flex w-full flex-col gap-8">
 	<!-- Fear Tracker -->
-		<Fear class="mx-auto mt-6" bind:fearValue={localFear} onUpdate={handleUpdateFear} isGM={true} />
+	<Fear class="mx-auto mt-6" bind:fearValue={localFear} onUpdate={handleUpdateFear} isGM={true} />
 
 	<!-- Countdowns -->
 	{#if countdowns.length > 0}
-			<div class="flex flex-wrap gap-4 justify-center">
-				{#each countdowns as countdown, index (countdown.id)}
-					<Countdown
-						bind:countdown={countdowns[index]}
-						isGM={true}
-						onUpdate={handleUpdateCountdown}
-						onClickCountdown={() => (countdownSheetOpen = true)}
-					/>
-				{/each}
-			</div>
-		
+		<div class="flex flex-wrap justify-center gap-4">
+			{#each countdowns as countdown, index (countdown.id)}
+				<Countdown
+					bind:countdown={countdowns[index]}
+					isGM={true}
+					onUpdate={handleUpdateCountdown}
+					onClickCountdown={() => (countdownSheetOpen = true)}
+				/>
+			{/each}
+		</div>
 	{/if}
 
 	<!-- Characters -->

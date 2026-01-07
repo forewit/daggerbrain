@@ -72,4 +72,3 @@
 		<p>{thresholds.severe}</p>
 	</div>
 </div>
-

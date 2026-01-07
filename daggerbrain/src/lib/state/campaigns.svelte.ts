@@ -4,6 +4,7 @@ import {
 	get_campaign_state,
 	get_campaign_characters,
 	update_campaign,
+	update_campaign_state,
 	delete_campaign,
 	assign_character_to_campaign,
 	leave_campaign,
@@ -22,15 +23,26 @@ import {
 import { error } from '@sveltejs/kit';
 import { getContext, setContext } from 'svelte';
 import { goto } from '$app/navigation';
-import { createCampaignLiveConnection } from './campaign-live.svelte';
-import type { Campaign, CampaignState, CampaignCharacterSummary, CampaignMember, CampaignCharacterLiveUpdate, Countdown } from '$lib/types/campaign-types';
+import type {
+	Campaign,
+	CampaignState,
+	CampaignCharacterSummary,
+	CampaignMember,
+	CampaignCharacterLiveUpdate,
+	Countdown,
+	CampaignLiveWebSocketMessage,
+	CampaignLiveClientMessage
+} from '$lib/types/campaign-types';
 import type { DerivedCharacter } from '$lib/types/derived-character-types';
 import type { HomebrewType } from '$lib/types/homebrew-types';
 
 // Helper function to merge live character updates with existing character data
 // Helper to convert DerivedCharacter to CampaignCharacterSummary
 // claimable is now passed separately since it's stored in campaign_characters table
-function derivedCharacterToSummary(derived: DerivedCharacter, claimable: boolean = false): CampaignCharacterSummary {
+function derivedCharacterToSummary(
+	derived: DerivedCharacter,
+	claimable: boolean = false
+): CampaignCharacterSummary {
 	return {
 		id: derived.id,
 		name: derived.name,
@@ -56,10 +68,10 @@ function derivedCharacterToSummary(derived: DerivedCharacter, claimable: boolean
 // Deep merge helper for nested objects
 function deepMerge<T extends Record<string, any>>(target: T, source: Partial<T>): T {
 	const output = { ...target };
-	
+
 	for (const key in source) {
 		if (source[key] === undefined) continue;
-		
+
 		if (
 			source[key] !== null &&
 			typeof source[key] === 'object' &&
@@ -75,7 +87,7 @@ function deepMerge<T extends Record<string, any>>(target: T, source: Partial<T>)
 			output[key] = source[key] as T[Extract<keyof T, string>];
 		}
 	}
-	
+
 	return output;
 }
 
@@ -88,34 +100,227 @@ function mergeCharacterLiveUpdate(
 		// Full character object - convert to summary
 		return derivedCharacterToSummary(liveUpdate as DerivedCharacter);
 	}
-	
+
 	// Partial update - need existing character to merge into
 	if (!existing) {
 		return null; // Can't apply partial update without existing character
 	}
-	
+
 	// Deep merge the partial update
 	const merged = deepMerge(existing, liveUpdate as Partial<CampaignCharacterSummary>);
-	
+
 	// Update derived fields if they're in the update
 	if ('derived_max_hp' in liveUpdate) merged.max_hp = (liveUpdate as any).derived_max_hp;
-	if ('derived_max_stress' in liveUpdate) merged.max_stress = (liveUpdate as any).derived_max_stress;
+	if ('derived_max_stress' in liveUpdate)
+		merged.max_stress = (liveUpdate as any).derived_max_stress;
 	if ('derived_max_hope' in liveUpdate) merged.max_hope = (liveUpdate as any).derived_max_hope;
 	if ('derived_evasion' in liveUpdate) merged.evasion = (liveUpdate as any).derived_evasion;
 	if ('derived_max_armor' in liveUpdate) merged.max_armor = (liveUpdate as any).derived_max_armor;
-	if ('derived_damage_thresholds' in liveUpdate) merged.damage_thresholds = (liveUpdate as any).derived_damage_thresholds;
-	if ('derived_descriptors' in liveUpdate) merged.derived_descriptors = (liveUpdate as any).derived_descriptors;
-	
+	if ('derived_damage_thresholds' in liveUpdate)
+		merged.damage_thresholds = (liveUpdate as any).derived_damage_thresholds;
+	if ('derived_descriptors' in liveUpdate)
+		merged.derived_descriptors = (liveUpdate as any).derived_descriptors;
+
 	return merged;
 }
 
-function campaignContext(campaignId: string | undefined) {
-	// State
+// Private WebSocket connection factory - not exported
+type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'reconnecting';
+
+function createCampaignLiveConnection(campaignId: string) {
+	let ws = $state<WebSocket | null>(null);
+	let status = $state<ConnectionStatus>('disconnected');
+	let reconnectAttempts = $state(0);
+	let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+	let isConnecting = $state(false);
+	let messageHandler: ((message: CampaignLiveWebSocketMessage) => void) | null = null;
+	let lastKnownVersion = $state<number | undefined>(undefined);
+	let shouldReconnect = $state(true); // Flag to prevent reconnection after explicit disconnect
+	const maxReconnectDelay = 30000; // 30 seconds
+
+	function connect() {
+		// Prevent multiple simultaneous connection attempts
+		if (ws?.readyState === WebSocket.OPEN) {
+			return;
+		}
+		if (isConnecting) {
+			return;
+		}
+
+		// Don't connect if we've been explicitly disconnected
+		if (!shouldReconnect) {
+			return;
+		}
+
+		isConnecting = true;
+		status = 'connecting';
+		shouldReconnect = true; // Allow reconnection when connecting
+
+		const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+		const url = `${protocol}//${window.location.host}/api/campaigns/${campaignId}/live`;
+
+		try {
+			const websocket = new WebSocket(url);
+
+			websocket.onopen = () => {
+				isConnecting = false;
+				status = 'connected';
+				reconnectAttempts = 0;
+				ws = websocket;
+
+				// Send rejoin message if we have a last known version
+				if (lastKnownVersion !== undefined) {
+					ws.send(
+						JSON.stringify({
+							type: 'rejoin',
+							lastKnownVersion
+						})
+					);
+				}
+
+				// Attach message handler if it was set before connection
+				if (messageHandler) {
+					// Store in local variable for type narrowing (messageHandler could be reassigned)
+					const handler = messageHandler;
+					ws.onmessage = (event) => {
+						try {
+							const parsed = JSON.parse(event.data);
+							// Type assertion is necessary here as JSON.parse returns 'any'
+							// Runtime validation happens via the message handler's type checking
+							const message = parsed as CampaignLiveWebSocketMessage;
+
+							// Update last known version from versioned messages
+							if ('version' in message && typeof message.version === 'number') {
+								lastKnownVersion = message.version;
+							}
+
+							handler(message);
+						} catch (error) {
+							console.error('Failed to parse WebSocket message:', error);
+						}
+					};
+				}
+			};
+
+			websocket.onclose = () => {
+				isConnecting = false;
+				status = 'disconnected';
+				ws = null;
+				// Only reconnect if we haven't been explicitly disconnected
+				if (shouldReconnect) {
+					scheduleReconnect();
+				}
+			};
+
+			websocket.onerror = () => {
+				isConnecting = false;
+				status = 'disconnected';
+				// Only reconnect if we haven't been explicitly disconnected
+				if (shouldReconnect) {
+					scheduleReconnect();
+				}
+			};
+
+			ws = websocket;
+		} catch (error) {
+			isConnecting = false;
+			console.error('Failed to create WebSocket:', error);
+			status = 'disconnected';
+			// Only reconnect if we haven't been explicitly disconnected
+			if (shouldReconnect) {
+				scheduleReconnect();
+			}
+		}
+	}
+
+	function scheduleReconnect() {
+		if (reconnectTimeout) return;
+		if (!shouldReconnect) return; // Don't reconnect if explicitly disconnected
+
+		const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), maxReconnectDelay);
+		reconnectAttempts++;
+		status = 'reconnecting';
+
+		reconnectTimeout = setTimeout(() => {
+			reconnectTimeout = null;
+			if (shouldReconnect) {
+				connect();
+			}
+		}, delay);
+	}
+
+	function disconnect() {
+		shouldReconnect = false; // Prevent reconnection
+		if (reconnectTimeout) {
+			clearTimeout(reconnectTimeout);
+			reconnectTimeout = null;
+		}
+		isConnecting = false;
+		ws?.close();
+		ws = null;
+		status = 'disconnected';
+		reconnectAttempts = 0;
+		// Keep lastKnownVersion on disconnect for rejoin
+	}
+
+	function send(message: CampaignLiveClientMessage) {
+		if (ws?.readyState === WebSocket.OPEN) {
+			ws.send(JSON.stringify(message));
+		} else {
+			console.warn('WebSocket not connected, message not sent:', message);
+		}
+	}
+
+	function onMessage(handler: (message: CampaignLiveWebSocketMessage) => void) {
+		// Store the handler so we can attach it when WebSocket connects
+		messageHandler = handler;
+
+		// If WebSocket is already connected, attach handler immediately
+		if (ws && ws.readyState === WebSocket.OPEN) {
+			ws.onmessage = (event) => {
+				try {
+					const parsed = JSON.parse(event.data);
+					// Type assertion is necessary here as JSON.parse returns 'any'
+					// Runtime validation happens via the message handler's type checking
+					const message = parsed as CampaignLiveWebSocketMessage;
+
+					// Update last known version from versioned messages
+					if ('version' in message && typeof message.version === 'number') {
+						lastKnownVersion = message.version;
+					}
+
+					handler(message);
+				} catch (error) {
+					console.error('Failed to parse WebSocket message:', error);
+				}
+			};
+		}
+	}
+
+	return {
+		get status() {
+			return status;
+		},
+		get connected() {
+			return status === 'connected';
+		},
+		connect,
+		disconnect,
+		send,
+		onMessage
+	};
+}
+
+function campaignContext() {
+	// State - campaign ID is now internal and settable
+	let campaignId = $state<string | undefined>(undefined);
 	let campaign = $state<Campaign | null>(null);
 	let members = $state<CampaignMember[]>([]);
 	let campaignState = $state<CampaignState | null>(null);
 	let characters = $state<Record<string, CampaignCharacterSummary>>({});
-	let vaultItems = $state<Array<{ id: string; homebrew_type: HomebrewType; homebrew_id: string }>>([]);
+	let vaultItems = $state<Array<{ id: string; homebrew_type: HomebrewType; homebrew_id: string }>>(
+		[]
+	);
 	let loading = $state(true);
 	let wsConnection = $state<ReturnType<typeof createCampaignLiveConnection> | null>(null);
 	let initialSyncComplete = $state(false);
@@ -152,6 +357,9 @@ function campaignContext(campaignId: string | undefined) {
 			campaignState = state;
 			characters = chars;
 			vaultItems = vault;
+			// Mark initial sync complete immediately after D1 data is assigned
+			// This ensures the loading getter returns false right away
+			initialSyncComplete = true;
 		} catch (err) {
 			error(500, err instanceof Error ? err.message : 'Failed to load campaign');
 		} finally {
@@ -161,29 +369,49 @@ function campaignContext(campaignId: string | undefined) {
 		}
 	}
 
-
 	// Update campaign state
-	async function updateState(updates: { fear_track?: number; notes?: string | null; countdowns?: Countdown[] }): Promise<void> {
+	async function updateState(updates: {
+		fear_track?: number;
+		notes?: string | null;
+		countdowns?: Countdown[];
+	}): Promise<void> {
 		const id = campaignId;
 		if (!id) {
 			throw new Error('Campaign ID is required');
 		}
 
-		if (!wsConnection || !wsConnection.connected) {
-			throw new Error('WebSocket not connected. Cannot update campaign state.');
-		}
+		// If WebSocket is connected, send via WebSocket for real-time updates
+		if (wsConnection && wsConnection.connected) {
+			// Send update via WebSocket - DO will validate, update, and broadcast
+			wsConnection.send({
+				type: 'update_state',
+				updates: {
+					...updates,
+					updated_at: Date.now()
+				}
+			});
 
-		// Send update via WebSocket - DO will validate, update, and broadcast
-		wsConnection.send({
-			type: 'update_state',
-			updates: {
-				...updates,
-				updated_at: Date.now()
+			// Local state will be updated via WebSocket message handler
+			// No need to update immediately - wait for DO's broadcast
+		} else {
+			// WebSocket not connected - fall back to HTTP endpoint to update D1 directly
+			try {
+				const updatedState = await update_campaign_state({
+					campaign_id: id,
+					...updates
+				});
+				// Update local state immediately since we won't get a WebSocket broadcast
+				if (campaignState) {
+					campaignState = {
+						...campaignState,
+						...updates,
+						updated_at: updatedState.updated_at
+					};
+				}
+			} catch (err) {
+				throw err;
 			}
-		});
-
-		// Local state will be updated via WebSocket message handler
-		// No need to update immediately - wait for DO's broadcast
+		}
 	}
 
 	// Delete campaign
@@ -200,7 +428,10 @@ function campaignContext(campaignId: string | undefined) {
 	}
 
 	// Assign character to campaign (or remove from campaign if campaignId is null)
-	async function assignCharacter(characterId: string, targetCampaignId: string | null): Promise<void> {
+	async function assignCharacter(
+		characterId: string,
+		targetCampaignId: string | null
+	): Promise<void> {
 		if (!characterId) return;
 
 		try {
@@ -345,24 +576,32 @@ function campaignContext(campaignId: string | undefined) {
 		}
 		if (id) {
 			load().then(() => {
-				// After initial load, connect WebSocket
+				// initialSyncComplete is now set immediately after D1 data assignment in load()
+				// WebSocket enhances with real-time updates but doesn't block rendering
+
+				// After initial load, connect WebSocket for real-time updates
 				if (typeof window !== 'undefined') {
 					// Only create new connection if we don't have one or it's disconnected
 					// Check if existing connection is still valid (connected or connecting)
-					if (wsConnection && (wsConnection.connected || wsConnection.status === 'connecting' || wsConnection.status === 'reconnecting')) {
+					if (
+						wsConnection &&
+						(wsConnection.connected ||
+							wsConnection.status === 'connecting' ||
+							wsConnection.status === 'reconnecting')
+					) {
 						// Connection already exists and is active, skip creating a new one
 						// Message handler should already be set up from previous creation
 						return;
 					}
-					
+
 					// Disconnect existing connection if any (shouldn't happen due to check above, but safety)
 					if (wsConnection) {
 						wsConnection.disconnect();
 					}
-					
+
 					// Create new WebSocket connection
 					wsConnection = createCampaignLiveConnection(id);
-					
+
 					// Set up message handler
 					wsConnection.onMessage((message) => {
 						switch (message.type) {
@@ -378,7 +617,10 @@ function campaignContext(campaignId: string | undefined) {
 									const merged: Record<string, CampaignCharacterSummary> = { ...characters };
 									for (const [id, derivedChar] of Object.entries(message.characters)) {
 										const claimable = claimableMap[id] ?? false;
-										const summary = derivedCharacterToSummary(derivedChar as DerivedCharacter, claimable);
+										const summary = derivedCharacterToSummary(
+											derivedChar as DerivedCharacter,
+											claimable
+										);
 										merged[id] = summary;
 									}
 									characters = merged;
@@ -439,7 +681,10 @@ function campaignContext(campaignId: string | undefined) {
 							case 'character_added':
 								// Add new character to state with claimable status
 								if (message.character) {
-									const summary = derivedCharacterToSummary(message.character, message.claimable ?? false);
+									const summary = derivedCharacterToSummary(
+										message.character,
+										message.claimable ?? false
+									);
 									characters = {
 										...characters,
 										[message.character.id]: summary
@@ -456,7 +701,10 @@ function campaignContext(campaignId: string | undefined) {
 							case 'character_full_update':
 								// Replace entire character object with claimable status
 								if (message.characterId && message.character) {
-									const summary = derivedCharacterToSummary(message.character, message.claimable ?? false);
+									const summary = derivedCharacterToSummary(
+										message.character,
+										message.claimable ?? false
+									);
 									characters = {
 										...characters,
 										[message.characterId]: summary
@@ -486,10 +734,8 @@ function campaignContext(campaignId: string | undefined) {
 								// Update member display name and refresh character owner_name
 								if (message.userId) {
 									// Update members list
-									members = members.map(m => 
-										m.user_id === message.userId 
-											? { ...m, display_name: message.displayName }
-											: m
+									members = members.map((m) =>
+										m.user_id === message.userId ? { ...m, display_name: message.displayName } : m
 									);
 									// Update owner_name in characters owned by this user
 									const updatedChars = { ...characters };
@@ -519,17 +765,19 @@ function campaignContext(campaignId: string | undefined) {
 								break;
 						}
 					});
-					
+
 					// Connect
 					wsConnection.connect();
-					
+
 					// Set a timeout to mark sync as complete if WebSocket doesn't connect/sync within 15 seconds
 					// This prevents the page from loading forever if the Durable Object is unreachable
 					// Only set timeout if sync isn't already complete and we don't already have a timeout
 					if (!initialSyncComplete && !syncTimeout) {
 						syncTimeout = setTimeout(() => {
 							if (!initialSyncComplete) {
-								console.warn('WebSocket sync timeout - marking as complete to prevent infinite loading');
+								console.warn(
+									'WebSocket sync timeout - marking as complete to prevent infinite loading'
+								);
 								initialSyncComplete = true;
 							}
 							syncTimeout = null;
@@ -554,7 +802,7 @@ function campaignContext(campaignId: string | undefined) {
 			// Reset tracking when campaign ID is cleared
 			currentCampaignIdForSync = undefined;
 		}
-		
+
 		// Cleanup on unmount
 		return () => {
 			if (wsConnection) {
@@ -572,7 +820,10 @@ function campaignContext(campaignId: string | undefined) {
 	$effect(() => {
 		if (campaign && !initialLoadComplete) {
 			initialLoadComplete = true;
-			lastSavedCampaign = JSON.stringify({ name: campaign.name, description: campaign.description });
+			lastSavedCampaign = JSON.stringify({
+				name: campaign.name,
+				description: campaign.description
+			});
 		}
 	});
 
@@ -611,7 +862,10 @@ function campaignContext(campaignId: string | undefined) {
 				.then(() => {
 					if (!campaign) return; // Guard against null campaign
 					// Only update lastSavedCampaign after successful save
-					lastSavedCampaign = JSON.stringify({ name: campaign.name, description: campaign.description });
+					lastSavedCampaign = JSON.stringify({
+						name: campaign.name,
+						description: campaign.description
+					});
 				})
 				.catch((err) => {
 					if (!campaign) return; // Guard against null campaign
@@ -637,6 +891,12 @@ function campaignContext(campaignId: string | undefined) {
 	});
 
 	return {
+		get campaignId() {
+			return campaignId;
+		},
+		set campaignId(value: string | undefined) {
+			campaignId = value;
+		},
 		get campaign() {
 			return campaign;
 		},
@@ -671,12 +931,11 @@ function campaignContext(campaignId: string | undefined) {
 
 const CAMPAIGN_CONTEXT_KEY = Symbol('CampaignContext');
 
-export const setCampaignContext = (campaignId: string | undefined) => {
-	const newCampaignContext = campaignContext(campaignId);
+export const setCampaignContext = () => {
+	const newCampaignContext = campaignContext();
 	return setContext(CAMPAIGN_CONTEXT_KEY, newCampaignContext);
 };
 
 export const getCampaignContext = (): ReturnType<typeof setCampaignContext> => {
 	return getContext(CAMPAIGN_CONTEXT_KEY);
 };
-

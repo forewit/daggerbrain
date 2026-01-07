@@ -412,7 +412,7 @@ function createCompendium() {
 		try {
 			const characterContext = getCharacterContext();
 			const character = characterContext?.character;
-			
+
 			if (!character?.campaign_id || !character.settings.campaign_homebrew_enabled) {
 				campaign_homebrew = null;
 				return;
@@ -431,7 +431,10 @@ function createCompendium() {
 						beastforms: items.beastforms || {},
 						classes: items.classes || {},
 						subclasses: items.subclasses || {},
-						domain_cards: (items.domain_cards || {}) as Record<DomainIds, Record<string, DomainCard>>,
+						domain_cards: (items.domain_cards || {}) as Record<
+							DomainIds,
+							Record<string, DomainCard>
+						>,
 						ancestry_cards: items.ancestry_cards || {},
 						community_cards: items.community_cards || {},
 						transformation_cards: items.transformation_cards || {}

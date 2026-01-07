@@ -26,23 +26,25 @@
 
 	const user = getUserContext();
 	const isOwner = $derived(user.user?.clerk_id === character.owner_user_id);
-	
+
 	const compendium = getCompendiumContext();
-	
+
 	// Find the primary class by name from compendium
 	const primary_class = $derived.by(() => {
 		if (!character.derived_descriptors.primary_class_name) return null;
 		const classes = compendium.classes;
-		return Object.values(classes).find(
-			(cls: CharacterClass) => cls.name === character.derived_descriptors.primary_class_name
-		) || null;
+		return (
+			Object.values(classes).find(
+				(cls: CharacterClass) => cls.name === character.derived_descriptors.primary_class_name
+			) || null
+		);
 	});
 </script>
 
-<div class="rounded-xl shadow bg-background flex flex-col max-w-[400px] w-full">
+<div class="flex w-full max-w-[400px] flex-col rounded-xl bg-background shadow">
 	<!-- Header -->
 	<div class="mb-2 flex gap-3 px-2">
-		<div class="relative grow min-w-0">
+		<div class="relative min-w-0 grow">
 			<!-- level class subclass -->
 			<div class="mt-3 mb-2.5 flex h-9 max-w-[400px] min-w-0 items-center truncate overflow-hidden">
 				<a
@@ -76,7 +78,7 @@
 				</Button>
 			</div>
 
-			<div class="flex gap-3 min-w-0">
+			<div class="flex min-w-0 gap-3">
 				<!-- character image -->
 				<div class="aspect-square h-[90px] w-[90px] shrink-0 overflow-hidden rounded-lg border-2">
 					<img
@@ -87,14 +89,12 @@
 				</div>
 
 				<!-- name and heritage -->
-				<div class="flex grow flex-col gap-1 min-w-0">
+				<div class="flex min-w-0 grow flex-col gap-1">
 					<p class="truncate text-2xl font-bold">{character.name}</p>
 					<p class="mt-1 truncate text-xs text-muted-foreground">
 						{character.derived_descriptors.ancestry_name || 'No ancestry'}
 					</p>
-					<p class="truncate text-xs text-muted-foreground">
-						No community
-					</p>
+					<p class="truncate text-xs text-muted-foreground">No community</p>
 				</div>
 			</div>
 		</div>
@@ -105,21 +105,16 @@
 		{/if}
 	</div>
 
-
-
 	<!-- Evasion and Armor -->
 	<div class="mb-4 flex justify-center gap-4">
 		<EvasionPreview evasion={character.evasion} />
 		<ArmorPreview max_armor={character.max_armor} marked_armor={character.marked_armor} />
 	</div>
 
-		<!-- Damage Thresholds -->
-		<div class="mx-auto mb-4">
-			<DamageThresholdsPreview
-				damage_thresholds={character.damage_thresholds}
-				class="scale-92"
-			/>
-		</div>
+	<!-- Damage Thresholds -->
+	<div class="mx-auto mb-4">
+		<DamageThresholdsPreview damage_thresholds={character.damage_thresholds} class="scale-92" />
+	</div>
 
 	<!-- HP, Stress, Hope -->
 	<div class="mb-4 flex flex-col items-center gap-3">
@@ -132,7 +127,7 @@
 	<div class="flex gap-2 p-2">
 		<Button variant="outline" size="sm" href={`/characters/${character.id}/`} class="grow">
 			View Character Sheet
-			<ExternalLink/>
+			<ExternalLink />
 		</Button>
 	</div>
 </div>

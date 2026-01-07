@@ -29,14 +29,14 @@ export async function POST({ params, platform, request }: RequestEvent) {
 		const response = await stub.fetch(request.url, {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json',
+				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify(body)
 		});
-		
+
 		return response;
 	} catch (err) {
 		console.error('Failed to notify DO:', err);
 		throw error(500, 'Failed to notify Durable Object');
 	}
-};
+}
