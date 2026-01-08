@@ -3,24 +3,21 @@
 	import { cn } from '$lib/utils';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
-	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Label } from '$lib/components/ui/label';
 	import Input from '$lib/components/ui/input/input.svelte';
+	import Switch from '$lib/components/ui/switch/switch.svelte';
 	import Footer from '$lib/components/app/footer.svelte';
 	import { getUserContext } from '$lib/state/user.svelte';
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
 	import { update_campaign_member } from '$lib/remote/campaigns.remote';
 	import { toast } from 'svelte-sonner';
-	import CampaignOverviewPlayer from '$lib/components/app/campaigns/campaign-overview-player.svelte';
-	import CampaignOverviewGm from '$lib/components/app/campaigns/campaign-overview-gm.svelte';
-	import { UseClipboard } from '$lib/hooks/use-clipboard.svelte';
-	import Copy from '@lucide/svelte/icons/copy';
-	import Settings from '@lucide/svelte/icons/settings';
-	import Play from '@lucide/svelte/icons/play';
+	import CampaignInviteLink from '$lib/components/app/campaigns/campaign-invite-link.svelte';
+	import CampaignVault from '$lib/components/app/campaigns/campaign-vault.svelte';
+	import CampaignNotes from '$lib/components/app/campaigns/campaign-notes.svelte';
+	import CampaignCharacters from '$lib/components/app/campaigns/campaign-characters.svelte';
+	import CampaignHeader from '$lib/components/app/campaigns/campaign-header.svelte';
 	import { page } from '$app/state';
 
 	let { data }: { data: import('./$types').PageData } = $props();
@@ -30,14 +27,6 @@
 
 	// Set up campaign context (reactive to campaignId changes)
 	const campaign = getCampaignContext();
-
-	// Get available characters for assignment (user's characters not in this campaign)
-	const availableCharacters = $derived(
-		user.all_characters
-			.filter((char) => !char.campaign_id || char.campaign_id !== campaignId)
-			.map((char) => ({ id: char.id, name: char.name || 'Unnamed Character' }))
-	);
-
 	const loading = $derived(campaign.loading);
 
 	// Settings dialog state
@@ -45,6 +34,7 @@
 	let campaignName = $state('');
 	let campaignDescription = $state('');
 	let gmDisplayName = $state('');
+	let fearVisibleToPlayers = $state(false);
 	let isDeleting = $state(false);
 
 	// Player settings dialog state
@@ -52,9 +42,6 @@
 	let playerDisplayName = $state('');
 	let isLeaving = $state(false);
 	let showLeaveConfirmation = $state(false);
-
-	const clipboard = new UseClipboard();
-	const joinUrl = $derived(campaignId ? `${page.url.origin}/campaigns/join/${campaignId}` : '');
 
 	// Initialize settings dialog values
 	$effect(() => {
@@ -64,10 +51,13 @@
 		}
 	});
 
-	// Initialize GM display name when settings dialog opens
+	// Initialize GM display name and fear visibility when settings dialog opens
 	$effect(() => {
 		if (data.userMembership && showSettingsDialog) {
 			gmDisplayName = data.userMembership.display_name || '';
+		}
+		if (campaign.campaignState && showSettingsDialog) {
+			fearVisibleToPlayers = campaign.campaignState.fear_visible_to_players ?? false;
 		}
 	});
 
@@ -75,7 +65,8 @@
 	const hasChanges = $derived(
 		campaign.campaign &&
 			(campaignName.trim() !== campaign.campaign.name ||
-				(gmDisplayName.trim() || '') !== (data.userMembership?.display_name || ''))
+				(gmDisplayName.trim() || '') !== (data.userMembership?.display_name || '') ||
+				fearVisibleToPlayers !== (campaign.campaignState?.fear_visible_to_players ?? false))
 	);
 
 	async function handleSave() {
@@ -91,6 +82,16 @@
 					campaign_id: campaignId,
 					display_name: gmDisplayName.trim() || undefined
 				});
+			}
+
+			// Update fear visibility if it changed - direct state mutation, auto-save handles persistence
+			if (fearVisibleToPlayers !== (campaign.campaignState?.fear_visible_to_players ?? false)) {
+				if (campaign.campaignState) {
+					campaign.campaignState = {
+						...campaign.campaignState,
+						fear_visible_to_players: fearVisibleToPlayers
+					};
+				}
 			}
 
 			showSettingsDialog = false;
@@ -112,23 +113,6 @@
 		}
 	}
 
-	async function handleCopyJoinUrl() {
-		if (!joinUrl) return;
-		await clipboard.copy(joinUrl);
-		if (clipboard.copied) {
-			toast.success('Join link copied');
-		}
-	}
-
-	async function handleCopyCampaignId() {
-		if (!campaignId) return;
-		const inviteLink = `${page.url.origin}/campaigns/join/${campaignId}`;
-		await clipboard.copy(inviteLink);
-		if (clipboard.copied) {
-			toast.success('Invite link copied');
-		}
-	}
-
 	const isGM = $derived(data.role === 'gm');
 
 	let deleteConfirmation = $state('');
@@ -136,6 +120,7 @@
 		if (!showSettingsDialog) {
 			deleteConfirmation = '';
 			gmDisplayName = '';
+			fearVisibleToPlayers = campaign.campaignState?.fear_visible_to_players ?? false;
 		}
 	});
 
@@ -191,77 +176,32 @@
 			<p class="text-sm text-muted-foreground italic">Campaign not found</p>
 			<Button href="/campaigns">Campaigns</Button>
 		</div>
-	{:else}
-		<!-- Header -->
-		<div
-			class="sticky top-[calc(var(--navbar-height,3.5rem)-1px)] z-20 w-full bg-background sm:top-0"
-		>
-			<div class="w-full bg-primary/50">
-				<div
-					class="relative mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-2 px-4"
-				>
-					<div class="flex items-center gap-2">
-						<Button
-							href="/campaigns"
-							variant="link"
-							class="hidden px-0 text-muted-foreground sm:flex"
-						>
-							Campaigns
-						</Button>
-						<ChevronRight class="hidden size-3.5 text-muted-foreground sm:block" />
-						<p class="truncate text-sm font-medium">
-							{campaign.campaign?.name || 'unnamed campaign'}
-						</p>
-					</div>
-					<div class="flex shrink-0 items-center gap-2">
-						{#if isGM}
-							<Button variant="outline" size="sm" onclick={handleCopyCampaignId} class="h-7">
-								<Copy class="size-3.5" />
-							</Button>
-							<Button
-								variant="outline"
-								size="sm"
-								onclick={() => (showSettingsDialog = true)}
-								class="h-7"
-							>
-								<Settings class="size-3.5" />
-								<p class="hidden sm:block">Settings</p>
-							</Button>
-						{:else}
-							<Button
-								variant="outline"
-								size="sm"
-								onclick={() => (showPlayerSettingsDialog = true)}
-								class="h-7"
-							>
-								<Settings class="size-3.5" />
-								<p class="hidden sm:block">Settings</p>
-							</Button>
-						{/if}
-						<Button size="sm" href={`/campaigns/${campaignId}/live`}>
-							<p class="hidden sm:block">Launch</p>
-							<Play class="size-3.5" />
-						</Button>
-					</div>
-				</div>
-			</div>
-		</div>
+	{:else if campaignId}
+		<CampaignHeader
+			{campaignId}
+			{isGM}
+			onSettingsClick={() => (showSettingsDialog = true)}
+			onPlayerSettingsClick={() => (showPlayerSettingsDialog = true)}
+		/>
 		<div
 			class={cn(
 				'relative z-10 flex h-full w-full flex-col items-center justify-start ',
 				'pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]'
 			)}
 		>
-			<div class="flex w-full max-w-6xl flex-col gap-6 px-4 py-4">
-				{#if data.role === 'gm' && campaignId}
-					<CampaignOverviewGm {campaignId} {user} />
-				{:else if campaignId}
-					<CampaignOverviewPlayer
-						{availableCharacters}
-						userMembership={data.userMembership}
-						{user}
-						{campaignId}
-					/>
+			<div class=" w-full max-w-6xl px-4 pt-4 pb-8">
+				{#if campaignId && campaign.campaign}
+					<div class="flex flex-col gap-6">
+						<div class="flex justify-end">
+							<CampaignInviteLink {isGM} class="grow" />
+						</div>
+						<CampaignCharacters />
+						{#if isGM}
+							<CampaignVault {campaignId} />
+
+							<CampaignNotes {campaignId} />
+						{/if}
+					</div>
 				{/if}
 			</div>
 		</div>
@@ -270,7 +210,7 @@
 
 <Footer />
 
-<!-- Settings Dialog -->
+<!-- GM Settings Dialog -->
 <Dialog.Root bind:open={showSettingsDialog}>
 	<Dialog.Content class="flex max-h-[90%] flex-col">
 		<Dialog.Header>
@@ -296,14 +236,22 @@
 					This is how other players will see your name in this campaign.
 				</p>
 			</div>
+
 			<div class="flex flex-col gap-2">
-				<Label>Invite Link</Label>
-				<div class="flex gap-2">
-					<Input value={joinUrl} readonly class="flex-1" />
-					<Button type="button" variant="outline" onclick={handleCopyJoinUrl}>
-						<Copy class="size-4" />
-					</Button>
-				</div>
+				<Label class="cursor-pointer items-start">
+					<div class="flex items-center gap-3">
+						<Switch
+							checked={fearVisibleToPlayers}
+							onCheckedChange={(checked) => (fearVisibleToPlayers = checked ?? false)}
+						/>
+						<div class="space-y-1">
+							<p class="whitespace-nowrap">Fear Visible to Players</p>
+							<p class="text-xs font-normal text-muted-foreground">
+								If enabled, players can see the Fear tracker on their character sheets.
+							</p>
+						</div>
+					</div>
+				</Label>
 			</div>
 
 			<div
@@ -327,7 +275,6 @@
 					<Button
 						type="button"
 						variant="destructive"
-						size="sm"
 						class="w-min"
 						disabled={deleteConfirmation !== 'delete' || isDeleting}
 						onclick={handleDelete}
@@ -383,8 +330,9 @@
 
 			<Button
 				type="button"
-				variant="link"
-				class="h-auto justify-start p-0 text-destructive"
+				variant="destructive"
+				class="w-min"
+				size="sm"
 				onclick={() => (showLeaveConfirmation = true)}
 			>
 				Leave Campaign

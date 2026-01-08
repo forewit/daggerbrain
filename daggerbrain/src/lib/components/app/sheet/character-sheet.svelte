@@ -189,7 +189,7 @@
 							</span>
 						</a>
 						<Button
-							href={`/characters/${character.id}/class/`}
+							href={`/characters/${character.id}/edit/`}
 							class={cn(
 								'h-full  justify-start gap-2 truncate  rounded-l-none rounded-r-full',
 								'border-0 border-b'

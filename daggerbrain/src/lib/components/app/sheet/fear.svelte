@@ -34,7 +34,7 @@
 			<CircleMinus />
 		</Button>
 
-		<div class="font-eveleth leading-none font-bold text-destructive">FEAR</div>
+		<div class="font-eveleth text-base leading-none text-destructive">FEAR</div>
 
 		<Button
 			onclick={() => {

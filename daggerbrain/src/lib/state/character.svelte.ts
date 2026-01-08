@@ -57,6 +57,12 @@ function createCharacter(id: string) {
 
 	// Load character: first try user.all_characters (fast path), then try get_character_by_id if not found
 	$effect(() => {
+		// Guard: check if user context exists before accessing it
+		if (!user) {
+			// User context not available yet, wait for it
+			return;
+		}
+
 		// Fast path: check if character is in user's owned characters
 		const ownedCharacter = user.all_characters.find((c) => c.id === id);
 		if (ownedCharacter) {

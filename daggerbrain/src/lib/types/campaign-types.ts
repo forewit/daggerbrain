@@ -18,7 +18,6 @@ export type Countdown = {
 	id: string; // Unique identifier for each countdown
 	name: string;
 	min: number;
-	max?: number; // Optional - if not set, countdown can go as high as needed
 	current: number;
 	visibleToPlayers: boolean;
 };
@@ -136,7 +135,12 @@ export type CampaignLiveClientMessage =
 	  }
 	| {
 			type: 'update_state';
-			updates: Partial<Pick<CampaignState, 'fear_track' | 'notes' | 'countdowns' | 'updated_at'>>;
+			updates: Partial<
+				Pick<
+					CampaignState,
+					'fear_track' | 'fear_visible_to_players' | 'notes' | 'countdowns' | 'updated_at'
+				>
+			>;
 	  }
 	| {
 			type: 'update_character';

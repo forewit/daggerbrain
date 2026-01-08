@@ -10,7 +10,8 @@
 	"compatibility_flags": ["nodejs_als"],
 	"assets": {
 		"binding": "ASSETS",
-		"directory": ".svelte-kit/cloudflare"
+		"directory": ".svelte-kit/cloudflare",
+		"not_found_handling": "single-page-application"
 	},
 	"preview_urls": false,
 	"workers_dev": false,

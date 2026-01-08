@@ -13,6 +13,7 @@
 
 	const context = getCharacterContext();
 	let character = $derived(context.character);
+	const isOwner = $derived(data.isOwner ?? false);
 
 	let showVoidDisableDialog = $state(false);
 	let voidCheckboxState = $state(false);
@@ -130,44 +131,46 @@
 					<div class="space-y-1">
 						<p class="whitespace-nowrap">Show Campaign Information</p>
 						<p class="text-xs font-normal text-muted-foreground">
-							Display the campaign's Fear tracker and visible countdowns at the top of your
-							character sheet.
+							Display campaign information that the GM shares with players (Fear tracker and visible
+							countdowns) at the top of your character sheet.
 						</p>
 					</div>
 				</Label>
 			{/if}
 
-			<Dialog.Root>
-				<Dialog.Trigger
-					class={cn(buttonVariants({ variant: 'link' }), 'mt-4 h-min w-min p-0 text-destructive')}
-					>Delete Character</Dialog.Trigger
-				>
-				<Dialog.Content>
-					<Dialog.Header>
-						<Dialog.Title>Delete Character</Dialog.Title>
-						<Dialog.Description>
-							Are you sure you want to delete <strong>{character.name}</strong>? This action cannot
-							be undone.
-						</Dialog.Description>
-					</Dialog.Header>
-					<Dialog.Footer>
-						<Dialog.Close class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
-							>Cancel</Dialog.Close
-						>
-						<Dialog.Close
-							class={buttonVariants({ variant: 'destructive' })}
-							onclick={async () => {
-								try {
-									await delete_character(character.id);
-									await goto('/characters/');
-								} catch (error) {
-									console.error(error);
-								}
-							}}>Delete</Dialog.Close
-						>
-					</Dialog.Footer>
-				</Dialog.Content>
-			</Dialog.Root>
+			{#if isOwner}
+				<Dialog.Root>
+					<Dialog.Trigger
+						class={cn(buttonVariants({ variant: 'link' }), 'mt-4 h-min w-min p-0 text-destructive')}
+						>Delete Character</Dialog.Trigger
+					>
+					<Dialog.Content>
+						<Dialog.Header>
+							<Dialog.Title>Delete Character</Dialog.Title>
+							<Dialog.Description>
+								Are you sure you want to delete <strong>{character.name}</strong>? This action
+								cannot be undone.
+							</Dialog.Description>
+						</Dialog.Header>
+						<Dialog.Footer>
+							<Dialog.Close class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
+								>Cancel</Dialog.Close
+							>
+							<Dialog.Close
+								class={buttonVariants({ variant: 'destructive' })}
+								onclick={async () => {
+									try {
+										await delete_character(character.id);
+										await goto('/characters/');
+									} catch (error) {
+										console.error(error);
+									}
+								}}>Delete</Dialog.Close
+							>
+						</Dialog.Footer>
+					</Dialog.Content>
+				</Dialog.Root>
+			{/if}
 		</div>
 	</div>
 {/if}

@@ -3,18 +3,11 @@ import { error } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 import { characters_table, characters_table_update_schema } from '../server/db/characters.schema';
-import { get_db, get_auth, get_kv } from './utils';
-import { get_user_campaigns } from './campaigns.remote';
+import { get_db, get_auth } from './utils';
+import { get_user_campaigns, get_campaign_characters } from './campaigns.remote';
 import { getCharacterAccess } from './permissions.remote';
 import { getCharacterAccessInternal, getCampaignAccessInternal } from '../server/permissions';
-import {
-	upsertCharacterSummary,
-	removeCharacterFromSummary,
-	rebuildCampaignCharacterCache,
-	KV_TTL_24H
-} from './cache.service';
-import type { CampaignCharacterSummary } from '../types/campaign-types';
-import type { ConditionIds } from '../types/rule-types';
+// Note: KV caching has been removed for cost optimization - D1 reads are 500x cheaper than KV reads
 import type { Character } from '../types/character-types';
 import type { DerivedCharacter } from '../types/derived-character-types';
 import { DerivedCharacterSchema } from '../types/derived-character-types';
@@ -97,7 +90,6 @@ export const delete_character = command(z.string(), async (characterId) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
 	// Verify the character exists and belongs to the user
 	const [character] = await db
@@ -112,29 +104,27 @@ export const delete_character = command(z.string(), async (characterId) => {
 
 	// Track if character was in a campaign (for refreshing queries)
 	const wasInCampaign = !!character.campaign_id;
-
-	// Clean up campaign KV entry if it exists
-	if (character.campaign_id) {
-		await kv.delete(`character:${characterId}:campaign`);
-		await removeCharacterFromSummary(kv, character.campaign_id, characterId);
-
-		// Notify DO that character was deleted
-		await notifyDurableObject(event, character.campaign_id, 'character_deleted', {
-			characterId
-		});
-	}
+	const campaignId = character.campaign_id;
 
 	// Delete the character
 	await db
 		.delete(characters_table)
 		.where(and(eq(characters_table.id, characterId), eq(characters_table.clerk_user_id, userId)));
 
+	// Notify DO that character was deleted
+	if (campaignId) {
+		await notifyDurableObject(event, campaignId, 'character_deleted', {
+			characterId
+		});
+	}
+
 	// Refresh the characters list
 	get_all_characters().refresh();
 
-	// Refresh campaign list if character was in a campaign (to update character_images)
-	if (wasInCampaign) {
+	// Refresh campaign-related queries if character was in a campaign
+	if (wasInCampaign && campaignId) {
 		get_user_campaigns().refresh();
+		get_campaign_characters(campaignId).refresh();
 	}
 
 	console.log('deleted character from D1');
@@ -153,7 +143,7 @@ export const create_character = command(
 		if (!userId) throw error(401, 'Unauthorized');
 		const db = get_db(event);
 
-		const isClaimable = options?.claimable === true;
+		let isClaimable = options?.claimable === true;
 		let isGM = false;
 
 		// If campaign_id is provided, verify user is a member
@@ -171,22 +161,22 @@ export const create_character = command(
 				throw error(403, 'Only GMs can create claimable characters.');
 			}
 
-			// Non-GMs cannot create characters in campaigns (unless claimable, which is GM-only)
-			if (!isGM && !isClaimable) {
-				throw error(403, 'GMs cannot create characters in campaigns');
+			// Players can only create non-claimable characters (claimed by them)
+			// Force non-claimable for players to ensure characters are created as claimed
+			if (!isGM) {
+				isClaimable = false;
 			}
 		}
 
-		// Check character limit - skip for GMs creating claimable characters
-		if (!isClaimable) {
-			const existingCharacters = await db
-				.select()
-				.from(characters_table)
-				.where(eq(characters_table.clerk_user_id, userId));
+		// Check character limit - ALL characters owned by user count toward the limit
+		// Claimable status is tracked in campaign_characters_table, not in character limit
+		const existingCharacters = await db
+			.select()
+			.from(characters_table)
+			.where(eq(characters_table.clerk_user_id, userId));
 
-			if (existingCharacters.length >= 3) {
-				throw error(403, 'Character limit reached. You can only have 3 characters.');
-			}
+		if (existingCharacters.length >= 3) {
+			throw error(403, 'Character limit reached. You can only have 3 characters.');
 		}
 
 		const characterId = crypto.randomUUID();
@@ -206,6 +196,9 @@ export const create_character = command(
 				claimable: isClaimable ? 1 : 0,
 				added_at: Date.now()
 			});
+
+			// Refresh the campaign characters query
+			get_campaign_characters(options.campaign_id).refresh();
 		}
 
 		// Refresh the characters list
@@ -266,23 +259,11 @@ export const update_character = command(
 		// Update character (without derived_character and id fields - id is immutable)
 		await db.update(characters_table).set(character).where(eq(characters_table.id, id));
 
-		// Handle KV materialization for campaign characters
-		const kv = get_kv(event);
-		// Always use DB's campaign_id as source of truth (client-provided campaign_id is explicitly excluded above)
+		// Get campaign_id from DB (source of truth)
 		const campaignId = existingCharacter.campaign_id;
 
-		// Store derived_character in KV for campaign characters
-		// This is needed for campaign summaries
-		if (campaignId && derived_character) {
-			await kv.put(`character:${id}:campaign`, JSON.stringify(derived_character), {
-				expirationTtl: KV_TTL_24H
-			});
-		}
-
-		// Update campaign character summary if character is in a campaign
+		// If character is in a campaign, notify DO about the update
 		if (campaignId) {
-			await upsertCharacterSummary(kv, db, campaignId, id);
-
 			// Notify DO about character update
 			// If derived_character is provided, send full character (first update or major change)
 			// Otherwise, send partial update with changed fields
@@ -311,32 +292,15 @@ export const update_character = command(
 					});
 				}
 			}
+
+			// Refresh the campaign characters query
+			get_campaign_characters(campaignId).refresh();
 		}
 
 		console.log('updated character in D1');
 		return id;
 	}
 );
-
-// Helper function to update campaign character summary
-// Now uses the shared cache service
-async function updateCampaignCharacterSummary(
-	kv: ReturnType<typeof get_kv>,
-	db: ReturnType<typeof get_db>,
-	campaignId: string,
-	characterId: string,
-	isDeletion: boolean = false
-) {
-	if (isDeletion) {
-		// Character was removed from campaign, rebuild summary without it
-		// Use rebuild to ensure consistency
-		await rebuildCampaignCharacterCache(kv, db, campaignId);
-		return;
-	}
-
-	// Use shared upsert function
-	await upsertCharacterSummary(kv, db, campaignId, characterId);
-}
 
 // Note: get_campaign_characters is defined in campaigns.remote.ts
 // Import it directly where needed instead of re-exporting
@@ -353,7 +317,6 @@ export const update_character_campaign_stats = command(
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
-		const kv = get_kv(event);
 
 		// Get character with permissions
 		const access = await getCharacterAccessInternal(db, userId, character_id);
@@ -373,12 +336,12 @@ export const update_character_campaign_stats = command(
 		// Update D1 immediately
 		await db.update(characters_table).set(updates).where(eq(characters_table.id, character_id));
 
-		// Update campaign summary immediately if in campaign
+		// Refresh campaign characters query if in campaign
 		if (character.campaign_id) {
-			await upsertCharacterSummary(kv, db, character.campaign_id, character_id);
+			get_campaign_characters(character.campaign_id).refresh();
 		}
 
-		console.log('updated character campaign stats in D1 and KV');
+		console.log('updated character campaign stats in D1');
 		return { success: true };
 	}
 );

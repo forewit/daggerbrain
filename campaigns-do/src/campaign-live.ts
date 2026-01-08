@@ -109,66 +109,33 @@ export class CampaignLiveDO extends DurableObject<Env> {
             });
           }
           
-          // Verify character should be in this campaign
           // The server already verified permissions before sending the notification,
-          // so we just do a basic sanity check here
+          // so we trust that the character belongs to this campaign
           const characterInState = this.characters[body.characterId];
           
           // Fix empty campaign_id: if state has empty campaign_id, use character's campaign_id to fix it
-          if (this.campaignState && !this.campaignState.campaign_id) {
-            let campaignIdToUse: string | undefined;
-            if (body.character?.campaign_id) {
-              campaignIdToUse = body.character.campaign_id;
-            } else if (this.env.KV) {
-              const kvChar = await this.env.KV.get<DerivedCharacter>(
-                `character:${body.characterId}:campaign`,
-                'json'
-              );
-              if (kvChar?.campaign_id) {
-                campaignIdToUse = kvChar.campaign_id;
-              }
-            }
-            if (campaignIdToUse) {
-              this.campaignState.campaign_id = campaignIdToUse;
-              await this.persistState();
-            }
+          if (this.campaignState && !this.campaignState.campaign_id && body.character?.campaign_id) {
+            this.campaignState.campaign_id = body.character.campaign_id;
+            await this.persistState();
           }
           
           if (!characterInState) {
             // Character not in DO state - if we have a full character, add it
-            // Otherwise check KV to verify it belongs to this campaign
+            // Server has already verified permissions, so trust the notification
             if (body.character) {
-              // Full character update - add to state if campaign matches (or if state campaign_id was empty, we just fixed it)
-              if (!this.campaignState?.campaign_id || body.character.campaign_id === this.campaignState.campaign_id) {
-                await this.addCharacter(body.character);
-                break;
-              }
+              // Full character update - add to state
+              await this.addCharacter(body.character, body.claimable ?? false);
+              break;
             }
             
-            // Check KV as fallback
-            if (this.env.KV) {
-              const kvChar = await this.env.KV.get<DerivedCharacter>(
-                `character:${body.characterId}:campaign`,
-                'json'
-              );
-              
-              // Allow if campaign matches, or if state campaign_id is empty (we trust KV as source of truth)
-              if (kvChar && (!this.campaignState?.campaign_id || kvChar.campaign_id === this.campaignState.campaign_id)) {
-                // Character belongs to this campaign, add it to state first
-                this.characters[body.characterId] = kvChar;
-              } else {
-                return new Response(JSON.stringify({ 
-                  error: 'Character not in this campaign' 
-                }), { 
-                  status: 403,
-                  headers: { 'Content-Type': 'application/json' }
-                });
-              }
-            } else {
+            // No full character provided and character not in state
+            // This can happen for partial updates - just apply the update if we have one
+            // If character truly doesn't exist, the update will have no effect
+            if (!body.updates) {
               return new Response(JSON.stringify({ 
-                error: 'Character not in this campaign' 
+                error: 'Character not in session state and no full character data provided' 
               }), { 
-                status: 403,
+                status: 400,
                 headers: { 'Content-Type': 'application/json' }
               });
             }
@@ -336,6 +303,28 @@ export class CampaignLiveDO extends DurableObject<Env> {
       if (!this.campaignState.countdowns) {
         this.campaignState.countdowns = [];
       }
+      // Backward compatibility: ensure fear_visible_to_players exists
+      if (this.campaignState.fear_visible_to_players === undefined) {
+        this.campaignState.fear_visible_to_players = false;
+      }
+      // Backward compatibility: ensure invite_code exists
+      if (!this.campaignState.invite_code) {
+        // Try to load from D1
+        const campaignId = this.campaignState.campaign_id;
+        if (campaignId && this.env.DB) {
+          try {
+            const result = await this.env.DB.prepare(
+              'SELECT invite_code FROM campaign_state_table WHERE campaign_id = ?'
+            ).bind(campaignId).first<{ invite_code: string }>();
+            if (result?.invite_code) {
+              this.campaignState.invite_code = result.invite_code;
+              await this.persistState();
+            }
+          } catch (error) {
+            console.error('Failed to load invite_code from D1:', error);
+          }
+        }
+      }
       this.characters = stored.characters;
       this.characterClaimable = stored.characterClaimable ?? {};
       this.version = stored.version ?? 0;
@@ -361,11 +350,28 @@ export class CampaignLiveDO extends DurableObject<Env> {
     } else {
       // Initialize with defaults if no stored data exists
       const campaignId = this.ctx.id.name || '';
+      // Try to load actual state from D1 to get invite_code
+      let inviteCode = '';
+      if (campaignId && this.env.DB) {
+        try {
+          const result = await this.env.DB.prepare(
+            'SELECT invite_code FROM campaign_state_table WHERE campaign_id = ?'
+          ).bind(campaignId).first<{ invite_code: string }>();
+          if (result?.invite_code) {
+            inviteCode = result.invite_code;
+          }
+        } catch (error) {
+          console.error('Failed to load invite_code from D1:', error);
+        }
+      }
+      // If we couldn't load it, use empty string (will be fixed when state is synced)
       this.campaignState = {
         campaign_id: campaignId,
         fear_track: 0,
+        fear_visible_to_players: false,
         notes: null,
         countdowns: [],
+        invite_code: inviteCode,
         updated_at: Date.now()
       };
       this.characters = {};
@@ -385,38 +391,66 @@ export class CampaignLiveDO extends DurableObject<Env> {
     if (!this.campaignState) return;
     
     const campaignId = this.campaignState.campaign_id;
-    if (!campaignId || !this.env.KV) return;
+    if (!campaignId || !this.env.DB) return;
 
     try {
-      // Get campaign character summaries from KV (includes claimable status)
-      const summaries = await this.env.KV.get<Record<string, { claimable?: boolean }>>(
-        `campaign:${campaignId}:characters`,
-        'json'
-      );
+      // Fetch characters directly from D1 (no KV caching - D1 is cheaper)
+      // Get characters in this campaign with their claimable status
+      const result = await this.env.DB.prepare(`
+        SELECT 
+          c.id,
+          c.clerk_user_id,
+          c.name,
+          c.image_url,
+          c.level,
+          c.marked_hp,
+          c.marked_stress,
+          c.marked_hope,
+          c.marked_armor,
+          c.active_conditions,
+          c.derived_descriptors,
+          cc.claimable
+        FROM characters_table c
+        INNER JOIN campaign_characters_table cc ON c.id = cc.character_id
+        WHERE c.campaign_id = ?
+      `).bind(campaignId).all();
 
-      if (!summaries) return;
+      if (!result.results || result.results.length === 0) return;
 
-      // Load full DerivedCharacter objects from KV for each character
-      const characterIds = Object.keys(summaries);
-      const characterPromises = characterIds.map(async (characterId) => {
-        const derivedChar = await this.env.KV!.get<DerivedCharacter>(
-          `character:${characterId}:campaign`,
-          'json'
-        );
-        return { characterId, derivedChar };
-      });
-
-      const characterResults = await Promise.all(characterPromises);
-      
-      for (const { characterId, derivedChar } of characterResults) {
-        if (derivedChar) {
-          this.characters[characterId] = derivedChar;
-          // Get claimable from summary
-          this.characterClaimable[characterId] = summaries[characterId]?.claimable ?? false;
-        }
+      for (const row of result.results) {
+        const characterId = row.id as string;
+        
+        // Build a basic DerivedCharacter from D1 data
+        // Note: Some derived fields (max_hp, evasion, etc.) require client-side computation
+        // They will be updated when clients connect and send full character data
+        const basicChar: DerivedCharacter = {
+          id: characterId,
+          clerk_user_id: row.clerk_user_id as string,
+          name: row.name as string,
+          image_url: row.image_url as string,
+          campaign_id: campaignId,
+          level: row.level as number,
+          marked_hp: row.marked_hp as number,
+          marked_stress: row.marked_stress as number,
+          marked_hope: row.marked_hope as number,
+          marked_armor: row.marked_armor as number,
+          active_conditions: (row.active_conditions as string[] | null) ?? [],
+          derived_descriptors: row.derived_descriptors as any,
+          // Default values for derived fields - will be updated by client
+          derived_max_hp: 0,
+          derived_max_stress: 6,
+          derived_max_hope: 6,
+          derived_evasion: 0,
+          derived_max_armor: 0,
+          derived_damage_thresholds: { major: 0, severe: 0 },
+          // Other fields will be populated when client sends full character
+        } as DerivedCharacter;
+        
+        this.characters[characterId] = basicChar;
+        this.characterClaimable[characterId] = (row.claimable as number) === 1;
       }
     } catch (error) {
-      console.error('Failed to initialize characters from KV:', error);
+      console.error('Failed to initialize characters from D1:', error);
       // Don't throw - continue with empty characters
     }
   }
@@ -673,21 +707,23 @@ export class CampaignLiveDO extends DurableObject<Env> {
       const campaignId = this.campaignState.campaign_id;
       
       // Update campaign state in D1 using direct SQL
-      // Using prepared statement for safety
+      // Using prepared statement for safety - includes all persistent fields
       const stmt = this.env.DB.prepare(
-        'UPDATE campaign_state_table SET fear_track = ?, notes = ?, updated_at = ? WHERE campaign_id = ?'
+        'UPDATE campaign_state_table SET fear_track = ?, fear_visible_to_players = ?, notes = ?, countdowns = ?, updated_at = ? WHERE campaign_id = ?'
       );
       
       await stmt.bind(
         this.campaignState.fear_track,
+        this.campaignState.fear_visible_to_players ? 1 : 0,
         this.campaignState.notes,
+        JSON.stringify(this.campaignState.countdowns ?? []),
         this.campaignState.updated_at,
         campaignId
       ).run();
       
       // Note: Character updates are stored in DO storage for live sessions
       // They should be persisted to D1 via the main character update flow
-      // This flush only handles campaign state (fear_track, notes)
+      // This flush handles campaign state (fear_track, fear_visible_to_players, notes, countdowns)
       
       console.log(`Flushed campaign state to D1 for campaign ${campaignId}`);
     } catch (error) {

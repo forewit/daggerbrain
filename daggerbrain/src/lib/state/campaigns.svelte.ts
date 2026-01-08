@@ -9,7 +9,10 @@ import {
 	assign_character_to_campaign,
 	leave_campaign,
 	claim_character,
-	unassign_character
+	unassign_character,
+	join_campaign,
+	get_user_campaigns,
+	reset_invite_code
 } from '$lib/remote/campaigns.remote';
 import {
 	get_campaign_homebrew_vault,
@@ -327,11 +330,16 @@ function campaignContext() {
 	let syncTimeout: ReturnType<typeof setTimeout> | null = null;
 	let currentCampaignIdForSync = $state<string | undefined>(undefined);
 
-	// Auto-save state tracking
+	// Auto-save state tracking for campaign (name/description)
 	let initialLoadComplete = $state(false);
 	let lastSavedCampaign = $state<string | null>(null);
 	let inFlightSave: Promise<void> | null = null;
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+	// Auto-save state tracking for campaignState (fear_track, countdowns, notes, etc.)
+	let lastSavedCampaignState = $state<string | null>(null);
+	let campaignStateDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+	let campaignStateInFlightSave: Promise<void> | null = null;
 
 	// Load all campaign data
 	async function load() {
@@ -357,6 +365,8 @@ function campaignContext() {
 			campaignState = state;
 			characters = chars;
 			vaultItems = vault;
+			// Initialize lastSavedCampaignState to track changes from this point
+			lastSavedCampaignState = JSON.stringify(state);
 			// Mark initial sync complete immediately after D1 data is assigned
 			// This ensures the loading getter returns false right away
 			initialSyncComplete = true;
@@ -365,51 +375,6 @@ function campaignContext() {
 		} finally {
 			if (isInitialLoad) {
 				loading = false;
-			}
-		}
-	}
-
-	// Update campaign state
-	async function updateState(updates: {
-		fear_track?: number;
-		notes?: string | null;
-		countdowns?: Countdown[];
-	}): Promise<void> {
-		const id = campaignId;
-		if (!id) {
-			throw new Error('Campaign ID is required');
-		}
-
-		// If WebSocket is connected, send via WebSocket for real-time updates
-		if (wsConnection && wsConnection.connected) {
-			// Send update via WebSocket - DO will validate, update, and broadcast
-			wsConnection.send({
-				type: 'update_state',
-				updates: {
-					...updates,
-					updated_at: Date.now()
-				}
-			});
-
-			// Local state will be updated via WebSocket message handler
-			// No need to update immediately - wait for DO's broadcast
-		} else {
-			// WebSocket not connected - fall back to HTTP endpoint to update D1 directly
-			try {
-				const updatedState = await update_campaign_state({
-					campaign_id: id,
-					...updates
-				});
-				// Update local state immediately since we won't get a WebSocket broadcast
-				if (campaignState) {
-					campaignState = {
-						...campaignState,
-						...updates,
-						updated_at: updatedState.updated_at
-					};
-				}
-			} catch (err) {
-				throw err;
 			}
 		}
 	}
@@ -425,6 +390,16 @@ function campaignContext() {
 		} catch (err) {
 			error(500, err instanceof Error ? err.message : 'Failed to delete campaign');
 		}
+	}
+
+	// Reset invite code (GM only - permission check is in the remote function)
+	async function resetInviteCode(): Promise<void> {
+		const id = campaignId;
+		if (!id) return;
+
+		await reset_invite_code({ campaign_id: id });
+		// Refresh campaign state to get the new invite code
+		await load();
 	}
 
 	// Assign character to campaign (or remove from campaign if campaignId is null)
@@ -494,6 +469,27 @@ function campaignContext() {
 		} catch (err) {
 			error(500, err instanceof Error ? err.message : 'Failed to leave campaign');
 		}
+	}
+
+	// Join campaign
+	async function joinCampaign(options?: {
+		display_name?: string;
+		character_id?: string;
+	}): Promise<void> {
+		const id = campaignId;
+		if (!id) return;
+
+		await join_campaign({
+			campaign_id: id,
+			display_name: options?.display_name,
+			character_id: options?.character_id
+		});
+
+		// Refresh user's campaign list
+		get_user_campaigns().refresh();
+
+		// Navigate to the campaign page
+		await goto(`/campaigns/${id}`);
 	}
 
 	// Add homebrew item to vault
@@ -610,6 +606,8 @@ function campaignContext() {
 								// Initial state sync or rejoin sync - now receives full DerivedCharacter objects
 								if (message.state) {
 									campaignState = message.state;
+									// Update lastSavedCampaignState to prevent auto-save from triggering
+									lastSavedCampaignState = JSON.stringify(message.state);
 								}
 								// Convert full DerivedCharacter objects to summaries with claimable status
 								if (message.characters) {
@@ -644,6 +642,8 @@ function campaignContext() {
 							case 'state_update':
 								if (message.state) {
 									campaignState = message.state;
+									// Update lastSavedCampaignState to prevent auto-save from triggering
+									lastSavedCampaignState = JSON.stringify(message.state);
 								}
 								break;
 							case 'characters_update':
@@ -890,6 +890,81 @@ function campaignContext() {
 		};
 	});
 
+	// Debounced auto-save effect for campaignState (fear_track, countdowns, notes, etc.)
+	$effect(() => {
+		if (!campaignState || lastSavedCampaignState === null) return;
+
+		const currentJson = JSON.stringify(campaignState);
+		// Only save if the state actually changed from the last saved state
+		if (currentJson === lastSavedCampaignState) return;
+
+		// Clear any existing debounce timer
+		if (campaignStateDebounceTimer) {
+			clearTimeout(campaignStateDebounceTimer);
+			campaignStateDebounceTimer = null;
+		}
+
+		// Debounce: wait 300ms before triggering save
+		campaignStateDebounceTimer = setTimeout(() => {
+			campaignStateDebounceTimer = null;
+			if (!campaignState) return; // Guard against null state
+
+			// Don't start a new save if one is already in flight
+			if (campaignStateInFlightSave) {
+				return;
+			}
+
+			const id = campaignId;
+			if (!id) return;
+
+			// If WebSocket is connected, send via WebSocket for real-time updates
+			if (wsConnection && wsConnection.connected) {
+				wsConnection.send({
+					type: 'update_state',
+					updates: {
+						fear_track: campaignState.fear_track,
+						countdowns: campaignState.countdowns,
+						notes: campaignState.notes,
+						fear_visible_to_players: campaignState.fear_visible_to_players,
+						updated_at: Date.now()
+					}
+				});
+				// Update lastSaved immediately for WebSocket path
+				lastSavedCampaignState = JSON.stringify(campaignState);
+			} else {
+				// HTTP fallback with in-flight tracking
+				// Note: fear_visible_to_players is only supported via WebSocket/DO
+				const savePromise = update_campaign_state({
+					campaign_id: id,
+					fear_track: campaignState.fear_track,
+					countdowns: campaignState.countdowns,
+					notes: campaignState.notes
+				})
+					.then(() => {
+						if (!campaignState) return;
+						lastSavedCampaignState = JSON.stringify(campaignState);
+					})
+					.catch((err) => {
+						console.error('Failed to auto-save campaign state:', err);
+					})
+					.finally(() => {
+						if (campaignStateInFlightSave === savePromise) {
+							campaignStateInFlightSave = null;
+						}
+					});
+
+				campaignStateInFlightSave = savePromise;
+			}
+		}, 300);
+
+		return () => {
+			if (campaignStateDebounceTimer) {
+				clearTimeout(campaignStateDebounceTimer);
+				campaignStateDebounceTimer = null;
+			}
+		};
+	});
+
 	return {
 		get campaignId() {
 			return campaignId;
@@ -906,6 +981,9 @@ function campaignContext() {
 		get campaignState() {
 			return campaignState;
 		},
+		set campaignState(value: CampaignState | null) {
+			campaignState = value;
+		},
 		get characters() {
 			return characters;
 		},
@@ -916,12 +994,13 @@ function campaignContext() {
 			return loading || !initialSyncComplete;
 		},
 		load,
-		updateState,
 		deleteCampaign,
+		resetInviteCode,
 		assignCharacter,
 		claimCharacter,
 		unassignCharacter,
 		leaveCampaign,
+		joinCampaign,
 		addToVault,
 		removeFromVault,
 		canClaimCharacter,

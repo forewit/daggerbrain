@@ -125,6 +125,17 @@
 </script>
 
 <div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
+	<!-- Campaigns footer image with fade effect - background -->
+	<div
+		class="campaigns-fade-container pointer-events-none absolute right-0 bottom-0 left-0 z-0 h-64 w-full overflow-hidden"
+	>
+		<img
+			src="/images/art/campaigns.webp"
+			alt=""
+			class="campaigns-fade-container h-full w-full object-cover object-center"
+		/>
+	</div>
+
 	{#if loading}
 		<div class="absolute inset-0 flex items-center justify-center">
 			<LoaderCircle class="h-8 w-8 animate-spin text-muted-foreground" />
@@ -357,3 +368,12 @@
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
+
+<style>
+	.campaigns-fade-container {
+		mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
+		-webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
+		mask-size: 100% 100%;
+		-webkit-mask-size: 100% 100%;
+	}
+</style>

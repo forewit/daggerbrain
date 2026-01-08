@@ -11,6 +11,8 @@
 	import { error } from '@sveltejs/kit';
 	import { goto } from '$app/navigation';
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
+	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
 
 	const campaignContext = getCampaignContext();
 	const user = getUserContext();
@@ -25,7 +27,7 @@
 
 	// Determine user role from campaign membership
 	const userRole = $derived.by(() => {
-		if (!campaignId || !user.user?.clerk_id) return null;
+		if (!campaignId || !user?.user?.clerk_id) return null;
 		const member = members.find((m) => m.user_id === user.user?.clerk_id);
 		return member?.role || null;
 	});
@@ -45,17 +47,18 @@
 			return !char.claimable;
 		})
 	);
-	const unassignedCharacters = $derived(
-		campaignCharacters.filter((char) => {
+	const unassignedCharacters = $derived.by(() => {
+		const result = campaignCharacters.filter((char) => {
 			// Both GMs and players see all claimable characters as unassigned
 			return char.claimable;
-		})
-	);
+		});
+		return result;
+	});
 
 	// Add Character dialog state
 	let showAddCharacterDialog = $state(false);
-	let addCharacterMode = $state<'create' | 'existing'>('create');
 	let selectedCharacterId = $state('');
+	let isAddingCharacter = $state(false);
 
 	// Unassign character dialog state
 	let showUnassignDialog = $state(false);
@@ -64,6 +67,7 @@
 	// Remove character dialog state
 	let showRemoveDialog = $state(false);
 	let characterToRemove = $state<string | null>(null);
+	let isRemovingCharacter = $state(false);
 
 	// Leave campaign dialog state
 	let showLeaveCampaignDialog = $state(false);
@@ -73,16 +77,16 @@
 
 	// Get available characters for assignment
 	const availableCharacters = $derived(
-		user.all_characters
+		user?.all_characters
 			.filter((char) => !char.campaign_id || char.campaign_id !== campaignId)
-			.map((char) => ({ id: char.id, name: char.name || 'Unnamed Character' }))
+			.map((char) => ({ id: char.id, name: char.name || 'Unnamed Character' })) || []
 	);
 
 	// Get GM's characters not in any campaign for the add dialog
 	const availableGmCharacters = $derived(
-		user.all_characters
+		user?.all_characters
 			.filter((char) => !char.campaign_id)
-			.map((char) => ({ id: char.id, name: char.name || 'Unnamed Character' }))
+			.map((char) => ({ id: char.id, name: char.name || 'Unnamed Character' })) || []
 	);
 
 	// Check if player already has a character in this campaign
@@ -91,7 +95,7 @@
 
 	// Update the check when campaign or characters change
 	$effect(() => {
-		if (!campaignId || !isPlayer || !user.user?.clerk_id) {
+		if (!campaignId || !isPlayer || !user?.user?.clerk_id) {
 			playerHasCharacterInCampaign = false;
 			return;
 		}
@@ -116,10 +120,10 @@
 				characterId = await create_character({ campaign_id: campaignId, claimable: true });
 			} else {
 				// Player creates regular character
+				if (!user?.create_character) throw new Error('User context not available');
 				characterId = await user.create_character(campaignId);
 			}
 			showAddCharacterDialog = false;
-			addCharacterMode = 'create';
 			await campaignContext.load();
 			// Navigate to character edit screen
 			await goto(`/characters/${characterId}/edit`);
@@ -128,40 +132,46 @@
 		}
 	}
 
-	async function handleAddExistingCharacter() {
-		if (!selectedCharacterId || !campaignId) return;
+	async function handleAddExistingCharacter(characterId?: string) {
+		const idToUse = characterId || selectedCharacterId;
+		if (!idToUse || !campaignId || isAddingCharacter) return;
 
+		isAddingCharacter = true;
 		try {
 			if (isGM) {
 				// GM adds existing character as unassigned
 				const { assign_character_to_campaign } = await import('$lib/remote/campaigns.remote');
 				await assign_character_to_campaign({
-					character_id: selectedCharacterId,
+					character_id: idToUse,
 					campaign_id: campaignId,
 					claimable: true
 				});
 			} else {
 				// Player assigns existing character
-				await campaignContext.assignCharacter(selectedCharacterId, campaignId);
+				await campaignContext.assignCharacter(idToUse, campaignId);
 			}
 			showAddCharacterDialog = false;
-			addCharacterMode = 'create';
 			selectedCharacterId = '';
 			await campaignContext.load();
 		} catch (err) {
 			toast.error(err instanceof Error ? err.message : 'Failed to add character');
+		} finally {
+			isAddingCharacter = false;
 		}
 	}
 
 	async function handleRemoveCharacter() {
-		if (!characterToRemove || !campaignId) return;
+		if (!characterToRemove || !campaignId || isRemovingCharacter) return;
 
+		isRemovingCharacter = true;
 		try {
 			await campaignContext.assignCharacter(characterToRemove, null);
 			showRemoveDialog = false;
 			characterToRemove = null;
 		} catch (err) {
 			// Error handling is done in assignCharacter
+		} finally {
+			isRemovingCharacter = false;
 		}
 	}
 
@@ -169,7 +179,7 @@
 		if (!characterId || !campaignId) return;
 
 		// Check if player has reached character limit
-		if (user.all_characters.length >= 3) {
+		if (user?.all_characters?.length >= 3) {
 			showCharacterLimitDialog = true;
 			return;
 		}
@@ -208,8 +218,11 @@
 	// Reset dialog state when closed
 	$effect(() => {
 		if (!showAddCharacterDialog) {
-			addCharacterMode = 'create';
 			selectedCharacterId = '';
+			isAddingCharacter = false;
+		}
+		if (!showRemoveDialog) {
+			isRemovingCharacter = false;
 		}
 	});
 </script>
@@ -219,7 +232,7 @@
 	showClaimButton: boolean = false
 )}
 	{@const playerName =
-		char.owner_name || (char.owner_user_id === user.user?.clerk_id ? 'you' : 'Anonymous')}
+		char.owner_name || (char.owner_user_id === user?.user?.clerk_id ? 'you' : 'Anonymous')}
 
 	<div class="mx- w-full overflow-hidden rounded">
 		<a
@@ -330,9 +343,11 @@
 	<div>
 		<div class="mb-4 flex items-center justify-between">
 			<h2 class="text-lg font-semibold">Active Characters</h2>
-			<Button variant="outline" size="sm" onclick={() => (showAddCharacterDialog = true)}>
-				{isGM ? 'Add Unassigned Character' : 'Add Character'}
-			</Button>
+			{#if isGM || !playerHasCharacterInCampaign}
+				<Button variant="outline" size="sm" onclick={() => (showAddCharacterDialog = true)}>
+					Add Character
+				</Button>
+			{/if}
 		</div>
 
 		{#if assignedCharacters.length === 0 && unassignedCharacters.length === 0}
@@ -364,116 +379,101 @@
 
 	<!-- Add Character Dialog -->
 	<Dialog.Root bind:open={showAddCharacterDialog}>
-		<Dialog.Content class="sm:max-w-md">
+		<Dialog.Content class="flex max-h-[90%] flex-col sm:max-w-md">
 			<Dialog.Header>
 				<Dialog.Title>Add Character</Dialog.Title>
 				<Dialog.Description>
 					{isGM
-						? 'Create an unassigned character or add an existing character for players to claim.'
-						: 'Create a new character or assign an existing character to this campaign.'}
+						? 'Add characters to this campaign that players can claim.'
+						: 'Add one of your characters to this campaign.'}
 				</Dialog.Description>
 			</Dialog.Header>
 
-			<div class="flex flex-col gap-4 py-4">
-				<!-- Mode selection (tabs/radio buttons) -->
-				<div class="flex gap-2 border-b">
-					<button
-						type="button"
-						class={cn(
-							'flex-1 border-b-2 px-4 py-2 text-sm font-medium transition-colors',
-							addCharacterMode === 'create'
-								? 'border-primary text-foreground'
-								: 'border-transparent text-muted-foreground hover:text-foreground'
-						)}
-						onclick={() => {
-							addCharacterMode = 'create';
-							selectedCharacterId = '';
-						}}
-					>
-						{isGM ? 'Create Unassigned Character' : 'Create Character'}
-					</button>
-					<button
-						type="button"
-						class={cn(
-							'flex-1 border-b-2 px-4 py-2 text-sm font-medium transition-colors',
-							addCharacterMode === 'existing'
-								? 'border-primary text-foreground'
-								: 'border-transparent text-muted-foreground hover:text-foreground'
-						)}
-						onclick={() => {
-							addCharacterMode = 'existing';
-							selectedCharacterId = '';
-						}}
-						disabled={isGM ? availableGmCharacters.length === 0 : availableCharacters.length === 0}
-					>
-						{isGM ? 'Add Existing Character' : 'Assign Existing Character'}
-					</button>
-				</div>
-
-				{#if addCharacterMode === 'create'}
-					<div class="flex flex-col gap-2">
-						<p class="text-sm text-muted-foreground">
-							{isGM
-								? "This will create an unassigned character that players can claim. You will be able to edit the character before it's claimed."
-								: 'This will create a new character and assign it to this campaign.'}
-						</p>
-						{#if !isGM && user.all_characters.length >= 3}
-							<p class="text-sm text-destructive">
-								You have reached the character limit (3 characters).
-							</p>
-						{/if}
-					</div>
-				{:else}
-					<div class="flex flex-col gap-2">
-						<Label.Root>Character</Label.Root>
-						<Select.Root
-							type="single"
-							value={selectedCharacterId}
-							onValueChange={(v) => (selectedCharacterId = v || '')}
-						>
-							<Select.Trigger class="w-full">
-								<p class="truncate">
-									{selectedCharacterId
-										? isGM
-											? availableGmCharacters.find((c) => c.id === selectedCharacterId)?.name ||
-												'Unnamed Character'
-											: availableCharacters.find((c) => c.id === selectedCharacterId)?.name ||
-												'Unnamed Character'
-										: 'Select a character...'}
-								</p>
-							</Select.Trigger>
-							<Select.Content>
-								{#each isGM ? availableGmCharacters : availableCharacters as char}
-									<Select.Item value={char.id}>{char.name || 'Unnamed Character'}</Select.Item>
-								{/each}
-							</Select.Content>
-						</Select.Root>
-						<p class="text-sm text-muted-foreground">
-							{isGM
-								? 'This will add an existing character as unassigned for players to claim.'
-								: 'Select a character to add to this campaign.'}
+			<div class="flex flex-col gap-6 overflow-y-auto py-4">
+				{#if isGM}
+					<div class="mb-2 rounded border border-accent/20 bg-accent/10 p-2">
+						<p class="text-sm text-accent/80">
+							<TriangleAlert class="-mt-[4px] mr-[5px] inline size-3.5" />Characters you add can be
+							claimed by players. You will not be able to edit these characters unless you are the
+							GM of that character's campaign.
 						</p>
 					</div>
 				{/if}
+
+				<div class="flex flex-col gap-2">
+					<Label.Root>Add Existing Character</Label.Root>
+					<Select.Root
+						type="single"
+						value={selectedCharacterId || 'none'}
+						onValueChange={(v) => {
+							if (v === 'none') {
+								selectedCharacterId = '';
+							} else if (v) {
+								selectedCharacterId = v;
+							}
+						}}
+					>
+						<Select.Trigger class="w-full">
+							<p class="truncate">
+								{selectedCharacterId && selectedCharacterId !== 'none'
+									? isGM
+										? availableGmCharacters.find((c) => c.id === selectedCharacterId)?.name ||
+											'Unnamed Character'
+										: availableCharacters.find((c) => c.id === selectedCharacterId)?.name ||
+											'Unnamed Character'
+									: 'None'}
+							</p>
+						</Select.Trigger>
+						<Select.Content>
+							<Select.Item value="none">None</Select.Item>
+							{#each isGM ? availableGmCharacters : availableCharacters as char}
+								<Select.Item value={char.id}>{char.name || 'Unnamed Character'}</Select.Item>
+							{/each}
+						</Select.Content>
+					</Select.Root>
+				</div>
+
+				<div class="flex items-center gap-4">
+					<div class="h-px flex-1 bg-border"></div>
+					<span class="text-sm text-muted-foreground">Or</span>
+					<div class="h-px flex-1 bg-border"></div>
+				</div>
+
+				<div class="flex flex-col gap-2">
+					<Button
+						onclick={handleCreateCharacter}
+						disabled={(user?.all_characters?.length ?? 0) >= 3}
+					>
+						Create New Character
+					</Button>
+					{#if (user?.all_characters?.length ?? 0) >= 3}
+						<p class="text-xs text-muted-foreground">
+							* You have reached the character limit. Free up a character slot to create a new
+							character.
+						</p>
+					{/if}
+				</div>
 			</div>
 
 			<Dialog.Footer class="flex gap-3">
+				<div class="grow"></div>
 				<Dialog.Close
 					type="button"
 					class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
 				>
 					Cancel
 				</Dialog.Close>
-				{#if addCharacterMode === 'create'}
+				{#if selectedCharacterId && selectedCharacterId !== 'none'}
 					<Button
-						onclick={handleCreateCharacter}
-						disabled={!isGM && user.all_characters.length >= 3}
+						onclick={() => handleAddExistingCharacter(selectedCharacterId)}
+						disabled={isAddingCharacter}
 					>
-						{isGM ? 'Create Unassigned Character' : 'Create Character'}
-					</Button>
-				{:else}
-					<Button onclick={handleAddExistingCharacter} disabled={!selectedCharacterId}>
-						{isGM ? 'Add Character' : 'Assign Character'}
+						{#if isAddingCharacter}
+							<Loader2 class="size-4 animate-spin" />
+							Adding...
+						{:else}
+							Add Character
+						{/if}
 					</Button>
 				{/if}
 			</Dialog.Footer>
@@ -522,11 +522,23 @@
 					class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
 					onclick={() => {
 						characterToRemove = null;
+						isRemovingCharacter = false;
 					}}
 				>
 					Cancel
 				</Dialog.Close>
-				<Button variant="destructive" onclick={handleRemoveCharacter}>Remove</Button>
+				<Button
+					variant="destructive"
+					onclick={handleRemoveCharacter}
+					disabled={isRemovingCharacter}
+				>
+					{#if isRemovingCharacter}
+						<Loader2 class="size-4 animate-spin" />
+						Removing...
+					{:else}
+						Remove
+					{/if}
+				</Button>
 			</Dialog.Footer>
 		</Dialog.Content>
 	</Dialog.Root>

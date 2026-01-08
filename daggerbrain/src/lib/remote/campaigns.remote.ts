@@ -10,24 +10,27 @@ import {
 	campaign_characters_table
 } from '../server/db/campaigns.schema';
 import { characters_table } from '../server/db/characters.schema';
-import { get_db, get_auth, get_kv } from './utils';
+import { get_db, get_auth } from './utils';
 import { get_all_characters } from './characters.remote';
 import { getCampaignAccessInternal } from '../server/permissions';
-import {
-	rebuildCampaignCharacterCache,
-	upsertCharacterSummary,
-	removeCharacterFromSummary,
-	KV_TTL_24H
-} from './cache.service';
+// Note: KV caching for campaign state and characters has been removed for cost optimization
+// D1 reads are 500x cheaper than KV reads
 import type {
 	CampaignState,
 	CampaignCharacterSummary,
 	CampaignWithDetails,
 	Countdown
 } from '../types/campaign-types';
-import type { Character } from '../types/character-types';
 import type { DerivedCharacter } from '../types/derived-character-types';
 import type { RequestEvent } from '@sveltejs/kit';
+
+// Helper function to generate a unique invite code
+function generateInviteCode(): string {
+	const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	const array = new Uint8Array(12);
+	crypto.getRandomValues(array);
+	return Array.from(array, (b) => chars[b % chars.length]).join('');
+}
 
 // Helper function to notify Durable Object about character changes
 // Calls the DO directly instead of going through HTTP to avoid auth issues
@@ -137,6 +140,37 @@ export const get_campaign = query(z.string(), async (campaignId) => {
 	}
 
 	console.log('fetched campaign from D1');
+	return campaign;
+});
+
+export const get_campaign_by_invite_code = query(z.string(), async (inviteCode) => {
+	const event = getRequestEvent();
+	get_auth(event); // Validate authentication
+	const db = get_db(event);
+
+	// Look up campaign state by invite code
+	const [state] = await db
+		.select()
+		.from(campaign_state_table)
+		.where(eq(campaign_state_table.invite_code, inviteCode))
+		.limit(1);
+
+	if (!state) {
+		throw error(404, 'Campaign not found');
+	}
+
+	// Get the campaign by campaign_id
+	const [campaign] = await db
+		.select()
+		.from(campaigns_table)
+		.where(eq(campaigns_table.id, state.campaign_id))
+		.limit(1);
+
+	if (!campaign) {
+		throw error(404, 'Campaign not found');
+	}
+
+	console.log('fetched campaign by invite code from D1');
 	return campaign;
 });
 
@@ -251,24 +285,9 @@ export const get_user_campaigns = query(async (): Promise<CampaignWithDetails[]>
 export const get_campaign_state = query(z.string(), async (campaignId): Promise<CampaignState> => {
 	const event = getRequestEvent();
 	get_auth(event); // Validate authentication
-	const kv = get_kv(event);
 	const db = get_db(event);
 
-	// Try KV first (write-through cache) - it's updated immediately after writes
-	// This helps work around D1 eventual consistency by using KV as a fast, consistent cache
-	const kvState = (await kv.get(`campaign:${campaignId}:state`, 'json')) as CampaignState | null;
-
-	// If KV has valid state, use it (no need to read D1)
-	if (kvState && kvState.updated_at) {
-		// Backward compatibility: ensure countdowns exists
-		if (!kvState.countdowns) {
-			kvState.countdowns = [];
-		}
-		console.log('fetched campaign state from KV');
-		return kvState;
-	}
-
-	// KV is missing or invalid - read from D1
+	// Read directly from D1 (no KV caching - D1 reads are 500x cheaper than KV)
 	const [dbState] = await db
 		.select()
 		.from(campaign_state_table)
@@ -278,74 +297,125 @@ export const get_campaign_state = query(z.string(), async (campaignId): Promise<
 	// If no state exists in D1, create default
 	if (!dbState) {
 		const now = Date.now();
+		const inviteCode = generateInviteCode();
 		await db.insert(campaign_state_table).values({
 			campaign_id: campaignId,
 			fear_track: 0,
 			notes: null,
 			countdowns: [],
+			invite_code: inviteCode,
 			updated_at: now
 		});
 
-		const defaultState: CampaignState = {
+		console.log('created default campaign state in D1');
+		return {
 			campaign_id: campaignId,
 			fear_track: 0,
+			fear_visible_to_players: false,
 			notes: null,
 			countdowns: [],
+			invite_code: inviteCode,
 			updated_at: now
 		};
-
-		// Store in KV
-		await kv.put(`campaign:${campaignId}:state`, JSON.stringify(defaultState), {
-			expirationTtl: KV_TTL_24H
-		});
-
-		return defaultState;
 	}
 
-	const d1State: CampaignState = {
-		campaign_id: dbState.campaign_id,
-		fear_track: dbState.fear_track,
-		notes: dbState.notes,
-		countdowns: dbState.countdowns ?? [],
-		updated_at: dbState.updated_at
-	};
-
-	// Update KV with D1 state
-	await kv.put(`campaign:${campaignId}:state`, JSON.stringify(d1State), {
-		expirationTtl: KV_TTL_24H
-	});
+	// Handle backward compatibility: if invite_code is missing, generate one
+	let inviteCode = dbState.invite_code;
+	if (!inviteCode) {
+		inviteCode = generateInviteCode();
+		const now = Date.now();
+		await db
+			.update(campaign_state_table)
+			.set({ invite_code: inviteCode, updated_at: now })
+			.where(eq(campaign_state_table.campaign_id, campaignId));
+	}
 
 	console.log('fetched campaign state from D1');
-	return d1State;
+	return {
+		campaign_id: dbState.campaign_id,
+		fear_track: dbState.fear_track,
+		fear_visible_to_players: dbState.fear_visible_to_players ?? false,
+		notes: dbState.notes,
+		countdowns: dbState.countdowns ?? [],
+		invite_code: inviteCode,
+		updated_at: dbState.updated_at
+	};
 });
-
-// Helper function to validate and rebuild campaign character summaries
-// Now uses the shared cache service
-async function validateAndRebuildCampaignCharacters(
-	kv: ReturnType<typeof get_kv>,
-	db: ReturnType<typeof get_db>,
-	campaignId: string
-): Promise<Record<string, CampaignCharacterSummary>> {
-	return rebuildCampaignCharacterCache(kv, db, campaignId);
-}
 
 export const get_campaign_characters = query(
 	z.string(),
 	async (campaignId): Promise<Record<string, CampaignCharacterSummary>> => {
 		const event = getRequestEvent();
 		get_auth(event); // Validate authentication
-		const kv = get_kv(event);
 		const db = get_db(event);
 
-		// Try to get from KV first - trust the cache, SvelteKit query invalidation handles updates
-		const kvCharacters = await kv.get(`campaign:${campaignId}:characters`, 'json');
-		if (kvCharacters) {
-			console.log('fetched campaign characters from KV');
-			return kvCharacters as Record<string, CampaignCharacterSummary>;
+		// Read directly from D1 (no KV caching - D1 reads are 500x cheaper than KV)
+		// Get all characters in campaign
+		const characters = await db
+			.select()
+			.from(characters_table)
+			.where(eq(characters_table.campaign_id, campaignId));
+
+		if (characters.length === 0) {
+			console.log('fetched campaign characters from D1 (empty)');
+			return {};
 		}
 
-		// Cache miss - rebuild from D1
-		const summaries = await validateAndRebuildCampaignCharacters(kv, db, campaignId);
+		// Get all campaign_characters entries for claimable status
+		const campaignChars = await db
+			.select()
+			.from(campaign_characters_table)
+			.where(eq(campaign_characters_table.campaign_id, campaignId));
+
+		// Build a map of character_id -> claimable
+		const claimableMap = new Map<string, boolean>();
+		for (const cc of campaignChars) {
+			claimableMap.set(cc.character_id, cc.claimable === 1);
+		}
+
+		// Get all campaign members with display names
+		const members = await db
+			.select()
+			.from(campaign_members_table)
+			.where(eq(campaign_members_table.campaign_id, campaignId));
+
+		// Build a map of user_id -> display_name
+		const displayNameMap = new Map<string, string | null>();
+		for (const member of members) {
+			displayNameMap.set(member.user_id, member.display_name || null);
+		}
+
+		// Build summaries from D1 data
+		// Note: derived stats (max_hp, evasion, etc.) are computed client-side
+		// We use reasonable defaults here - the live session will have accurate data from DO
+		const summaries: Record<string, CampaignCharacterSummary> = {};
+
+		for (const char of characters) {
+			const owner_name = displayNameMap.get(char.clerk_user_id) || undefined;
+			const isClaimable = claimableMap.get(char.id) ?? false;
+
+			summaries[char.id] = {
+				id: char.id,
+				name: char.name,
+				image_url: char.image_url,
+				level: char.level,
+				marked_hp: char.marked_hp,
+				max_hp: 0, // Computed client-side from derived character
+				marked_stress: char.marked_stress,
+				max_stress: 6, // Default, computed client-side
+				marked_hope: char.marked_hope,
+				max_hope: 6, // Default, computed client-side
+				active_conditions: char.active_conditions,
+				owner_user_id: char.clerk_user_id,
+				owner_name,
+				derived_descriptors: char.derived_descriptors,
+				evasion: 0, // Computed client-side
+				max_armor: 0, // Computed client-side
+				marked_armor: char.marked_armor,
+				damage_thresholds: { major: 0, severe: 0 }, // Computed client-side
+				claimable: isClaimable
+			};
+		}
 
 		console.log('fetched campaign characters from D1');
 		return summaries;
@@ -369,6 +439,7 @@ export const create_campaign = command(
 
 		const campaignId = crypto.randomUUID();
 		const now = Date.now();
+		const inviteCode = generateInviteCode();
 
 		// Create campaign
 		await db.insert(campaigns_table).values({
@@ -395,20 +466,8 @@ export const create_campaign = command(
 			fear_track: 0,
 			notes: null,
 			countdowns: [],
+			invite_code: inviteCode,
 			updated_at: now
-		});
-
-		// Store state in KV
-		const kv = get_kv(event);
-		const initialState: CampaignState = {
-			campaign_id: campaignId,
-			fear_track: 0,
-			notes: null,
-			countdowns: [],
-			updated_at: now
-		};
-		await kv.put(`campaign:${campaignId}:state`, JSON.stringify(initialState), {
-			expirationTtl: KV_TTL_24H
 		});
 
 		// Refresh the query
@@ -517,7 +576,6 @@ export const join_campaign = command(
 
 		// If character_id is provided, assign it to the campaign
 		if (character_id) {
-			const kv = get_kv(event);
 			const now = Date.now();
 
 			// Update character's campaign_id
@@ -534,22 +592,11 @@ export const join_campaign = command(
 				added_at: now
 			});
 
-			// Update campaign summary
-			await upsertCharacterSummary(kv, db, campaign_id, character_id);
-
-			// Notify DO about character being added with claimable status
-			const derivedChar = (await kv.get(
-				`character:${character_id}:campaign`,
-				'json'
-			)) as DerivedCharacter | null;
-
-			if (derivedChar) {
-				await notifyDurableObject(event, campaign_id, 'character_added', {
-					characterId: character_id,
-					character: derivedChar,
-					claimable: false
-				});
-			}
+			// Notify DO about character being added (DO will fetch full data if needed)
+			await notifyDurableObject(event, campaign_id, 'character_added', {
+				characterId: character_id,
+				claimable: false
+			});
 
 			// Refresh character queries
 			get_campaign_characters(campaign_id).refresh();
@@ -562,6 +609,42 @@ export const join_campaign = command(
 
 		console.log('joined campaign in D1');
 		return { success: true };
+	}
+);
+
+export const reset_invite_code = command(
+	z.object({
+		campaign_id: z.string()
+	}),
+	async ({ campaign_id }) => {
+		const event = getRequestEvent();
+		const { userId } = get_auth(event);
+		const db = get_db(event);
+
+		// Verify user is GM of the campaign
+		const access = await getCampaignAccessInternal(db, userId, campaign_id);
+		if (!access.canEdit) {
+			throw error(403, 'Only the GM can reset the invite code');
+		}
+
+		// Generate new invite code
+		const newInviteCode = generateInviteCode();
+		const now = Date.now();
+
+		// Update database
+		await db
+			.update(campaign_state_table)
+			.set({
+				invite_code: newInviteCode,
+				updated_at: now
+			})
+			.where(eq(campaign_state_table.campaign_id, campaign_id));
+
+		// Refresh the query
+		get_campaign_state(campaign_id).refresh();
+
+		console.log('reset invite code in D1');
+		return { invite_code: newInviteCode };
 	}
 );
 
@@ -657,8 +740,6 @@ export const claim_character = command(
 			throw error(403, 'Character limit reached. You can only have 3 characters.');
 		}
 
-		const kv = get_kv(event);
-
 		// Update character ownership
 		await db
 			.update(characters_table)
@@ -676,25 +757,12 @@ export const claim_character = command(
 				)
 			);
 
-		// Update campaign summary using cache service
-		await upsertCharacterSummary(kv, db, campaign_id, character_id);
-
 		// Notify DO about character being updated (ownership changed)
-		// Fetch full DerivedCharacter from KV and update with new owner
-		const derivedChar = (await kv.get(
-			`character:${character_id}:campaign`,
-			'json'
-		)) as DerivedCharacter | null;
-
-		if (derivedChar) {
-			// Update the derived character with the new owner before sending
-			derivedChar.clerk_user_id = userId;
-			await notifyDurableObject(event, campaign_id, 'character_updated', {
-				characterId: character_id,
-				character: derivedChar,
-				claimable: false
-			});
-		}
+		await notifyDurableObject(event, campaign_id, 'character_updated', {
+			characterId: character_id,
+			updates: { clerk_user_id: userId },
+			claimable: false
+		});
 
 		// Refresh the queries
 		get_campaign_characters(campaign_id).refresh();
@@ -763,8 +831,6 @@ export const unassign_character = command(
 			throw error(403, 'You must be a member of the campaign to unassign characters');
 		}
 
-		const kv = get_kv(event);
-
 		// Set character as claimable (unassign) in campaign_characters table
 		await db
 			.update(campaign_characters_table)
@@ -776,23 +842,11 @@ export const unassign_character = command(
 				)
 			);
 
-		// Update campaign summary using cache service
-		await upsertCharacterSummary(kv, db, campaign_id, character_id);
-
 		// Notify DO about character being updated (now claimable)
-		// Fetch full DerivedCharacter from KV
-		const derivedChar = (await kv.get(
-			`character:${character_id}:campaign`,
-			'json'
-		)) as DerivedCharacter | null;
-
-		if (derivedChar) {
-			await notifyDurableObject(event, campaign_id, 'character_updated', {
-				characterId: character_id,
-				character: derivedChar,
-				claimable: true
-			});
-		}
+		await notifyDurableObject(event, campaign_id, 'character_updated', {
+			characterId: character_id,
+			claimable: true
+		});
 
 		// Refresh the queries
 		get_campaign_characters(campaign_id).refresh();
@@ -867,10 +921,6 @@ export const leave_campaign = command(z.string(), async (campaignId) => {
 			and(eq(characters_table.campaign_id, campaignId), eq(characters_table.clerk_user_id, userId))
 		);
 
-	// Update campaign character summary KV cache to reflect removed characters
-	const kv = get_kv(event);
-	await validateAndRebuildCampaignCharacters(kv, db, campaignId);
-
 	// Notify DO about removed characters
 	for (const char of charactersToRemove) {
 		await notifyDurableObject(event, campaignId, 'character_removed', {
@@ -878,8 +928,9 @@ export const leave_campaign = command(z.string(), async (campaignId) => {
 		});
 	}
 
-	// Refresh the query
+	// Refresh the queries
 	get_user_campaigns().refresh();
+	get_campaign_characters(campaignId).refresh();
 
 	console.log('left campaign in D1');
 	return { success: true };
@@ -889,33 +940,25 @@ export const leave_campaign = command(z.string(), async (campaignId) => {
 const countdownSchema = z
 	.object({
 		id: z.string(),
-		name: z.string().min(1, 'Countdown name cannot be empty'),
+		name: z.string(),
 		min: z.number(),
-		max: z.number().optional(),
 		current: z.number(),
 		visibleToPlayers: z.boolean()
 	})
 	.refine((data) => data.current >= data.min, {
 		message: 'Current value must be greater than or equal to min',
 		path: ['current']
-	})
-	.refine((data) => !data.max || data.current <= data.max, {
-		message: 'Current value must be less than or equal to max (if max is set)',
-		path: ['current']
-	})
-	.refine((data) => !data.max || data.min <= data.max, {
-		message: 'Min value must be less than or equal to max value (if max is set)',
-		path: ['min']
 	});
 
 export const update_campaign_state = command(
 	z.object({
 		campaign_id: z.string(),
 		fear_track: z.number().optional(),
+		fear_visible_to_players: z.boolean().optional(),
 		notes: z.string().nullable().optional(),
 		countdowns: z.array(countdownSchema).optional()
 	}),
-	async ({ campaign_id, fear_track, notes, countdowns }) => {
+	async ({ campaign_id, fear_track, fear_visible_to_players, notes, countdowns }) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
@@ -939,42 +982,37 @@ export const update_campaign_state = command(
 			throw error(404, 'Campaign state not found');
 		}
 
-		// Update D1
+		// Compute final values
+		const finalFearTrack = fear_track !== undefined ? fear_track : currentState.fear_track;
+		const finalFearVisibleToPlayers =
+			fear_visible_to_players !== undefined
+				? fear_visible_to_players
+				: (currentState.fear_visible_to_players ?? false);
+		const finalNotes = notes !== undefined ? notes : currentState.notes;
+		const finalCountdowns = countdowns !== undefined ? countdowns : (currentState.countdowns ?? []);
+
+		// Update D1 with all fields including fear_visible_to_players
 		await db
 			.update(campaign_state_table)
 			.set({
-				fear_track: fear_track !== undefined ? fear_track : currentState.fear_track,
-				notes: notes !== undefined ? notes : currentState.notes,
-				countdowns: countdowns !== undefined ? countdowns : (currentState.countdowns ?? []),
+				fear_track: finalFearTrack,
+				fear_visible_to_players: finalFearVisibleToPlayers,
+				notes: finalNotes,
+				countdowns: finalCountdowns,
 				updated_at: now
 			})
 			.where(eq(campaign_state_table.campaign_id, campaign_id));
 
-		// Verify the update by reading it back from D1 (handles eventual consistency)
-		const [updatedState] = await db
-			.select()
-			.from(campaign_state_table)
-			.where(eq(campaign_state_table.campaign_id, campaign_id))
-			.limit(1);
-
-		if (!updatedState) {
-			throw error(500, 'Failed to verify campaign state update');
-		}
-
+		// Build state from computed values (no need to re-read from D1)
 		const state: CampaignState = {
-			campaign_id: updatedState.campaign_id,
-			fear_track: updatedState.fear_track,
-			notes: updatedState.notes,
-			countdowns: updatedState.countdowns ?? [],
-			updated_at: updatedState.updated_at
+			campaign_id: campaign_id,
+			fear_track: finalFearTrack,
+			fear_visible_to_players: finalFearVisibleToPlayers,
+			notes: finalNotes,
+			countdowns: finalCountdowns,
+			invite_code: currentState.invite_code,
+			updated_at: now
 		};
-
-		// Update KV cache for read-only views (browse, lobby, etc.)
-		// Note: During live sessions, DO storage is authoritative, not KV
-		const kv = get_kv(event);
-		await kv.put(`campaign:${campaign_id}:state`, JSON.stringify(state), {
-			expirationTtl: KV_TTL_24H
-		});
 
 		// Update the query cache with the new value
 		await get_campaign_state(campaign_id).set(state);
@@ -982,7 +1020,7 @@ export const update_campaign_state = command(
 		// Note: Live session updates should go through WebSocket to the Durable Object
 		// This HTTP endpoint is for non-live updates or initial state setup
 
-		console.log('updated campaign state in D1 and KV');
+		console.log('updated campaign state in D1');
 		return state;
 	}
 );
@@ -1067,7 +1105,6 @@ export const assign_character_to_campaign = command(
 			}
 		}
 
-		const kv = get_kv(event);
 		const now = Date.now();
 
 		// Determine if character should be claimable
@@ -1105,8 +1142,6 @@ export const assign_character_to_campaign = command(
 						eq(campaign_characters_table.character_id, character_id)
 					)
 				);
-			// Update old campaign summary
-			await upsertCharacterSummary(kv, db, oldCampaignId, character_id);
 		}
 
 		// If assigned to campaign, insert/update join table
@@ -1144,21 +1179,11 @@ export const assign_character_to_campaign = command(
 				});
 			}
 
-			await upsertCharacterSummary(kv, db, campaign_id, character_id);
-
 			// Notify DO about character being added to campaign
-			const derivedChar = (await kv.get(
-				`character:${character_id}:campaign`,
-				'json'
-			)) as DerivedCharacter | null;
-
-			if (derivedChar) {
-				await notifyDurableObject(event, campaign_id, 'character_added', {
-					characterId: character_id,
-					character: derivedChar,
-					claimable: shouldBeClaimable
-				});
-			}
+			await notifyDurableObject(event, campaign_id, 'character_added', {
+				characterId: character_id,
+				claimable: shouldBeClaimable
+			});
 		}
 
 		// If character was removed from old campaign, notify DO
@@ -1274,10 +1299,6 @@ export const update_campaign_member = command(
 
 		// Refresh queries
 		get_campaign_members(campaign_id).refresh();
-
-		// Rebuild character cache to update owner_name fields
-		const kv = get_kv(event);
-		await validateAndRebuildCampaignCharacters(kv, db, campaign_id);
 		get_campaign_characters(campaign_id).refresh();
 
 		// Notify DO about member name update
@@ -1292,7 +1313,6 @@ export const delete_campaign = command(z.string(), async (campaignId) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
 	// Verify user is GM
 	const [campaign] = await db
@@ -1331,16 +1351,12 @@ export const delete_campaign = command(z.string(), async (campaignId) => {
 		.delete(campaign_homebrew_vault_table)
 		.where(eq(campaign_homebrew_vault_table.campaign_id, campaignId));
 
-	// Clean up KV entries
-	await kv.delete(`campaign:${campaignId}:state`);
-	await kv.delete(`campaign:${campaignId}:characters`);
-
 	// Delete campaign
 	await db.delete(campaigns_table).where(eq(campaigns_table.id, campaignId));
 
 	// Refresh the query
 	get_user_campaigns().refresh();
 
-	console.log('deleted campaign from D1 and KV');
+	console.log('deleted campaign from D1');
 	return { success: true };
 });

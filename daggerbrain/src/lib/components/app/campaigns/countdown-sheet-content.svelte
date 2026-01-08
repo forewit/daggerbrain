@@ -8,128 +8,172 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import type { Countdown } from '$lib/types/campaign-types';
-	import { error } from '@sveltejs/kit';
 
 	const campaignContext = getCampaignContext();
 	const campaignState = $derived(campaignContext.campaignState);
 	const countdowns = $derived(campaignState?.countdowns ?? []);
 
-	let newCountdownName = $state('');
-
-	async function handleAddCountdown() {
-		if (!newCountdownName.trim() || !campaignState) return;
+	function handleAddCountdown() {
+		if (!campaignContext.campaignState) return;
 
 		const newCountdown: Countdown = {
 			id: crypto.randomUUID(),
-			name: newCountdownName.trim(),
+			name: '',
 			min: 0,
 			current: 6,
 			visibleToPlayers: false
 		};
 
-		const updatedCountdowns = [...countdowns, newCountdown];
-
-		try {
-			await campaignContext.updateState({
-				countdowns: updatedCountdowns
-			});
-			// Reset form
-			newCountdownName = '';
-		} catch (err) {
-			error(500, err instanceof Error ? err.message : 'Failed to add countdown');
-		}
+		// Direct state mutation - auto-save is handled by the context's debounced effect
+		campaignContext.campaignState = {
+			...campaignContext.campaignState,
+			countdowns: [...countdowns, newCountdown]
+		};
 	}
 
-	async function handleDeleteCountdown(countdownId: string) {
-		if (!campaignState) return;
+	function handleDeleteCountdown(countdownId: string) {
+		if (!campaignContext.campaignState) return;
 
-		const updatedCountdowns = countdowns.filter((cd) => cd.id !== countdownId);
-
-		try {
-			await campaignContext.updateState({
-				countdowns: updatedCountdowns
-			});
-		} catch (err) {
-			error(500, err instanceof Error ? err.message : 'Failed to delete countdown');
-		}
+		// Direct state mutation - auto-save is handled by the context's debounced effect
+		campaignContext.campaignState = {
+			...campaignContext.campaignState,
+			countdowns: countdowns.filter((cd) => cd.id !== countdownId)
+		};
 	}
 
-	async function handleToggleVisibility(countdown: Countdown) {
-		if (!campaignState) return;
+	function handleToggleVisibility(countdown: Countdown) {
+		if (!campaignContext.campaignState) return;
 
 		const updatedCountdowns = countdowns.map((cd) =>
 			cd.id === countdown.id ? { ...cd, visibleToPlayers: !cd.visibleToPlayers } : cd
 		);
 
-		try {
-			await campaignContext.updateState({
-				countdowns: updatedCountdowns
-			});
-		} catch (err) {
-			error(500, err instanceof Error ? err.message : 'Failed to toggle countdown visibility');
-		}
+		// Direct state mutation - auto-save is handled by the context's debounced effect
+		campaignContext.campaignState = {
+			...campaignContext.campaignState,
+			countdowns: updatedCountdowns
+		};
+	}
+
+	function handleUpdateName(countdown: Countdown, newName: string) {
+		if (!campaignContext.campaignState) return;
+
+		const updatedCountdowns = countdowns.map((cd) =>
+			cd.id === countdown.id ? { ...cd, name: newName } : cd
+		);
+
+		// Direct state mutation - auto-save is handled by the context's debounced effect
+		campaignContext.campaignState = {
+			...campaignContext.campaignState,
+			countdowns: updatedCountdowns
+		};
+	}
+
+	function handleUpdateValue(countdown: Countdown, newValue: number) {
+		if (!campaignContext.campaignState) return;
+
+		// Ensure value is within bounds
+		const clampedValue = Math.max(countdown.min, newValue);
+
+		const updatedCountdowns = countdowns.map((cd) =>
+			cd.id === countdown.id ? { ...cd, current: clampedValue } : cd
+		);
+
+		// Direct state mutation - auto-save is handled by the context's debounced effect
+		campaignContext.campaignState = {
+			...campaignContext.campaignState,
+			countdowns: updatedCountdowns
+		};
 	}
 </script>
 
 <Sheet.Header>
 	<Sheet.Title>Countdowns</Sheet.Title>
+	<Sheet.Description>
+		Countdowns represent a period of time or series of events preceding a future effect.
+	</Sheet.Description>
 </Sheet.Header>
 
 <div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
-	<!-- Add New Countdown Section -->
-	<div class="flex items-center gap-2">
-		<Input
-			bind:value={newCountdownName}
-			placeholder="Enter countdown name..."
-			class="flex-1"
-			onkeydown={(e) => {
-				if (e.key === 'Enter' && newCountdownName.trim()) {
-					handleAddCountdown();
-				}
-			}}
-		/>
-		<Button size="sm" disabled={!newCountdownName.trim()} onclick={handleAddCountdown}>Add</Button>
-	</div>
-
-	{#if countdowns.length > 0}
-		<!-- Countdowns Table -->
-		<table class="w-full border-collapse text-sm">
-			<tbody>
-				{#each countdowns as countdown}
-					<tr class="border-b">
-						<td class="py-2 pr-4 text-left text-muted-foreground">
-							{countdown.name}
-						</td>
-						<td class="py-2 text-right">
-							<div class="flex items-center justify-end gap-2">
-								<Button
-									variant="ghost"
-									size="sm"
-									class="h-auto"
-									onclick={() => handleToggleVisibility(countdown)}
-									title={countdown.visibleToPlayers ? 'Hide from players' : 'Show to players'}
-								>
-									{#if countdown.visibleToPlayers}
-										<Eye class="size-3.5" />
-									{:else}
-										<EyeOff class="size-3.5" />
-									{/if}
-								</Button>
-								<Button
-									variant="ghost"
-									size="sm"
-									class="h-auto"
-									onclick={() => handleDeleteCountdown(countdown.id)}
-								>
-									<CircleMinus class="size-3.5" />
-								</Button>
-							</div>
-						</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
-	{:else}
-		<p class="py-4 text-center text-sm text-muted-foreground italic">No countdowns</p>
-	{/if}
+	<!-- Countdowns Table -->
+	<table class="w-full border-collapse text-sm">
+		<thead>
+			<tr class="border-b">
+				<th class="py-2 text-left text-xs font-medium text-muted-foreground">Name</th>
+				<th class="py-2 text-left text-xs font-medium text-muted-foreground">Value</th>
+				<th class="py-2 text-center text-xs font-medium text-muted-foreground">Visibility</th>
+				<th class="py-2 text-right"></th>
+			</tr>
+		</thead>
+		<tbody>
+			{#each countdowns as countdown, i}
+				<tr class="border-b">
+					<td class="py-2 pr-4">
+						<Input
+							value={countdown.name}
+							placeholder={`Countdown ${i + 1}`}
+							class="w-full"
+							onblur={(e) => {
+								if (e.currentTarget.value !== countdown.name) {
+									handleUpdateName(countdown, e.currentTarget.value);
+								}
+							}}
+							onkeydown={(e) => {
+								if (e.key === 'Enter') {
+									e.currentTarget.blur();
+								}
+							}}
+						/>
+					</td>
+					<td class="py-2 text-center">
+						<Input
+							type="number"
+							inputmode="numeric"
+							value={countdown.current}
+							min={countdown.min}
+							step="1"
+							class="w-16"
+							onblur={(e) => {
+								const newValue = Number(e.currentTarget.value);
+								if (!isNaN(newValue) && newValue !== countdown.current) {
+									handleUpdateValue(countdown, newValue);
+								}
+							}}
+							onkeydown={(e) => {
+								if (e.key === 'Enter') {
+									e.currentTarget.blur();
+								}
+							}}
+						/>
+					</td>
+					<td class="py-2 text-center">
+						<Button
+							variant="ghost"
+							size="sm"
+							class="h-auto"
+							onclick={() => handleToggleVisibility(countdown)}
+							title={countdown.visibleToPlayers ? 'Hide from players' : 'Show to players'}
+						>
+							{#if countdown.visibleToPlayers}
+								<Eye class="size-3.5" />
+							{:else}
+								<EyeOff class="size-3.5" />
+							{/if}
+						</Button>
+					</td>
+					<td class="py-2 text-right">
+						<Button
+							variant="ghost"
+							size="sm"
+							class="h-auto"
+							onclick={() => handleDeleteCountdown(countdown.id)}
+						>
+							<CircleMinus class="size-3.5" />
+						</Button>
+					</td>
+				</tr>
+			{/each}
+		</tbody>
+	</table>
+	<Button size="sm" onclick={handleAddCountdown}>Add Countdown</Button>
 </div>

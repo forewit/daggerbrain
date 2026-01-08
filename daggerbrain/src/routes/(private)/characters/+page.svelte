@@ -139,7 +139,7 @@
 										</div>
 									</a>
 									{#if char.campaign_id && campaignMap.has(char.campaign_id)}
-										<div class="absolute right-2 bottom-10 left-22 flex truncate">
+										<div class="absolute right-2 bottom-10.5 left-22 flex truncate">
 											<a
 												href={`/campaigns/${char.campaign_id}`}
 												class="w-min max-w-full truncate rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 text-center text-xs text-accent hover:underline"

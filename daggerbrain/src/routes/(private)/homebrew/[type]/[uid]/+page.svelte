@@ -18,7 +18,6 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { cn } from '$lib/utils';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
-	import { error } from '@sveltejs/kit';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import { beforeNavigate } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
@@ -238,13 +237,6 @@
 				default:
 					homebrewItem = null;
 			}
-		}
-	});
-
-	// Check if item is not found after loading completes
-	$effect(() => {
-		if (!homebrew.loading && homebrewItem === null) {
-			error(404, `${data.type} with UID "${data.uid}" not found`);
 		}
 	});
 

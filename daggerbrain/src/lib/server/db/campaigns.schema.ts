@@ -51,13 +51,21 @@ export const campaign_members_table_update_schema = createUpdateSchema(campaign_
 // Campaign State
 // ============================================================================
 
-export const campaign_state_table = sqliteTable('campaign_state_table', {
-	campaign_id: text('campaign_id').primaryKey().notNull(),
-	fear_track: integer('fear_track').notNull().default(0),
-	notes: text('notes'),
-	countdowns: text('countdowns', { mode: 'json' }).notNull().default('[]').$type<Countdown[]>(),
-	updated_at: integer('updated_at').notNull()
-});
+export const campaign_state_table = sqliteTable(
+	'campaign_state_table',
+	{
+		campaign_id: text('campaign_id').primaryKey().notNull(),
+		fear_track: integer('fear_track').notNull().default(0),
+		fear_visible_to_players: integer('fear_visible_to_players', { mode: 'boolean' })
+			.notNull()
+			.default(false),
+		notes: text('notes'),
+		countdowns: text('countdowns', { mode: 'json' }).notNull().default('[]').$type<Countdown[]>(),
+		invite_code: text('invite_code').notNull().unique(),
+		updated_at: integer('updated_at').notNull()
+	},
+	(table) => [index('campaign_state_table_invite_code_idx').on(table.invite_code)]
+);
 
 export const campaign_state_table_schema = createSelectSchema(campaign_state_table);
 export const campaign_state_table_insert_schema = createInsertSchema(campaign_state_table);

@@ -1,70 +1,52 @@
 <!-- src/routes/(private)/campaigns/join/[uid]/+page.svelte -->
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import * as Select from '$lib/components/ui/select';
-	import { Label } from '$lib/components/ui/label';
-	import Input from '$lib/components/ui/input/input.svelte';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
-	import { get_campaign, join_campaign } from '$lib/remote/campaigns.remote';
-	import { getUserContext } from '$lib/state/user.svelte';
+	import { getCampaignContext } from '$lib/state/campaigns.svelte';
 	import Footer from '$lib/components/app/footer.svelte';
 	import { toast } from 'svelte-sonner';
-	import type { Campaign } from '$lib/types/campaign-types';
+	import { cn } from '$lib/utils';
+	import { formatDate } from '$lib/utils';
+	import { Input } from '$lib/components/ui/input/index.js';
 
-	const campaignId = $derived($page.params.uid);
-	const user = getUserContext();
-	let loading = $state(true);
-	let campaign = $state<Campaign | null>(null);
-	let errorMessage = $state<string | null>(null);
+	let { data } = $props();
+
+	const campaignCtx = getCampaignContext();
+	const campaign = data.campaign;
+	const gmDisplayName = data.gmDisplayName;
+	const isMember = data.isMember;
+	const userRole = data.userRole;
+	const playerCount = data.playerCount;
+	const characterImages = data.characterImages;
+
+	// Set the campaign ID in context so joinCampaign can use it
+	$effect(() => {
+		if (campaign) {
+			campaignCtx.campaignId = campaign.id;
+		}
+	});
+
 	let joining = $state(false);
 	let playerName = $state('');
-	let selectedCharacterId = $state<string>('');
 
-	// Get available characters (not in any campaign)
-	const availableCharacters = $derived(
-		user.all_characters
-			.filter((char) => !char.campaign_id)
-			.map((char) => ({ id: char.id, name: char.name || 'Unnamed Character' }))
-	);
+	async function handleJoin() {
+		if (joining || isMember) return;
 
-	// Validate campaign on mount
-	$effect(() => {
-		if (!campaignId) {
-			errorMessage = 'Invalid campaign ID';
-			loading = false;
+		if (!campaign?.id) {
+			toast.error('Campaign information is missing');
 			return;
 		}
 
-		loading = true;
-		get_campaign(campaignId)
-			.then((c) => {
-				campaign = c;
-				errorMessage = null;
-			})
-			.catch((err) => {
-				const message = err instanceof Error ? err.message : 'Campaign not found';
-				errorMessage = message;
-				campaign = null;
-			})
-			.finally(() => {
-				loading = false;
-			});
-	});
-
-	async function handleJoin() {
-		if (!campaignId || joining) return;
+		// Ensure campaignId is set in context before calling joinCampaign
+		campaignCtx.campaignId = campaign.id;
 
 		joining = true;
 		try {
-			await join_campaign({
-				campaign_id: campaignId,
-				display_name: playerName.trim() || undefined,
-				character_id: selectedCharacterId || undefined
+			await campaignCtx.joinCampaign({
+				display_name: playerName.trim() || undefined
 			});
 			toast.success('Successfully joined campaign');
-			await goto(`/campaigns/${campaignId}`);
 		} catch (err) {
 			joining = false;
 			const message = err instanceof Error ? err.message : 'Failed to join campaign';
@@ -73,7 +55,7 @@
 				toast.info('You are already a member of this campaign');
 				// Redirect to campaign page since they're already a member
 				setTimeout(() => {
-					goto(`/campaigns/${campaignId}`);
+					goto(`/campaigns/${campaign.id}`);
 				}, 1000);
 			} else {
 				toast.error(message);
@@ -83,72 +65,147 @@
 </script>
 
 <div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
-	<div class="flex h-full w-full flex-col items-center justify-center gap-4 px-4 py-12">
-		{#if loading}
-			<LoaderCircle class="h-8 w-8 animate-spin text-muted-foreground" />
-			<p class="text-sm text-muted-foreground">Loading campaign...</p>
-		{:else if errorMessage}
-			<div class="flex w-full flex-col items-center justify-center py-16">
-				<p class="text-sm text-muted-foreground italic">{errorMessage}</p>
-				<p class="mt-4 text-sm text-muted-foreground italic">
-					If the issue persists <a href="/contact" class="underline">let us know</a>.
+	<!-- Campaigns footer image with fade effect - background -->
+	<div
+		class="campaigns-fade-container pointer-events-none absolute right-0 bottom-0 left-0 z-0 h-64 w-full overflow-hidden"
+	>
+		<img
+			src="/images/art/campaigns.webp"
+			alt=""
+			class="campaigns-fade-container h-full w-full object-cover object-center"
+		/>
+	</div>
+
+	<div
+		class={cn(
+			'relative z-10 flex h-full w-full flex-col items-center justify-start ',
+			'pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]'
+		)}
+	>
+		<div class="flex w-full max-w-6xl flex-col gap-6 px-4 py-6">
+			<!-- Header -->
+			<div class="flex flex-col items-center gap-2 text-center">
+				<h1 class="font-eveleth text-2xl">
+					{isMember ? 'You are already a member of this campaign' : 'Join Campaign'}
+				</h1>
+				<p class="text-sm text-muted-foreground">
+					<span class="font-bold">GM:</span>
+					{gmDisplayName || 'Anonymous'}
 				</p>
-				<Button href="/campaigns" class="mt-4">Back to Campaigns</Button>
 			</div>
-		{:else if campaign}
-			<div class="flex w-full max-w-md flex-col items-center gap-4">
-				<div class="text-center">
-					<h1 class="mb-2 text-2xl font-bold">{campaign.name}</h1>
-					{#if campaign.description}
-						<p class="text-sm text-muted-foreground">{campaign.description}</p>
-					{/if}
-				</div>
-				<form
-					class="flex w-full flex-col gap-4"
-					onsubmit={(e) => {
-						e.preventDefault();
-						handleJoin();
-					}}
+
+			<!-- Campaign Preview Card -->
+			<div class="mx-auto w-full max-w-[500px]">
+				<!-- Character Images -->
+				{#if characterImages.length > 0}
+					<div class="mx-auto -mb-6 flex flex-wrap justify-center gap-2">
+						{#each characterImages as imageUrl}
+							<div class="z-10 h-12 w-12 shrink-0 overflow-hidden rounded border-2 bg-card">
+								<img
+									src={imageUrl || '/images/portrait-placeholder.png'}
+									alt="Character"
+									class="h-full w-full object-cover"
+								/>
+							</div>
+						{/each}
+					</div>
+				{/if}
+
+				<!-- Campaign Card -->
+				<div
+					class={cn(
+						'block flex h-[148px] w-full flex-col overflow-hidden rounded-t border border-b-0 bg-card',
+						characterImages.length > 0 ? '' : ''
+					)}
 				>
-					<div class="flex flex-col gap-2">
-						<Label for="player-name">Player Name (optional)</Label>
-						<Input id="player-name" bind:value={playerName} placeholder="Enter your display name" />
-					</div>
-					<div class="flex flex-col gap-2">
-						<Label for="character-select">Character (optional)</Label>
-						<Select.Root
-							type="single"
-							value={selectedCharacterId}
-							onValueChange={(v) => (selectedCharacterId = v || '')}
+					<div class="grow">
+						<!-- Campaign Title -->
+						<div
+							class={cn('px-4 pb-1.5 text-center', characterImages.length > 0 ? 'pt-8' : 'pt-6')}
 						>
-							<Select.Trigger id="character-select" class="w-full">
-								<p class="truncate">
-									{selectedCharacterId
-										? availableCharacters.find((c) => c.id === selectedCharacterId)?.name ||
-											'Unnamed Character'
-										: 'Join without character'}
-								</p>
-							</Select.Trigger>
-							<Select.Content>
-								<Select.Item value="">Join without character</Select.Item>
-								{#each availableCharacters as char}
-									<Select.Item value={char.id}>{char.name}</Select.Item>
-								{/each}
-							</Select.Content>
-						</Select.Root>
+							<p class="truncate text-xl font-bold">{campaign.name}</p>
+						</div>
+
+						<!-- Start Date -->
+						<div class="px-4 pb-5 text-center">
+							<p class="text-xs font-medium text-muted-foreground">
+								Campaign Started {formatDate(campaign.created_at)}
+							</p>
+						</div>
 					</div>
-					<Button type="submit" disabled={joining} class="w-full">
-						{#if joining}
-							<LoaderCircle class="mr-2 h-4 w-4 animate-spin" />
-							Joining...
-						{:else}
-							Join Campaign
+
+					<div class="flex items-center justify-center gap-4 px-4 pb-5">
+						<!-- Player Count -->
+						<div class="flex items-center gap-2 text-center">
+							<p class="text-[10px] font-medium text-muted-foreground uppercase">Players</p>
+							<p class="flex font-eveleth">{playerCount}</p>
+						</div>
+
+						<!-- Role (only show if user is already a member) -->
+						{#if isMember && userRole}
+							<div class="flex items-center gap-2 text-center">
+								<p class="text-[10px] font-medium text-muted-foreground uppercase">Role</p>
+								<p class="flex font-eveleth text-xs">
+									{userRole === 'gm' ? 'Game Master' : 'Player'}
+								</p>
+							</div>
 						{/if}
-					</Button>
-				</form>
+					</div>
+				</div>
 			</div>
-		{/if}
+
+			<!-- Join information -->
+			<div class="mx-auto mt-2 w-full max-w-[400px]">
+				{#if isMember}
+					<Button
+						size="sm"
+						class="hover:text-text w-full rounded border"
+						href={`/campaigns/${campaign.id}`}
+					>
+						View Campaign
+					</Button>
+				{:else}
+					<form
+						class="flex flex-col gap-6"
+						onsubmit={(e) => {
+							e.preventDefault();
+							handleJoin();
+						}}
+					>
+						<div class="flex flex-col gap-2">
+							<label for="display-name" class="text-sm font-medium">Display Name (optional)</label>
+							<Input
+								id="display-name"
+								type="text"
+								placeholder="Enter your display name"
+								bind:value={playerName}
+							/>
+							<p class="text-xs text-muted-foreground">
+								This is how other players will see your name in this campaign.
+							</p>
+						</div>
+						<Button type="submit" class="w-full" size="sm" disabled={joining}>
+							{#if joining}
+								<LoaderCircle class="mr-2 h-4 w-4 animate-spin" />
+								Joining...
+							{:else}
+								Join Campaign
+							{/if}
+						</Button>
+					</form>
+				{/if}
+			</div>
+		</div>
 	</div>
 </div>
 
 <Footer />
+
+<style>
+	.campaigns-fade-container {
+		mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
+		-webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
+		mask-size: 100% 100%;
+		-webkit-mask-size: 100% 100%;
+	}
+</style>

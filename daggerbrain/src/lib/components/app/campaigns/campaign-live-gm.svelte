@@ -2,7 +2,7 @@
 <script lang="ts">
 	import Fear from '$lib/components/app/sheet/fear.svelte';
 	import CharacterPreview from './character-preview.svelte';
-	import Countdown from './countdown.svelte';
+	import Countdown from '../sheet/countdown.svelte';
 	import CountdownSheetContent from './countdown-sheet-content.svelte';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
@@ -10,8 +10,6 @@
 	import { cn } from '$lib/utils';
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
 	import { getUserContext } from '$lib/state/user.svelte';
-	import { error } from '@sveltejs/kit';
-	import type { Countdown as CountdownType } from '$lib/types/campaign-types';
 
 	let {
 		campaignId,
@@ -27,7 +25,8 @@
 	// Get data from context
 	const campaignState = $derived(campaignContext.campaignState);
 	const characters = $derived(campaignContext.characters);
-	const characterList = $derived(Object.values(characters));
+	// Filter to only show assigned (non-claimable) characters
+	const characterList = $derived(Object.values(characters).filter((char) => !char.claimable));
 	const countdowns = $derived(campaignState?.countdowns ?? []);
 
 	// Local state for fear (for change tracking)
@@ -43,43 +42,36 @@
 		}
 	});
 
-	async function handleUpdateFear(newValue: number) {
-		if (!campaignId) return;
+	function handleUpdateFear(newValue: number) {
+		if (!campaignContext.campaignState) return;
 
 		localFear = newValue;
 
-		// Auto-save fear changes via WebSocket
-		try {
-			await campaignContext.updateState({
-				fear_track: newValue
-			});
-			// State will be updated via WebSocket message handler
-			// The $effect watching campaignState will sync localFear automatically
-		} catch (err) {
-			error(500, err instanceof Error ? err.message : 'Failed to update fear track');
-		}
+		// Direct state mutation - auto-save is handled by the context's debounced effect
+		campaignContext.campaignState = {
+			...campaignContext.campaignState,
+			fear_track: newValue
+		};
 	}
 
-	async function handleUpdateCountdown() {
-		if (!campaignId) return;
+	function handleUpdateCountdown() {
+		if (!campaignContext.campaignState) return;
 
-		try {
-			await campaignContext.updateState({
-				countdowns: countdowns
-			});
-		} catch (err) {
-			error(500, err instanceof Error ? err.message : 'Failed to update countdown');
-		}
+		// Direct state mutation - auto-save is handled by the context's debounced effect
+		campaignContext.campaignState = {
+			...campaignContext.campaignState,
+			countdowns: countdowns
+		};
 	}
 </script>
 
-<div class="mb-6 flex w-full flex-col gap-8">
+<div class="mb-6 flex w-full flex-col">
 	<!-- Fear Tracker -->
 	<Fear class="mx-auto mt-6" bind:fearValue={localFear} onUpdate={handleUpdateFear} isGM={true} />
 
 	<!-- Countdowns -->
 	{#if countdowns.length > 0}
-		<div class="flex flex-wrap justify-center gap-4">
+		<div class="mt-4 flex flex-wrap justify-center gap-4">
 			{#each countdowns as countdown, index (countdown.id)}
 				<Countdown
 					bind:countdown={countdowns[index]}
@@ -92,31 +84,31 @@
 	{/if}
 
 	<!-- Characters -->
-	{#if characterList.length > 0}
-		<div
-			class="flex flex-col items-center border-accent/10 bg-accent/5 px-2 py-8 sm:mx-auto sm:rounded-3xl sm:border sm:px-8 sm:py-6"
-		>
-			<div class="mb-8 flex items-center justify-center gap-4 sm:mb-6">
-				<p class="text-center font-eveleth text-accent">Characters</p>
-				<label
-					class={cn(
-						buttonVariants({ variant: 'outline', size: 'sm' }),
-						'cursor-pointer gap-3 rounded-full border-accent/10 px-4 text-accent hover:text-accent',
-						showPreviews && ' bg-accent/5  hover:bg-accent/10 '
-					)}
-				>
-					Previews
-					<Switch
-						class="data-[state=checked]:bg-accent/50 data-[state=unchecked]:bg-accent/15"
-						checked={showPreviews}
-						onCheckedChange={(checked) => (showPreviews = checked)}
-					/>
-				</label>
-			</div>
-
-			<div
-				class="grid grid-cols-[400px] gap-6 min-[916px]:grid-cols-[repeat(2,400px)] min-[1348px]:grid-cols-[repeat(3,400px)]"
+	<div
+		class="mt-8 flex flex-col items-center border-accent/10 bg-accent/5 px-2 py-8 sm:mx-auto sm:rounded-3xl sm:border sm:px-8 sm:py-6"
+	>
+		<div class="mb-8 flex items-center justify-center gap-4 sm:mb-6">
+			<p class="text-center font-eveleth text-accent">Characters</p>
+			<label
+				class={cn(
+					buttonVariants({ variant: 'outline', size: 'sm' }),
+					'cursor-pointer gap-3 rounded-full border-accent/10 px-4 text-accent hover:text-accent',
+					showPreviews && ' bg-accent/5  hover:bg-accent/10 '
+				)}
 			>
+				Previews
+				<Switch
+					class="data-[state=checked]:bg-accent/50 data-[state=unchecked]:bg-accent/15"
+					checked={showPreviews}
+					onCheckedChange={(checked: boolean | undefined) => (showPreviews = checked ?? false)}
+				/>
+			</label>
+		</div>
+
+		<div
+			class="grid grid-cols-[400px] gap-6 min-[916px]:grid-cols-[repeat(2,400px)] min-[1348px]:grid-cols-[repeat(3,400px)]"
+		>
+			{#if characterList.length > 0}
 				{#if showPreviews}
 					<!-- Character Previews Grid -->
 					{#each characterList as character}
@@ -178,9 +170,11 @@
 						</div>
 					{/each}
 				{/if}
-			</div>
+			{:else}
+				<p class="py-8 text-center text-xs text-accent/80">No active characters in this campaign</p>
+			{/if}
 		</div>
-	{/if}
+	</div>
 </div>
 
 <!-- Countdown Management Sheet -->

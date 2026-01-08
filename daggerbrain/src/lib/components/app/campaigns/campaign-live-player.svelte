@@ -1,7 +1,7 @@
 <!-- src/lib/components/app/campaigns/campaign-live-player.svelte -->
 <script lang="ts">
 	import Fear from '$lib/components/app/sheet/fear.svelte';
-	import Countdown from './countdown.svelte';
+	import Countdown from '../sheet/countdown.svelte';
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
 	import type { Countdown as CountdownType } from '$lib/types/campaign-types';
 

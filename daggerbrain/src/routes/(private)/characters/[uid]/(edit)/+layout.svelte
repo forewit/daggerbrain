@@ -24,20 +24,10 @@
 	const user = getUserContext();
 
 	// Check both user loading and character context loading
-	// This prevents race condition where "Character not found" is shown briefly
-	// when loading a character accessible via GM permissions
 	const isLoading = $derived.by(() => {
 		const userLoading = user?.loading;
 		const contextLoading = context?.loading;
 		return userLoading || contextLoading;
-	});
-
-	// Character context handles permission checking, so we just check if character is null
-	// Wait for both user and character context to finish loading before showing "not found"
-	const characterNotFound = $derived.by(() => {
-		const loading = isLoading;
-		const hasCharacter = character !== null;
-		return !loading && !hasCharacter;
 	});
 
 	// Redirect if permission check completes and user can't edit
@@ -115,11 +105,6 @@
 		<div class="absolute inset-0 flex items-center justify-center">
 			<LoaderCircle class="h-8 w-8 animate-spin text-muted-foreground" />
 		</div>
-	</div>
-{:else if characterNotFound}
-	<div class="flex flex-col items-center justify-center gap-4 px-4 py-12">
-		<p class="text-sm text-muted-foreground italic">Character not found</p>
-		<Button href="/characters">Back to Characters</Button>
 	</div>
 {:else if !canEdit}
 	<div class="flex flex-col items-center justify-center gap-4 px-4 py-12">
