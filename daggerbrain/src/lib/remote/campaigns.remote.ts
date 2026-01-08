@@ -10,7 +10,7 @@ import {
 	campaign_characters_table
 } from '../server/db/campaigns.schema';
 import { characters_table } from '../server/db/characters.schema';
-import { get_db, get_auth } from './utils';
+import { get_db, get_auth, CHARACTER_LIMIT } from './utils';
 import { get_all_characters } from './characters.remote';
 import { getCampaignAccessInternal } from '../server/permissions';
 // Note: KV caching for campaign state and characters has been removed for cost optimization
@@ -544,8 +544,8 @@ export const join_campaign = command(
 				.from(characters_table)
 				.where(eq(characters_table.clerk_user_id, userId));
 
-			if (existingCharacters.length >= 3) {
-				throw error(403, 'Character limit reached. You can only have 3 characters.');
+			if (existingCharacters.length >= CHARACTER_LIMIT) {
+				throw error(403, `Character limit reached. You can only have ${CHARACTER_LIMIT} characters.`);
 			}
 		}
 
@@ -736,8 +736,8 @@ export const claim_character = command(
 			.from(characters_table)
 			.where(eq(characters_table.clerk_user_id, userId));
 
-		if (existingCharacters.length >= 3) {
-			throw error(403, 'Character limit reached. You can only have 3 characters.');
+		if (existingCharacters.length >= CHARACTER_LIMIT) {
+			throw error(403, `Character limit reached. You can only have ${CHARACTER_LIMIT} characters.`);
 		}
 
 		// Update character ownership

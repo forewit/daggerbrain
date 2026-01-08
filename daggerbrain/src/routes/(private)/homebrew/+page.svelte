@@ -40,7 +40,7 @@
 	import Filter from '@lucide/svelte/icons/filter';
 	import { goto } from '$app/navigation';
 	import type { HomebrewType } from '$lib/types/homebrew-types';
-	import { MAX_HOMEBREW } from '$lib/types/homebrew-types';
+	import { UI_HOMEBREW_LIMIT } from '$lib/types/constants';
 
 	const homebrew = getHomebrewContext();
 	const compendium = getCompendiumContext();
@@ -891,7 +891,7 @@
 	);
 
 	// Check if all types are at limit
-	let atLimit = $derived(totalCount >= MAX_HOMEBREW);
+	let atLimit = $derived(totalCount >= UI_HOMEBREW_LIMIT);
 
 	// Handle delete
 	function openDeleteDialog(
@@ -1180,7 +1180,7 @@
 						<span
 							class="rounded-full border bg-card px-2 py-0.5 text-base tracking-widest text-muted-foreground"
 						>
-							{totalCount}/{MAX_HOMEBREW}
+							{totalCount}/{UI_HOMEBREW_LIMIT}
 						</span>
 					</p>
 

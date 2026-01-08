@@ -8,8 +8,8 @@
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
 	import { getUserContext } from '$lib/state/user.svelte';
 	import { toast } from 'svelte-sonner';
-	import { error } from '@sveltejs/kit';
 	import { goto } from '$app/navigation';
+	import { UI_CHARACTER_LIMIT } from '$lib/types/constants';
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
@@ -442,11 +442,11 @@
 				<div class="flex flex-col gap-2">
 					<Button
 						onclick={handleCreateCharacter}
-						disabled={(user?.all_characters?.length ?? 0) >= 3}
+						disabled={(user?.all_characters?.length ?? 0) >= UI_CHARACTER_LIMIT}
 					>
 						Create New Character
 					</Button>
-					{#if (user?.all_characters?.length ?? 0) >= 3}
+					{#if (user?.all_characters?.length ?? 0) >= UI_CHARACTER_LIMIT}
 						<p class="text-xs text-muted-foreground">
 							* You have reached the character limit. Free up a character slot to create a new
 							character.

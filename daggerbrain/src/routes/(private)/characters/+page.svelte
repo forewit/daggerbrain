@@ -10,6 +10,7 @@
 	import { getUserContext } from '$lib/state/user.svelte';
 	import { error } from '@sveltejs/kit';
 	import Footer from '$lib/components/app/footer.svelte';
+	import { UI_CHARACTER_LIMIT } from '$lib/types/constants';
 
 	const user = getUserContext();
 
@@ -19,10 +20,10 @@
 	let creatingCharacter = $state(false);
 
 	// Check if user is at character limit (3 characters max)
-	let isAtLimit = $derived(user.all_characters.length >= 3);
+	let isAtLimit = $derived(user.all_characters.length >= UI_CHARACTER_LIMIT);
 
 	// Calculate title with character count
-	let titleText = $derived(`${user.all_characters.length}/3`);
+	let titleText = $derived(`${user.all_characters.length}/${UI_CHARACTER_LIMIT}`);
 
 	// Create campaign lookup map for O(1) campaign name lookups
 	let campaignMap = $derived(new Map(user.all_campaigns.map((c) => [c.id, c.name])));

@@ -11,4 +11,10 @@ export type HomebrewType =
 	| 'community-cards'
 	| 'transformation-cards';
 
-export const MAX_HOMEBREW = 5;
+
+export type EnabledHomebrewTypes = 
+ | 'weapon'
+ | 'armor'
+ | 'beastform'
+ | 'loot'
+ | 'consumable'
