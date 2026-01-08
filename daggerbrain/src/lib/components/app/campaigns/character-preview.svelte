@@ -18,10 +18,12 @@
 
 	let {
 		character,
-		campaignId
+		campaignId,
+		canEdit = false
 	}: {
 		character: CampaignCharacterSummary;
 		campaignId: string;
+		canEdit?: boolean;
 	} = $props();
 
 	const user = getUserContext();
@@ -49,7 +51,10 @@
 			<div class="mt-3 mb-2.5 flex h-9 max-w-[400px] min-w-0 items-center truncate overflow-hidden">
 				<a
 					href={`/characters/${character.id}/class/`}
-					class="group relative grid h-full min-w-[72px] place-items-center overflow-hidden rounded-l-full border-b border-accent/10 bg-accent/10 pr-3 pl-4 text-xs font-medium text-accent hover:bg-accent/20"
+					class={cn(
+						'group relative grid h-full min-w-[72px] place-items-center overflow-hidden rounded-l-full border-b border-accent/10 bg-accent/10 pr-3 pl-4 text-xs font-medium text-accent hover:bg-accent/20',
+						!canEdit && 'pointer-events-none'
+					)}
 				>
 					<span class="transition-transform duration-200 group-hover:-translate-y-[150%]">
 						Level {character.level}
@@ -64,7 +69,8 @@
 					href={`/characters/${character.id}/class/`}
 					class={cn(
 						'h-full  justify-start gap-2 truncate  rounded-l-none rounded-r-full',
-						'border-0 border-b'
+						'border-0 border-b',
+						!canEdit && 'pointer-events-none'
 					)}
 					variant="outline"
 				>
@@ -74,7 +80,9 @@
 						{character.derived_descriptors.primary_subclass_name || 'No subclass'}
 					</p>
 					<div class="grow"></div>
-					<Pencil class="mr-1 size-3 stroke-3" />
+					{#if canEdit}
+						<Pencil class="mr-1 size-3 stroke-3" />
+					{/if}
 				</Button>
 			</div>
 

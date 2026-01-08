@@ -17,7 +17,7 @@
 	import CampaignVault from '$lib/components/app/campaigns/campaign-vault.svelte';
 	import CampaignNotes from '$lib/components/app/campaigns/campaign-notes.svelte';
 	import CampaignCharacters from '$lib/components/app/campaigns/campaign-characters.svelte';
-	import CampaignHeader from '$lib/components/app/campaigns/campaign-header.svelte';
+	import CampaignHeader from '$lib/components/app/campaigns/campaign-overview-header.svelte';
 	import { page } from '$app/state';
 
 	let { data }: { data: import('./$types').PageData } = $props();

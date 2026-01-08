@@ -6,12 +6,10 @@
 
 	let {
 		fearValue = $bindable(0),
-		onUpdate,
 		isGM = false,
 		class: className = ''
 	}: {
 		fearValue?: number;
-		onUpdate: (value: number) => void;
 		isGM?: boolean;
 		class?: string;
 	} = $props();
@@ -24,7 +22,6 @@
 		<Button
 			onclick={() => {
 				fearValue = Math.max(0, fearValue - 1);
-				onUpdate(fearValue);
 			}}
 			variant="ghost"
 			hidden={!isGM}
@@ -39,7 +36,6 @@
 		<Button
 			onclick={() => {
 				fearValue = Math.max(0, fearValue + 1);
-				onUpdate(fearValue);
 			}}
 			variant="ghost"
 			hidden={!isGM}
@@ -97,7 +93,6 @@
 						} else {
 							fearValue = fearLevel;
 						}
-						onUpdate(fearValue);
 					}}
 					type="button"
 					class={cn('disabled:cursor-default')}

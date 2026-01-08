@@ -5,30 +5,21 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Eye from '@lucide/svelte/icons/eye';
 	import EyeOff from '@lucide/svelte/icons/eye-off';
-	import { getCampaignContext } from '$lib/state/campaigns.svelte';
 
 	let {
 		countdown = $bindable<Countdown>(),
 		isGM = false,
-		onUpdate = () => {},
 		class: className = '',
 		onClickCountdown = () => {}
 	}: {
 		countdown: Countdown;
 		isGM?: boolean;
-		onUpdate?: (value: number) => void;
 		class?: string;
 		onClickCountdown?: () => void;
 	} = $props();
 
-	const campaignContext = getCampaignContext();
-	const campaignState = $derived(campaignContext.campaignState);
-	const countdowns = $derived(campaignState?.countdowns ?? []);
-
 	// Rotation state for animation
 	let rotation = $state(0);
-
-	const isZero = $derived(countdown.current === 0);
 
 	function handleHourglassClick() {
 		if (!isGM) return;
@@ -38,7 +29,6 @@
 
 		// Decrement countdown
 		countdown.current = Math.max(countdown.min, countdown.current - 1);
-		onUpdate(countdown.current);
 	}
 
 	function handleHourglassRightClick(e: MouseEvent) {
@@ -52,7 +42,6 @@
 
 		// Increment countdown
 		countdown.current = countdown.current + 1;
-		onUpdate(countdown.current);
 	}
 
 	// Only validate min value, don't call onUpdate from effect
@@ -80,7 +69,7 @@
 	<button
 		class={cn(
 			'relative flex size-12 items-center justify-center overflow-visible',
-			isZero && ' text-accent'
+			countdown.current === 0 && ' text-accent'
 		)}
 		onclick={handleHourglassClick}
 		oncontextmenu={handleHourglassRightClick}

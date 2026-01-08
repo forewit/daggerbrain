@@ -2,81 +2,72 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
-	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
-	import Hourglass from '@lucide/svelte/icons/hourglass';
 	import Footer from '$lib/components/app/footer.svelte';
 	import { page } from '$app/state';
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
-	import CampaignLivePlayer from '$lib/components/app/campaigns/campaign-live-player.svelte';
-	import CampaignLiveGm from '$lib/components/app/campaigns/campaign-live-gm.svelte';
+	import CampaignLiveHeader from '$lib/components/app/campaigns/campaign-live-header.svelte';
+	import CampaignLiveCharacters from '$lib/components/app/campaigns/campaign-live-characters.svelte';
+	import Fear from '$lib/components/app/sheet/fear.svelte';
+	import Countdown from '$lib/components/app/sheet/countdown.svelte';
+	import CountdownSheet from '$lib/components/app/campaigns/countdown-sheet.svelte';
 	import { cn } from '$lib/utils';
 
-	let { data }: { data: import('../$types').PageData } = $props();
+	let { data } = $props();
 
-	const campaignId = $derived(page.params.id);
-	const campaign = getCampaignContext();
-	const loading = $derived(campaign.loading);
+	const campaignContext = getCampaignContext();
+	const isGM = $derived(data.role === 'gm');
 
 	// Countdown sheet state
 	let countdownSheetOpen = $state(false);
 </script>
 
 <div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
-	{#if loading}
+	{#if campaignContext.loading || !campaignContext.campaign || !campaignContext.campaignState || !campaignContext.campaignId}
 		<div class="absolute inset-0 flex items-center justify-center">
 			<LoaderCircle class="h-8 w-8 animate-spin text-muted-foreground" />
 		</div>
-	{:else if !campaign.campaign}
-		<div class="flex flex-col items-center justify-center gap-4 px-4 py-12">
-			<p class="text-sm text-muted-foreground italic">Campaign not found</p>
-			<Button href="/campaigns">Campaigns</Button>
-		</div>
 	{:else}
-		<!-- Header -->
-		<div
-			class="sticky top-[calc(var(--navbar-height,3.5rem)-1px)] z-20 w-full bg-background sm:top-0"
-		>
-			<div class="w-full bg-primary/50">
-				<div
-					class="relative mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-2 px-4"
-				>
-					<div class="flex items-center gap-2">
-						<Button href={`/campaigns/${campaignId}`} variant="link">
-							<ChevronLeft />
-							{campaign.campaign?.name}
-						</Button>
-					</div>
-					{#if data.role === 'gm'}
-						<div class="flex shrink-0 items-center gap-2">
-							<Button
-								variant="outline"
-								size="sm"
-								onclick={() => (countdownSheetOpen = true)}
-								class="h-7"
-							>
-								<Hourglass class="size-3.5" />
-								<p class="hidden sm:block">Countdowns</p>
-							</Button>
-						</div>
-					{/if}
-				</div>
-			</div>
-		</div>
+		<CampaignLiveHeader
+			campaignId={campaignContext.campaignId}
+			{isGM}
+			onCountdownClick={() => (countdownSheetOpen = true)}
+		/>
 		<div
 			class={cn(
 				'relative z-10 flex h-full w-full flex-col items-center justify-start ',
 				'pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]'
 			)}
 		>
-			<div class="flex w-full">
-				{#if data.role === 'gm' && campaignId}
-					<CampaignLiveGm {campaignId} bind:countdownSheetOpen />
-				{:else if campaignId}
-					<CampaignLivePlayer {campaignId} />
+			<div class="mb-6 flex w-full flex-col">
+				<!-- Fear Tracker -->
+				<Fear
+					class="mx-auto mt-6"
+					bind:fearValue={campaignContext.campaignState.fear_track}
+					{isGM}
+				/>
+
+				<!-- Countdowns -->
+				{#if campaignContext.campaignState.countdowns.length > 0}
+					<div class={cn('mt-6 flex flex-wrap justify-center gap-4', isGM && 'mt-4')}>
+						{#each campaignContext.campaignState.countdowns as countdown, index (countdown.id)}
+							<Countdown
+								bind:countdown={campaignContext.campaignState.countdowns[index]}
+								{isGM}
+								onClickCountdown={() => (countdownSheetOpen = true)}
+							/>
+						{/each}
+					</div>
 				{/if}
+				<!-- Characters (GM only) -->
+				<CampaignLiveCharacters {isGM} />
 			</div>
 		</div>
 	{/if}
 </div>
 
 <Footer />
+
+<!-- Countdown Management Sheet -->
+{#if isGM}
+	<CountdownSheet bind:open={countdownSheetOpen} />
+{/if}
