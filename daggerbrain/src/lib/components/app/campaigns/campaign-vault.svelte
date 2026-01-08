@@ -7,9 +7,14 @@
 	import * as Select from '$lib/components/ui/select';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
-	import type { HomebrewType } from '$lib/types/homebrew-types';
+	import { ENABLED_HOMEBREW_TYPES, type HomebrewType } from '$lib/types/homebrew-types';
 
 	let { campaignId }: { campaignId: string } = $props();
+
+	// Helper to check if a homebrew type is enabled
+	function isTypeEnabled(type: HomebrewType): boolean {
+		return (ENABLED_HOMEBREW_TYPES as readonly string[]).includes(type);
+	}
 
 	const campaignContext = getCampaignContext();
 	const vaultItems = $derived(campaignContext.vaultItems);
@@ -216,12 +221,63 @@
 							<Select.Item value="loot">Loot</Select.Item>
 							<Select.Item value="consumable">Consumable</Select.Item>
 							<Select.Item value="beastform">Beastform</Select.Item>
-							<Select.Item value="class">Class</Select.Item>
-							<Select.Item value="subclass">Subclass</Select.Item>
-							<Select.Item value="domain-cards">Domain Card</Select.Item>
-							<Select.Item value="ancestry-cards">Ancestry Card</Select.Item>
-							<Select.Item value="community-cards">Community Card</Select.Item>
-							<Select.Item value="transformation-cards">Transformation Card</Select.Item>
+							<Select.Item value="class" disabled={!isTypeEnabled('class')}>
+								<div class="flex grow items-center gap-2">
+									Class
+									{#if !isTypeEnabled('class')}<span
+											class="ml-auto rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 text-[10px] text-accent"
+											>Coming Soon</span
+										>{/if}
+								</div>
+							</Select.Item>
+							<Select.Item value="subclass" disabled={!isTypeEnabled('subclass')}>
+								<div class="flex grow items-center gap-2">
+									Subclass
+									{#if !isTypeEnabled('subclass')}<span
+											class="ml-auto rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 text-[10px] text-accent"
+											>Coming Soon</span
+										>{/if}
+								</div>
+							</Select.Item>
+							<Select.Item value="domain-cards" disabled={!isTypeEnabled('domain-cards')}>
+								<div class="flex grow items-center gap-2">
+									Domain Card
+									{#if !isTypeEnabled('domain-cards')}<span
+											class="ml-auto rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 text-[10px] text-accent"
+											>Coming Soon</span
+										>{/if}
+								</div>
+							</Select.Item>
+							<Select.Item value="ancestry-cards" disabled={!isTypeEnabled('ancestry-cards')}>
+								<div class="flex grow items-center gap-2">
+									Ancestry Card
+									{#if !isTypeEnabled('ancestry-cards')}<span
+											class="ml-auto rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 text-[10px] text-accent"
+											>Coming Soon</span
+										>{/if}
+								</div>
+							</Select.Item>
+							<Select.Item value="community-cards" disabled={!isTypeEnabled('community-cards')}>
+								<div class="flex grow items-center gap-2">
+									Community Card
+									{#if !isTypeEnabled('community-cards')}<span
+											class="ml-auto rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 text-[10px] text-accent"
+											>Coming Soon</span
+										>{/if}
+								</div>
+							</Select.Item>
+							<Select.Item
+								value="transformation-cards"
+								disabled={!isTypeEnabled('transformation-cards')}
+							>
+								<div class="flex grow items-center gap-2">
+									Transformation Card
+									{#if !isTypeEnabled('transformation-cards')}<span
+											class="ml-auto rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 text-[10px] text-accent"
+											>Coming Soon</span
+										>{/if}
+								</div>
+							</Select.Item>
 						</Select.Content>
 					</Select.Root>
 				</div>

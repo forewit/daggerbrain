@@ -545,7 +545,10 @@ export const join_campaign = command(
 				.where(eq(characters_table.clerk_user_id, userId));
 
 			if (existingCharacters.length >= CHARACTER_LIMIT) {
-				throw error(403, `Character limit reached. You can only have ${CHARACTER_LIMIT} characters.`);
+				throw error(
+					403,
+					`Character limit reached. You can only have ${CHARACTER_LIMIT} characters.`
+				);
 			}
 		}
 

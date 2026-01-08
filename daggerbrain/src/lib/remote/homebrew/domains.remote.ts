@@ -7,7 +7,12 @@ import { DomainSchema, DomainCardSchema } from '$lib/compendium/compendium-schem
 import type { Domain, DomainCard, DomainIds } from '$lib/types/compendium-types';
 import { homebrew_domains, homebrew_domain_cards } from '$lib/server/db/homebrew.schema';
 import { campaign_homebrew_vault_table } from '../../server/db/campaigns.schema';
-import { verifyOwnership, getTotalHomebrewCount, HOMEBREW_LIMIT } from './utils';
+import {
+	verifyOwnership,
+	getTotalHomebrewCount,
+	HOMEBREW_LIMIT,
+	assertHomebrewTypeEnabled
+} from './utils';
 
 // ============================================================================
 // Domains
@@ -33,6 +38,7 @@ export const get_homebrew_domains = query(async () => {
 });
 
 export const create_homebrew_domain = command(DomainSchema, async (data) => {
+	assertHomebrewTypeEnabled('domain-cards');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -65,6 +71,7 @@ export const create_homebrew_domain = command(DomainSchema, async (data) => {
 export const update_homebrew_domain = command(
 	z.object({ id: z.string(), data: DomainSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('domain-cards');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
@@ -93,6 +100,7 @@ export const update_homebrew_domain = command(
 );
 
 export const delete_homebrew_domain = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('domain-cards');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -153,6 +161,7 @@ export const get_homebrew_domain_cards = query(async () => {
 });
 
 export const create_homebrew_domain_card = command(DomainCardSchema, async (data) => {
+	assertHomebrewTypeEnabled('domain-cards');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -186,6 +195,7 @@ export const create_homebrew_domain_card = command(DomainCardSchema, async (data
 export const update_homebrew_domain_card = command(
 	z.object({ id: z.string(), data: DomainCardSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('domain-cards');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
@@ -217,6 +227,7 @@ export const update_homebrew_domain_card = command(
 );
 
 export const delete_homebrew_domain_card = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('domain-cards');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);

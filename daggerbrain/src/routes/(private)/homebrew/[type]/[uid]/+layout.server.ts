@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 import { getHomebrewAccess } from '$lib/remote/permissions.remote';
 import type { HomebrewTableType } from '$lib/types/permissions-types';
+import { isEnabledHomebrewType, type HomebrewType } from '$lib/types/homebrew-types';
 
 // Map URL types to database table types
 // Some URL types map to multiple DB types (e.g., 'weapon' -> primary_weapons OR secondary_weapons)
@@ -29,6 +30,11 @@ export const load: LayoutServerLoad = async ({ params }) => {
 	const dbTypes = urlToDbTypes[type];
 	if (!dbTypes) {
 		throw error(404, `Invalid homebrew type: ${type}`);
+	}
+
+	// Check if this type is currently enabled
+	if (!isEnabledHomebrewType(type as HomebrewType)) {
+		throw error(404, `This homebrew type (${type}) is not yet available.`);
 	}
 
 	// Try each possible DB type until we find the item

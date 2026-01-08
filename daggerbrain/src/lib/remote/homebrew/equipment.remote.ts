@@ -18,7 +18,12 @@ import {
 	homebrew_consumables
 } from '$lib/server/db/homebrew.schema';
 import { campaign_homebrew_vault_table } from '$lib/server/db/campaigns.schema';
-import { verifyOwnership, getTotalHomebrewCount, HOMEBREW_LIMIT } from './utils';
+import {
+	verifyOwnership,
+	getTotalHomebrewCount,
+	HOMEBREW_LIMIT,
+	assertHomebrewTypeEnabled
+} from './utils';
 
 // ============================================================================
 // Primary Weapons
@@ -44,6 +49,7 @@ export const get_homebrew_primary_weapons = query(async () => {
 });
 
 export const create_homebrew_primary_weapon = command(WeaponSchema, async (data) => {
+	assertHomebrewTypeEnabled('weapon');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -78,6 +84,7 @@ export const create_homebrew_primary_weapon = command(WeaponSchema, async (data)
 export const update_homebrew_primary_weapon = command(
 	z.object({ id: z.string(), data: WeaponSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('weapon');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
@@ -109,6 +116,7 @@ export const update_homebrew_primary_weapon = command(
 );
 
 export const delete_homebrew_primary_weapon = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('weapon');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -169,6 +177,7 @@ export const get_homebrew_secondary_weapons = query(async () => {
 });
 
 export const create_homebrew_secondary_weapon = command(WeaponSchema, async (data) => {
+	assertHomebrewTypeEnabled('weapon');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -202,6 +211,7 @@ export const create_homebrew_secondary_weapon = command(WeaponSchema, async (dat
 export const update_homebrew_secondary_weapon = command(
 	z.object({ id: z.string(), data: WeaponSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('weapon');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
@@ -236,6 +246,7 @@ export const update_homebrew_secondary_weapon = command(
 );
 
 export const delete_homebrew_secondary_weapon = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('weapon');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -299,6 +310,7 @@ export const get_homebrew_armor = query(async () => {
 });
 
 export const create_homebrew_armor = command(ArmorSchema, async (data) => {
+	assertHomebrewTypeEnabled('armor');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -332,6 +344,7 @@ export const create_homebrew_armor = command(ArmorSchema, async (data) => {
 export const update_homebrew_armor = command(
 	z.object({ id: z.string(), data: ArmorSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('armor');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
@@ -361,6 +374,7 @@ export const update_homebrew_armor = command(
 );
 
 export const delete_homebrew_armor = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('armor');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -419,6 +433,7 @@ export const get_homebrew_loot = query(async () => {
 });
 
 export const create_homebrew_loot = command(LootSchema, async (data) => {
+	assertHomebrewTypeEnabled('loot');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -452,6 +467,7 @@ export const create_homebrew_loot = command(LootSchema, async (data) => {
 export const update_homebrew_loot = command(
 	z.object({ id: z.string(), data: LootSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('loot');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
@@ -481,6 +497,7 @@ export const update_homebrew_loot = command(
 );
 
 export const delete_homebrew_loot = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('loot');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -535,6 +552,7 @@ export const get_homebrew_consumables = query(async () => {
 });
 
 export const create_homebrew_consumable = command(ConsumableSchema, async (data) => {
+	assertHomebrewTypeEnabled('consumable');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -568,6 +586,7 @@ export const create_homebrew_consumable = command(ConsumableSchema, async (data)
 export const update_homebrew_consumable = command(
 	z.object({ id: z.string(), data: ConsumableSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('consumable');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
@@ -597,6 +616,7 @@ export const update_homebrew_consumable = command(
 );
 
 export const delete_homebrew_consumable = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('consumable');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);

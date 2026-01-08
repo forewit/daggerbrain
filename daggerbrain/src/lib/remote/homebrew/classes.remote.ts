@@ -7,7 +7,12 @@ import { ClassSchema, SubclassSchema } from '$lib/compendium/compendium-schemas'
 import type { CharacterClass, Subclass } from '$lib/types/compendium-types';
 import { homebrew_classes, homebrew_subclasses } from '$lib/server/db/homebrew.schema';
 import { campaign_homebrew_vault_table } from '../../server/db/campaigns.schema';
-import { verifyOwnership, getTotalHomebrewCount, HOMEBREW_LIMIT } from './utils';
+import {
+	verifyOwnership,
+	getTotalHomebrewCount,
+	HOMEBREW_LIMIT,
+	assertHomebrewTypeEnabled
+} from './utils';
 
 // ============================================================================
 // Classes
@@ -33,6 +38,7 @@ export const get_homebrew_classes = query(async () => {
 });
 
 export const create_homebrew_class = command(ClassSchema, async (data) => {
+	assertHomebrewTypeEnabled('class');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -67,6 +73,7 @@ export const create_homebrew_class = command(ClassSchema, async (data) => {
 export const update_homebrew_class = command(
 	z.object({ id: z.string(), data: ClassSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('class');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
@@ -96,6 +103,7 @@ export const update_homebrew_class = command(
 );
 
 export const delete_homebrew_class = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('class');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -154,6 +162,7 @@ export const get_homebrew_subclasses = query(async () => {
 });
 
 export const create_homebrew_subclass = command(SubclassSchema, async (data) => {
+	assertHomebrewTypeEnabled('subclass');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -208,6 +217,7 @@ export const create_homebrew_subclass = command(SubclassSchema, async (data) => 
 export const update_homebrew_subclass = command(
 	z.object({ id: z.string(), data: SubclassSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('subclass');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
@@ -258,6 +268,7 @@ export const update_homebrew_subclass = command(
 );
 
 export const delete_homebrew_subclass = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('subclass');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);

@@ -59,7 +59,7 @@
 	}
 </script>
 
-<div class={cn('max-w-[490px] rounded border border-dashed border-foreground/20 p-2', className)}>
+<div class={cn('max-w-[500px] rounded border border-dashed border-foreground/20 p-2', className)}>
 	<div class="flex items-center gap-2">
 		<Input
 			value={joinUrl}

@@ -15,7 +15,12 @@ import {
 	homebrew_transformation_cards
 } from '$lib/server/db/homebrew.schema';
 import { campaign_homebrew_vault_table } from '../../server/db/campaigns.schema';
-import { verifyOwnership, getTotalHomebrewCount, HOMEBREW_LIMIT } from './utils';
+import {
+	verifyOwnership,
+	getTotalHomebrewCount,
+	HOMEBREW_LIMIT,
+	assertHomebrewTypeEnabled
+} from './utils';
 
 // ============================================================================
 // Ancestry Cards
@@ -41,6 +46,7 @@ export const get_homebrew_ancestry_cards = query(async () => {
 });
 
 export const create_homebrew_ancestry_card = command(AncestryCardSchema, async (data) => {
+	assertHomebrewTypeEnabled('ancestry-cards');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -74,6 +80,7 @@ export const create_homebrew_ancestry_card = command(AncestryCardSchema, async (
 export const update_homebrew_ancestry_card = command(
 	z.object({ id: z.string(), data: AncestryCardSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('ancestry-cards');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
@@ -105,6 +112,7 @@ export const update_homebrew_ancestry_card = command(
 );
 
 export const delete_homebrew_ancestry_card = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('ancestry-cards');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -165,6 +173,7 @@ export const get_homebrew_community_cards = query(async () => {
 });
 
 export const create_homebrew_community_card = command(CommunityCardSchema, async (data) => {
+	assertHomebrewTypeEnabled('community-cards');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -198,6 +207,7 @@ export const create_homebrew_community_card = command(CommunityCardSchema, async
 export const update_homebrew_community_card = command(
 	z.object({ id: z.string(), data: CommunityCardSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('community-cards');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
@@ -229,6 +239,7 @@ export const update_homebrew_community_card = command(
 );
 
 export const delete_homebrew_community_card = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('community-cards');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -291,6 +302,7 @@ export const get_homebrew_transformation_cards = query(async () => {
 export const create_homebrew_transformation_card = command(
 	TransformationCardSchema,
 	async (data) => {
+		assertHomebrewTypeEnabled('transformation-cards');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
@@ -328,6 +340,7 @@ export const create_homebrew_transformation_card = command(
 export const update_homebrew_transformation_card = command(
 	z.object({ id: z.string(), data: TransformationCardSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('transformation-cards');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
@@ -365,6 +378,7 @@ export const update_homebrew_transformation_card = command(
 );
 
 export const delete_homebrew_transformation_card = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('transformation-cards');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);

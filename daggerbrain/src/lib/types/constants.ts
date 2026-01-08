@@ -14,7 +14,6 @@ import type {
 import type { ConditionIds, LevelUpChoice } from '$lib/types/rule-types';
 import type { Traits } from './compendium-types';
 
-
 export const UI_HOMEBREW_LIMIT = 5;
 export const UI_CHARACTER_LIMIT = 3;
 

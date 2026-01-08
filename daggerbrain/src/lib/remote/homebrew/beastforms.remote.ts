@@ -7,7 +7,12 @@ import { campaign_homebrew_vault_table } from '../../server/db/campaigns.schema'
 import { BeastformSchema } from '$lib/compendium/compendium-schemas';
 import type { Beastform } from '$lib/types/compendium-types';
 import { homebrew_beastforms } from '$lib/server/db/homebrew.schema';
-import { verifyOwnership, getTotalHomebrewCount, HOMEBREW_LIMIT } from './utils';
+import {
+	verifyOwnership,
+	getTotalHomebrewCount,
+	HOMEBREW_LIMIT,
+	assertHomebrewTypeEnabled
+} from './utils';
 
 // ============================================================================
 // Beastforms
@@ -33,6 +38,7 @@ export const get_homebrew_beastforms = query(async () => {
 });
 
 export const create_homebrew_beastform = command(BeastformSchema, async (data) => {
+	assertHomebrewTypeEnabled('beastform');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -66,6 +72,7 @@ export const create_homebrew_beastform = command(BeastformSchema, async (data) =
 export const update_homebrew_beastform = command(
 	z.object({ id: z.string(), data: BeastformSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('beastform');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
@@ -95,6 +102,7 @@ export const update_homebrew_beastform = command(
 );
 
 export const delete_homebrew_beastform = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('beastform');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);

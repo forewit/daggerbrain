@@ -1,9 +1,9 @@
 import { error } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
-import type { HomebrewType } from '$lib/types/homebrew-types';
+import { isEnabledHomebrewType, type HomebrewType } from '$lib/types/homebrew-types';
 
-// Valid homebrew types for URL routing
-const validTypes: HomebrewType[] = [
+// All valid homebrew types for URL routing validation
+const ALL_HOMEBREW_TYPES: HomebrewType[] = [
 	'weapon',
 	'armor',
 	'beastform',
@@ -20,8 +20,14 @@ const validTypes: HomebrewType[] = [
 export const load: LayoutServerLoad = async ({ params }) => {
 	const type = params.type;
 
-	if (!type || !validTypes.includes(type as HomebrewType)) {
+	// First check if it's a valid homebrew type at all
+	if (!type || !ALL_HOMEBREW_TYPES.includes(type as HomebrewType)) {
 		throw error(404, `Invalid homebrew type: ${type}`);
+	}
+
+	// Then check if this type is currently enabled
+	if (!isEnabledHomebrewType(type as HomebrewType)) {
+		throw error(404, `This homebrew type (${type}) is not yet available.`);
 	}
 
 	return {

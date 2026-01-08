@@ -1,4 +1,5 @@
 import { eq, and, count } from 'drizzle-orm';
+import { error } from '@sveltejs/kit';
 import type { get_db } from '../utils';
 import {
 	homebrew_primary_weapons,
@@ -14,8 +15,22 @@ import {
 	homebrew_community_cards,
 	homebrew_transformation_cards
 } from '$lib/server/db/homebrew.schema';
+import { isEnabledHomebrewType, type HomebrewType } from '$lib/types/homebrew-types';
 
 export const HOMEBREW_LIMIT = 5;
+
+/**
+ * Throws a 403 error if the given homebrew type is not currently enabled.
+ * Use this at the start of create/update/delete remote functions to prevent
+ * modifications to disabled homebrew types.
+ * @param type - The homebrew type to check
+ * @throws 403 error if the type is not enabled
+ */
+export function assertHomebrewTypeEnabled(type: HomebrewType): void {
+	if (!isEnabledHomebrewType(type)) {
+		throw error(403, `This homebrew type (${type}) is not yet available.`);
+	}
+}
 
 // Helper function to verify ownership
 export async function verifyOwnership(
