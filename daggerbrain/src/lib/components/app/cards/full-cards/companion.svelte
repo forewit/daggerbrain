@@ -259,7 +259,12 @@
 						<label for="companion-name" class="text-xs font-medium text-muted-foreground"
 							>Name</label
 						>
-						<Input disabled={!context.canEdit} id="companion-name" bind:value={companion.name} placeholder="Companion name" />
+						<Input
+							disabled={!context.canEdit}
+							id="companion-name"
+							bind:value={companion.name}
+							placeholder="Companion name"
+						/>
 					</div>
 				</div>
 
@@ -536,9 +541,13 @@
 									{derived_companion.name || companion.name}
 								</p>
 								{#if context.canEdit}
-								<Button  variant="ghost" class="h-auto px-2 py-0" onclick={() => (edit_mode = true)}>
-									<Pencil class="size-3.5" />
-								</Button>
+									<Button
+										variant="ghost"
+										class="h-auto px-2 py-0"
+										onclick={() => (edit_mode = true)}
+									>
+										<Pencil class="size-3.5" />
+									</Button>
 								{/if}
 							</div>
 

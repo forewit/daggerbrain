@@ -8,6 +8,10 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import type { Countdown } from '$lib/types/campaign-types';
+	import Plus from '@lucide/svelte/icons/plus';
+	import * as Collapsible from '$lib/components/ui/collapsible';
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import { cn } from '$lib/utils';
 
 	let { open = $bindable(false) } = $props();
 
@@ -87,6 +91,8 @@
 			countdowns: updatedCountdowns
 		};
 	}
+
+	let whatIsCountdownsOpen = $state(false);
 </script>
 
 <Sheet.Root bind:open>
@@ -98,8 +104,13 @@
 			</Sheet.Description>
 		</Sheet.Header>
 
-		<div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
+		<div class="flex flex-col gap-4 overflow-y-auto px-4 pb-6">
 			<!-- Countdowns Table -->
+			<Button class="ml-auto w-min" size="sm" onclick={handleAddCountdown}>
+				<Plus class="size-3.5" />
+				New Countdown</Button
+			>
+
 			<table class="w-full border-collapse text-sm">
 				<thead>
 					<tr class="border-b">
@@ -179,7 +190,31 @@
 					{/each}
 				</tbody>
 			</table>
-			<Button size="sm" onclick={handleAddCountdown}>Add Countdown</Button>
+
+			<Collapsible.Root bind:open={whatIsCountdownsOpen}>
+				<Collapsible.Trigger class="mt-4 flex items-center gap-1">
+					<ChevronRight
+						class={cn('size-4 transition-transform', whatIsCountdownsOpen && 'rotate-90')}
+					/>
+					<p class="text-sm font-medium">More info</p>
+				</Collapsible.Trigger>
+				<Collapsible.Content class="space-y-3 pt-2 pl-5">
+					<p class="text-xs text-muted-foreground italic">How to use countdowns:</p>
+
+					<ul class="list-disc space-y-3 text-xs text-muted-foreground italic">
+						<li>
+							<b>Clicking</b> a countdown will decrease it by one.
+						</li>
+						<li>
+							<b>Right-clicking</b> a countdown will increase it by one.
+						</li>
+						<li>
+							<b>Visible (<Eye class="stroke- mx-0.5 -mt-0.5 inline size-3.5" />)</b> countdowns can
+							be seen by players on their character sheet.
+						</li>
+					</ul>
+				</Collapsible.Content>
+			</Collapsible.Root>
 		</div>
 	</Sheet.Content>
 </Sheet.Root>

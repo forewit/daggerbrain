@@ -10,8 +10,8 @@
 {#if character}
 	<p class="pb-2 text-sm font-medium">Character Notes</p>
 	{#if context.canEdit}
-	<Textarea bind:value={character.notes} class="min-h-48 resize-y" />
+		<Textarea bind:value={character.notes} class="min-h-48 resize-y" />
 	{:else}
-	<p class="text-xs text-muted-foreground italic">{character.notes || 'No notes'}</p>
+		<p class="text-xs text-muted-foreground italic">{character.notes || 'No notes'}</p>
 	{/if}
 {/if}

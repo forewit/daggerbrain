@@ -19,7 +19,11 @@ async function notifyDurableObject(
 	event: RequestEvent,
 	campaignId: string,
 	type: 'character_added' | 'character_updated' | 'character_removed' | 'character_deleted',
-	data: { characterId: string; summary?: CampaignCharacterSummary; updates?: Partial<CampaignCharacterSummary> }
+	data: {
+		characterId: string;
+		summary?: CampaignCharacterSummary;
+		updates?: Partial<CampaignCharacterSummary>;
+	}
 ): Promise<void> {
 	if (!campaignId || !event.platform?.env?.CAMPAIGN_LIVE) {
 		console.log('Skipping DO notification: no campaignId or CAMPAIGN_LIVE not available');
@@ -235,12 +239,7 @@ export const update_character = command(
 		// - campaign_id: modified via assign_character_to_campaign
 		// - clerk_user_id: immutable, determines ownership
 		// Note: claimable is now stored in campaign_characters_table, not characters_table
-		const {
-			id,
-			campaign_id: _campaignId,
-			clerk_user_id: _clerkUserId,
-			...character
-		} = data;
+		const { id, campaign_id: _campaignId, clerk_user_id: _clerkUserId, ...character } = data;
 
 		if (!id) {
 			throw error(400, 'Character id missing');

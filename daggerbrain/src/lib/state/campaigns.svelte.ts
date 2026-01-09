@@ -38,6 +38,7 @@ import type {
 	CampaignLiveClientMessage
 } from '$lib/types/campaign-types';
 import type { HomebrewType } from '$lib/types/homebrew-types';
+import { getUserContext } from './user.svelte';
 
 // Deep merge helper for nested objects
 function deepMerge<T extends Record<string, any>>(target: T, source: Partial<T>): T {
@@ -267,6 +268,8 @@ function createCampaignLiveConnection(campaignId: string) {
 }
 
 function campaignContext() {
+	const userContext = getUserContext();
+
 	// State - campaign ID is now internal and settable
 	let campaignId = $state<string | undefined>(undefined);
 	let campaign = $state<Campaign | null>(null);
@@ -293,6 +296,12 @@ function campaignContext() {
 	let campaignStateDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 	let campaignStateInFlightSave: Promise<void> | null = null;
 
+	// Auto-save state tracking for user membership (display_name)
+	let userMembership = $state<CampaignMember | null>(null);
+	let lastSavedUserMembership = $state<string | null>(null);
+	let userMembershipDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+	let userMembershipInFlightSave: Promise<void> | null = null;
+
 	// Load all campaign data
 	async function load() {
 		const id = campaignId;
@@ -305,13 +314,41 @@ function campaignContext() {
 			loading = true;
 		}
 		try {
-			const [camp, mems, state, chars, vault] = await Promise.all([
+			const [fetchedCamp, mems, state, chars, vault] = await Promise.all([
 				get_campaign(id),
 				get_campaign_members(id),
 				get_campaign_state(id),
 				get_campaign_characters(id),
 				get_campaign_homebrew_vault(id)
 			]);
+			// Don't overwrite if there's an in-flight save - wait for it to complete
+			if (inFlightSave) {
+				await inFlightSave;
+			}
+			if (campaignStateInFlightSave) {
+				await campaignStateInFlightSave;
+			}
+
+			// Prevent overwriting with stale server data after a recent save
+			// If our local state matches what we last saved, but server data is different,
+			// the server cache is stale - keep our local state
+			let camp = fetchedCamp;
+			if (campaign && lastSavedCampaign) {
+				const currentJson = JSON.stringify({
+					name: campaign.name,
+					description: campaign.description
+				});
+				const fetchedJson = JSON.stringify({
+					name: fetchedCamp.name,
+					description: fetchedCamp.description
+				});
+				// If local state matches what we saved, but server data is different, server is stale
+				if (currentJson === lastSavedCampaign && fetchedJson !== lastSavedCampaign) {
+					// Use fetched data for other fields, but keep campaign name/description from local state
+					camp = { ...fetchedCamp, name: campaign.name, description: campaign.description };
+				}
+			}
+
 			campaign = camp;
 			members = mems;
 			campaignState = state;
@@ -319,6 +356,17 @@ function campaignContext() {
 			vaultItems = vault;
 			// Initialize lastSavedCampaignState to track changes from this point
 			lastSavedCampaignState = JSON.stringify(state);
+			// Initialize userMembership from members array
+			const currentUserId = userContext.user?.clerk_id;
+			if (currentUserId) {
+				const currentUserMember = mems.find((m) => m.user_id === currentUserId);
+				if (currentUserMember) {
+					userMembership = currentUserMember;
+					lastSavedUserMembership = JSON.stringify({
+						display_name: currentUserMember.display_name
+					});
+				}
+			}
 			// Mark initial sync complete immediately after D1 data is assigned
 			// This ensures the loading getter returns false right away
 			initialSyncComplete = true;
@@ -511,21 +559,6 @@ function campaignContext() {
 		}
 	}
 
-	// Update campaign member display name
-	async function updateCampaignMember(params: { display_name?: string }): Promise<void> {
-		const id = campaignId;
-		if (!id) return;
-
-		await update_campaign_member({
-			campaign_id: id,
-			display_name: params.display_name
-		});
-
-		// Refresh members list after update
-		const updatedMembers = await get_campaign_members(id);
-		members = updatedMembers;
-	}
-
 	// Auto-load when campaign ID changes
 	$effect(() => {
 		const id = campaignId;
@@ -691,6 +724,13 @@ function campaignContext() {
 									members = members.map((m) =>
 										m.user_id === message.userId ? { ...m, display_name: message.displayName } : m
 									);
+									// Update userMembership if this is the current user
+									const currentUserId = userContext.user?.clerk_id;
+									if (currentUserId && message.userId === currentUserId && userMembership) {
+										userMembership = { ...userMembership, display_name: message.displayName };
+										// Update lastSavedUserMembership to prevent auto-save from triggering
+										lastSavedUserMembership = JSON.stringify({ display_name: message.displayName });
+									}
 									// Update owner_name in characters owned by this user
 									const updatedChars = { ...characters };
 									for (const [charId, char] of Object.entries(updatedChars)) {
@@ -887,12 +927,12 @@ function campaignContext() {
 				lastSavedCampaignState = JSON.stringify(campaignState);
 			} else {
 				// HTTP fallback with in-flight tracking
-				// Note: fear_visible_to_players is only supported via WebSocket/DO
 				const savePromise = update_campaign_state({
 					campaign_id: id,
 					fear_track: campaignState.fear_track,
 					countdowns: campaignState.countdowns,
-					notes: campaignState.notes
+					notes: campaignState.notes,
+					fear_visible_to_players: campaignState.fear_visible_to_players
 				})
 					.then(() => {
 						if (!campaignState) return;
@@ -919,6 +959,70 @@ function campaignContext() {
 		};
 	});
 
+	// Debounced auto-save effect for userMembership (display_name)
+	$effect(() => {
+		if (!userMembership || lastSavedUserMembership === null) return;
+
+		const currentJson = JSON.stringify({ display_name: userMembership.display_name });
+		// Only save if the membership actually changed from the last saved state
+		if (currentJson === lastSavedUserMembership) return;
+
+		// Clear any existing debounce timer
+		if (userMembershipDebounceTimer) {
+			clearTimeout(userMembershipDebounceTimer);
+			userMembershipDebounceTimer = null;
+		}
+
+		// Debounce: wait 300ms before triggering save
+		userMembershipDebounceTimer = setTimeout(() => {
+			userMembershipDebounceTimer = null;
+			if (!userMembership) return; // Guard against null membership
+
+			// Don't start a new save if one is already in flight
+			if (userMembershipInFlightSave) {
+				return;
+			}
+
+			const id = campaignId;
+			if (!id) return;
+
+			const savePromise = update_campaign_member({
+				campaign_id: id,
+				display_name: userMembership.display_name ?? undefined
+			})
+				.then(() => {
+					if (!userMembership) return;
+					// Only update lastSavedUserMembership after successful save
+					lastSavedUserMembership = JSON.stringify({ display_name: userMembership.display_name });
+					// Also update the members array to keep it in sync
+					const currentUserId = userContext.user?.clerk_id;
+					if (currentUserId) {
+						members = members.map((m) =>
+							m.user_id === currentUserId ? { ...m, display_name: userMembership!.display_name } : m
+						);
+					}
+				})
+				.catch((err) => {
+					console.error('Failed to auto-save user membership:', err);
+					// Leave lastSavedUserMembership unchanged so the next debounced change will retry
+				})
+				.finally(() => {
+					if (userMembershipInFlightSave === savePromise) {
+						userMembershipInFlightSave = null;
+					}
+				});
+
+			userMembershipInFlightSave = savePromise;
+		}, 300);
+
+		return () => {
+			if (userMembershipDebounceTimer) {
+				clearTimeout(userMembershipDebounceTimer);
+				userMembershipDebounceTimer = null;
+			}
+		};
+	});
+
 	return {
 		get campaignId() {
 			return campaignId;
@@ -931,6 +1035,12 @@ function campaignContext() {
 		},
 		get members() {
 			return members;
+		},
+		get userMembership() {
+			return userMembership;
+		},
+		set userMembership(value: CampaignMember | null) {
+			userMembership = value;
 		},
 		get campaignState() {
 			return campaignState;
@@ -958,8 +1068,7 @@ function campaignContext() {
 		addToVault,
 		removeFromVault,
 		canClaimCharacter,
-		hasCharacterInCampaign,
-		updateCampaignMember
+		hasCharacterInCampaign
 	};
 }
 

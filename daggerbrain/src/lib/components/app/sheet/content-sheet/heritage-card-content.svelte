@@ -85,56 +85,56 @@
 </script>
 
 {#if context.canEdit}
-<Sheet.Header>
-	<Sheet.Title>Customize Your Character Cards</Sheet.Title>
-	<Sheet.Description class="text-xs italic"
-		>Manually add Ancestry, Community, or Transformation to your character.</Sheet.Description
-	>
-</Sheet.Header>
+	<Sheet.Header>
+		<Sheet.Title>Customize Your Character Cards</Sheet.Title>
+		<Sheet.Description class="text-xs italic"
+			>Manually add Ancestry, Community, or Transformation to your character.</Sheet.Description
+		>
+	</Sheet.Header>
 
-<div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
-	<!-- Added Heritage Cards Table -->
-	{#if allAdditionalHeritageCards.length > 0}
+	<div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
+		<!-- Added Heritage Cards Table -->
+		{#if allAdditionalHeritageCards.length > 0}
+			<div class="flex flex-col gap-2">
+				<table class="w-full border-collapse text-sm">
+					<tbody>
+						{#each allAdditionalHeritageCards as card (card.compendium_id)}
+							<tr class="border-b">
+								<td class="py-2 pr-4 text-left">
+									<div class="flex flex-col gap-0.5">
+										<span class="font-medium">{card.title}</span>
+										<span class="flex items-center gap-1.5 text-xs text-muted-foreground">
+											{#if card.source_id === 'Homebrew'}
+												<HomebrewBadge
+													type={card.card_type === 'ancestry'
+														? 'ancestry-cards'
+														: card.card_type === 'community'
+															? 'community-cards'
+															: 'transformation-cards'}
+													id={card.compendium_id}
+													class="-mt-0.5 size-4"
+												/>
+											{/if}
+											{getCardTypeName(card)}
+										</span>
+									</div>
+								</td>
+								<td class="py-2 text-right">
+									<Button variant="ghost" size="sm" class="h-auto" onclick={() => removeCard(card)}>
+										<CircleMinus class="size-3.5" />
+									</Button>
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+		{/if}
+
+		<!-- Heritage Card Catalog -->
 		<div class="flex flex-col gap-2">
-			<table class="w-full border-collapse text-sm">
-				<tbody>
-					{#each allAdditionalHeritageCards as card (card.compendium_id)}
-						<tr class="border-b">
-							<td class="py-2 pr-4 text-left">
-								<div class="flex flex-col gap-0.5">
-									<span class="font-medium">{card.title}</span>
-									<span class="flex items-center gap-1.5 text-xs text-muted-foreground">
-										{#if card.source_id === 'Homebrew'}
-											<HomebrewBadge
-												type={card.card_type === 'ancestry'
-													? 'ancestry-cards'
-													: card.card_type === 'community'
-														? 'community-cards'
-														: 'transformation-cards'}
-												id={card.compendium_id}
-												class="-mt-0.5 size-4"
-											/>
-										{/if}
-										{getCardTypeName(card)}
-									</span>
-								</div>
-							</td>
-							<td class="py-2 text-right">
-								<Button variant="ghost" size="sm" class="h-auto" onclick={() => removeCard(card)}>
-									<CircleMinus class="size-3.5" />
-								</Button>
-							</td>
-						</tr>
-					{/each}
-				</tbody>
-			</table>
+			<h3 class="text-sm font-medium">Browse Character Cards</h3>
+			<HeritageCardCatalog onCardClick={handleCardClick} />
 		</div>
-	{/if}
-
-	<!-- Heritage Card Catalog -->
-	<div class="flex flex-col gap-2">
-		<h3 class="text-sm font-medium">Browse Character Cards</h3>
-		<HeritageCardCatalog onCardClick={handleCardClick} />
 	</div>
-</div>
 {/if}

@@ -48,7 +48,7 @@
 
 				<!-- Countdowns -->
 				{#if campaignContext.campaignState.countdowns.length > 0}
-					<div class={cn('mt-6 flex flex-wrap justify-center gap-4', isGM && 'mt-4')}>
+					<div class={cn('mt-6 flex flex-wrap items-end justify-center gap-4', isGM && 'mt-4')}>
 						{#each campaignContext.campaignState.countdowns as countdown, index (countdown.id)}
 							<Countdown
 								bind:countdown={campaignContext.campaignState.countdowns[index]}

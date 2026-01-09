@@ -11,7 +11,6 @@
 	import Footer from '$lib/components/app/footer.svelte';
 	import { getUserContext } from '$lib/state/user.svelte';
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
-	import { toast } from 'svelte-sonner';
 	import CampaignInviteLink from '$lib/components/app/campaigns/campaign-invite-link.svelte';
 	import CampaignVault from '$lib/components/app/campaigns/campaign-vault.svelte';
 	import CampaignNotes from '$lib/components/app/campaigns/campaign-notes.svelte';
@@ -52,8 +51,8 @@
 
 	// Initialize GM display name and fear visibility when settings dialog opens
 	$effect(() => {
-		if (data.userMembership && showSettingsDialog) {
-			gmDisplayName = data.userMembership.display_name || '';
+		if (campaign.userMembership && showSettingsDialog) {
+			gmDisplayName = campaign.userMembership.display_name || '';
 		}
 		if (campaign.campaignState && showSettingsDialog) {
 			fearVisibleToPlayers = campaign.campaignState.fear_visible_to_players ?? false;
@@ -64,39 +63,37 @@
 	const hasChanges = $derived(
 		campaign.campaign &&
 			(campaignName.trim() !== campaign.campaign.name ||
-				(gmDisplayName.trim() || '') !== (data.userMembership?.display_name || '') ||
+				(gmDisplayName.trim() || '') !== (campaign.userMembership?.display_name || '') ||
 				fearVisibleToPlayers !== (campaign.campaignState?.fear_visible_to_players ?? false))
 	);
 
-	async function handleSave() {
+	function handleSave() {
 		if (!campaignId || !campaignName.trim() || !campaign.campaign) return;
 
-		try {
-			// Update campaign name - auto-save will handle persistence
-			campaign.campaign.name = campaignName.trim();
+		// Update campaign name - auto-save will handle persistence
+		campaign.campaign.name = campaignName.trim();
 
-			// Update GM display name if it changed
-			if (gmDisplayName.trim() !== (data.userMembership?.display_name || '')) {
-				await campaign.updateCampaignMember({
-					display_name: gmDisplayName.trim() || undefined
-				});
+		// Update GM display name if it changed - auto-save will handle persistence
+		if (gmDisplayName.trim() !== (campaign.userMembership?.display_name || '')) {
+			if (campaign.userMembership) {
+				campaign.userMembership = {
+					...campaign.userMembership,
+					display_name: gmDisplayName.trim() || null
+				};
 			}
-
-			// Update fear visibility if it changed - direct state mutation, auto-save handles persistence
-			if (fearVisibleToPlayers !== (campaign.campaignState?.fear_visible_to_players ?? false)) {
-				if (campaign.campaignState) {
-					campaign.campaignState = {
-						...campaign.campaignState,
-						fear_visible_to_players: fearVisibleToPlayers
-					};
-				}
-			}
-
-			showSettingsDialog = false;
-		} catch (err) {
-			const message = err instanceof Error ? err.message : 'Failed to save settings';
-			toast.error(message);
 		}
+
+		// Update fear visibility if it changed - auto-save will handle persistence
+		if (fearVisibleToPlayers !== (campaign.campaignState?.fear_visible_to_players ?? false)) {
+			if (campaign.campaignState) {
+				campaign.campaignState = {
+					...campaign.campaignState,
+					fear_visible_to_players: fearVisibleToPlayers
+				};
+			}
+		}
+
+		showSettingsDialog = false;
 	}
 
 	async function handleDelete() {
@@ -124,29 +121,27 @@
 
 	// Initialize player settings dialog values
 	$effect(() => {
-		if (data.userMembership && showPlayerSettingsDialog) {
-			playerDisplayName = data.userMembership.display_name || '';
+		if (campaign.userMembership && showPlayerSettingsDialog) {
+			playerDisplayName = campaign.userMembership.display_name || '';
 		}
 	});
 
 	// Check if player display name has changed
 	const hasPlayerChanges = $derived(
-		data.userMembership && playerDisplayName.trim() !== (data.userMembership.display_name || '')
+		campaign.userMembership &&
+			playerDisplayName.trim() !== (campaign.userMembership.display_name || '')
 	);
 
-	async function handleSavePlayerSettings() {
-		if (!campaignId || !data.userMembership) return;
+	function handleSavePlayerSettings() {
+		if (!campaignId || !campaign.userMembership) return;
 
-		try {
-			await campaign.updateCampaignMember({
-				display_name: playerDisplayName.trim() || undefined
-			});
-			toast.success('Settings saved');
-			showPlayerSettingsDialog = false;
-		} catch (err) {
-			const message = err instanceof Error ? err.message : 'Failed to save settings';
-			toast.error(message);
-		}
+		// Update player display name - auto-save will handle persistence
+		campaign.userMembership = {
+			...campaign.userMembership,
+			display_name: playerDisplayName.trim() || null
+		};
+
+		showPlayerSettingsDialog = false;
 	}
 
 	async function handleLeaveCampaign() {

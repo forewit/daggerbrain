@@ -154,33 +154,32 @@
 							{/if}
 						</div>
 
-
 						<!-- Rest Mode -->
 						{#if context.canEdit}
-						<div class="flex flex-col items-center justify-center gap-3 px-6">
-							<Stress
-								class={cn(
-									'rounded-full bg-muted px-4 py-2',
-									restMode && 'opacity-30'
-									// character.ephemeral_stats.marked_stress >= character.derived_stats.max_stress &&
-									//"border-3 border-destructive"
-								)}
-								displayOnly
-							/>
-							<Label
-								class={cn(
-									'flex h-10 w-min items-center rounded-full border px-3 text-nowrap hover:cursor-pointer',
-									restMode ? 'bg-primary' : 'bg-muted text-muted-foreground'
-								)}
-							>
-								<Switch
-									bind:checked={restMode}
-									class="data-[state=checked]:bg-primary-muted/50 data-[state=unchecked]:bg-foreground/20"
+							<div class="flex flex-col items-center justify-center gap-3 px-6">
+								<Stress
+									class={cn(
+										'rounded-full bg-muted px-4 py-2',
+										restMode && 'opacity-30'
+										// character.ephemeral_stats.marked_stress >= character.derived_stats.max_stress &&
+										//"border-3 border-destructive"
+									)}
+									displayOnly
 								/>
-								<Tent class="size-4" />
-								<p>Rest Mode</p>
-							</Label>
-						</div>
+								<Label
+									class={cn(
+										'flex h-10 w-min items-center rounded-full border px-3 text-nowrap hover:cursor-pointer',
+										restMode ? 'bg-primary' : 'bg-muted text-muted-foreground'
+									)}
+								>
+									<Switch
+										bind:checked={restMode}
+										class="data-[state=checked]:bg-primary-muted/50 data-[state=unchecked]:bg-foreground/20"
+									/>
+									<Tent class="size-4" />
+									<p>Rest Mode</p>
+								</Label>
+							</div>
 						{/if}
 					</div>
 					<Dialog.Footer class="px-6">
@@ -190,12 +189,12 @@
 			</Dialog.Root>
 
 			{#if context.canEdit}
-			<Button
-				variant="ghost"
-				class="text-muted-foreground/50"
-				size="sm"
-				onclick={openDomainCardCatalog}><Pencil /></Button
-			>
+				<Button
+					variant="ghost"
+					class="text-muted-foreground/50"
+					size="sm"
+					onclick={openDomainCardCatalog}><Pencil /></Button
+				>
 			{/if}
 		</div>
 		{#if expanded}

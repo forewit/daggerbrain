@@ -40,19 +40,19 @@
 		<div class="flex items-center justify-center gap-2">
 			<!-- Minus Button -->
 			{#if context.canEdit}
-			<button
-				type="button"
-				onclick={() => {
-					if (!character) return;
-					const current = character.domain_card_tokens[card.compendium_id] || 0;
-					character.domain_card_tokens[card.compendium_id] = Math.max(0, current - 1);
-				}}
-				disabled={current_count === 0}
-				class="flex size-7 items-center justify-center rounded-full bg-red-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-gray-300"
-				aria-label="Decrease token count"
-			>
-				−
-			</button>
+				<button
+					type="button"
+					onclick={() => {
+						if (!character) return;
+						const current = character.domain_card_tokens[card.compendium_id] || 0;
+						character.domain_card_tokens[card.compendium_id] = Math.max(0, current - 1);
+					}}
+					disabled={current_count === 0}
+					class="flex size-7 items-center justify-center rounded-full bg-red-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+					aria-label="Decrease token count"
+				>
+					−
+				</button>
 			{/if}
 			<!-- Coin Stack -->
 			<div class="relative flex items-center justify-center">
@@ -81,19 +81,19 @@
 
 			<!-- Plus Button -->
 			{#if context.canEdit}
-			<button
-				type="button"
-				onclick={() => {
-					if (!character) return;
-					const current = character.domain_card_tokens[card.compendium_id] || 0;
-					character.domain_card_tokens[card.compendium_id] = Math.min(99, current + 1);
-				}}
-				disabled={current_count === 99}
-				class="flex size-7 items-center justify-center rounded-full bg-green-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-gray-300"
-				aria-label="Increase token count"
-			>
-				+
-			</button>
+				<button
+					type="button"
+					onclick={() => {
+						if (!character) return;
+						const current = character.domain_card_tokens[card.compendium_id] || 0;
+						character.domain_card_tokens[card.compendium_id] = Math.min(99, current + 1);
+					}}
+					disabled={current_count === 99}
+					class="flex size-7 items-center justify-center rounded-full bg-green-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+					aria-label="Increase token count"
+				>
+					+
+				</button>
 			{/if}
 		</div>
 	{/if}

@@ -31,7 +31,7 @@
 {#if character}
 	<div class={cn('flex flex-col justify-center gap-2 text-center', className)}>
 		<button
-		disabled={!context.canEdit}
+			disabled={!context.canEdit}
 			onclick={() => {
 				character.marked_hope = 0;
 			}}

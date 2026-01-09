@@ -52,7 +52,7 @@
 					'cursor-pointer gap-3 rounded-full px-4',
 					apply_beastform_bonuses &&
 						'border-accent/10 bg-accent/5 text-accent hover:bg-accent/10 hover:text-accent',
-						!context.canEdit && 'pointer-events-none'
+					!context.canEdit && 'pointer-events-none'
 				)}
 			>
 				Transformed
@@ -66,18 +66,17 @@
 			<BeastformComponent beastform={derivedBeastform} show_choices={true} />
 
 			{#if context.canEdit}
-			<div class="flex justify-center gap-2">
-				<Button variant="outline" size="sm" onclick={onBeastformCatalogClick}>
-					<PawPrint class="size-4" />
-					Change Beastform
-				</Button>
-				<Button variant="link" size="sm" class="text-destructive" onclick={removeBeastform}>
-					Remove
-				</Button>
-			</div>
+				<div class="flex justify-center gap-2">
+					<Button variant="outline" size="sm" onclick={onBeastformCatalogClick}>
+						<PawPrint class="size-4" />
+						Change Beastform
+					</Button>
+					<Button variant="link" size="sm" class="text-destructive" onclick={removeBeastform}>
+						Remove
+					</Button>
+				</div>
 			{/if}
 		{:else if context.canEdit}
-		
 			<Button variant="outline" size="sm" onclick={onBeastformCatalogClick}>
 				<PawPrint class="size-4" />
 				Choose a Beastform

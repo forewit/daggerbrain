@@ -7,6 +7,8 @@
 	import { fade, slide } from 'svelte/transition';
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import ExternalLink from '@lucide/svelte/icons/external-link';
 
 	let { class: className = '' }: { class?: string } = $props();
 
@@ -17,48 +19,56 @@
 	const fearVisibleToPlayers = $derived(
 		campaignCtx?.campaignState?.fear_visible_to_players ?? false
 	);
+
 	const countdowns = $derived(campaignCtx?.campaignState?.countdowns ?? []);
 	const visibleCountdowns = $derived(countdowns.filter((c) => c.visibleToPlayers));
-	const connected = $derived(!campaignCtx?.loading);
 
 	// Only show the component if there's something visible
 	let isExpanded = $state(false);
 </script>
 
 <div class={cn('relative', className)}>
-	{#if connected}
-		<!-- link to campaign -->
-		<button
-			transition:fade={{ duration: 300 }}
-			class="absolute bottom-0 left-1/2 z-90 flex max-w-full -translate-x-1/2 translate-y-1/2 items-center gap-0.5 truncate rounded-full bg-background px-1 text-xs font-medium text-primary"
-			onclick={() => (isExpanded = !isExpanded)}
+	<!-- link to campaign -->
+	<div class="border-b border-primary/20 bg-primary/10">
+		<div class="mx-auto flex max-w-2xl items-center justify-end truncate">
+			{#if !campaignCtx.loading}
+				<div class="flex grow truncate" transition:fade={{ duration: 300 }}>
+					<Button
+						class="grow justify-start truncate"
+						variant="link"
+						size="sm"
+						onclick={() => (isExpanded = !isExpanded)}
+					>
+						<ChevronRight class={cn('size-3.5 transition-transform', isExpanded && 'rotate-90')} />
+						{campaignCtx.campaign?.name || 'Unnamed campaign'}
+					</Button>
+				</div>
+			{/if}
+			<Button href={`/campaigns/${campaignCtx.campaign?.id}`} variant="link" size="sm">
+				see campaign
+				<ExternalLink class="size-3.5" />
+			</Button>
+		</div>
+	</div>
+
+	{#if isExpanded && !campaignCtx?.loading}
+		<div
+			class="flex flex-wrap items-center justify-center gap-4 border-b border-primary/20 bg-primary/5 px-4 pt-5 pb-6"
+			transition:slide={{ duration: 300 }}
 		>
-			<ChevronRight
-				class={cn('size-3.5 transition-transform duration-300', isExpanded && '-rotate-90')}
-			/>
+			<!-- Fear Tracker (read-only for players) - only show if visible to players -->
+			{#if fearVisibleToPlayers}
+				<Fear class="sm:flex-row sm:gap-3" {fearValue} isGM={false} />
+			{/if}
 
-			Campaign: {campaignCtx.campaign?.name || 'Unnamed campaign'}
-		</button>
-
-		{#if isExpanded}
-			<div
-				class="flex flex-wrap items-center justify-center gap-4 border-y border-primary/20 bg-primary/5 px-4 pt-5 pb-6"
-				transition:slide={{ duration: 300 }}
-			>
-				<!-- Fear Tracker (read-only for players) - only show if visible to players -->
-				{#if fearVisibleToPlayers}
-					<Fear class="sm:flex-row sm:gap-3" {fearValue} isGM={false} />
-				{/if}
-
-				<!-- Visible Countdowns (read-only) -->
-				{#if visibleCountdowns.length > 0}
-					<div class="flex flex-wrap items-center justify-center gap-4">
-						{#each visibleCountdowns as countdown (countdown.id)}
-							<Countdown {countdown} isGM={false} />
-						{/each}
-					</div>
-				{/if}
-			</div>
-		{/if}
+			<!-- Visible Countdowns (read-only) -->
+			{#if visibleCountdowns.length > 0}
+				<div class="flex flex-wrap items-end justify-center gap-4">
+					{#each visibleCountdowns as countdown (countdown.id)}
+						<Countdown {countdown} isGM={false} />
+					{/each}
+				</div>
+			{/if}
+		</div>
 	{/if}
 </div>

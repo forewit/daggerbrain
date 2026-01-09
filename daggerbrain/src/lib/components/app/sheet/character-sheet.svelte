@@ -151,7 +151,6 @@
 	function triggerImageUpload() {
 		fileInput?.click();
 	}
-
 </script>
 
 {#if character}
@@ -180,8 +179,10 @@
 					<div class="mt-4 mb-2.5 flex h-9 max-w-[400px] items-center truncate overflow-hidden">
 						<a
 							href={`/characters/${character.id}/class/`}
-							
-							class={cn("group relative grid h-full min-w-[72px] place-items-center overflow-hidden rounded-l-full border-b border-accent/10 bg-accent/10 pr-3 pl-4 text-xs font-medium text-accent hover:bg-accent/20", !context.canEdit && 'pointer-events-none')}
+							class={cn(
+								'group relative grid h-full min-w-[72px] place-items-center overflow-hidden rounded-l-full border-b border-accent/10 bg-accent/10 pr-3 pl-4 text-xs font-medium text-accent hover:bg-accent/20',
+								!context.canEdit && 'pointer-events-none'
+							)}
 						>
 							<span class="transition-transform duration-200 group-hover:-translate-y-[150%]">
 								Level {character.level}
@@ -216,7 +217,10 @@
 					<div class="ml-1 flex gap-3">
 						<!-- character image -->
 						<button
-							class={cn("group aspect-square h-[90px] w-[90px] shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 p-1 transition-colors hover:border-primary/50", !context.canEdit && 'pointer-events-none')}
+							class={cn(
+								'group aspect-square h-[90px] w-[90px] shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 p-1 transition-colors hover:border-primary/50',
+								!context.canEdit && 'pointer-events-none'
+							)}
 							onclick={triggerImageUpload}
 							disabled={!context.canEdit}
 						>
@@ -308,12 +312,12 @@
 					</div>
 				</button>
 				{#if context.canEdit}
-				<Button
-					variant="ghost"
-					size="sm"
-					class="h-auto text-muted-foreground/50"
-					onclick={openHeritageCardCatalog}><Pencil /></Button
-				>
+					<Button
+						variant="ghost"
+						size="sm"
+						class="h-auto text-muted-foreground/50"
+						onclick={openHeritageCardCatalog}><Pencil /></Button
+					>
 				{/if}
 			</div>
 			{#if character_cards_expanded}

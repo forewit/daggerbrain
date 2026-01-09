@@ -28,7 +28,7 @@
 </script>
 
 <Select.Root
-{disabled}
+	{disabled}
 	type="multiple"
 	bind:open
 	value={selected_ids}

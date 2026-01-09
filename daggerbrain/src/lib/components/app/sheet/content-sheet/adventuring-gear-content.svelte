@@ -20,40 +20,39 @@
 </Sheet.Header>
 
 <div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
-	
 	<!-- Add New Gear Section -->
 	{#if context.canEdit}
-	<div class="flex items-center gap-2">
-		<Input
-			bind:value={newGearTitle}
-			placeholder="Enter gear name..."
-			class="flex-1"
-			onkeydown={(e) => {
-				if (e.key === 'Enter' && newGearTitle.trim()) {
-					context.addToInventory(
-						{ compendium_id: newGearTitle.trim(), title: newGearTitle.trim() },
-						'adventuring_gear'
-					);
-					newGearTitle = '';
-				}
-			}}
-		/>
-		<Button
-			size="sm"
-			disabled={!newGearTitle.trim()}
-			onclick={() => {
-				if (newGearTitle.trim()) {
-					context.addToInventory(
-						{ compendium_id: newGearTitle.trim(), title: newGearTitle.trim() },
-						'adventuring_gear'
-					);
-					newGearTitle = '';
-				}
-			}}
-		>
-			Add
-		</Button>
-	</div>
+		<div class="flex items-center gap-2">
+			<Input
+				bind:value={newGearTitle}
+				placeholder="Enter gear name..."
+				class="flex-1"
+				onkeydown={(e) => {
+					if (e.key === 'Enter' && newGearTitle.trim()) {
+						context.addToInventory(
+							{ compendium_id: newGearTitle.trim(), title: newGearTitle.trim() },
+							'adventuring_gear'
+						);
+						newGearTitle = '';
+					}
+				}}
+			/>
+			<Button
+				size="sm"
+				disabled={!newGearTitle.trim()}
+				onclick={() => {
+					if (newGearTitle.trim()) {
+						context.addToInventory(
+							{ compendium_id: newGearTitle.trim(), title: newGearTitle.trim() },
+							'adventuring_gear'
+						);
+						newGearTitle = '';
+					}
+				}}
+			>
+				Add
+			</Button>
+		</div>
 	{/if}
 
 	{#if adventuringGear.length > 0}
@@ -67,14 +66,15 @@
 						</td>
 						<td class="py-2 text-right">
 							{#if context.canEdit}
-							<Button
-								variant="ghost"
-								size="sm"
-								class="h-auto"
-								onclick={() => context.removeFromInventory({ id: gear.title }, 'adventuring_gear')}
-							>
-								<CircleMinus class="size-3.5" />
-							</Button>
+								<Button
+									variant="ghost"
+									size="sm"
+									class="h-auto"
+									onclick={() =>
+										context.removeFromInventory({ id: gear.title }, 'adventuring_gear')}
+								>
+									<CircleMinus class="size-3.5" />
+								</Button>
 							{/if}
 						</td>
 					</tr>

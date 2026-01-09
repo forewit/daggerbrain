@@ -58,26 +58,26 @@
 			<div class="flex items-center gap-2">
 				<!-- Minus Button -->
 				{#if context.canEdit}
-				<Button
-					type="button"
-					onclick={() => {
-						if (!character) return;
-						if (!character.class_choices[guardian_class_id])
-							character.class_choices[guardian_class_id] = {};
-						const current = current_unstoppable_value;
-						const newValue = Math.max(1, current - 1);
-						character.class_choices[guardian_class_id]['unstoppable_active'] = [
-							'yes',
-							String(newValue)
-						];
-					}}
-					disabled={current_unstoppable_value === 1}
-					size="icon"
-					variant="outline"
-					class="h-auto rounded-full p-0"
-				>
-					−
-				</Button>
+					<Button
+						type="button"
+						onclick={() => {
+							if (!character) return;
+							if (!character.class_choices[guardian_class_id])
+								character.class_choices[guardian_class_id] = {};
+							const current = current_unstoppable_value;
+							const newValue = Math.max(1, current - 1);
+							character.class_choices[guardian_class_id]['unstoppable_active'] = [
+								'yes',
+								String(newValue)
+							];
+						}}
+						disabled={current_unstoppable_value === 1}
+						size="icon"
+						variant="outline"
+						class="h-auto rounded-full p-0"
+					>
+						−
+					</Button>
 				{/if}
 				<!-- Die SVG and Value -->
 				<div class="flex items-center gap-2">
@@ -164,26 +164,26 @@
 
 				<!-- Plus Button -->
 				{#if context.canEdit}
-				<Button
-					type="button"
-					onclick={() => {
-						if (!character) return;
-						if (!character.class_choices[guardian_class_id])
-							character.class_choices[guardian_class_id] = {};
-						const current = current_unstoppable_value;
-						const newValue = Math.min(max_unstoppable_value, current + 1);
-						character.class_choices[guardian_class_id]['unstoppable_active'] = [
-							'yes',
-							String(newValue)
-						];
-					}}
-					disabled={current_unstoppable_value === max_unstoppable_value}
-					size="icon"
-					variant="outline"
-					class="h-auto rounded-full p-0"
-				>
-					+
-				</Button>
+					<Button
+						type="button"
+						onclick={() => {
+							if (!character) return;
+							if (!character.class_choices[guardian_class_id])
+								character.class_choices[guardian_class_id] = {};
+							const current = current_unstoppable_value;
+							const newValue = Math.min(max_unstoppable_value, current + 1);
+							character.class_choices[guardian_class_id]['unstoppable_active'] = [
+								'yes',
+								String(newValue)
+							];
+						}}
+						disabled={current_unstoppable_value === max_unstoppable_value}
+						size="icon"
+						variant="outline"
+						class="h-auto rounded-full p-0"
+					>
+						+
+					</Button>
 				{/if}
 				<!-- Descriptive Text -->
 				<p class="text-xs text-muted-foreground">
@@ -195,7 +195,10 @@
 				</p>
 			</div>
 		{:else}
-			<Label for="unstoppable-switch" class={cn("cursor-pointer text-xs font-normal", !context.canEdit && 'pointer-events-none')}>
+			<Label
+				for="unstoppable-switch"
+				class={cn('cursor-pointer text-xs font-normal', !context.canEdit && 'pointer-events-none')}
+			>
 				Become Unstoppable
 			</Label>
 		{/if}

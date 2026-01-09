@@ -4,7 +4,11 @@ import {
 	delete_character
 } from '$lib/remote/characters.remote';
 import { get_user, update_user } from '$lib/remote/users.remote';
-import { get_user_campaigns, create_campaign, delete_campaign } from '$lib/remote/campaigns/campaigns.remote';
+import {
+	get_user_campaigns,
+	create_campaign,
+	delete_campaign
+} from '$lib/remote/campaigns/campaigns.remote';
 import { upload_user_image } from '$lib/remote/images.remote';
 import type { User } from '$lib/types/user-types';
 import type { Character } from '$lib/types/character-types';

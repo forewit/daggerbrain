@@ -120,10 +120,7 @@
 							Track character cards, class abilities, inventory, and everything you need at the
 							table.
 						</p>
-						<a
-							class={cn(buttonVariants({ variant: 'outline' }), 'mt-2 w-min')}
-							href="/characters"
-						>
+						<a class={cn(buttonVariants({ variant: 'outline' }), 'mt-2 w-min')} href="/characters">
 							My characters
 							<ArrowRight class="size-3.5" />
 						</a>
@@ -143,14 +140,14 @@
 						loading="lazy"
 					/>
 					<div class="flex grow flex-col justify-center gap-3 px-6 pt-5 pb-6 sm:w-1/2 sm:py-8">
-						<h3 class="font-eveleth text-lg font-bold">Campaigns: focus on your game, not the tools</h3>
+						<h3 class="font-eveleth text-lg font-bold">
+							Campaigns: focus on your game, not the tools
+						</h3>
 						<p class="text-sm text-muted-foreground">
-							Live updating fear tracker, countdowns, and characer sheets make it easy to run a campaign with friends.
+							Live updating fear tracker, countdowns, and characer sheets make it easy to run a
+							campaign with friends.
 						</p>
-						<a
-							class={cn(buttonVariants({ variant: 'outline' }), 'mt-2 w-min')}
-							href="/campaigns"
-						>
+						<a class={cn(buttonVariants({ variant: 'outline' }), 'mt-2 w-min')} href="/campaigns">
 							My characters
 							<ArrowRight class="size-3.5" />
 						</a>
@@ -180,7 +177,9 @@
 						class="relative z-10 mx-auto flex h-full w-full max-w-5xl flex-col justify-center gap-4 px-4 py-8 sm:px-8 sm:py-12"
 					>
 						<div class="flex flex-col items-center gap-8 sm:text-left">
-							<h3 class="font-eveleth text-2xl font-bold text-foreground">Create Homebrew Content</h3>
+							<h3 class="font-eveleth text-2xl font-bold text-foreground">
+								Create Homebrew Content
+							</h3>
 							<p class="text-center text-sm">
 								Design your own Weapons, Armor, Loot, and more! <br />Build custom content for your
 								Daggerheart characters.

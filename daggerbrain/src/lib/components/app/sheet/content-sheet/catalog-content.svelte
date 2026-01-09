@@ -7,13 +7,12 @@
 </script>
 
 {#if context.canEdit}
+	<Sheet.Header>
+		<Sheet.Title>Add Items</Sheet.Title>
+		<Sheet.Description>Browse and add items to your inventory</Sheet.Description>
+	</Sheet.Header>
 
-<Sheet.Header>
-	<Sheet.Title>Add Items</Sheet.Title>
-	<Sheet.Description>Browse and add items to your inventory</Sheet.Description>
-</Sheet.Header>
-
-<div class="overflow-y-auto px-4 pb-6">
-	<Catalog />
-</div>
+	<div class="overflow-y-auto px-4 pb-6">
+		<Catalog />
+	</div>
 {/if}

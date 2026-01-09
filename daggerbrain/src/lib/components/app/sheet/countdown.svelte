@@ -43,7 +43,6 @@
 		// Increment countdown
 		countdown.current = countdown.current + 1;
 	}
-
 	// Only validate min value, don't call onUpdate from effect
 	$effect(() => {
 		if (countdown.current < countdown.min) {
@@ -52,24 +51,25 @@
 	});
 </script>
 
-<div class={cn('gap- flex flex-col items-center', className)}>
+<div class={cn('flex flex-col items-center', className)}>
 	<!-- Countdown Name -->
-	{#if isGM}
-		<Button class="h-7" disabled={!isGM} variant="ghost" size="sm" onclick={onClickCountdown}>
-			{countdown.name}
-			{#if countdown.visibleToPlayers}
-				<Eye class="size-4 text-muted-foreground" />
-			{:else}
-				<EyeOff class="ml-1 size-4 text-muted-foreground" />
-			{/if}
-		</Button>
-	{/if}
-
+	<div
+		class={cn(
+			'flex items-center gap-1 text-muted-foreground',
+			countdown.current === 0 && 'text-accent/80'
+		)}
+	>
+		<p class="text-xs font-medium">{countdown.name}</p>
+		{#if isGM && countdown.visibleToPlayers}
+			<Eye class="size-4" />
+		{/if}
+	</div>
 	<!-- Hourglass Button -->
 	<button
 		class={cn(
-			'relative flex size-12 items-center justify-center overflow-visible',
-			countdown.current === 0 && ' text-accent'
+			'relative flex size-12 items-center justify-center overflow-visible transition-transform duration-200 hover:scale-105',
+			countdown.current === 0 && ' text-accent',
+			!isGM && 'pointer-events-none'
 		)}
 		onclick={handleHourglassClick}
 		oncontextmenu={handleHourglassRightClick}

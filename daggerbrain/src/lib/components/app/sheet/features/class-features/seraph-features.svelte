@@ -26,7 +26,10 @@
 				<button
 					disabled={!context.canEdit}
 					aria-label="Prayer dice {index + 1}"
-					class={cn(index < prayer_dice_used ? 'text-accent' : 'text-muted-foreground/50', !context.canEdit && 'pointer-events-none')}
+					class={cn(
+						index < prayer_dice_used ? 'text-accent' : 'text-muted-foreground/50',
+						!context.canEdit && 'pointer-events-none'
+					)}
 					onclick={() => {
 						if (!character.class_choices[seraph_class_id])
 							character.class_choices[seraph_class_id] = {};
