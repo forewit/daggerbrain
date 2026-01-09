@@ -102,17 +102,16 @@
 					</Button>
 				</div>
 			</section>
-			 
 
 			<!-- Campaigns -->
-			<section class="mx-auto w-full max-w-5xl md:h-[600px] px-4 pt-24 md:px-8 ">
+			<section class="mx-auto w-full max-w-5xl px-4 pt-24 md:px-8">
 				<button
-					class="shadow-[0_0_60px_rgba(253,212,113,0.2)] hover:shadow-[0_0_60px_rgba(253,212,113,0.25)] transition-all duration-600 group relative flex flex-col overflow-hidden rounded-3xl border-x border-accent/20 bg-background/70 text-left md:flex-row"
+					class="group relative flex flex-col overflow-hidden rounded-3xl border-x border-accent/20 bg-background/70 text-left shadow-[0_0_60px_rgba(253,212,113,0.2)] transition-all duration-600 hover:shadow-[0_0_60px_rgba(253,212,113,0.25)] md:max-h-[400px] md:flex-row"
 					onclick={() => {
 						goto('/campaigns');
 					}}
 				>
-					<div class="grow relative w-full overflow-hidden">
+					<div class="relative w-full grow overflow-hidden">
 						<img
 							src="/images/screenshots/campaign-screenshot.webp"
 							alt="Character sheet screenshot"
@@ -120,19 +119,26 @@
 							loading="lazy"
 						/>
 					</div>
-					<div class="relative z-20 flex grow max-w-[300px] flex-col justify-center gap-3 px-6 pt-5 pb-6 sm:w-1/2 sm:py-8 border-l border-accent/10">
-						<h3 class="font-eveleth text-xl font-bold">
-							Campaigns
-						</h3>
-						<ul class="text-sm text-muted-foreground list-disc pl-6 space-y-1">
+					<div
+						class="relative z-20 flex max-w-[300px] grow flex-col justify-center gap-3 border-l border-accent/10 px-6 pt-5 pb-6 sm:w-1/2 sm:py-8"
+					>
+						<h3 class="font-eveleth text-xl font-bold">Campaigns</h3>
+						<ul class="list-disc space-y-1 pl-6 text-sm text-muted-foreground">
 							<li>Live updates</li>
 							<li>Fear tracker</li>
 							<li>Countdowns</li>
 							<li>Character previews</li>
 						</ul>
-						<div class={cn(buttonVariants({ variant: 'outline' }), 'group-hover:shadow-[0_0_8px_rgba(253,212,113,0.4)] transition-all duration-600 mt-2 w-min pointer-events-none text-accent border-accent/20 bg-accent/10')}>
+						<div
+							class={cn(
+								buttonVariants({ variant: 'outline' }),
+								'pointer-events-none mt-2 w-min border-accent/20 bg-accent/10 text-accent transition-all duration-600 group-hover:shadow-[0_0_8px_rgba(253,212,113,0.4)]'
+							)}
+						>
 							Create a campaign
-							<ArrowRight class="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+							<ArrowRight
+								class="size-3.5 transition-transform duration-300 group-hover:translate-x-1"
+							/>
 						</div>
 					</div>
 				</button>
@@ -163,10 +169,8 @@
 				</div>
 			</section> -->
 
-			
-
 			<!-- Homebrew Showcase - Full Width Glass Pane -->
-			<section class="relative z-10 mt-24 w-full pb-30">
+			<section class="relative z-10 mt-30 w-full pb-30">
 				<button
 					class="homebrew-showcase group relative min-h-[400px] w-full cursor-pointer overflow-hidden border-y border-muted-foreground/30 bg-background sm:min-h-[320px]"
 					onclick={() => {

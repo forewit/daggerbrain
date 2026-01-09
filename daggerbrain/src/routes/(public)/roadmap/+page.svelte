@@ -45,7 +45,7 @@
 					</Button>
 				</div>
 				<ol class="relative border-l border-dashed border-muted-foreground/40 pl-8">
-					<!-- past releases -->
+					<!-- Homebrew support -->
 					<li class="relative pb-8">
 						<span
 							class="absolute top-4 -left-[11px] size-[18px] rounded-full border border-emerald-500 bg-background ring-4 ring-emerald-500/15"
@@ -70,7 +70,7 @@
 						</div>
 					</li>
 
-					<!-- Recently Released -->
+					<!-- Campaigns -->
 					<li class="relative pb-8">
 						<span
 							class="absolute top-4 -left-[11px] size-[18px] rounded-full border border-emerald-500 bg-background ring-4 ring-emerald-500/15"
@@ -80,16 +80,17 @@
 							class="rounded-xl border border-emerald-500/40 bg-background/70 shadow-sm [filter:drop-shadow(0_0_12px_rgba(16,185,129,0.08))] backdrop-blur-sm"
 						>
 							<div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-5 pt-4">
-								<div class="text-sm font-semibold">Homebrew Support</div>
+								<div class="text-sm font-semibold">Campaigns</div>
 								<span
 									class="inline-flex items-center rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-500"
 									>January 2026</span
 								>
 							</div>
 							<div class="px-5 pt-3 pb-4 text-sm text-muted-foreground">
-								Added homebrew support for Weapons, Armor, Loot, Consumables, and Beastforms. <a
-									href="/homebrew"
-									class="underline hover:text-emerald-500">Check it out!</a
+								Create campaigns for your players to join. Track fear, countdowns, character sheets,
+								and more.
+								<a href="/campaigns" class="block underline hover:text-emerald-500"
+									>Try creating a campaign</a
 								>
 							</div>
 						</div>
@@ -119,7 +120,7 @@
 								<a href="/contact" class="underline hover:text-accent">lets talk!</a>
 							</div>
 
-								<div class="text-sm font-semibold px-5 pt-4">3D Dice Roller</div>
+							<div class="px-5 pt-4 text-sm font-semibold">3D Dice Roller</div>
 							<div class="px-5 pt-3 pb-4 text-sm text-muted-foreground">
 								Roll with hope or fear directly on your character sheets and campaigns.
 							</div>
