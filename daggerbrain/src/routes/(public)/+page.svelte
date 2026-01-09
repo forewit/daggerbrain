@@ -104,9 +104,9 @@
 			</section>
 
 			<!-- Campaigns -->
-			<section class="mx-auto w-full max-w-5xl px-4 pt-24 md:px-8">
+			<section class="mx-auto w-full max-w-5xl px-4 pt-20 md:px-8">
 				<button
-					class="group relative flex flex-col overflow-hidden rounded-3xl border-x border-accent/20 bg-background/70 text-left shadow-[0_0_60px_rgba(253,212,113,0.2)] transition-all duration-600 hover:shadow-[0_0_60px_rgba(253,212,113,0.25)] md:max-h-[400px] md:flex-row"
+					class="campaigns-scroll-trigger group relative flex flex-col overflow-hidden text-left transition-all rounded-3xl border-x border-accent/0 duration-600 md:max-h-[400px] md:flex-row"
 					onclick={() => {
 						goto('/campaigns');
 					}}
@@ -115,24 +115,25 @@
 						<img
 							src="/images/screenshots/campaign-screenshot.webp"
 							alt="Character sheet screenshot"
-							class="h-full w-full object-cover transition-all duration-600 group-hover:scale-103"
+							class="h-full w-full object-cover transition-all duration-600"
 							loading="lazy"
 						/>
 					</div>
 					<div
-						class="relative z-20 flex max-w-[300px] grow flex-col justify-center gap-3 border-l border-accent/10 px-6 pt-5 pb-6 sm:w-1/2 sm:py-8"
+						class="relative z-20 flex max-w-[300px] grow flex-col justify-center gap-3 px-6 pt-5 pb-6 sm:w-1/2 sm:py-8"
 					>
-						<h3 class="font-eveleth text-xl font-bold">Campaigns</h3>
+						<h3 class="font-eveleth text-xl font-bold">Run Campaigns</h3>
 						<ul class="list-disc space-y-1 pl-6 text-sm text-muted-foreground">
 							<li>Live updates</li>
 							<li>Fear tracker</li>
 							<li>Countdowns</li>
 							<li>Character previews</li>
+								<li>... and more!</li>
 						</ul>
 						<div
 							class={cn(
 								buttonVariants({ variant: 'outline' }),
-								'pointer-events-none mt-2 w-min border-accent/20 bg-accent/10 text-accent transition-all duration-600 group-hover:shadow-[0_0_8px_rgba(253,212,113,0.4)]'
+								'pointer-events-none mt-2 w-min border-accent/20 bg-accent/10 text-accent transition-all duration-300 group-hover:shadow-[0_0_8px_rgba(253,212,113,0.4)]'
 							)}
 						>
 							Create a campaign
@@ -182,7 +183,7 @@
 						<img
 							src="/images/art/forge.webp"
 							alt=""
-							class="h-full w-full object-cover opacity-30 transition-all duration-600 group-hover:scale-103 group-hover:opacity-40"
+							class="h-full w-full object-cover opacity-30 transition-all duration-600"
 							loading="lazy"
 						/>
 					</div>
@@ -241,5 +242,37 @@
 		box-shadow:
 			0 -8px 16px -4px rgba(0, 0, 0, 1),
 			0 8px 16px -4px rgba(0, 0, 0, 1);
+	}
+
+	/* Campaigns scroll-triggered animations */
+	@keyframes campaigns-border {
+		from {
+			border-color: rgba(253, 212, 113, 0);
+		}
+		to {
+			border-color: rgba(253, 212, 113, 0.2);
+		}
+	}
+
+	@keyframes campaigns-shadow {
+		from {
+			box-shadow: none;
+		}
+		to {
+			box-shadow: 0 0 60px rgba(253, 212, 113, 0.25);
+		}
+	}
+
+	.campaigns-scroll-trigger {
+		animation:
+			campaigns-border 1s ease-out both,
+			campaigns-shadow 1s ease-out both;
+		/* Modern browsers: scroll-driven animations */
+		animation-timeline: view();
+		animation-range: entry 50%;
+		/* Fallback for browsers that don't support view() timeline */
+		@supports not (animation-timeline: view()) {
+			animation: none;
+		}
 	}
 </style>
