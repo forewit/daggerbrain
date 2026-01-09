@@ -3542,6 +3542,12 @@ function createCharacter(id: string) {
 	$effect(() => {
 		if (!character || !initialLoadComplete) return;
 
+		// Don't auto-save if user doesn't have edit permissions
+		// If canEdit is null, permissions are still loading - wait
+		if (canEdit === null) return;
+		// If canEdit is false, user can't edit - don't attempt to save
+		if (canEdit === false) return;
+
 		const currentCharacterJson = JSON.stringify(character);
 		// Only save if the character actually changed from the last saved state
 		if (currentCharacterJson === lastSavedCharacter) return;

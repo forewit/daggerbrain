@@ -69,7 +69,7 @@
 					<p class="text-left text-xs text-muted-foreground">
 						{@html renderMarkdown(context.primary_class.hope_feature.description_html)}
 					</p>
-					{#if is_druid}
+					{#if is_druid && context.canEdit}
 						<Select.Root
 							type="single"
 							value={evolution_trait}
