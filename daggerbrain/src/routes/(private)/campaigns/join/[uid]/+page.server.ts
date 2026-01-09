@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { get_campaign_by_invite_code, get_campaign_members } from '$lib/remote/campaigns.remote';
+import { get_campaign_by_invite_code, get_campaign_members } from '$lib/remote/campaigns/campaigns.remote';
 import { getRequestEvent } from '$app/server';
 import { get_db, get_auth } from '$lib/remote/utils';
 import { eq, and } from 'drizzle-orm';

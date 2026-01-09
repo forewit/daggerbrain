@@ -14,12 +14,12 @@ import {
 	join_campaign,
 	get_user_campaigns,
 	reset_invite_code
-} from '$lib/remote/campaigns.remote';
+} from '$lib/remote/campaigns/campaigns.remote';
 import {
 	get_campaign_homebrew_vault,
 	add_homebrew_to_vault,
 	remove_homebrew_from_vault
-} from '$lib/remote/campaign-homebrew.remote';
+} from '$lib/remote/campaigns/campaign-homebrew.remote';
 import {
 	getClaimCharacterAccess,
 	hasCharacterInCampaign as hasCharacterInCampaignCheck

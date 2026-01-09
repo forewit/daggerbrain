@@ -8,11 +8,11 @@ import {
 	campaign_state_table,
 	campaign_homebrew_vault_table,
 	campaign_characters_table
-} from '../server/db/campaigns.schema';
-import { characters_table } from '../server/db/characters.schema';
-import { get_db, get_auth, CHARACTER_LIMIT } from './utils';
-import { get_all_characters } from './characters.remote';
-import { getCampaignAccessInternal } from '../server/permissions';
+} from '../../server/db/campaigns.schema';
+import { characters_table } from '../../server/db/characters.schema';
+import { get_db, get_auth, CHARACTER_LIMIT } from '../utils';
+import { get_all_characters } from '../characters.remote';
+import { getCampaignAccessInternal } from '../../server/permissions';
 // Note: KV caching for campaign state and characters has been removed for cost optimization
 // D1 reads are 500x cheaper than KV reads
 import type {
@@ -20,8 +20,8 @@ import type {
 	CampaignCharacterSummary,
 	CampaignWithDetails,
 	Countdown
-} from '../types/campaign-types';
-import type { DerivedCharacter } from '../types/derived-character-types';
+} from '../../types/campaign-types';
+import type { DerivedCharacter } from '../../types/derived-character-types';
 import type { RequestEvent } from '@sveltejs/kit';
 
 // Helper function to generate a unique invite code

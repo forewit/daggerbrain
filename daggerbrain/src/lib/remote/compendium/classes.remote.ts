@@ -1,7 +1,7 @@
 import { query, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { z } from 'zod';
-import { get_kv, get_auth } from './utils';
+import { get_kv, get_auth } from '../utils';
 import { ClassSchema, SubclassSchema } from '$lib/compendium/compendium-schemas';
 import type { CharacterClass, Subclass } from '$lib/types/compendium-types';
 

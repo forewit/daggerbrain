@@ -4,7 +4,7 @@ import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 import { characters_table, characters_table_update_schema } from '../server/db/characters.schema';
 import { get_db, get_auth, CHARACTER_LIMIT } from './utils';
-import { get_user_campaigns, get_campaign_characters } from './campaigns.remote';
+import { get_user_campaigns, get_campaign_characters } from './campaigns/campaigns.remote';
 import { getCharacterAccess } from './permissions.remote';
 import { getCharacterAccessInternal, getCampaignAccessInternal } from '../server/permissions';
 // Note: KV caching has been removed for cost optimization - D1 reads are 500x cheaper than KV reads

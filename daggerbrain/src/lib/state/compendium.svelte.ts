@@ -21,21 +21,21 @@ import {
 	get_all_ancestry_cards,
 	get_all_community_cards,
 	get_all_transformation_cards
-} from '$lib/remote/heritages.remote';
-import { get_all_classes, get_all_subclasses } from '$lib/remote/classes.remote';
-import { get_all_beastforms } from '$lib/remote/beastforms.remote';
-import { get_all_domains, get_domain_cards } from '$lib/remote/domains.remote';
+} from '$lib/remote/compendium/heritages.remote';
+import { get_all_classes, get_all_subclasses } from '$lib/remote/compendium/classes.remote';
+import { get_all_beastforms } from '$lib/remote/compendium/beastforms.remote';
+import { get_all_domains, get_domain_cards } from '$lib/remote/compendium/domains.remote';
 import {
 	get_all_armor,
 	get_all_consumables,
 	get_all_loot,
 	get_all_primary_weapons,
 	get_all_secondary_weapons
-} from '$lib/remote/equipment.remote';
-import { get_all_sources } from '$lib/remote/sources.remote';
+} from '$lib/remote/compendium/equipment.remote';
+import { get_all_sources } from '$lib/remote/compendium/sources.remote';
 import { getHomebrewContext } from './homebrew.svelte';
 import { getCharacterContext } from './character.svelte';
-import { get_campaign_homebrew_items } from '$lib/remote/campaign-homebrew.remote';
+import { get_campaign_homebrew_items } from '$lib/remote/campaigns/campaign-homebrew.remote';
 
 function createCompendium() {
 	let all_ancestry_cards: Record<string, AncestryCard> = $state({});

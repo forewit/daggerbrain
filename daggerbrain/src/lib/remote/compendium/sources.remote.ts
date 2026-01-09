@@ -2,7 +2,7 @@ import { query, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { SourcesSchema } from '$lib/compendium/compendium-schemas';
 import type { Source } from '$lib/types/compendium-types';
-import { get_kv, get_auth } from './utils';
+import { get_kv, get_auth } from '../utils';
 
 export const get_all_sources = query(async () => {
 	const event = getRequestEvent();

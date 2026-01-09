@@ -2,12 +2,12 @@ import { query, command, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { eq, and, inArray } from 'drizzle-orm';
 import { z } from 'zod';
-import { campaign_homebrew_vault_table } from '../server/db/campaigns.schema';
-import { get_db, get_auth } from './utils';
-import { getCampaignAccess } from './permissions.remote';
-import { getCampaignAccessInternal } from '../server/permissions';
-import type { HomebrewType } from '../types/homebrew-types';
-import type { DomainIds } from '../types/compendium-types';
+import { campaign_homebrew_vault_table } from '../../server/db/campaigns.schema';
+import { get_db, get_auth } from '../utils';
+import { getCampaignAccess } from '../permissions.remote';
+import { getCampaignAccessInternal } from '../../server/permissions';
+import type { HomebrewType } from '../../types/homebrew-types';
+import type { DomainIds } from '../../types/compendium-types';
 import {
 	homebrew_primary_weapons,
 	homebrew_secondary_weapons,
@@ -21,7 +21,7 @@ import {
 	homebrew_ancestry_cards,
 	homebrew_community_cards,
 	homebrew_transformation_cards
-} from '../server/db/homebrew.schema';
+} from '../../server/db/homebrew.schema';
 
 // ============================================================================
 // Queries

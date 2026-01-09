@@ -1,7 +1,7 @@
 import { query, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { z } from 'zod';
-import { get_kv, get_auth } from './utils';
+import { get_kv, get_auth } from '../utils';
 import { BeastformSchema } from '$lib/compendium/compendium-schemas';
 import type { Beastform } from '$lib/types/compendium-types';
 
