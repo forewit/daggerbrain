@@ -92,7 +92,7 @@
 						onclick={() => {
 							goto('/roadmap');
 						}}
-						>Visit the roadmap
+						>See the roadmap
 						<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"
 							><path
 								fill="currentColor"
@@ -102,9 +102,44 @@
 					</Button>
 				</div>
 			</section>
+			 
+
+			<!-- Campaigns -->
+			<section class="mx-auto w-full max-w-5xl md:h-[600px] px-4 pt-24 md:px-8 ">
+				<button
+					class="shadow-[0_0_60px_rgba(253,212,113,0.2)] hover:shadow-[0_0_60px_rgba(253,212,113,0.25)] transition-all duration-600 group relative flex flex-col overflow-hidden rounded-3xl border-x border-accent/20 bg-background/70 text-left md:flex-row"
+					onclick={() => {
+						goto('/campaigns');
+					}}
+				>
+					<div class="grow relative w-full overflow-hidden">
+						<img
+							src="/images/screenshots/campaign-screenshot.webp"
+							alt="Character sheet screenshot"
+							class="h-full w-full object-cover transition-all duration-600 group-hover:scale-103"
+							loading="lazy"
+						/>
+					</div>
+					<div class="relative z-20 flex grow max-w-[300px] flex-col justify-center gap-3 px-6 pt-5 pb-6 sm:w-1/2 sm:py-8 border-l border-accent/10">
+						<h3 class="font-eveleth text-xl font-bold">
+							Campaigns
+						</h3>
+						<ul class="text-sm text-muted-foreground list-disc pl-6 space-y-1">
+							<li>Live updates</li>
+							<li>Fear tracker</li>
+							<li>Countdowns</li>
+							<li>Character previews</li>
+						</ul>
+						<div class={cn(buttonVariants({ variant: 'outline' }), 'group-hover:shadow-[0_0_8px_rgba(253,212,113,0.4)] transition-all duration-600 mt-2 w-min pointer-events-none text-accent border-accent/20 bg-accent/10')}>
+							Create a campaign
+							<ArrowRight class="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+						</div>
+					</div>
+				</button>
+			</section>
 
 			<!-- Character Sheet -->
-			<section class="mx-auto w-full max-w-3xl px-4 pt-24 sm:px-8">
+			<!-- <section class="mx-auto w-full max-w-3xl px-4 pt-24 sm:px-8">
 				<div
 					class="relative flex flex-col overflow-hidden rounded-xl border border-muted-foreground/20 bg-background/70 text-left shadow-lg backdrop-blur-sm sm:flex-row"
 				>
@@ -126,34 +161,9 @@
 						</a>
 					</div>
 				</div>
-			</section>
+			</section> -->
 
-			<!-- Campaigns -->
-			<section class="mx-auto w-full max-w-3xl px-4 pt-24 sm:px-8">
-				<div
-					class="relative flex flex-col overflow-hidden rounded-xl border border-muted-foreground/20 bg-background/70 text-left shadow-lg backdrop-blur-sm sm:flex-row"
-				>
-					<img
-						src="/images/art/campaigns.webp"
-						alt="Character sheet screenshot"
-						class="w-full object-cover sm:w-1/2"
-						loading="lazy"
-					/>
-					<div class="flex grow flex-col justify-center gap-3 px-6 pt-5 pb-6 sm:w-1/2 sm:py-8">
-						<h3 class="font-eveleth text-lg font-bold">
-							Campaigns: focus on your game, not the tools
-						</h3>
-						<p class="text-sm text-muted-foreground">
-							Live updating fear tracker, countdowns, and characer sheets make it easy to run a
-							campaign with friends.
-						</p>
-						<a class={cn(buttonVariants({ variant: 'outline' }), 'mt-2 w-min')} href="/campaigns">
-							My characters
-							<ArrowRight class="size-3.5" />
-						</a>
-					</div>
-				</div>
-			</section>
+			
 
 			<!-- Homebrew Showcase - Full Width Glass Pane -->
 			<section class="relative z-10 mt-24 w-full pb-30">
@@ -191,7 +201,7 @@
 									'pointer-events-none mx-auto w-min shrink-0 sm:mx-0'
 								)}
 							>
-								Explore Homebrew
+								Create Homebrew
 								<ArrowRight
 									class="size-3.5 transition-transform duration-300 group-hover:translate-x-1"
 								/>

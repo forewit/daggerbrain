@@ -45,6 +45,31 @@
 					</Button>
 				</div>
 				<ol class="relative border-l border-dashed border-muted-foreground/40 pl-8">
+					<!-- past releases -->
+					<li class="relative pb-8">
+						<span
+							class="absolute top-4 -left-[11px] size-[18px] rounded-full border border-emerald-500 bg-background ring-4 ring-emerald-500/15"
+							aria-hidden="true"
+						></span>
+						<div
+							class="rounded-xl border border-emerald-500/40 bg-background/70 shadow-sm [filter:drop-shadow(0_0_12px_rgba(16,185,129,0.08))] backdrop-blur-sm"
+						>
+							<div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-5 pt-4">
+								<div class="text-sm font-semibold">Homebrew Support</div>
+								<span
+									class="inline-flex items-center rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-500"
+									>December 2025</span
+								>
+							</div>
+							<div class="px-5 pt-3 pb-4 text-sm text-muted-foreground">
+								Added homebrew support for Weapons, Armor, Loot, Consumables, and Beastforms. <a
+									href="/homebrew"
+									class="underline hover:text-emerald-500">Check it out!</a
+								>
+							</div>
+						</div>
+					</li>
+
 					<!-- Recently Released -->
 					<li class="relative pb-8">
 						<span
@@ -58,7 +83,7 @@
 								<div class="text-sm font-semibold">Homebrew Support</div>
 								<span
 									class="inline-flex items-center rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-500"
-									>Recently Released</span
+									>January 2026</span
 								>
 							</div>
 							<div class="px-5 pt-3 pb-4 text-sm text-muted-foreground">
@@ -93,6 +118,11 @@
 								>. If you can help with this,
 								<a href="/contact" class="underline hover:text-accent">lets talk!</a>
 							</div>
+
+								<div class="text-sm font-semibold px-5 pt-4">3D Dice Roller</div>
+							<div class="px-5 pt-3 pb-4 text-sm text-muted-foreground">
+								Roll with hope or fear directly on your character sheets and campaigns.
+							</div>
 						</div>
 					</li>
 
@@ -109,19 +139,18 @@
 								<div class="text-sm font-semibold">Upcoming</div>
 								<span
 									class="inline-flex items-center rounded-full border border-muted-foreground/30 bg-muted/40 px-2 py-0.5 text-xs text-muted-foreground"
-									>Next</span
+									>Coming soon</span
 								>
 							</div>
 							<div class="px-5 pt-3 pb-5 text-sm text-muted-foreground">
 								<ul class="list-disc space-y-1 pl-5">
 									<li>
-										<span class="text-foreground">Homebrew support</span>
+										<span class="text-foreground">Expanded Homebrew support</span>
 										for Classes, Subclasses, Domain, Ancestry, and Community Cards
 									</li>
 
 									<li>
-										<span class="text-foreground">DM tools</span>
-										campaigns, fear tracking, encounter manager
+										<span class="text-foreground">Adversary Manager</span>
 									</li>
 									<li><span class="text-foreground">PDF export</span></li>
 
@@ -130,7 +159,6 @@
 										<span class="text-foreground">The Void content</span>
 										playtest material
 									</li>
-									<li><span class="text-foreground">Integrated dice roller</span></li>
 								</ul>
 							</div>
 						</div>
