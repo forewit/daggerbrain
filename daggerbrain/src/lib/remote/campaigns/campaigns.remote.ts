@@ -21,7 +21,6 @@ import type {
 	CampaignWithDetails,
 	Countdown
 } from '../../types/campaign-types';
-import type { DerivedCharacter } from '../../types/derived-character-types';
 import type { RequestEvent } from '@sveltejs/kit';
 
 // Helper function to generate a unique invite code
@@ -34,14 +33,15 @@ function generateInviteCode(): string {
 
 // Helper function to notify Durable Object about character changes
 // Calls the DO directly instead of going through HTTP to avoid auth issues
+// Now uses CampaignCharacterSummary instead of full DerivedCharacter for lightweight updates
 async function notifyDurableObject(
 	event: RequestEvent,
 	campaignId: string,
 	type: 'character_added' | 'character_updated' | 'character_removed' | 'character_deleted',
 	data: {
 		characterId: string;
-		character?: DerivedCharacter;
-		updates?: Partial<DerivedCharacter>;
+		summary?: CampaignCharacterSummary;
+		updates?: Partial<CampaignCharacterSummary>;
 		claimable?: boolean;
 	}
 ): Promise<void> {
@@ -392,13 +392,14 @@ export const get_campaign_characters = query(
 		}
 
 		// Build summaries from D1 data
-		// Note: derived stats (max_hp, evasion, etc.) are computed client-side
-		// We use reasonable defaults here - the live session will have accurate data from DO
+		// Derived stats are now read from derived_character_summary (stored in D1)
 		const summaries: Record<string, CampaignCharacterSummary> = {};
 
 		for (const char of characters) {
 			const owner_name = displayNameMap.get(char.clerk_user_id) || undefined;
 			const isClaimable = claimableMap.get(char.id) ?? false;
+			// Get derived stats from stored summary, with fallback defaults for old characters
+			const summary = char.derived_character_summary;
 
 			summaries[char.id] = {
 				id: char.id,
@@ -406,19 +407,14 @@ export const get_campaign_characters = query(
 				image_url: char.image_url,
 				level: char.level,
 				marked_hp: char.marked_hp,
-				max_hp: 0, // Computed client-side from derived character
 				marked_stress: char.marked_stress,
-				max_stress: 6, // Default, computed client-side
 				marked_hope: char.marked_hope,
-				max_hope: 6, // Default, computed client-side
+				marked_armor: char.marked_armor,
 				active_conditions: char.active_conditions,
 				owner_user_id: char.clerk_user_id,
 				owner_name,
-				derived_descriptors: char.derived_descriptors,
-				evasion: 0, // Computed client-side
-				max_armor: 0, // Computed client-side
-				marked_armor: char.marked_armor,
-				damage_thresholds: { major: 0, severe: 0 }, // Computed client-side
+				// Use derived_character_summary from D1 (computed client-side, persisted on save)
+				derived_character_summary: summary,
 				claimable: isClaimable
 			};
 		}
@@ -747,7 +743,7 @@ export const claim_character = command(
 		// Notify DO about character being updated (ownership changed)
 		await notifyDurableObject(event, campaign_id, 'character_updated', {
 			characterId: character_id,
-			updates: { clerk_user_id: userId },
+			updates: { owner_user_id: userId },
 			claimable: false
 		});
 

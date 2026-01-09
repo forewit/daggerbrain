@@ -7,8 +7,7 @@ import type {
 	campaign_members_table,
 	campaign_state_table
 } from '$lib/server/db/campaigns.schema';
-import type { DerivedDescriptors } from './character-types';
-import type { DerivedCharacter } from './derived-character-types';
+import type { DerivedCharacterSummary } from './character-types';
 
 export type Campaign = typeof campaigns_table.$inferSelect;
 export type CampaignMember = typeof campaign_members_table.$inferSelect;
@@ -28,31 +27,37 @@ export type CampaignWithDetails = Campaign & {
 	character_images: string[];
 };
 
+/**
+ * Summary of a character for campaign view.
+ * Combines base character fields with derived stats from DerivedCharacterSummary.
+ * This is the primary type used for displaying characters in campaign context.
+ */
 export type CampaignCharacterSummary = {
+	// Base character fields
 	id: string;
 	name: string;
 	image_url: string;
 	level: number;
 	marked_hp: number;
-	max_hp: number;
 	marked_stress: number;
-	max_stress: number;
 	marked_hope: number;
-	max_hope: number;
-	active_conditions: string[];
-	owner_user_id: string;
-	owner_name?: string; // Optional display name
-	derived_descriptors: DerivedDescriptors;
-	evasion: number;
-	max_armor: number;
 	marked_armor: number;
-	damage_thresholds: { major: number; severe: number };
+	active_conditions: string[];
+
+	// Ownership fields (from joins)
+	owner_user_id: string;
+	owner_name?: string; // Optional display name from campaign_members
+
+	// Derived stats summary (stored in D1, computed client-side)
+	derived_character_summary: DerivedCharacterSummary;
+
+	// Campaign-specific field (from campaign_characters table)
 	claimable: boolean;
 };
 
-// Type for character updates - partial diff of DerivedCharacter (all fields optional)
-// Represents only the changed fields when updating a character
-export type CampaignCharacterLiveUpdate = Partial<DerivedCharacter>;
+// Type for character updates - partial diff of CampaignCharacterSummary
+// Represents only the changed fields when updating a character via WebSocket
+export type CampaignCharacterLiveUpdate = Partial<CampaignCharacterSummary>;
 
 // WebSocket message types for live campaign updates
 export type CampaignLiveWebSocketMessage =
@@ -60,7 +65,7 @@ export type CampaignLiveWebSocketMessage =
 			type: 'connected';
 			version: number;
 			state: CampaignState | null;
-			characters: Record<string, DerivedCharacter>;
+			characters: Record<string, CampaignCharacterSummary>;
 			characterClaimable?: Record<string, boolean>;
 	  }
 	| {
@@ -84,7 +89,7 @@ export type CampaignLiveWebSocketMessage =
 			type: 'state_sync';
 			version: number;
 			state: CampaignState | null;
-			characters: Record<string, DerivedCharacter>;
+			characters: Record<string, CampaignCharacterSummary>;
 			characterClaimable?: Record<string, boolean>;
 	  }
 	| {
@@ -94,20 +99,13 @@ export type CampaignLiveWebSocketMessage =
 	| {
 			type: 'character_added';
 			version: number;
-			character: DerivedCharacter;
+			character: CampaignCharacterSummary;
 			claimable?: boolean;
 	  }
 	| {
 			type: 'character_removed';
 			version: number;
 			characterId: string;
-	  }
-	| {
-			type: 'character_full_update';
-			version: number;
-			characterId: string;
-			character: DerivedCharacter;
-			claimable?: boolean;
 	  }
 	| {
 			type: 'character_diff_update';

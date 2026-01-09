@@ -37,37 +37,7 @@ import type {
 	CampaignLiveWebSocketMessage,
 	CampaignLiveClientMessage
 } from '$lib/types/campaign-types';
-import type { DerivedCharacter } from '$lib/types/derived-character-types';
 import type { HomebrewType } from '$lib/types/homebrew-types';
-
-// Helper function to merge live character updates with existing character data
-// Helper to convert DerivedCharacter to CampaignCharacterSummary
-// claimable is now passed separately since it's stored in campaign_characters table
-function derivedCharacterToSummary(
-	derived: DerivedCharacter,
-	claimable: boolean = false
-): CampaignCharacterSummary {
-	return {
-		id: derived.id,
-		name: derived.name,
-		image_url: derived.image_url,
-		level: derived.level,
-		marked_hp: derived.marked_hp,
-		max_hp: derived.derived_max_hp,
-		marked_stress: derived.marked_stress,
-		max_stress: derived.derived_max_stress,
-		marked_hope: derived.marked_hope,
-		max_hope: derived.derived_max_hope,
-		active_conditions: derived.active_conditions,
-		owner_user_id: derived.clerk_user_id,
-		derived_descriptors: derived.derived_descriptors,
-		evasion: derived.derived_evasion,
-		max_armor: derived.derived_max_armor,
-		marked_armor: derived.marked_armor,
-		damage_thresholds: derived.derived_damage_thresholds,
-		claimable
-	};
-}
 
 // Deep merge helper for nested objects
 function deepMerge<T extends Record<string, any>>(target: T, source: Partial<T>): T {
@@ -95,37 +65,18 @@ function deepMerge<T extends Record<string, any>>(target: T, source: Partial<T>)
 	return output;
 }
 
+// Simplified merge for partial character updates (now CampaignCharacterSummary, not DerivedCharacter)
 function mergeCharacterLiveUpdate(
 	existing: CampaignCharacterSummary | undefined,
-	liveUpdate: CampaignCharacterLiveUpdate | DerivedCharacter
+	liveUpdate: CampaignCharacterLiveUpdate
 ): CampaignCharacterSummary | null {
-	// Check if liveUpdate is a full DerivedCharacter
-	if ('id' in liveUpdate && 'clerk_user_id' in liveUpdate && 'derived_max_hp' in liveUpdate) {
-		// Full character object - convert to summary
-		return derivedCharacterToSummary(liveUpdate as DerivedCharacter);
-	}
-
 	// Partial update - need existing character to merge into
 	if (!existing) {
 		return null; // Can't apply partial update without existing character
 	}
 
 	// Deep merge the partial update
-	const merged = deepMerge(existing, liveUpdate as Partial<CampaignCharacterSummary>);
-
-	// Update derived fields if they're in the update
-	if ('derived_max_hp' in liveUpdate) merged.max_hp = (liveUpdate as any).derived_max_hp;
-	if ('derived_max_stress' in liveUpdate)
-		merged.max_stress = (liveUpdate as any).derived_max_stress;
-	if ('derived_max_hope' in liveUpdate) merged.max_hope = (liveUpdate as any).derived_max_hope;
-	if ('derived_evasion' in liveUpdate) merged.evasion = (liveUpdate as any).derived_evasion;
-	if ('derived_max_armor' in liveUpdate) merged.max_armor = (liveUpdate as any).derived_max_armor;
-	if ('derived_damage_thresholds' in liveUpdate)
-		merged.damage_thresholds = (liveUpdate as any).derived_damage_thresholds;
-	if ('derived_descriptors' in liveUpdate)
-		merged.derived_descriptors = (liveUpdate as any).derived_descriptors;
-
-	return merged;
+	return deepMerge(existing, liveUpdate as Partial<CampaignCharacterSummary>);
 }
 
 // Private WebSocket connection factory - not exported
@@ -621,23 +572,22 @@ function campaignContext() {
 						switch (message.type) {
 							case 'connected':
 							case 'state_sync':
-								// Initial state sync or rejoin sync - now receives full DerivedCharacter objects
+								// Initial state sync or rejoin sync - now receives CampaignCharacterSummary objects directly
 								if (message.state) {
 									campaignState = message.state;
 									// Update lastSavedCampaignState to prevent auto-save from triggering
 									lastSavedCampaignState = JSON.stringify(message.state);
 								}
-								// Convert full DerivedCharacter objects to summaries with claimable status
+								// Characters are now CampaignCharacterSummary objects directly
 								if (message.characters) {
 									const claimableMap = message.characterClaimable ?? {};
 									const merged: Record<string, CampaignCharacterSummary> = { ...characters };
-									for (const [id, derivedChar] of Object.entries(message.characters)) {
+									for (const [id, charSummary] of Object.entries(message.characters)) {
 										const claimable = claimableMap[id] ?? false;
-										const summary = derivedCharacterToSummary(
-											derivedChar as DerivedCharacter,
+										merged[id] = {
+											...charSummary,
 											claimable
-										);
-										merged[id] = summary;
+										};
 									}
 									characters = merged;
 								}
@@ -697,15 +647,14 @@ function campaignContext() {
 								}
 								break;
 							case 'character_added':
-								// Add new character to state with claimable status
+								// Add new character to state - now receives CampaignCharacterSummary directly
 								if (message.character) {
-									const summary = derivedCharacterToSummary(
-										message.character,
-										message.claimable ?? false
-									);
 									characters = {
 										...characters,
-										[message.character.id]: summary
+										[message.character.id]: {
+											...message.character,
+											claimable: message.claimable ?? false
+										}
 									};
 								}
 								break;
@@ -714,19 +663,6 @@ function campaignContext() {
 								if (message.characterId) {
 									const { [message.characterId]: removed, ...rest } = characters;
 									characters = rest;
-								}
-								break;
-							case 'character_full_update':
-								// Replace entire character object with claimable status
-								if (message.characterId && message.character) {
-									const summary = derivedCharacterToSummary(
-										message.character,
-										message.claimable ?? false
-									);
-									characters = {
-										...characters,
-										[message.characterId]: summary
-									};
 								}
 								break;
 							case 'character_diff_update':

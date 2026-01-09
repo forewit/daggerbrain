@@ -2,7 +2,7 @@ import type {
 	BackgroundQuestionAnswer,
 	CharacterSettings,
 	ConnectionAnswer,
-	DerivedDescriptors,
+	DerivedCharacterSummary,
 	DomainCardId,
 	CharacterDescriptions,
 	LevelUpChoices,
@@ -37,13 +37,19 @@ export const CHARACTER_DEFAULTS = {
 		show_campaign_info: true
 	},
 
-	// derived
-	derived_descriptors: <DerivedDescriptors>{
+	// derived character summary for campaign previews
+	derived_character_summary: <DerivedCharacterSummary>{
 		ancestry_name: '',
 		primary_class_name: '',
 		primary_subclass_name: '',
 		secondary_class_name: '',
-		secondary_subclass_name: ''
+		secondary_subclass_name: '',
+		max_hp: 0,
+		max_stress: 6,
+		max_hope: 6,
+		evasion: 0,
+		max_armor: 0,
+		damage_thresholds: { major: 0, severe: 0 }
 	},
 
 	// heritage

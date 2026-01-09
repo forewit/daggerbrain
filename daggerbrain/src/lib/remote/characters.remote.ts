@@ -9,17 +9,17 @@ import { getCharacterAccess } from './permissions.remote';
 import { getCharacterAccessInternal, getCampaignAccessInternal } from '../server/permissions';
 // Note: KV caching has been removed for cost optimization - D1 reads are 500x cheaper than KV reads
 import type { Character } from '../types/character-types';
-import type { DerivedCharacter } from '../types/derived-character-types';
-import { DerivedCharacterSchema } from '../types/derived-character-types';
+import type { CampaignCharacterSummary } from '../types/campaign-types';
 import type { RequestEvent } from '@sveltejs/kit';
 
 // Helper function to notify Durable Object about character changes
 // Calls the DO directly instead of going through HTTP to avoid auth issues
+// Now uses CampaignCharacterSummary instead of full DerivedCharacter for lightweight updates
 async function notifyDurableObject(
 	event: RequestEvent,
 	campaignId: string,
 	type: 'character_added' | 'character_updated' | 'character_removed' | 'character_deleted',
-	data: { characterId: string; character?: DerivedCharacter; updates?: Partial<DerivedCharacter> }
+	data: { characterId: string; summary?: CampaignCharacterSummary; updates?: Partial<CampaignCharacterSummary> }
 ): Promise<void> {
 	if (!campaignId || !event.platform?.env?.CAMPAIGN_LIVE) {
 		console.log('Skipping DO notification: no campaignId or CAMPAIGN_LIVE not available');
@@ -220,8 +220,7 @@ export const create_character = command(
 export const update_character = command(
 	characters_table_update_schema
 		.extend({
-			id: z.string(), // Make id required (override optional from update schema)
-			derived_character: DerivedCharacterSchema.optional() // Derived character from client
+			id: z.string() // Make id required (override optional from update schema)
 		})
 		.passthrough(), // Allow extra fields but strip them
 	async (data) => {
@@ -230,14 +229,13 @@ export const update_character = command(
 		if (!userId) throw error(401, 'Unauthorized');
 		const db = get_db(event);
 
-		// Extract derived_character and id before updating DB
+		// Extract id before updating DB
 		// id is in the schema but won't be updated (it's only used for WHERE clause)
 		// Exclude sensitive fields that should only be modified through dedicated endpoints:
 		// - campaign_id: modified via assign_character_to_campaign
 		// - clerk_user_id: immutable, determines ownership
 		// Note: claimable is now stored in campaign_characters_table, not characters_table
 		const {
-			derived_character,
 			id,
 			campaign_id: _campaignId,
 			clerk_user_id: _clerkUserId,
@@ -256,41 +254,34 @@ export const update_character = command(
 			throw error(403, 'You do not have permission to edit this character');
 		}
 
-		// Update character (without derived_character and id fields - id is immutable)
+		// Update character in D1 (derived_character_summary is part of the character object now)
 		await db.update(characters_table).set(character).where(eq(characters_table.id, id));
 
 		// Get campaign_id from DB (source of truth)
 		const campaignId = existingCharacter.campaign_id;
 
-		// If character is in a campaign, notify DO about the update
+		// If character is in a campaign, notify DO about the update with partial CampaignCharacterSummary
 		if (campaignId) {
-			// Notify DO about character update
-			// If derived_character is provided, send full character (first update or major change)
-			// Otherwise, send partial update with changed fields
-			if (derived_character) {
+			// Build partial update for DO notification based on changed fields
+			const updates: Partial<CampaignCharacterSummary> = {};
+			if (character.marked_hp !== undefined) updates.marked_hp = character.marked_hp;
+			if (character.marked_stress !== undefined) updates.marked_stress = character.marked_stress;
+			if (character.marked_hope !== undefined) updates.marked_hope = character.marked_hope;
+			if (character.marked_armor !== undefined) updates.marked_armor = character.marked_armor;
+			if (character.active_conditions !== undefined)
+				updates.active_conditions = character.active_conditions;
+			if (character.name !== undefined) updates.name = character.name;
+			if (character.level !== undefined) updates.level = character.level;
+			if (character.image_url !== undefined) updates.image_url = character.image_url;
+			// Include derived_character_summary if it was updated
+			if (character.derived_character_summary !== undefined)
+				updates.derived_character_summary = character.derived_character_summary;
+
+			if (Object.keys(updates).length > 0) {
 				await notifyDurableObject(event, campaignId, 'character_updated', {
 					characterId: id,
-					character: derived_character as DerivedCharacter
+					updates
 				});
-			} else {
-				// Compute partial update from changed fields
-				const updates: Partial<DerivedCharacter> = {};
-				if (character.marked_hp !== undefined) updates.marked_hp = character.marked_hp;
-				if (character.marked_stress !== undefined) updates.marked_stress = character.marked_stress;
-				if (character.marked_hope !== undefined) updates.marked_hope = character.marked_hope;
-				if (character.marked_armor !== undefined) updates.marked_armor = character.marked_armor;
-				if (character.active_conditions !== undefined)
-					updates.active_conditions = character.active_conditions;
-				if (character.name !== undefined) updates.name = character.name;
-				if (character.level !== undefined) updates.level = character.level;
-				// Add other fields as needed
-
-				if (Object.keys(updates).length > 0) {
-					await notifyDurableObject(event, campaignId, 'character_updated', {
-						characterId: id,
-						updates
-					});
-				}
 			}
 
 			// Refresh the campaign characters query

@@ -31,13 +31,30 @@
 
 	const compendium = getCompendiumContext();
 
+	// Get summary for convenient access (with fallback defaults for old data)
+	const summary = $derived(
+		character.derived_character_summary ?? {
+			ancestry_name: '',
+			primary_class_name: '',
+			primary_subclass_name: '',
+			secondary_class_name: '',
+			secondary_subclass_name: '',
+			max_hp: 0,
+			max_stress: 6,
+			max_hope: 6,
+			evasion: 0,
+			max_armor: 0,
+			damage_thresholds: { major: 0, severe: 0 }
+		}
+	);
+
 	// Find the primary class by name from compendium
 	const primary_class = $derived.by(() => {
-		if (!character.derived_descriptors.primary_class_name) return null;
+		if (!summary.primary_class_name) return null;
 		const classes = compendium.classes;
 		return (
 			Object.values(classes).find(
-				(cls: CharacterClass) => cls.name === character.derived_descriptors.primary_class_name
+				(cls: CharacterClass) => cls.name === summary.primary_class_name
 			) || null
 		);
 	});
@@ -75,9 +92,9 @@
 					variant="outline"
 				>
 					<p class="truncate text-left text-xs">
-						{character.derived_descriptors.primary_class_name || 'No class'}
+						{summary.primary_class_name || 'No class'}
 						&ensp;•&ensp;
-						{character.derived_descriptors.primary_subclass_name || 'No subclass'}
+						{summary.primary_subclass_name || 'No subclass'}
 					</p>
 					<div class="grow"></div>
 					{#if canEdit}
@@ -100,7 +117,7 @@
 				<div class="flex min-w-0 grow flex-col gap-1">
 					<p class="truncate text-2xl font-bold">{character.name}</p>
 					<p class="mt-1 truncate text-xs text-muted-foreground">
-						{character.derived_descriptors.ancestry_name || 'No ancestry'}
+						{summary.ancestry_name || 'No ancestry'}
 					</p>
 					<p class="truncate text-xs text-muted-foreground">No community</p>
 				</div>
@@ -115,20 +132,20 @@
 
 	<!-- Evasion and Armor -->
 	<div class="mb-4 flex justify-center gap-4">
-		<EvasionPreview evasion={character.evasion} />
-		<ArmorPreview max_armor={character.max_armor} marked_armor={character.marked_armor} />
+		<EvasionPreview evasion={summary.evasion} />
+		<ArmorPreview max_armor={summary.max_armor} marked_armor={character.marked_armor} />
 	</div>
 
 	<!-- Damage Thresholds -->
 	<div class="mx-auto mb-4">
-		<DamageThresholdsPreview damage_thresholds={character.damage_thresholds} class="scale-92" />
+		<DamageThresholdsPreview damage_thresholds={summary.damage_thresholds} class="scale-92" />
 	</div>
 
 	<!-- HP, Stress, Hope -->
 	<div class="mb-4 flex flex-col items-center gap-3">
-		<HpPreview max_hp={character.max_hp} marked_hp={character.marked_hp} />
-		<StressPreview max_stress={character.max_stress} marked_stress={character.marked_stress} />
-		<HopePreview max_hope={character.max_hope} marked_hope={character.marked_hope} />
+		<HpPreview max_hp={summary.max_hp} marked_hp={character.marked_hp} />
+		<StressPreview max_stress={summary.max_stress} marked_stress={character.marked_stress} />
+		<HopePreview max_hope={summary.max_hope} marked_hope={character.marked_hope} />
 	</div>
 
 	<!-- Action Button -->

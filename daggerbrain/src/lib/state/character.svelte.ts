@@ -1779,20 +1779,22 @@ function createCharacter(id: string) {
 		}
 	});
 
-	// ! update descriptors
+	// ! update derived_character_summary (keeps stats in sync for campaign preview)
 	$effect(() => {
 		if (!character) return;
-		character.derived_descriptors.ancestry_name = ancestry_card ? ancestry_card.title : '';
-		character.derived_descriptors.primary_class_name = primary_class ? primary_class.name : '';
-		character.derived_descriptors.primary_subclass_name = primary_subclass
-			? primary_subclass.name
-			: '';
-		character.derived_descriptors.secondary_class_name = secondary_class
-			? secondary_class.name
-			: '';
-		character.derived_descriptors.secondary_subclass_name = secondary_subclass
-			? secondary_subclass.name
-			: '';
+		character.derived_character_summary = {
+			ancestry_name: ancestry_card?.title ?? '',
+			primary_class_name: primary_class?.name ?? '',
+			primary_subclass_name: primary_subclass?.name ?? '',
+			secondary_class_name: secondary_class?.name ?? '',
+			secondary_subclass_name: secondary_subclass?.name ?? '',
+			max_hp: max_hp,
+			max_stress: max_stress,
+			max_hope: max_hope,
+			evasion: evasion,
+			max_armor: max_armor,
+			damage_thresholds: damage_thresholds
+		};
 	});
 
 	// ! clear invalid community card tokens
@@ -3546,12 +3548,10 @@ function createCharacter(id: string) {
 			}
 
 			// Use JSON serialization for deep clone to avoid structuredClone issues
+			// Note: derived_character_summary is kept in sync by the effect above,
+			// so it's already part of the character object and will be saved to D1
 			const cloned = JSON.parse(JSON.stringify(character));
-			const derived = buildDerivedCharacter();
-			const savePromise = update_character({
-				...cloned,
-				derived_character: derived
-			})
+			const savePromise = update_character(cloned)
 				.then(() => {
 					if (!character) return; // Guard against null character
 					// Only update lastSavedCharacter after successful save
@@ -3879,14 +3879,20 @@ function createCharacter(id: string) {
 		derived.derived_domain_card_vault = domain_card_vault;
 		derived.derived_domain_card_loadout = domain_card_loadout;
 
-		// Update derived_descriptors with current class/subclass names
+		// Update derived_character_summary with all summary fields needed for campaign preview
 		// Note: ancestry_card uses 'title', classes/subclasses use 'name'
-		derived.derived_descriptors = {
+		derived.derived_character_summary = {
 			ancestry_name: ancestry_card?.title ?? '',
 			primary_class_name: primary_class?.name ?? '',
 			primary_subclass_name: primary_subclass?.name ?? '',
 			secondary_class_name: secondary_class?.name ?? '',
-			secondary_subclass_name: secondary_subclass?.name ?? ''
+			secondary_subclass_name: secondary_subclass?.name ?? '',
+			max_hp: max_hp,
+			max_stress: max_stress,
+			max_hope: max_hope,
+			evasion: evasion,
+			max_armor: max_armor,
+			damage_thresholds: damage_thresholds
 		};
 
 		return derived;

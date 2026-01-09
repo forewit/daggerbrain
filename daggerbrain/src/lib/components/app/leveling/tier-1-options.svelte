@@ -27,11 +27,11 @@
 			title="Class"
 			highlighted={!context.primary_class}
 			subtitle={context.primary_class && compendium.sources[context.primary_class.source_id]
-				? character.derived_descriptors.primary_class_name +
+				? character.derived_character_summary.primary_class_name +
 					' • ' +
 					compendium.sources[context.primary_class.source_id].short_title
 				: context.primary_class
-					? character.derived_descriptors.primary_class_name
+					? character.derived_character_summary.primary_class_name
 					: ''}
 		>
 			<PrimaryClassSelector />
@@ -42,7 +42,7 @@
 			highlighted={!character.primary_subclass_id}
 			disabled={!character.primary_class_id}
 			title="Subclass"
-			subtitle={character.derived_descriptors.primary_subclass_name}
+			subtitle={character.derived_character_summary.primary_subclass_name}
 		>
 			<PrimarySubclassSelector />
 		</Dropdown>

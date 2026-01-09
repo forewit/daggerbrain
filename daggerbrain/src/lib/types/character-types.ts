@@ -102,13 +102,32 @@ export type Inventory = {
 export type ChosenBeastform = z.infer<typeof ChosenBeastformSchema>;
 export type Companion = z.infer<typeof CompanionSchema>;
 
-export type DerivedDescriptors = {
+/**
+ * Summary of derived character stats for campaign previews.
+ * Stored in D1 and used for character cards in campaign view.
+ * This is the source of truth for derived stats - computed client-side and persisted.
+ */
+export type DerivedCharacterSummary = {
+	// Name descriptors
 	ancestry_name: string;
 	primary_class_name: string;
 	primary_subclass_name: string;
 	secondary_class_name: string;
 	secondary_subclass_name: string;
+
+	// Derived stats for campaign preview
+	max_hp: number;
+	max_stress: number;
+	max_hope: number;
+	evasion: number;
+	max_armor: number;
+	damage_thresholds: { major: number; severe: number };
 };
+
+/**
+ * @deprecated Use DerivedCharacterSummary instead. This alias exists for backward compatibility.
+ */
+export type DerivedDescriptors = DerivedCharacterSummary;
 
 export type BackgroundQuestionAnswer = {
 	question: string;

@@ -75,8 +75,8 @@
 									{char.name.trim() || 'Unnamed Character'}
 								</p>
 								<p class="truncate text-xs text-muted-foreground">
-									HP: {char.marked_hp} / {char.max_hp}
-									&ensp;•&ensp; Stress: {char.marked_stress} / {char.max_stress}
+									HP: {char.marked_hp} / {char.derived_character_summary?.max_hp ?? 0}
+									&ensp;•&ensp; Stress: {char.marked_stress} / {char.derived_character_summary?.max_stress ?? 6}
 									&ensp;•&ensp; Hope: {char.marked_hope}
 								</p>
 								{#if !char.claimable}

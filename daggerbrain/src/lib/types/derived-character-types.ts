@@ -12,12 +12,16 @@ import type {
 	TransformationCard,
 	Weapon
 } from './compendium-types';
-import { z } from 'zod';
 
 /**
  * Fully derived character state - includes base character plus all computed derived values.
- * The derived values are computed client-side and serialized for storage in KV.
- * Used for campaign character summaries and other contexts where fully computed character data is needed.
+ *
+ * @deprecated This type is only used internally by the character sheet for client-side state.
+ * For campaign/DO contexts, use CampaignCharacterSummary instead, which uses the lightweight
+ * DerivedCharacterSummary stored in D1.
+ *
+ * The campaign live view no longer requires full DerivedCharacter objects - it uses
+ * CampaignCharacterSummary which contains only the fields needed for character previews.
  */
 export type DerivedCharacter = Character & {
 	// Derived compendium references
@@ -62,37 +66,3 @@ export type DerivedCharacter = Character & {
 	derived_domain_card_vault: DomainCard[];
 	derived_domain_card_loadout: DomainCard[];
 };
-
-/**
- * Zod schema for validating DerivedCharacter.
- * This validates that all required derived fields are present.
- */
-export const DerivedCharacterSchema = z
-	.object({
-		// Validate key derived stats exist (we don't validate the full nested structure)
-		derived_max_hp: z.number(),
-		derived_max_stress: z.number(),
-		derived_max_hope: z.number(),
-		derived_traits: z.record(z.string(), z.number()),
-		derived_proficiency: z.number(),
-		derived_experience_modifiers: z.array(z.number()),
-		derived_max_experiences: z.number(),
-		derived_max_loadout: z.number(),
-		derived_max_armor: z.number(),
-		derived_max_burden: z.number(),
-		derived_max_short_rest_actions: z.number(),
-		derived_max_long_rest_actions: z.number(),
-		derived_max_consumables: z.number(),
-		derived_consumable_count: z.number(),
-		derived_evasion: z.number(),
-		derived_damage_thresholds: z.object({
-			major: z.number(),
-			severe: z.number()
-		}),
-		derived_primary_class_mastery_level: z.number(),
-		derived_secondary_class_mastery_level: z.number(),
-		derived_spellcast_roll_bonus: z.number(),
-		derived_domain_card_vault: z.array(z.any()),
-		derived_domain_card_loadout: z.array(z.any())
-	})
-	.passthrough(); // Allow other fields from Character type

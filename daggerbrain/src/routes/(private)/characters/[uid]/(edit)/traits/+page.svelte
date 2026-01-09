@@ -75,7 +75,7 @@
 						<Dialog.Content>
 							<Dialog.Header
 								><Dialog.Title
-									>Suggested Traits: {character.derived_descriptors
+									>Suggested Traits: {character.derived_character_summary
 										.primary_class_name}</Dialog.Title
 								></Dialog.Header
 							>

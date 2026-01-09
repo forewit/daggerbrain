@@ -246,11 +246,11 @@
 					{char.name.trim() || 'Unnamed Character'}
 				</p>
 				<p class=" truncate text-xs text-muted-foreground">
-					{char.derived_descriptors.ancestry_name || 'No ancestry'}
+					{char.derived_character_summary?.ancestry_name || 'No ancestry'}
 					&ensp;•&ensp;
-					{char.derived_descriptors.primary_class_name || 'No class'}
+					{char.derived_character_summary?.primary_class_name || 'No class'}
 					&ensp;•&ensp;
-					{char.derived_descriptors.primary_subclass_name || 'No subclass'}
+					{char.derived_character_summary?.primary_subclass_name || 'No subclass'}
 				</p>
 				{#if !char.claimable}
 					<div

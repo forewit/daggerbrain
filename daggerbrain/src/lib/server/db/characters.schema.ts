@@ -4,7 +4,7 @@ import type {
 	BackgroundQuestionAnswer,
 	ConnectionAnswer,
 	CharacterSettings,
-	DerivedDescriptors,
+	DerivedCharacterSummary,
 	LevelUpDomainCardIds,
 	LevelUpChoices,
 	DomainCardId,
@@ -39,11 +39,11 @@ export const characters_table = sqliteTable(
 			.default(CHARACTER_DEFAULTS.settings)
 			.$type<CharacterSettings>(),
 
-		// derived
-		derived_descriptors: text('derived_descriptors', { mode: 'json' })
+		// derived character summary for campaign previews (DB column: derived_descriptors for backward compat)
+		derived_character_summary: text('derived_descriptors', { mode: 'json' })
 			.notNull()
-			.default(CHARACTER_DEFAULTS.derived_descriptors)
-			.$type<DerivedDescriptors>(),
+			.default(CHARACTER_DEFAULTS.derived_character_summary)
+			.$type<DerivedCharacterSummary>(),
 
 		// heritage
 		ancestry_card_id: text('ancestry_card_id'),
