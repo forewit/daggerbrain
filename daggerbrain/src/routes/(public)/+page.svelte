@@ -29,50 +29,6 @@
 	<!-- Content -->
 	<div class="relative z-10 mx-auto h-full w-full">
 		<div class="flex flex-col items-center sm:items-start">
-			<!-- Homebrew Showcase - Full Width Glass Pane -->
-			<section class="relative z-10 mt-14 w-full">
-				<button
-					class="homebrew-showcase group relative min-h-[400px] w-full cursor-pointer overflow-hidden border-y border-muted-foreground/30 bg-background sm:min-h-[320px]"
-					onclick={() => {
-						goto('/homebrew');
-					}}
-				>
-					<!-- Forge Background Image -->
-					<div class="absolute inset-0">
-						<img
-							src="/images/art/forge.webp"
-							alt=""
-							class="h-full w-full object-cover opacity-30 transition-all duration-600 group-hover:scale-103 group-hover:opacity-40"
-							loading="lazy"
-						/>
-					</div>
-
-					<div
-						class="relative z-10 mx-auto flex h-full w-full max-w-5xl flex-col justify-center gap-4 px-4 py-8 sm:px-8 sm:py-12"
-					>
-						<div class="flex flex-col items-center gap-8 sm:text-left">
-							<h3 class="font-eveleth text-2xl font-bold text-foreground">Announcing Homebrew!</h3>
-							<p class="text-center text-sm">
-								Design your own Weapons, Armor, Loot, and more! <br />Build custom content for your
-								Daggerheart characters.
-							</p>
-
-							<div
-								class={cn(
-									buttonVariants({ variant: 'outline' }),
-									'pointer-events-none mx-auto w-min shrink-0 sm:mx-0'
-								)}
-							>
-								Explore Homebrew
-								<ArrowRight
-									class="size-3.5 transition-transform duration-300 group-hover:translate-x-1"
-								/>
-							</div>
-						</div>
-					</div>
-				</button>
-			</section>
-
 			<!-- Hero section-->
 			<section
 				class="mx-auto flex w-full max-w-6xl flex-col items-center gap-x-10 gap-y-16 px-4 pt-16 sm:flex-row sm:justify-evenly sm:px-8"
@@ -148,7 +104,7 @@
 			</section>
 
 			<!-- Character Sheet -->
-			<section class="mx-auto w-full max-w-3xl px-4 pt-24 pb-30 sm:px-8">
+			<section class="mx-auto w-full max-w-3xl px-4 pt-24 sm:px-8">
 				<div
 					class="relative flex flex-col overflow-hidden rounded-xl border border-muted-foreground/20 bg-background/70 text-left shadow-lg backdrop-blur-sm sm:flex-row"
 				>
@@ -167,15 +123,83 @@
 						<a
 							class={cn(buttonVariants({ variant: 'outline' }), 'mt-2 w-min')}
 							href="/characters"
-							onclick={() => {
-								goto('/characters');
-							}}
 						>
 							My characters
 							<ArrowRight class="size-3.5" />
 						</a>
 					</div>
 				</div>
+			</section>
+
+			<!-- Campaigns -->
+			<section class="mx-auto w-full max-w-3xl px-4 pt-24 sm:px-8">
+				<div
+					class="relative flex flex-col overflow-hidden rounded-xl border border-muted-foreground/20 bg-background/70 text-left shadow-lg backdrop-blur-sm sm:flex-row"
+				>
+					<img
+						src="/images/art/campaigns.webp"
+						alt="Character sheet screenshot"
+						class="w-full object-cover sm:w-1/2"
+						loading="lazy"
+					/>
+					<div class="flex grow flex-col justify-center gap-3 px-6 pt-5 pb-6 sm:w-1/2 sm:py-8">
+						<h3 class="font-eveleth text-lg font-bold">Campaigns: focus on your game, not the tools</h3>
+						<p class="text-sm text-muted-foreground">
+							Live updating fear tracker, countdowns, and characer sheets make it easy to run a campaign with friends.
+						</p>
+						<a
+							class={cn(buttonVariants({ variant: 'outline' }), 'mt-2 w-min')}
+							href="/campaigns"
+						>
+							My characters
+							<ArrowRight class="size-3.5" />
+						</a>
+					</div>
+				</div>
+			</section>
+
+			<!-- Homebrew Showcase - Full Width Glass Pane -->
+			<section class="relative z-10 mt-24 w-full pb-30">
+				<button
+					class="homebrew-showcase group relative min-h-[400px] w-full cursor-pointer overflow-hidden border-y border-muted-foreground/30 bg-background sm:min-h-[320px]"
+					onclick={() => {
+						goto('/homebrew');
+					}}
+				>
+					<!-- Forge Background Image -->
+					<div class="absolute inset-0">
+						<img
+							src="/images/art/forge.webp"
+							alt=""
+							class="h-full w-full object-cover opacity-30 transition-all duration-600 group-hover:scale-103 group-hover:opacity-40"
+							loading="lazy"
+						/>
+					</div>
+
+					<div
+						class="relative z-10 mx-auto flex h-full w-full max-w-5xl flex-col justify-center gap-4 px-4 py-8 sm:px-8 sm:py-12"
+					>
+						<div class="flex flex-col items-center gap-8 sm:text-left">
+							<h3 class="font-eveleth text-2xl font-bold text-foreground">Create Homebrew Content</h3>
+							<p class="text-center text-sm">
+								Design your own Weapons, Armor, Loot, and more! <br />Build custom content for your
+								Daggerheart characters.
+							</p>
+
+							<div
+								class={cn(
+									buttonVariants({ variant: 'outline' }),
+									'pointer-events-none mx-auto w-min shrink-0 sm:mx-0'
+								)}
+							>
+								Explore Homebrew
+								<ArrowRight
+									class="size-3.5 transition-transform duration-300 group-hover:translate-x-1"
+								/>
+							</div>
+						</div>
+					</div>
+				</button>
 			</section>
 		</div>
 	</div>
