@@ -84,6 +84,7 @@
 	}
 </script>
 
+{#if context.canEdit}
 <Sheet.Header>
 	<Sheet.Title>Customize Your Character Cards</Sheet.Title>
 	<Sheet.Description class="text-xs italic"
@@ -136,3 +137,4 @@
 		<HeritageCardCatalog onCardClick={handleCardClick} />
 	</div>
 </div>
+{/if}

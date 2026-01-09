@@ -21,6 +21,7 @@
 		<p class="text-xs font-medium text-muted-foreground">Strange Patterns</p>
 
 		<Input
+			disabled={!context.canEdit}
 			type="number"
 			min="1"
 			max="12"

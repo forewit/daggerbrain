@@ -14,6 +14,7 @@
 {#if character}
 	<div class={cn('relative flex items-center gap-4', className)}>
 		<button
+			disabled={!context.canEdit}
 			onclick={() => {
 				character.marked_hp = 0;
 			}}
@@ -22,6 +23,7 @@
 		<div class="flex flex-wrap gap-2">
 			{#each Array(context.max_hp) as _, index}
 				<button
+					disabled={!context.canEdit}
 					aria-label="hp-slot"
 					class="h-3 w-6 rounded-md border border-muted-foreground {index < character.marked_hp
 						? 'bg-muted-foreground'

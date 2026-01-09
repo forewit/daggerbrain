@@ -56,6 +56,7 @@
 	}
 </script>
 
+{#if context.canEdit}
 <Sheet.Header>
 	<Sheet.Title>Customize Your Vault</Sheet.Title>
 	<Sheet.Description class="text-xs italic"
@@ -142,3 +143,4 @@
 		<DomainCardCatalog onCardClick={handleCardClick} />
 	</div>
 </div>
+{/if}

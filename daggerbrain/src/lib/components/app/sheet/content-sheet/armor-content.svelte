@@ -294,7 +294,7 @@
 			</div>
 		{/if}
 
-		{#if inventoryItem}
+		{#if inventoryItem && context.canEdit}
 			<Collapsible.Root bind:open={customizeOpen}>
 				<Collapsible.Trigger
 					class={cn(

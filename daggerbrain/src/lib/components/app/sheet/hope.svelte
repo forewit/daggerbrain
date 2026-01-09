@@ -31,6 +31,7 @@
 {#if character}
 	<div class={cn('flex flex-col justify-center gap-2 text-center', className)}>
 		<button
+		disabled={!context.canEdit}
 			onclick={() => {
 				character.marked_hope = 0;
 			}}
@@ -39,6 +40,7 @@
 		<div class="mb-2 flex flex-wrap justify-center gap-4">
 			{#each Array(context.max_hope) as _, index}
 				<button
+					disabled={!context.canEdit}
 					aria-label="hope-slot"
 					class={cn(
 						'aspect-square h-[16px] w-[16px] rotate-45 transform rounded-[2px] border border-accent transition-all duration-300',

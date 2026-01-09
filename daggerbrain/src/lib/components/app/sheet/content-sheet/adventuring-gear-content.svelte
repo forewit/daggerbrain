@@ -12,7 +12,6 @@
 	let character = $derived(context.character);
 	let adventuringGear = $derived(character?.inventory.adventuring_gear || []);
 
-	let whatIsAdventuringGearOpen = $state(false);
 	let newGearTitle = $state('');
 </script>
 
@@ -21,7 +20,9 @@
 </Sheet.Header>
 
 <div class="flex flex-col gap-6 overflow-y-auto px-4 pb-6">
+	
 	<!-- Add New Gear Section -->
+	{#if context.canEdit}
 	<div class="flex items-center gap-2">
 		<Input
 			bind:value={newGearTitle}
@@ -53,6 +54,7 @@
 			Add
 		</Button>
 	</div>
+	{/if}
 
 	{#if adventuringGear.length > 0}
 		<!-- Adventuring Gear Table -->
@@ -64,6 +66,7 @@
 							{gear.title}
 						</td>
 						<td class="py-2 text-right">
+							{#if context.canEdit}
 							<Button
 								variant="ghost"
 								size="sm"
@@ -72,6 +75,7 @@
 							>
 								<CircleMinus class="size-3.5" />
 							</Button>
+							{/if}
 						</td>
 					</tr>
 				{/each}

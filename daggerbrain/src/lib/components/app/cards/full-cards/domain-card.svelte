@@ -39,6 +39,7 @@
 		{@const current_count = character.domain_card_tokens[card.compendium_id] || 0}
 		<div class="flex items-center justify-center gap-2">
 			<!-- Minus Button -->
+			{#if context.canEdit}
 			<button
 				type="button"
 				onclick={() => {
@@ -52,7 +53,7 @@
 			>
 				−
 			</button>
-
+			{/if}
 			<!-- Coin Stack -->
 			<div class="relative flex items-center justify-center">
 				<!-- Stack of coins (background coins) -->
@@ -79,6 +80,7 @@
 			</div>
 
 			<!-- Plus Button -->
+			{#if context.canEdit}
 			<button
 				type="button"
 				onclick={() => {
@@ -92,6 +94,7 @@
 			>
 				+
 			</button>
+			{/if}
 		</div>
 	{/if}
 {/snippet}
@@ -105,6 +108,7 @@
 			{#if choice.conditional_choice === null || (conditional_choice_id && conditional_selection_id && character.domain_card_choices[card.compendium_id][conditional_choice_id] && character.domain_card_choices[card.compendium_id][conditional_choice_id].includes(conditional_selection_id))}
 				{#if choice.type === 'arbitrary'}
 					<ChoiceSelector
+						disabled={!context.canEdit}
 						class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
 						bind:selected_ids={character.domain_card_choices[card.compendium_id][choice.choice_id]}
 						max={choice.max}
@@ -113,6 +117,7 @@
 					/>
 				{:else if choice.type === 'experience'}
 					<ChoiceSelector
+						disabled={!context.canEdit}
 						class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
 						bind:selected_ids={character.domain_card_choices[card.compendium_id][choice.choice_id]}
 						max={choice.max}

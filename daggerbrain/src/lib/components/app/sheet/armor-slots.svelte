@@ -11,7 +11,7 @@
 
 {#if character}
 	<div class={cn('flex h-min gap-2 rounded-md  text-center', className)}>
-		<button class="relative" onclick={() => (character.marked_armor = 0)}>
+		<button class="relative" disabled={!context.canEdit} onclick={() => (character.marked_armor = 0)}>
 			<svg
 				class="size-20 text-primary-muted"
 				xmlns="http://www.w3.org/2000/svg"
@@ -71,6 +71,7 @@
 		>
 			{#each Array(context.max_armor) as _, index}
 				<button
+					disabled={!context.canEdit}
 					aria-label="armor-slot"
 					class="size-min rounded outline-offset-2"
 					onclick={() => {

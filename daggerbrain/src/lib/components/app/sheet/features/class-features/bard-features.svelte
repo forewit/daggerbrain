@@ -3,6 +3,7 @@
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
+	import { cn } from '$lib/utils';
 
 	const context = getCharacterContext();
 	let character = $derived(context.character);
@@ -30,6 +31,8 @@
 
 		<Label class="mr-2 ml-auto cursor-pointer text-xs font-normal text-muted-foreground">
 			<Checkbox
+				disabled={!context.canEdit}
+				class={cn(!context.canEdit && 'pointer-events-none')}
 				checked={character.class_choices[bard_class_id]?.['given_out_this_session']?.[0] === 'yes'}
 				onCheckedChange={(checked) => {
 					if (!character.class_choices[bard_class_id]) character.class_choices[bard_class_id] = {};

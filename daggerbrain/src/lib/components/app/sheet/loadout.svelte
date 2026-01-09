@@ -154,7 +154,9 @@
 							{/if}
 						</div>
 
+
 						<!-- Rest Mode -->
+						{#if context.canEdit}
 						<div class="flex flex-col items-center justify-center gap-3 px-6">
 							<Stress
 								class={cn(
@@ -179,6 +181,7 @@
 								<p>Rest Mode</p>
 							</Label>
 						</div>
+						{/if}
 					</div>
 					<Dialog.Footer class="px-6">
 						<Dialog.Close class={buttonVariants({ variant: 'link' })}>Close</Dialog.Close>
@@ -186,12 +189,14 @@
 				</Dialog.Content>
 			</Dialog.Root>
 
+			{#if context.canEdit}
 			<Button
 				variant="ghost"
 				class="text-muted-foreground/50"
 				size="sm"
 				onclick={openDomainCardCatalog}><Pencil /></Button
 			>
+			{/if}
 		</div>
 		{#if expanded}
 			<div class="relative">

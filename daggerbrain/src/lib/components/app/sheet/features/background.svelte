@@ -30,7 +30,11 @@
 					{#each character.background_question_answers as item, i}
 						<div class="flex flex-col gap-1">
 							<p class="text-xs text-muted-foreground">{item.question || 'Untitled question'}</p>
+							{#if context.canEdit}
 							<Textarea bind:value={character.background_question_answers[i].answer} />
+							{:else}
+							<p class="text-xs text-muted-foreground italic">{item.answer || 'No answer'}</p>
+							{/if}
 						</div>
 					{/each}
 				</div>
@@ -54,7 +58,11 @@
 							<p class="text-xs text-muted-foreground">
 								{item.question || 'Untitled connection'}
 							</p>
+							{#if context.canEdit}
 							<Textarea bind:value={character.connection_answers[i].answer} />
+							{:else}
+							<p class="text-xs text-muted-foreground italic">{item.answer || 'No answer'}</p>
+							{/if}
 						</div>
 					{/each}
 				</div>
@@ -74,40 +82,62 @@
 			<div class="ml-5 flex flex-col gap-3 pt-2">
 				<div class="flex items-center gap-1">
 					<p class="w-30 text-xs text-muted-foreground">Clothes that are:</p>
+					{#if context.canEdit}
 					<Input
 						bind:value={character.character_descriptions.clothes}
 						placeholder={primary_class.character_description_suggestions.clothes}
 					/>
+					{:else}
+					<p class="text-xs text-muted-foreground italic">{character.character_descriptions.clothes || 'No answer'}</p>
+					{/if}
 				</div>
 				<div class="flex items-center gap-1">
 					<p class="w-30 text-xs text-muted-foreground">Eyes like:</p>
+					{#if context.canEdit}
 					<Input
 						bind:value={character.character_descriptions.eyes}
 						placeholder={primary_class.character_description_suggestions.eyes}
 					/>
+					{:else}
+					<p class="text-xs text-muted-foreground italic">{character.character_descriptions.eyes || 'No answer'}</p>
+					{/if}					
 				</div>
 				<div class="flex items-center gap-1">
 					<p class="w-30 text-xs text-muted-foreground">Body that's:</p>
+
+						{#if context.canEdit}
 					<Input
 						bind:value={character.character_descriptions.body}
 						placeholder={primary_class.character_description_suggestions.body}
 					/>
+					{:else}
+					<p class="text-xs text-muted-foreground italic">{character.character_descriptions.body || 'No answer'}</p>
+					{/if}
+					
 				</div>
 
 				<div class="flex items-center gap-1">
 					<p class="w-30 text-xs text-muted-foreground">Skin the color of:</p>
+					{#if context.canEdit}
 					<Input
 						bind:value={character.character_descriptions.skin}
 						placeholder={primary_class.character_description_suggestions.skin}
 					/>
+					{:else}
+					<p class="text-xs text-muted-foreground italic">{character.character_descriptions.skin || 'No answer'}</p>
+					{/if}
 				</div>
 
 				<div class="flex items-center gap-1">
 					<p class="w-30 text-xs text-muted-foreground">Attitude like:</p>
+					{#if context.canEdit}
 					<Input
 						bind:value={character.character_descriptions.attitude}
 						placeholder={primary_class.character_description_suggestions.attitude}
 					/>
+					{:else}
+					<p class="text-xs text-muted-foreground italic">{character.character_descriptions.attitude || 'No answer'}</p>
+					{/if}
 				</div>
 			</div>
 		</Collapsible.Content>

@@ -10,7 +10,8 @@
 		onSelectionChange: onSelectionChange = () => {},
 		class: className = '',
 		term = 'Option',
-		term_plural = 'Options'
+		term_plural = 'Options',
+		disabled = false
 	}: {
 		selected_ids: string[];
 		max: number;
@@ -20,12 +21,14 @@
 		class?: string;
 		term?: string;
 		term_plural?: string;
+		disabled?: boolean;
 	} = $props();
 
 	let open = $state(false);
 </script>
 
 <Select.Root
+{disabled}
 	type="multiple"
 	bind:open
 	value={selected_ids}

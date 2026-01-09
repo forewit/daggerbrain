@@ -150,6 +150,7 @@
 		<div class="flex flex-col gap-2">
 			<span class="text-xs font-medium">Base Form (Tier 1):</span>
 			<Select.Root
+				disabled={!context.canEdit}
 				type="single"
 				value={current_choice}
 				onValueChange={(value: string) => {
@@ -196,6 +197,7 @@
 			<div class="flex flex-col gap-1">
 				<span class="text-xs font-medium">Base Forms (Tiers 1-2):</span>
 				<Select.Root
+					disabled={!context.canEdit}
 					type="multiple"
 					value={base_forms.filter(Boolean)}
 					onValueChange={(value: string[]) => {
@@ -314,6 +316,7 @@
 					<div class="flex flex-col gap-1">
 						<span class="text-xs font-medium">Advantages (Select 4):</span>
 						<Select.Root
+							disabled={!context.canEdit}
 							type="multiple"
 							value={combined_advantage_selections}
 							onValueChange={(value: string[]) => {
@@ -389,6 +392,7 @@
 					<div class="flex flex-col gap-1">
 						<span class="text-xs font-medium">Features (Select 2):</span>
 						<Select.Root
+							disabled={!context.canEdit}
 							type="multiple"
 							value={combined_feature_selections}
 							onValueChange={(value: string[]) => {
@@ -489,6 +493,7 @@
 		<div class="flex flex-col gap-2">
 			<span class="text-xs font-medium">Base Form (Tiers 1-2):</span>
 			<Select.Root
+				disabled={!context.canEdit}
 				type="single"
 				value={current_choice}
 				onValueChange={(value: string) => {
@@ -536,6 +541,7 @@
 			<div class="flex flex-col gap-1">
 				<span class="text-xs font-medium">Base Forms (Tiers 1-3):</span>
 				<Select.Root
+					disabled={!context.canEdit}
 					type="multiple"
 					value={base_forms.filter(Boolean)}
 					onValueChange={(value: string[]) => {
@@ -668,6 +674,7 @@
 					<div class="flex flex-col gap-1">
 						<span class="text-xs font-medium">Advantages (Select 5):</span>
 						<Select.Root
+							disabled={!context.canEdit}
 							type="multiple"
 							value={combined_advantage_selections}
 							onValueChange={(value: string[]) => {
@@ -749,6 +756,7 @@
 					<div class="flex flex-col gap-1">
 						<span class="text-xs font-medium">Features (Select 3):</span>
 						<Select.Root
+							disabled={!context.canEdit}
 							type="multiple"
 							value={combined_feature_selections}
 							onValueChange={(value: string[]) => {

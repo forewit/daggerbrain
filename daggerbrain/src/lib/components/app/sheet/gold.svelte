@@ -134,6 +134,7 @@
 				{#each Array(unit.slots) as _, slotIndex}
 					{@const isActive = slotIndex < Math.min(unitCounts[unit.key], MAX_COUNTS[unit.key])}
 					<button
+						disabled={!context.canEdit}
 						type="button"
 						aria-label={`${unit.label} slot ${slotIndex + 1}`}
 						aria-pressed={isActive}
@@ -142,7 +143,8 @@
 							heightClass,
 							isActive
 								? 'text-accent drop-shadow-[0_0_6px_rgba(253,212,113,0.4)]'
-								: 'text-muted-foreground'
+								: 'text-muted-foreground',
+							!context.canEdit && 'pointer-events-none'
 						)}
 						onclick={() => handleSlotClick(unit.key, slotIndex)}
 					>

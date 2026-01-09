@@ -3486,8 +3486,23 @@ function createCharacter(id: string) {
 
 	// Sync character updates from campaign context (when character is in a campaign)
 	// This replaces the old WebSocket connection in character context
+	// IMPORTANT: Only sync FROM campaign context TO character when user cannot edit
+	// (i.e., when viewing someone else's character). Users with edit permissions
+	// should be able to make changes that sync TO the campaign context, not FROM it.
 	$effect(() => {
 		if (!character || !character.campaign_id) return;
+
+		// Don't sync if user has edit permissions - they should be the source of truth
+		// Only sync when viewing (canEdit === false) to get updates from other users
+		const editPermission = canEdit;
+		if (editPermission === true) {
+			// User can edit - don't overwrite their changes with campaign context
+			return;
+		}
+		// If editPermission is null, it's still loading - wait
+		if (editPermission === null) {
+			return;
+		}
 
 		// Try to get campaign context (may not exist if not set up yet)
 		try {
