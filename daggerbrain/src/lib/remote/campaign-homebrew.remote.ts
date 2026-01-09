@@ -489,31 +489,36 @@ export const add_homebrew_to_vault = command(
 			throw error(403, 'You can only add your own homebrew items to the vault');
 		}
 
-		// Check if already in vault
-		const [existing] = await db
-			.select()
-			.from(campaign_homebrew_vault_table)
-			.where(
-				and(
-					eq(campaign_homebrew_vault_table.campaign_id, campaign_id),
-					eq(campaign_homebrew_vault_table.homebrew_id, homebrew_id)
-				)
-			)
-			.limit(1);
-
-		if (existing) {
-			throw error(400, 'Item is already in the vault');
-		}
-
-		// Add to vault
+		// Add to vault - idempotent insert pattern to handle race conditions
 		const vaultId = crypto.randomUUID();
-		await db.insert(campaign_homebrew_vault_table).values({
+		const insertResult = await db.insert(campaign_homebrew_vault_table).values({
 			id: vaultId,
 			campaign_id,
 			homebrew_type: homebrewType,
 			homebrew_id,
 			added_at: Date.now()
 		});
+
+		// Check if insert succeeded (0 changes means duplicate or error)
+		if (insertResult.meta.changes === 0) {
+			// Check if it's actually a duplicate (race condition)
+			const [existing] = await db
+				.select()
+				.from(campaign_homebrew_vault_table)
+				.where(
+					and(
+						eq(campaign_homebrew_vault_table.campaign_id, campaign_id),
+						eq(campaign_homebrew_vault_table.homebrew_id, homebrew_id)
+					)
+				)
+				.limit(1);
+
+			if (existing) {
+				throw error(400, 'Item is already in the vault');
+			}
+			// If not found, it was a different error - re-throw
+			throw error(500, 'Failed to add item to vault');
+		}
 
 		// Refresh the query
 		get_campaign_homebrew_vault(campaign_id).refresh();

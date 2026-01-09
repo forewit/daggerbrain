@@ -1,6 +1,6 @@
 import { query, command, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
-import { eq, and, inArray } from 'drizzle-orm';
+import { eq, and, inArray, count, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import {
 	campaigns_table,
@@ -287,28 +287,14 @@ export const get_campaign_state = query(z.string(), async (campaignId): Promise<
 	get_auth(event); // Validate authentication
 	const db = get_db(event);
 
-	// Read directly from D1 (no KV caching - D1 reads are 500x cheaper than KV)
-	const [dbState] = await db
-		.select()
-		.from(campaign_state_table)
-		.where(eq(campaign_state_table.campaign_id, campaignId))
-		.limit(1);
+	// Try to insert default state - silently ignored if already exists
+	// This eliminates the race condition in the old check-then-insert pattern
+	const inviteCode = generateInviteCode();
+	const now = Date.now();
 
-	// If no state exists in D1, create default
-	if (!dbState) {
-		const now = Date.now();
-		const inviteCode = generateInviteCode();
-		await db.insert(campaign_state_table).values({
-			campaign_id: campaignId,
-			fear_track: 0,
-			notes: null,
-			countdowns: [],
-			invite_code: inviteCode,
-			updated_at: now
-		});
-
-		console.log('created default campaign state in D1');
-		return {
+	await db
+		.insert(campaign_state_table)
+		.values({
 			campaign_id: campaignId,
 			fear_track: 0,
 			fear_visible_to_players: false,
@@ -316,28 +302,48 @@ export const get_campaign_state = query(z.string(), async (campaignId): Promise<
 			countdowns: [],
 			invite_code: inviteCode,
 			updated_at: now
-		};
-	}
+		})
+		.onConflictDoNothing({
+			target: campaign_state_table.campaign_id // Explicit target for primary key
+		});
+
+	// Now fetch the state (either just inserted or existing)
+	const [dbState] = await db
+		.select()
+		.from(campaign_state_table)
+		.where(eq(campaign_state_table.campaign_id, campaignId))
+		.limit(1);
 
 	// Handle backward compatibility: if invite_code is missing, generate one
-	let inviteCode = dbState.invite_code;
-	if (!inviteCode) {
-		inviteCode = generateInviteCode();
-		const now = Date.now();
-		await db
+	let inviteCodeResult = dbState.invite_code;
+	if (!inviteCodeResult) {
+		const newInviteCode = generateInviteCode();
+		// Use conditional update - only if still null (another race protection)
+		const updateResult = await db
 			.update(campaign_state_table)
-			.set({ invite_code: inviteCode, updated_at: now })
-			.where(eq(campaign_state_table.campaign_id, campaignId));
+			.set({ invite_code: newInviteCode, updated_at: Date.now() })
+			.where(and(eq(campaign_state_table.campaign_id, campaignId), sql`invite_code IS NULL`));
+
+		if (updateResult.meta.changes > 0) {
+			inviteCodeResult = newInviteCode;
+		} else {
+			// Another request set it first, re-fetch
+			const [refreshed] = await db
+				.select({ invite_code: campaign_state_table.invite_code })
+				.from(campaign_state_table)
+				.where(eq(campaign_state_table.campaign_id, campaignId))
+				.limit(1);
+			inviteCodeResult = refreshed.invite_code;
+		}
 	}
 
-	console.log('fetched campaign state from D1');
 	return {
 		campaign_id: dbState.campaign_id,
 		fear_track: dbState.fear_track,
 		fear_visible_to_players: dbState.fear_visible_to_players ?? false,
 		notes: dbState.notes,
 		countdowns: dbState.countdowns ?? [],
-		invite_code: inviteCode,
+		invite_code: inviteCodeResult!,
 		updated_at: dbState.updated_at
 	};
 });
@@ -577,25 +583,33 @@ export const join_campaign = command(
 			throw err;
 		}
 
-		// If character_id is provided, assign it to the campaign
+		// If character_id is provided, use batch for atomicity
 		if (character_id) {
 			const now = Date.now();
 
-			// Update character's campaign_id
-			await db
-				.update(characters_table)
-				.set({ campaign_id })
-				.where(eq(characters_table.id, character_id));
+			await db.batch([
+				// Update character's campaign_id
+				db
+					.update(characters_table)
+					.set({ campaign_id })
+					.where(eq(characters_table.id, character_id)),
 
-			// Insert into campaign_characters join table (not claimable since player is joining with it)
-			await db.insert(campaign_characters_table).values({
-				campaign_id,
-				character_id,
-				claimable: 0,
-				added_at: now
-			});
+				// Insert into campaign_characters - ignore if already exists (race condition)
+				db
+					.insert(campaign_characters_table)
+					.values({
+						campaign_id,
+						character_id,
+						claimable: 0,
+						added_at: now
+					})
+					.onConflictDoNothing({
+						// Composite primary key requires array of columns
+						target: [campaign_characters_table.campaign_id, campaign_characters_table.character_id]
+					})
+			]);
 
-			// Notify DO about character being added (DO will fetch full data if needed)
+			// Notify DO about character being added
 			await notifyDurableObject(event, campaign_id, 'character_added', {
 				characterId: character_id,
 				claimable: false
@@ -661,104 +675,74 @@ export const claim_character = command(
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		// Get character
-		const [character] = await db
-			.select()
-			.from(characters_table)
-			.where(eq(characters_table.id, character_id))
-			.limit(1);
-
-		if (!character) {
-			throw error(404, 'Character not found');
-		}
-
-		// Verify character is in the specified campaign
-		if (character.campaign_id !== campaign_id) {
-			throw error(400, 'Character is not in this campaign');
-		}
-
-		// Get campaign_characters entry to check claimable status
-		const [campaignChar] = await db
-			.select()
-			.from(campaign_characters_table)
-			.where(
-				and(
-					eq(campaign_characters_table.campaign_id, campaign_id),
-					eq(campaign_characters_table.character_id, character_id)
-				)
-			)
-			.limit(1);
-
-		if (!campaignChar) {
-			throw error(400, 'Character is not registered in this campaign');
-		}
-
-		// Verify character is claimable
-		if (campaignChar.claimable !== 1) {
-			throw error(403, 'This character is not claimable');
-		}
-
-		// Verify user is a member of the campaign and get their role
+		// Verify user is a player in the campaign (not GM)
 		const access = await getCampaignAccessInternal(db, userId, campaign_id);
 		if (!access.membership) {
-			throw error(403, 'You must be a member of the campaign to claim characters');
+			throw error(403, 'You must be a member of the campaign');
 		}
-
-		// Verify user is a player (not GM)
 		if (access.role === 'gm') {
 			throw error(403, 'GMs cannot claim characters');
 		}
 
-		// Check if player already has a non-claimable character in this campaign
-		const existingCampaignCharacters = await db
-			.select()
+		// Check character limit before attempting claim
+		const [existingCharacters] = await db
+			.select({ count: count() })
 			.from(characters_table)
-			.innerJoin(
-				campaign_characters_table,
-				and(
-					eq(characters_table.id, campaign_characters_table.character_id),
-					eq(campaign_characters_table.campaign_id, campaign_id)
-				)
-			)
+			.where(eq(characters_table.clerk_user_id, userId));
+
+		if (existingCharacters.count >= CHARACTER_LIMIT) {
+			throw error(403, 'Character limit reached');
+		}
+
+		// Check if user already has a non-claimable character in this campaign
+		const existingInCampaign = await db
+			.select()
+			.from(campaign_characters_table)
+			.innerJoin(characters_table, eq(characters_table.id, campaign_characters_table.character_id))
 			.where(
 				and(
-					eq(characters_table.campaign_id, campaign_id),
+					eq(campaign_characters_table.campaign_id, campaign_id),
 					eq(characters_table.clerk_user_id, userId),
 					eq(campaign_characters_table.claimable, 0)
 				)
 			)
 			.limit(1);
 
-		if (existingCampaignCharacters.length > 0) {
-			throw error(403, 'You can only claim one character per campaign');
+		if (existingInCampaign.length > 0) {
+			throw error(403, 'You already have a character in this campaign');
 		}
 
-		// Check if user has reached the character limit
-		const existingCharacters = await db
-			.select()
-			.from(characters_table)
-			.where(eq(characters_table.clerk_user_id, userId));
+		// ATOMIC: Use batch with conditional updates
+		// Order matters: claim status first, then ownership
+		// The claimable update only succeeds if claimable = 1
+		const [claimResult, ownershipResult] = await db.batch([
+			// First: Atomically set claimable = 0, but ONLY if it's currently 1
+			// This is the "lock" - only one concurrent request can succeed
+			db
+				.update(campaign_characters_table)
+				.set({ claimable: 0 })
+				.where(
+					and(
+						eq(campaign_characters_table.campaign_id, campaign_id),
+						eq(campaign_characters_table.character_id, character_id),
+						eq(campaign_characters_table.claimable, 1) // KEY: Only if claimable!
+					)
+				),
 
-		if (existingCharacters.length >= CHARACTER_LIMIT) {
-			throw error(403, `Character limit reached. You can only have ${CHARACTER_LIMIT} characters.`);
-		}
-
-		// Update character ownership
-		await db
-			.update(characters_table)
-			.set({ clerk_user_id: userId })
-			.where(eq(characters_table.id, character_id));
-
-		// Update campaign_characters to set claimable to false
-		await db
-			.update(campaign_characters_table)
-			.set({ claimable: 0 })
-			.where(
-				and(
-					eq(campaign_characters_table.campaign_id, campaign_id),
-					eq(campaign_characters_table.character_id, character_id)
+			// Second: Update ownership
+			db
+				.update(characters_table)
+				.set({ clerk_user_id: userId })
+				.where(
+					and(eq(characters_table.id, character_id), eq(characters_table.campaign_id, campaign_id))
 				)
-			);
+		]);
+
+		// Check if claim succeeded (claimable update affected 1 row)
+		// NOTE: D1 uses meta.changes property
+		if (claimResult.meta.changes === 0) {
+			throw error(400, 'Character is not claimable or was already claimed');
+		}
 
 		// Notify DO about character being updated (ownership changed)
 		await notifyDurableObject(event, campaign_id, 'character_updated', {
@@ -771,7 +755,6 @@ export const claim_character = command(
 		get_campaign_characters(campaign_id).refresh();
 		get_all_characters().refresh();
 
-		console.log('claimed character in D1');
 		return { success: true };
 	}
 );
@@ -1128,15 +1111,47 @@ export const assign_character_to_campaign = command(
 			}
 		}
 
-		// Update character's campaign_id
-		await db
-			.update(characters_table)
-			.set({ campaign_id })
-			.where(eq(characters_table.id, character_id));
+		// When assigning to a new campaign, use batch for atomicity
+		if (campaign_id) {
+			await db.batch([
+				// Update character's campaign_id
+				db
+					.update(characters_table)
+					.set({ campaign_id })
+					.where(eq(characters_table.id, character_id)),
 
-		// Handle campaign_characters join table
+				// Insert or update campaign_characters entry
+				// Uses upsert pattern for idempotency
+				db
+					.insert(campaign_characters_table)
+					.values({
+						campaign_id,
+						character_id,
+						claimable: shouldBeClaimable ? 1 : 0,
+						added_at: now
+					})
+					.onConflictDoUpdate({
+						// Composite primary key requires array
+						target: [campaign_characters_table.campaign_id, campaign_characters_table.character_id],
+						set: { claimable: shouldBeClaimable ? 1 : 0 }
+					})
+			]);
+
+			// Notify DO about character being added to campaign
+			await notifyDurableObject(event, campaign_id, 'character_added', {
+				characterId: character_id,
+				claimable: shouldBeClaimable
+			});
+		} else {
+			// Just removing from campaign - no new campaign to assign to
+			await db
+				.update(characters_table)
+				.set({ campaign_id: null })
+				.where(eq(characters_table.id, character_id));
+		}
+
+		// When removing from old campaign (if different), handle separately
 		if (oldCampaignId && oldCampaignId !== campaign_id) {
-			// Remove from old campaign's join table
 			await db
 				.delete(campaign_characters_table)
 				.where(
@@ -1145,52 +1160,8 @@ export const assign_character_to_campaign = command(
 						eq(campaign_characters_table.character_id, character_id)
 					)
 				);
-		}
 
-		// If assigned to campaign, insert/update join table
-		if (campaign_id) {
-			// Check if entry already exists
-			const [existing] = await db
-				.select()
-				.from(campaign_characters_table)
-				.where(
-					and(
-						eq(campaign_characters_table.campaign_id, campaign_id),
-						eq(campaign_characters_table.character_id, character_id)
-					)
-				)
-				.limit(1);
-
-			if (existing) {
-				// Update existing entry
-				await db
-					.update(campaign_characters_table)
-					.set({ claimable: shouldBeClaimable ? 1 : 0 })
-					.where(
-						and(
-							eq(campaign_characters_table.campaign_id, campaign_id),
-							eq(campaign_characters_table.character_id, character_id)
-						)
-					);
-			} else {
-				// Insert new entry
-				await db.insert(campaign_characters_table).values({
-					campaign_id,
-					character_id,
-					claimable: shouldBeClaimable ? 1 : 0,
-					added_at: now
-				});
-			}
-
-			// Notify DO about character being added to campaign
-			await notifyDurableObject(event, campaign_id, 'character_added', {
-				characterId: character_id,
-				claimable: shouldBeClaimable
-			});
-		}
-
-		// If character was removed from old campaign, notify DO
-		if (oldCampaignId && oldCampaignId !== campaign_id) {
+			// Notify old campaign's DO
 			await notifyDurableObject(event, oldCampaignId, 'character_removed', {
 				characterId: character_id
 			});

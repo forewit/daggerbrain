@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { upload_user_image } from '$lib/remote/images.remote';
+	import { getUserContext } from '$lib/state/user.svelte';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 
 	let {
@@ -11,6 +11,8 @@
 		id?: string;
 		alt?: string;
 	} = $props();
+
+	const user = getUserContext();
 
 	let fileInput: HTMLInputElement | null = $state(null);
 	let pendingFile: File | null = $state(null);
@@ -65,7 +67,7 @@
 				reader.readAsDataURL(pendingFile!);
 			});
 
-			const url = await upload_user_image({
+			const url = await user.upload_user_image({
 				data: base64,
 				name: pendingFile.name,
 				type: pendingFile.type

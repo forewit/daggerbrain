@@ -38,29 +38,29 @@ export const dismiss_popup = command(z.string(), async (popupId) => {
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Get or create user record
+	// Get existing dismissed_popups or use empty array
 	const [existingUser] = await db
-		.select()
+		.select({ dismissed_popups: users_table.dismissed_popups })
 		.from(users_table)
 		.where(eq(users_table.clerk_id, userId))
 		.limit(1);
 
-	// Use existing dismissed_popups or start with empty array
-	const dismissed_popups = [...(existingUser?.dismissed_popups ?? [])];
+	const currentPopups = existingUser?.dismissed_popups ?? [];
+	const updatedPopups = currentPopups.includes(popupId)
+		? currentPopups
+		: [...currentPopups, popupId];
 
-	// Add popup ID if not already present
-	if (!dismissed_popups.includes(popupId)) {
-		dismissed_popups.push(popupId);
-	}
-
-	if (existingUser) {
-		await db.update(users_table).set({ dismissed_popups }).where(eq(users_table.clerk_id, userId));
-	} else {
-		await db.insert(users_table).values({
+	// Atomic upsert
+	await db
+		.insert(users_table)
+		.values({
 			clerk_id: userId,
-			dismissed_popups
+			dismissed_popups: updatedPopups
+		})
+		.onConflictDoUpdate({
+			target: users_table.clerk_id,
+			set: { dismissed_popups: updatedPopups }
 		});
-	}
 
 	get_user().refresh();
 	console.log('dismissed popup in D1');
@@ -72,21 +72,17 @@ export const update_user = command(users_table_update_schema, async (updates) =>
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Get or create user record
-	const [existingUser] = await db
-		.select()
-		.from(users_table)
-		.where(eq(users_table.clerk_id, userId))
-		.limit(1);
-
-	if (existingUser) {
-		await db.update(users_table).set(updates).where(eq(users_table.clerk_id, userId));
-	} else {
-		await db.insert(users_table).values({
+	// Atomic upsert
+	await db
+		.insert(users_table)
+		.values({
 			clerk_id: userId,
 			...updates
+		})
+		.onConflictDoUpdate({
+			target: users_table.clerk_id,
+			set: updates
 		});
-	}
 
 	get_user().refresh();
 	console.log('updated user in D1');

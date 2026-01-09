@@ -12,11 +12,6 @@
 	import { goto } from '$app/navigation';
 	import { error } from '@sveltejs/kit';
 	import Footer from '$lib/components/app/footer.svelte';
-	import {
-		get_user_campaigns,
-		create_campaign,
-		delete_campaign
-	} from '$lib/remote/campaigns.remote';
 	import { getUserContext } from '$lib/state/user.svelte';
 	import type { CampaignWithDetails } from '$lib/types/campaign-types';
 	import { formatDate } from '$lib/utils';
@@ -26,8 +21,9 @@
 	const clerkCtx = useClerkContext();
 	const clerkUser = $derived(clerkCtx.user);
 
-	let campaigns = $state<CampaignWithDetails[]>([]);
-	let loading = $state(true);
+	// Use user context's campaigns and loading state
+	const campaigns = $derived(user.all_campaigns);
+	const loading = $derived(user.loading);
 	let creatingCampaign = $state(false);
 
 	// Create campaign dialog state
@@ -41,27 +37,12 @@
 	let deletingCampaign = $state(false);
 	let deleteConfirmation = $state('');
 
-	// Load campaigns
-	$effect(() => {
-		loading = true;
-		get_user_campaigns()
-			.then((c) => {
-				campaigns = c;
-			})
-			.catch((err) => {
-				error(500, err.message);
-			})
-			.finally(() => {
-				loading = false;
-			});
-	});
-
 	async function handleCreateCampaign() {
 		if (!newCampaignName.trim()) return;
 
 		creatingCampaign = true;
 		try {
-			const id = await create_campaign({
+			const id = await user.create_campaign({
 				name: newCampaignName.trim(),
 				display_name: gmDisplayName.trim() || undefined
 			});
@@ -105,9 +86,8 @@
 		if (campaignToDelete && !deletingCampaign && deleteConfirmation === 'delete') {
 			deletingCampaign = true;
 			try {
-				await delete_campaign(campaignToDelete.id);
-				// Refresh campaigns query to get updated data
-				campaigns = await get_user_campaigns();
+				await user.delete_campaign(campaignToDelete.id);
+				// user.delete_campaign already refreshes all_campaigns
 				campaignToDelete = null;
 				showDeleteDialog = false;
 			} catch (err) {

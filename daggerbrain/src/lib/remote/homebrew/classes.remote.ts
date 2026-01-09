@@ -119,19 +119,23 @@ export const delete_homebrew_class = command(z.string(), async (id) => {
 		throw error(403, 'Not authorized to delete this class');
 	}
 
-	await db
-		.delete(homebrew_classes)
-		.where(and(eq(homebrew_classes.id, id), eq(homebrew_classes.clerk_user_id, userId)));
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db
+			.delete(homebrew_classes)
+			.where(and(eq(homebrew_classes.id, id), eq(homebrew_classes.clerk_user_id, userId))),
 
-	// Remove from all campaign vaults
-	await db
-		.delete(campaign_homebrew_vault_table)
-		.where(
-			and(
-				eq(campaign_homebrew_vault_table.homebrew_type, 'class'),
-				eq(campaign_homebrew_vault_table.homebrew_id, id)
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'class'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
 			)
-		);
+	]);
 
 	// refresh the classes query
 	get_homebrew_classes().refresh();
@@ -284,19 +288,23 @@ export const delete_homebrew_subclass = command(z.string(), async (id) => {
 		throw error(403, 'Not authorized to delete this subclass');
 	}
 
-	await db
-		.delete(homebrew_subclasses)
-		.where(and(eq(homebrew_subclasses.id, id), eq(homebrew_subclasses.clerk_user_id, userId)));
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db
+			.delete(homebrew_subclasses)
+			.where(and(eq(homebrew_subclasses.id, id), eq(homebrew_subclasses.clerk_user_id, userId))),
 
-	// Remove from all campaign vaults
-	await db
-		.delete(campaign_homebrew_vault_table)
-		.where(
-			and(
-				eq(campaign_homebrew_vault_table.homebrew_type, 'subclass'),
-				eq(campaign_homebrew_vault_table.homebrew_id, id)
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'subclass'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
 			)
-		);
+	]);
 
 	// refresh the subclasses query
 	get_homebrew_subclasses().refresh();

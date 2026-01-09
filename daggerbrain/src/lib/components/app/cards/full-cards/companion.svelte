@@ -3,10 +3,10 @@
 	import type { Snippet } from 'svelte';
 	import type { Companion } from '$lib/types/character-types';
 	import { getCharacterContext } from '$lib/state/character.svelte';
+	import { getUserContext } from '$lib/state/user.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import { Input } from '$lib/components/ui/input';
-	import { upload_user_image } from '$lib/remote/images.remote';
 	import * as Select from '$lib/components/ui/select/';
 	import { COMPANION_LEVEL_UP_OPTION_MAXES } from '$lib/types/rules';
 	import type { CompanionLevelUpOptionIds } from '$lib/types/rule-types';
@@ -25,6 +25,7 @@
 	} = $props();
 
 	const context = getCharacterContext();
+	const user = getUserContext();
 	const character = $derived(context.character);
 	const companion = $derived(character?.companion || null); // companion that can be updated (including choices)
 	const derived_companion = $derived(context.derived_companion); // used to show final stats and is updated automatically based on companion choices
@@ -103,7 +104,7 @@
 			const base64 = dataUrl.split(',')[1];
 
 			try {
-				const url = await upload_user_image({
+				const url = await user.upload_user_image({
 					data: base64,
 					name: file.name,
 					type: file.type

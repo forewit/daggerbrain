@@ -243,19 +243,25 @@ export const delete_homebrew_domain_card = command(z.string(), async (id) => {
 		throw error(403, 'Not authorized to delete this domain card');
 	}
 
-	await db
-		.delete(homebrew_domain_cards)
-		.where(and(eq(homebrew_domain_cards.id, id), eq(homebrew_domain_cards.clerk_user_id, userId)));
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db
+			.delete(homebrew_domain_cards)
+			.where(
+				and(eq(homebrew_domain_cards.id, id), eq(homebrew_domain_cards.clerk_user_id, userId))
+			),
 
-	// Remove from all campaign vaults
-	await db
-		.delete(campaign_homebrew_vault_table)
-		.where(
-			and(
-				eq(campaign_homebrew_vault_table.homebrew_type, 'domain-cards'),
-				eq(campaign_homebrew_vault_table.homebrew_id, id)
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'domain-cards'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
 			)
-		);
+	]);
 
 	// refresh the domain cards query
 	get_homebrew_domain_cards().refresh();

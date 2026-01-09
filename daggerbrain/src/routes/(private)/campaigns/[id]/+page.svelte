@@ -11,7 +11,6 @@
 	import Footer from '$lib/components/app/footer.svelte';
 	import { getUserContext } from '$lib/state/user.svelte';
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
-	import { update_campaign_member } from '$lib/remote/campaigns.remote';
 	import { toast } from 'svelte-sonner';
 	import CampaignInviteLink from '$lib/components/app/campaigns/campaign-invite-link.svelte';
 	import CampaignVault from '$lib/components/app/campaigns/campaign-vault.svelte';
@@ -78,8 +77,7 @@
 
 			// Update GM display name if it changed
 			if (gmDisplayName.trim() !== (data.userMembership?.display_name || '')) {
-				await update_campaign_member({
-					campaign_id: campaignId,
+				await campaign.updateCampaignMember({
 					display_name: gmDisplayName.trim() || undefined
 				});
 			}
@@ -140,8 +138,7 @@
 		if (!campaignId || !data.userMembership) return;
 
 		try {
-			await update_campaign_member({
-				campaign_id: campaignId,
+			await campaign.updateCampaignMember({
 				display_name: playerDisplayName.trim() || undefined
 			});
 			toast.success('Settings saved');

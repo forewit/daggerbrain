@@ -5,6 +5,7 @@ import {
 	get_campaign_characters,
 	update_campaign,
 	update_campaign_state,
+	update_campaign_member,
 	delete_campaign,
 	assign_character_to_campaign,
 	leave_campaign,
@@ -405,14 +406,16 @@ function campaignContext() {
 	// Assign character to campaign (or remove from campaign if campaignId is null)
 	async function assignCharacter(
 		characterId: string,
-		targetCampaignId: string | null
+		targetCampaignId: string | null,
+		options?: { claimable?: boolean }
 	): Promise<void> {
 		if (!characterId) return;
 
 		try {
 			await assign_character_to_campaign({
 				character_id: characterId,
-				campaign_id: targetCampaignId
+				campaign_id: targetCampaignId,
+				claimable: options?.claimable
 			});
 			// Query refresh is handled by the remote command
 			// Reload to get fresh data
@@ -555,6 +558,21 @@ function campaignContext() {
 		} catch (err) {
 			return false;
 		}
+	}
+
+	// Update campaign member display name
+	async function updateCampaignMember(params: { display_name?: string }): Promise<void> {
+		const id = campaignId;
+		if (!id) return;
+
+		await update_campaign_member({
+			campaign_id: id,
+			display_name: params.display_name
+		});
+
+		// Refresh members list after update
+		const updatedMembers = await get_campaign_members(id);
+		members = updatedMembers;
 	}
 
 	// Auto-load when campaign ID changes
@@ -1004,7 +1022,8 @@ function campaignContext() {
 		addToVault,
 		removeFromVault,
 		canClaimCharacter,
-		hasCharacterInCampaign
+		hasCharacterInCampaign,
+		updateCampaignMember
 	};
 }
 

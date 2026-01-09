@@ -115,9 +115,9 @@
 		try {
 			let characterId: string;
 			if (isGM) {
-				// GM creates unassigned character
-				const { create_character } = await import('$lib/remote/characters.remote');
-				characterId = await create_character({ campaign_id: campaignId, claimable: true });
+				// GM creates unassigned character (claimable by players)
+				if (!user?.create_character) throw new Error('User context not available');
+				characterId = await user.create_character(campaignId, { claimable: true });
 			} else {
 				// Player creates regular character
 				if (!user?.create_character) throw new Error('User context not available');
@@ -139,13 +139,8 @@
 		isAddingCharacter = true;
 		try {
 			if (isGM) {
-				// GM adds existing character as unassigned
-				const { assign_character_to_campaign } = await import('$lib/remote/campaigns.remote');
-				await assign_character_to_campaign({
-					character_id: idToUse,
-					campaign_id: campaignId,
-					claimable: true
-				});
+				// GM adds existing character as unassigned (claimable by players)
+				await campaignContext.assignCharacter(idToUse, campaignId, { claimable: true });
 			} else {
 				// Player assigns existing character
 				await campaignContext.assignCharacter(idToUse, campaignId);

@@ -7,11 +7,12 @@
 	import * as Dialog from '$lib/components/ui/dialog/index';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import { getCharacterContext } from '$lib/state/character.svelte';
-	import { delete_character } from '$lib/remote/characters.remote';
+	import { getUserContext } from '$lib/state/user.svelte';
 
 	let { data } = $props();
 
 	const context = getCharacterContext();
+	const user = getUserContext();
 	let character = $derived(context.character);
 	const isOwner = $derived(data.isOwner ?? false);
 
@@ -160,7 +161,7 @@
 								class={buttonVariants({ variant: 'destructive' })}
 								onclick={async () => {
 									try {
-										await delete_character(character.id);
+										await user.delete_character(character.id);
 										await goto('/characters/');
 									} catch (error) {
 										console.error(error);

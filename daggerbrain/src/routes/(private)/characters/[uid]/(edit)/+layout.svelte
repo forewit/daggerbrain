@@ -11,7 +11,6 @@
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getUserContext } from '$lib/state/user.svelte';
 	import { goto } from '$app/navigation';
-	import { upload_user_image } from '$lib/remote/images.remote';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 
 	let { data, children } = $props();
@@ -63,7 +62,7 @@
 			const base64 = dataUrl.split(',')[1];
 
 			try {
-				const url = await upload_user_image({
+				const url = await user.upload_user_image({
 					data: base64,
 					name: file.name,
 					type: file.type

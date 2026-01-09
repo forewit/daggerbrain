@@ -1,6 +1,37 @@
 import { error } from '@sveltejs/kit';
 import { getCampaignAccess } from '$lib/remote/permissions.remote';
 import type { RequestEvent } from '@sveltejs/kit';
+import { z } from 'zod';
+
+// Define schema for valid notification types
+const NotifyBodySchema = z.discriminatedUnion('type', [
+	z.object({
+		type: z.literal('character_added'),
+		characterId: z.string(),
+		character: z.any().optional(),
+		claimable: z.boolean().optional()
+	}),
+	z.object({
+		type: z.literal('character_updated'),
+		characterId: z.string(),
+		character: z.any().optional(),
+		updates: z.record(z.string(), z.any()).optional(),
+		claimable: z.boolean().optional()
+	}),
+	z.object({
+		type: z.literal('character_removed'),
+		characterId: z.string()
+	}),
+	z.object({
+		type: z.literal('character_deleted'),
+		characterId: z.string()
+	}),
+	z.object({
+		type: z.literal('member_updated'),
+		userId: z.string(),
+		displayName: z.string().nullable()
+	})
+]);
 
 export async function POST({ params, platform, request }: RequestEvent) {
 	const campaignId = params.id;
@@ -23,9 +54,18 @@ export async function POST({ params, platform, request }: RequestEvent) {
 	const id = platform.env.CAMPAIGN_LIVE.idFromName(campaignId);
 	const stub = platform.env.CAMPAIGN_LIVE.get(id);
 
-	// Forward the request to the Durable Object
 	try {
-		const body = await request.json();
+		const rawBody = await request.json();
+
+		// Validate request body
+		const parseResult = NotifyBodySchema.safeParse(rawBody);
+		if (!parseResult.success) {
+			console.error('Invalid notify body:', parseResult.error.issues);
+			throw error(400, 'Invalid request body');
+		}
+
+		const body = parseResult.data;
+
 		const response = await stub.fetch(request.url, {
 			method: 'POST',
 			headers: {
@@ -36,6 +76,9 @@ export async function POST({ params, platform, request }: RequestEvent) {
 
 		return response;
 	} catch (err) {
+		if (err && typeof err === 'object' && 'status' in err) {
+			throw err; // Re-throw SvelteKit errors
+		}
 		console.error('Failed to notify DO:', err);
 		throw error(500, 'Failed to notify Durable Object');
 	}

@@ -53,7 +53,6 @@ export const create_homebrew_primary_weapon = command(WeaponSchema, async (data)
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
-	const kv = get_kv(event);
 
 	// Check if user has reached the global homebrew limit
 	const totalCount = await getTotalHomebrewCount(db, userId);
@@ -132,21 +131,25 @@ export const delete_homebrew_primary_weapon = command(z.string(), async (id) => 
 		throw error(403, 'Not authorized to delete this weapon');
 	}
 
-	await db
-		.delete(homebrew_primary_weapons)
-		.where(
-			and(eq(homebrew_primary_weapons.id, id), eq(homebrew_primary_weapons.clerk_user_id, userId))
-		);
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db
+			.delete(homebrew_primary_weapons)
+			.where(
+				and(eq(homebrew_primary_weapons.id, id), eq(homebrew_primary_weapons.clerk_user_id, userId))
+			),
 
-	// Remove from all campaign vaults
-	await db
-		.delete(campaign_homebrew_vault_table)
-		.where(
-			and(
-				eq(campaign_homebrew_vault_table.homebrew_type, 'weapon'),
-				eq(campaign_homebrew_vault_table.homebrew_id, id)
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'weapon'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
 			)
-		);
+	]);
 
 	// refresh the primary weapons query
 	get_homebrew_primary_weapons().refresh();
@@ -262,24 +265,28 @@ export const delete_homebrew_secondary_weapon = command(z.string(), async (id) =
 		throw error(403, 'Not authorized to delete this weapon');
 	}
 
-	await db
-		.delete(homebrew_secondary_weapons)
-		.where(
-			and(
-				eq(homebrew_secondary_weapons.id, id),
-				eq(homebrew_secondary_weapons.clerk_user_id, userId)
-			)
-		);
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db
+			.delete(homebrew_secondary_weapons)
+			.where(
+				and(
+					eq(homebrew_secondary_weapons.id, id),
+					eq(homebrew_secondary_weapons.clerk_user_id, userId)
+				)
+			),
 
-	// Remove from all campaign vaults
-	await db
-		.delete(campaign_homebrew_vault_table)
-		.where(
-			and(
-				eq(campaign_homebrew_vault_table.homebrew_type, 'weapon'),
-				eq(campaign_homebrew_vault_table.homebrew_id, id)
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'weapon'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
 			)
-		);
+	]);
 
 	// refresh the secondary weapons query
 	get_homebrew_secondary_weapons().refresh();
@@ -390,19 +397,23 @@ export const delete_homebrew_armor = command(z.string(), async (id) => {
 		throw error(403, 'Not authorized to delete this armor');
 	}
 
-	await db
-		.delete(homebrew_armor)
-		.where(and(eq(homebrew_armor.id, id), eq(homebrew_armor.clerk_user_id, userId)));
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db
+			.delete(homebrew_armor)
+			.where(and(eq(homebrew_armor.id, id), eq(homebrew_armor.clerk_user_id, userId))),
 
-	// Remove from all campaign vaults
-	await db
-		.delete(campaign_homebrew_vault_table)
-		.where(
-			and(
-				eq(campaign_homebrew_vault_table.homebrew_type, 'armor'),
-				eq(campaign_homebrew_vault_table.homebrew_id, id)
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'armor'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
 			)
-		);
+	]);
 
 	// refresh the armor query
 	get_homebrew_armor().refresh();
@@ -509,19 +520,23 @@ export const delete_homebrew_loot = command(z.string(), async (id) => {
 		throw error(403, 'Not authorized to delete this loot');
 	}
 
-	await db
-		.delete(homebrew_loot)
-		.where(and(eq(homebrew_loot.id, id), eq(homebrew_loot.clerk_user_id, userId)));
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db
+			.delete(homebrew_loot)
+			.where(and(eq(homebrew_loot.id, id), eq(homebrew_loot.clerk_user_id, userId))),
 
-	// Remove from all campaign vaults
-	await db
-		.delete(campaign_homebrew_vault_table)
-		.where(
-			and(
-				eq(campaign_homebrew_vault_table.homebrew_type, 'loot'),
-				eq(campaign_homebrew_vault_table.homebrew_id, id)
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'loot'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
 			)
-		);
+	]);
 
 	// refresh the loot query
 	get_homebrew_loot().refresh();
@@ -632,19 +647,23 @@ export const delete_homebrew_consumable = command(z.string(), async (id) => {
 		throw error(403, 'Not authorized to delete this consumable');
 	}
 
-	await db
-		.delete(homebrew_consumables)
-		.where(and(eq(homebrew_consumables.id, id), eq(homebrew_consumables.clerk_user_id, userId)));
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db
+			.delete(homebrew_consumables)
+			.where(and(eq(homebrew_consumables.id, id), eq(homebrew_consumables.clerk_user_id, userId))),
 
-	// Remove from all campaign vaults
-	await db
-		.delete(campaign_homebrew_vault_table)
-		.where(
-			and(
-				eq(campaign_homebrew_vault_table.homebrew_type, 'consumable'),
-				eq(campaign_homebrew_vault_table.homebrew_id, id)
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'consumable'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
 			)
-		);
+	]);
 
 	// refresh the consumables query
 	get_homebrew_consumables().refresh();

@@ -11,12 +11,12 @@
 	import Conditions from './conditions.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Pencil from '@lucide/svelte/icons/pencil';
-	import { upload_user_image } from '$lib/remote/images.remote';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import CardCarousel from '../cards/card-carousel.svelte';
 	import Loadout from './loadout.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
+	import { getUserContext } from '$lib/state/user.svelte';
 	import type {
 		DomainCard,
 		AncestryCard,
@@ -87,6 +87,7 @@
 	let { class: className = '' }: { class?: string } = $props();
 
 	const context = getCharacterContext();
+	const user = getUserContext();
 	let character = $derived(context.character);
 
 	let character_cards: (
@@ -130,7 +131,7 @@
 			const base64 = dataUrl.split(',')[1];
 
 			try {
-				const url = await upload_user_image({
+				const url = await user.upload_user_image({
 					data: base64,
 					name: file.name,
 					type: file.type

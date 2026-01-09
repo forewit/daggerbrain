@@ -128,21 +128,25 @@ export const delete_homebrew_ancestry_card = command(z.string(), async (id) => {
 		throw error(403, 'Not authorized to delete this ancestry card');
 	}
 
-	await db
-		.delete(homebrew_ancestry_cards)
-		.where(
-			and(eq(homebrew_ancestry_cards.id, id), eq(homebrew_ancestry_cards.clerk_user_id, userId))
-		);
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db
+			.delete(homebrew_ancestry_cards)
+			.where(
+				and(eq(homebrew_ancestry_cards.id, id), eq(homebrew_ancestry_cards.clerk_user_id, userId))
+			),
 
-	// Remove from all campaign vaults
-	await db
-		.delete(campaign_homebrew_vault_table)
-		.where(
-			and(
-				eq(campaign_homebrew_vault_table.homebrew_type, 'ancestry-cards'),
-				eq(campaign_homebrew_vault_table.homebrew_id, id)
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'ancestry-cards'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
 			)
-		);
+	]);
 
 	// refresh the ancestry cards query
 	get_homebrew_ancestry_cards().refresh();
@@ -255,21 +259,25 @@ export const delete_homebrew_community_card = command(z.string(), async (id) => 
 		throw error(403, 'Not authorized to delete this community card');
 	}
 
-	await db
-		.delete(homebrew_community_cards)
-		.where(
-			and(eq(homebrew_community_cards.id, id), eq(homebrew_community_cards.clerk_user_id, userId))
-		);
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db
+			.delete(homebrew_community_cards)
+			.where(
+				and(eq(homebrew_community_cards.id, id), eq(homebrew_community_cards.clerk_user_id, userId))
+			),
 
-	// Remove from all campaign vaults
-	await db
-		.delete(campaign_homebrew_vault_table)
-		.where(
-			and(
-				eq(campaign_homebrew_vault_table.homebrew_type, 'community-cards'),
-				eq(campaign_homebrew_vault_table.homebrew_id, id)
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'community-cards'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
 			)
-		);
+	]);
 
 	// refresh the community cards query
 	get_homebrew_community_cards().refresh();
@@ -394,24 +402,28 @@ export const delete_homebrew_transformation_card = command(z.string(), async (id
 		throw error(403, 'Not authorized to delete this transformation card');
 	}
 
-	await db
-		.delete(homebrew_transformation_cards)
-		.where(
-			and(
-				eq(homebrew_transformation_cards.id, id),
-				eq(homebrew_transformation_cards.clerk_user_id, userId)
-			)
-		);
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db
+			.delete(homebrew_transformation_cards)
+			.where(
+				and(
+					eq(homebrew_transformation_cards.id, id),
+					eq(homebrew_transformation_cards.clerk_user_id, userId)
+				)
+			),
 
-	// Remove from all campaign vaults
-	await db
-		.delete(campaign_homebrew_vault_table)
-		.where(
-			and(
-				eq(campaign_homebrew_vault_table.homebrew_type, 'transformation-cards'),
-				eq(campaign_homebrew_vault_table.homebrew_id, id)
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'transformation-cards'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
 			)
-		);
+	]);
 
 	// refresh the transformation cards query
 	get_homebrew_transformation_cards().refresh();

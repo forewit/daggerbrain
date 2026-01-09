@@ -118,19 +118,23 @@ export const delete_homebrew_beastform = command(z.string(), async (id) => {
 		throw error(403, 'Not authorized to delete this beastform');
 	}
 
-	await db
-		.delete(homebrew_beastforms)
-		.where(and(eq(homebrew_beastforms.id, id), eq(homebrew_beastforms.clerk_user_id, userId)));
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db
+			.delete(homebrew_beastforms)
+			.where(and(eq(homebrew_beastforms.id, id), eq(homebrew_beastforms.clerk_user_id, userId))),
 
-	// Remove from all campaign vaults
-	await db
-		.delete(campaign_homebrew_vault_table)
-		.where(
-			and(
-				eq(campaign_homebrew_vault_table.homebrew_type, 'beastform'),
-				eq(campaign_homebrew_vault_table.homebrew_id, id)
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'beastform'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
 			)
-		);
+	]);
 
 	// refresh the beastforms query
 	get_homebrew_beastforms().refresh();
