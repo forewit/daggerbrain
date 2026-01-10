@@ -106,7 +106,7 @@
 			<!-- Campaigns -->
 			<section class="mx-auto w-full max-w-5xl px-4 pt-20 md:px-8">
 				<button
-					class="campaigns-scroll-trigger group relative flex flex-col overflow-hidden text-left transition-all rounded-3xl border-x border-accent/0 duration-600 md:max-h-[400px] md:flex-row"
+					class="campaigns-scroll-trigger group relative flex flex-col overflow-hidden rounded-3xl border-x border-accent/0 text-left transition-all duration-600 md:max-h-[400px] md:flex-row"
 					onclick={() => {
 						goto('/campaigns');
 					}}
@@ -128,7 +128,7 @@
 							<li>Fear tracker</li>
 							<li>Countdowns</li>
 							<li>Character previews</li>
-								<li>... and more!</li>
+							<li>... and more!</li>
 						</ul>
 						<div
 							class={cn(

@@ -744,6 +744,10 @@ function campaignContext() {
 									characters = updatedChars;
 								}
 								break;
+							case 'refresh_required':
+								// Client is behind server version - reload from D1
+								load();
+								break;
 							case 'error':
 								console.error('WebSocket error:', message.message);
 								// If we get an error and haven't synced yet, mark as complete to prevent infinite loading
@@ -911,44 +915,43 @@ function campaignContext() {
 			const id = campaignId;
 			if (!id) return;
 
-			// If WebSocket is connected, send via WebSocket for real-time updates
-			if (wsConnection && wsConnection.connected) {
-				wsConnection.send({
-					type: 'update_state',
-					updates: {
-						fear_track: campaignState.fear_track,
-						countdowns: campaignState.countdowns,
-						notes: campaignState.notes,
-						fear_visible_to_players: campaignState.fear_visible_to_players,
-						updated_at: Date.now()
+			// Always save to D1 first (source of truth), then broadcast via WebSocket
+			const savePromise = update_campaign_state({
+				campaign_id: id,
+				fear_track: campaignState.fear_track,
+				countdowns: campaignState.countdowns,
+				notes: campaignState.notes,
+				fear_visible_to_players: campaignState.fear_visible_to_players
+			})
+				.then(() => {
+					if (!campaignState) return;
+					// Update lastSaved after successful D1 save
+					lastSavedCampaignState = JSON.stringify(campaignState);
+
+					// Then send via WebSocket for live broadcast to other clients
+					if (wsConnection && wsConnection.connected) {
+						wsConnection.send({
+							type: 'update_state',
+							updates: {
+								fear_track: campaignState.fear_track,
+								countdowns: campaignState.countdowns,
+								notes: campaignState.notes,
+								fear_visible_to_players: campaignState.fear_visible_to_players,
+								updated_at: Date.now()
+							}
+						});
+					}
+				})
+				.catch((err) => {
+					console.error('Failed to auto-save campaign state:', err);
+				})
+				.finally(() => {
+					if (campaignStateInFlightSave === savePromise) {
+						campaignStateInFlightSave = null;
 					}
 				});
-				// Update lastSaved immediately for WebSocket path
-				lastSavedCampaignState = JSON.stringify(campaignState);
-			} else {
-				// HTTP fallback with in-flight tracking
-				const savePromise = update_campaign_state({
-					campaign_id: id,
-					fear_track: campaignState.fear_track,
-					countdowns: campaignState.countdowns,
-					notes: campaignState.notes,
-					fear_visible_to_players: campaignState.fear_visible_to_players
-				})
-					.then(() => {
-						if (!campaignState) return;
-						lastSavedCampaignState = JSON.stringify(campaignState);
-					})
-					.catch((err) => {
-						console.error('Failed to auto-save campaign state:', err);
-					})
-					.finally(() => {
-						if (campaignStateInFlightSave === savePromise) {
-							campaignStateInFlightSave = null;
-						}
-					});
 
-				campaignStateInFlightSave = savePromise;
-			}
+			campaignStateInFlightSave = savePromise;
 		}, 300);
 
 		return () => {

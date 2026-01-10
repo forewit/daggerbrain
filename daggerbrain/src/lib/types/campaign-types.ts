@@ -123,6 +123,10 @@ export type CampaignLiveWebSocketMessage =
 	| {
 			type: 'error';
 			message: string;
+	  }
+	| {
+			type: 'refresh_required';
+			version: number;
 	  };
 
 // WebSocket client-to-server message types
