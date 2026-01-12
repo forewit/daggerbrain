@@ -70,13 +70,22 @@ async function notifyDurableObject(
 
 		if (!response.ok) {
 			const errorText = await response.text();
-			console.error(`DO notification failed with status ${response.status}: ${errorText}`);
+			// Log at error level for monitoring - DO failures indicate real-time sync issues
+			console.error(
+				`[DO Notification Error] ${type} for character ${data.characterId}: Status ${response.status}, ${errorText}`
+			);
+			// TODO: Consider adding metrics/monitoring here for DO notification failures
 		} else {
 			console.log(`DO notification sent successfully: ${type} for character ${data.characterId}`);
 		}
 	} catch (err) {
-		// Log error but don't fail the operation
-		console.error(`Failed to notify DO for ${type}:`, err);
+		// Log error but don't fail the operation (D1 is source of truth, DO is for real-time sync)
+		// Log at error level for monitoring - consistent DO failures may indicate infrastructure issues
+		console.error(
+			`[DO Notification Error] Failed to notify DO for ${type} (character ${data.characterId}):`,
+			err instanceof Error ? err.message : String(err)
+		);
+		// TODO: Consider adding metrics/monitoring here for DO notification failures
 	}
 }
 
@@ -111,12 +120,21 @@ async function notifyDurableObjectMemberUpdate(
 
 		if (!response.ok) {
 			const errorText = await response.text();
-			console.error(`DO member notification failed with status ${response.status}: ${errorText}`);
+			// Log at error level for monitoring - DO failures indicate real-time sync issues
+			console.error(
+				`[DO Notification Error] member_updated for user ${userId}: Status ${response.status}, ${errorText}`
+			);
+			// TODO: Consider adding metrics/monitoring here for DO notification failures
 		} else {
 			console.log(`DO member notification sent successfully for user ${userId}`);
 		}
 	} catch (err) {
-		console.error('Failed to notify DO for member_updated:', err);
+		// Log at error level for monitoring - consistent DO failures may indicate infrastructure issues
+		console.error(
+			`[DO Notification Error] Failed to notify DO for member_updated (user ${userId}):`,
+			err instanceof Error ? err.message : String(err)
+		);
+		// TODO: Consider adding metrics/monitoring here for DO notification failures
 	}
 }
 
@@ -144,7 +162,9 @@ export const get_campaign_by_invite_code = query(z.string(), async (inviteCode) 
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Look up campaign state by invite code
+	// Security: Invite codes are 12-character cryptographically random strings (62^12 combinations)
+	// They are used only for campaign discovery - actual joining requires proper authentication
+	// Look up campaign state by invite code (invite_code has unique constraint in DB)
 	const [state] = await db
 		.select()
 		.from(campaign_state_table)
@@ -155,11 +175,14 @@ export const get_campaign_by_invite_code = query(z.string(), async (inviteCode) 
 		throw error(404, 'Campaign not found');
 	}
 
-	// Get campaign with permissions check
+	// Get campaign data - this will throw 404 if campaign doesn't exist
+	// Note: getCampaignAccessInternal returns the campaign object even if user is not a member
+	// This is intentional - invite codes allow viewing basic campaign info before joining
 	const access = await getCampaignAccessInternal(db, userId, state.campaign_id);
 
-	// Note: For invite codes, we allow viewing even if not a member (so they can see it before joining)
-	// But we still use the access function to get the campaign data efficiently
+	// Security: We return campaign data even if user is not a member
+	// This allows users to see campaign name/description before joining
+	// Actual joining still requires proper authentication and permission checks in join_campaign()
 
 	console.log('fetched campaign by invite code from D1');
 	return access.campaign;
@@ -292,38 +315,52 @@ export const get_campaign_state = query(z.string(), async (campaignId): Promise<
 		throw error(403, 'You do not have permission to view this campaign');
 	}
 
-	// Try to insert default state - silently ignored if already exists
-	// This eliminates the race condition in the old check-then-insert pattern
-	const inviteCode = generateInviteCode();
-	const now = Date.now();
-
-	await db
-		.insert(campaign_state_table)
-		.values({
-			campaign_id: campaignId,
-			fear_track: 0,
-			fear_visible_to_players: false,
-			notes: null,
-			countdowns: [],
-			invite_code: inviteCode,
-			updated_at: now
-		})
-		.onConflictDoNothing({
-			target: campaign_state_table.campaign_id // Explicit target for primary key
-		});
-
-	// Now fetch the state (either just inserted or existing)
-	const [dbState] = await db
+	// Optimized: Try to select first (common case - state usually exists)
+	// Only insert if it doesn't exist, then select again
+	let [dbState] = await db
 		.select()
 		.from(campaign_state_table)
 		.where(eq(campaign_state_table.campaign_id, campaignId))
 		.limit(1);
 
-	// Handle backward compatibility: if invite_code is missing, generate one
+	// If state doesn't exist, create it (handles race condition with onConflictDoNothing)
+	if (!dbState) {
+		const inviteCode = generateInviteCode();
+		const now = Date.now();
+
+		await db
+			.insert(campaign_state_table)
+			.values({
+				campaign_id: campaignId,
+				fear_track: 0,
+				fear_visible_to_players: false,
+				notes: null,
+				countdowns: [],
+				invite_code: inviteCode,
+				updated_at: now
+			})
+			.onConflictDoNothing({
+				target: campaign_state_table.campaign_id // Explicit target for primary key
+			});
+
+		// Re-fetch after insert (another request might have inserted first)
+		[dbState] = await db
+			.select()
+			.from(campaign_state_table)
+			.where(eq(campaign_state_table.campaign_id, campaignId))
+			.limit(1);
+
+		// Safety check: if still null after insert, something is wrong
+		if (!dbState) {
+			throw error(500, 'Failed to create campaign state');
+		}
+	}
+
+	// Handle backward compatibility: if invite_code is missing, generate one atomically
 	let inviteCodeResult = dbState.invite_code;
 	if (!inviteCodeResult) {
 		const newInviteCode = generateInviteCode();
-		// Use conditional update - only if still null (another race protection)
+		// Single atomic update - only updates if still null
 		const updateResult = await db
 			.update(campaign_state_table)
 			.set({ invite_code: newInviteCode, updated_at: Date.now() })
@@ -332,13 +369,13 @@ export const get_campaign_state = query(z.string(), async (campaignId): Promise<
 		if (updateResult.meta.changes > 0) {
 			inviteCodeResult = newInviteCode;
 		} else {
-			// Another request set it first, re-fetch
+			// Another request set it first, re-fetch once
 			const [refreshed] = await db
 				.select({ invite_code: campaign_state_table.invite_code })
 				.from(campaign_state_table)
 				.where(eq(campaign_state_table.campaign_id, campaignId))
 				.limit(1);
-			inviteCodeResult = refreshed.invite_code;
+			inviteCodeResult = refreshed?.invite_code || generateInviteCode(); // Fallback if still null
 		}
 	}
 
@@ -368,66 +405,67 @@ export const get_campaign_characters = query(
 		}
 
 		// Read directly from D1 (no KV caching - D1 reads are 500x cheaper than KV)
-		// Get all characters in campaign
-		const characters = await db
-			.select()
+		// Optimized: Use JOINs to combine all three tables in a single query
+		const results = await db
+			.select({
+				// Character fields
+				id: characters_table.id,
+				name: characters_table.name,
+				image_url: characters_table.image_url,
+				level: characters_table.level,
+				marked_hp: characters_table.marked_hp,
+				marked_stress: characters_table.marked_stress,
+				marked_hope: characters_table.marked_hope,
+				marked_armor: characters_table.marked_armor,
+				active_conditions: characters_table.active_conditions,
+				owner_user_id: characters_table.clerk_user_id,
+				derived_character_summary: characters_table.derived_character_summary,
+				// Campaign characters fields (for claimable status)
+				claimable: campaign_characters_table.claimable,
+				// Campaign members fields (for display name)
+				owner_name: campaign_members_table.display_name
+			})
 			.from(characters_table)
+			.leftJoin(
+				campaign_characters_table,
+				and(
+					eq(campaign_characters_table.campaign_id, campaignId),
+					eq(campaign_characters_table.character_id, characters_table.id)
+				)
+			)
+			.leftJoin(
+				campaign_members_table,
+				and(
+					eq(campaign_members_table.campaign_id, campaignId),
+					eq(campaign_members_table.user_id, characters_table.clerk_user_id)
+				)
+			)
 			.where(eq(characters_table.campaign_id, campaignId));
 
-		if (characters.length === 0) {
+		if (results.length === 0) {
 			console.log('fetched campaign characters from D1 (empty)');
 			return {};
 		}
 
-		// Get all campaign_characters entries for claimable status
-		const campaignChars = await db
-			.select()
-			.from(campaign_characters_table)
-			.where(eq(campaign_characters_table.campaign_id, campaignId));
-
-		// Build a map of character_id -> claimable
-		const claimableMap = new Map<string, boolean>();
-		for (const cc of campaignChars) {
-			claimableMap.set(cc.character_id, cc.claimable === 1);
-		}
-
-		// Get all campaign members with display names
-		const members = await db
-			.select()
-			.from(campaign_members_table)
-			.where(eq(campaign_members_table.campaign_id, campaignId));
-
-		// Build a map of user_id -> display_name
-		const displayNameMap = new Map<string, string | null>();
-		for (const member of members) {
-			displayNameMap.set(member.user_id, member.display_name || null);
-		}
-
-		// Build summaries from D1 data
-		// Derived stats are now read from derived_character_summary (stored in D1)
+		// Build summaries from joined data
 		const summaries: Record<string, CampaignCharacterSummary> = {};
 
-		for (const char of characters) {
-			const owner_name = displayNameMap.get(char.clerk_user_id) || undefined;
-			const isClaimable = claimableMap.get(char.id) ?? false;
-			// Get derived stats from stored summary, with fallback defaults for old characters
-			const summary = char.derived_character_summary;
-
-			summaries[char.id] = {
-				id: char.id,
-				name: char.name,
-				image_url: char.image_url,
-				level: char.level,
-				marked_hp: char.marked_hp,
-				marked_stress: char.marked_stress,
-				marked_hope: char.marked_hope,
-				marked_armor: char.marked_armor,
-				active_conditions: char.active_conditions,
-				owner_user_id: char.clerk_user_id,
-				owner_name,
+		for (const row of results) {
+			summaries[row.id] = {
+				id: row.id,
+				name: row.name,
+				image_url: row.image_url,
+				level: row.level,
+				marked_hp: row.marked_hp,
+				marked_stress: row.marked_stress,
+				marked_hope: row.marked_hope,
+				marked_armor: row.marked_armor,
+				active_conditions: row.active_conditions,
+				owner_user_id: row.owner_user_id,
+				owner_name: row.owner_name ?? undefined,
 				// Use derived_character_summary from D1 (computed client-side, persisted on save)
-				derived_character_summary: summary,
-				claimable: isClaimable
+				derived_character_summary: row.derived_character_summary,
+				claimable: (row.claimable ?? 0) === 1
 			};
 		}
 
@@ -455,34 +493,36 @@ export const create_campaign = command(
 		const now = Date.now();
 		const inviteCode = generateInviteCode();
 
-		// Create campaign
-		await db.insert(campaigns_table).values({
-			id: campaignId,
-			gm_user_id: userId,
-			name,
-			description: description || null,
-			created_at: now,
-			updated_at: now
-		});
-
-		// Add GM as member
-		await db.insert(campaign_members_table).values({
-			campaign_id: campaignId,
-			user_id: userId,
-			role: 'gm',
-			display_name: display_name || null,
-			joined_at: now
-		});
-
-		// Create initial campaign state
-		await db.insert(campaign_state_table).values({
-			campaign_id: campaignId,
-			fear_track: 0,
-			notes: null,
-			countdowns: [],
-			invite_code: inviteCode,
-			updated_at: now
-		});
+		// Atomic batch: Create campaign, add GM as member, and create initial state
+		// All operations succeed or all fail together
+		await db.batch([
+			// Create campaign
+			db.insert(campaigns_table).values({
+				id: campaignId,
+				gm_user_id: userId,
+				name,
+				description: description || null,
+				created_at: now,
+				updated_at: now
+			}),
+			// Add GM as member
+			db.insert(campaign_members_table).values({
+				campaign_id: campaignId,
+				user_id: userId,
+				role: 'gm',
+				display_name: display_name || null,
+				joined_at: now
+			}),
+			// Create initial campaign state
+			db.insert(campaign_state_table).values({
+				campaign_id: campaignId,
+				fear_track: 0,
+				notes: null,
+				countdowns: [],
+				invite_code: inviteCode,
+				updated_at: now
+			})
+		]);
 
 		// Refresh the query
 		get_user_campaigns().refresh();
@@ -547,41 +587,43 @@ export const join_campaign = command(
 			}
 		}
 
-		// Add user as player
-		try {
-			await db.insert(campaign_members_table).values({
+		// Add user as player - use onConflictDoNothing to handle race conditions atomically
+		// This eliminates the check-then-insert race condition
+		const membershipInsertResult = await db
+			.insert(campaign_members_table)
+			.values({
 				campaign_id,
 				user_id: userId,
 				role: 'player',
 				display_name: display_name || null,
 				joined_at: Date.now()
+			})
+			.onConflictDoNothing({
+				// Composite primary key requires array of columns
+				target: [campaign_members_table.campaign_id, campaign_members_table.user_id]
 			});
-		} catch (err) {
-			// Handle race condition: if user clicks join link multiple times quickly,
-			// the check might pass but the insert fails due to primary key constraint
-			const errorMessage = err instanceof Error ? err.message : String(err);
-			if (
-				errorMessage.includes('UNIQUE constraint') ||
-				errorMessage.includes('PRIMARY KEY constraint') ||
-				errorMessage.includes('Failed query')
-			) {
-				// User is already a member (race condition)
-				throw error(400, 'You are already a member of this campaign');
-			}
-			// Re-throw other errors
-			throw err;
+
+		// Check if insert succeeded (0 changes means user is already a member)
+		if (membershipInsertResult.meta.changes === 0) {
+			throw error(400, 'You are already a member of this campaign');
 		}
 
 		// If character_id is provided, use batch for atomicity
 		if (character_id) {
 			const now = Date.now();
 
-			await db.batch([
-				// Update character's campaign_id
+			const [characterUpdateResult] = await db.batch([
+				// Update character's campaign_id ONLY if limit not exceeded
+				// This ensures atomic limit check and campaign assignment
 				db
 					.update(characters_table)
 					.set({ campaign_id })
-					.where(eq(characters_table.id, character_id)),
+					.where(
+						and(
+							eq(characters_table.id, character_id),
+							sql`(SELECT COUNT(*) FROM ${characters_table} WHERE ${characters_table.clerk_user_id} = ${userId}) < ${CHARACTER_LIMIT}`
+						)
+					),
 
 				// Insert into campaign_characters - ignore if already exists (race condition)
 				db
@@ -597,6 +639,14 @@ export const join_campaign = command(
 						target: [campaign_characters_table.campaign_id, campaign_characters_table.character_id]
 					})
 			]);
+
+			// Check if character update succeeded (0 changes means character limit exceeded)
+			if (characterUpdateResult.meta.changes === 0) {
+				throw error(
+					403,
+					`Character limit reached. You can only have ${CHARACTER_LIMIT} characters.`
+				);
+			}
 
 			// Notify DO about character being added
 			await notifyDurableObject(event, campaign_id, 'character_added', {
@@ -673,16 +723,6 @@ export const claim_character = command(
 			throw error(403, 'GMs cannot claim characters');
 		}
 
-		// Check character limit before attempting claim
-		const [existingCharacters] = await db
-			.select({ count: count() })
-			.from(characters_table)
-			.where(eq(characters_table.clerk_user_id, userId));
-
-		if (existingCharacters.count >= CHARACTER_LIMIT) {
-			throw error(403, 'Character limit reached');
-		}
-
 		// Check if user already has a non-claimable character in this campaign
 		const existingInCampaign = await db
 			.select()
@@ -704,6 +744,7 @@ export const claim_character = command(
 		// ATOMIC: Use batch with conditional updates
 		// Order matters: claim status first, then ownership
 		// The claimable update only succeeds if claimable = 1
+		// The ownership update only succeeds if character limit not exceeded
 		const [claimResult, ownershipResult] = await db.batch([
 			// First: Atomically set claimable = 0, but ONLY if it's currently 1
 			// This is the "lock" - only one concurrent request can succeed
@@ -718,12 +759,17 @@ export const claim_character = command(
 					)
 				),
 
-			// Second: Update ownership
+			// Second: Update ownership ONLY if character limit not exceeded
+			// This ensures atomic limit check and ownership transfer
 			db
 				.update(characters_table)
 				.set({ clerk_user_id: userId })
 				.where(
-					and(eq(characters_table.id, character_id), eq(characters_table.campaign_id, campaign_id))
+					and(
+						eq(characters_table.id, character_id),
+						eq(characters_table.campaign_id, campaign_id),
+						sql`(SELECT COUNT(*) FROM ${characters_table} WHERE ${characters_table.clerk_user_id} = ${userId}) < ${CHARACTER_LIMIT}`
+					)
 				)
 		]);
 
@@ -731,6 +777,11 @@ export const claim_character = command(
 		// NOTE: D1 uses meta.changes property
 		if (claimResult.meta.changes === 0) {
 			throw error(400, 'Character is not claimable or was already claimed');
+		}
+
+		// Check if ownership update succeeded (0 changes means character limit exceeded)
+		if (ownershipResult.meta.changes === 0) {
+			throw error(403, 'Character limit reached');
 		}
 
 		// Notify DO about character being updated (ownership changed)
@@ -842,17 +893,7 @@ export const leave_campaign = command(z.string(), async (campaignId) => {
 		throw error(400, 'GM cannot leave campaign. Delete the campaign or transfer ownership.');
 	}
 
-	// Remove user from campaign
-	await db
-		.delete(campaign_members_table)
-		.where(
-			and(
-				eq(campaign_members_table.campaign_id, campaignId),
-				eq(campaign_members_table.user_id, userId)
-			)
-		);
-
-	// Get character IDs before removing them
+	// Get character IDs before removing them (needed for DO notifications)
 	const charactersToRemove = await db
 		.select({ id: characters_table.id })
 		.from(characters_table)
@@ -860,27 +901,67 @@ export const leave_campaign = command(z.string(), async (campaignId) => {
 			and(eq(characters_table.campaign_id, campaignId), eq(characters_table.clerk_user_id, userId))
 		);
 
-	// Remove characters from campaign_characters join table
-	for (const char of charactersToRemove) {
-		await db
-			.delete(campaign_characters_table)
-			.where(
+	// Atomic batch: Remove membership, campaign_characters entries, and update characters
+	// All operations succeed or all fail together
+	if (charactersToRemove.length > 0) {
+		// If there are characters, delete from campaign_characters table
+		await db.batch([
+			// Remove user from campaign members
+			db
+				.delete(campaign_members_table)
+				.where(
+					and(
+						eq(campaign_members_table.campaign_id, campaignId),
+						eq(campaign_members_table.user_id, userId)
+					)
+				),
+			// Remove all user's characters from campaign_characters join table
+			db.delete(campaign_characters_table).where(
 				and(
 					eq(campaign_characters_table.campaign_id, campaignId),
-					eq(campaign_characters_table.character_id, char.id)
+					inArray(
+						campaign_characters_table.character_id,
+						charactersToRemove.map((c) => c.id)
+					)
 				)
-			);
+			),
+			// Remove characters from campaign (set campaign_id to null)
+			db
+				.update(characters_table)
+				.set({ campaign_id: null })
+				.where(
+					and(
+						eq(characters_table.campaign_id, campaignId),
+						eq(characters_table.clerk_user_id, userId)
+					)
+				)
+		]);
+	} else {
+		// No characters to remove, just remove membership and update (no campaign_characters delete needed)
+		await db.batch([
+			// Remove user from campaign members
+			db
+				.delete(campaign_members_table)
+				.where(
+					and(
+						eq(campaign_members_table.campaign_id, campaignId),
+						eq(campaign_members_table.user_id, userId)
+					)
+				),
+			// Remove characters from campaign (set campaign_id to null)
+			db
+				.update(characters_table)
+				.set({ campaign_id: null })
+				.where(
+					and(
+						eq(characters_table.campaign_id, campaignId),
+						eq(characters_table.clerk_user_id, userId)
+					)
+				)
+		]);
 	}
 
-	// Remove any characters from campaign
-	await db
-		.update(characters_table)
-		.set({ campaign_id: null })
-		.where(
-			and(eq(characters_table.campaign_id, campaignId), eq(characters_table.clerk_user_id, userId))
-		);
-
-	// Notify DO about removed characters
+	// Notify DO about removed characters (after atomic batch completes)
 	for (const char of charactersToRemove) {
 		await notifyDurableObject(event, campaignId, 'character_removed', {
 			characterId: char.id
@@ -1017,13 +1098,17 @@ export const assign_character_to_campaign = command(
 			existingCampaignChar = entry;
 		}
 
+		// Cache permission checks to avoid redundant database queries
+		let oldCampaignAccess: Awaited<ReturnType<typeof getCampaignAccessInternal>> | null = null;
+		let newCampaignAccess: Awaited<ReturnType<typeof getCampaignAccessInternal>> | null = null;
+
 		// Permission checks based on action
 		if (campaign_id === null) {
 			// Removing character from campaign
 			// Allow if: character owner OR GM of the campaign the character is currently in
 			if (!isOwner && character.campaign_id) {
-				const access = await getCampaignAccessInternal(db, userId, character.campaign_id);
-				if (!access.canEdit) {
+				oldCampaignAccess = await getCampaignAccessInternal(db, userId, character.campaign_id);
+				if (!oldCampaignAccess.canEdit) {
 					throw error(
 						403,
 						'Only the character owner or campaign GM can remove characters from campaigns'
@@ -1039,14 +1124,14 @@ export const assign_character_to_campaign = command(
 				throw error(403, 'Only the character owner can assign characters to campaigns');
 			}
 
-			// Verify user is a member of the campaign
-			const access = await getCampaignAccessInternal(db, userId, campaign_id);
-			if (!access.membership) {
+			// Verify user is a member of the campaign (cache result for later use)
+			newCampaignAccess = await getCampaignAccessInternal(db, userId, campaign_id);
+			if (!newCampaignAccess.membership) {
 				throw error(403, 'You must be a member of the campaign to assign characters');
 			}
 
 			// GMs cannot assign characters to campaigns (unless making them claimable)
-			if (access.canEdit && claimable !== true) {
+			if (newCampaignAccess.canEdit && claimable !== true) {
 				throw error(403, 'GMs cannot assign characters to campaigns');
 			}
 
@@ -1070,8 +1155,11 @@ export const assign_character_to_campaign = command(
 			shouldBeClaimable = true;
 		} else if (campaign_id && !isOwner) {
 			// If GM is assigning someone else's character, make it claimable
-			const gmAccess = await getCampaignAccessInternal(db, userId, campaign_id);
-			if (gmAccess.canEdit) {
+			// Reuse cached access check if available
+			if (!newCampaignAccess) {
+				newCampaignAccess = await getCampaignAccessInternal(db, userId, campaign_id);
+			}
+			if (newCampaignAccess.canEdit) {
 				shouldBeClaimable = true;
 			}
 		}
@@ -1245,30 +1333,29 @@ export const delete_campaign = command(z.string(), async (campaignId) => {
 		throw error(403, 'Only the GM can delete the campaign');
 	}
 
-	// Remove all characters from campaign (set campaign_id to null)
-	await db
-		.update(characters_table)
-		.set({ campaign_id: null })
-		.where(eq(characters_table.campaign_id, campaignId));
-
-	// Delete campaign_characters entries
-	await db
-		.delete(campaign_characters_table)
-		.where(eq(campaign_characters_table.campaign_id, campaignId));
-
-	// Delete campaign members
-	await db.delete(campaign_members_table).where(eq(campaign_members_table.campaign_id, campaignId));
-
-	// Delete campaign state
-	await db.delete(campaign_state_table).where(eq(campaign_state_table.campaign_id, campaignId));
-
-	// Delete campaign homebrew vault entries
-	await db
-		.delete(campaign_homebrew_vault_table)
-		.where(eq(campaign_homebrew_vault_table.campaign_id, campaignId));
-
-	// Delete campaign
-	await db.delete(campaigns_table).where(eq(campaigns_table.id, campaignId));
+	// Atomic batch: Delete all campaign-related data
+	// All operations succeed or all fail together
+	await db.batch([
+		// Remove all characters from campaign (set campaign_id to null)
+		db
+			.update(characters_table)
+			.set({ campaign_id: null })
+			.where(eq(characters_table.campaign_id, campaignId)),
+		// Delete campaign_characters entries
+		db
+			.delete(campaign_characters_table)
+			.where(eq(campaign_characters_table.campaign_id, campaignId)),
+		// Delete campaign members
+		db.delete(campaign_members_table).where(eq(campaign_members_table.campaign_id, campaignId)),
+		// Delete campaign state
+		db.delete(campaign_state_table).where(eq(campaign_state_table.campaign_id, campaignId)),
+		// Delete campaign homebrew vault entries
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(eq(campaign_homebrew_vault_table.campaign_id, campaignId)),
+		// Delete campaign (must be last due to foreign key constraints)
+		db.delete(campaigns_table).where(eq(campaigns_table.id, campaignId))
+	]);
 
 	// Refresh the query
 	get_user_campaigns().refresh();

@@ -1,6 +1,6 @@
 import { query, command, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, count } from 'drizzle-orm';
 import { z } from 'zod';
 import { characters_table, characters_table_update_schema } from '../server/db/characters.schema';
 import { get_db, get_auth, CHARACTER_LIMIT } from './utils';
@@ -49,13 +49,22 @@ async function notifyDurableObject(
 
 		if (!response.ok) {
 			const errorText = await response.text();
-			console.error(`DO notification failed with status ${response.status}: ${errorText}`);
+			// Log at error level for monitoring - DO failures indicate real-time sync issues
+			console.error(
+				`[DO Notification Error] ${type} for character ${data.characterId}: Status ${response.status}, ${errorText}`
+			);
+			// TODO: Consider adding metrics/monitoring here for DO notification failures
 		} else {
 			console.log(`DO notification sent successfully: ${type} for character ${data.characterId}`);
 		}
 	} catch (err) {
-		// Log error but don't fail the operation
-		console.error(`Failed to notify DO for ${type}:`, err);
+		// Log error but don't fail the operation (D1 is source of truth, DO is for real-time sync)
+		// Log at error level for monitoring - consistent DO failures may indicate infrastructure issues
+		console.error(
+			`[DO Notification Error] Failed to notify DO for ${type} (character ${data.characterId}):`,
+			err instanceof Error ? err.message : String(err)
+		);
+		// TODO: Consider adding metrics/monitoring here for DO notification failures
 	}
 }
 
@@ -114,7 +123,6 @@ export const delete_character = command(z.string(), async (characterId) => {
 	const character = access.character;
 
 	// Track if character was in a campaign (for refreshing queries)
-	const wasInCampaign = !!character.campaign_id;
 	const campaignId = character.campaign_id;
 
 	// Delete the character
@@ -127,11 +135,12 @@ export const delete_character = command(z.string(), async (characterId) => {
 		});
 	}
 
-	// Refresh the characters list
+	// Refresh the characters list (always needed when deleting)
 	get_all_characters().refresh();
 
-	// Refresh campaign-related queries if character was in a campaign
-	if (wasInCampaign && campaignId) {
+	// Only refresh campaign-related queries if character was actually in a campaign
+	// get_user_campaigns needs refresh because character_images may have changed
+	if (campaignId) {
 		get_user_campaigns().refresh();
 		get_campaign_characters(campaignId).refresh();
 	}
@@ -179,35 +188,47 @@ export const create_character = command(
 
 		// Check character limit - ALL characters owned by user count toward the limit
 		// Claimable status is tracked in campaign_characters_table, not in character limit
-		const existingCharacters = await db
-			.select()
+		// Optimized: Use COUNT query instead of selecting all characters
+		const [result] = await db
+			.select({ count: count() })
 			.from(characters_table)
 			.where(eq(characters_table.clerk_user_id, userId));
 
-		if (existingCharacters.length >= CHARACTER_LIMIT) {
+		const characterCount = Number(result?.count ?? 0);
+		if (characterCount >= CHARACTER_LIMIT) {
 			throw error(403, `Character limit reached. You can only have ${CHARACTER_LIMIT} characters.`);
 		}
 
 		const characterId = crypto.randomUUID();
+		const now = Date.now();
 
-		await db.insert(characters_table).values({
-			id: characterId,
-			clerk_user_id: userId,
-			campaign_id: options?.campaign_id || null
-		});
-
-		// If character is being created in a campaign, also insert into campaign_characters table
+		// Use batch for atomic character + campaign_characters insert
+		// This ensures both operations succeed or both fail
 		if (options?.campaign_id) {
 			const { campaign_characters_table } = await import('../server/db/campaigns.schema');
-			await db.insert(campaign_characters_table).values({
-				campaign_id: options.campaign_id,
-				character_id: characterId,
-				claimable: isClaimable ? 1 : 0,
-				added_at: Date.now()
-			});
+			await db.batch([
+				db.insert(characters_table).values({
+					id: characterId,
+					clerk_user_id: userId,
+					campaign_id: options.campaign_id
+				}),
+				db.insert(campaign_characters_table).values({
+					campaign_id: options.campaign_id,
+					character_id: characterId,
+					claimable: isClaimable ? 1 : 0,
+					added_at: now
+				})
+			]);
 
 			// Refresh the campaign characters query
 			get_campaign_characters(options.campaign_id).refresh();
+		} else {
+			// No campaign - just insert character
+			await db.insert(characters_table).values({
+				id: characterId,
+				clerk_user_id: userId,
+				campaign_id: null
+			});
 		}
 
 		// Refresh the characters list
@@ -266,21 +287,63 @@ export const update_character = command(
 
 		// If character is in a campaign, notify DO about the update with partial CampaignCharacterSummary
 		if (campaignId) {
-			// Build partial update for DO notification based on changed fields
+			// Build partial update for DO notification based on actually changed fields
+			// Only include fields that have actually changed values
 			const updates: Partial<CampaignCharacterSummary> = {};
-			if (character.marked_hp !== undefined) updates.marked_hp = character.marked_hp;
-			if (character.marked_stress !== undefined) updates.marked_stress = character.marked_stress;
-			if (character.marked_hope !== undefined) updates.marked_hope = character.marked_hope;
-			if (character.marked_armor !== undefined) updates.marked_armor = character.marked_armor;
-			if (character.active_conditions !== undefined)
-				updates.active_conditions = character.active_conditions;
-			if (character.name !== undefined) updates.name = character.name;
-			if (character.level !== undefined) updates.level = character.level;
-			if (character.image_url !== undefined) updates.image_url = character.image_url;
-			// Include derived_character_summary if it was updated
-			if (character.derived_character_summary !== undefined)
-				updates.derived_character_summary = character.derived_character_summary;
 
+			if (
+				character.marked_hp !== undefined &&
+				character.marked_hp !== existingCharacter.marked_hp
+			) {
+				updates.marked_hp = character.marked_hp;
+			}
+			if (
+				character.marked_stress !== undefined &&
+				character.marked_stress !== existingCharacter.marked_stress
+			) {
+				updates.marked_stress = character.marked_stress;
+			}
+			if (
+				character.marked_hope !== undefined &&
+				character.marked_hope !== existingCharacter.marked_hope
+			) {
+				updates.marked_hope = character.marked_hope;
+			}
+			if (
+				character.marked_armor !== undefined &&
+				character.marked_armor !== existingCharacter.marked_armor
+			) {
+				updates.marked_armor = character.marked_armor;
+			}
+			if (character.active_conditions !== undefined) {
+				const existingConditions = existingCharacter.active_conditions || [];
+				const newConditions = character.active_conditions || [];
+				if (JSON.stringify(existingConditions) !== JSON.stringify(newConditions)) {
+					updates.active_conditions = character.active_conditions;
+				}
+			}
+			if (character.name !== undefined && character.name !== existingCharacter.name) {
+				updates.name = character.name;
+			}
+			if (character.level !== undefined && character.level !== existingCharacter.level) {
+				updates.level = character.level;
+			}
+			if (
+				character.image_url !== undefined &&
+				character.image_url !== existingCharacter.image_url
+			) {
+				updates.image_url = character.image_url;
+			}
+			// Include derived_character_summary if it was actually updated
+			if (character.derived_character_summary !== undefined) {
+				const existingSummary = existingCharacter.derived_character_summary;
+				const newSummary = character.derived_character_summary;
+				if (JSON.stringify(existingSummary) !== JSON.stringify(newSummary)) {
+					updates.derived_character_summary = character.derived_character_summary;
+				}
+			}
+
+			// Only notify if there are actual changes
 			if (Object.keys(updates).length > 0) {
 				await notifyDurableObject(event, campaignId, 'character_updated', {
 					characterId: id,

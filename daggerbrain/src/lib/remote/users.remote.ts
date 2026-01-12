@@ -1,5 +1,5 @@
 import { query, command, getRequestEvent } from '$app/server';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import {
 	users_table,
@@ -38,28 +38,30 @@ export const dismiss_popup = command(z.string(), async (popupId) => {
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Get existing dismissed_popups or use empty array
-	const [existingUser] = await db
-		.select({ dismissed_popups: users_table.dismissed_popups })
-		.from(users_table)
-		.where(eq(users_table.clerk_id, userId))
-		.limit(1);
-
-	const currentPopups = existingUser?.dismissed_popups ?? [];
-	const updatedPopups = currentPopups.includes(popupId)
-		? currentPopups
-		: [...currentPopups, popupId];
-
-	// Atomic upsert
+	// Atomic upsert using SQL JSON functions to conditionally add popup
+	// This eliminates the read-modify-write race condition
+	// Only adds popupId if it's not already in the array
 	await db
 		.insert(users_table)
 		.values({
 			clerk_id: userId,
-			dismissed_popups: updatedPopups
+			dismissed_popups: sql`json_array(${popupId})`
 		})
 		.onConflictDoUpdate({
 			target: users_table.clerk_id,
-			set: { dismissed_popups: updatedPopups }
+			set: {
+				dismissed_popups: sql`
+					CASE 
+						WHEN dismissed_popups IS NULL THEN json_array(${popupId})
+						WHEN json_array_length(dismissed_popups) = 0 THEN json_array(${popupId})
+						WHEN EXISTS (
+							SELECT 1 FROM json_each(dismissed_popups) 
+							WHERE value = ${popupId}
+						) THEN dismissed_popups
+						ELSE dismissed_popups || json_array(${popupId})
+					END
+				`
+			}
 		});
 
 	get_user().refresh();

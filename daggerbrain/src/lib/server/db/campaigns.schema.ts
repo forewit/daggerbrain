@@ -1,4 +1,11 @@
-import { integer, sqliteTable, text, index, primaryKey } from 'drizzle-orm/sqlite-core';
+import {
+	integer,
+	sqliteTable,
+	text,
+	index,
+	primaryKey,
+	uniqueIndex
+} from 'drizzle-orm/sqlite-core';
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from 'drizzle-zod';
 import type { Countdown } from '../../types/campaign-types';
 
@@ -109,7 +116,13 @@ export const campaign_homebrew_vault_table = sqliteTable(
 		homebrew_id: text('homebrew_id').notNull(),
 		added_at: integer('added_at').notNull()
 	},
-	(table) => [index('campaign_homebrew_vault_table_campaign_id_idx').on(table.campaign_id)]
+	(table) => [
+		index('campaign_homebrew_vault_table_campaign_id_idx').on(table.campaign_id),
+		uniqueIndex('campaign_homebrew_vault_table_campaign_id_homebrew_id_unique').on(
+			table.campaign_id,
+			table.homebrew_id
+		)
+	]
 );
 
 export const campaign_homebrew_vault_table_schema = createSelectSchema(

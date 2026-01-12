@@ -123,3 +123,179 @@ When remote commands modify campaign-related data:
 4. Clients receive updates and merge into local state
 
 This ensures D1 is source of truth, DO is just for real-time sync.
+
+## Race Condition Prevention Patterns
+
+When multiple concurrent requests modify the same data, race conditions can occur. D1 supports batch operations for atomicity, but we need to design our operations carefully to prevent race conditions.
+
+### Core Principles
+
+1. **Use Batches for Multi-Table Operations**: Wrap all related operations in `db.batch([...])` to ensure atomicity
+2. **Embed Conditions in WHERE Clauses**: Include condition checks directly in WHERE clauses using SQL subqueries
+3. **Use Upsert Patterns for Idempotency**: Use `onConflictDoNothing()` or `onConflictDoUpdate()` instead of check-then-insert
+4. **Use Conditional Updates as Locks**: Include state checks in WHERE clauses to act as optimistic locks
+5. **Verify Results with `meta.changes`**: Check `result.meta.changes` to verify operations affected rows
+
+### Pattern 1: Conditional Update with Limit Check
+
+Embed limit checks directly in WHERE clauses to make them atomic:
+
+```typescript
+// ✅ Good: Limit check in WHERE clause
+const [result] = await db.batch([
+  db
+    .update(characters_table)
+    .set({ clerk_user_id: userId })
+    .where(
+      and(
+        eq(characters_table.id, character_id),
+        sql`(SELECT COUNT(*) FROM ${characters_table} WHERE ${characters_table.clerk_user_id} = ${userId}) < ${CHARACTER_LIMIT}`
+      )
+    )
+]);
+
+if (result.meta.changes === 0) {
+  throw error(403, 'Character limit reached');
+}
+```
+
+**Why**: The update only succeeds if the limit condition is met, eliminating the check-then-act race condition.
+
+### Pattern 2: Atomic Multi-Table Operation
+
+Wrap multiple related operations in a batch to ensure atomicity:
+
+```typescript
+// ✅ Good: All related operations in one batch
+await db.batch([
+  db.insert(characters_table).values({...}),
+  db.insert(campaign_characters_table).values({...})
+]);
+```
+
+**Why**: All operations succeed or all fail together, preventing partial updates.
+
+### Pattern 3: Upsert with Conflict Handling
+
+Use `onConflictDoNothing()` or `onConflictDoUpdate()` to eliminate check-then-insert race conditions:
+
+```typescript
+// ✅ Good: Idempotent insert
+const result = await db
+  .insert(table)
+  .values({...})
+  .onConflictDoNothing({ target: table.id });
+
+if (result.meta.changes === 0) {
+  throw error(400, 'Already exists');
+}
+```
+
+**Why**: Eliminates the race condition where two requests both check "doesn't exist" then both try to insert.
+
+### Pattern 4: Conditional Update as Lock
+
+Include state checks in WHERE clauses to act as optimistic locks:
+
+```typescript
+// ✅ Good: Only succeeds if in expected state
+const [result] = await db.batch([
+  db
+    .update(table)
+    .set({ claimable: 0 })
+    .where(
+      and(
+        eq(table.id, id),
+        eq(table.claimable, 1) // Acts as lock - only one concurrent request can succeed
+      )
+    )
+]);
+
+if (result.meta.changes === 0) {
+  throw error(400, 'Already claimed');
+}
+```
+
+**Why**: Only one concurrent request can succeed when the state matches, preventing double-claiming.
+
+### Pattern 5: Atomic Array Updates
+
+Use SQL JSON functions to update arrays atomically instead of read-modify-write:
+
+```typescript
+// ✅ Good: Atomic array update using SQL
+await db
+  .insert(users_table)
+  .values({
+    clerk_id: userId,
+    dismissed_popups: sql`json_array(${popupId})`
+  })
+  .onConflictDoUpdate({
+    target: users_table.clerk_id,
+    set: {
+      dismissed_popups: sql`
+        CASE 
+          WHEN dismissed_popups IS NULL THEN json_array(${popupId})
+          WHEN json_array_length(dismissed_popups) = 0 THEN json_array(${popupId})
+          WHEN EXISTS (
+            SELECT 1 FROM json_each(dismissed_popups) 
+            WHERE value = ${popupId}
+          ) THEN dismissed_popups
+          ELSE dismissed_popups || json_array(${popupId})
+        END
+      `
+    }
+  });
+```
+
+**Why**: Eliminates read-modify-write race conditions where two requests both read, modify, and write.
+
+### Anti-Patterns to Avoid
+
+#### ❌ Check-Then-Act
+
+```typescript
+// ❌ BAD: Race condition possible
+const existing = await db.select().from(table).where(...);
+if (existing.length === 0) {
+  await db.insert(table).values({...}); // Another request might insert here
+}
+```
+
+**Fix**: Use `onConflictDoNothing()` pattern instead.
+
+#### ❌ Sequential Operations
+
+```typescript
+// ❌ BAD: Not atomic - partial failure possible
+await db.insert(table1).values({...});
+await db.insert(table2).values({...});
+await db.update(table3).set({...});
+```
+
+**Fix**: Wrap in `db.batch([...])` for atomicity.
+
+#### ❌ Read-Modify-Write
+
+```typescript
+// ❌ BAD: Race condition on concurrent updates
+const [record] = await db.select().from(table).where(...);
+const updated = { ...record, field: newValue };
+await db.update(table).set(updated).where(...);
+```
+
+**Fix**: Use SQL expressions in `set()` to compute values atomically, or use conditional WHERE clauses.
+
+### Utility Functions
+
+See `src/lib/server/atomic-operations.ts` for reusable helper functions:
+- `verifyChanges()` - Verify operation affected expected rows
+- `verifyBatchResults()` - Verify multiple batch results
+
+### Testing Race Conditions
+
+When testing, simulate concurrent requests:
+1. Use tools to send multiple simultaneous requests
+2. Verify atomicity: batches either fully succeed or fully fail
+3. Test edge cases: limit boundaries, concurrent claims, etc.
+4. Verify conditional WHERE clauses prevent invalid operations

@@ -395,8 +395,7 @@ function campaignContext() {
 		if (!id) return;
 
 		await reset_invite_code({ campaign_id: id });
-		// Refresh campaign state to get the new invite code
-		await load();
+		// Query refresh is handled by the remote command - state will update automatically
 	}
 
 	// Assign character to campaign (or remove from campaign if campaignId is null)
@@ -413,9 +412,7 @@ function campaignContext() {
 				campaign_id: targetCampaignId,
 				claimable: options?.claimable
 			});
-			// Query refresh is handled by the remote command
-			// Reload to get fresh data
-			await load();
+			// Query refresh is handled by the remote command - state will update automatically
 		} catch (err) {
 			error(500, err instanceof Error ? err.message : 'Failed to assign character');
 		}
@@ -431,9 +428,7 @@ function campaignContext() {
 				character_id: characterId,
 				campaign_id: id
 			});
-			// Query refresh is handled by the remote command
-			// Reload to get fresh data
-			await load();
+			// Query refresh is handled by the remote command - state will update automatically
 		} catch (err) {
 			error(500, err instanceof Error ? err.message : 'Failed to claim character');
 		}
@@ -449,9 +444,7 @@ function campaignContext() {
 				character_id: characterId,
 				campaign_id: id
 			});
-			// Query refresh is handled by the remote command
-			// Reload to get fresh data
-			await load();
+			// Query refresh is handled by the remote command - state will update automatically
 		} catch (err) {
 			error(500, err instanceof Error ? err.message : 'Failed to unassign character');
 		}
@@ -502,9 +495,7 @@ function campaignContext() {
 				homebrew_type: homebrewType,
 				homebrew_id: homebrewId
 			});
-			// Query refresh is handled by the remote command
-			// Reload to get fresh data
-			await load();
+			// Query refresh is handled by the remote command - state will update automatically
 		} catch (err) {
 			error(500, err instanceof Error ? err.message : 'Failed to add item to vault');
 		}
@@ -520,9 +511,7 @@ function campaignContext() {
 				campaign_id: id,
 				vault_id: vaultId
 			});
-			// Query refresh is handled by the remote command
-			// Reload to get fresh data
-			await load();
+			// Query refresh is handled by the remote command - state will update automatically
 		} catch (err) {
 			error(500, err instanceof Error ? err.message : 'Failed to remove item from vault');
 		}
