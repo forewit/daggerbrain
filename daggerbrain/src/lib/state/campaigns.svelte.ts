@@ -795,9 +795,13 @@ function campaignContext() {
 			currentCampaignIdForSync = undefined;
 		}
 
-		// Cleanup on unmount
+		// Cleanup on unmount or when campaign ID changes
+		// Only disconnect if campaign ID is actually changing or becoming undefined
 		return () => {
-			if (wsConnection) {
+			const currentId = campaignId;
+			// Only disconnect if campaign ID changed or is now undefined
+			// This prevents disconnecting when the effect re-runs for other reasons
+			if (currentId !== id && wsConnection) {
 				wsConnection.disconnect();
 				wsConnection = null;
 			}
@@ -923,7 +927,8 @@ function campaignContext() {
 					lastSavedCampaignState = JSON.stringify(campaignState);
 
 					// Then send via WebSocket for live broadcast to other clients
-					if (wsConnection && wsConnection.connected) {
+					// Use the send() method which handles connection checking internally
+					if (wsConnection) {
 						wsConnection.send({
 							type: 'update_state',
 							updates: {

@@ -1837,7 +1837,7 @@ function createCharacter(id: string) {
 				multiclass_used ? character.secondary_class_domain_id_choice : null
 			].filter((id) => id !== null);
 
-			//***** level up domain cards *****/
+			// ***** level up domain cards *****/
 			// filter out cards that are not valid for the current level
 			if (level_up_domain_card !== null && level_up_domain_card.level_requirement > i) {
 				console.warn(`Domain card ${level_up_domain_card?.title} is not valid for level ${i}`);
@@ -1866,9 +1866,9 @@ function createCharacter(id: string) {
 			} else if (level_up_domain_card !== null) {
 				new_domain_card_vault.push(level_up_domain_card);
 			}
-			//***** END level up domain cards *****/
+			// ***** END level up domain cards *****/
 
-			//***** domain card choices *****/
+			// ***** domain card choices *****/
 			// clear domain card choices if the level choice is set and is not a domain card choice
 			// (don't clear if option_id is null, as user might select domain card before selecting tier option)
 			if (
@@ -1969,7 +1969,7 @@ function createCharacter(id: string) {
 			} else if (choice_B_selected_domain_card !== null) {
 				new_domain_card_vault.push(choice_B_selected_domain_card);
 			}
-			//***** END domain card choices *****/
+			// ***** END domain card choices *****/
 		}
 
 		// ! add cards from additional_domain_Cards
@@ -3600,10 +3600,9 @@ function createCharacter(id: string) {
 	// INVENTORY HELPER FUNCTIONS
 	// ================================================
 
-	/**
-	 * Add an item to the character's inventory
-	 * @param item - The item to add, where item.id is the compendium_id
-	 */
+	
+	 // Add an item to the character's inventory
+	 //@param item - The item to add, where item.id is the compendium_id
 	function addToInventory(
 		item: { compendium_id: string; title?: string },
 		type:
@@ -3688,10 +3687,10 @@ function createCharacter(id: string) {
 		}
 	}
 
-	/**
-	 * Remove an item from the character's inventory
-	 * @param item - The item to remove, where item.id is the unique inventory item id (or title for adventuring_gear)
-	 */
+	
+	// Remove an item from the character's inventory
+	// @param item - The item to remove, where item.id is the unique inventory item id (or title for adventuring_gear)
+	
 	function removeFromInventory(
 		item: { id: string },
 		type:
@@ -3746,9 +3745,9 @@ function createCharacter(id: string) {
 		}
 	}
 
-	/**
-	 * Equip an armor or weapon
-	 */
+	
+	// Equip an armor or weapon
+	 
 	function equipItem(
 		item: { id: string; level_requirement: number },
 		type: 'primary_weapon' | 'secondary_weapon' | 'armor'
@@ -3768,9 +3767,7 @@ function createCharacter(id: string) {
 		}
 	}
 
-	/**
-	 * Unequip an armor or weapon
-	 */
+	// Unequip an armor or weapon
 	function unequipItem(
 		item: { id: string },
 		type: 'primary_weapon' | 'secondary_weapon' | 'armor'
@@ -3786,9 +3783,7 @@ function createCharacter(id: string) {
 		}
 	}
 
-	/**
-	 * Check if an armor or weapon is equipped
-	 */
+	// Check if an armor or weapon is equipped
 	function isItemEquipped(
 		item: { id: string },
 		type: 'primary_weapon' | 'secondary_weapon' | 'armor'
@@ -3805,17 +3800,13 @@ function createCharacter(id: string) {
 		return false;
 	}
 
-	/**
-	 * Check if the character meets the level requirement to equip an item
-	 */
+	// Check if the character meets the level requirement to equip an item
 	function canEquipItem(item: { level_requirement: number }): boolean {
 		if (!character) return false;
 		return character.level >= item.level_requirement;
 	}
 
-	/**
-	 * Add a condition to the character's active conditions
-	 */
+	// Add a condition to the character's active conditions
 	function addCondition(conditionId: ConditionIds) {
 		if (!character) return;
 		const validConditionIds = Object.keys(CONDITIONS) as ConditionIds[];
@@ -3828,9 +3819,7 @@ function createCharacter(id: string) {
 		}
 	}
 
-	/**
-	 * Remove a condition from the character's active conditions
-	 */
+	// Remove a condition from the character's active conditions
 	function removeCondition(conditionId: ConditionIds) {
 		if (!character) return;
 		const index = character.active_conditions.indexOf(conditionId);
@@ -3841,78 +3830,6 @@ function createCharacter(id: string) {
 
 	const destroy = () => {};
 
-	/**
-	 * Build a fully derived character object.
-	 * This serializes all the computed derived state into a single object.
-	 * Used for campaign character summaries and other contexts where fully computed character data is needed.
-	 */
-	function buildDerivedCharacter():
-		| import('../types/derived-character-types').DerivedCharacter
-		| null {
-		if (!character) return null;
-
-		// Use JSON serialization to create a deep copy and flatten all derived values
-		const derived = JSON.parse(
-			JSON.stringify(character)
-		) as import('../types/derived-character-types').DerivedCharacter;
-
-		// Add all derived values
-		derived.derived_ancestry_card = ancestry_card;
-		derived.derived_community_card = community_card;
-		derived.derived_transformation_card = transformation_card;
-		derived.derived_primary_class = primary_class;
-		derived.derived_primary_subclass = primary_subclass;
-		derived.derived_secondary_class = secondary_class;
-		derived.derived_secondary_subclass = secondary_subclass;
-
-		derived.derived_armor = derived_armor;
-		derived.derived_primary_weapon = derived_primary_weapon;
-		derived.derived_secondary_weapon = derived_secondary_weapon;
-		derived.derived_unarmed_attack = derived_unarmed_attack;
-		derived.derived_beastform = derived_beastform;
-		derived.derived_companion = derived_companion;
-
-		derived.derived_traits = traits;
-		derived.derived_proficiency = proficiency;
-		derived.derived_experience_modifiers = experience_modifiers;
-		derived.derived_max_experiences = max_experiences;
-		derived.derived_max_loadout = max_loadout;
-		derived.derived_max_hope = max_hope;
-		derived.derived_max_armor = max_armor;
-		derived.derived_max_hp = max_hp;
-		derived.derived_max_stress = max_stress;
-		derived.derived_max_burden = max_burden;
-		derived.derived_max_short_rest_actions = max_short_rest_actions;
-		derived.derived_max_long_rest_actions = max_long_rest_actions;
-		derived.derived_max_consumables = max_consumables;
-		derived.derived_consumable_count = consumable_count;
-		derived.derived_evasion = evasion;
-		derived.derived_damage_thresholds = damage_thresholds;
-		derived.derived_primary_class_mastery_level = primary_class_mastery_level;
-		derived.derived_secondary_class_mastery_level = secondary_class_mastery_level;
-		derived.derived_spellcast_roll_bonus = spellcast_roll_bonus;
-
-		derived.derived_domain_card_vault = domain_card_vault;
-		derived.derived_domain_card_loadout = domain_card_loadout;
-
-		// Update derived_character_summary with all summary fields needed for campaign preview
-		// Note: ancestry_card uses 'title', classes/subclasses use 'name'
-		derived.derived_character_summary = {
-			ancestry_name: ancestry_card?.title ?? '',
-			primary_class_name: primary_class?.name ?? '',
-			primary_subclass_name: primary_subclass?.name ?? '',
-			secondary_class_name: secondary_class?.name ?? '',
-			secondary_subclass_name: secondary_subclass?.name ?? '',
-			max_hp: max_hp,
-			max_stress: max_stress,
-			max_hope: max_hope,
-			evasion: evasion,
-			max_armor: max_armor,
-			damage_thresholds: damage_thresholds
-		};
-
-		return derived;
-	}
 
 	return {
 		// read only
@@ -4108,9 +4025,6 @@ function createCharacter(id: string) {
 		// condition helper functions
 		addCondition,
 		removeCondition,
-
-		// derived character builder
-		buildDerivedCharacter
 	};
 }
 
