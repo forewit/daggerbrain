@@ -38,7 +38,6 @@ import type {
 } from '$lib/types/compendium-types';
 import { BLANK_LEVEL_UP_CHOICE } from '$lib/types/constants';
 import { update_character, get_character_by_id } from '$lib/remote/characters.remote';
-import { getCharacterAccess } from '$lib/remote/permissions.remote';
 import { getCompendiumContext } from './compendium.svelte';
 import { increaseDie, increase_range } from '$lib/utils';
 import { getCampaignContext } from './campaigns.svelte';
@@ -54,6 +53,8 @@ function createCharacter(id: string) {
 	let loadingPromise = $state<Promise<void> | null>(null);
 	// Track if we've already failed to load with a permission error (403) to prevent infinite retries
 	let loadFailedWithPermissionError = $state(false);
+	// Track canEdit permission from server (for permission-loaded characters)
+	let characterCanEdit = $state<boolean | null>(null);
 
 	// Load character: first try user.all_characters (fast path), then try get_character_by_id if not found
 	$effect(() => {
@@ -69,6 +70,7 @@ function createCharacter(id: string) {
 			// Character is owned - always use this (may have been updated)
 			character = ownedCharacter;
 			characterLoadSource = 'owned';
+			characterCanEdit = true; // Owned characters can always be edited
 			loadFailedWithPermissionError = false; // Reset failure flag if character becomes owned
 			loadingCharacter = false; // Character found, no longer loading
 			return;
@@ -94,8 +96,9 @@ function createCharacter(id: string) {
 			// in case it was set to false in a previous run
 			loadingCharacter = true;
 			const promise = get_character_by_id(id)
-				.then((loadedCharacter) => {
-					character = loadedCharacter;
+				.then((result) => {
+					character = result.character;
+					characterCanEdit = result.canEdit;
 					characterLoadSource = 'permission';
 					// Set loadingCharacter to false IMMEDIATELY after setting character
 					// This prevents race condition where page computes characterNotFound=true
@@ -105,6 +108,7 @@ function createCharacter(id: string) {
 				.catch((err) => {
 					// Character not found or user doesn't have permission
 					character = null;
+					characterCanEdit = null;
 					characterLoadSource = null;
 					loadingCharacter = false;
 					// If it's a 403 (permission denied), mark that we've failed to prevent infinite retries
@@ -119,26 +123,17 @@ function createCharacter(id: string) {
 		}
 	});
 
-	// Permission checks - use single query to get both canEdit and canView
-	const characterAccessQuery = $derived.by(() => {
-		if (!id) return null;
-		return getCharacterAccess(id);
-	});
-
+	// Permission checks - derive from existing state
 	const canEdit = $derived.by(() => {
-		const query = characterAccessQuery;
-		if (!query) return null;
-		if (query.loading) return null;
-		if (query.error) return false;
-		return query.current?.canEdit ?? false;
+		// For owned characters (fast path), canEdit is always true
+		if (characterLoadSource === 'owned') return true;
+		// For permission-loaded characters, use the flag from server
+		return characterCanEdit ?? false;
 	});
 
 	const canView = $derived.by(() => {
-		const query = characterAccessQuery;
-		if (!query) return null;
-		if (query.loading) return null;
-		if (query.error) return false;
-		return query.current?.canView ?? false;
+		// If character exists, user has view permission (backend validated via get_character_by_id)
+		return character !== null;
 	});
 
 	const compendium = getCompendiumContext();

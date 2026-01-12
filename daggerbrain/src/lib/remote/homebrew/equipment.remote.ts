@@ -24,6 +24,7 @@ import {
 	HOMEBREW_LIMIT,
 	assertHomebrewTypeEnabled
 } from './utils';
+import { getHomebrewAccessInternal } from '../../server/permissions';
 
 // ============================================================================
 // Primary Weapons
@@ -88,14 +89,10 @@ export const update_homebrew_primary_weapon = command(
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		// Verify ownership
-		const [existing] = await db
-			.select()
-			.from(homebrew_primary_weapons)
-			.where(eq(homebrew_primary_weapons.id, id))
-			.limit(1);
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'primary_weapons', id);
 
-		if (!existing || existing.clerk_user_id !== userId) {
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this weapon');
 		}
 
@@ -106,9 +103,7 @@ export const update_homebrew_primary_weapon = command(
 		await db
 			.update(homebrew_primary_weapons)
 			.set({ data: validatedData, updated_at: now })
-			.where(
-				and(eq(homebrew_primary_weapons.id, id), eq(homebrew_primary_weapons.clerk_user_id, userId))
-			);
+			.where(eq(homebrew_primary_weapons.id, id));
 
 		console.log('updated homebrew primary weapon in D1');
 	}
@@ -120,25 +115,17 @@ export const delete_homebrew_primary_weapon = command(z.string(), async (id) => 
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Verify ownership
-	const [existing] = await db
-		.select()
-		.from(homebrew_primary_weapons)
-		.where(eq(homebrew_primary_weapons.id, id))
-		.limit(1);
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'primary_weapons', id);
 
-	if (!existing || existing.clerk_user_id !== userId) {
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this weapon');
 	}
 
 	// Atomic batch delete - both operations succeed or both fail
 	await db.batch([
 		// Delete from homebrew table
-		db
-			.delete(homebrew_primary_weapons)
-			.where(
-				and(eq(homebrew_primary_weapons.id, id), eq(homebrew_primary_weapons.clerk_user_id, userId))
-			),
+		db.delete(homebrew_primary_weapons).where(eq(homebrew_primary_weapons.id, id)),
 
 		// Delete from all campaign vaults
 		db
@@ -219,14 +206,10 @@ export const update_homebrew_secondary_weapon = command(
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		// Verify ownership
-		const [existing] = await db
-			.select()
-			.from(homebrew_secondary_weapons)
-			.where(eq(homebrew_secondary_weapons.id, id))
-			.limit(1);
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'secondary_weapons', id);
 
-		if (!existing || existing.clerk_user_id !== userId) {
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this weapon');
 		}
 
@@ -237,12 +220,7 @@ export const update_homebrew_secondary_weapon = command(
 		await db
 			.update(homebrew_secondary_weapons)
 			.set({ data: validatedData, updated_at: now })
-			.where(
-				and(
-					eq(homebrew_secondary_weapons.id, id),
-					eq(homebrew_secondary_weapons.clerk_user_id, userId)
-				)
-			);
+			.where(eq(homebrew_secondary_weapons.id, id));
 
 		console.log('updated homebrew secondary weapon in D1');
 	}
@@ -254,28 +232,17 @@ export const delete_homebrew_secondary_weapon = command(z.string(), async (id) =
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Verify ownership
-	const [existing] = await db
-		.select()
-		.from(homebrew_secondary_weapons)
-		.where(eq(homebrew_secondary_weapons.id, id))
-		.limit(1);
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'secondary_weapons', id);
 
-	if (!existing || existing.clerk_user_id !== userId) {
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this weapon');
 	}
 
 	// Atomic batch delete - both operations succeed or both fail
 	await db.batch([
 		// Delete from homebrew table
-		db
-			.delete(homebrew_secondary_weapons)
-			.where(
-				and(
-					eq(homebrew_secondary_weapons.id, id),
-					eq(homebrew_secondary_weapons.clerk_user_id, userId)
-				)
-			),
+		db.delete(homebrew_secondary_weapons).where(eq(homebrew_secondary_weapons.id, id)),
 
 		// Delete from all campaign vaults
 		db
@@ -356,14 +323,10 @@ export const update_homebrew_armor = command(
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		// Verify ownership
-		const [existing] = await db
-			.select()
-			.from(homebrew_armor)
-			.where(eq(homebrew_armor.id, id))
-			.limit(1);
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'armor', id);
 
-		if (!existing || existing.clerk_user_id !== userId) {
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this armor');
 		}
 
@@ -374,7 +337,7 @@ export const update_homebrew_armor = command(
 		await db
 			.update(homebrew_armor)
 			.set({ data: validatedData, updated_at: now })
-			.where(and(eq(homebrew_armor.id, id), eq(homebrew_armor.clerk_user_id, userId)));
+			.where(eq(homebrew_armor.id, id));
 
 		console.log('updated homebrew armor in D1');
 	}
@@ -386,23 +349,17 @@ export const delete_homebrew_armor = command(z.string(), async (id) => {
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Verify ownership
-	const [existing] = await db
-		.select()
-		.from(homebrew_armor)
-		.where(eq(homebrew_armor.id, id))
-		.limit(1);
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'armor', id);
 
-	if (!existing || existing.clerk_user_id !== userId) {
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this armor');
 	}
 
 	// Atomic batch delete - both operations succeed or both fail
 	await db.batch([
 		// Delete from homebrew table
-		db
-			.delete(homebrew_armor)
-			.where(and(eq(homebrew_armor.id, id), eq(homebrew_armor.clerk_user_id, userId))),
+		db.delete(homebrew_armor).where(eq(homebrew_armor.id, id)),
 
 		// Delete from all campaign vaults
 		db
@@ -483,14 +440,10 @@ export const update_homebrew_loot = command(
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		// Verify ownership
-		const [existing] = await db
-			.select()
-			.from(homebrew_loot)
-			.where(eq(homebrew_loot.id, id))
-			.limit(1);
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'loot', id);
 
-		if (!existing || existing.clerk_user_id !== userId) {
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this loot');
 		}
 
@@ -501,7 +454,7 @@ export const update_homebrew_loot = command(
 		await db
 			.update(homebrew_loot)
 			.set({ data: validatedData, updated_at: now })
-			.where(and(eq(homebrew_loot.id, id), eq(homebrew_loot.clerk_user_id, userId)));
+			.where(eq(homebrew_loot.id, id));
 
 		console.log('updated homebrew loot');
 	}
@@ -513,19 +466,17 @@ export const delete_homebrew_loot = command(z.string(), async (id) => {
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Verify ownership
-	const [existing] = await db.select().from(homebrew_loot).where(eq(homebrew_loot.id, id)).limit(1);
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'loot', id);
 
-	if (!existing || existing.clerk_user_id !== userId) {
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this loot');
 	}
 
 	// Atomic batch delete - both operations succeed or both fail
 	await db.batch([
 		// Delete from homebrew table
-		db
-			.delete(homebrew_loot)
-			.where(and(eq(homebrew_loot.id, id), eq(homebrew_loot.clerk_user_id, userId))),
+		db.delete(homebrew_loot).where(eq(homebrew_loot.id, id)),
 
 		// Delete from all campaign vaults
 		db
@@ -606,14 +557,10 @@ export const update_homebrew_consumable = command(
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		// Verify ownership
-		const [existing] = await db
-			.select()
-			.from(homebrew_consumables)
-			.where(eq(homebrew_consumables.id, id))
-			.limit(1);
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'consumables', id);
 
-		if (!existing || existing.clerk_user_id !== userId) {
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this consumable');
 		}
 
@@ -624,7 +571,7 @@ export const update_homebrew_consumable = command(
 		await db
 			.update(homebrew_consumables)
 			.set({ data: validatedData, updated_at: now })
-			.where(and(eq(homebrew_consumables.id, id), eq(homebrew_consumables.clerk_user_id, userId)));
+			.where(eq(homebrew_consumables.id, id));
 
 		console.log('updated homebrew consumable');
 	}
@@ -636,23 +583,17 @@ export const delete_homebrew_consumable = command(z.string(), async (id) => {
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Verify ownership
-	const [existing] = await db
-		.select()
-		.from(homebrew_consumables)
-		.where(eq(homebrew_consumables.id, id))
-		.limit(1);
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'consumables', id);
 
-	if (!existing || existing.clerk_user_id !== userId) {
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this consumable');
 	}
 
 	// Atomic batch delete - both operations succeed or both fail
 	await db.batch([
 		// Delete from homebrew table
-		db
-			.delete(homebrew_consumables)
-			.where(and(eq(homebrew_consumables.id, id), eq(homebrew_consumables.clerk_user_id, userId))),
+		db.delete(homebrew_consumables).where(eq(homebrew_consumables.id, id)),
 
 		// Delete from all campaign vaults
 		db

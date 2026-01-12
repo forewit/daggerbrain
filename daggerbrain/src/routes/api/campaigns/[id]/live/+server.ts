@@ -1,8 +1,9 @@
 import { error } from '@sveltejs/kit';
-import { getCampaignAccess } from '$lib/remote/permissions.remote';
+import { getCampaignAccessInternal } from '$lib/server/permissions';
+import { get_db, get_auth } from '$lib/remote/utils';
 import type { RequestHandler } from './$types';
 
-export const GET: RequestHandler = async ({ params, platform, request }) => {
+export const GET: RequestHandler = async ({ params, platform, request, locals }) => {
 	const upgradeHeader = request.headers.get('Upgrade');
 	if (upgradeHeader !== 'websocket') {
 		return new Response('Expected WebSocket upgrade', { status: 426 });
@@ -15,7 +16,10 @@ export const GET: RequestHandler = async ({ params, platform, request }) => {
 	}
 
 	// Get campaign access - handles auth and membership check
-	const access = await getCampaignAccess(campaignId);
+	const event = { platform, locals } as Parameters<typeof get_db>[0];
+	const db = get_db(event);
+	const { userId } = get_auth(event);
+	const access = await getCampaignAccessInternal(db, userId, campaignId);
 	if (!access.membership) {
 		throw error(403, 'Not a member of this campaign');
 	}

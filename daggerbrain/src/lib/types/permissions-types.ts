@@ -29,4 +29,3 @@ export type HomebrewAccess<T> = {
 	canEdit: boolean;
 	isOwner: boolean;
 };
-

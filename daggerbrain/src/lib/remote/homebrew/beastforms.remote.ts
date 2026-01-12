@@ -13,6 +13,7 @@ import {
 	HOMEBREW_LIMIT,
 	assertHomebrewTypeEnabled
 } from './utils';
+import { getHomebrewAccessInternal } from '../../server/permissions';
 
 // ============================================================================
 // Beastforms
@@ -77,14 +78,10 @@ export const update_homebrew_beastform = command(
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		// Verify ownership
-		const [existing] = await db
-			.select()
-			.from(homebrew_beastforms)
-			.where(eq(homebrew_beastforms.id, id))
-			.limit(1);
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'beastforms', id);
 
-		if (!existing || existing.clerk_user_id !== userId) {
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this beastform');
 		}
 
@@ -95,7 +92,7 @@ export const update_homebrew_beastform = command(
 		await db
 			.update(homebrew_beastforms)
 			.set({ data: validatedData, updated_at: now })
-			.where(and(eq(homebrew_beastforms.id, id), eq(homebrew_beastforms.clerk_user_id, userId)));
+			.where(eq(homebrew_beastforms.id, id));
 
 		console.log('updated homebrew beastform in D1');
 	}
@@ -107,23 +104,17 @@ export const delete_homebrew_beastform = command(z.string(), async (id) => {
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Verify ownership
-	const [existing] = await db
-		.select()
-		.from(homebrew_beastforms)
-		.where(eq(homebrew_beastforms.id, id))
-		.limit(1);
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'beastforms', id);
 
-	if (!existing || existing.clerk_user_id !== userId) {
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this beastform');
 	}
 
 	// Atomic batch delete - both operations succeed or both fail
 	await db.batch([
 		// Delete from homebrew table
-		db
-			.delete(homebrew_beastforms)
-			.where(and(eq(homebrew_beastforms.id, id), eq(homebrew_beastforms.clerk_user_id, userId))),
+		db.delete(homebrew_beastforms).where(eq(homebrew_beastforms.id, id)),
 
 		// Delete from all campaign vaults
 		db

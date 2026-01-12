@@ -1,5 +1,6 @@
 import { error } from '@sveltejs/kit';
-import { getCampaignAccess } from '$lib/remote/permissions.remote';
+import { getCampaignAccessInternal } from '$lib/server/permissions';
+import { get_db, get_auth } from '$lib/remote/utils';
 import type { RequestEvent } from '@sveltejs/kit';
 import { z } from 'zod';
 
@@ -33,14 +34,17 @@ const NotifyBodySchema = z.discriminatedUnion('type', [
 	})
 ]);
 
-export async function POST({ params, platform, request }: RequestEvent) {
+export async function POST({ params, platform, request, locals }: RequestEvent) {
 	const campaignId = params.id;
 	if (!campaignId) {
 		throw error(400, 'Campaign ID required');
 	}
 
 	// Verify campaign membership - handles auth internally
-	const access = await getCampaignAccess(campaignId);
+	const event = { platform, locals } as Parameters<typeof get_db>[0];
+	const db = get_db(event);
+	const { userId } = get_auth(event);
+	const access = await getCampaignAccessInternal(db, userId, campaignId);
 	if (!access.membership) {
 		throw error(403, 'Not a member of this campaign');
 	}

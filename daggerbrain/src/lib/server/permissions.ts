@@ -29,11 +29,7 @@ import {
 	homebrew_transformation_cards,
 	homebrew_beastforms
 } from './db/homebrew.schema';
-import type {
-	CampaignAccess,
-	CharacterAccess,
-	HomebrewAccess
-} from '../types/permissions-types';
+import type { CampaignAccess, CharacterAccess, HomebrewAccess } from '../types/permissions-types';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
 
 // Homebrew type enum for validation (internal use only, not exported)
@@ -68,7 +64,6 @@ export const homebrewTables = {
 	transformation_cards: homebrew_transformation_cards,
 	beastforms: homebrew_beastforms
 } as const;
-
 
 /**
  * Internal helper to get campaign access within a command context.
@@ -241,4 +236,3 @@ export async function getHomebrewAccessInternal<T>(
 		isOwner: false
 	};
 }
-

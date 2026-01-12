@@ -12,7 +12,7 @@ import {
 import { characters_table } from '../../server/db/characters.schema';
 import { get_db, get_auth, CHARACTER_LIMIT } from '../utils';
 import { get_all_characters } from '../characters.remote';
-import { getCampaignAccessInternal } from '../../server/permissions';
+import { getCampaignAccessInternal, getCharacterAccessInternal } from '../../server/permissions';
 // Note: KV caching for campaign state and characters has been removed for cost optimization
 // D1 reads are 500x cheaper than KV reads
 import type {
@@ -126,26 +126,22 @@ async function notifyDurableObjectMemberUpdate(
 
 export const get_campaign = query(z.string(), async (campaignId) => {
 	const event = getRequestEvent();
-	get_auth(event); // Validate authentication
+	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	const [campaign] = await db
-		.select()
-		.from(campaigns_table)
-		.where(eq(campaigns_table.id, campaignId))
-		.limit(1);
+	const access = await getCampaignAccessInternal(db, userId, campaignId);
 
-	if (!campaign) {
-		throw error(404, 'Campaign not found');
+	if (!access.canView) {
+		throw error(403, 'You do not have permission to view this campaign');
 	}
 
 	console.log('fetched campaign from D1');
-	return campaign;
+	return access.campaign;
 });
 
 export const get_campaign_by_invite_code = query(z.string(), async (inviteCode) => {
 	const event = getRequestEvent();
-	get_auth(event); // Validate authentication
+	const { userId } = get_auth(event);
 	const db = get_db(event);
 
 	// Look up campaign state by invite code
@@ -159,25 +155,27 @@ export const get_campaign_by_invite_code = query(z.string(), async (inviteCode) 
 		throw error(404, 'Campaign not found');
 	}
 
-	// Get the campaign by campaign_id
-	const [campaign] = await db
-		.select()
-		.from(campaigns_table)
-		.where(eq(campaigns_table.id, state.campaign_id))
-		.limit(1);
+	// Get campaign with permissions check
+	const access = await getCampaignAccessInternal(db, userId, state.campaign_id);
 
-	if (!campaign) {
-		throw error(404, 'Campaign not found');
-	}
+	// Note: For invite codes, we allow viewing even if not a member (so they can see it before joining)
+	// But we still use the access function to get the campaign data efficiently
 
 	console.log('fetched campaign by invite code from D1');
-	return campaign;
+	return access.campaign;
 });
 
 export const get_campaign_members = query(z.string(), async (campaignId) => {
 	const event = getRequestEvent();
-	get_auth(event); // Validate authentication
+	const { userId } = get_auth(event);
 	const db = get_db(event);
+
+	// Verify user is a member of the campaign
+	const access = await getCampaignAccessInternal(db, userId, campaignId);
+
+	if (!access.canView) {
+		throw error(403, 'You do not have permission to view this campaign');
+	}
 
 	const members = await db
 		.select()
@@ -284,8 +282,15 @@ export const get_user_campaigns = query(async (): Promise<CampaignWithDetails[]>
 
 export const get_campaign_state = query(z.string(), async (campaignId): Promise<CampaignState> => {
 	const event = getRequestEvent();
-	get_auth(event); // Validate authentication
+	const { userId } = get_auth(event);
 	const db = get_db(event);
+
+	// Verify user is a member of the campaign
+	const access = await getCampaignAccessInternal(db, userId, campaignId);
+
+	if (!access.canView) {
+		throw error(403, 'You do not have permission to view this campaign');
+	}
 
 	// Try to insert default state - silently ignored if already exists
 	// This eliminates the race condition in the old check-then-insert pattern
@@ -352,8 +357,15 @@ export const get_campaign_characters = query(
 	z.string(),
 	async (campaignId): Promise<Record<string, CampaignCharacterSummary>> => {
 		const event = getRequestEvent();
-		get_auth(event); // Validate authentication
+		const { userId } = get_auth(event);
 		const db = get_db(event);
+
+		// Verify user is a member of the campaign
+		const access = await getCampaignAccessInternal(db, userId, campaignId);
+
+		if (!access.canView) {
+			throw error(403, 'You do not have permission to view this campaign');
+		}
 
 		// Read directly from D1 (no KV caching - D1 reads are 500x cheaper than KV)
 		// Get all characters in campaign
@@ -491,30 +503,11 @@ export const join_campaign = command(
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		// Check if campaign exists
-		const [campaign] = await db
-			.select()
-			.from(campaigns_table)
-			.where(eq(campaigns_table.id, campaign_id))
-			.limit(1);
-
-		if (!campaign) {
-			throw error(404, 'Campaign not found');
-		}
+		// Get campaign with permissions check
+		const access = await getCampaignAccessInternal(db, userId, campaign_id);
 
 		// Check if user is already a member
-		const [existingMembership] = await db
-			.select()
-			.from(campaign_members_table)
-			.where(
-				and(
-					eq(campaign_members_table.campaign_id, campaign_id),
-					eq(campaign_members_table.user_id, userId)
-				)
-			)
-			.limit(1);
-
-		if (existingMembership) {
+		if (access.membership) {
 			throw error(400, 'You are already a member of this campaign');
 		}
 
@@ -765,19 +758,12 @@ export const unassign_character = command(
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		// Get character
-		const [character] = await db
-			.select()
-			.from(characters_table)
-			.where(eq(characters_table.id, character_id))
-			.limit(1);
-
-		if (!character) {
-			throw error(404, 'Character not found');
-		}
+		// Get character with permissions
+		const characterAccess = await getCharacterAccessInternal(db, userId, character_id);
+		const character = characterAccess.character;
 
 		// Verify user owns the character
-		if (character.clerk_user_id !== userId) {
+		if (!characterAccess.isOwner) {
 			throw error(403, 'You can only unassign your own characters');
 		}
 
@@ -808,8 +794,8 @@ export const unassign_character = command(
 		}
 
 		// Verify user is a member of the campaign
-		const access = await getCampaignAccessInternal(db, userId, campaign_id);
-		if (!access.membership) {
+		const campaignAccess = await getCampaignAccessInternal(db, userId, campaign_id);
+		if (!campaignAccess.membership) {
 			throw error(403, 'You must be a member of the campaign to unassign characters');
 		}
 
@@ -844,24 +830,15 @@ export const leave_campaign = command(z.string(), async (campaignId) => {
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Check if user is a member
-	const [membership] = await db
-		.select()
-		.from(campaign_members_table)
-		.where(
-			and(
-				eq(campaign_members_table.campaign_id, campaignId),
-				eq(campaign_members_table.user_id, userId)
-			)
-		)
-		.limit(1);
+	// Get campaign with permissions
+	const access = await getCampaignAccessInternal(db, userId, campaignId);
 
-	if (!membership) {
+	if (!access.membership) {
 		throw error(404, 'You are not a member of this campaign');
 	}
 
 	// Don't allow GM to leave (they must delete the campaign or transfer ownership)
-	if (membership.role === 'gm') {
+	if (access.role === 'gm') {
 		throw error(400, 'GM cannot leave campaign. Delete the campaign or transfer ownership.');
 	}
 
@@ -1018,18 +995,10 @@ export const assign_character_to_campaign = command(
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		// Get character (without ownership check yet - we'll check permissions based on action)
-		const [character] = await db
-			.select()
-			.from(characters_table)
-			.where(eq(characters_table.id, character_id))
-			.limit(1);
-
-		if (!character) {
-			throw error(404, 'Character not found');
-		}
-
-		const isOwner = character.clerk_user_id === userId;
+		// Get character with permissions
+		const characterAccess = await getCharacterAccessInternal(db, userId, character_id);
+		const character = characterAccess.character;
+		const isOwner = characterAccess.isOwner;
 		const oldCampaignId = character.campaign_id;
 
 		// Get existing campaign_characters entry if any
@@ -1194,19 +1163,13 @@ export const update_campaign = command(
 		const db = get_db(event);
 
 		// Verify user is GM
-		const [campaign] = await db
-			.select()
-			.from(campaigns_table)
-			.where(eq(campaigns_table.id, campaign_id))
-			.limit(1);
+		const access = await getCampaignAccessInternal(db, userId, campaign_id);
 
-		if (!campaign) {
-			throw error(404, 'Campaign not found');
-		}
-
-		if (campaign.gm_user_id !== userId) {
+		if (!access.canEdit) {
 			throw error(403, 'Only the GM can update the campaign');
 		}
+
+		const campaign = access.campaign;
 
 		const now = Date.now();
 
@@ -1238,19 +1201,10 @@ export const update_campaign_member = command(
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		// Check if user is a member
-		const [membership] = await db
-			.select()
-			.from(campaign_members_table)
-			.where(
-				and(
-					eq(campaign_members_table.campaign_id, campaign_id),
-					eq(campaign_members_table.user_id, userId)
-				)
-			)
-			.limit(1);
+		// Get campaign with permissions
+		const access = await getCampaignAccessInternal(db, userId, campaign_id);
 
-		if (!membership) {
+		if (!access.membership) {
 			throw error(404, 'You are not a member of this campaign');
 		}
 
@@ -1285,17 +1239,9 @@ export const delete_campaign = command(z.string(), async (campaignId) => {
 	const db = get_db(event);
 
 	// Verify user is GM
-	const [campaign] = await db
-		.select()
-		.from(campaigns_table)
-		.where(eq(campaigns_table.id, campaignId))
-		.limit(1);
+	const access = await getCampaignAccessInternal(db, userId, campaignId);
 
-	if (!campaign) {
-		throw error(404, 'Campaign not found');
-	}
-
-	if (campaign.gm_user_id !== userId) {
+	if (!access.canEdit) {
 		throw error(403, 'Only the GM can delete the campaign');
 	}
 

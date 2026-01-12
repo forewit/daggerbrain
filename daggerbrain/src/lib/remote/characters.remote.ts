@@ -77,45 +77,48 @@ export const get_all_characters = query(async () => {
 
 /**
  * Get a character by ID if the user has permission to view it
- * Uses getCharacterAccess from permissions service
+ * Returns the character along with canEdit permission flag
  */
-export const get_character_by_id = query(z.string(), async (characterId): Promise<Character> => {
-	const event = getRequestEvent();
-	const { userId } = get_auth(event);
-	const db = get_db(event);
-	const access = await getCharacterAccessInternal(db, userId, characterId);
+export const get_character_by_id = query(
+	z.string(),
+	async (characterId): Promise<{ character: Character; canEdit: boolean }> => {
+		const event = getRequestEvent();
+		const { userId } = get_auth(event);
+		const db = get_db(event);
+		const access = await getCharacterAccessInternal(db, userId, characterId);
 
-	if (!access.canView) {
-		throw error(403, 'You do not have permission to view this character');
+		if (!access.canView) {
+			throw error(403, 'You do not have permission to view this character');
+		}
+
+		return {
+			character: access.character,
+			canEdit: access.canEdit
+		};
 	}
-
-	return access.character;
-});
+);
 
 export const delete_character = command(z.string(), async (characterId) => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Verify the character exists and belongs to the user
-	const [character] = await db
-		.select()
-		.from(characters_table)
-		.where(and(eq(characters_table.id, characterId), eq(characters_table.clerk_user_id, userId)))
-		.limit(1);
+	// Get character with permissions
+	const access = await getCharacterAccessInternal(db, userId, characterId);
 
-	if (!character) {
-		throw error(404, 'Character not found');
+	// Only character owner can delete
+	if (!access.isOwner) {
+		throw error(403, 'You can only delete your own characters');
 	}
+
+	const character = access.character;
 
 	// Track if character was in a campaign (for refreshing queries)
 	const wasInCampaign = !!character.campaign_id;
 	const campaignId = character.campaign_id;
 
 	// Delete the character
-	await db
-		.delete(characters_table)
-		.where(and(eq(characters_table.id, characterId), eq(characters_table.clerk_user_id, userId)));
+	await db.delete(characters_table).where(eq(characters_table.id, characterId));
 
 	// Notify DO that character was deleted
 	if (campaignId) {

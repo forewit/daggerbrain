@@ -13,6 +13,7 @@ import {
 	HOMEBREW_LIMIT,
 	assertHomebrewTypeEnabled
 } from './utils';
+import { getHomebrewAccessInternal } from '../../server/permissions';
 
 // ============================================================================
 // Domains
@@ -76,14 +77,10 @@ export const update_homebrew_domain = command(
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		// Verify ownership
-		const [existing] = await db
-			.select()
-			.from(homebrew_domains)
-			.where(eq(homebrew_domains.id, id))
-			.limit(1);
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'domains', id);
 
-		if (!existing || existing.clerk_user_id !== userId) {
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this domain');
 		}
 
@@ -93,7 +90,7 @@ export const update_homebrew_domain = command(
 		await db
 			.update(homebrew_domains)
 			.set({ data: validatedData, updated_at: now })
-			.where(and(eq(homebrew_domains.id, id), eq(homebrew_domains.clerk_user_id, userId)));
+			.where(eq(homebrew_domains.id, id));
 
 		console.log('updated homebrew domain in D1');
 	}
@@ -105,20 +102,14 @@ export const delete_homebrew_domain = command(z.string(), async (id) => {
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Verify ownership
-	const [existing] = await db
-		.select()
-		.from(homebrew_domains)
-		.where(eq(homebrew_domains.id, id))
-		.limit(1);
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'domains', id);
 
-	if (!existing || existing.clerk_user_id !== userId) {
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this domain');
 	}
 
-	await db
-		.delete(homebrew_domains)
-		.where(and(eq(homebrew_domains.id, id), eq(homebrew_domains.clerk_user_id, userId)));
+	await db.delete(homebrew_domains).where(eq(homebrew_domains.id, id));
 
 	// refresh the domains query
 	get_homebrew_domains().refresh();
@@ -200,14 +191,10 @@ export const update_homebrew_domain_card = command(
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		// Verify ownership
-		const [existing] = await db
-			.select()
-			.from(homebrew_domain_cards)
-			.where(eq(homebrew_domain_cards.id, id))
-			.limit(1);
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'domain_cards', id);
 
-		if (!existing || existing.clerk_user_id !== userId) {
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this domain card');
 		}
 
@@ -218,9 +205,7 @@ export const update_homebrew_domain_card = command(
 		await db
 			.update(homebrew_domain_cards)
 			.set({ data: validatedData, updated_at: now })
-			.where(
-				and(eq(homebrew_domain_cards.id, id), eq(homebrew_domain_cards.clerk_user_id, userId))
-			);
+			.where(eq(homebrew_domain_cards.id, id));
 
 		console.log('updated homebrew domain card in D1');
 	}
@@ -232,25 +217,17 @@ export const delete_homebrew_domain_card = command(z.string(), async (id) => {
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Verify ownership
-	const [entry] = await db
-		.select()
-		.from(homebrew_domain_cards)
-		.where(and(eq(homebrew_domain_cards.id, id), eq(homebrew_domain_cards.clerk_user_id, userId)))
-		.limit(1);
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'domain_cards', id);
 
-	if (!entry) {
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this domain card');
 	}
 
 	// Atomic batch delete - both operations succeed or both fail
 	await db.batch([
 		// Delete from homebrew table
-		db
-			.delete(homebrew_domain_cards)
-			.where(
-				and(eq(homebrew_domain_cards.id, id), eq(homebrew_domain_cards.clerk_user_id, userId))
-			),
+		db.delete(homebrew_domain_cards).where(eq(homebrew_domain_cards.id, id)),
 
 		// Delete from all campaign vaults
 		db
