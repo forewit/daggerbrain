@@ -1,8 +1,8 @@
 import { error } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 import { getHomebrewAccess } from '$lib/remote/permissions.remote';
-import type { HomebrewTableType } from '$lib/types/permissions-types';
-import { isEnabledHomebrewType, type HomebrewType } from '$lib/types/homebrew-types';
+import type { HomebrewTableType, HomebrewType } from '$lib/types/homebrew-types';
+import { isEnabledHomebrewType } from '$lib/types/homebrew-types';
 
 // Map URL types to database table types
 // Some URL types map to multiple DB types (e.g., 'weapon' -> primary_weapons OR secondary_weapons)

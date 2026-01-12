@@ -1,3 +1,18 @@
+export type HomebrewTableType =
+	| 'classes'
+	| 'subclasses'
+	| 'domains'
+	| 'domain_cards'
+	| 'primary_weapons'
+	| 'secondary_weapons'
+	| 'armor'
+	| 'loot'
+	| 'consumables'
+	| 'ancestry_cards'
+	| 'community_cards'
+	| 'transformation_cards'
+	| 'beastforms';
+
 export type HomebrewType =
 	| 'weapon'
 	| 'armor'

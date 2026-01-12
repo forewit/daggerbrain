@@ -11,17 +11,15 @@ import { eq, and } from 'drizzle-orm';
 import { characters_table } from './db/characters.schema';
 import { campaigns_table, campaign_members_table } from './db/campaigns.schema';
 import type { CampaignAccess, CharacterAccess } from '../types/permissions-types';
+import type { DrizzleD1Database } from 'drizzle-orm/d1';
 
-type DbClient = {
-	select: () => any;
-};
 
 /**
  * Internal helper to get campaign access within a command context.
  * Use this when you already have db and userId from the calling command.
  */
 export async function getCampaignAccessInternal(
-	db: DbClient,
+	db: DrizzleD1Database,
 	userId: string,
 	campaignId: string
 ): Promise<CampaignAccess> {
@@ -64,7 +62,7 @@ export async function getCampaignAccessInternal(
  * Use this when you already have db and userId from the calling command.
  */
 export async function getCharacterAccessInternal(
-	db: DbClient,
+	db: DrizzleD1Database,
 	userId: string,
 	characterId: string
 ): Promise<CharacterAccess> {

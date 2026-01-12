@@ -40,7 +40,7 @@ import type {
 	CharacterAccess,
 	HomebrewAccess,
 	ClaimCharacterAccess,
-	HomebrewTableType
+	
 } from '../types/permissions-types';
 
 // Homebrew type enum for validation (internal use only, not exported)
@@ -124,25 +124,25 @@ export const getCampaignAccess = query(z.string(), async (campaignId): Promise<C
 	};
 });
 
-/**
- * Get all members of a campaign (for cases where we need the full member list).
- * This is separate from getCampaignAccess since fetching all members is more expensive.
- */
-export const getCampaignMembers = query(
-	z.string(),
-	async (campaignId): Promise<CampaignMember[]> => {
-		const event = getRequestEvent();
-		get_auth(event); // Validate authentication
-		const db = get_db(event);
+// /**
+//  * Get all members of a campaign (for cases where we need the full member list).
+//  * This is separate from getCampaignAccess since fetching all members is more expensive.
+//  */
+// export const getCampaignMembers = query(
+// 	z.string(),
+// 	async (campaignId): Promise<CampaignMember[]> => {
+// 		const event = getRequestEvent();
+// 		get_auth(event); // Validate authentication
+// 		const db = get_db(event);
 
-		const members = await db
-			.select()
-			.from(campaign_members_table)
-			.where(eq(campaign_members_table.campaign_id, campaignId));
+// 		const members = await db
+// 			.select()
+// 			.from(campaign_members_table)
+// 			.where(eq(campaign_members_table.campaign_id, campaignId));
 
-		return members;
-	}
-);
+// 		return members;
+// 	}
+// );
 
 // ============================================================================
 // Character Access
