@@ -9,9 +9,65 @@
 import { error } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { characters_table } from './db/characters.schema';
-import { campaigns_table, campaign_members_table } from './db/campaigns.schema';
-import type { CampaignAccess, CharacterAccess } from '../types/permissions-types';
+import {
+	campaigns_table,
+	campaign_members_table,
+	campaign_characters_table
+} from './db/campaigns.schema';
+import {
+	homebrew_classes,
+	homebrew_subclasses,
+	homebrew_domains,
+	homebrew_domain_cards,
+	homebrew_primary_weapons,
+	homebrew_secondary_weapons,
+	homebrew_armor,
+	homebrew_loot,
+	homebrew_consumables,
+	homebrew_ancestry_cards,
+	homebrew_community_cards,
+	homebrew_transformation_cards,
+	homebrew_beastforms
+} from './db/homebrew.schema';
+import type {
+	CampaignAccess,
+	CharacterAccess,
+	HomebrewAccess
+} from '../types/permissions-types';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
+
+// Homebrew type enum for validation (internal use only, not exported)
+export type HomebrewType =
+	| 'classes'
+	| 'subclasses'
+	| 'domains'
+	| 'domain_cards'
+	| 'primary_weapons'
+	| 'secondary_weapons'
+	| 'armor'
+	| 'loot'
+	| 'consumables'
+	| 'ancestry_cards'
+	| 'community_cards'
+	| 'transformation_cards'
+	| 'beastforms';
+
+// Map of homebrew types to their database tables
+export const homebrewTables = {
+	classes: homebrew_classes,
+	subclasses: homebrew_subclasses,
+	domains: homebrew_domains,
+	domain_cards: homebrew_domain_cards,
+	primary_weapons: homebrew_primary_weapons,
+	secondary_weapons: homebrew_secondary_weapons,
+	armor: homebrew_armor,
+	loot: homebrew_loot,
+	consumables: homebrew_consumables,
+	ancestry_cards: homebrew_ancestry_cards,
+	community_cards: homebrew_community_cards,
+	transformation_cards: homebrew_transformation_cards,
+	beastforms: homebrew_beastforms
+} as const;
 
 
 /**
@@ -122,3 +178,67 @@ export async function getCharacterAccessInternal(
 		campaignRole: null
 	};
 }
+
+/**
+ * Internal helper to get homebrew item access within a command context.
+ * Use this when you already have db and userId from the calling command.
+ */
+export async function getHomebrewAccessInternal<T>(
+	db: DrizzleD1Database,
+	userId: string,
+	homebrewType: HomebrewType,
+	homebrewId: string
+): Promise<HomebrewAccess<T>> {
+	const table = homebrewTables[homebrewType];
+
+	// Fetch the homebrew item
+	const [item] = await db.select().from(table).where(eq(table.id, homebrewId)).limit(1);
+
+	if (!item) {
+		throw error(404, 'Homebrew item not found');
+	}
+
+	const isOwner = item.clerk_user_id === userId;
+
+	// Owner always has full access
+	if (isOwner) {
+		return {
+			item: item as T,
+			canView: true,
+			canEdit: true,
+			isOwner: true
+		};
+	}
+
+	// Check if homebrew is in a campaign the user belongs to
+	if (item.campaign_id) {
+		const [membership] = await db
+			.select()
+			.from(campaign_members_table)
+			.where(
+				and(
+					eq(campaign_members_table.campaign_id, item.campaign_id),
+					eq(campaign_members_table.user_id, userId)
+				)
+			)
+			.limit(1);
+
+		if (membership) {
+			return {
+				item: item as T,
+				canView: true,
+				canEdit: false, // Only owner can edit
+				isOwner: false
+			};
+		}
+	}
+
+	// No access
+	return {
+		item: item as T,
+		canView: false,
+		canEdit: false,
+		isOwner: false
+	};
+}
+

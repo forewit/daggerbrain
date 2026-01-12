@@ -4,7 +4,6 @@ import { eq, and, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import { campaign_homebrew_vault_table } from '../../server/db/campaigns.schema';
 import { get_db, get_auth } from '../utils';
-import { getCampaignAccess } from '../permissions.remote';
 import { getCampaignAccessInternal } from '../../server/permissions';
 import type { HomebrewType } from '../../types/homebrew-types';
 import type { DomainIds } from '../../types/compendium-types';
@@ -34,9 +33,10 @@ export const get_campaign_homebrew_vault = query(
 	): Promise<Array<{ id: string; homebrew_type: HomebrewType; homebrew_id: string }>> => {
 		const event = getRequestEvent();
 		const db = get_db(event);
+		const { userId } = get_auth(event);
 
 		// Verify user is a member of the campaign
-		const access = await getCampaignAccess(campaignId);
+		const access = await getCampaignAccessInternal(db, userId, campaignId);
 		if (!access.canView) {
 			throw error(403, 'Forbidden: Not a member of this campaign.');
 		}
@@ -59,9 +59,10 @@ export const get_campaign_homebrew_vault = query(
 export const get_campaign_homebrew_items = query(z.string(), async (campaignId) => {
 	const event = getRequestEvent();
 	const db = get_db(event);
+	const { userId } = get_auth(event);
 
 	// Verify user is a member of the campaign
-	const access = await getCampaignAccess(campaignId);
+	const access = await getCampaignAccessInternal(db, userId, campaignId);
 	if (!access.canView) {
 		throw error(403, 'Forbidden: Not a member of this campaign.');
 	}

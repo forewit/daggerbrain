@@ -62,6 +62,6 @@
 	"dependencies": {
 		"dompurify": "^3.3.1",
 		"marked": "^17.0.1",
-		"svelte-clerk": "^0.18.1"
+		"svelte-clerk": "^0.20.3"
 	}
 }

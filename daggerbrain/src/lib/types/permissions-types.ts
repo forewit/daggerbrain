@@ -30,8 +30,3 @@ export type HomebrewAccess<T> = {
 	isOwner: boolean;
 };
 
-export type ClaimCharacterAccess = {
-	character: Character;
-	canClaim: boolean;
-	reason: string | null;
-};

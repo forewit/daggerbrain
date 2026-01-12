@@ -20,10 +20,6 @@ import {
 	add_homebrew_to_vault,
 	remove_homebrew_from_vault
 } from '$lib/remote/campaigns/campaign-homebrew.remote';
-import {
-	getClaimCharacterAccess,
-	hasCharacterInCampaign as hasCharacterInCampaignCheck
-} from '$lib/remote/permissions.remote';
 import { error } from '@sveltejs/kit';
 import { getContext, setContext } from 'svelte';
 import { goto } from '$app/navigation';
@@ -38,6 +34,7 @@ import type {
 	CampaignLiveClientMessage
 } from '$lib/types/campaign-types';
 import type { HomebrewType } from '$lib/types/homebrew-types';
+import { UI_CHARACTER_LIMIT } from '$lib/types/constants';
 import { getUserContext } from './user.svelte';
 
 // Deep merge helper for nested objects
@@ -532,31 +529,39 @@ function campaignContext() {
 	}
 
 	// Check if user can claim a character
-	async function canClaimCharacter(characterId: string): Promise<boolean> {
+	// Calculated locally using available state - server-side enforcement happens in claim_character command
+	function canClaimCharacter(characterId: string): boolean {
 		const id = campaignId;
 		if (!id || !characterId) return false;
 
-		try {
-			const access = await getClaimCharacterAccess({
-				characterId,
-				campaignId: id
-			});
-			return access.canClaim;
-		} catch (err) {
-			return false;
-		}
-	}
+		// Get the character from campaign state
+		const character = characters[characterId];
+		if (!character) return false;
 
-	// Check if user already has a character in this campaign
-	async function hasCharacterInCampaign(): Promise<boolean> {
-		const id = campaignId;
-		if (!id) return false;
+		// Character must be claimable
+		if (!character.claimable) return false;
 
-		try {
-			return await hasCharacterInCampaignCheck(id);
-		} catch (err) {
-			return false;
-		}
+		// User must be a member of the campaign
+		if (!userMembership) return false;
+
+		// User must be a player (not GM)
+		if (userMembership.role === 'gm') return false;
+
+		// Player must not already have a non-claimable character in this campaign
+		const currentUserId = userContext.user?.clerk_id;
+		if (!currentUserId) return false;
+
+		const hasExistingCharacter = Object.values(characters).some(
+			(char) => char.owner_user_id === currentUserId && !char.claimable
+		);
+
+		if (hasExistingCharacter) return false;
+
+		// Check character limit
+		const characterCount = userContext.all_characters?.length ?? 0;
+		if (characterCount >= UI_CHARACTER_LIMIT) return false;
+
+		return true;
 	}
 
 	// Auto-load when campaign ID changes
@@ -1070,8 +1075,7 @@ function campaignContext() {
 		joinCampaign,
 		addToVault,
 		removeFromVault,
-		canClaimCharacter,
-		hasCharacterInCampaign
+		canClaimCharacter
 	};
 }
 
