@@ -1,0 +1,34 @@
+{
+  "name": "daggerbrain-testing",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:headed": "playwright test --headed",
+    "test:chromium": "playwright test --project=chromium",
+    "test:firefox": "playwright test --project=firefox",
+    "test:webkit": "playwright test --project=webkit",
+    "test:signin": "NODE_TLS_REJECT_UNAUTHORIZED=0 playwright test e2e/signin.spec.ts",
+    "test:signin:headed": "NODE_TLS_REJECT_UNAUTHORIZED=0 playwright test e2e/signin.spec.ts --headed",
+    "test:characters": "playwright test e2e/characters.spec.ts",
+    "test:campaigns": "playwright test e2e/campaigns.spec.ts",
+    "test:multi-user": "playwright test e2e/multi-user.spec.ts",
+    "test:real-time": "playwright test e2e/real-time-sync.spec.ts",
+    "test:report": "playwright show-report",
+    "test:install": "playwright install",
+    "test:install-deps": "playwright install --with-deps",
+    "check": "tsc --noEmit",
+    "check:watch": "tsc --noEmit --watch"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@clerk/testing": "^1.13.28",
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^25.0.6",
+    "dotenv": "^17.2.3",
+    "typescript": "^5.9.3"
+  }
+}

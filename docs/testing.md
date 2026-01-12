@@ -1,199 +1,231 @@
-# Testing Guide
+# Testing Instructions
 
-This document outlines testing steps for all features in the application. Each section includes both positive (happy path) and negative (error/edge case) scenarios.
+Thank you for helping test the application! This guide will walk you through testing all the features. Please follow these instructions step by step and let me know if you encounter any issues or unexpected behavior.
 
-**Note**: Many scenarios require multiple user accounts or browser sessions to fully test. Scenarios that require multiple users are marked with `[Multi-user]`.
+## Getting Started
 
-## 1. Characters
+Before you begin testing, you'll need:
+- Access to the application (URL will be provided)
+- At least 2 user accounts (for testing multi-user features)
+- Two different browsers or browser sessions (for testing real-time sync)
 
-### Create Character
+**Important Notes:**
+- Some tests require multiple users. These are marked with `[Multi-user]` - you'll need to open the app in two different browsers with different accounts.
+- When testing real-time features, keep both browser windows open side-by-side so you can see updates happening simultaneously.
+- If something doesn't work as expected, note the exact steps you took and what happened instead.
 
-**Standalone Character**
-- Create a new character without assigning to a campaign
-- Verify character appears in your characters list
-- Verify character has no campaign_id set
+## 1. Testing Characters
 
-**Character in Campaign (Player)**
-- As a player, create a character while in a campaign
-- Verify character is automatically assigned to the campaign
-- Verify character is not claimable (owned by you)
+### Creating Characters
 
-**Character in Campaign (GM - Claimable)**
-- As a GM, create a character in your campaign with claimable option
-- Verify character appears in campaign as unassigned/claimable
-- Verify character ownership is set to GM initially
+**Test 1: Create a Standalone Character**
+1. Go to the Characters page
+2. Click the button to create a new character
+3. Fill in a character name and any other required fields
+4. Save the character
+5. **Check:** The character should appear in your characters list
+6. **Check:** The character should NOT be assigned to any campaign
 
-**Character in Campaign (GM - Non-claimable)**
-- As a GM, create a character in your campaign without claimable option
-- Verify character is assigned to you (not claimable)
+**Test 2: Create a Character as a Player in a Campaign**
+1. Join or create a campaign (you'll need to be a member)
+2. While viewing the campaign, create a new character
+3. **Check:** The character should automatically be assigned to that campaign
+4. **Check:** The character should be owned by you (not claimable by others)
 
-**Character Limit**
-- Create 3 characters (at the limit)
-- Attempt to create a 4th character
-- Verify error message about character limit (3 max)
-- Delete one character
-- Verify you can now create a new character
+**Test 3: Create a Claimable Character as GM**
+1. As a Game Master (GM), go to your campaign
+2. Create a new character and mark it as "claimable" or "unassigned"
+3. **Check:** The character should appear in the campaign's unassigned characters list
+4. **Check:** Other players should be able to see this character and claim it
 
-### Modify Character
+**Test 4: Create a Non-claimable Character as GM**
+1. As GM, create a character in your campaign without marking it as claimable
+2. **Check:** The character should be assigned directly to you
+3. **Check:** The character should NOT appear in the unassigned list
 
-**Basic Updates**
-- Update character name
-- Update character level
-- Update character image
-- Verify all changes persist after page refresh
+**Test 5: Character Limit Enforcement**
+1. Create 3 characters (this is the maximum allowed)
+2. Try to create a 4th character
+3. **Check:** You should see an error message saying you've reached the character limit (3 max)
+4. Delete one of your characters
+5. **Check:** You should now be able to create a new character
 
-**Character Stats (Campaign Context)**
-- Update marked HP (hit points)
-- Update marked stress
-- Update marked hope
-- Update marked armor
-- Add/remove active conditions (hidden, restrained, vulnerable)
-- Verify updates appear in campaign view for other members
+### Modifying Characters
 
-**Inventory Updates**
-- Add/remove weapons, armor, consumables, loot
-- Update item quantities
-- Modify custom item properties (tier, damage thresholds, etc.)
-- Verify inventory changes persist
+**Test 6: Basic Character Updates**
+1. Open one of your characters for editing
+2. Change the character's name
+3. Change the character's level
+4. Upload a new character image
+5. Save your changes
+6. Refresh the page
+7. **Check:** All your changes should still be there after refreshing
 
-**Character Settings**
-- Update character settings and choices
-- Modify level-up choices
-- Update card selections
-- Verify all settings persist
+**Test 7: Update Character Stats in Campaign**
+1. Open a character that's assigned to a campaign
+2. Update the character's HP (hit points)
+3. Update the character's stress level
+4. Update the character's hope
+5. Update the character's armor value
+6. Add or remove conditions (hidden, restrained, vulnerable)
+7. **Check:** If other players are viewing the campaign, they should see these updates appear in real-time
 
-### Delete Character
+**Test 8: Update Character Inventory**
+1. Add weapons, armor, consumables, or loot to your character
+2. Change item quantities
+3. Modify custom properties of items (like tier or damage thresholds)
+4. Save and refresh
+5. **Check:** All inventory changes should persist
 
-**Standalone Character**
-- Delete a character that is not in any campaign
-- Verify character is removed from your characters list
-- Verify character data is deleted from database
+### Deleting Characters
 
-**Character in Campaign**
-- Delete a character that is assigned to a campaign
-- Verify character is removed from campaign view
-- Verify character is removed from your characters list
-- Verify Durable Object is notified of character removal
+**Test 9: Delete a Standalone Character**
+1. Delete a character that's not in any campaign
+2. **Check:** The character should disappear from your characters list
+3. **Check:** The character should be completely removed (try accessing its URL directly - it should be gone)
 
-**Permission Check**
-- Attempt to delete another user's character
-- Verify error message about permission denied
+**Test 10: Delete a Character in a Campaign**
+1. Delete a character that's assigned to a campaign
+2. **Check:** The character should disappear from the campaign view
+3. **Check:** The character should disappear from your characters list
+4. **Check:** Other campaign members should see the character removed in real-time
+
+**Test 11: Permission Check - Cannot Delete Others' Characters**
+1. Try to delete a character owned by another user
+2. **Check:** You should see an error message saying you can only delete your own characters
+3. **Check:** The character should NOT be deleted
 
 ### Character Permissions
 
-**Owner Access**
-- View your own character
-- Edit your own character
-- Verify full access to all character features
+**Test 12: View and Edit Your Own Character**
+1. Open one of your own characters
+2. **Check:** You should be able to view all character details
+3. **Check:** You should be able to edit everything
+4. Make some changes and save
+5. **Check:** Changes should save successfully
 
-**GM Access to Player Character**
-- As GM, view a player's character in your campaign
-- Verify you can edit the character (HP, stress, conditions, etc.)
-- Verify you can see all character details
+**Test 13: GM Editing Player Character**
+1. As a GM, view a player's character in your campaign
+2. **Check:** You should be able to see all character details
+3. Try editing the character's HP, stress, or conditions
+4. **Check:** You should be able to edit these stats
+5. **Check:** The player should see your changes in real-time
 
-**Player Access to Other Player's Character**
-- As a player, view another player's character in the same campaign
-- Verify you can view the character
-- Verify you cannot edit the character
-- Attempt to edit and verify error message
+**Test 14: Player Viewing Another Player's Character**
+1. As a player, view another player's character in the same campaign
+2. **Check:** You should be able to view the character
+3. Try to edit the character
+4. **Check:** You should NOT be able to edit it (or see an error message)
+5. **Check:** Edit buttons/controls should be disabled or hidden
 
-**Non-Member Access**
-- Attempt to view a character from a campaign you're not in
-- Verify access is denied or character is not visible
+**Test 15: Accessing Character You're Not Allowed to See**
+1. Try to access a character URL for a character you don't own and aren't in a campaign with
+2. **Check:** You should see an error message or the character should not be found
+3. **Check:** You should NOT be able to view the character
 
 ### Character Image Uploads
 
-**Valid Image Upload**
-- Upload an image for a character (JPG, PNG, WebP)
-- Verify image appears in character sheet
-- Verify image URL is generated correctly
-- Verify image is stored in R2_USERCONTENT bucket
+**Test 16: Upload a Valid Character Image**
+1. Open a character for editing
+2. Upload an image file (JPG, PNG, or WebP format)
+3. **Check:** The image should appear in the character sheet
+4. **Check:** The image should still be there after refreshing the page
 
-**Image Size Limit**
-- Attempt to upload an image larger than 5MB
-- Verify error message about file size limit
+**Test 17: Image Size Limit**
+1. Try to upload an image file larger than 5MB
+2. **Check:** You should see an error message about the file size limit (5MB max)
+3. **Check:** The upload should be rejected
 
-**Invalid File Type**
-- Attempt to upload a non-image file (PDF, text file, etc.)
-- Verify error message about invalid file type
+**Test 18: Invalid File Type**
+1. Try to upload a non-image file (like a PDF or text file)
+2. **Check:** You should see an error message saying the file must be an image
+3. **Check:** The upload should be rejected
 
-## 2. Campaigns
+## 2. Testing Campaigns
 
-### Create Campaign
+### Creating Campaigns
 
-**Basic Campaign**
-- Create a new campaign with just a name
-- Verify campaign appears in your campaigns list
-- Verify you are added as GM member
-- Verify initial campaign state is created (fear_track: 0, empty countdowns)
-- Verify invite code is generated
+**Test 19: Create a Basic Campaign**
+1. Go to the Campaigns page
+2. Click to create a new campaign
+3. Enter a campaign name
+4. Save
+5. **Check:** The campaign should appear in your campaigns list
+6. **Check:** You should be listed as the GM (Game Master)
+7. **Check:** The campaign should have an initial fear track value of 0
+8. **Check:** An invite code should be automatically generated
 
-**Campaign with Description**
-- Create a campaign with name and description
-- Verify description is saved and displayed
+**Test 20: Create Campaign with Description**
+1. Create a new campaign
+2. Enter both a name and a description
+3. Save
+4. **Check:** Both the name and description should be saved and displayed
 
-**Campaign with GM Display Name**
-- Create a campaign with a custom GM display name
-- Verify display name appears in campaign members list
-- Verify display name is used in invite link preview
+**Test 21: Create Campaign with GM Display Name**
+1. Create a campaign and enter a custom display name for yourself as GM
+2. **Check:** Your display name should appear in the campaign members list
+3. **Check:** Your display name should appear in the invite link preview
 
-### Modify Campaign
+### Modifying Campaigns
 
-**Update Campaign Name (GM)**
-- As GM, update the campaign name
-- Verify name change is reflected immediately
-- Verify name appears correctly for all members
+**Test 22: Update Campaign Name (GM Only)**
+1. As a GM, go to your campaign settings
+2. Change the campaign name
+3. **Check:** The name change should appear immediately
+4. **Check:** All campaign members should see the new name
 
-**Update Campaign Description (GM)**
-- As GM, update the campaign description
-- Verify description change persists
+**Test 23: Update Campaign Description (GM Only)**
+1. As GM, update the campaign description
+2. **Check:** The description should save and persist
 
-**Player Cannot Modify**
-- As a player, attempt to update campaign name or description
-- Verify error message about GM-only permissions
+**Test 24: Player Cannot Modify Campaign**
+1. As a player (not GM), try to update the campaign name or description
+2. **Check:** You should see an error message saying only the GM can do this
+3. **Check:** The changes should NOT be saved
 
-### Delete Campaign
+### Deleting Campaigns
 
-**GM Deletes Campaign**
-- As GM, delete a campaign
-- Verify campaign is removed from your campaigns list
-- Verify all campaign members are removed
-- Verify all characters are unassigned from campaign (campaign_id set to null)
-- Verify campaign state is deleted
-- Verify campaign homebrew vault entries are deleted
-- Verify campaign_characters join table entries are deleted
+**Test 25: GM Deletes Campaign**
+1. As GM, delete one of your campaigns
+2. **Check:** The campaign should disappear from your campaigns list
+3. **Check:** All campaign members should be removed
+4. **Check:** All characters should be unassigned from the campaign (they should still exist, just not in the campaign)
+5. **Check:** Campaign members should no longer see the campaign in their list
 
-**Player Cannot Delete**
-- As a player, attempt to delete a campaign
-- Verify error message about GM-only permissions
+**Test 26: Player Cannot Delete Campaign**
+1. As a player, try to delete a campaign
+2. **Check:** You should see an error message saying only the GM can delete campaigns
+3. **Check:** The campaign should NOT be deleted
 
 ### Campaign Permissions
 
-**GM Access**
-- As GM, verify you can view all campaign features
-- Verify you can edit campaign state (fear, countdowns, notes)
-- Verify you can manage members
-- Verify you can add/remove characters
-- Verify you can manage homebrew vault
+**Test 27: GM Access**
+1. As a GM, view your campaign
+2. **Check:** You should be able to see all campaign features
+3. **Check:** You should be able to edit campaign state (fear, countdowns, notes)
+4. **Check:** You should be able to manage members
+5. **Check:** You should be able to add/remove characters
+6. **Check:** You should be able to manage the homebrew vault
 
-**Player Access**
-- As a player, verify you can view campaign
-- Verify you can see campaign state (if fear_visible_to_players is true)
-- Verify you cannot edit campaign state
-- Verify you cannot manage members
-- Verify you can add your own characters
-- Verify you can claim unassigned characters
+**Test 28: Player Access**
+1. As a player, view a campaign you're a member of
+2. **Check:** You should be able to view the campaign
+3. **Check:** You should be able to see campaign state IF the GM has made it visible to players
+4. **Check:** You should NOT be able to edit campaign state
+5. **Check:** You should NOT be able to manage members
+6. **Check:** You should be able to add your own characters
+7. **Check:** You should be able to claim unassigned characters
 
-**Non-Member Access**
-- Attempt to access a campaign you're not a member of
-- Verify access is denied or campaign is not visible
+**Test 29: Non-Member Access**
+1. Try to access a campaign URL for a campaign you're not a member of
+2. **Check:** You should see an error message or the campaign should not be accessible
 
-## 3. Homebrew
+## 3. Testing Homebrew Content
 
-### Create Homebrew Items
+### Creating Homebrew Items
 
-**All Homebrew Types**
-Test creating each of the 13 homebrew types:
+**Test 30: Create Different Types of Homebrew**
+Try creating at least one of each of these homebrew types:
 - Class
 - Subclass
 - Primary Weapon
@@ -205,705 +237,641 @@ Test creating each of the 13 homebrew types:
 - Ancestry Card
 - Community Card
 - Transformation Card
-- Domain Card (for each domain: arcana, blade, bone, codex, grace, midnight, sage, splendor, valor)
+- Domain Card (try different domains: arcana, blade, bone, codex, grace, midnight, sage, splendor, valor)
 
-**Basic Creation**
-- Create a homebrew item with required fields
-- Verify item appears in your homebrew list
-- Verify item is marked with source_id: 'Homebrew'
-- Verify item can be used in character creation/editing
+For each type:
+1. Create a new homebrew item
+2. Fill in the required fields
+3. **Check:** The item should appear in your homebrew list
+4. **Check:** The item should be marked as "Homebrew" (not from the base game)
+5. **Check:** The item should be usable when creating or editing characters
 
-**Homebrew with Image**
-- Create a homebrew item and upload an image
-- Verify image is stored and displayed correctly
+**Test 31: Create Homebrew with Image**
+1. Create a homebrew item
+2. Upload an image for it
+3. **Check:** The image should be stored and displayed correctly
+4. **Check:** The image should appear when viewing the homebrew item
 
-**Homebrew in Campaign Context**
-- Create a homebrew item while viewing a campaign
-- Verify item is available to campaign members when added to vault
+### Modifying Homebrew Items
 
-### Modify Homebrew Items
+**Test 32: Update Homebrew Properties**
+1. Edit one of your homebrew items
+2. Change the name, description, or other properties
+3. Save
+4. **Check:** Changes should persist
+5. **Check:** If any characters are using this homebrew item, the changes should be reflected there too
 
-**Update Homebrew Properties**
-- Update name, description, or other properties of a homebrew item
-- Verify changes persist
-- Verify changes are reflected in characters using the item
+**Test 33: Update Homebrew Image**
+1. Edit a homebrew item that has an image
+2. Replace the image with a new one
+3. **Check:** The new image should be displayed
 
-**Update Homebrew Image**
-- Replace the image for a homebrew item
-- Verify new image is displayed
+### Deleting Homebrew Items
 
-### Delete Homebrew Items
+**Test 34: Delete Your Own Homebrew**
+1. Delete a homebrew item you created
+2. **Check:** The item should be removed from your homebrew list
+3. **Check:** If the item was in a campaign vault, it should be removed from there too
+4. **Check:** Characters using the item should still function (though the item might show as missing)
 
-**Delete Own Homebrew**
-- Delete a homebrew item you created
-- Verify item is removed from your homebrew list
-- Verify item is removed from any campaign vaults it was in
-- Verify characters using the item still function (item may show as missing)
-
-**Cannot Delete Others' Homebrew**
-- Attempt to delete a homebrew item created by another user
-- Verify error message about permission denied
+**Test 35: Cannot Delete Others' Homebrew**
+1. Try to delete a homebrew item created by another user
+2. **Check:** You should see an error message about permission denied
+3. **Check:** The item should NOT be deleted
 
 ### Homebrew Limits
 
-**Reach Homebrew Limit**
-- Create 5 homebrew items (at the limit)
-- Attempt to create a 6th homebrew item
-- Verify error message about homebrew limit (5 max)
-- Delete one homebrew item
-- Verify you can now create a new homebrew item
+**Test 36: Reach Homebrew Limit**
+1. Create 5 homebrew items (this is the maximum)
+2. Try to create a 6th homebrew item
+3. **Check:** You should see an error message about the homebrew limit (5 max)
+4. Delete one homebrew item
+5. **Check:** You should now be able to create a new homebrew item
 
-**Limit Across All Types**
-- Verify the 5-item limit applies across all homebrew types combined
-- Create 3 classes and 2 weapons (total 5)
-- Attempt to create a 6th item of any type
-- Verify limit is enforced
-
-### Homebrew Permissions
-
-**Owner Access**
-- View your own homebrew items
-- Edit your own homebrew items
-- Verify full access
-
-**Campaign Member Access**
-- View homebrew items added to campaign vault
-- Verify you can see the items in compendium
-- Verify you cannot edit items (even in campaign vault)
-- Attempt to edit and verify error message
-
-**Non-Member Access**
-- Attempt to view homebrew items from a campaign you're not in
-- Verify items are not visible
+**Test 37: Limit Applies Across All Types**
+1. Create 3 homebrew classes and 2 homebrew weapons (total 5 items)
+2. Try to create any 6th homebrew item (of any type)
+3. **Check:** The limit should be enforced - you should see an error
 
 ### Campaign Homebrew Vault
 
-**Add Item to Vault (GM)**
-- As GM, add a homebrew item to campaign vault
-- Verify item appears in vault list
-- Verify item becomes available to all campaign members
-- Verify item appears in compendium for campaign members
+**Test 38: Add Item to Vault (GM Only)**
+1. As GM, go to your campaign's homebrew vault
+2. Add one of your homebrew items to the vault
+3. **Check:** The item should appear in the vault list
+4. **Check:** The item should become available to all campaign members
+5. **Check:** Campaign members should see the item in their compendium
 
-**Remove Item from Vault (GM)**
-- As GM, remove an item from campaign vault
-- Verify item is removed from vault
-- Verify item is no longer available to campaign members
+**Test 39: Remove Item from Vault (GM Only)**
+1. As GM, remove an item from the campaign vault
+2. **Check:** The item should be removed from the vault
+3. **Check:** Campaign members should no longer see the item in their compendium
 
-**Player Cannot Manage Vault**
-- As a player, attempt to add item to vault
-- Verify error message about GM-only permissions
-- As a player, attempt to remove item from vault
-- Verify error message about GM-only permissions
+**Test 40: Player Cannot Manage Vault**
+1. As a player, try to add an item to the campaign vault
+2. **Check:** You should see an error message saying only the GM can do this
+3. Try to remove an item from the vault
+4. **Check:** You should see an error message
 
-**Add Own Homebrew Only**
-- As GM, attempt to add another user's homebrew to vault
-- Verify error message about only adding your own items
+**Test 41: Can Only Add Your Own Homebrew**
+1. As GM, try to add another user's homebrew item to your campaign vault
+2. **Check:** You should see an error message saying you can only add your own items
+3. **Check:** The item should NOT be added to the vault
 
-## 4. Campaign Membership
+## 4. Testing Campaign Membership
 
-### Join Campaign
+### Joining Campaigns
 
-**Join via Invite Link**
-- Use a valid invite link to join a campaign
-- Verify you are added as a player member
-- Verify campaign appears in your campaigns list
-- Verify you can access the campaign page
+**Test 42: Join via Invite Link**
+1. Get an invite link from a GM (or use one you generated)
+2. Open the invite link in your browser (or share it with another account)
+3. Click to join the campaign
+4. **Check:** You should be added as a player member
+5. **Check:** The campaign should appear in your campaigns list
+6. **Check:** You should be able to access the campaign page
 
-**Join with Display Name**
-- Join a campaign and provide a display name
-- Verify display name appears in campaign members list
-- Verify display name is used instead of username
+**Test 43: Join with Display Name**
+1. When joining a campaign, enter a display name
+2. **Check:** Your display name should appear in the campaign members list
+3. **Check:** Your display name should be used instead of your username
 
-**Join without Display Name**
-- Join a campaign without providing a display name
-- Verify username is used as display name
+**Test 44: Join without Display Name**
+1. Join a campaign without providing a display name
+2. **Check:** Your username should be used as your display name
 
-**Join with Character**
-- Join a campaign and bring an existing character
-- Verify character is automatically assigned to the campaign
-- Verify character is not claimable (owned by you)
+**Test 45: Join with Character**
+1. When joining a campaign, bring an existing character with you
+2. **Check:** The character should automatically be assigned to the campaign
+3. **Check:** The character should be owned by you (not claimable)
 
-**Join when Already Member**
-- Attempt to join a campaign you're already a member of
-- Verify error message about already being a member
-- Verify no duplicate membership is created
+**Test 46: Join When Already a Member**
+1. Try to join a campaign you're already a member of (use the invite link again)
+2. **Check:** You should see a message saying you're already a member
+3. **Check:** No duplicate membership should be created
 
-**Join with Invalid Invite Code**
-- Attempt to join using an invalid/non-existent invite code
-- Verify error message about campaign not found
+**Test 47: Join with Invalid Invite Code**
+1. Try to join using a fake or invalid invite code
+2. **Check:** You should see an error message saying the campaign was not found
 
-**Join when at Character Limit**
-- Have 3 characters already
-- Attempt to join a campaign with a character
-- Verify error message about character limit
-- Verify you can still join without bringing a character
+**Test 48: Join When at Character Limit**
+1. Make sure you have 3 characters (the maximum)
+2. Try to join a campaign and bring a character with you
+3. **Check:** You should see an error message about the character limit
+4. **Check:** You should still be able to join the campaign without bringing a character
 
-### Leave Campaign
+### Leaving Campaigns
 
-**Player Leaves Campaign**
-- As a player, leave a campaign
-- Verify you are removed from campaign members
-- Verify your characters are unassigned from campaign (campaign_id set to null)
-- Verify campaign_characters entries are removed
-- Verify Durable Object is notified of character removals
-- Verify campaign no longer appears in your campaigns list
+**Test 49: Player Leaves Campaign**
+1. As a player, leave a campaign
+2. **Check:** You should be removed from the campaign members list
+3. **Check:** Your characters should be unassigned from the campaign (they should still exist, just not in the campaign)
+4. **Check:** The campaign should no longer appear in your campaigns list
+5. **Check:** Other campaign members should see you removed in real-time
 
-**GM Cannot Leave**
-- As GM, attempt to leave your campaign
-- Verify error message about GM cannot leave
-- Verify you must delete the campaign instead
+**Test 50: GM Cannot Leave**
+1. As a GM, try to leave your campaign
+2. **Check:** You should see an error message saying the GM cannot leave
+3. **Check:** You should be told you must delete the campaign instead
 
-**Leave with Multiple Characters**
-- As a player with multiple characters in campaign, leave
-- Verify all your characters are removed from campaign
-- Verify all characters are unassigned
+**Test 51: Leave with Multiple Characters**
+1. As a player with multiple characters in a campaign, leave the campaign
+2. **Check:** All your characters should be removed from the campaign
+3. **Check:** All characters should be unassigned
 
-### Re-join Campaign
+### Re-joining Campaigns
 
-**Re-join After Leaving**
-- Leave a campaign
-- Use the same invite link to re-join
-- Verify you are added as a new member
-- Verify you can access the campaign again
+**Test 52: Re-join After Leaving**
+1. Leave a campaign
+2. Use the same invite link to re-join
+3. **Check:** You should be added as a new member
+4. **Check:** You should be able to access the campaign again
 
-**Re-join with New Character**
-- Leave a campaign (characters were unassigned)
-- Re-join and bring a character
-- Verify character is assigned to campaign
+**Test 53: Re-join with New Character**
+1. Leave a campaign (your characters will be unassigned)
+2. Re-join the campaign and bring a character
+3. **Check:** The character should be assigned to the campaign
 
-## 5. Invite Links
+## 5. Testing Invite Links
 
-### View Invite Link
+### Viewing and Copying Invite Links
 
-**GM Can View**
-- As GM, view the campaign invite link
-- Verify link is displayed in format: `/campaigns/join/{invite_code}`
-- Verify invite code is shown
+**Test 54: GM Can View Invite Link**
+1. As GM, go to your campaign
+2. **Check:** You should see the invite link displayed
+3. **Check:** The link should be in the format: `/campaigns/join/{invite_code}`
+4. **Check:** The invite code should be visible
 
-**Player Cannot View**
-- As a player, verify invite link section is not visible or accessible
+**Test 55: Player Cannot View Invite Link**
+1. As a player, view a campaign
+2. **Check:** You should NOT see the invite link section (or it should be hidden)
 
-### Copy Invite Link
+**Test 56: Copy Invite Link**
+1. As GM, copy the invite link
+2. **Check:** The link should be copied to your clipboard
+3. Paste it in another browser or share it with another account
+4. **Check:** The link should work to join the campaign
 
-**Copy Functionality**
-- As GM, copy the invite link
-- Verify link is copied to clipboard
-- Verify copied link works when used in another browser/account
+### Resetting Invite Links
 
-### Reset Invite Link
+**Test 57: GM Resets Invite Code**
+1. As GM, reset the invite code
+2. **Check:** A new invite code should be generated
+3. **Check:** The old invite link should no longer work (should show an error)
+4. **Check:** The new invite link should work
 
-**GM Resets Invite Code**
-- As GM, reset the invite code
-- Verify new invite code is generated
-- Verify old invite link no longer works (404 error)
-- Verify new invite link works
+**Test 58: Player Cannot Reset Invite Code**
+1. As a player, try to reset the invite code
+2. **Check:** You should see an error message saying only the GM can do this
 
-**Player Cannot Reset**
-- As a player, attempt to reset invite code
-- Verify error message about GM-only permissions
+**Test 59: Use Reset Invite Link**
+1. As GM, reset the invite code
+2. Use the new invite link to join as a different user (or in a different browser)
+3. **Check:** The join should succeed with the new code
 
-**Use Reset Invite Link**
-- Reset invite code
-- Use the new invite link to join as a different user
-- Verify join succeeds with new code
+## 6. Testing Character Assignment & Claiming
 
-## 6. Character Assignment & Claiming
+### GM Assigns Characters
 
-### GM Assigns Character to Campaign
+**Test 60: Assign Character as Claimable**
+1. As GM, assign a character to your campaign and mark it as "claimable" or "unassigned"
+2. **Check:** The character should appear in the unassigned characters list
+3. **Check:** The character should be marked as claimable
+4. **Check:** Players should be able to see and claim this character
 
-**Assign as Claimable**
-- As GM, assign a character to campaign as claimable (unassigned)
-- Verify character appears in unassigned characters list
-- Verify character is marked as claimable
-- Verify character ownership remains with GM initially
+**Test 61: Assign Character as Non-claimable**
+1. As GM, assign a character to your campaign without marking it as claimable
+2. **Check:** The character should appear in the assigned characters list
+3. **Check:** The character should be owned by you
+4. **Check:** The character should NOT be claimable
 
-**Assign as Non-claimable**
-- As GM, assign a character to campaign as non-claimable
-- Verify character appears in assigned characters list
-- Verify character is owned by GM
-- Verify character is not claimable
+**Test 62: Assign Existing Character**
+1. As GM, assign a character you already own to the campaign
+2. **Check:** The character should be added to the campaign
+3. **Check:** The character should appear in the campaign characters list
 
-**Assign Existing Character**
-- As GM, assign an existing character you own to the campaign
-- Verify character is added to campaign
-- Verify character appears in campaign characters list
+### Players Claim Characters
 
-### Player Claims Unassigned Character
+**Test 63: Player Claims Unassigned Character**
+1. As a player, view a campaign with an unassigned character
+2. Click to claim the character
+3. **Check:** The character ownership should transfer to you
+4. **Check:** The character should no longer be claimable
+5. **Check:** The character should appear in your characters list
+6. **Check:** Other campaign members should see the ownership change in real-time
 
-**Successful Claim**
-- As a player, claim an unassigned character
-- Verify character ownership transfers to you
-- Verify character is no longer claimable
-- Verify character appears in your characters list
-- Verify Durable Object is notified of ownership change
+**Test 64: Claim When at Character Limit**
+1. Make sure you have 3 characters (the maximum)
+2. Try to claim an unassigned character
+3. **Check:** You should see an error message about the character limit
+4. **Check:** The character should remain claimable (not claimed by you)
 
-**Claim when at Character Limit**
-- Have 3 characters already
-- Attempt to claim an unassigned character
-- Verify error message about character limit
-- Verify character remains claimable (not claimed)
+**Test 65: Claim When Already Has Character**
+1. As a player who already has a character in the campaign, try to claim another unassigned character
+2. **Check:** You should see an error message saying you already have a character in this campaign
+3. **Check:** The claim should fail
 
-**Claim when Already Has Character**
-- As a player with a character in the campaign, attempt to claim another
-- Verify error message about already having a character
-- Verify claim fails
+**Test 66: GM Cannot Claim**
+1. As GM, try to claim an unassigned character
+2. **Check:** You should see an error message saying GMs cannot claim characters
 
-**GM Cannot Claim**
-- As GM, attempt to claim an unassigned character
-- Verify error message about GMs cannot claim characters
+### Unassigning Characters
 
-### Unassign Character
+**Test 67: GM Unassigns Character**
+1. As GM, unassign a character (make it claimable again)
+2. **Check:** The character should become claimable
+3. **Check:** The character should appear in the unassigned list
+4. **Check:** Players should be able to claim it again
 
-**GM Unassigns Character**
-- As GM, unassign a character (make it claimable again)
-- Verify character becomes claimable
-- Verify character ownership remains with current owner
-- Verify character appears in unassigned list
+**Test 68: Player Cannot Unassign**
+1. As a player, try to unassign a character
+2. **Check:** You should see an error message saying only the GM can do this
 
-**Player Cannot Unassign**
-- As a player, attempt to unassign a character
-- Verify error message about GM-only permissions
+### Removing Characters from Campaign
 
-### Remove Character from Campaign
+**Test 69: GM Removes Character**
+1. As GM, remove a character from the campaign
+2. **Check:** The character should be removed from the campaign view
+3. **Check:** Other campaign members should see the character removed in real-time
 
-**GM Removes Character**
-- As GM, remove a character from campaign
-- Verify character's campaign_id is set to null
-- Verify character is removed from campaign view
-- Verify Durable Object is notified
+**Test 70: Character Owner Removes Their Character**
+1. As the owner of a character in a campaign, remove your character from the campaign
+2. **Check:** The character should be unassigned from the campaign
+3. **Check:** The character should still exist in your characters list
 
-**Character Owner Removes**
-- As character owner, remove your character from campaign
-- Verify character is unassigned
-- Verify character remains in your characters list
+### Race Condition Testing (Advanced)
 
-### Concurrent Claiming (Race Condition)
+**Test 71: Multiple Players Try to Claim Same Character** `[Multi-user]`
+1. Have two different players (in different browsers) view the same campaign
+2. Both players should try to claim the same unassigned character at the exact same time
+3. **Check:** Only one player should succeed in claiming the character
+4. **Check:** The other player should get an error message saying the character was already claimed
+5. **Check:** The character should be owned by exactly one player (no duplicates)
 
-**Multiple Players Claim Same Character** `[Multi-user]`
-- Have two players attempt to claim the same unassigned character simultaneously
-- Verify only one player succeeds
-- Verify the other player gets an error about character already claimed
-- Verify character ownership is correctly assigned to one player
-- Verify no duplicate ownership occurs
+## 7. Testing Campaign State Updates
 
-## 7. Campaign State Updates
+### Fear Track
 
-### Update Fear Track
+**Test 72: GM Updates Fear Track**
+1. As GM, update the fear track value
+2. **Check:** The fear value should be saved
+3. **Check:** You should see the updated value
+4. **Check:** Whether players can see it depends on the "fear visible to players" setting
 
-**GM Updates Fear**
-- As GM, update the fear track value
-- Verify fear value is saved
-- Verify fear is visible to GM
-- Verify fear visibility to players respects `fear_visible_to_players` setting
+**Test 73: Toggle Fear Visibility**
+1. As GM, toggle the "fear visible to players" setting on and off
+2. As a player, check if you can see the fear track
+3. **Check:** You should only see it when the setting is ON
+4. **Check:** The setting should persist
 
-**Toggle Fear Visibility**
-- As GM, toggle fear visibility to players on/off
-- As a player, verify you can/cannot see fear based on setting
-- Verify setting persists
-
-**Player Cannot Update Fear**
-- As a player, attempt to update fear track
-- Verify error message about GM-only permissions
+**Test 74: Player Cannot Update Fear**
+1. As a player, try to update the fear track
+2. **Check:** You should see an error message saying only the GM can do this
 
 ### Countdowns
 
-**Add Countdown (GM)**
-- As GM, add a new countdown
-- Verify countdown appears in campaign state
-- Verify countdown has required fields (id, name, min, current, visibleToPlayers)
-- Verify countdown appears in live view
+**Test 75: Add Countdown (GM Only)**
+1. As GM, add a new countdown
+2. Fill in the required fields (name, minimum value, current value, visibility)
+3. **Check:** The countdown should appear in the campaign state
+4. **Check:** The countdown should appear in the live campaign view
 
-**Update Countdown (GM)**
-- As GM, update countdown current value
-- Verify countdown updates
-- Verify current value cannot go below min value
+**Test 76: Update Countdown (GM Only)**
+1. As GM, update a countdown's current value
+2. **Check:** The countdown should update
+3. Try to set the current value below the minimum value
+4. **Check:** You should not be able to do this (or see a validation error)
 
-**Remove Countdown (GM)**
-- As GM, remove a countdown
-- Verify countdown is removed from campaign state
-- Verify countdown disappears from live view
+**Test 77: Remove Countdown (GM Only)**
+1. As GM, remove a countdown
+2. **Check:** The countdown should be removed from the campaign state
+3. **Check:** The countdown should disappear from the live view
 
-**Player Cannot Manage Countdowns**
-- As a player, attempt to add/update/remove countdowns
-- Verify error message about GM-only permissions
+**Test 78: Player Cannot Manage Countdowns**
+1. As a player, try to add, update, or remove countdowns
+2. **Check:** You should see an error message saying only the GM can do this
 
-**Countdown Visibility**
-- As GM, set countdown visibility to players on/off
-- As a player, verify you can/cannot see countdown based on setting
+**Test 79: Countdown Visibility**
+1. As GM, set a countdown's visibility to players on or off
+2. As a player, check if you can see the countdown
+3. **Check:** You should only see it when visibility is set to ON
 
 ### Campaign Notes
 
-**GM Updates Notes**
-- As GM, update campaign notes
-- Verify notes are saved
-- Verify notes are visible to GM
-- Verify notes are visible to players (if applicable)
+**Test 80: GM Updates Notes**
+1. As GM, update the campaign notes
+2. **Check:** The notes should be saved
+3. **Check:** You should be able to see the notes
+4. **Check:** Players should also be able to see the notes (if applicable)
 
-**Player Cannot Update Notes**
-- As a player, attempt to update campaign notes
-- Verify error message about GM-only permissions
+**Test 81: Player Cannot Update Notes**
+1. As a player, try to update the campaign notes
+2. **Check:** You should see an error message saying only the GM can do this
 
-### Updates with Durable Object
+### Updates with Real-time Sync
 
-**DO Connected**
-- With Durable Object connected, update campaign state (fear, countdowns, notes)
-- Verify updates are broadcast to all connected clients in real-time
-- Verify updates persist in D1 database
+**Test 82: Updates Broadcast in Real-time** `[Multi-user]`
+1. Have multiple users viewing the same campaign (GM and at least one player)
+2. As GM, update the fear track, add a countdown, or update notes
+3. **Check:** All connected users should see these updates appear immediately (within seconds)
+4. **Check:** No one should need to refresh the page to see the changes
 
-**DO Disconnected**
-- With Durable Object disconnected, update campaign state
-- Verify updates are saved to D1 database
-- Reconnect Durable Object
-- Verify updates are synced to DO and broadcast to clients
+**Test 83: Updates Persist After Disconnect**
+1. Make some campaign state updates (fear, countdowns, notes)
+2. Close the browser tab or disconnect your internet
+3. Reconnect and reload the page
+4. **Check:** All your updates should still be there
 
-**DO Unavailable**
-- With Durable Object unavailable, update campaign state
-- Verify updates are saved to D1 database
-- Verify application continues to function (graceful degradation)
-- When DO becomes available, verify state syncs correctly
+## 8. Testing Character Sheet Updates
 
-## 8. Character Sheet Updates
+### Updating Character Stats
 
-### Update Character Stats
+**Test 84: Update HP**
+1. Open a character that's in a campaign
+2. Update the character's marked HP (hit points) value
+3. **Check:** The value should be saved
+4. **Check:** If other players are viewing the campaign, they should see this update in real-time
 
-**Update HP (marked_hp)**
-- Update character's marked HP value
-- Verify value is saved
-- Verify value appears in campaign view for other members
-- Verify Durable Object is notified (if in campaign)
+**Test 85: Update Stress**
+1. Update a character's marked stress value
+2. **Check:** The value should be saved and synced
 
-**Update Stress (marked_stress)**
-- Update character's marked stress value
-- Verify value is saved and synced
+**Test 86: Update Hope**
+1. Update a character's marked hope value
+2. **Check:** The value should be saved and synced
 
-**Update Hope (marked_hope)**
-- Update character's marked hope value
-- Verify value is saved and synced
+**Test 87: Update Armor**
+1. Update a character's marked armor value
+2. **Check:** The value should be saved and synced
 
-**Update Armor (marked_armor)**
-- Update character's marked armor value
-- Verify value is saved and synced
+**Test 88: Add/Remove Conditions**
+1. Add conditions to a character: hidden, restrained, or vulnerable
+2. **Check:** The conditions should appear in the character's condition list
+3. Remove some conditions
+4. **Check:** The conditions should be removed
+5. **Check:** Conditions should appear in the campaign view for other members
 
-**Add/Remove Conditions**
-- Add conditions: hidden, restrained, vulnerable
-- Remove conditions
-- Verify conditions list updates correctly
-- Verify conditions appear in campaign view
+### Real-time Updates
 
-### Updates with Durable Object
+**Test 89: Updates Broadcast to All Users** `[Multi-user]`
+1. Have multiple users viewing the same campaign
+2. Update a character's HP, stress, hope, armor, or conditions from one browser
+3. **Check:** All other users viewing the campaign should see these updates appear immediately
+4. **Check:** No one should need to refresh to see the changes
 
-**DO Connected**
-- With Durable Object connected, update character stats
-- Verify updates are broadcast to all connected clients in real-time
-- Verify other campaign members see updates immediately
-- Verify updates persist in D1 database
-
-**DO Disconnected**
-- With Durable Object disconnected, update character stats
-- Verify updates are saved to D1 database
-- Reconnect Durable Object
-- Verify updates are synced to DO and broadcast to clients
-
-**DO Unavailable**
-- With Durable Object unavailable, update character stats
-- Verify updates are saved to D1 database
-- Verify application continues to function
-- When DO becomes available, verify state syncs correctly
+**Test 90: Updates Persist After Disconnect**
+1. Update character stats
+2. Close the browser or disconnect internet
+3. Reconnect and reload
+4. **Check:** All updates should still be there
 
 ### Permission-Based Updates
 
-**GM Editing Player Character**
-- As GM, edit a player's character stats (HP, stress, conditions)
-- Verify updates are saved
-- Verify player sees updates in real-time
-- Verify updates appear in campaign view
+**Test 91: GM Editing Player Character**
+1. As GM, edit a player's character stats (HP, stress, conditions)
+2. **Check:** The updates should be saved
+3. **Check:** The player should see your changes in real-time
+4. **Check:** The updates should appear in the campaign view
 
-**Player Editing Own Character**
-- As a player, edit your own character stats
-- Verify updates are saved
-- Verify GM and other players see updates in real-time
+**Test 92: Player Editing Own Character**
+1. As a player, edit your own character's stats
+2. **Check:** The updates should be saved
+3. **Check:** The GM and other players should see your updates in real-time
 
-**Player Cannot Edit Other Player's Character**
-- As a player, attempt to edit another player's character
-- Verify error message about permission denied
+**Test 93: Player Cannot Edit Other Player's Character**
+1. As a player, try to edit another player's character
+2. **Check:** You should see an error message about permission denied
+3. **Check:** The edit should fail
 
-## 9. Durable Object Scenarios
+## 9. Testing Real-time Sync Features
+
+### Multi-User Real-time Updates
+
+**Test 94: All Users See Updates Simultaneously** `[Multi-user]`
+1. Have multiple users (GM and players) viewing the same campaign in different browsers
+2. From one browser, make an update (character stat, campaign state, etc.)
+3. **Check:** All other users should see the update appear in their browser within seconds
+4. **Check:** Updates should appear simultaneously for everyone
+5. **Check:** No one should miss any updates
+
+**Test 95: Character Updates Broadcast**
+1. With multiple users viewing a campaign, update a character from one browser
+2. **Check:** All other users should see the character update immediately
+3. **Check:** Only the changed fields should be updated (for efficiency)
+
+**Test 96: Campaign State Updates Broadcast**
+1. With multiple users viewing a campaign, update the campaign state (fear, countdowns, notes) from one browser
+2. **Check:** All other users should see the state update immediately
+
+**Test 97: Character Added/Removed Broadcast**
+1. With multiple users viewing a campaign, add a character to the campaign
+2. **Check:** All users should see the character appear immediately
+3. Remove a character from the campaign
+4. **Check:** All users should see the character disappear immediately
+
+**Test 98: Member Updates Broadcast**
+1. Update a member's display name
+2. **Check:** All users viewing the campaign should see the display name update immediately in the members list
+
+### Connection and Reconnection
+
+**Test 99: Automatic Reconnection**
+1. View a campaign page
+2. Close the browser tab or disconnect your internet
+3. Reopen the page or reconnect
+4. **Check:** The connection should automatically reconnect
+5. **Check:** Your state should sync correctly after reconnecting
+
+**Test 100: Updates Work When Disconnected**
+1. Disconnect your internet or close the WebSocket connection
+2. Make some updates (character stats, campaign state)
+3. **Check:** Updates should still be saved (they'll sync when you reconnect)
+4. Reconnect
+5. **Check:** Your updates should sync and be visible to others
+
+## 10. Testing Image Uploads
+
+### Character Images
+
+**Test 101: Upload Valid Character Image**
+1. Open a character for editing
+2. Upload an image file (JPG, PNG, or WebP)
+3. **Check:** The image should appear in the character sheet
+4. **Check:** The image should still be there after refreshing the page
+
+**Test 102: Image Size Validation**
+1. Try to upload an image file larger than 5MB
+2. **Check:** You should see an error message about the file size limit (5MB max)
+3. **Check:** The upload should be rejected
+
+**Test 103: Invalid File Type**
+1. Try to upload a non-image file (like a PDF or text file)
+2. **Check:** You should see an error message saying the file must be an image
+3. **Check:** The upload should be rejected
+
+### Homebrew Images
+
+**Test 104: Upload Homebrew Image**
+1. Create or edit a homebrew item
+2. Upload an image for it
+3. **Check:** The image should be stored and displayed correctly
+4. **Check:** The image should appear when viewing the homebrew item
+
+**Test 105: Homebrew Image in Campaign Vault**
+1. Add a homebrew item with an image to a campaign vault
+2. **Check:** Campaign members should be able to see the image
+3. **Check:** The image should load correctly for all members
+
+## 11. Testing Error Scenarios and Edge Cases
+
+### Permission Errors
+
+**Test 106: Cannot View Character Without Permission**
+1. Try to access a character URL for a character you don't own and aren't in a campaign with
+2. **Check:** You should see an error message or the character should not be found
+3. **Check:** You should NOT be able to view the character
+
+**Test 107: Cannot Edit Character Without Permission**
+1. As a player, try to edit another player's character in the same campaign
+2. **Check:** You should see an error message about permission denied
+3. **Check:** The edit should fail
+
+**Test 108: Cannot View Campaign Without Membership**
+1. Try to access a campaign URL for a campaign you're not a member of
+2. **Check:** You should see an error message or the campaign should not be accessible
+
+**Test 109: Cannot Edit Campaign as Player**
+1. As a player, try to update the campaign name, description, or state
+2. **Check:** You should see error messages saying only the GM can do this
+
+**Test 110: Cannot Add to Vault as Player**
+1. As a player, try to add a homebrew item to the campaign vault
+2. **Check:** You should see an error message about GM-only permissions
+
+**Test 111: Cannot Edit Campaign Homebrew**
+1. As a campaign member (not the owner), try to edit a homebrew item in the vault
+2. **Check:** You should see an error message saying only the owner can edit
+
+**Test 112: Cannot Claim Character as GM**
+1. As GM, try to claim an unassigned character
+2. **Check:** You should see an error message saying GMs cannot claim characters
+
+**Test 113: Cannot Delete Others' Characters**
+1. Try to delete a character owned by another user
+2. **Check:** You should see an error message saying you can only delete your own characters
+
+### General Error Handling
+
+**Test 114: Error Messages Are Clear**
+When you encounter errors during testing:
+- **Check:** Error messages should be clear and explain what went wrong
+- **Check:** Error messages should tell you what you can do (if anything)
+
+**Test 115: System Remains Stable After Errors**
+1. Trigger various error scenarios (try invalid operations)
+2. **Check:** The application should continue to work normally after showing errors
+3. **Check:** No data should be corrupted
+4. **Check:** You should be able to continue using the app
+
+## Testing Checklist Summary
+
+Use this checklist to make sure you've tested everything:
+
+### Characters
+- [ ] Create standalone character
+- [ ] Create character as player in campaign
+- [ ] Create claimable character as GM
+- [ ] Create non-claimable character as GM
+- [ ] Character limit enforcement (3 max)
+- [ ] Modify character (name, level, image, stats, inventory)
+- [ ] Delete character (standalone and in campaign)
+- [ ] Character permissions (owner, GM, player, non-member)
+- [ ] Character image uploads (valid, size limit, invalid type)
+
+### Campaigns
+- [ ] Create campaign (basic, with description, with display name)
+- [ ] Modify campaign (GM only)
+- [ ] Delete campaign (GM only)
+- [ ] Campaign permissions (GM vs Player vs Non-member)
+
+### Homebrew
+- [ ] Create different types of homebrew items
+- [ ] Modify homebrew items
+- [ ] Delete homebrew items
+- [ ] Homebrew limits (5 max across all types)
+- [ ] Homebrew permissions
+- [ ] Campaign homebrew vault (add/remove, GM only)
+
+### Campaign Membership
+- [ ] Join campaign (various scenarios)
+- [ ] Leave campaign
+- [ ] Re-join campaign
+- [ ] GM cannot leave
+
+### Invite Links
+- [ ] View invite link (GM only)
+- [ ] Copy invite link
+- [ ] Reset invite link (GM only)
+- [ ] Use reset invite link
+
+### Character Assignment & Claiming
+- [ ] GM assigns character (claimable vs non-claimable)
+- [ ] Player claims unassigned character
+- [ ] Claim restrictions (limit, already has character, GM cannot claim)
+- [ ] Unassign character
+- [ ] Remove character from campaign
+- [ ] Race condition (multiple players claim same character)
+
+### Campaign State
+- [ ] Update fear track (GM only)
+- [ ] Toggle fear visibility
+- [ ] Add/update/remove countdowns (GM only)
+- [ ] Update campaign notes (GM only)
+- [ ] Real-time sync of state updates
+
+### Character Sheet Updates
+- [ ] Update HP, stress, hope, armor
+- [ ] Add/remove conditions
+- [ ] Real-time sync of character updates
+- [ ] GM editing player character
+- [ ] Player editing own character
+- [ ] Player cannot edit other player's character
 
 ### Real-time Sync
+- [ ] Multiple users see updates simultaneously
+- [ ] Character updates broadcast
+- [ ] Campaign state updates broadcast
+- [ ] Character added/removed broadcast
+- [ ] Member updates broadcast
+- [ ] Automatic reconnection
+- [ ] Updates work when disconnected
 
-**Updates when DO is Connected**
-- With Durable Object connected, make updates (character stats, campaign state)
-- Verify updates are broadcast to all connected WebSocket clients immediately
-- Verify no delay in sync
-- Verify all clients receive the same update
-
-**Updates when DO is Disconnected**
-- Disconnect Durable Object (close WebSocket)
-- Make updates to character or campaign state
-- Verify updates are saved to D1 database
-- Reconnect WebSocket
-- Verify updates are synced to DO
-- Verify updates are broadcast to newly connected clients
-
-**Updates when DO is Unavailable**
-- Simulate DO unavailability (network issue, DO not running)
-- Make updates to character or campaign state
-- Verify updates are saved to D1 database
-- Verify application continues to function normally
-- When DO becomes available, verify state syncs correctly
-- Verify no data loss occurred
-
-### WebSocket Reconnection
-
-**Automatic Reconnection**
-- Disconnect WebSocket (close browser tab, network issue)
-- Verify reconnection is attempted with exponential backoff
-- Verify reconnection succeeds
-- Verify state is synced after reconnection
-
-**Reconnection with Stale State**
-- Disconnect for extended period
-- Make updates from another client
-- Reconnect original client
-- Verify client detects stale state (version mismatch)
-- Verify client refreshes from D1 (source of truth)
-- Verify client receives `refresh_required` message
-
-**Reconnection State Sync**
-- Disconnect client
-- Make multiple updates from other clients
-- Reconnect original client
-- Verify all updates are received
-- Verify state is consistent across all clients
-
-### Stale Client Detection
-
-**Version Mismatch**
-- Have client A connected with version N
-- Make updates from client B (version increments)
-- Client A's lastKnownVersion < DO version
-- Verify client A receives `refresh_required` message
-- Verify client A refreshes from D1 instead of using stale DO cache
-
-**Already Synced**
-- Have client with lastKnownVersion = DO version
-- Client sends rejoin message
-- Verify client receives `already_synced` message
-- Verify client does not refresh unnecessarily
-
-### Multiple Clients
-
-**All Clients Receive Updates** `[Multi-user]`
-- Have multiple users connected to same campaign
-- Make update from one client (character stat, campaign state)
-- Verify all other connected clients receive the update
-- Verify updates appear simultaneously on all clients
-- Verify no client misses updates
-
-**Character Updates Broadcast**
-- Update character from one client
-- Verify all connected clients see character update
-- Verify update includes only changed fields (partial update)
-
-**Campaign State Updates Broadcast**
-- Update campaign state from one client
-- Verify all connected clients see state update
-- Verify fear, countdowns, notes updates are broadcast
-
-**Character Added/Removed Broadcast**
-- Add character to campaign
-- Verify all connected clients see character added
-- Remove character from campaign
-- Verify all connected clients see character removed
-
-**Member Updates Broadcast**
-- Update member display name
-- Verify all connected clients see member update
-
-## 10. Image Uploads
-
-### Character Image Upload
-
-**Valid Image Upload**
-- Upload an image for a character (JPG, PNG, WebP)
-- Verify image is uploaded to R2_USERCONTENT bucket
-- Verify image URL is generated in format: `/api/usercontent/images/{userId}/{uuid}.{ext}`
-- Verify image appears in character sheet
-- Verify image persists after page refresh
-
-**Image Size Validation**
-- Attempt to upload image larger than 5MB
-- Verify error message about file size limit (5MB max)
-- Verify upload is rejected
-
-**Invalid File Type**
-- Attempt to upload non-image file (PDF, text, etc.)
-- Verify error message about file must be an image
-- Verify upload is rejected
-
-### Homebrew Image Upload
-
-**Valid Image Upload**
-- Upload an image for a homebrew item
-- Verify image is stored in R2_USERCONTENT
-- Verify image URL is generated correctly
-- Verify image appears in homebrew item display
-
-**Image in Campaign Vault**
-- Add homebrew item with image to campaign vault
-- Verify image is visible to campaign members
-- Verify image loads correctly for all members
-
-## 11. Permission Edge Cases
-
-### Character Permissions
-
-**View Character Without Permission**
-- Attempt to access a character URL for a character you don't own and aren't in campaign with
-- Verify access is denied or character is not found
-- Verify appropriate error message
-
-**Edit Character Without Permission**
-- As a player, attempt to edit another player's character in the same campaign
-- Verify error message about permission denied
-- Verify edit operation fails
-
-**Edit Character as Non-Member**
-- Attempt to edit a character from a campaign you're not a member of
-- Verify access is denied
-
-### Campaign Permissions
-
-**View Campaign Without Membership**
-- Attempt to access a campaign URL for a campaign you're not a member of
-- Verify access is denied or campaign is not found
-- Verify appropriate error message
-
-**Edit Campaign as Player**
-- As a player, attempt to update campaign name or description
-- Verify error message about GM-only permissions
-- Attempt to update campaign state (fear, countdowns)
-- Verify error message about GM-only permissions
-
-### Homebrew Permissions
-
-**Add to Vault as Player**
-- As a player, attempt to add homebrew item to campaign vault
-- Verify error message about GM-only permissions
-
-**Edit Campaign Homebrew**
-- As a campaign member (not owner), attempt to edit a homebrew item in the vault
-- Verify error message about only owner can edit
-
-### Character Claiming Permissions
-
-**Claim Character as GM**
-- As GM, attempt to claim an unassigned character
-- Verify error message about GMs cannot claim characters
-
-**Delete Someone Else's Character**
-- Attempt to delete a character owned by another user
-- Verify error message about only being able to delete your own characters
-
-## 12. Real-time Sync
-
-### Multiple Users in Campaign
-
-**All Users See Updates** `[Multi-user]`
-- Have multiple users (GM and players) connected to the same campaign
-- Make update from one user (character stat, campaign state)
-- Verify all other users see the update in real-time
-- Verify updates appear simultaneously
-- Verify no user misses updates
-
-### Character Updates Broadcast
-
-**Character Stat Updates**
-- Update character HP, stress, hope, armor, or conditions
-- Verify update is broadcast to all connected clients
-- Verify all clients see the update immediately
-- Verify update includes only changed fields (efficiency)
-
-**Character Added Broadcast**
-- Add a character to campaign
-- Verify all connected clients receive `character_added` message
-- Verify character appears in campaign view for all clients
-
-**Character Removed Broadcast**
-- Remove a character from campaign
-- Verify all connected clients receive `character_removed` message
-- Verify character disappears from campaign view for all clients
-
-**Character Ownership Change Broadcast**
-- Claim an unassigned character (ownership transfer)
-- Verify all connected clients see ownership change
-- Verify character moves from unassigned to assigned list
-
-### Campaign State Updates Broadcast
-
-**Fear Track Updates**
-- Update fear track value
-- Verify all connected clients receive state update
-- Verify fear visibility respects `fear_visible_to_players` setting
-
-**Countdown Updates**
-- Add, update, or remove countdowns
-- Verify all connected clients receive state update
-- Verify countdown visibility respects settings
-
-**Notes Updates**
-- Update campaign notes
-- Verify all connected clients receive state update
-
-### Member Updates Broadcast
-
-**Display Name Changes**
-- Update member display name
-- Verify all connected clients receive `member_updated` message
-- Verify display name updates in members list for all clients
-
-## Testing Notes
-
-### Multi-User Testing Setup
-
-For scenarios marked `[Multi-user]`, you'll need:
-- Multiple user accounts (or browser sessions with different accounts)
-- All users joined to the same campaign
-- All users viewing the campaign page simultaneously
-
-### Durable Object Testing
-
-To test Durable Object scenarios:
-- **Connected**: Normal operation with WebSocket connected
-- **Disconnected**: Close WebSocket connection (close browser tab, disable network)
-- **Unavailable**: Stop the Durable Object worker or simulate network failure
-
-### Version Tracking
-
-The Durable Object uses version numbers to detect stale clients:
-- Each update increments the version
-- Clients track `lastKnownVersion`
-- If `lastKnownVersion < DO.version`, client must refresh from D1
-
-### Data Persistence
-
-Remember: **D1 is the source of truth**. Durable Object is for real-time sync only:
-- All updates are saved to D1 first
-- DO notifications are for broadcasting to connected clients
-- If DO fails, data is still in D1
-- Clients always refresh from D1 when needed
-
-### Limits
-
-- **Character Limit**: 3 characters per user
-- **Homebrew Limit**: 5 homebrew items per user (across all types)
-- **Image Size Limit**: 5MB per image
+### Image Uploads
+- [ ] Character image uploads
+- [ ] Homebrew image uploads
+- [ ] Image size validation
+- [ ] Invalid file type validation
 
 ### Error Scenarios
+- [ ] Permission errors (various scenarios)
+- [ ] Error messages are clear
+- [ ] System remains stable after errors
 
-When testing error scenarios, verify:
-- Appropriate error messages are displayed
-- Operations fail gracefully
-- No data corruption occurs
-- User is informed of the issue
-- System remains in consistent state
+## What to Report
+
+When you find issues, please report:
+1. **What you were trying to do** - The test number and description
+2. **What you expected to happen** - Based on the test instructions
+3. **What actually happened** - Describe the actual behavior
+4. **Steps to reproduce** - Exact steps you took
+5. **Screenshots** - If applicable, include screenshots of errors or unexpected behavior
+6. **Browser/Device** - What browser and device you were using
+
+## Important Notes
+
+- **Character Limit**: You can have a maximum of 3 characters
+- **Homebrew Limit**: You can have a maximum of 5 homebrew items (across all types combined)
+- **Image Size Limit**: Images must be 5MB or smaller
+- **Multi-user Tests**: Some tests require multiple user accounts. Use different browsers or browser sessions with different accounts.
+- **Real-time Features**: For real-time sync tests, keep multiple browser windows open side-by-side to see updates happening simultaneously.
+
+Thank you for your help testing! Your feedback is invaluable for improving the application.
