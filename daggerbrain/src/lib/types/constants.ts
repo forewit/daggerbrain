@@ -33,7 +33,6 @@ export const CHARACTER_DEFAULTS = {
 		void_enabled: false,
 		use_gold_coins: false,
 		homebrew_enabled: false,
-		campaign_homebrew_enabled: true,
 		show_campaign_info: true
 	},
 

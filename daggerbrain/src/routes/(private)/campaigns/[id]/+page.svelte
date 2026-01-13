@@ -188,11 +188,11 @@
 							<CampaignInviteLink {isGM} class="grow" />
 						</div>
 						<CampaignCharacters />
-						<!-- {#if isGM}
+						{#if isGM}
 							<CampaignVault {campaignId} />
 
 							<CampaignNotes {campaignId} />
-						{/if} -->
+						{/if}
 					</div>
 				{/if}
 			</div>

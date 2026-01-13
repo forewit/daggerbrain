@@ -31,6 +31,7 @@ import type {
 	BeastformSchema
 } from '$lib/compendium/compendium-schemas';
 import type { z } from 'zod';
+import type { Weapon, Armor, Loot, Consumable, Beastform, CharacterClass, Subclass, DomainIds, DomainCard, AncestryCard, CommunityCard, TransformationCard, Domain } from './compendium-types';
 
 // ============================================================================
 // Core Enums & IDs
@@ -101,3 +102,18 @@ export type Armor = z.infer<typeof ArmorSchema>;
 export type AdventuringGear = z.infer<typeof AdventuringGearSchema>;
 export type Loot = z.infer<typeof LootSchema>;
 export type Consumable = z.infer<typeof ConsumableSchema>;
+export type CompendiumContent = {
+	primary_weapons: Record<string, Weapon>;
+	secondary_weapons: Record<string, Weapon>;
+	armor: Record<string, Armor>;
+	loot: Record<string, Loot>;
+	consumables: Record<string, Consumable>;
+	beastforms: Record<string, Beastform>;
+	classes: Record<string, CharacterClass>;
+	subclasses: Record<string, Subclass>;
+	domain_cards: Record<DomainIds, Record<string, DomainCard>>;
+	ancestry_cards: Record<string, AncestryCard>;
+	community_cards: Record<string, CommunityCard>;
+	transformation_cards: Record<string, TransformationCard>;
+	domains: Record<string, Domain>;
+};

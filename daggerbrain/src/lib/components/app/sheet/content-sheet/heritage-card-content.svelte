@@ -10,6 +10,7 @@
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import CircleMinus from '@lucide/svelte/icons/circle-minus';
 	import HomebrewBadge from '../../homebrew/homebrew-badge.svelte';
+	import CampaignBadge from '../../homebrew/campaign-badge.svelte';
 
 	type HeritageCard = AncestryCard | CommunityCard | TransformationCard;
 
@@ -114,6 +115,12 @@
 													id={card.compendium_id}
 													class="-mt-0.5 size-4"
 												/>
+											{:else if card.source_id === 'Campaign'}
+												<CampaignBadge type={card.card_type === 'ancestry'
+													? 'ancestry-cards'
+													: card.card_type === 'community'
+														? 'community-cards'
+														: 'transformation-cards'} id={card.compendium_id} class="-mt-0.5 size-4" />
 											{/if}
 											{getCardTypeName(card)}
 										</span>

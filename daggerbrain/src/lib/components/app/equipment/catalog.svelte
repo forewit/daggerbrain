@@ -17,6 +17,7 @@
 	import { cn } from '$lib/utils';
 	import { SvelteSet } from 'svelte/reactivity';
 	import HomebrewBadge from '../homebrew/homebrew-badge.svelte';
+	import CampaignBadge from '../homebrew/campaign-badge.svelte';
 
 	let searchQuery = $state('');
 	let typeFilter = $state<'Weapons' | 'Armor' | 'Consumables' | 'Loot' | null>(null);
@@ -494,6 +495,8 @@
 							>
 								{#if entry.item.source_id === 'Homebrew'}
 									<HomebrewBadge type="weapon" id={entry.item.compendium_id} class="size-3" />
+								{:else if entry.item.source_id === 'Campaign'}
+									<CampaignBadge type="weapon" id={entry.item.compendium_id} class="size-3" />
 								{/if}
 								Tier {context.level_to_tier(entry.item.level_requirement)}
 								{entry.item.category} Weapon
@@ -538,6 +541,8 @@
 										id={entry.item.compendium_id}
 										class="-mt-0.5 size-3"
 									/>
+								{:else if entry.item.source_id === 'Campaign'}
+									<CampaignBadge type="armor" id={entry.item.compendium_id} class="size-3" />
 								{/if}
 								Tier {context.level_to_tier(entry.item.level_requirement)} Armor
 							</p>

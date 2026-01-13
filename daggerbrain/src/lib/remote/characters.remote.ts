@@ -252,7 +252,7 @@ export const update_character = command(
 		.extend({
 			id: z.string() // Make id required (override optional from update schema)
 		})
-		.passthrough(), // Allow extra fields but strip them
+		.loose(), // Allow extra fields but strip them
 	async (data) => {
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);

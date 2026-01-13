@@ -6,7 +6,7 @@ import { campaign_homebrew_vault_table } from '../../server/db/campaigns.schema'
 import { get_db, get_auth } from '../utils';
 import { getCampaignAccessInternal } from '../../server/permissions';
 import type { HomebrewType } from '../../types/homebrew-types';
-import type { DomainIds } from '../../types/compendium-types';
+import type { AncestryCard, Armor, Beastform, CharacterClass, CommunityCard, CompendiumContent, Consumable, Domain, DomainCard, DomainIds, Loot, Subclass, TransformationCard, Weapon } from '../../types/compendium-types';
 import {
 	homebrew_primary_weapons,
 	homebrew_secondary_weapons,
@@ -74,21 +74,7 @@ export const get_campaign_homebrew_items = query(z.string(), async (campaignId) 
 		.where(eq(campaign_homebrew_vault_table.campaign_id, campaignId));
 
 	// Group by type and fetch items
-	const result: {
-		primary_weapons: Record<string, any>;
-		secondary_weapons: Record<string, any>;
-		armor: Record<string, any>;
-		loot: Record<string, any>;
-		consumables: Record<string, any>;
-		beastforms: Record<string, any>;
-		classes: Record<string, any>;
-		subclasses: Record<string, any>;
-		domains: Record<string, any>;
-		domain_cards: Record<DomainIds, Record<string, any>>;
-		ancestry_cards: Record<string, any>;
-		community_cards: Record<string, any>;
-		transformation_cards: Record<string, any>;
-	} = {
+	const result: CompendiumContent = {
 		primary_weapons: {},
 		secondary_weapons: {},
 		armor: {},
@@ -111,7 +97,7 @@ export const get_campaign_homebrew_items = query(z.string(), async (campaignId) 
 		},
 		ancestry_cards: {},
 		community_cards: {},
-		transformation_cards: {}
+		transformation_cards: {},
 	};
 
 	// Group vault items by type for batch fetching

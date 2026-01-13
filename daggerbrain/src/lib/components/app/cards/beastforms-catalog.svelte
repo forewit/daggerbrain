@@ -9,6 +9,7 @@
 	import Dropdown from '../leveling/dropdown.svelte';
 	import Search from '@lucide/svelte/icons/search';
 	import HomebrewBadge from '../homebrew/homebrew-badge.svelte';
+	import CampaignBadge from '../homebrew/campaign-badge.svelte';
 
 	let {
 		onBeastformClick = () => {},
@@ -178,7 +179,9 @@
 						>
 							{#if beastform.source_id === 'Homebrew'}
 								<HomebrewBadge type="beastform" id={beastform.compendium_id} class="size-3" />
-							{/if}
+							{:else if beastform.source_id === 'Campaign'}
+								<CampaignBadge type="beastform" id={beastform.compendium_id} class="size-3" />
+								{/if}
 							Tier {tier}
 							{beastform.category}
 						</p>

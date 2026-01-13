@@ -27,6 +27,17 @@ export type CampaignWithDetails = Campaign & {
 	character_images: string[];
 };
 
+export type CampaignJoinPreview = {
+	campaignId: string;
+	campaignName: string;
+	campaignCreatedAt: number;
+	gmDisplayName: string | null;
+	isMember: boolean;
+	characterImages: string[];
+	playerCount: number;
+	userRole: 'gm' | 'player' | null;
+};
+
 /**
  * Summary of a character for campaign view.
  * Combines base character fields with derived stats from DerivedCharacterSummary.

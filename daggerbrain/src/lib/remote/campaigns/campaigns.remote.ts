@@ -19,6 +19,7 @@ import type {
 	CampaignState,
 	CampaignCharacterSummary,
 	CampaignWithDetails,
+	CampaignJoinPreview,
 	Countdown
 } from '../../types/campaign-types';
 import type { RequestEvent } from '@sveltejs/kit';
@@ -157,7 +158,7 @@ export const get_campaign = query(z.string(), async (campaignId) => {
 	return access.campaign;
 });
 
-export const get_campaign_by_invite_code = query(z.string(), async (inviteCode) => {
+export const get_campaign_by_invite_code = query(z.string(), async (inviteCode): Promise<CampaignJoinPreview> => {
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -175,17 +176,64 @@ export const get_campaign_by_invite_code = query(z.string(), async (inviteCode) 
 		throw error(404, 'Campaign not found');
 	}
 
+	const campaignId = state.campaign_id;
+
 	// Get campaign data - this will throw 404 if campaign doesn't exist
 	// Note: getCampaignAccessInternal returns the campaign object even if user is not a member
 	// This is intentional - invite codes allow viewing basic campaign info before joining
-	const access = await getCampaignAccessInternal(db, userId, state.campaign_id);
+	const access = await getCampaignAccessInternal(db, userId, campaignId);
+	const campaign = access.campaign;
 
-	// Security: We return campaign data even if user is not a member
-	// This allows users to see campaign name/description before joining
-	// Actual joining still requires proper authentication and permission checks in join_campaign()
+	// Get campaign members directly (without membership check) since user accessed via invite code
+	// This allows non-members to see basic campaign info before joining
+	const members = await db
+		.select()
+		.from(campaign_members_table)
+		.where(eq(campaign_members_table.campaign_id, campaignId));
+
+	// Find GM member
+	const gmMember = members.find((m) => m.role === 'gm');
+	const gmDisplayName = gmMember?.display_name || null;
+
+	// Check if current user is a member
+	const userMembership = members.find((m) => m.user_id === userId);
+	const isMember = !!userMembership;
+	const userRole = (userMembership?.role as 'gm' | 'player' | null) || null;
+
+	// Count players (excluding GM)
+	const playerCount = members.filter((m) => m.role === 'player').length;
+
+	// Get character images for the preview
+	const allCharacters = await db
+		.select({
+			image_url: characters_table.image_url
+		})
+		.from(characters_table)
+		.innerJoin(
+			campaign_characters_table,
+			eq(characters_table.id, campaign_characters_table.character_id)
+		)
+		.where(
+			and(eq(characters_table.campaign_id, campaignId), eq(campaign_characters_table.claimable, 0))
+		);
+
+	// Extract character images (limit to 6)
+	const characterImages = allCharacters
+		.map((char) => char.image_url)
+		.filter((url): url is string => !!url)
+		.slice(0, 6);
 
 	console.log('fetched campaign by invite code from D1');
-	return access.campaign;
+	return {
+		campaignId: campaign.id,
+		campaignName: campaign.name,
+		campaignCreatedAt: campaign.created_at,
+		gmDisplayName,
+		isMember,
+		userRole,
+		playerCount,
+		characterImages
+	};
 });
 
 export const get_campaign_members = query(z.string(), async (campaignId) => {
@@ -968,9 +1016,13 @@ export const leave_campaign = command(z.string(), async (campaignId) => {
 		});
 	}
 
-	// Refresh the queries
-	get_user_campaigns().refresh();
-	get_campaign_characters(campaignId).refresh();
+	// Refresh the queries (only refresh user campaigns since user no longer has access to this campaign)
+	try {
+		await get_user_campaigns().refresh();
+	} catch (err) {
+		console.error('Failed to refresh user campaigns:', err);
+	}
+	// Note: We don't refresh get_campaign_characters(campaignId) here because the user no longer has access to this campaign
 
 	console.log('left campaign in D1');
 	return { success: true };

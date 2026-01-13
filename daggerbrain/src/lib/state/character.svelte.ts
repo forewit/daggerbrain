@@ -164,7 +164,7 @@ function createCharacter(id: string) {
 		}
 
 		// campaign homebrew content
-		if (character.settings.campaign_homebrew_enabled && character.campaign_id) {
+		if (character.settings.homebrew_enabled && character.campaign_id) {
 			compendium.source_whitelist.add('Campaign');
 		} else {
 			compendium.source_whitelist.delete('Campaign');
@@ -536,6 +536,15 @@ function createCharacter(id: string) {
 	let spellcast_roll_bonus: number = $state(BASE_STATS.spellcast_roll_bonus);
 	let derived_beastform: Beastform | null = $state(null);
 	let derived_companion: Companion | null = $state(null);
+
+
+	// Load campaign homebrew
+	$effect(()=>{
+		if (!character) return;
+		if (!character.campaign_id) return;
+		if (!character.settings.homebrew_enabled) return;
+		compendium.load_campaign_homebrew(character.campaign_id);
+	})
 
 	// ================================================
 	// CHARACTER VALIDATION EFFECTS

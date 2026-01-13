@@ -13,7 +13,9 @@
 	let { data } = $props();
 
 	const campaignCtx = getCampaignContext();
-	const campaign = data.campaign;
+	const campaignId = data.campaignId;
+	const campaignName = data.campaignName;
+	const campaignCreatedAt = data.campaignCreatedAt;
 	const gmDisplayName = data.gmDisplayName;
 	const isMember = data.isMember;
 	const userRole = data.userRole;
@@ -22,8 +24,8 @@
 
 	// Set the campaign ID in context so joinCampaign can use it
 	$effect(() => {
-		if (campaign) {
-			campaignCtx.campaignId = campaign.id;
+		if (campaignId) {
+			campaignCtx.campaignId = campaignId;
 		}
 	});
 
@@ -33,13 +35,13 @@
 	async function handleJoin() {
 		if (joining || isMember) return;
 
-		if (!campaign?.id) {
+		if (!campaignId) {
 			toast.error('Campaign information is missing');
 			return;
 		}
 
 		// Ensure campaignId is set in context before calling joinCampaign
-		campaignCtx.campaignId = campaign.id;
+		campaignCtx.campaignId = campaignId;
 
 		joining = true;
 		try {
@@ -55,7 +57,7 @@
 				toast.info('You are already a member of this campaign');
 				// Redirect to campaign page since they're already a member
 				setTimeout(() => {
-					goto(`/campaigns/${campaign.id}`);
+					goto(`/campaigns/${campaignId}`);
 				}, 1000);
 			} else {
 				toast.error(message);
@@ -123,13 +125,13 @@
 						<div
 							class={cn('px-4 pb-1.5 text-center', characterImages.length > 0 ? 'pt-8' : 'pt-6')}
 						>
-							<p class="truncate text-xl font-bold">{campaign.name}</p>
+							<p class="truncate text-xl font-bold">{campaignName}</p>
 						</div>
 
 						<!-- Start Date -->
 						<div class="px-4 pb-5 text-center">
 							<p class="text-xs font-medium text-muted-foreground">
-								Campaign Started {formatDate(campaign.created_at)}
+								Campaign Started {formatDate(campaignCreatedAt)}
 							</p>
 						</div>
 					</div>
@@ -160,7 +162,7 @@
 					<Button
 						size="sm"
 						class="hover:text-text w-full rounded border"
-						href={`/campaigns/${campaign.id}`}
+						href={`/campaigns/${campaignId}`}
 					>
 						View Campaign
 					</Button>

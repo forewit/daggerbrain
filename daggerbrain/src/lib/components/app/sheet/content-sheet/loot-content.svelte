@@ -12,6 +12,7 @@
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import CircleMinus from '@lucide/svelte/icons/circle-minus';
 	import HomebrewBadge from '../../homebrew/homebrew-badge.svelte';
+	import CampaignBadge from '../../homebrew/campaign-badge.svelte';
 
 	let { lootId }: { lootId: string } = $props();
 
@@ -91,6 +92,8 @@
 		<p class="flex items-center gap-1.5 text-xs text-muted-foreground italic">
 			{#if loot.source_id === 'Homebrew'}
 				<HomebrewBadge type="loot" id={loot.compendium_id} class="-mt-0.5 size-4" />
+			{:else if loot.source_id === 'Campaign'}
+				<CampaignBadge type="loot" id={loot.compendium_id} class="-mt-0.5 size-4" />
 			{/if}
 			Loot
 		</p>

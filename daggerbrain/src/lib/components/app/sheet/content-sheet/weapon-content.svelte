@@ -16,6 +16,7 @@
 	import WeaponsRules from '../../rules/weapons-rules.svelte';
 	import DicePicker from '../../dice/dice-picker.svelte';
 	import { z } from 'zod';
+	import CampaignBadge from '../../homebrew/campaign-badge.svelte';
 
 	let { weaponId }: { weaponId: string } = $props();
 
@@ -333,6 +334,8 @@
 			<p class="flex items-center gap-1.5 text-xs text-muted-foreground italic">
 				{#if weapon.source_id === 'Homebrew'}
 					<HomebrewBadge type="weapon" id={weapon.compendium_id} class="-mt-0.5 size-4" />
+				{:else if weapon.source_id === 'Campaign'}
+					<CampaignBadge type="weapon" id={weapon.compendium_id} class="-mt-0.5 size-4" />
 				{/if}
 				Tier {context.level_to_tier(weapon.level_requirement)}
 				{weapon.category} Weapon
