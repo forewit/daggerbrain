@@ -344,7 +344,7 @@
 					<div class="relative mx-auto flex w-full max-w-6xl items-center gap-2 py-2 pr-4">
 						<Button href="/homebrew" variant="link">
 							<ChevronLeft />
-							Back to Homebrew
+							Homebrew
 						</Button>
 
 						<div class="grow"></div>

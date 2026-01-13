@@ -1,33 +1,3 @@
----
-name: Refactor Compendium Data Storage by Source
-overview: Refactor compendium data storage from type-based KV keys (classes, subclasses, domains, etc.) to source-based keys (SRD, etc.), where each source contains all its compendium data types in a single KV entry. This will reduce KV reads and simplify the compendium state management.
-todos:
-  - id: update-seed-script
-    content: Update seed.ts to group compendium data by source_id and create source-based KV entries
-    status: pending
-  - id: create-source-type
-    content: Create SourceCompendiumData type definition for the new structure
-    status: pending
-  - id: update-classes-remote
-    content: Update classes.remote.ts to fetch from source-based KV entries
-    status: pending
-  - id: update-domains-remote
-    content: Update domains.remote.ts to fetch from source-based KV entries
-    status: pending
-  - id: update-equipment-remote
-    content: Update equipment.remote.ts to fetch from source-based KV entries
-    status: pending
-  - id: update-heritages-remote
-    content: Update heritages.remote.ts to fetch from source-based KV entries
-    status: pending
-  - id: update-beastforms-remote
-    content: Update beastforms.remote.ts to fetch from source-based KV entries
-    status: pending
-  - id: simplify-compendium-state
-    content: Simplify compendium.svelte.ts to fetch sources and extract types, reducing from 15+ KV reads to 1-2 reads
-    status: pending
----
-
 # Refactor Compendium Data Storage by Source
 
 ## Current Structure

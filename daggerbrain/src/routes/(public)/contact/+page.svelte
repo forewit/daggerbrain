@@ -92,11 +92,10 @@
 				</Button>
 			</div>
 
-			<div class="space-y-2">
-				<p class="text-sm font-medium text-foreground">Want to support the project?</p>
-				<div class="flex gap-4">
+			<div class="flex flex-col items-center justify-center gap-4 -mt-2">
+				<p class="text-sm font-medium text-foreground text-center">Or</p>
 					<Button
-						class="bg-[#5865F2] hover:bg-[#5865F2]/80"
+						class="bg-[#5865F2] hover:bg-[#5865F2]/80 mx-auto"
 						target="_blank"
 						href="https://discord.gg/nTATkV7d9S"
 					>
@@ -115,12 +114,7 @@
 						>
 						Join the Discord
 					</Button>
-					<Button
-						class="bg-accent text-background hover:bg-accent/80"
-						target="_blank"
-						href="https://buymeacoffee.com/marcanderson">☕ Buy me a coffee</Button
-					>
-				</div>
+					
 			</div>
 		</div>
 	</div>

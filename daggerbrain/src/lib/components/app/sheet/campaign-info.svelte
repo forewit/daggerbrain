@@ -34,8 +34,8 @@
 			{#if !campaignCtx.loading}
 				<div class="flex grow truncate" transition:fade={{ duration: 300 }}>
 					<Button
-						class="grow justify-start truncate text-muted-foreground font-normal"
-						variant="link"
+						class="grow justify-start truncate text- font-normal hover:bg-transparent"
+						variant="ghost"
 						size="sm"
 						onclick={() => (isExpanded = !isExpanded)}
 					>
@@ -44,8 +44,8 @@
 					</Button>
 				</div>
 			{/if}
-			<Button href={`/campaigns/${campaignCtx.campaign?.id}`} variant="link" size="sm" class="text-muted-foreground font-normal">
-				see campaign
+			<Button href={`/campaigns/${campaignCtx.campaign?.id}`} variant="link" size="sm" class="text- font-normal">
+				campaign
 				<ExternalLink class="size-3.5" />
 			</Button>
 		</div>

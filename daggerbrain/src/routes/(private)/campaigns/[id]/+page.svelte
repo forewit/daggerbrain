@@ -183,15 +183,15 @@
 		>
 			<div class=" w-full max-w-6xl px-4 pt-4 pb-8">
 				{#if campaignId && campaign.campaign}
-					<div class="flex flex-col gap-6">
+					<div class="flex flex-col">
 						<div class="flex justify-end">
 							<CampaignInviteLink {isGM} class="grow" />
 						</div>
-						<CampaignCharacters />
+						<CampaignCharacters class="mt-6"/>
 						{#if isGM}
-							<CampaignVault {campaignId} />
+							<CampaignVault {campaignId} class="mt-8"/>
 
-							<CampaignNotes {campaignId} />
+							<!-- <CampaignNotes {campaignId} /> -->
 						{/if}
 					</div>
 				{/if}

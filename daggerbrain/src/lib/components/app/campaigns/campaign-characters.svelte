@@ -14,6 +14,9 @@
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 
+
+	let { class: className }: { class?: string } = $props();
+
 	const campaignContext = getCampaignContext();
 	const user = getUserContext();
 
@@ -335,7 +338,7 @@
 
 {#if campaign}
 	<!-- Characters Section -->
-	<div>
+	<div class={className}>
 		<div class="mb-4 flex items-center justify-between">
 			<h2 class="text-lg font-semibold">Active Characters</h2>
 			{#if isGM || !playerHasCharacterInCampaign}
