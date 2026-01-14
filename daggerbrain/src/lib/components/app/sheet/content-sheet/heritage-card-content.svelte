@@ -116,11 +116,15 @@
 													class="-mt-0.5 size-4"
 												/>
 											{:else if card.source_id === 'Campaign'}
-												<CampaignBadge type={card.card_type === 'ancestry'
-													? 'ancestry-cards'
-													: card.card_type === 'community'
-														? 'community-cards'
-														: 'transformation-cards'} id={card.compendium_id} class="-mt-0.5 size-4" />
+												<CampaignBadge
+													type={card.card_type === 'ancestry'
+														? 'ancestry-cards'
+														: card.card_type === 'community'
+															? 'community-cards'
+															: 'transformation-cards'}
+													id={card.compendium_id}
+													class="-mt-0.5 size-4"
+												/>
 											{/if}
 											{getCardTypeName(card)}
 										</span>

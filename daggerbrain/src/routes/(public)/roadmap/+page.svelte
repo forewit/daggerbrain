@@ -62,8 +62,7 @@
 								>
 							</div>
 							<div class="px-5 pt-3 pb-4 text-sm text-muted-foreground">
-								Added homebrew support for Weapons, Armor, Loot, Consumables, and Beastforms. 
-								
+								Added homebrew support for Weapons, Armor, Loot, Consumables, and Beastforms.
 							</div>
 						</div>
 					</li>
@@ -77,8 +76,7 @@
 						<div
 							class="rounded-xl border border-emerald-500/40 bg-background/70 shadow-sm [filter:drop-shadow(0_0_12px_rgba(16,185,129,0.08))] backdrop-blur-sm"
 						>
-							
-						<div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-5 pt-4">
+							<div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-5 pt-4">
 								<div class="text-sm font-semibold">Campaigns</div>
 								<span
 									class="inline-flex items-center rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-500"
@@ -89,11 +87,11 @@
 								Create campaigns for your players to join. Track fear, countdowns, character sheets,
 								and more.
 								<a href="/campaigns" class="block underline hover:text-emerald-500"
-									>Read more about it here <ExternalLink class="size-3.5 inline -mt-0.5 ml-0.5" /></a
+									>Read more about it here <ExternalLink
+										class="-mt-0.5 ml-0.5 inline size-3.5"
+									/></a
 								>
 							</div>
-							
-							
 						</div>
 					</li>
 
@@ -167,7 +165,7 @@
 					</li>
 				</ol>
 
-				<div class="space-y-2 mt-10">
+				<div class="mt-10 space-y-2">
 					<p class="text-sm font-medium text-foreground">Want to support the project?</p>
 					<div class="flex gap-4">
 						<Button

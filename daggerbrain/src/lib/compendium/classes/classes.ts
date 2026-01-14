@@ -737,11 +737,11 @@ export const CLASSES = {
 		starting_evasion: 11,
 		starting_max_hp: 6,
 		suggested_traits: {
-			agility: 0,
-			strength: -1,
-			finesse: 1,
-			instinct: 2,
-			presence: 1,
+			agility: 2,
+			strength: 1,
+			finesse: 0,
+			instinct: 1,
+			presence: -1,
 			knowledge: 0
 		},
 		name: 'Warrior',

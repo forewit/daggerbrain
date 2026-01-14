@@ -14,7 +14,6 @@
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 
-
 	let { class: className }: { class?: string } = $props();
 
 	const campaignContext = getCampaignContext();
@@ -177,7 +176,7 @@
 		if (!characterId || !campaignId) return;
 
 		// Check if player has reached character limit
-		if (user?.all_characters?.length >= 3) {
+		if (user?.all_characters?.length >= UI_CHARACTER_LIMIT) {
 			showCharacterLimitDialog = true;
 			return;
 		}

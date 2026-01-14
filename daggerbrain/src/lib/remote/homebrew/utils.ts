@@ -17,7 +17,7 @@ import {
 } from '$lib/server/db/homebrew.schema';
 import { isEnabledHomebrewType, type HomebrewType } from '$lib/types/homebrew-types';
 
-export const HOMEBREW_LIMIT = 5;
+export const HOMEBREW_LIMIT = 20;
 
 /**
  * Throws a 403 error if the given homebrew type is not currently enabled.

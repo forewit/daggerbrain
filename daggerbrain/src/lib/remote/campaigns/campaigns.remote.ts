@@ -158,83 +158,89 @@ export const get_campaign = query(z.string(), async (campaignId) => {
 	return access.campaign;
 });
 
-export const get_campaign_by_invite_code = query(z.string(), async (inviteCode): Promise<CampaignJoinPreview> => {
-	const event = getRequestEvent();
-	const { userId } = get_auth(event);
-	const db = get_db(event);
+export const get_campaign_by_invite_code = query(
+	z.string(),
+	async (inviteCode): Promise<CampaignJoinPreview> => {
+		const event = getRequestEvent();
+		const { userId } = get_auth(event);
+		const db = get_db(event);
 
-	// Security: Invite codes are 12-character cryptographically random strings (62^12 combinations)
-	// They are used only for campaign discovery - actual joining requires proper authentication
-	// Look up campaign state by invite code (invite_code has unique constraint in DB)
-	const [state] = await db
-		.select()
-		.from(campaign_state_table)
-		.where(eq(campaign_state_table.invite_code, inviteCode))
-		.limit(1);
+		// Security: Invite codes are 12-character cryptographically random strings (62^12 combinations)
+		// They are used only for campaign discovery - actual joining requires proper authentication
+		// Look up campaign state by invite code (invite_code has unique constraint in DB)
+		const [state] = await db
+			.select()
+			.from(campaign_state_table)
+			.where(eq(campaign_state_table.invite_code, inviteCode))
+			.limit(1);
 
-	if (!state) {
-		throw error(404, 'Campaign not found');
+		if (!state) {
+			throw error(404, 'Campaign not found');
+		}
+
+		const campaignId = state.campaign_id;
+
+		// Get campaign data - this will throw 404 if campaign doesn't exist
+		// Note: getCampaignAccessInternal returns the campaign object even if user is not a member
+		// This is intentional - invite codes allow viewing basic campaign info before joining
+		const access = await getCampaignAccessInternal(db, userId, campaignId);
+		const campaign = access.campaign;
+
+		// Get campaign members directly (without membership check) since user accessed via invite code
+		// This allows non-members to see basic campaign info before joining
+		const members = await db
+			.select()
+			.from(campaign_members_table)
+			.where(eq(campaign_members_table.campaign_id, campaignId));
+
+		// Find GM member
+		const gmMember = members.find((m) => m.role === 'gm');
+		const gmDisplayName = gmMember?.display_name || null;
+
+		// Check if current user is a member
+		const userMembership = members.find((m) => m.user_id === userId);
+		const isMember = !!userMembership;
+		const userRole = (userMembership?.role as 'gm' | 'player' | null) || null;
+
+		// Count players (excluding GM)
+		const playerCount = members.filter((m) => m.role === 'player').length;
+
+		// Get character images for the preview
+		const allCharacters = await db
+			.select({
+				image_url: characters_table.image_url
+			})
+			.from(characters_table)
+			.innerJoin(
+				campaign_characters_table,
+				eq(characters_table.id, campaign_characters_table.character_id)
+			)
+			.where(
+				and(
+					eq(characters_table.campaign_id, campaignId),
+					eq(campaign_characters_table.claimable, 0)
+				)
+			);
+
+		// Extract character images (limit to 6)
+		const characterImages = allCharacters
+			.map((char) => char.image_url)
+			.filter((url): url is string => !!url)
+			.slice(0, 6);
+
+		console.log('fetched campaign by invite code from D1');
+		return {
+			campaignId: campaign.id,
+			campaignName: campaign.name,
+			campaignCreatedAt: campaign.created_at,
+			gmDisplayName,
+			isMember,
+			userRole,
+			playerCount,
+			characterImages
+		};
 	}
-
-	const campaignId = state.campaign_id;
-
-	// Get campaign data - this will throw 404 if campaign doesn't exist
-	// Note: getCampaignAccessInternal returns the campaign object even if user is not a member
-	// This is intentional - invite codes allow viewing basic campaign info before joining
-	const access = await getCampaignAccessInternal(db, userId, campaignId);
-	const campaign = access.campaign;
-
-	// Get campaign members directly (without membership check) since user accessed via invite code
-	// This allows non-members to see basic campaign info before joining
-	const members = await db
-		.select()
-		.from(campaign_members_table)
-		.where(eq(campaign_members_table.campaign_id, campaignId));
-
-	// Find GM member
-	const gmMember = members.find((m) => m.role === 'gm');
-	const gmDisplayName = gmMember?.display_name || null;
-
-	// Check if current user is a member
-	const userMembership = members.find((m) => m.user_id === userId);
-	const isMember = !!userMembership;
-	const userRole = (userMembership?.role as 'gm' | 'player' | null) || null;
-
-	// Count players (excluding GM)
-	const playerCount = members.filter((m) => m.role === 'player').length;
-
-	// Get character images for the preview
-	const allCharacters = await db
-		.select({
-			image_url: characters_table.image_url
-		})
-		.from(characters_table)
-		.innerJoin(
-			campaign_characters_table,
-			eq(characters_table.id, campaign_characters_table.character_id)
-		)
-		.where(
-			and(eq(characters_table.campaign_id, campaignId), eq(campaign_characters_table.claimable, 0))
-		);
-
-	// Extract character images (limit to 6)
-	const characterImages = allCharacters
-		.map((char) => char.image_url)
-		.filter((url): url is string => !!url)
-		.slice(0, 6);
-
-	console.log('fetched campaign by invite code from D1');
-	return {
-		campaignId: campaign.id,
-		campaignName: campaign.name,
-		campaignCreatedAt: campaign.created_at,
-		gmDisplayName,
-		isMember,
-		userRole,
-		playerCount,
-		characterImages
-	};
-});
+);
 
 export const get_campaign_members = query(z.string(), async (campaignId) => {
 	const event = getRequestEvent();

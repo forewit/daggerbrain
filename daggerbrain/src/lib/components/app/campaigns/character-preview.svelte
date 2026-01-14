@@ -60,7 +60,7 @@
 	});
 </script>
 
-<div class={cn("flex w-full max-w-[400px] flex-col rounded-xl bg-background shadow-lg", className)}>
+<div class={cn('flex w-full max-w-[400px] flex-col rounded-xl bg-background shadow-lg', className)}>
 	<!-- Header -->
 	<div class="mb-2 flex gap-3 px-2">
 		<div class="relative min-w-0 grow">

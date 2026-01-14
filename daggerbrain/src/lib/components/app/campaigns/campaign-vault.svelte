@@ -15,7 +15,7 @@
 	import HomebrewItemsCombobox from './homebrew-items-combobox.svelte';
 	import Anvil from '@lucide/svelte/icons/anvil';
 
-	let { campaignId, class: className }: { campaignId: string, class?: string } = $props();
+	let { campaignId, class: className }: { campaignId: string; class?: string } = $props();
 
 	const campaignContext = getCampaignContext();
 	const vaultItems = $derived(campaignContext.vaultItems);
@@ -26,7 +26,9 @@
 		HomebrewType,
 		{
 			name: string;
-			getItems: (homebrew: ReturnType<typeof getHomebrewContext>) => Array<{ id: string; name: string }>;
+			getItems: (
+				homebrew: ReturnType<typeof getHomebrewContext>
+			) => Array<{ id: string; name: string }>;
 			getItemName: (homebrew: ReturnType<typeof getHomebrewContext>, id: string) => string | null;
 		}
 	> = {
@@ -50,7 +52,8 @@
 		},
 		consumable: {
 			name: 'Consumable',
-			getItems: (h) => Object.entries(h.consumables).map(([id, item]) => ({ id, name: item.title })),
+			getItems: (h) =>
+				Object.entries(h.consumables).map(([id, item]) => ({ id, name: item.title })),
 			getItemName: (h, id) => h.consumables[id]?.title || null
 		},
 		beastform: {
@@ -84,12 +87,14 @@
 		},
 		'ancestry-cards': {
 			name: 'Ancestry Card',
-			getItems: (h) => Object.entries(h.ancestry_cards).map(([id, item]) => ({ id, name: item.title })),
+			getItems: (h) =>
+				Object.entries(h.ancestry_cards).map(([id, item]) => ({ id, name: item.title })),
 			getItemName: (h, id) => h.ancestry_cards[id]?.title || null
 		},
 		'community-cards': {
 			name: 'Community Card',
-			getItems: (h) => Object.entries(h.community_cards).map(([id, item]) => ({ id, name: item.title })),
+			getItems: (h) =>
+				Object.entries(h.community_cards).map(([id, item]) => ({ id, name: item.title })),
 			getItemName: (h, id) => h.community_cards[id]?.title || null
 		},
 		'transformation-cards': {
@@ -110,11 +115,11 @@
 
 	async function handleAddToVault() {
 		if (!campaignId || !selectedItem) return;
-		
+
 		// Parse the value format: `${type}:${id}`
 		const [homebrewType, homebrewId] = selectedItem.split(':');
 		if (!homebrewType || !homebrewId) return;
-		
+
 		try {
 			await campaignContext.addToVault(homebrewType as HomebrewType, homebrewId);
 			showAddVaultDialog = false;
@@ -158,27 +163,27 @@
 	});
 </script>
 
-<div class={cn("rounded-2xl bg-primary/10 shadow-xl", className)}>
-	<div class="px-4 pt-4 flex items-center justify-between">
+<div class={cn('rounded-2xl bg-primary/10 shadow-xl', className)}>
+	<div class="flex items-center justify-between px-4 pt-4">
 		<h2 class="text-lg font-semibold">
 			<!-- <Anvil class="size-5 inline -mt-0.5 mr-0.5" /> -->
 
 			Homebrew Vault
 		</h2>
-	
+
 		<Button variant="ghost" size="sm" onclick={() => (showAddVaultDialog = true)}>
 			<!-- <Plus class="size-4" /> -->
 			<Plus class="size-4" />
 		</Button>
 	</div>
-	<p class="text-xs text-muted-foreground pb-4 pl-4 pt-4 sm:pt-0">
+	<p class="pt-4 pb-4 pl-4 text-xs text-muted-foreground sm:pt-0">
 		Items in the vault will be available your player's character sheets.
 	</p>
 
 	{#if sortedVaultItems.length === 0}
-		<p class="text-sm text-muted-foreground text-center pb-8 pt-2">No items in vault yet.</p>
+		<p class="pt-2 pb-8 text-center text-sm text-muted-foreground">No items in vault yet.</p>
 	{:else}
-		<div class=" mb-4 mx-4 bg-background">
+		<div class=" mx-4 mb-4 bg-background">
 			<table class="w-full border-collapse">
 				<colgroup>
 					<col />
@@ -194,15 +199,11 @@
 				</thead>
 				<tbody>
 					{#each sortedVaultItems as item (item.id)}
-						<tr class="border-b ">
+						<tr class="border-b">
 							<td class="px-4 py-2">
-								<a
-									href={item.href}
-									class="text-sm font-medium text-foreground hover:underline"
-								>
-									{item.name.trim() || "Unnamed Item"}
-									<ExternalLink class="size-4 inline ml-0.5 -mt-0.5" />
-
+								<a href={item.href} class="text-sm font-medium text-foreground hover:underline">
+									{item.name.trim() || 'Unnamed Item'}
+									<ExternalLink class="-mt-0.5 ml-0.5 inline size-4" />
 								</a>
 							</td>
 							<td class="py-2 pr-4 text-sm text-muted-foreground">
@@ -234,7 +235,9 @@
 			<Dialog.Description>
 				Select a homebrew item from your collection to add to the campaign vault.
 
-				<Button href="/homebrew" class="mt-2 flex w-min pl-0" variant="link">Manage homebrew collection <ExternalLink class="size-4"/></Button>
+				<Button href="/homebrew" class="mt-2 flex w-min pl-0" variant="link"
+					>Manage homebrew collection <ExternalLink class="size-4" /></Button
+				>
 			</Dialog.Description>
 		</Dialog.Header>
 
@@ -260,9 +263,7 @@
 				>
 					Cancel
 				</Dialog.Close>
-				<Button type="submit" disabled={!selectedItem}>
-					Add
-				</Button>
+				<Button type="submit" disabled={!selectedItem}>Add</Button>
 			</Dialog.Footer>
 		</form>
 	</Dialog.Content>

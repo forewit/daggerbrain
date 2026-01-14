@@ -39,8 +39,6 @@ import { getCharacterContext } from './character.svelte';
 import { get_campaign_homebrew_items } from '$lib/remote/campaigns/campaign-homebrew.remote';
 
 function createCompendium() {
-	
-	
 	// Campaign homebrew state (loaded reactively from character context)
 	let campaign_homebrew = $state<CompendiumContent>({
 		primary_weapons: {},
@@ -107,7 +105,7 @@ function createCompendium() {
 
 	// Helper to fetch with retry on failure
 	let accessible_sources = $state<Record<string, Source>>({});
-	
+
 	let accessible_content = $state<CompendiumContent>({
 		primary_weapons: {},
 		secondary_weapons: {},
@@ -131,7 +129,7 @@ function createCompendium() {
 		ancestry_cards: {},
 		community_cards: {},
 		transformation_cards: {},
-		domains: {},
+		domains: {}
 	});
 
 	async function fetchWithRetry<T>(
@@ -309,63 +307,49 @@ function createCompendium() {
 				...homebrewContext.domain_cards.bone,
 				...campaign_homebrew.domain_cards.bone,
 				...accessible_content.domain_cards.bone
-			}).filter(([, card]) =>
-				source_whitelist.has(card.source_id)
-			)
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		),
 		codex: Object.fromEntries(
 			Object.entries({
 				...homebrewContext.domain_cards.codex,
 				...campaign_homebrew.domain_cards.codex,
 				...accessible_content.domain_cards.codex
-			}).filter(([, card]) =>
-				source_whitelist.has(card.source_id)
-			)
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		),
 		grace: Object.fromEntries(
 			Object.entries({
 				...homebrewContext.domain_cards.grace,
 				...campaign_homebrew.domain_cards.grace,
 				...accessible_content.domain_cards.grace
-			}).filter(([, card]) =>
-				source_whitelist.has(card.source_id)
-			)
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		),
 		midnight: Object.fromEntries(
 			Object.entries({
 				...homebrewContext.domain_cards.midnight,
 				...campaign_homebrew.domain_cards.midnight,
 				...accessible_content.domain_cards.midnight
-			}).filter(([, card]) =>
-				source_whitelist.has(card.source_id)
-			)
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		),
 		sage: Object.fromEntries(
 			Object.entries({
 				...homebrewContext.domain_cards.sage,
 				...campaign_homebrew.domain_cards.sage,
 				...accessible_content.domain_cards.sage
-			}).filter(([, card]) =>
-				source_whitelist.has(card.source_id)
-			)
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		),
 		splendor: Object.fromEntries(
 			Object.entries({
 				...homebrewContext.domain_cards.splendor,
 				...campaign_homebrew.domain_cards.splendor,
 				...accessible_content.domain_cards.splendor
-			}).filter(([, card]) =>
-				source_whitelist.has(card.source_id)
-			)
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		),
 		valor: Object.fromEntries(
 			Object.entries({
 				...homebrewContext.domain_cards.valor,
 				...campaign_homebrew.domain_cards.valor,
 				...accessible_content.domain_cards.valor
-			}).filter(([, card]) =>
-				source_whitelist.has(card.source_id)
-			)
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
 	});
 	let primary_weapons: Record<string, Weapon> = $derived(
@@ -383,9 +367,7 @@ function createCompendium() {
 				...homebrewContext.secondary_weapons,
 				...campaign_homebrew.secondary_weapons,
 				...accessible_content.secondary_weapons
-			}).filter(([, card]) =>
-				source_whitelist.has(card.source_id)
-			)
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
 	);
 	let armor: Record<string, Armor> = $derived(

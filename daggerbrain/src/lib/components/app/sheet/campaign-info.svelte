@@ -34,7 +34,7 @@
 			{#if !campaignCtx.loading}
 				<div class="flex grow truncate" transition:fade={{ duration: 300 }}>
 					<Button
-						class="grow justify-start truncate text- font-normal hover:bg-transparent"
+						class="text- grow justify-start truncate font-normal hover:bg-transparent"
 						variant="ghost"
 						size="sm"
 						onclick={() => (isExpanded = !isExpanded)}
@@ -44,7 +44,12 @@
 					</Button>
 				</div>
 			{/if}
-			<Button href={`/campaigns/${campaignCtx.campaign?.id}`} variant="link" size="sm" class="text- font-normal">
+			<Button
+				href={`/campaigns/${campaignCtx.campaign?.id}`}
+				variant="link"
+				size="sm"
+				class="text- font-normal"
+			>
 				campaign
 				<ExternalLink class="size-3.5" />
 			</Button>
@@ -71,11 +76,13 @@
 			{/if}
 
 			<!-- nothing to show -->
-			 {#if !fearVisibleToPlayers && visibleCountdowns.length === 0}
+			{#if !fearVisibleToPlayers && visibleCountdowns.length === 0}
 				<div class="flex flex-wrap items-end justify-center gap-4">
-					<p class="text-xs text-muted-foreground italic">Your GM has not shared anything with you yet</p>
+					<p class="text-xs text-muted-foreground italic">
+						Your GM has not shared anything with you yet
+					</p>
 				</div>
-			 {/if}
+			{/if}
 		</div>
 	{/if}
 </div>

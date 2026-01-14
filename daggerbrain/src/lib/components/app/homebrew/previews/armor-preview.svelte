@@ -58,7 +58,9 @@
 						<p class="text-sm font-medium text-muted-foreground">
 							{feature.title || 'Unnamed feature'}
 						</p>
-						<p class="mt-0.5 text-xs text-muted-foreground">{@html renderMarkdown(feature.description_html)}</p>
+						<p class="mt-0.5 text-xs text-muted-foreground">
+							{@html renderMarkdown(feature.description_html)}
+						</p>
 					</div>
 				{/each}
 			</div>

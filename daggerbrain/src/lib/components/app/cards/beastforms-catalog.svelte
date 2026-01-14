@@ -181,7 +181,7 @@
 								<HomebrewBadge type="beastform" id={beastform.compendium_id} class="size-3" />
 							{:else if beastform.source_id === 'Campaign'}
 								<CampaignBadge type="beastform" id={beastform.compendium_id} class="size-3" />
-								{/if}
+							{/if}
 							Tier {tier}
 							{beastform.category}
 						</p>

@@ -122,7 +122,11 @@
 													class="-mt-0.5 size-4"
 												/>
 											{:else if card.source_id === 'Campaign'}
-												<CampaignBadge type="domain-cards" id={card.compendium_id} class="-mt-0.5 size-4" />
+												<CampaignBadge
+													type="domain-cards"
+													id={card.compendium_id}
+													class="-mt-0.5 size-4"
+												/>
 											{/if}
 											{getDomainName(card.domain_id)} • Level {card.level_requirement}
 										</span>

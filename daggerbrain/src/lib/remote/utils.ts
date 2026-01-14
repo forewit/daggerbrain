@@ -1,7 +1,7 @@
 import { error, type RequestEvent } from '@sveltejs/kit';
 import { drizzle } from 'drizzle-orm/d1';
 
-export const CHARACTER_LIMIT = 3;
+export const CHARACTER_LIMIT = 6;
 
 export const get_db = (event: RequestEvent) => {
 	if (!event.platform?.env?.DB) {

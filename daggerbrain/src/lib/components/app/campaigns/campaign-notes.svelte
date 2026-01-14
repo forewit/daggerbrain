@@ -9,7 +9,7 @@
 	import EyeOff from '@lucide/svelte/icons/eye-off';
 	import Pencil from '@lucide/svelte/icons/pencil';
 
-	let { class: className = '', isGM = false }: { class?: string, isGM?: boolean } = $props();
+	let { class: className = '', isGM = false }: { class?: string; isGM?: boolean } = $props();
 
 	const campaignContext = getCampaignContext();
 	const campaignState = $derived(campaignContext.campaignState);
@@ -47,36 +47,35 @@
 	const remainingChars = $derived(MAX_NOTES_LENGTH - notesLength);
 </script>
 
-<div class={cn("rounded-2xl bg-primary/10 shadow-xl p-4", className)}>
+<div class={cn('rounded-2xl bg-primary/10 p-4 shadow-xl', className)}>
 	<div class="mb-2 flex items-center justify-between">
-	<h2 class="text-lg font-semibold">
+		<h2 class="text-lg font-semibold">
+			{#if isGM}
+				Public Notes
+			{:else}
+				Campaign Notes
+			{/if}
+		</h2>
 		{#if isGM}
-		Public Notes
-		{:else}
-		Campaign Notes
+			<Button variant="ghost" size="sm" onclick={() => (showPreview = !showPreview)}>
+				{#if showPreview}
+					<Pencil class="size-4" />
+				{:else}
+					<Eye class="size-4" />
+				{/if}
+			</Button>
 		{/if}
-	</h2>
-	{#if isGM}
-	<Button variant="ghost" size="sm" onclick={() => (showPreview = !showPreview)}>
-		{#if showPreview}
-		<Pencil class="size-4" />
-		{:else}
-		<Eye class="size-4" />
-		{/if}
-
-	</Button>
-	{/if}
 	</div>
 	{#if showPreview || !isGM}
-	<div class="py-2 px-2 text-sm text-muted-foreground">
-		{@html renderMarkdown(localNotes || 'No notes')}
-	</div>
+		<div class="px-2 py-2 text-sm text-muted-foreground">
+			{@html renderMarkdown(localNotes || 'No notes')}
+		</div>
 	{:else}
-	<Textarea
-		bind:value={localNotes}
-		oninput={handleNotesChange}
-		class=" bg-background"
-		placeholder="Add campaign notes..."
-	/>
+		<Textarea
+			bind:value={localNotes}
+			oninput={handleNotesChange}
+			class=" bg-background"
+			placeholder="Add campaign notes..."
+		/>
 	{/if}
 </div>

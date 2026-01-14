@@ -537,14 +537,13 @@ function createCharacter(id: string) {
 	let derived_beastform: Beastform | null = $state(null);
 	let derived_companion: Companion | null = $state(null);
 
-
 	// Load campaign homebrew
-	$effect(()=>{
+	$effect(() => {
 		if (!character) return;
 		if (!character.campaign_id) return;
 		if (!character.settings.homebrew_enabled) return;
 		compendium.load_campaign_homebrew(character.campaign_id);
-	})
+	});
 
 	// ================================================
 	// CHARACTER VALIDATION EFFECTS
@@ -3609,9 +3608,8 @@ function createCharacter(id: string) {
 	// INVENTORY HELPER FUNCTIONS
 	// ================================================
 
-	
-	 // Add an item to the character's inventory
-	 //@param item - The item to add, where item.id is the compendium_id
+	// Add an item to the character's inventory
+	//@param item - The item to add, where item.id is the compendium_id
 	function addToInventory(
 		item: { compendium_id: string; title?: string },
 		type:
@@ -3696,10 +3694,9 @@ function createCharacter(id: string) {
 		}
 	}
 
-	
 	// Remove an item from the character's inventory
 	// @param item - The item to remove, where item.id is the unique inventory item id (or title for adventuring_gear)
-	
+
 	function removeFromInventory(
 		item: { id: string },
 		type:
@@ -3754,9 +3751,8 @@ function createCharacter(id: string) {
 		}
 	}
 
-	
 	// Equip an armor or weapon
-	 
+
 	function equipItem(
 		item: { id: string; level_requirement: number },
 		type: 'primary_weapon' | 'secondary_weapon' | 'armor'
@@ -3838,7 +3834,6 @@ function createCharacter(id: string) {
 	}
 
 	const destroy = () => {};
-
 
 	return {
 		// read only
@@ -4033,7 +4028,7 @@ function createCharacter(id: string) {
 
 		// condition helper functions
 		addCondition,
-		removeCondition,
+		removeCondition
 	};
 }
 

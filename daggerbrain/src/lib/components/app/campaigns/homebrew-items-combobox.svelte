@@ -32,7 +32,9 @@
 		HomebrewType,
 		{
 			name: string;
-			getItems: (homebrew: ReturnType<typeof getHomebrewContext>) => Array<{ id: string; name: string }>;
+			getItems: (
+				homebrew: ReturnType<typeof getHomebrewContext>
+			) => Array<{ id: string; name: string }>;
 			icon: typeof Swords;
 		}
 	> = {
@@ -56,7 +58,8 @@
 		},
 		consumable: {
 			name: 'Consumable',
-			getItems: (h) => Object.entries(h.consumables).map(([id, item]) => ({ id, name: item.title })),
+			getItems: (h) =>
+				Object.entries(h.consumables).map(([id, item]) => ({ id, name: item.title })),
 			icon: FlaskConical
 		},
 		beastform: {
@@ -84,12 +87,14 @@
 		},
 		'ancestry-cards': {
 			name: 'Ancestry Card',
-			getItems: (h) => Object.entries(h.ancestry_cards).map(([id, item]) => ({ id, name: item.title })),
+			getItems: (h) =>
+				Object.entries(h.ancestry_cards).map(([id, item]) => ({ id, name: item.title })),
 			icon: null as any // Will use cardIcon snippet
 		},
 		'community-cards': {
 			name: 'Community Card',
-			getItems: (h) => Object.entries(h.community_cards).map(([id, item]) => ({ id, name: item.title })),
+			getItems: (h) =>
+				Object.entries(h.community_cards).map(([id, item]) => ({ id, name: item.title })),
 			icon: null as any // Will use cardIcon snippet
 		},
 		'transformation-cards': {
@@ -122,7 +127,7 @@
 
 		for (const [type, config] of Object.entries(HOMEBREW_TYPE_CONFIG) as [
 			HomebrewType,
-			typeof HOMEBREW_TYPE_CONFIG[HomebrewType]
+			(typeof HOMEBREW_TYPE_CONFIG)[HomebrewType]
 		][]) {
 			const items = config
 				.getItems(homebrew)
@@ -211,12 +216,12 @@
 				<Command.Empty>No items found.</Command.Empty>
 				{#each groupedItems.groups as group (group.type)}
 					<Command.Group class="p-0">
-						<div class="flex items-center gap-2 px-2 py-1.5 text-xs font-medium text-muted-foreground">
+						<div
+							class="flex items-center gap-2 px-2 py-1.5 text-xs font-medium text-muted-foreground"
+						>
 							{#if group.type === 'loot'}
 								{@render lootIcon('size-4')}
-							{:else if ['domain-cards', 'ancestry-cards', 'community-cards', 'transformation-cards'].includes(
-								group.type
-							)}
+							{:else if ['domain-cards', 'ancestry-cards', 'community-cards', 'transformation-cards'].includes(group.type)}
 								{@render cardIcon('size-4')}
 							{:else}
 								{@const Icon = HOMEBREW_TYPE_CONFIG[group.type].icon}

@@ -14,8 +14,8 @@ import type {
 import type { ConditionIds, LevelUpChoice } from '$lib/types/rule-types';
 import type { Traits } from './compendium-types';
 
-export const UI_HOMEBREW_LIMIT = 5;
-export const UI_CHARACTER_LIMIT = 3;
+export const UI_HOMEBREW_LIMIT = 20;
+export const UI_CHARACTER_LIMIT = 6;
 
 export const BLANK_LEVEL_UP_CHOICE: LevelUpChoice = {
 	option_id: null,
