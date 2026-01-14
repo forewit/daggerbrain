@@ -18,6 +18,9 @@
 	"observability": {
 		"enabled": true
 	},
+	"limits": {
+		"cpu_ms": 50
+	},
 	"r2_buckets": [
 		{
 			"binding": "R2_IMAGES",
@@ -41,5 +44,14 @@
 			"binding": "KV",
 			"id": "c6a68fb4a3af4958a02aec33f40213ac"
 		}
-	]
+	],
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "CAMPAIGN_LIVE",
+				"class_name": "CampaignLiveDO",
+				"script_name": "daggerbrain-do"
+			}
+		]
+	},
 }

@@ -1787,6 +1787,7 @@ function createCharacter(id: string) {
 		if (!character) return;
 		character.derived_character_summary = {
 			ancestry_name: ancestry_card?.title ?? '',
+			community_name: community_card?.title ?? '',
 			primary_class_name: primary_class?.name ?? '',
 			primary_subclass_name: primary_subclass?.name ?? '',
 			secondary_class_name: secondary_class?.name ?? '',

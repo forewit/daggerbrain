@@ -39,6 +39,7 @@ export const CHARACTER_DEFAULTS = {
 	// derived character summary for campaign previews
 	derived_character_summary: <DerivedCharacterSummary>{
 		ancestry_name: '',
+		community_name: '',
 		primary_class_name: '',
 		primary_subclass_name: '',
 		secondary_class_name: '',

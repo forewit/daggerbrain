@@ -18,6 +18,9 @@
 	"observability": {
 		"enabled": false
 	},
+	"limits": {
+		"cpu_ms": 50
+	},
 	"r2_buckets": [
 		{
 			"binding": "R2_IMAGES",

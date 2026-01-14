@@ -161,6 +161,7 @@ export type Companion = z.infer<typeof CompanionSchema>;
 export type DerivedCharacterSummary = {
 	// Name descriptors
 	ancestry_name: string;
+	community_name: string;
 	primary_class_name: string;
 	primary_subclass_name: string;
 	secondary_class_name: string;
@@ -174,11 +175,6 @@ export type DerivedCharacterSummary = {
 	max_armor: number;
 	damage_thresholds: { major: number; severe: number };
 };
-
-/**
- * @deprecated Use DerivedCharacterSummary instead. This alias exists for backward compatibility.
- */
-export type DerivedDescriptors = DerivedCharacterSummary;
 
 export type BackgroundQuestionAnswer = {
 	question: string;

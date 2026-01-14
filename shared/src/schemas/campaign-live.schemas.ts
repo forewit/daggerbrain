@@ -19,6 +19,7 @@ export const CountdownSchema = z.object({
 export const DerivedCharacterSummarySchema = z.object({
   // Name descriptors
   ancestry_name: z.string(),
+  community_name: z.string(),
   primary_class_name: z.string(),
   primary_subclass_name: z.string(),
   secondary_class_name: z.string(),
