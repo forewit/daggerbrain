@@ -4,7 +4,7 @@
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Switch from '$lib/components/ui/switch/switch.svelte';
-	import type { DomainCard } from '$lib/types/compendium-types';
+	import type { DomainCard } from '@shared/types/compendium.types';
 	import { cn } from '$lib/utils';
 	import Tent from '@lucide/svelte/icons/tent';
 	import ArrowUp from '@lucide/svelte/icons/arrow-up';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Beastform } from '$lib/types/compendium-types';
+	import type { Beastform } from '@shared/types/compendium.types';
 	import BeastformCard from '$lib/components/app/cards/full-cards/beastform.svelte';
 
 	let { beastform }: { beastform: Beastform } = $props();

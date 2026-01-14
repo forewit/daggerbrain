@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import type { Snippet } from 'svelte';
-	import type { Companion } from '$lib/types/character-types';
+	import type { Companion } from '@shared/types/character.types';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getUserContext } from '$lib/state/user.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import { Input } from '$lib/components/ui/input';
 	import * as Select from '$lib/components/ui/select/';
-	import { COMPANION_LEVEL_UP_OPTION_MAXES } from '$lib/types/rules';
-	import type { CompanionLevelUpOptionIds } from '$lib/types/rule-types';
+	import { COMPANION_LEVEL_UP_OPTION_MAXES } from '@shared/constants/rules';
+	import type { CompanionLevelUpOptionIds } from '@shared/types/rule.types';
 	import CompanionEvasion from './companion-evasion.svelte';
 	import CompanionStress from './companion-stress.svelte';
 	import CompanionHope from './companion-hope.svelte';

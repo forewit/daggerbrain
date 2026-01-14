@@ -6,7 +6,7 @@
 		AncestryCard,
 		CommunityCard,
 		TransformationCard
-	} from '$lib/types/compendium-types';
+	} from '@shared/types/compendium.types';
 	import AncestryCardComponent from './full-cards/ancestry-card.svelte';
 	import CommunityCardComponent from './full-cards/community-card.svelte';
 	import TransformationCardComponent from './full-cards/transformation-card.svelte';

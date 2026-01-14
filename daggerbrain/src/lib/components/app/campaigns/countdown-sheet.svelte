@@ -7,7 +7,7 @@
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
-	import type { Countdown } from '$lib/types/campaign-types';
+	import type { Countdown } from '@shared/types/campaign.types';
 	import Plus from '@lucide/svelte/icons/plus';
 	import * as Collapsible from '$lib/components/ui/collapsible';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
@@ -209,8 +209,8 @@
 							<b>Right-clicking</b> a countdown will increase it by one.
 						</li>
 						<li>
-							<b>Visible (<Eye class="stroke- mx-0.5 -mt-0.5 inline size-3.5" />)</b> countdowns can
-							be seen by players on their character sheet.
+							<b>Visible (<Eye class="stroke- mx-0.5 -mt-0.5 inline size-3.5" />)</b> countdowns can be
+							seen by players on their character sheet.
 						</li>
 					</ul>
 				</Collapsible.Content>

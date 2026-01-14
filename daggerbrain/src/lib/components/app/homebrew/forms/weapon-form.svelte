@@ -6,7 +6,7 @@
 		TraitIds,
 		Weapon,
 		WeaponCategories
-	} from '$lib/types/compendium-types';
+	} from '@shared/types/compendium.types';
 	import * as Select from '$lib/components/ui/select';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';

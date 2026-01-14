@@ -25,7 +25,7 @@
 		SubclassFoundationCard,
 		SubclassSpecializationCard,
 		SubclassMasteryCard
-	} from '$lib/types/compendium-types';
+	} from '@shared/types/compendium.types';
 	import Features from './features/features.svelte';
 	import ContentSheet, { type SheetContent } from './content-sheet/content-sheet.svelte';
 	import Tent from '@lucide/svelte/icons/tent';

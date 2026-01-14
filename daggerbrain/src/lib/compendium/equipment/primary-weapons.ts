@@ -1,4 +1,4 @@
-import type { Weapon } from '$lib/types/compendium-types';
+import type { Weapon } from '@shared/types/compendium.types';
 
 // todo: verify all below
 export const TIER_1_PRIMARY_WEAPONS = {

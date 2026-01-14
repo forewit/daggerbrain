@@ -3,7 +3,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Collapsible from '$lib/components/ui/collapsible';
 	import * as Select from '$lib/components/ui/select';
-	import type { Weapon, Armor, Consumable, Loot, SourceIds } from '$lib/types/compendium-types';
+	import type { Weapon, Armor, Consumable, Loot, SourceIds } from '@shared/types/compendium.types';
 	import WeaponDetails from './weapon-details.svelte';
 	import ArmorDetails from './armor-details.svelte';
 	import ConsumableDetails from './consumable-details.svelte';

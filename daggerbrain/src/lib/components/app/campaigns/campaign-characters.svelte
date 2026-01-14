@@ -9,7 +9,7 @@
 	import { getUserContext } from '$lib/state/user.svelte';
 	import { toast } from 'svelte-sonner';
 	import { goto } from '$app/navigation';
-	import { UI_CHARACTER_LIMIT } from '$lib/types/constants';
+	import { UI_CHARACTER_LIMIT } from '@shared/constants/constants';
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import Loader2 from '@lucide/svelte/icons/loader-2';

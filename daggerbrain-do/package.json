@@ -1,5 +1,5 @@
 {
-  "name": "campaigns-do",
+  "name": "daggerbrain-do",
   "module": "index.ts",
   "type": "module",
   "private": true,
@@ -16,5 +16,10 @@
   },
   "peerDependencies": {
     "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@types/node": "^25.0.8",
+    "shared": "workspace:*",
+    "zod": "^4.3.5"
   }
 }

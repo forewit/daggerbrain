@@ -13,7 +13,7 @@
 	import { error } from '@sveltejs/kit';
 	import Footer from '$lib/components/app/footer.svelte';
 	import { getUserContext } from '$lib/state/user.svelte';
-	import type { CampaignWithDetails } from '$lib/types/campaign-types';
+	import type { CampaignWithDetails } from '@shared/types/campaign.types';
 	import { formatDate } from '$lib/utils';
 	import { useClerkContext } from 'svelte-clerk';
 

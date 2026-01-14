@@ -3,7 +3,7 @@
 	import BeastformComponent from '../../cards/full-cards/beastform.svelte';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import type { Beastform } from '$lib/types/compendium-types';
+	import type { Beastform } from '@shared/types/compendium.types';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import CircleMinus from '@lucide/svelte/icons/circle-minus';
 

@@ -3,12 +3,12 @@ import { error } from '@sveltejs/kit';
 import { eq, and, count } from 'drizzle-orm';
 import { z } from 'zod';
 import { characters_table, characters_table_update_schema } from '../server/db/characters.schema';
-import { get_db, get_auth, CHARACTER_LIMIT } from './utils';
+import { get_db, get_auth, CHARACTER_LIMIT, get_do } from './utils';
 import { get_user_campaigns, get_campaign_characters } from './campaigns/campaigns.remote';
 import { getCharacterAccessInternal, getCampaignAccessInternal } from '../server/permissions';
 // Note: KV caching has been removed for cost optimization - D1 reads are 500x cheaper than KV reads
-import type { Character } from '../types/character-types';
-import type { CampaignCharacterSummary } from '../types/campaign-types';
+import type { Character } from '@shared/types/character.types';
+import type { CampaignCharacterSummary } from '@shared/types/campaign.types';
 import type { RequestEvent } from '@sveltejs/kit';
 
 // Helper function to notify Durable Object about character changes
@@ -24,17 +24,18 @@ async function notifyDurableObject(
 		updates?: Partial<CampaignCharacterSummary>;
 	}
 ): Promise<void> {
-	if (!campaignId || !event.platform?.env?.CAMPAIGN_LIVE) {
-		console.log('Skipping DO notification: no campaignId or CAMPAIGN_LIVE not available');
-		return; // No campaign or DO not available, skip notification
+	if (!campaignId) {
+		console.log('Skipping DO notification: no campaignId');
+		return;
+	}
+
+	const stub = get_do(event, campaignId);
+	if (!stub) {
+		console.log('Skipping DO notification: CAMPAIGN_LIVE not available');
+		return; // DO not available, skip notification
 	}
 
 	try {
-		// Get DO instance directly instead of going through HTTP
-		const doNamespace = event.platform.env.CAMPAIGN_LIVE;
-		const id = doNamespace.idFromName(campaignId);
-		const stub = doNamespace.get(id);
-
 		// Send POST request directly to the DO
 		const response = await stub.fetch('https://do-internal/notify', {
 			method: 'POST',

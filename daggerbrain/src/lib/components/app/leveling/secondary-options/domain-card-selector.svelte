@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { DomainCard } from '$lib/types/compendium-types';
+	import type { DomainCard } from '@shared/types/compendium.types';
 	import { cn } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import * as Dialog from '$lib/components/ui/dialog/';
@@ -9,7 +9,7 @@
 	import CardCarousel from '$lib/components/app/cards/card-carousel.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import CircleMinus from '@lucide/svelte/icons/circle-minus';
-	import type { DomainCardId } from '$lib/types/character-types';
+	import type { DomainCardId } from '@shared/types/character.types';
 
 	let {
 		selected_card_id = $bindable(),

@@ -5,7 +5,7 @@
 	import ArmorCard from './equipment/armor-row.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
-	import { TRAITS } from '$lib/types/rules';
+	import { TRAITS } from '@shared/constants/rules';
 	let {
 		class: className = '',
 		onItemClick = () => {},

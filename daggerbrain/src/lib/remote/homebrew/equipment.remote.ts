@@ -8,8 +8,8 @@ import {
 	ArmorSchema,
 	LootSchema,
 	ConsumableSchema
-} from '$lib/compendium/compendium-schemas';
-import type { Weapon, Armor, Loot, Consumable } from '$lib/types/compendium-types';
+} from '@shared/schemas/compendium.schemas';
+import type { Weapon, Armor, Loot, Consumable } from '@shared/types/compendium.types';
 import {
 	homebrew_primary_weapons,
 	homebrew_secondary_weapons,

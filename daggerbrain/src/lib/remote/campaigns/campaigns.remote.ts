@@ -10,7 +10,7 @@ import {
 	campaign_characters_table
 } from '../../server/db/campaigns.schema';
 import { characters_table } from '../../server/db/characters.schema';
-import { get_db, get_auth, CHARACTER_LIMIT } from '../utils';
+import { get_db, get_auth, CHARACTER_LIMIT, get_do } from '../utils';
 import { get_all_characters } from '../characters.remote';
 import { getCampaignAccessInternal, getCharacterAccessInternal } from '../../server/permissions';
 // Note: KV caching for campaign state and characters has been removed for cost optimization
@@ -21,7 +21,7 @@ import type {
 	CampaignWithDetails,
 	CampaignJoinPreview,
 	Countdown
-} from '../../types/campaign-types';
+} from '@shared/types/campaign.types';
 import type { RequestEvent } from '@sveltejs/kit';
 
 // Helper function to generate a unique invite code
@@ -46,17 +46,18 @@ async function notifyDurableObject(
 		claimable?: boolean;
 	}
 ): Promise<void> {
-	if (!campaignId || !event.platform?.env?.CAMPAIGN_LIVE) {
-		console.log('Skipping DO notification: no campaignId or CAMPAIGN_LIVE not available');
-		return; // No campaign or DO not available, skip notification
+	if (!campaignId) {
+		console.log('Skipping DO notification: no campaignId');
+		return;
+	}
+
+	const stub = get_do(event, campaignId);
+	if (!stub) {
+		console.log('Skipping DO notification: CAMPAIGN_LIVE not available');
+		return; // DO not available, skip notification
 	}
 
 	try {
-		// Get DO instance directly instead of going through HTTP
-		const doNamespace = event.platform.env.CAMPAIGN_LIVE;
-		const id = doNamespace.idFromName(campaignId);
-		const stub = doNamespace.get(id);
-
 		// Send POST request directly to the DO
 		const response = await stub.fetch('https://do-internal/notify', {
 			method: 'POST',
@@ -97,16 +98,18 @@ async function notifyDurableObjectMemberUpdate(
 	userId: string,
 	displayName: string | null
 ): Promise<void> {
-	if (!campaignId || !event.platform?.env?.CAMPAIGN_LIVE) {
-		console.log('Skipping DO member notification: no campaignId or CAMPAIGN_LIVE not available');
+	if (!campaignId) {
+		console.log('Skipping DO member notification: no campaignId');
+		return;
+	}
+
+	const stub = get_do(event, campaignId);
+	if (!stub) {
+		console.log('Skipping DO member notification: CAMPAIGN_LIVE not available');
 		return;
 	}
 
 	try {
-		const doNamespace = event.platform.env.CAMPAIGN_LIVE;
-		const id = doNamespace.idFromName(campaignId);
-		const stub = doNamespace.get(id);
-
 		const response = await stub.fetch('https://do-internal/notify', {
 			method: 'POST',
 			headers: {

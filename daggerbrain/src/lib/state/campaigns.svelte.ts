@@ -32,9 +32,9 @@ import type {
 	Countdown,
 	CampaignLiveWebSocketMessage,
 	CampaignLiveClientMessage
-} from '$lib/types/campaign-types';
-import type { HomebrewType } from '$lib/types/homebrew-types';
-import { UI_CHARACTER_LIMIT } from '$lib/types/constants';
+} from '@shared/types/campaign.types';
+import type { HomebrewType } from '@shared/types/homebrew.types';
+import { UI_CHARACTER_LIMIT } from '@shared/constants/constants';
 import { getUserContext } from './user.svelte';
 
 // Deep merge helper for nested objects
@@ -63,7 +63,7 @@ function deepMerge<T extends Record<string, any>>(target: T, source: Partial<T>)
 	return output;
 }
 
-// Simplified merge for partial character updates (now CampaignCharacterSummary, not DerivedCharacter)
+// Simplified merge for partial character updates CampaignCharacterSummary
 function mergeCharacterLiveUpdate(
 	existing: CampaignCharacterSummary | undefined,
 	liveUpdate: CampaignCharacterLiveUpdate
@@ -347,7 +347,7 @@ function campaignContext() {
 			}
 
 			campaign = camp;
-			members = mems;
+			members = mems.map((m) => ({ ...m, role: m.role as 'gm' | 'player' }));
 			campaignState = state;
 			characters = chars;
 			vaultItems = vault;
@@ -358,7 +358,10 @@ function campaignContext() {
 			if (currentUserId) {
 				const currentUserMember = mems.find((m) => m.user_id === currentUserId);
 				if (currentUserMember) {
-					userMembership = currentUserMember;
+					userMembership = {
+						...currentUserMember,
+						role: currentUserMember.role as 'gm' | 'player'
+					};
 					lastSavedUserMembership = JSON.stringify({
 						display_name: currentUserMember.display_name
 					});

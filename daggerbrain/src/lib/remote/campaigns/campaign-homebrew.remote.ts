@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { campaign_homebrew_vault_table } from '../../server/db/campaigns.schema';
 import { get_db, get_auth } from '../utils';
 import { getCampaignAccessInternal } from '../../server/permissions';
-import type { HomebrewType } from '../../types/homebrew-types';
+import type { HomebrewType } from '@shared/types/homebrew.types';
 import type {
 	AncestryCard,
 	Armor,
@@ -21,7 +21,7 @@ import type {
 	Subclass,
 	TransformationCard,
 	Weapon
-} from '../../types/compendium-types';
+} from '@shared/types/compendium.types';
 import {
 	homebrew_primary_weapons,
 	homebrew_secondary_weapons,

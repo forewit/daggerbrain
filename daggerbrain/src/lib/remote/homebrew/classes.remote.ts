@@ -3,8 +3,8 @@ import { error } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 import { get_db, get_auth, get_kv } from '../utils';
-import { ClassSchema, SubclassSchema } from '$lib/compendium/compendium-schemas';
-import type { CharacterClass, Subclass } from '$lib/types/compendium-types';
+import { ClassSchema, SubclassSchema } from '@shared/schemas/compendium.schemas';
+import type { CharacterClass, Subclass } from '@shared/types/compendium.types';
 import { homebrew_classes, homebrew_subclasses } from '$lib/server/db/homebrew.schema';
 import { campaign_homebrew_vault_table } from '../../server/db/campaigns.schema';
 import {

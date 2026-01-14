@@ -13,7 +13,7 @@ import type {
 	CommunityCard,
 	TransformationCard,
 	Beastform
-} from '../../types/compendium-types';
+} from '@shared/types/compendium.types';
 
 // ============================================================================
 // Classes

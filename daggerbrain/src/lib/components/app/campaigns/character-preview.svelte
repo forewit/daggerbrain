@@ -2,7 +2,7 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import type { CampaignCharacterSummary } from '$lib/types/campaign-types';
+	import type { CampaignCharacterSummary } from '@shared/types/campaign.types';
 	import EvasionPreview from '$lib/components/app/sheet/character-previews/evasion-preview.svelte';
 	import ArmorPreview from '$lib/components/app/sheet/character-previews/armor-preview.svelte';
 	import DamageThresholdsPreview from '$lib/components/app/sheet/character-previews/damage-thresholds-preview.svelte';
@@ -13,7 +13,7 @@
 	import Banner from '../cards/class-banner.svelte';
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
-	import type { CharacterClass } from '$lib/types/compendium-types';
+	import type { CharacterClass } from '@shared/types/compendium.types';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 
 	let {

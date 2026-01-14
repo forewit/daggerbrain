@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import { getCharacterContext } from '$lib/state/character.svelte';
-	import { CONDITIONS } from '$lib/types/rules';
+	import { CONDITIONS } from '@shared/constants/rules';
 	import Button from '$lib/components/ui/button/button.svelte';
 
 	let {

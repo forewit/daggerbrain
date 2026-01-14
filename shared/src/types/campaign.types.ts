@@ -2,16 +2,10 @@
 // Campaign Types
 // ============================================================================
 
-import type {
-	campaigns_table,
-	campaign_members_table,
-	campaign_state_table
-} from '$lib/server/db/campaigns.schema';
-import type { DerivedCharacterSummary } from './character-types';
+import type { Campaign, CampaignMember, CampaignState } from './database.types';
+import type { DerivedCharacterSummary } from './character.types';
 
-export type Campaign = typeof campaigns_table.$inferSelect;
-export type CampaignMember = typeof campaign_members_table.$inferSelect;
-export type CampaignState = typeof campaign_state_table.$inferSelect;
+export type { Campaign, CampaignMember, CampaignState };
 
 export type Countdown = {
 	id: string; // Unique identifier for each countdown
@@ -160,4 +154,51 @@ export type CampaignLiveClientMessage =
 			characterId: string;
 			userId: string;
 			updates: Partial<CampaignCharacterLiveUpdate>;
+	  };
+
+// Additional types for WebSocket and HTTP communication
+export type CampaignStateUpdate = Partial<
+	Pick<CampaignState, 'fear_track' | 'fear_visible_to_players' | 'notes' | 'countdowns' | 'updated_at'>
+>;
+
+export type WebSocketClientMessage =
+	| {
+			type: 'rejoin';
+			lastKnownVersion?: number;
+	  }
+	| {
+			type: 'update_state';
+			updates: CampaignStateUpdate;
+	  }
+	| {
+			type: 'update_character';
+			characterId: string;
+			updates: CampaignCharacterLiveUpdate;
+	  };
+
+export type HttpNotificationBody =
+	| {
+			type: 'character_added';
+			characterId: string;
+			summary?: CampaignCharacterSummary;
+			claimable?: boolean;
+	  }
+	| {
+			type: 'character_updated';
+			characterId: string;
+			updates?: CampaignCharacterLiveUpdate;
+			claimable?: boolean;
+	  }
+	| {
+			type: 'character_removed';
+			characterId: string;
+	  }
+	| {
+			type: 'character_deleted';
+			characterId: string;
+	  }
+	| {
+			type: 'member_updated';
+			userId: string;
+			displayName: string | null;
 	  };

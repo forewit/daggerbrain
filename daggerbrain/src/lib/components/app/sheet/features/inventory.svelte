@@ -6,7 +6,7 @@
 		Consumable,
 		Loot,
 		AdventuringGear
-	} from '$lib/types/compendium-types';
+	} from '@shared/types/compendium.types';
 	import WeaponCard from './equipment/weapon-row.svelte';
 	import ArmorCard from './equipment/armor-row.svelte';
 	import ConsumableCard from './equipment/consumable-row.svelte';

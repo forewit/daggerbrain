@@ -1,4 +1,4 @@
-import type { DomainCard } from '$lib/types/compendium-types';
+import type { DomainCard } from '@shared/types/compendium.types';
 
 export const SPLENDOR_DOMAIN_CARDS = {
 	bolt_beacon: {

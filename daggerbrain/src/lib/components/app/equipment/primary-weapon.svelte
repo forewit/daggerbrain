@@ -2,7 +2,7 @@
 	import { cn, capitalize } from '$lib/utils';
 	import Hand from '@lucide/svelte/icons/hand';
 	import * as Select from '$lib/components/ui/select/';
-	import type { Weapon, Traits, DamageTypes } from '$lib/types/compendium-types';
+	import type { Weapon, Traits, DamageTypes } from '@shared/types/compendium.types';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 
 	let {

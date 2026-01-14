@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { DamageTypes, Ranges } from '$lib/types/compendium-types';
+	import type { DamageTypes, Ranges } from '@shared/types/compendium.types';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import * as Collapsible from '$lib/components/ui/collapsible';
 	import * as Select from '$lib/components/ui/select';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { cn, capitalize } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import Hand from '@lucide/svelte/icons/hand';

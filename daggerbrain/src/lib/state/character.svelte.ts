@@ -8,15 +8,15 @@ import {
 	COMPANION_BASE_EXPERIENCE_MODIFIER,
 	CONDITIONS,
 	TRAIT_OPTIONS
-} from '../types/rules';
+} from '@shared/constants/rules';
 import { getContext, setContext } from 'svelte';
 import type {
 	Character,
 	DomainCardId,
 	ChosenBeastform,
 	Companion
-} from '$lib/types/character-types';
-import type { AllTierOptionIds, ConditionIds, LevelUpChoice } from '$lib/types/rule-types';
+} from '@shared/types/character.types';
+import type { AllTierOptionIds, ConditionIds, LevelUpChoice } from '@shared/types/rule.types';
 import type {
 	DamageThresholds,
 	Traits,
@@ -35,8 +35,8 @@ import type {
 	Loot,
 	Consumable,
 	TransformationCard
-} from '$lib/types/compendium-types';
-import { BLANK_LEVEL_UP_CHOICE } from '$lib/types/constants';
+} from '@shared/types/compendium.types';
+import { BLANK_LEVEL_UP_CHOICE } from '@shared/constants/constants';
 import { update_character, get_character_by_id } from '$lib/remote/characters.remote';
 import { getCompendiumContext } from './compendium.svelte';
 import { increaseDie, increase_range } from '$lib/utils';
@@ -1379,7 +1379,7 @@ function createCharacter(id: string) {
 		if (!character) return;
 
 		const validConditionIds = Object.keys(CONDITIONS) as ConditionIds[];
-		const cleaned = character.active_conditions
+		const cleaned = (character.active_conditions as ConditionIds[])
 			.filter((condition) => validConditionIds.includes(condition))
 			.filter((condition, index, array) => array.indexOf(condition) === index)
 			.sort();

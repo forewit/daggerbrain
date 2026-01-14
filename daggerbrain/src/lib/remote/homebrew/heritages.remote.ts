@@ -7,8 +7,12 @@ import {
 	AncestryCardSchema,
 	CommunityCardSchema,
 	TransformationCardSchema
-} from '$lib/compendium/compendium-schemas';
-import type { AncestryCard, CommunityCard, TransformationCard } from '$lib/types/compendium-types';
+} from '@shared/schemas/compendium.schemas';
+import type {
+	AncestryCard,
+	CommunityCard,
+	TransformationCard
+} from '@shared/types/compendium.types';
 import {
 	homebrew_ancestry_cards,
 	homebrew_community_cards,

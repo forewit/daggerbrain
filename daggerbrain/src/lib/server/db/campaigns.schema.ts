@@ -7,7 +7,7 @@ import {
 	uniqueIndex
 } from 'drizzle-orm/sqlite-core';
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from 'drizzle-zod';
-import type { Countdown } from '../../types/campaign-types';
+import type { Countdown } from '@shared/types/campaign.types';
 
 // ============================================================================
 // Campaigns

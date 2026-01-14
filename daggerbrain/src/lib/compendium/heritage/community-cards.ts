@@ -1,4 +1,4 @@
-import type { CommunityCard } from '$lib/types/compendium-types';
+import type { CommunityCard } from '@shared/types/compendium.types';
 
 export const COMMUNITY_CARDS = {
 	warborne: {

@@ -3,8 +3,8 @@ import { error } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 import { get_db, get_auth, get_kv } from '../utils';
-import { DomainSchema, DomainCardSchema } from '$lib/compendium/compendium-schemas';
-import type { Domain, DomainCard, DomainIds } from '$lib/types/compendium-types';
+import { DomainSchema, DomainCardSchema } from '@shared/schemas/compendium.schemas';
+import type { Domain, DomainCard, DomainIds } from '@shared/types/compendium.types';
 import { homebrew_domains, homebrew_domain_cards } from '$lib/server/db/homebrew.schema';
 import { campaign_homebrew_vault_table } from '../../server/db/campaigns.schema';
 import {

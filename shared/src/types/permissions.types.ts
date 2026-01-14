@@ -4,8 +4,8 @@
  * Types for the centralized permission service.
  */
 
-import type { Campaign, CampaignMember } from './campaign-types';
-import type { Character } from './character-types';
+import type { Campaign, CampaignMember } from './campaign.types';
+import type { Character } from './character.types';
 
 export type CampaignAccess = {
 	campaign: Campaign;

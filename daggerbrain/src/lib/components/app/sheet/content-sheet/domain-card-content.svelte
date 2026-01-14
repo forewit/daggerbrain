@@ -5,8 +5,8 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { cn } from '$lib/utils';
-	import type { DomainCard } from '$lib/types/compendium-types';
-	import type { DomainCardId } from '$lib/types/character-types';
+	import type { DomainCard } from '@shared/types/compendium.types';
+	import type { DomainCardId } from '@shared/types/character.types';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import CircleMinus from '@lucide/svelte/icons/circle-minus';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';

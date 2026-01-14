@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { getCampaignAccessInternal } from '$lib/server/permissions';
-import { get_db, get_auth } from '$lib/remote/utils';
+import { get_db, get_auth, get_do } from '$lib/remote/utils';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params, platform, request, locals }) => {
@@ -25,7 +25,8 @@ export const GET: RequestHandler = async ({ params, platform, request, locals })
 	}
 
 	// Get DO instance via DurableObjectNamespace
-	if (!platform?.env?.CAMPAIGN_LIVE) {
+	const stub = get_do(event, campaignId);
+	if (!stub) {
 		// In development with vite dev, DO binding may not be available
 		// Return a helpful error message
 		console.error(
@@ -36,9 +37,6 @@ export const GET: RequestHandler = async ({ params, platform, request, locals })
 			'Durable Object service unavailable. Please use wrangler dev for local development.'
 		);
 	}
-
-	const id = platform.env.CAMPAIGN_LIVE.idFromName(campaignId);
-	const stub = platform.env.CAMPAIGN_LIVE.get(id);
 
 	// Forward the WebSocket upgrade request to the Durable Object
 	// For WebSocket upgrades, body is null, so we can safely reconstruct the request

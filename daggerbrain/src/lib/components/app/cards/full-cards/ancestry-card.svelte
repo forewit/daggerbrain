@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { AncestryCard, AncestryCardChoice } from '$lib/types/compendium-types';
+	import type { AncestryCard, AncestryCardChoice } from '@shared/types/compendium.types';
 	import { cn } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import type { Snippet } from 'svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
-	import { BASE_MIXED_ANCESTRY_CARD } from '$lib/types/rules';
+	import { BASE_MIXED_ANCESTRY_CARD } from '@shared/constants/rules';
 	import ChoiceSelector from '$lib/components/app/leveling/secondary-options/choice-selector.svelte';
 	import * as Select from '$lib/components/ui/select/';
 

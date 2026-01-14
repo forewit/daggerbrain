@@ -13,14 +13,14 @@
 	let { data } = $props();
 
 	const campaignCtx = getCampaignContext();
-	const campaignId = data.campaignId;
-	const campaignName = data.campaignName;
-	const campaignCreatedAt = data.campaignCreatedAt;
-	const gmDisplayName = data.gmDisplayName;
-	const isMember = data.isMember;
-	const userRole = data.userRole;
-	const playerCount = data.playerCount;
-	const characterImages = data.characterImages;
+	const campaignId = $derived(data.campaignId);
+	const campaignName = $derived(data.campaignName);
+	const campaignCreatedAt = $derived(data.campaignCreatedAt);
+	const gmDisplayName = $derived(data.gmDisplayName);
+	const isMember = $derived(data.isMember);
+	const userRole = $derived(data.userRole);
+	const playerCount = $derived(data.playerCount);
+	const characterImages = $derived(data.characterImages);
 
 	// Set the campaign ID in context so joinCampaign can use it
 	$effect(() => {

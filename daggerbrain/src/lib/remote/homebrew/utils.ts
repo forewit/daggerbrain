@@ -15,7 +15,7 @@ import {
 	homebrew_community_cards,
 	homebrew_transformation_cards
 } from '$lib/server/db/homebrew.schema';
-import { isEnabledHomebrewType, type HomebrewType } from '$lib/types/homebrew-types';
+import { isEnabledHomebrewType, type HomebrewType } from '@shared/types/homebrew.types';
 
 export const HOMEBREW_LIMIT = 20;
 

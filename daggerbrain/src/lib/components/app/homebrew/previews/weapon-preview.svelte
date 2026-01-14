@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { DamageTypes, Weapon } from '$lib/types/compendium-types';
+	import type { DamageTypes, Weapon } from '@shared/types/compendium.types';
 	import { capitalize, applyProficiencyToDice, level_to_tier } from '$lib/utils';
 	import Hand from '@lucide/svelte/icons/hand';
 	import WeaponRow from '../../sheet/features/equipment/weapon-row.svelte';
-	import { TRAITS } from '$lib/types/rules';
+	import { TRAITS } from '@shared/constants/rules';
 
 	let { weapon }: { weapon: Weapon } = $props();
 
@@ -21,17 +21,19 @@
 	};
 
 	// For preview: use first available trait and damage type, proficiency = 1
-	const currentTrait = weapon.available_traits[0] || null;
-	const currentDamageType = weapon.available_damage_types[0] || null;
+	const currentTrait = $derived(weapon.available_traits[0] || null);
+	const currentDamageType = $derived(weapon.available_damage_types[0] || null);
 	const proficiency = 1; // Default for preview
 
 	// Calculate to hit: just weapon attack_roll_bonus (no trait bonus in preview)
-	const toHit = weapon.attack_roll_bonus;
-	const formattedToHit = toHit >= 0 ? `+${toHit}` : `${toHit}`;
+	const toHit = $derived(weapon.attack_roll_bonus);
+	const formattedToHit = $derived(toHit >= 0 ? `+${toHit}` : `${toHit}`);
 
 	// Format damage (with proficiency = 1, so no change)
-	const diceWithProficiency = applyProficiencyToDice(weapon.damage_dice, proficiency);
-	const formattedDamage = `${diceWithProficiency}${weapon.damage_bonus > 0 ? '+' + weapon.damage_bonus : ''}${currentDamageType ? ' ' + currentDamageType : ''}`;
+	const diceWithProficiency = $derived(applyProficiencyToDice(weapon.damage_dice, proficiency));
+	const formattedDamage = $derived(
+		`${diceWithProficiency}${weapon.damage_bonus > 0 ? '+' + weapon.damage_bonus : ''}${currentDamageType ? ' ' + currentDamageType : ''}`
+	);
 </script>
 
 <!-- weapon content preview -->

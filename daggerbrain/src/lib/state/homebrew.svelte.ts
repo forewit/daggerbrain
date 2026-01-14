@@ -12,7 +12,7 @@ import type {
 	Subclass,
 	TransformationCard,
 	Weapon
-} from '$lib/types/compendium-types';
+} from '@shared/types/compendium.types';
 import { getContext, setContext } from 'svelte';
 import { SvelteSet } from 'svelte/reactivity';
 import {

@@ -29,7 +29,11 @@ import {
 	homebrew_transformation_cards,
 	homebrew_beastforms
 } from './db/homebrew.schema';
-import type { CampaignAccess, CharacterAccess, HomebrewAccess } from '../types/permissions-types';
+import type {
+	CampaignAccess,
+	CharacterAccess,
+	HomebrewAccess
+} from '@shared/types/permissions.types';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
 
 // Homebrew type enum for validation (internal use only, not exported)
@@ -101,7 +105,7 @@ export async function getCampaignAccessInternal(
 
 	return {
 		campaign,
-		membership: membership ?? null,
+		membership: membership ? { ...membership, role: membership.role as 'gm' | 'player' } : null,
 		role,
 		canView: !!membership,
 		canEdit: role === 'gm'

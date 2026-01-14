@@ -1,4 +1,4 @@
-import type { AncestryCard } from '$lib/types/compendium-types';
+import type { AncestryCard } from '@shared/types/compendium.types';
 
 export const ANCESTRY_CARDS = {
 	// todo: verify everything below

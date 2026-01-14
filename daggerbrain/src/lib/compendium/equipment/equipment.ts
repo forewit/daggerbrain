@@ -1,4 +1,4 @@
-import type { Armor, Consumable, Loot, Weapon } from '$lib/types/compendium-types';
+import type { Armor, Consumable, Loot, Weapon } from '@shared/types/compendium.types';
 import { TIER_1_ARMOR, TIER_2_ARMOR, TIER_3_ARMOR, TIER_4_ARMOR } from './armor';
 import { CONSUMABLES } from './consumables';
 import { LOOT } from './loot';

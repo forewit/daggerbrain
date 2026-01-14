@@ -22,7 +22,7 @@
 		TransformationCard,
 		DomainIds,
 		Feature
-	} from '$lib/types/compendium-types';
+	} from '@shared/types/compendium.types';
 	import Search from '@lucide/svelte/icons/search';
 	import Shield from '@lucide/svelte/icons/shield';
 	import Swords from '@lucide/svelte/icons/swords';
@@ -38,8 +38,8 @@
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { goto } from '$app/navigation';
-	import { ENABLED_HOMEBREW_TYPES, type HomebrewType } from '$lib/types/homebrew-types';
-	import { UI_HOMEBREW_LIMIT } from '$lib/types/constants';
+	import { ENABLED_HOMEBREW_TYPES, type HomebrewType } from '@shared/types/homebrew.types';
+	import { UI_HOMEBREW_LIMIT } from '@shared/constants/constants';
 
 	// Helper to check if a homebrew type is enabled
 	function isTypeEnabled(type: HomebrewType): boolean {

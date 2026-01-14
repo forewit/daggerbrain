@@ -1,7 +1,7 @@
 <!-- src/lib/components/app/campaigns/countdown.svelte -->
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import type { Countdown } from '$lib/types/campaign-types';
+	import type { Countdown } from '@shared/types/campaign.types';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Eye from '@lucide/svelte/icons/eye';
 	import EyeOff from '@lucide/svelte/icons/eye-off';

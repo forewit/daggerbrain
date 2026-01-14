@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { DomainCardChoice } from '$lib/types/compendium-types';
+	import type { DomainCardChoice } from '@shared/types/compendium.types';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import * as Select from '$lib/components/ui/select';
 	import Button from '$lib/components/ui/button/button.svelte';

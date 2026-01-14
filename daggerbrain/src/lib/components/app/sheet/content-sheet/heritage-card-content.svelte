@@ -6,7 +6,7 @@
 		AncestryCard,
 		CommunityCard,
 		TransformationCard
-	} from '$lib/types/compendium-types';
+	} from '@shared/types/compendium.types';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import CircleMinus from '@lucide/svelte/icons/circle-minus';
 	import HomebrewBadge from '../../homebrew/homebrew-badge.svelte';

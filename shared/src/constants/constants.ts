@@ -10,9 +10,9 @@ import type {
 	Inventory,
 	ChosenBeastform,
 	Companion
-} from '$lib/types/character-types';
-import type { ConditionIds, LevelUpChoice } from '$lib/types/rule-types';
-import type { Traits } from './compendium-types';
+} from '../types/character.types';
+import type { ConditionIds, LevelUpChoice } from '../types/rule.types';
+import type { Traits } from '../types/compendium.types';
 
 export const UI_HOMEBREW_LIMIT = 20;
 export const UI_CHARACTER_LIMIT = 6;

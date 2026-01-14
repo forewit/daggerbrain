@@ -1,0 +1,9 @@
+{
+  "name": "daggerbrain-monorepo",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "daggerbrain-do",
+    "daggerbrain"
+  ]
+}

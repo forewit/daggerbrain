@@ -7,8 +7,8 @@ import {
 	ArmorSchema,
 	ConsumableSchema,
 	LootSchema
-} from '$lib/compendium/compendium-schemas';
-import type { Weapon, Armor, Consumable, Loot } from '$lib/types/compendium-types';
+} from '@shared/schemas/compendium.schemas';
+import type { Weapon, Armor, Consumable, Loot } from '@shared/types/compendium.types';
 
 // Primary Weapons
 export const get_all_primary_weapons = query(async () => {

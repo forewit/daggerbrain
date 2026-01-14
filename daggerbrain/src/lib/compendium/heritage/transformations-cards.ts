@@ -1,4 +1,4 @@
-import type { TransformationCard } from '$lib/types/compendium-types';
+import type { TransformationCard } from '@shared/types/compendium.types';
 
 export const TRANSFORMATION_CARDS = {
 	werewolf: {

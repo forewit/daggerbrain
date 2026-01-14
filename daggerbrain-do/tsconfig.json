@@ -14,12 +14,10 @@
     "verbatimModuleSyntax": true,
     "noEmit": true,
 
-    // Path aliases to import types from main project
+    // Path aliases
     "baseUrl": ".",
     "paths": {
-      "$lib/types/*": ["../daggerbrain/src/lib/types/*"],
-      "$lib/server/*": ["../daggerbrain/src/lib/server/*"],
-      "$lib/*": ["../daggerbrain/src/lib/*"]
+      "@shared/*": ["../shared/src/*"]
     },
 
     // Best practices

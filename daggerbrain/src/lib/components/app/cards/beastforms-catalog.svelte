@@ -2,7 +2,7 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Select from '$lib/components/ui/select';
-	import type { Beastform, SourceIds } from '$lib/types/compendium-types';
+	import type { Beastform, SourceIds } from '@shared/types/compendium.types';
 	import BeastformComponent from './full-cards/beastform.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
@@ -22,6 +22,7 @@
 	} = $props();
 
 	let searchQuery = $state('');
+	// svelte-ignore state_referenced_locally
 	let tierFilter = $state<'1' | '2' | '3' | '4' | ''>(initialTierFilter);
 	let sourceFilter = $state<SourceIds | ''>('');
 

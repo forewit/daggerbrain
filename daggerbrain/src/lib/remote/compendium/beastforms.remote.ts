@@ -2,8 +2,8 @@ import { query, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { z } from 'zod';
 import { get_kv, get_auth } from '../utils';
-import { BeastformSchema } from '$lib/compendium/compendium-schemas';
-import type { Beastform } from '$lib/types/compendium-types';
+import { BeastformSchema } from '@shared/schemas/compendium.schemas';
+import type { Beastform } from '@shared/types/compendium.types';
 
 // Beastforms
 export const get_all_beastforms = query(async () => {

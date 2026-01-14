@@ -1,4 +1,4 @@
-import type { Source, SourceIds } from '$lib/types/compendium-types';
+import type { Source, SourceIds } from '@shared/types/compendium.types';
 
 export const SOURCES = {
 	'Void 1.5': {

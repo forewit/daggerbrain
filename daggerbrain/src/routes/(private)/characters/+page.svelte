@@ -10,7 +10,7 @@
 	import { getUserContext } from '$lib/state/user.svelte';
 	import { error } from '@sveltejs/kit';
 	import Footer from '$lib/components/app/footer.svelte';
-	import { UI_CHARACTER_LIMIT } from '$lib/types/constants';
+	import { UI_CHARACTER_LIMIT } from '@shared/constants/constants';
 
 	const user = getUserContext();
 

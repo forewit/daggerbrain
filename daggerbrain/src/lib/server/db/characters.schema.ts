@@ -12,17 +12,14 @@ import type {
 	Inventory,
 	ChosenBeastform,
 	Companion
-} from '../../types/character-types';
-import type { DomainIds, Traits } from '../../types/compendium-types';
-import { CHARACTER_DEFAULTS } from '../../types/constants';
+} from '@shared/types/character.types';
+import type { DomainIds, Traits } from '@shared/types/compendium.types';
+import { CHARACTER_DEFAULTS } from '@shared/constants/constants';
 import {
-	RangesSchema,
 	DomainIdsSchema,
-	TraitIdsSchema,
-	DamageTypesSchema
-} from '../../compendium/compendium-schemas';
-import type { ConditionIds } from '$lib/types/rule-types';
-import { z } from 'zod';
+} from '@shared/schemas/compendium.schemas';
+import { ChosenBeastformSchema, CompanionSchema } from '@shared/schemas/character.schemas';
+import type { ConditionIds } from '@shared/types/rule.types';
 
 export const characters_table = sqliteTable(
 	'characters_table',
@@ -176,36 +173,7 @@ export const characters_table = sqliteTable(
 	]
 );
 
-export const ChosenBeastformSchema = z.object({
-	apply_beastform_bonuses: z.boolean(),
-	compendium_id: z.string(),
-	choices: z.record(z.string(), z.array(z.string())),
-	custom_title: z.string().nullable(),
-	custom_level_requirement: z.number().nullable()
-});
-
-export const CompanionSchema = z.object({
-	name: z.string(),
-	image_url: z.string(),
-	attack: z
-		.object({
-			name: z.string(),
-			range: RangesSchema,
-			damage_dice: z.string(),
-			damage_bonus: z.number(),
-			damage_type: DamageTypesSchema
-		})
-		.nullable(),
-	max_stress: z.number(),
-	marked_stress: z.number(),
-	max_hope: z.number(),
-	marked_hope: z.number(),
-	evasion: z.number(),
-	level_up_choices: z.array(z.string()),
-	experiences: z.array(z.string()),
-	experience_modifiers: z.array(z.number()),
-	choices: z.record(z.string(), z.array(z.string()))
-});
+// ChosenBeastformSchema and CompanionSchema are now imported from @shared
 
 export const characters_table_schema = createSelectSchema(characters_table, {
 	secondary_class_domain_id_choice: DomainIdsSchema.nullable(),
@@ -228,3 +196,5 @@ export const characters_table_update_schema = createUpdateSchema(characters_tabl
 	// Note: id is not omitted here because it's needed for WHERE clauses, but it won't be updated
 	// Note: claimable status is now stored in campaign_characters_table
 });
+
+

@@ -10,7 +10,7 @@
 	import AncestryCard from '$lib/components/app/cards/full-cards/ancestry-card.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
-	import { BASE_MIXED_ANCESTRY_CARD } from '$lib/types/rules.js';
+	import { BASE_MIXED_ANCESTRY_CARD } from '@shared/constants/rules.js';
 	import { SOURCES } from '$lib/compendium/sources/sources.js';
 
 	let { data } = $props();

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { CharacterCondition, DomainIds } from '$lib/types/compendium-types';
+	import type { CharacterCondition, DomainIds } from '@shared/types/compendium.types';
 	import * as Select from '$lib/components/ui/select';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';

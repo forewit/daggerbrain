@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
-import type { HomebrewType } from '$lib/types/homebrew-types';
-import { isEnabledHomebrewType } from '$lib/types/homebrew-types';
+import type { HomebrewType } from '@shared/types/homebrew.types';
+import { isEnabledHomebrewType } from '@shared/types/homebrew.types';
 
 export const load: LayoutServerLoad = async ({ params }) => {
 	const { type, uid } = params;

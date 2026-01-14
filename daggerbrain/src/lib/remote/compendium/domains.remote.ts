@@ -6,8 +6,8 @@ import {
 	DomainIdsSchema,
 	DomainCardSchema,
 	DomainSchema
-} from '$lib/compendium/compendium-schemas';
-import type { Domain, DomainCard, DomainIds } from '$lib/types/compendium-types';
+} from '@shared/schemas/compendium.schemas';
+import type { Domain, DomainCard, DomainIds } from '@shared/types/compendium.types';
 
 export const get_all_domains = query(async () => {
 	const event = getRequestEvent();

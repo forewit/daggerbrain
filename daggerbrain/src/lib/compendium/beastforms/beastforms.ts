@@ -1,4 +1,4 @@
-import type { Beastform } from '$lib/types/compendium-types';
+import type { Beastform } from '@shared/types/compendium.types';
 
 const TIER_1_BEASTFORMS = {
 	agile_scout: {

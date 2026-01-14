@@ -1,4 +1,4 @@
-import type { CharacterClass } from '$lib/types/compendium-types';
+import type { CharacterClass } from '@shared/types/compendium.types';
 
 export const CLASSES = {
 	assassin: {

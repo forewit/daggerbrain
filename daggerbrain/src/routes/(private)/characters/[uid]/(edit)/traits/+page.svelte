@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { getCharacterContext } from '$lib/state/character.svelte';
-	import { type Traits } from '$lib/types/compendium-types';
+	import { type Traits } from '@shared/types/compendium.types';
 	import * as Select from '$lib/components/ui/select';
 	import { capitalize } from '$lib/utils';
 	import { cn } from '$lib/utils';
-	import { TRAIT_OPTIONS } from '$lib/types/rules';
+	import { TRAIT_OPTIONS } from '@shared/constants/rules';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
 

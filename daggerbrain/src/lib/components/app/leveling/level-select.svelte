@@ -3,7 +3,7 @@
 	import * as Select from '$lib/components/ui/select';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import { cn } from '$lib/utils';
-	import type { LevelUpChoices } from '$lib/types/character-types';
+	import type { LevelUpChoices } from '@shared/types/character.types';
 
 	let {
 		level = $bindable(),

@@ -1,4 +1,4 @@
-import type { DomainIds, Domain } from '$lib/types/compendium-types';
+import type { DomainIds, Domain } from '@shared/types/compendium.types';
 
 export const DOMAINS = {
 	arcana: {

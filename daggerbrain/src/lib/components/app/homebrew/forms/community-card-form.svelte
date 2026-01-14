@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Feature, CommunityCard } from '$lib/types/compendium-types';
+	import type { Feature, CommunityCard } from '@shared/types/compendium.types';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';

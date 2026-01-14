@@ -10,9 +10,9 @@ import {
 	delete_campaign
 } from '$lib/remote/campaigns/campaigns.remote';
 import { upload_user_image } from '$lib/remote/images.remote';
-import type { User } from '$lib/types/user-types';
-import type { Character } from '$lib/types/character-types';
-import type { CampaignWithDetails } from '$lib/types/campaign-types';
+import type { User } from '@shared/types/user.types';
+import type { Character } from '@shared/types/character.types';
+import type { CampaignWithDetails } from '@shared/types/campaign.types';
 import { getContext, setContext } from 'svelte';
 import { error } from '@sveltejs/kit';
 

@@ -7,7 +7,7 @@
 	"name": "daggerbrain",
 	"main": ".svelte-kit/cloudflare/_worker.js",
 	"compatibility_date": "2025-11-18",
-	"compatibility_flags": ["nodejs_als"],
+	"compatibility_flags": ["nodejs_compat"],
 	"assets": {
 		"binding": "ASSETS",
 		"directory": ".svelte-kit/cloudflare",
@@ -47,7 +47,7 @@
 			{
 				"name": "CAMPAIGN_LIVE",
 				"class_name": "CampaignLiveDO",
-				"script_name": "campaigns-do"
+				"script_name": "daggerbrain-do"
 			}
 		]
 	},

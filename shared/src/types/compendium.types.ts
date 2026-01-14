@@ -29,7 +29,7 @@ import type {
 	SourcesSchema,
 	AncestryCardChoiceSchema,
 	BeastformSchema
-} from '$lib/compendium/compendium-schemas';
+} from '../schemas/compendium.schemas';
 import type { z } from 'zod';
 
 // ============================================================================

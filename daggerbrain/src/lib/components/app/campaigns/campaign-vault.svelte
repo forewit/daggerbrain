@@ -7,9 +7,9 @@
 	import * as Select from '$lib/components/ui/select';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
-	import type { HomebrewType } from '$lib/types/homebrew-types';
+	import type { HomebrewType } from '@shared/types/homebrew.types';
 	import CircleMinus from '@lucide/svelte/icons/circle-minus';
-	import type { DomainIds } from '$lib/types/compendium-types';
+	import type { DomainIds } from '@shared/types/compendium.types';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 	import Plus from '@lucide/svelte/icons/plus';
 	import HomebrewItemsCombobox from './homebrew-items-combobox.svelte';

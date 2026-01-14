@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import Dropdown from './dropdown.svelte';
 	import PrimaryClassSelector from './secondary-options/primary-class-selector.svelte';
 	import PrimarySubclassSelector from './secondary-options/primary-subclass-selector.svelte';

@@ -4,8 +4,8 @@ import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 import { get_db, get_auth, get_kv } from '../utils';
 import { campaign_homebrew_vault_table } from '../../server/db/campaigns.schema';
-import { BeastformSchema } from '$lib/compendium/compendium-schemas';
-import type { Beastform } from '$lib/types/compendium-types';
+import { BeastformSchema } from '@shared/schemas/compendium.schemas';
+import type { Beastform } from '@shared/types/compendium.types';
 import { homebrew_beastforms } from '$lib/server/db/homebrew.schema';
 import {
 	verifyOwnership,

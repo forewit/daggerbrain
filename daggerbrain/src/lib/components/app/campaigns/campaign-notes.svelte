@@ -4,7 +4,7 @@
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import { getCampaignContext } from '$lib/state/campaigns.svelte';
 	import { cn } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import Eye from '@lucide/svelte/icons/eye';
 	import EyeOff from '@lucide/svelte/icons/eye-off';
 	import Pencil from '@lucide/svelte/icons/pencil';
@@ -41,10 +41,7 @@
 		};
 	}
 
-	let showPreview = $state(false);
-	const MAX_NOTES_LENGTH = 10000;
-	const notesLength = $derived(localNotes.length);
-	const remainingChars = $derived(MAX_NOTES_LENGTH - notesLength);
+	let showPreview = $state(true);
 </script>
 
 <div class={cn('rounded-2xl bg-primary/10 p-4 shadow-xl', className)}>

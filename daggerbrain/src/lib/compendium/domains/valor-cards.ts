@@ -1,4 +1,4 @@
-import type { DomainCard } from '$lib/types/compendium-types';
+import type { DomainCard } from '@shared/types/compendium.types';
 
 export const VALOR_DOMAIN_CARDS = {
 	bare_bones: {

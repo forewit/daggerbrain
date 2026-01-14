@@ -1,4 +1,4 @@
-import type { Subclass } from '$lib/types/compendium-types';
+import type { Subclass } from '@shared/types/compendium.types';
 
 export const SUBCLASSES = {
 	assassin_executioners_guild: {

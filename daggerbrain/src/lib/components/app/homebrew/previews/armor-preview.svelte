@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { Armor } from '$lib/types/compendium-types';
+	import type { Armor } from '@shared/types/compendium.types';
 	import { level_to_tier } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import Shield from '@lucide/svelte/icons/shield';
 
 	let { armor }: { armor: Armor } = $props();

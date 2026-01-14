@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { Beastform } from '$lib/types/compendium-types';
+	import type { Beastform } from '@shared/types/compendium.types';
 	import type { Snippet } from 'svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import * as Select from '$lib/components/ui/select/';
 	import { capitalize, cn, applyProficiencyToDice, level_to_tier } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 
 	let {
 		show_choices = false,

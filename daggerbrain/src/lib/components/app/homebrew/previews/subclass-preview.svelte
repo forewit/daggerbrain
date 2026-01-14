@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Subclass } from '$lib/types/compendium-types';
+	import type { Subclass } from '@shared/types/compendium.types';
 	import SubclassCard from '$lib/components/app/cards/full-cards/subclass-card.svelte';
 
 	let { subclass }: { subclass: Subclass } = $props();

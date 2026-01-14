@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { HomebrewType } from '$lib/types/homebrew-types';
+	import type { HomebrewType } from '@shared/types/homebrew.types';
 	import type {
 		Weapon,
 		Armor,
@@ -13,7 +13,7 @@
 		TransformationCard,
 		DomainCard,
 		DomainIds
-	} from '$lib/types/compendium-types';
+	} from '@shared/types/compendium.types';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { cn } from '$lib/utils';

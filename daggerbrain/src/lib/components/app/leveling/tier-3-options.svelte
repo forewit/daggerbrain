@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import * as Select from '$lib/components/ui/select/';
-	import { TIER_2_BASE_OPTIONS, TIER_3_BASE_OPTIONS } from '$lib/types/rules';
+	import { TIER_2_BASE_OPTIONS, TIER_3_BASE_OPTIONS } from '@shared/constants/rules';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import Dropdown from './dropdown.svelte';
 	import {
@@ -16,7 +16,7 @@
 	import TierOptionsGroup from './tier-options-group.svelte';
 	import SecondarySubclassSelector from './secondary-options/secondary-subclass-selector.svelte';
 	import SecondaryClassSelector from './secondary-options/secondary-class-selector.svelte';
-	import { BLANK_LEVEL_UP_CHOICE } from '$lib/types/constants';
+	import { BLANK_LEVEL_UP_CHOICE } from '@shared/constants/constants';
 
 	let {
 		class: className = '',

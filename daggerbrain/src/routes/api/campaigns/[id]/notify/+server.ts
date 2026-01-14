@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { getCampaignAccessInternal } from '$lib/server/permissions';
-import { get_db, get_auth } from '$lib/remote/utils';
+import { get_db, get_auth, get_do } from '$lib/remote/utils';
 import type { RequestEvent } from '@sveltejs/kit';
 import { z } from 'zod';
 
@@ -50,13 +50,11 @@ export async function POST({ params, platform, request, locals }: RequestEvent) 
 	}
 
 	// Get DO instance
-	if (!platform?.env?.CAMPAIGN_LIVE) {
+	const stub = get_do(event, campaignId);
+	if (!stub) {
 		console.error('CAMPAIGN_LIVE Durable Object binding not available.');
 		throw error(503, 'Durable Object service unavailable.');
 	}
-
-	const id = platform.env.CAMPAIGN_LIVE.idFromName(campaignId);
-	const stub = platform.env.CAMPAIGN_LIVE.get(id);
 
 	try {
 		const rawBody = await request.json();

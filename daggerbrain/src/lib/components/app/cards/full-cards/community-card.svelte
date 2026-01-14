@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { CommunityCard } from '$lib/types/compendium-types';
+	import type { CommunityCard } from '@shared/types/compendium.types';
 	import { cn } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import type { Snippet } from 'svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 

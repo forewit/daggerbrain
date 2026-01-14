@@ -1,5 +1,5 @@
-import type { CharacterModifier, TraitIds as TraitIds } from '$lib/types/compendium-types';
-import type { DomainCardId } from './character-types';
+import type { CharacterModifier, TraitIds as TraitIds } from './compendium.types';
+import type { DomainCardId } from './character.types';
 
 export type CompanionLevelUpOptionIds =
 	| 'intelligent'

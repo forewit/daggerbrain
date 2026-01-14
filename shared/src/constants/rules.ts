@@ -9,9 +9,9 @@ import type {
 	Tier3OptionIds,
 	Tier4OptionIds,
 	Trait
-} from '$lib/types/rule-types';
-import type { AncestryCard, Armor, TraitIds, Weapon } from '$lib/types/compendium-types';
-import type { Companion } from './character-types';
+} from '../types/rule.types';
+import type { AncestryCard, Armor, TraitIds, Weapon } from '../types/compendium.types';
+import type { Companion } from '../types/character.types';
 
 export const CONDITIONS: Record<ConditionIds, Condition> = {
 	hidden: {

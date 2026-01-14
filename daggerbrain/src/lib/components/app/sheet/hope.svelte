@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import * as Select from '$lib/components/ui/select';
-	import { TRAITS } from '$lib/types/rules';
-	import type { TraitIds } from '$lib/types/compendium-types';
+	import { TRAITS } from '@shared/constants/rules';
+	import type { TraitIds } from '@shared/types/compendium.types';
 
 	let { class: className = '' }: { class?: string } = $props();
 

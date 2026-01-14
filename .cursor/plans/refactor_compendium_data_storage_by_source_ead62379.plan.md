@@ -178,7 +178,7 @@ All remote functions in `daggerbrain/src/lib/remote/compendium/` need to be upda
 Create a type for the source data structure:
 
 ```typescript
-type SourceCompendiumData = {
+ype SourceCompendiumData = {
   classes: Record<string, CharacterClass>;
   subclasses: Record<string, Subclass>;
   domains: Record<string, Domain>;

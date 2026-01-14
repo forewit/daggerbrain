@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import type { DomainIds } from '$lib/types/compendium-types';
+	import type { DomainIds } from '@shared/types/compendium.types';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	let {
 		class: className = '',

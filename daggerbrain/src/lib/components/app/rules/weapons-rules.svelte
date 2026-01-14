@@ -34,8 +34,7 @@
 			maximum burden is 2 hands.
 		</li>
 		<li>
-			<b>Feature</b> — A weapon's feature is a special rule that stays in effect while the weapon is
-			equipped.
+			<b>Feature</b> — A weapon's feature is a special rule that stays in effect while the weapon is equipped.
 		</li>
 	</ul>
 	<p class="pt-2">

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { DomainCard, DomainCardChoice } from '$lib/types/compendium-types';
+	import type { DomainCard, DomainCardChoice } from '@shared/types/compendium.types';
 	import { cn } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import type { Snippet } from 'svelte';
 	import DomainBanner from '../domain-banner.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';

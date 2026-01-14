@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { DomainCard } from '$lib/types/compendium-types';
+	import type { DomainCard } from '@shared/types/compendium.types';
 	import DomainCardComponent from '$lib/components/app/cards/full-cards/domain-card.svelte';
 
 	let { card }: { card: DomainCard } = $props();

@@ -4,7 +4,7 @@
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 	import * as Command from '$lib/components/ui/command';
 	import * as Select from '$lib/components/ui/select';
-	import type { HomebrewType } from '$lib/types/homebrew-types';
+	import type { HomebrewType } from '@shared/types/homebrew.types';
 	import Swords from '@lucide/svelte/icons/swords';
 	import Shield from '@lucide/svelte/icons/shield';
 	import PawPrint from '@lucide/svelte/icons/paw-print';

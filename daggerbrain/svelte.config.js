@@ -14,6 +14,9 @@ const config = {
 		adapter: adapter({
 			fallback: 'spa'
 		}),
+		alias: {
+			'@shared': '../shared/src'
+		},
 		experimental: {
 			remoteFunctions: true
 		}

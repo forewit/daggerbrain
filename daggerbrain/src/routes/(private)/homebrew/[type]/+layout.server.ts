@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
-import { isEnabledHomebrewType, type HomebrewType } from '$lib/types/homebrew-types';
+import { isEnabledHomebrewType, type HomebrewType } from '@shared/types/homebrew.types';
 
 // All valid homebrew types for URL routing validation
 const ALL_HOMEBREW_TYPES: HomebrewType[] = [
