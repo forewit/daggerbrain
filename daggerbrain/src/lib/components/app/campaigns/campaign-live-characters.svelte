@@ -22,7 +22,7 @@
 </script>
 
 <div
-	class="mt-8 flex flex-col items-center border-accent/10 bg-accent/5 px-2 py-8 sm:mx-auto sm:rounded-3xl sm:border sm:px-8 sm:py-6"
+	class="mt-8 flex flex-col items-center border-accent/10 bg-accent/5 px-2 pt-7 pb-10 sm:mx-auto sm:rounded-3xl border-y sm:border sm:px-8 sm:pt-5 sm:pb-8"
 >
 	<div class="mb-8 flex items-center justify-center gap-4 sm:mb-6">
 		<p class="text-center font-eveleth text-accent">Characters</p>
@@ -50,7 +50,7 @@
 				<!-- Character Previews Grid -->
 				{#each characterList as character}
 					{@const canEdit = isGM || user.user?.clerk_id === character.owner_user_id}
-					<CharacterPreview {character} campaignId={campaignContext.campaignId} {canEdit} />
+					<CharacterPreview {character} {canEdit} />
 				{/each}
 			{:else}
 				<!-- Active Characters Grid -->
@@ -58,7 +58,7 @@
 					{@const playerName =
 						char.owner_name || (char.owner_user_id === user.user?.clerk_id ? 'you' : 'Anonymous')}
 					{@const canEdit = isGM || user.user?.clerk_id === char.owner_user_id}
-					<div class="mx-auto w-full overflow-hidden rounded-lg shadow">
+					<div class="mx-auto w-full overflow-hidden rounded-lg shadow-lg">
 						<a
 							href={`/characters/${char.id}/`}
 							class="flex gap-2 rounded-t-lg border bg-background p-1 hover:bg-background/80"

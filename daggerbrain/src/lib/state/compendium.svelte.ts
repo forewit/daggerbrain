@@ -229,8 +229,8 @@ function createCompendium() {
 	let ancestry_cards: Record<string, AncestryCard> = $derived(
 		Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.ancestry_cards,
 				...homebrewContext.ancestry_cards,
+				...campaign_homebrew.ancestry_cards,
 				...accessible_content.ancestry_cards
 			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
@@ -238,8 +238,8 @@ function createCompendium() {
 	let community_cards: Record<string, CommunityCard> = $derived(
 		Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.community_cards,
 				...homebrewContext.community_cards,
+				...campaign_homebrew.community_cards,
 				...accessible_content.community_cards
 			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
@@ -247,8 +247,8 @@ function createCompendium() {
 	let transformation_cards: Record<string, TransformationCard> = $derived(
 		Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.transformation_cards,
 				...homebrewContext.transformation_cards,
+				...campaign_homebrew.transformation_cards,
 				...accessible_content.transformation_cards
 			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
@@ -256,8 +256,8 @@ function createCompendium() {
 	let beastforms: Record<string, Beastform> = $derived(
 		Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.beastforms,
 				...homebrewContext.beastforms,
+				...campaign_homebrew.beastforms,
 				...accessible_content.beastforms
 			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
@@ -265,8 +265,8 @@ function createCompendium() {
 	let classes: Record<string, CharacterClass> = $derived(
 		Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.classes,
 				...homebrewContext.classes,
+				...campaign_homebrew.classes,
 				...accessible_content.classes
 			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
@@ -274,8 +274,8 @@ function createCompendium() {
 	let subclasses: Record<string, Subclass> = $derived(
 		Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.subclasses,
 				...homebrewContext.subclasses,
+				...campaign_homebrew.subclasses,
 				...accessible_content.subclasses
 			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
@@ -283,8 +283,8 @@ function createCompendium() {
 	let domains: Record<string, Domain> = $derived(
 		Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.domains,
 				...homebrewContext.domains,
+				...campaign_homebrew.domains,
 				...accessible_content.domains
 			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
@@ -292,22 +292,22 @@ function createCompendium() {
 	let domain_cards: Record<DomainIds, Record<string, DomainCard>> = $derived({
 		arcana: Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.domain_cards.arcana,
 				...homebrewContext.domain_cards.arcana,
+				...campaign_homebrew.domain_cards.arcana,
 				...accessible_content.domain_cards.arcana
 			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		),
 		blade: Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.domain_cards.blade,
 				...homebrewContext.domain_cards.blade,
+				...campaign_homebrew.domain_cards.blade,
 				...accessible_content.domain_cards.blade
 			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		),
 		bone: Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.domain_cards.bone,
 				...homebrewContext.domain_cards.bone,
+				...campaign_homebrew.domain_cards.bone,
 				...accessible_content.domain_cards.bone
 			}).filter(([, card]) =>
 				source_whitelist.has(card.source_id)
@@ -315,8 +315,8 @@ function createCompendium() {
 		),
 		codex: Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.domain_cards.codex,
 				...homebrewContext.domain_cards.codex,
+				...campaign_homebrew.domain_cards.codex,
 				...accessible_content.domain_cards.codex
 			}).filter(([, card]) =>
 				source_whitelist.has(card.source_id)
@@ -324,8 +324,8 @@ function createCompendium() {
 		),
 		grace: Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.domain_cards.grace,
 				...homebrewContext.domain_cards.grace,
+				...campaign_homebrew.domain_cards.grace,
 				...accessible_content.domain_cards.grace
 			}).filter(([, card]) =>
 				source_whitelist.has(card.source_id)
@@ -333,8 +333,8 @@ function createCompendium() {
 		),
 		midnight: Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.domain_cards.midnight,
 				...homebrewContext.domain_cards.midnight,
+				...campaign_homebrew.domain_cards.midnight,
 				...accessible_content.domain_cards.midnight
 			}).filter(([, card]) =>
 				source_whitelist.has(card.source_id)
@@ -342,8 +342,8 @@ function createCompendium() {
 		),
 		sage: Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.domain_cards.sage,
 				...homebrewContext.domain_cards.sage,
+				...campaign_homebrew.domain_cards.sage,
 				...accessible_content.domain_cards.sage
 			}).filter(([, card]) =>
 				source_whitelist.has(card.source_id)
@@ -351,8 +351,8 @@ function createCompendium() {
 		),
 		splendor: Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.domain_cards.splendor,
 				...homebrewContext.domain_cards.splendor,
+				...campaign_homebrew.domain_cards.splendor,
 				...accessible_content.domain_cards.splendor
 			}).filter(([, card]) =>
 				source_whitelist.has(card.source_id)
@@ -360,8 +360,8 @@ function createCompendium() {
 		),
 		valor: Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.domain_cards.valor,
 				...homebrewContext.domain_cards.valor,
+				...campaign_homebrew.domain_cards.valor,
 				...accessible_content.domain_cards.valor
 			}).filter(([, card]) =>
 				source_whitelist.has(card.source_id)
@@ -371,8 +371,8 @@ function createCompendium() {
 	let primary_weapons: Record<string, Weapon> = $derived(
 		Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.primary_weapons,
 				...homebrewContext.primary_weapons,
+				...campaign_homebrew.primary_weapons,
 				...accessible_content.primary_weapons
 			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
@@ -380,8 +380,8 @@ function createCompendium() {
 	let secondary_weapons: Record<string, Weapon> = $derived(
 		Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.secondary_weapons,
 				...homebrewContext.secondary_weapons,
+				...campaign_homebrew.secondary_weapons,
 				...accessible_content.secondary_weapons
 			}).filter(([, card]) =>
 				source_whitelist.has(card.source_id)
@@ -391,8 +391,8 @@ function createCompendium() {
 	let armor: Record<string, Armor> = $derived(
 		Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.armor,
 				...homebrewContext.armor,
+				...campaign_homebrew.armor,
 				...accessible_content.armor
 			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
@@ -400,8 +400,8 @@ function createCompendium() {
 	let loot: Record<string, Loot> = $derived(
 		Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.loot,
 				...homebrewContext.loot,
+				...campaign_homebrew.loot,
 				...accessible_content.loot
 			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
@@ -409,8 +409,8 @@ function createCompendium() {
 	let consumables: Record<string, Consumable> = $derived(
 		Object.fromEntries(
 			Object.entries({
-				...campaign_homebrew.consumables,
 				...homebrewContext.consumables,
+				...campaign_homebrew.consumables,
 				...accessible_content.consumables
 			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)

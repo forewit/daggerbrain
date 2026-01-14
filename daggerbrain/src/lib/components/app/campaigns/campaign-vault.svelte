@@ -158,27 +158,27 @@
 	});
 </script>
 
-<div class={cn("rounded-2xl border-3 bg-primary/5", className)}>
-	<div class="px-4 pt-3 flex items-center justify-between">
+<div class={cn("rounded-2xl bg-primary/10 shadow-xl", className)}>
+	<div class="px-4 pt-4 flex items-center justify-between">
 		<h2 class="text-lg font-semibold">
-			<Anvil class="size-5 inline -mt-0.5 mr-0.5" />
+			<!-- <Anvil class="size-5 inline -mt-0.5 mr-0.5" /> -->
 
 			Homebrew Vault
 		</h2>
 	
-		<Button variant="outline" size="sm" onclick={() => (showAddVaultDialog = true)}>
+		<Button variant="ghost" size="sm" onclick={() => (showAddVaultDialog = true)}>
 			<!-- <Plus class="size-4" /> -->
-			Add to vault
+			<Plus class="size-4" />
 		</Button>
 	</div>
-	<p class="text-xs text-muted-foreground pb-4 pl-4 pt-2 sm:pt-0">
+	<p class="text-xs text-muted-foreground pb-4 pl-4 pt-4 sm:pt-0">
 		Items in the vault will be available your player's character sheets.
 	</p>
 
 	{#if sortedVaultItems.length === 0}
-		<p class="text-sm text-muted-foreground text-center pb-8 pt-">No items in vault yet.</p>
+		<p class="text-sm text-muted-foreground text-center pb-8 pt-2">No items in vault yet.</p>
 	{:else}
-		<div class="flex flex-col gap-1 mb-4 bg-background">
+		<div class=" mb-4 mx-4 bg-background">
 			<table class="w-full border-collapse">
 				<colgroup>
 					<col />
@@ -186,7 +186,7 @@
 					<col class="w-12" />
 				</colgroup>
 				<thead>
-					<tr class="border-b bg-primary-muted/50 text-xs text-muted-foreground">
+					<tr class="border-b bg-primary-muted text-xs text-muted-foreground">
 						<th class="px-4 py-2 text-left">Name</th>
 						<th class="py-2 pr-4 text-left">Type</th>
 						<th class="py-2 pr-4 text-center"></th>
@@ -234,7 +234,7 @@
 			<Dialog.Description>
 				Select a homebrew item from your collection to add to the campaign vault.
 
-				<p class="mt-2"> <a href="/homebrew" class="text-primary hover:underline">Manage homebrew</a> to create new items.</p>
+				<Button href="/homebrew" class="mt-2 flex w-min pl-0" variant="link">Manage homebrew collection <ExternalLink class="size-4"/></Button>
 			</Dialog.Description>
 		</Dialog.Header>
 

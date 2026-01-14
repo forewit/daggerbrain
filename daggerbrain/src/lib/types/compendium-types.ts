@@ -31,7 +31,6 @@ import type {
 	BeastformSchema
 } from '$lib/compendium/compendium-schemas';
 import type { z } from 'zod';
-import type { Weapon, Armor, Loot, Consumable, Beastform, CharacterClass, Subclass, DomainIds, DomainCard, AncestryCard, CommunityCard, TransformationCard, Domain } from './compendium-types';
 
 // ============================================================================
 // Core Enums & IDs

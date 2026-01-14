@@ -211,56 +211,56 @@ export const get_campaign_homebrew_items = query(z.string(), async (campaignId) 
 	// Populate result from batched queries
 	for (const weapon of primaryWeapons) {
 		if (weapon.data) {
-			result.primary_weapons[weapon.id] = withCampaignSource(weapon.data as any);
+			result.primary_weapons[weapon.id] = withCampaignSource(weapon.data);
 		}
 	}
 
 	for (const weapon of secondaryWeapons) {
 		if (weapon.data) {
-			result.secondary_weapons[weapon.id] = withCampaignSource(weapon.data as any);
+			result.secondary_weapons[weapon.id] = withCampaignSource(weapon.data);
 		}
 	}
 
 	for (const armor of armors) {
 		if (armor.data) {
-			result.armor[armor.id] = withCampaignSource(armor.data as any);
+			result.armor[armor.id] = withCampaignSource(armor.data);
 		}
 	}
 
 	for (const loot of loots) {
 		if (loot.data) {
-			result.loot[loot.id] = withCampaignSource(loot.data as any);
+			result.loot[loot.id] = withCampaignSource(loot.data);
 		}
 	}
 
 	for (const consumable of consumables) {
 		if (consumable.data) {
-			result.consumables[consumable.id] = withCampaignSource(consumable.data as any);
+			result.consumables[consumable.id] = withCampaignSource(consumable.data);
 		}
 	}
 
 	for (const beastform of beastforms) {
 		if (beastform.data) {
-			result.beastforms[beastform.id] = withCampaignSource(beastform.data as any);
+			result.beastforms[beastform.id] = withCampaignSource(beastform.data);
 		}
 	}
 
 	for (const classItem of classes) {
 		if (classItem.data) {
-			result.classes[classItem.id] = withCampaignSource(classItem.data as any);
+			result.classes[classItem.id] = withCampaignSource(classItem.data);
 		}
 	}
 
 	for (const subclass of subclasses) {
 		if (subclass.data) {
-			result.subclasses[subclass.id] = withCampaignSource(subclass.data as any);
+			result.subclasses[subclass.id] = withCampaignSource(subclass.data);
 		}
 	}
 
 	// Domain cards have special handling (nested by domain_id)
 	for (const domainCard of domainCards) {
 		if (domainCard.data) {
-			const data = withCampaignSource(domainCard.data as any);
+			const data = withCampaignSource(domainCard.data);
 			const domainId = data.domain_id as DomainIds;
 			if (domainId && result.domain_cards[domainId]) {
 				result.domain_cards[domainId][domainCard.id] = data;
@@ -270,20 +270,20 @@ export const get_campaign_homebrew_items = query(z.string(), async (campaignId) 
 
 	for (const ancestryCard of ancestryCards) {
 		if (ancestryCard.data) {
-			result.ancestry_cards[ancestryCard.id] = withCampaignSource(ancestryCard.data as any);
+			result.ancestry_cards[ancestryCard.id] = withCampaignSource(ancestryCard.data);
 		}
 	}
 
 	for (const communityCard of communityCards) {
 		if (communityCard.data) {
-			result.community_cards[communityCard.id] = withCampaignSource(communityCard.data as any);
+			result.community_cards[communityCard.id] = withCampaignSource(communityCard.data);
 		}
 	}
 
 	for (const transformationCard of transformationCards) {
 		if (transformationCard.data) {
 			result.transformation_cards[transformationCard.id] = withCampaignSource(
-				transformationCard.data as any
+				transformationCard.data
 			);
 		}
 	}

@@ -232,7 +232,7 @@
 	{@const playerName =
 		char.owner_name || (char.owner_user_id === user?.user?.clerk_id ? 'you' : 'Anonymous')}
 
-	<div class="mx- w-full overflow-hidden rounded">
+	<div class="mx- w-full overflow-hidden rounded-lg shadow-lg">
 		<a
 			href={`/characters/${char.id}/`}
 			class="flex gap-2 border bg-primary-muted p-1 hover:bg-primary-muted/80"

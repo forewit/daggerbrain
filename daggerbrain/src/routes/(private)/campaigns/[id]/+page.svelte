@@ -187,12 +187,11 @@
 						<div class="flex justify-end">
 							<CampaignInviteLink {isGM} class="grow" />
 						</div>
-						<CampaignCharacters class="mt-6"/>
+						<CampaignCharacters class="mt-8" />
 						{#if isGM}
-							<CampaignVault {campaignId} class="mt-8"/>
-
-							<!-- <CampaignNotes {campaignId} /> -->
+							<CampaignVault {campaignId} class="mt-12" />
 						{/if}
+						<CampaignNotes {isGM} class="mt-12 mb-10" />
 					</div>
 				{/if}
 			</div>

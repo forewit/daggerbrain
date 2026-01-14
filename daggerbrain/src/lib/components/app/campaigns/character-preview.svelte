@@ -18,12 +18,12 @@
 
 	let {
 		character,
-		campaignId,
-		canEdit = false
+		canEdit = false,
+		class: className = ''
 	}: {
 		character: CampaignCharacterSummary;
-		campaignId: string;
 		canEdit?: boolean;
+		class?: string;
 	} = $props();
 
 	const user = getUserContext();
@@ -60,7 +60,7 @@
 	});
 </script>
 
-<div class="flex w-full max-w-[400px] flex-col rounded-xl bg-background shadow">
+<div class={cn("flex w-full max-w-[400px] flex-col rounded-xl bg-background shadow-lg", className)}>
 	<!-- Header -->
 	<div class="mb-2 flex gap-3 px-2">
 		<div class="relative min-w-0 grow">

@@ -1047,7 +1047,7 @@ export const update_campaign_state = command(
 		campaign_id: z.string(),
 		fear_track: z.number().optional(),
 		fear_visible_to_players: z.boolean().optional(),
-		notes: z.string().nullable().optional(),
+		notes: z.string().max(10000).nullable().optional(),
 		countdowns: z.array(countdownSchema).optional()
 	}),
 	async ({ campaign_id, fear_track, fear_visible_to_players, notes, countdowns }) => {

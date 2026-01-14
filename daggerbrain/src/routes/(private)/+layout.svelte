@@ -9,8 +9,6 @@
 	setUserContext();
 	setHomebrewContext();
 	const compendium = setCompendiumContext();
-
-	$inspect(compendium.sources);
 </script>
 
 <SignedIn>

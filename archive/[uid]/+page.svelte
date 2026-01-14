@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang="ts"> 
 	import type { DamageTypes } from '$lib/types/compendium-types';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
@@ -9,6 +9,7 @@
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { error } from '@sveltejs/kit';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
+	import { renderMarkdown } from '$lib/utils/markdown';
 
 	let { data } = $props();
 
@@ -205,7 +206,7 @@
 											<div class="border-l-2 border-accent/30 pl-3">
 												<p class="text-sm font-medium text-muted-foreground">{feature.title || 'Unnamed feature'}</p>
 												<p class="mt-0.5 text-xs text-muted-foreground">
-													{@html feature.description_html}
+													{@html renderMarkdown( feature.description_html)}
 												</p>
 											</div>
 										{/each}
