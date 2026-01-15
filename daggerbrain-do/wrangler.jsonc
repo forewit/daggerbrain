@@ -4,6 +4,8 @@
   "main": "src/index.ts",
   "compatibility_date": "2025-11-18",
   "compatibility_flags": ["nodejs_compat"],
+  "preview_urls": false,
+	"workers_dev": false,
   "limits": {
     "cpu_ms": 50
   }

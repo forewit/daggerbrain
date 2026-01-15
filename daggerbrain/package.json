@@ -20,8 +20,8 @@
 		"db:migrate": "drizzle-kit migrate",
 		"db:studio": "drizzle-kit studio",
 		"seed": "bun run src/lib/scripts/seed.ts",
-		"deploy:prod": "bun run build && wrangler deploy",
-		"deploy:beta": "bun run build && wrangler deploy -c wrangler.beta.jsonc",
+		"deploy:prod": "bun run build && wrangler deploy --config ../daggerbrain-do/wrangler.jsonc && wrangler deploy --config wrangler.jsonc",
+		"deploy:beta": "bun run build && wrangler deploy --config ../daggerbrain-do/wrangler.jsonc && wrangler deploy --config wrangler.beta.jsonc",
 		"cf-typegen": "wrangler types ./src/worker-configuration.d.ts"
 	},
 	"devDependencies": {

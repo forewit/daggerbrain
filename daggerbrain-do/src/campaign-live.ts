@@ -401,25 +401,43 @@ export class CampaignLiveDO extends DurableObject<Env> {
   }
 
   private async updateState(updates: Partial<CampaignState>): Promise<void> {
-    // If we don't have state cached, we can't update it
-    // State should be loaded from storage during initialization
+    // If state is not initialized, initialize it from the first update
+    // Since the client has already saved to D1 (source of truth), we can trust this update
     if (!this.campaignState) {
-      return;
-    }
-
-    // Check for stale updates using timestamp
-    if (updates.updated_at !== undefined && this.campaignState.updated_at) {
-      if (updates.updated_at <= this.campaignState.updated_at) {
-        return; // Ignore stale update
+      // Get campaign ID from the DO's ID (created using idFromName)
+      const campaignId = this.ctx.id.name || "";
+      
+      // Initialize state from the update with sensible defaults
+      // Note: invite_code will be a placeholder until state is properly synced from D1
+      // This is acceptable since D1 is the source of truth and this is just a cache
+      this.campaignState = {
+        campaign_id: campaignId,
+        fear_track: updates.fear_track ?? 0,
+        fear_visible_to_players: updates.fear_visible_to_players ?? false,
+        notes: updates.notes ?? null,
+        countdowns: updates.countdowns ?? [],
+        invite_code: "", // Placeholder - will be updated when state syncs from D1
+        updated_at: updates.updated_at ?? Date.now(),
+      };
+      
+      console.log(
+        `[CampaignLiveDO] Initialized campaign state from first update: campaign_id=${campaignId}`
+      );
+    } else {
+      // Check for stale updates using timestamp
+      if (updates.updated_at !== undefined && this.campaignState.updated_at) {
+        if (updates.updated_at <= this.campaignState.updated_at) {
+          return; // Ignore stale update
+        }
       }
-    }
 
-    // Update in-memory cache
-    this.campaignState = {
-      ...this.campaignState,
-      ...updates,
-      updated_at: updates.updated_at ?? Date.now(),
-    };
+      // Update in-memory cache
+      this.campaignState = {
+        ...this.campaignState,
+        ...updates,
+        updated_at: updates.updated_at ?? Date.now(),
+      };
+    }
 
     await this.incrementVersionAndSave();
 
