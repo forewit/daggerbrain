@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { DomainCard, DomainCardChoice } from '$lib/types/compendium-types';
+	import type { DomainCard, DomainCardChoice } from '@shared/types/compendium.types';
 	import { cn } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import type { Snippet } from 'svelte';
 	import DomainBanner from '../domain-banner.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
@@ -39,20 +39,21 @@
 		{@const current_count = character.domain_card_tokens[card.compendium_id] || 0}
 		<div class="flex items-center justify-center gap-2">
 			<!-- Minus Button -->
-			<button
-				type="button"
-				onclick={() => {
-					if (!character) return;
-					const current = character.domain_card_tokens[card.compendium_id] || 0;
-					character.domain_card_tokens[card.compendium_id] = Math.max(0, current - 1);
-				}}
-				disabled={current_count === 0}
-				class="flex size-7 items-center justify-center rounded-full bg-red-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-gray-300"
-				aria-label="Decrease token count"
-			>
-				−
-			</button>
-
+			{#if context.canEdit}
+				<button
+					type="button"
+					onclick={() => {
+						if (!character) return;
+						const current = character.domain_card_tokens[card.compendium_id] || 0;
+						character.domain_card_tokens[card.compendium_id] = Math.max(0, current - 1);
+					}}
+					disabled={current_count === 0}
+					class="flex size-7 items-center justify-center rounded-full bg-red-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+					aria-label="Decrease token count"
+				>
+					−
+				</button>
+			{/if}
 			<!-- Coin Stack -->
 			<div class="relative flex items-center justify-center">
 				<!-- Stack of coins (background coins) -->
@@ -79,19 +80,21 @@
 			</div>
 
 			<!-- Plus Button -->
-			<button
-				type="button"
-				onclick={() => {
-					if (!character) return;
-					const current = character.domain_card_tokens[card.compendium_id] || 0;
-					character.domain_card_tokens[card.compendium_id] = Math.min(99, current + 1);
-				}}
-				disabled={current_count === 99}
-				class="flex size-7 items-center justify-center rounded-full bg-green-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-gray-300"
-				aria-label="Increase token count"
-			>
-				+
-			</button>
+			{#if context.canEdit}
+				<button
+					type="button"
+					onclick={() => {
+						if (!character) return;
+						const current = character.domain_card_tokens[card.compendium_id] || 0;
+						character.domain_card_tokens[card.compendium_id] = Math.min(99, current + 1);
+					}}
+					disabled={current_count === 99}
+					class="flex size-7 items-center justify-center rounded-full bg-green-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+					aria-label="Increase token count"
+				>
+					+
+				</button>
+			{/if}
 		</div>
 	{/if}
 {/snippet}
@@ -105,6 +108,7 @@
 			{#if choice.conditional_choice === null || (conditional_choice_id && conditional_selection_id && character.domain_card_choices[card.compendium_id][conditional_choice_id] && character.domain_card_choices[card.compendium_id][conditional_choice_id].includes(conditional_selection_id))}
 				{#if choice.type === 'arbitrary'}
 					<ChoiceSelector
+						disabled={!context.canEdit}
 						class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
 						bind:selected_ids={character.domain_card_choices[card.compendium_id][choice.choice_id]}
 						max={choice.max}
@@ -113,6 +117,7 @@
 					/>
 				{:else if choice.type === 'experience'}
 					<ChoiceSelector
+						disabled={!context.canEdit}
 						class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
 						bind:selected_ids={character.domain_card_choices[card.compendium_id][choice.choice_id]}
 						max={choice.max}

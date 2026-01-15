@@ -16,7 +16,7 @@ import {
 	AncestryCardSchema,
 	CommunityCardSchema,
 	TransformationCardSchema
-} from '$lib/compendium/compendium-schemas';
+} from '@shared/schemas/compendium.schemas';
 
 // ============================================================================
 // Re-export existing schemas for validation

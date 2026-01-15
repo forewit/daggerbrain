@@ -1,0 +1,63 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "daggerbrain",
+	"main": ".svelte-kit/cloudflare/_worker.js",
+	"compatibility_date": "2025-11-18",
+	"compatibility_flags": ["nodejs_compat"],
+	"assets": {
+		"binding": "ASSETS",
+		"directory": ".svelte-kit/cloudflare",
+		"not_found_handling": "single-page-application"
+	},
+	"preview_urls": false,
+	"workers_dev": false,
+	"observability": {
+		"enabled": false
+	},
+	"limits": {
+		"cpu_ms": 50
+	},
+	"r2_buckets": [
+		{
+			"binding": "R2_IMAGES",
+			"bucket_name": "daggerbrain-images"
+		},
+		{
+			"binding": "R2_USERCONTENT",
+			"bucket_name": "daggerbrain-usercontent"
+		}
+	],
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "daggerbrain-db",
+			"database_id": "45e0761b-25c5-4fb8-b52e-0b6787ca840f",
+			"migrations_dir": "./drizzle"
+		}
+	],
+	"kv_namespaces": [
+		{
+			"binding": "KV",
+			"id": "c6a68fb4a3af4958a02aec33f40213ac"
+		}
+	],
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "CAMPAIGN_LIVE",
+				"class_name": "CampaignLiveDO",
+				"script_name": "daggerbrain-do"
+			}
+		]
+	},
+	"routes": [
+		{
+			"pattern": "daggerbrain.com",
+			"custom_domain": true
+		}
+	]
+}

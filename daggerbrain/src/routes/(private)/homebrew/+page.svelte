@@ -22,7 +22,7 @@
 		TransformationCard,
 		DomainIds,
 		Feature
-	} from '$lib/types/compendium-types';
+	} from '@shared/types/compendium.types';
 	import Search from '@lucide/svelte/icons/search';
 	import Shield from '@lucide/svelte/icons/shield';
 	import Swords from '@lucide/svelte/icons/swords';
@@ -37,10 +37,14 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import Label from '$lib/components/ui/label/label.svelte';
-	import Filter from '@lucide/svelte/icons/filter';
 	import { goto } from '$app/navigation';
-	import type { HomebrewType } from '$lib/types/homebrew-types';
-	import { MAX_HOMEBREW } from '$lib/types/homebrew-types';
+	import { ENABLED_HOMEBREW_TYPES, type HomebrewType } from '@shared/types/homebrew.types';
+	import { UI_HOMEBREW_LIMIT } from '@shared/constants/constants';
+
+	// Helper to check if a homebrew type is enabled
+	function isTypeEnabled(type: HomebrewType): boolean {
+		return (ENABLED_HOMEBREW_TYPES as readonly string[]).includes(type);
+	}
 
 	const homebrew = getHomebrewContext();
 	const compendium = getCompendiumContext();
@@ -891,7 +895,7 @@
 	);
 
 	// Check if all types are at limit
-	let atLimit = $derived(totalCount >= MAX_HOMEBREW);
+	let atLimit = $derived(totalCount >= UI_HOMEBREW_LIMIT);
 
 	// Handle delete
 	function openDeleteDialog(
@@ -1180,7 +1184,7 @@
 						<span
 							class="rounded-full border bg-card px-2 py-0.5 text-base tracking-widest text-muted-foreground"
 						>
-							{totalCount}/{MAX_HOMEBREW}
+							{totalCount}/{UI_HOMEBREW_LIMIT}
 						</span>
 					</p>
 
@@ -1272,7 +1276,7 @@
 												{:else if activeTab === 'consumables'}
 													<FlaskConical class="size-4" />
 													Consumables ({consumableCount})
-													<!-- {:else if activeTab === 'classes'}
+												{:else if activeTab === 'classes'}
 													<GraduationCap class="size-4" />
 													Classes ({classCount})
 												{:else if activeTab === 'subclasses'}
@@ -1289,7 +1293,7 @@
 													Community Cards ({communityCardCount})
 												{:else if activeTab === 'transformation-cards'}
 													{@render cardIcon('size-4')}
-													Transformation Cards ({transformationCardCount}) -->
+													Transformation Cards ({transformationCardCount})
 												{/if}
 											</div>
 										</Select.Trigger>
@@ -1329,46 +1333,67 @@
 													Consumables ({consumableCount})
 												</div>
 											</Select.Item>
-											<Select.Item value="classes" disabled>
+											<Select.Item value="classes" disabled={!isTypeEnabled('class')}>
 												<div class="flex grow items-center gap-2">
 													<GraduationCap class="size-4" />
 													Classes ({classCount})
-													<span class="ml-auto">{@render commingSoonBadge()}</span>
+													{#if !isTypeEnabled('class')}<span class="ml-auto"
+															>{@render commingSoonBadge()}</span
+														>{/if}
 												</div>
 											</Select.Item>
-											<Select.Item value="subclasses" disabled>
+											<Select.Item value="subclasses" disabled={!isTypeEnabled('subclass')}>
 												<div class="flex grow items-center gap-2">
 													<BookOpen class="size-4" />
 													Subclasses ({subclassCount})
-													<span class="ml-auto">{@render commingSoonBadge()}</span>
+													{#if !isTypeEnabled('subclass')}<span class="ml-auto"
+															>{@render commingSoonBadge()}</span
+														>{/if}
 												</div>
 											</Select.Item>
-											<Select.Item value="domain-cards" disabled>
+											<Select.Item value="domain-cards" disabled={!isTypeEnabled('domain-cards')}>
 												<div class="flex grow items-center gap-2">
 													{@render cardIcon('size-4')}
 													Domain Cards ({domainCardCount})
-													<span class="ml-auto">{@render commingSoonBadge()}</span>
+													{#if !isTypeEnabled('domain-cards')}<span class="ml-auto"
+															>{@render commingSoonBadge()}</span
+														>{/if}
 												</div>
 											</Select.Item>
-											<Select.Item value="ancestry-cards" disabled>
+											<Select.Item
+												value="ancestry-cards"
+												disabled={!isTypeEnabled('ancestry-cards')}
+											>
 												<div class="flex grow items-center gap-2">
 													{@render cardIcon('size-4')}
 													Ancestry Cards ({ancestryCardCount})
-													<span class="ml-auto">{@render commingSoonBadge()}</span>
+													{#if !isTypeEnabled('ancestry-cards')}<span class="ml-auto"
+															>{@render commingSoonBadge()}</span
+														>{/if}
 												</div>
 											</Select.Item>
-											<Select.Item value="community-cards" disabled>
+											<Select.Item
+												value="community-cards"
+												disabled={!isTypeEnabled('community-cards')}
+											>
 												<div class="flex grow items-center gap-2">
 													{@render cardIcon('size-4')}
 													Community Cards ({communityCardCount})
-													<span class="ml-auto">{@render commingSoonBadge()}</span>
+													{#if !isTypeEnabled('community-cards')}<span class="ml-auto"
+															>{@render commingSoonBadge()}</span
+														>{/if}
 												</div>
 											</Select.Item>
-											<Select.Item value="transformation-cards" disabled>
+											<Select.Item
+												value="transformation-cards"
+												disabled={!isTypeEnabled('transformation-cards')}
+											>
 												<div class="flex grow items-center gap-2">
 													{@render cardIcon('size-4')}
 													Transformation Cards ({transformationCardCount})
-													<span class="ml-auto">{@render commingSoonBadge()}</span>
+													{#if !isTypeEnabled('transformation-cards')}<span class="ml-auto"
+															>{@render commingSoonBadge()}</span
+														>{/if}
 												</div>
 											</Select.Item>
 										</Select.Content>
@@ -1603,7 +1628,7 @@
 									<FlaskConical class="size-4" />
 									Consumable
 								</div>
-								<!-- {:else if newItemType === 'class'}
+							{:else if newItemType === 'class'}
 								<div class="flex items-center gap-2">
 									<GraduationCap class="size-4" />
 									Class
@@ -1632,7 +1657,7 @@
 								<div class="flex items-center gap-2">
 									{@render cardIcon('size-4')}
 									Transformation Card
-								</div> -->
+								</div>
 							{:else}
 								<span class="text-muted-foreground">Select a type...</span>
 							{/if}
@@ -1668,46 +1693,70 @@
 									Consumable
 								</div>
 							</Select.Item>
-							<Select.Item value="class" disabled>
+							<Select.Item value="class" disabled={atLimit || !isTypeEnabled('class')}>
 								<div class="flex grow items-center gap-2">
 									<GraduationCap class="size-4" />
 									Class
-									<span class="ml-auto">{@render commingSoonBadge()}</span>
+									{#if !isTypeEnabled('class')}<span class="ml-auto"
+											>{@render commingSoonBadge()}</span
+										>{/if}
 								</div>
 							</Select.Item>
-							<Select.Item value="subclass" disabled>
+							<Select.Item value="subclass" disabled={atLimit || !isTypeEnabled('subclass')}>
 								<div class="flex grow items-center gap-2">
 									<BookOpen class="size-4" />
 									Subclass
-									<span class="ml-auto">{@render commingSoonBadge()}</span>
+									{#if !isTypeEnabled('subclass')}<span class="ml-auto"
+											>{@render commingSoonBadge()}</span
+										>{/if}
 								</div>
 							</Select.Item>
-							<Select.Item value="domain-cards" disabled>
+							<Select.Item
+								value="domain-cards"
+								disabled={atLimit || !isTypeEnabled('domain-cards')}
+							>
 								<div class="flex grow items-center gap-2">
 									{@render cardIcon('size-4')}
 									Domain Card
-									<span class="ml-auto">{@render commingSoonBadge()}</span>
+									{#if !isTypeEnabled('domain-cards')}<span class="ml-auto"
+											>{@render commingSoonBadge()}</span
+										>{/if}
 								</div>
 							</Select.Item>
-							<Select.Item value="ancestry-cards" disabled>
+							<Select.Item
+								value="ancestry-cards"
+								disabled={atLimit || !isTypeEnabled('ancestry-cards')}
+							>
 								<div class="flex grow items-center gap-2">
 									{@render cardIcon('size-4')}
 									Ancestry Card
-									<span class="ml-auto">{@render commingSoonBadge()}</span>
+									{#if !isTypeEnabled('ancestry-cards')}<span class="ml-auto"
+											>{@render commingSoonBadge()}</span
+										>{/if}
 								</div>
 							</Select.Item>
-							<Select.Item value="community-cards" disabled>
+							<Select.Item
+								value="community-cards"
+								disabled={atLimit || !isTypeEnabled('community-cards')}
+							>
 								<div class="flex grow items-center gap-2">
 									{@render cardIcon('size-4')}
 									Community Card
-									<span class="ml-auto">{@render commingSoonBadge()}</span>
+									{#if !isTypeEnabled('community-cards')}<span class="ml-auto"
+											>{@render commingSoonBadge()}</span
+										>{/if}
 								</div>
 							</Select.Item>
-							<Select.Item value="transformation-cards" disabled>
+							<Select.Item
+								value="transformation-cards"
+								disabled={atLimit || !isTypeEnabled('transformation-cards')}
+							>
 								<div class="flex grow items-center gap-2">
 									{@render cardIcon('size-4')}
 									Transformation Card
-									<span class="ml-auto">{@render commingSoonBadge()}</span>
+									{#if !isTypeEnabled('transformation-cards')}<span class="ml-auto"
+											>{@render commingSoonBadge()}</span
+										>{/if}
 								</div>
 							</Select.Item>
 						</Select.Content>

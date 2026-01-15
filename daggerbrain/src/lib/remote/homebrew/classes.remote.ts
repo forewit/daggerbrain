@@ -2,11 +2,18 @@ import { query, command, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
-import { get_db, get_auth } from '../utils';
-import { ClassSchema, SubclassSchema } from '$lib/compendium/compendium-schemas';
-import type { CharacterClass, Subclass } from '$lib/types/compendium-types';
+import { get_db, get_auth, get_kv } from '../utils';
+import { ClassSchema, SubclassSchema } from '@shared/schemas/compendium.schemas';
+import type { CharacterClass, Subclass } from '@shared/types/compendium.types';
 import { homebrew_classes, homebrew_subclasses } from '$lib/server/db/homebrew.schema';
-import { verifyOwnership, getTotalHomebrewCount, HOMEBREW_LIMIT } from './utils';
+import { campaign_homebrew_vault_table } from '../../server/db/campaigns.schema';
+import {
+	verifyOwnership,
+	getTotalHomebrewCount,
+	HOMEBREW_LIMIT,
+	assertHomebrewTypeEnabled
+} from './utils';
+import { getHomebrewAccessInternal } from '../../server/permissions';
 
 // ============================================================================
 // Classes
@@ -32,6 +39,7 @@ export const get_homebrew_classes = query(async () => {
 });
 
 export const create_homebrew_class = command(ClassSchema, async (data) => {
+	assertHomebrewTypeEnabled('class');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -66,11 +74,15 @@ export const create_homebrew_class = command(ClassSchema, async (data) => {
 export const update_homebrew_class = command(
 	z.object({ id: z.string(), data: ClassSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('class');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		if (!(await verifyOwnership(db, homebrew_classes, id, userId))) {
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'classes', id);
+
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this class');
 		}
 
@@ -81,24 +93,40 @@ export const update_homebrew_class = command(
 		await db
 			.update(homebrew_classes)
 			.set({ data: validatedData, updated_at: now })
-			.where(and(eq(homebrew_classes.id, id), eq(homebrew_classes.clerk_user_id, userId)));
+			.where(eq(homebrew_classes.id, id));
 
 		console.log('updated homebrew class in D1');
 	}
 );
 
 export const delete_homebrew_class = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('class');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	if (!(await verifyOwnership(db, homebrew_classes, id, userId))) {
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'classes', id);
+
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this class');
 	}
 
-	await db
-		.delete(homebrew_classes)
-		.where(and(eq(homebrew_classes.id, id), eq(homebrew_classes.clerk_user_id, userId)));
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db.delete(homebrew_classes).where(eq(homebrew_classes.id, id)),
+
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'class'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
+			)
+	]);
 
 	// refresh the classes query
 	get_homebrew_classes().refresh();
@@ -129,6 +157,7 @@ export const get_homebrew_subclasses = query(async () => {
 });
 
 export const create_homebrew_subclass = command(SubclassSchema, async (data) => {
+	assertHomebrewTypeEnabled('subclass');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -183,11 +212,15 @@ export const create_homebrew_subclass = command(SubclassSchema, async (data) => 
 export const update_homebrew_subclass = command(
 	z.object({ id: z.string(), data: SubclassSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('subclass');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		if (!(await verifyOwnership(db, homebrew_subclasses, id, userId))) {
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'subclasses', id);
+
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this subclass');
 		}
 
@@ -219,24 +252,40 @@ export const update_homebrew_subclass = command(
 		await db
 			.update(homebrew_subclasses)
 			.set({ data: validatedData, updated_at: now })
-			.where(and(eq(homebrew_subclasses.id, id), eq(homebrew_subclasses.clerk_user_id, userId)));
+			.where(eq(homebrew_subclasses.id, id));
 
 		console.log('updated homebrew subclass in D1');
 	}
 );
 
 export const delete_homebrew_subclass = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('subclass');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	if (!(await verifyOwnership(db, homebrew_subclasses, id, userId))) {
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'subclasses', id);
+
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this subclass');
 	}
 
-	await db
-		.delete(homebrew_subclasses)
-		.where(and(eq(homebrew_subclasses.id, id), eq(homebrew_subclasses.clerk_user_id, userId)));
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db.delete(homebrew_subclasses).where(eq(homebrew_subclasses.id, id)),
+
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'subclass'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
+			)
+	]);
 
 	// refresh the subclasses query
 	get_homebrew_subclasses().refresh();

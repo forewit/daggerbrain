@@ -2,13 +2,14 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Select from '$lib/components/ui/select';
-	import type { Beastform, SourceIds } from '$lib/types/compendium-types';
+	import type { Beastform, SourceIds } from '@shared/types/compendium.types';
 	import BeastformComponent from './full-cards/beastform.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import Dropdown from '../leveling/dropdown.svelte';
 	import Search from '@lucide/svelte/icons/search';
 	import HomebrewBadge from '../homebrew/homebrew-badge.svelte';
+	import CampaignBadge from '../homebrew/campaign-badge.svelte';
 
 	let {
 		onBeastformClick = () => {},
@@ -21,6 +22,7 @@
 	} = $props();
 
 	let searchQuery = $state('');
+	// svelte-ignore state_referenced_locally
 	let tierFilter = $state<'1' | '2' | '3' | '4' | ''>(initialTierFilter);
 	let sourceFilter = $state<SourceIds | ''>('');
 
@@ -178,6 +180,8 @@
 						>
 							{#if beastform.source_id === 'Homebrew'}
 								<HomebrewBadge type="beastform" id={beastform.compendium_id} class="size-3" />
+							{:else if beastform.source_id === 'Campaign'}
+								<CampaignBadge type="beastform" id={beastform.compendium_id} class="size-3" />
 							{/if}
 							Tier {tier}
 							{beastform.category}

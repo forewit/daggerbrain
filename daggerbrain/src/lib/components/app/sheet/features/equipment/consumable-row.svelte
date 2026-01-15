@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 
 	let {

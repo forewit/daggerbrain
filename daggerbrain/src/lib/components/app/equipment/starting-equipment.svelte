@@ -4,7 +4,7 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
-	import type { Loot, Consumable } from '$lib/types/compendium-types';
+	import type { Loot, Consumable } from '@shared/types/compendium.types';
 	import { cn } from '$lib/utils';
 	import ArmorCard from './armor.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';

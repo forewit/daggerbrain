@@ -2,7 +2,7 @@
 	import type {
 		SubclassSpecializationCard,
 		SubclassMasteryCard
-	} from '$lib/types/compendium-types';
+	} from '@shared/types/compendium.types';
 	import { cn } from '$lib/utils';
 	import * as Select from '$lib/components/ui/select/';
 	import SubclassCard from '$lib/components/app/cards/full-cards/subclass-card.svelte';

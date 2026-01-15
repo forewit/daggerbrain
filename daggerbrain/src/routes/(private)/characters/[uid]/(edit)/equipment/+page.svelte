@@ -5,7 +5,7 @@
 	import Catalog from '$lib/components/app/equipment/catalog.svelte';
 	import Inventory from '$lib/components/app/equipment/inventory.svelte';
 	import ActiveEquipment from '$lib/components/app/equipment/active-equipment.svelte';
-	import Gold from '$lib/components/app/equipment/gold.svelte';
+	import Gold from '$lib/components/app/sheet/gold.svelte';
 	import ClassStartingEqiupment from '$lib/components/app/equipment/starting-equipment.svelte';
 
 	let { data } = $props();

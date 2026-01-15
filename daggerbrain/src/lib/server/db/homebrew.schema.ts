@@ -13,7 +13,7 @@ import type {
 	CommunityCard,
 	TransformationCard,
 	Beastform
-} from '../../types/compendium-types';
+} from '../../../../../shared/src/types/compendium.types';
 
 // ============================================================================
 // Classes
@@ -25,10 +25,14 @@ export const homebrew_classes = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<CharacterClass>(),
+		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
 	},
-	(table) => [index('homebrew_classes_clerk_user_id_idx').on(table.clerk_user_id)]
+	(table) => [
+		index('homebrew_classes_clerk_user_id_idx').on(table.clerk_user_id),
+		index('homebrew_classes_campaign_id_idx').on(table.campaign_id)
+	]
 );
 
 export const homebrew_classes_schema = createSelectSchema(homebrew_classes);
@@ -45,10 +49,14 @@ export const homebrew_subclasses = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<Subclass>(),
+		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
 	},
-	(table) => [index('homebrew_subclasses_clerk_user_id_idx').on(table.clerk_user_id)]
+	(table) => [
+		index('homebrew_subclasses_clerk_user_id_idx').on(table.clerk_user_id),
+		index('homebrew_subclasses_campaign_id_idx').on(table.campaign_id)
+	]
 );
 
 export const homebrew_subclasses_schema = createSelectSchema(homebrew_subclasses);
@@ -65,10 +73,14 @@ export const homebrew_domains = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<Domain>(),
+		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
 	},
-	(table) => [index('homebrew_domains_clerk_user_id_idx').on(table.clerk_user_id)]
+	(table) => [
+		index('homebrew_domains_clerk_user_id_idx').on(table.clerk_user_id),
+		index('homebrew_domains_campaign_id_idx').on(table.campaign_id)
+	]
 );
 
 export const homebrew_domains_schema = createSelectSchema(homebrew_domains);
@@ -85,10 +97,14 @@ export const homebrew_domain_cards = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<DomainCard>(),
+		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
 	},
-	(table) => [index('homebrew_domain_cards_clerk_user_id_idx').on(table.clerk_user_id)]
+	(table) => [
+		index('homebrew_domain_cards_clerk_user_id_idx').on(table.clerk_user_id),
+		index('homebrew_domain_cards_campaign_id_idx').on(table.campaign_id)
+	]
 );
 
 export const homebrew_domain_cards_schema = createSelectSchema(homebrew_domain_cards);
@@ -105,10 +121,14 @@ export const homebrew_primary_weapons = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<Weapon>(),
+		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
 	},
-	(table) => [index('homebrew_primary_weapons_clerk_user_id_idx').on(table.clerk_user_id)]
+	(table) => [
+		index('homebrew_primary_weapons_clerk_user_id_idx').on(table.clerk_user_id),
+		index('homebrew_primary_weapons_campaign_id_idx').on(table.campaign_id)
+	]
 );
 
 export const homebrew_primary_weapons_schema = createSelectSchema(homebrew_primary_weapons);
@@ -125,10 +145,14 @@ export const homebrew_secondary_weapons = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<Weapon>(),
+		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
 	},
-	(table) => [index('homebrew_secondary_weapons_clerk_user_id_idx').on(table.clerk_user_id)]
+	(table) => [
+		index('homebrew_secondary_weapons_clerk_user_id_idx').on(table.clerk_user_id),
+		index('homebrew_secondary_weapons_campaign_id_idx').on(table.campaign_id)
+	]
 );
 
 export const homebrew_secondary_weapons_schema = createSelectSchema(homebrew_secondary_weapons);
@@ -149,10 +173,14 @@ export const homebrew_armor = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<Armor>(),
+		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
 	},
-	(table) => [index('homebrew_armor_clerk_user_id_idx').on(table.clerk_user_id)]
+	(table) => [
+		index('homebrew_armor_clerk_user_id_idx').on(table.clerk_user_id),
+		index('homebrew_armor_campaign_id_idx').on(table.campaign_id)
+	]
 );
 
 export const homebrew_armor_schema = createSelectSchema(homebrew_armor);
@@ -169,10 +197,14 @@ export const homebrew_loot = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<Loot>(),
+		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
 	},
-	(table) => [index('homebrew_loot_clerk_user_id_idx').on(table.clerk_user_id)]
+	(table) => [
+		index('homebrew_loot_clerk_user_id_idx').on(table.clerk_user_id),
+		index('homebrew_loot_campaign_id_idx').on(table.campaign_id)
+	]
 );
 
 export const homebrew_loot_schema = createSelectSchema(homebrew_loot);
@@ -189,10 +221,14 @@ export const homebrew_consumables = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<Consumable>(),
+		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
 	},
-	(table) => [index('homebrew_consumables_clerk_user_id_idx').on(table.clerk_user_id)]
+	(table) => [
+		index('homebrew_consumables_clerk_user_id_idx').on(table.clerk_user_id),
+		index('homebrew_consumables_campaign_id_idx').on(table.campaign_id)
+	]
 );
 
 export const homebrew_consumables_schema = createSelectSchema(homebrew_consumables);
@@ -209,10 +245,14 @@ export const homebrew_ancestry_cards = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<AncestryCard>(),
+		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
 	},
-	(table) => [index('homebrew_ancestry_cards_clerk_user_id_idx').on(table.clerk_user_id)]
+	(table) => [
+		index('homebrew_ancestry_cards_clerk_user_id_idx').on(table.clerk_user_id),
+		index('homebrew_ancestry_cards_campaign_id_idx').on(table.campaign_id)
+	]
 );
 
 export const homebrew_ancestry_cards_schema = createSelectSchema(homebrew_ancestry_cards);
@@ -229,10 +269,14 @@ export const homebrew_community_cards = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<CommunityCard>(),
+		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
 	},
-	(table) => [index('homebrew_community_cards_clerk_user_id_idx').on(table.clerk_user_id)]
+	(table) => [
+		index('homebrew_community_cards_clerk_user_id_idx').on(table.clerk_user_id),
+		index('homebrew_community_cards_campaign_id_idx').on(table.campaign_id)
+	]
 );
 
 export const homebrew_community_cards_schema = createSelectSchema(homebrew_community_cards);
@@ -249,10 +293,14 @@ export const homebrew_transformation_cards = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<TransformationCard>(),
+		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
 	},
-	(table) => [index('homebrew_transformation_cards_clerk_user_id_idx').on(table.clerk_user_id)]
+	(table) => [
+		index('homebrew_transformation_cards_clerk_user_id_idx').on(table.clerk_user_id),
+		index('homebrew_transformation_cards_campaign_id_idx').on(table.campaign_id)
+	]
 );
 
 export const homebrew_transformation_cards_schema = createSelectSchema(
@@ -275,10 +323,14 @@ export const homebrew_beastforms = sqliteTable(
 		id: text('id').primaryKey().notNull(),
 		clerk_user_id: text('clerk_user_id').notNull(),
 		data: text('data', { mode: 'json' }).notNull().$type<Beastform>(),
+		campaign_id: text('campaign_id'),
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
 	},
-	(table) => [index('homebrew_beastforms_clerk_user_id_idx').on(table.clerk_user_id)]
+	(table) => [
+		index('homebrew_beastforms_clerk_user_id_idx').on(table.clerk_user_id),
+		index('homebrew_beastforms_campaign_id_idx').on(table.campaign_id)
+	]
 );
 
 export const homebrew_beastforms_schema = createSelectSchema(homebrew_beastforms);

@@ -4,6 +4,7 @@
 	import Switch from '$lib/components/ui/switch/switch.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
+	import { cn } from '$lib/utils';
 
 	const context = getCharacterContext();
 	let character = $derived(context.character);
@@ -39,6 +40,8 @@
 			<Switch
 				id="unstoppable-switch"
 				checked={character.class_choices[guardian_class_id]?.['unstoppable_active']?.[0] === 'yes'}
+				disabled={!context.canEdit}
+				class={cn(!context.canEdit && 'pointer-events-none')}
 				onCheckedChange={(checked) => {
 					if (!character.class_choices[guardian_class_id])
 						character.class_choices[guardian_class_id] = {};
@@ -54,27 +57,28 @@
 		{#if character.class_choices[guardian_class_id]?.['unstoppable_active']?.[0] === 'yes'}
 			<div class="flex items-center gap-2">
 				<!-- Minus Button -->
-				<Button
-					type="button"
-					onclick={() => {
-						if (!character) return;
-						if (!character.class_choices[guardian_class_id])
-							character.class_choices[guardian_class_id] = {};
-						const current = current_unstoppable_value;
-						const newValue = Math.max(1, current - 1);
-						character.class_choices[guardian_class_id]['unstoppable_active'] = [
-							'yes',
-							String(newValue)
-						];
-					}}
-					disabled={current_unstoppable_value === 1}
-					size="icon"
-					variant="outline"
-					class="h-auto rounded-full p-0"
-				>
-					−
-				</Button>
-
+				{#if context.canEdit}
+					<Button
+						type="button"
+						onclick={() => {
+							if (!character) return;
+							if (!character.class_choices[guardian_class_id])
+								character.class_choices[guardian_class_id] = {};
+							const current = current_unstoppable_value;
+							const newValue = Math.max(1, current - 1);
+							character.class_choices[guardian_class_id]['unstoppable_active'] = [
+								'yes',
+								String(newValue)
+							];
+						}}
+						disabled={current_unstoppable_value === 1}
+						size="icon"
+						variant="outline"
+						class="h-auto rounded-full p-0"
+					>
+						−
+					</Button>
+				{/if}
 				<!-- Die SVG and Value -->
 				<div class="flex items-center gap-2">
 					{#if character.level < 5}
@@ -159,27 +163,28 @@
 				</div>
 
 				<!-- Plus Button -->
-				<Button
-					type="button"
-					onclick={() => {
-						if (!character) return;
-						if (!character.class_choices[guardian_class_id])
-							character.class_choices[guardian_class_id] = {};
-						const current = current_unstoppable_value;
-						const newValue = Math.min(max_unstoppable_value, current + 1);
-						character.class_choices[guardian_class_id]['unstoppable_active'] = [
-							'yes',
-							String(newValue)
-						];
-					}}
-					disabled={current_unstoppable_value === max_unstoppable_value}
-					size="icon"
-					variant="outline"
-					class="h-auto rounded-full p-0"
-				>
-					+
-				</Button>
-
+				{#if context.canEdit}
+					<Button
+						type="button"
+						onclick={() => {
+							if (!character) return;
+							if (!character.class_choices[guardian_class_id])
+								character.class_choices[guardian_class_id] = {};
+							const current = current_unstoppable_value;
+							const newValue = Math.min(max_unstoppable_value, current + 1);
+							character.class_choices[guardian_class_id]['unstoppable_active'] = [
+								'yes',
+								String(newValue)
+							];
+						}}
+						disabled={current_unstoppable_value === max_unstoppable_value}
+						size="icon"
+						variant="outline"
+						class="h-auto rounded-full p-0"
+					>
+						+
+					</Button>
+				{/if}
 				<!-- Descriptive Text -->
 				<p class="text-xs text-muted-foreground">
 					<span class="font-medium text-foreground">Unstoppable: </span>
@@ -190,7 +195,10 @@
 				</p>
 			</div>
 		{:else}
-			<Label for="unstoppable-switch" class="cursor-pointer text-xs font-normal">
+			<Label
+				for="unstoppable-switch"
+				class={cn('cursor-pointer text-xs font-normal', !context.canEdit && 'pointer-events-none')}
+			>
 				Become Unstoppable
 			</Label>
 		{/if}

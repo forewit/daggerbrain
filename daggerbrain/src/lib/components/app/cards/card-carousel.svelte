@@ -7,7 +7,7 @@
 		SubclassFoundationCard,
 		SubclassSpecializationCard,
 		SubclassMasteryCard
-	} from '$lib/types/compendium-types';
+	} from '@shared/types/compendium.types';
 	import { cn } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import AncestryCardComponent from './full-cards/ancestry-card.svelte';

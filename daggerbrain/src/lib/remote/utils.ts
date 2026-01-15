@@ -1,5 +1,8 @@
 import { error, type RequestEvent } from '@sveltejs/kit';
 import { drizzle } from 'drizzle-orm/d1';
+import type { DurableObjectStub } from '@cloudflare/workers-types';
+
+export const CHARACTER_LIMIT = 6;
 
 export const get_db = (event: RequestEvent) => {
 	if (!event.platform?.env?.DB) {
@@ -40,4 +43,13 @@ export const get_r2_usercontent = (event: RequestEvent) => {
 	}
 
 	return event.platform.env.R2_USERCONTENT;
+};
+
+export const get_do = (event: RequestEvent, campaignId: string): DurableObjectStub | null => {
+	if (!event.platform?.env?.CAMPAIGN_LIVE) {
+		return null;
+	}
+	const doNamespace = event.platform.env.CAMPAIGN_LIVE;
+	const id = doNamespace.idFromName(campaignId);
+	return doNamespace.get(id);
 };

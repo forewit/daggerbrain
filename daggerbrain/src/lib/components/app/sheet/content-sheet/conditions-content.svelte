@@ -40,6 +40,8 @@
 					</div>
 					<div class="flex items-center gap-2">
 						<Switch
+							disabled={!context.canEdit}
+							class={cn(!context.canEdit && 'pointer-events-none')}
 							id="condition-hidden"
 							onCheckedChange={(checked) => {
 								if (checked) {
@@ -80,6 +82,8 @@
 					</div>
 					<div class="flex items-center gap-2">
 						<Switch
+							disabled={!context.canEdit}
+							class={cn(!context.canEdit && 'pointer-events-none')}
 							id="condition-restrained"
 							onCheckedChange={(checked) => {
 								if (checked) {
@@ -120,6 +124,8 @@
 					</div>
 					<div class="flex items-center gap-2">
 						<Switch
+							disabled={!context.canEdit}
+							class={cn(!context.canEdit && 'pointer-events-none')}
 							id="condition-vulnerable"
 							onCheckedChange={(checked) => {
 								if (checked) {

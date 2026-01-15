@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import type { Snippet } from 'svelte';
-	import type { Companion } from '$lib/types/character-types';
+	import type { Companion } from '@shared/types/character.types';
 	import { getCharacterContext } from '$lib/state/character.svelte';
+	import { getUserContext } from '$lib/state/user.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import { Input } from '$lib/components/ui/input';
-	import { upload_user_image } from '$lib/remote/images.remote';
 	import * as Select from '$lib/components/ui/select/';
-	import { COMPANION_LEVEL_UP_OPTION_MAXES } from '$lib/types/rules';
-	import type { CompanionLevelUpOptionIds } from '$lib/types/rule-types';
+	import { COMPANION_LEVEL_UP_OPTION_MAXES } from '@shared/constants/rules';
+	import type { CompanionLevelUpOptionIds } from '@shared/types/rule.types';
 	import CompanionEvasion from './companion-evasion.svelte';
 	import CompanionStress from './companion-stress.svelte';
 	import CompanionHope from './companion-hope.svelte';
@@ -25,6 +25,7 @@
 	} = $props();
 
 	const context = getCharacterContext();
+	const user = getUserContext();
 	const character = $derived(context.character);
 	const companion = $derived(character?.companion || null); // companion that can be updated (including choices)
 	const derived_companion = $derived(context.derived_companion); // used to show final stats and is updated automatically based on companion choices
@@ -103,7 +104,7 @@
 			const base64 = dataUrl.split(',')[1];
 
 			try {
-				const url = await upload_user_image({
+				const url = await user.upload_user_image({
 					data: base64,
 					name: file.name,
 					type: file.type
@@ -223,6 +224,7 @@
 	<div class={cn('flex max-w-[calc(min(100%,400px))] flex-col rounded bg-card/50 p-3', className)}>
 		<!-- Hidden file input for image upload (available in both modes) -->
 		<input
+			disabled={!context.canEdit}
 			bind:this={fileInput}
 			type="file"
 			accept="image/*"
@@ -238,6 +240,7 @@
 					<!-- Image Upload -->
 					<div class="flex flex-col gap-1">
 						<button
+							disabled={!context.canEdit}
 							type="button"
 							class="group aspect-square h-[90px] w-[90px] shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 p-1 transition-colors hover:border-primary/50"
 							onclick={triggerImageUpload}
@@ -256,7 +259,12 @@
 						<label for="companion-name" class="text-xs font-medium text-muted-foreground"
 							>Name</label
 						>
-						<Input id="companion-name" bind:value={companion.name} placeholder="Companion name" />
+						<Input
+							disabled={!context.canEdit}
+							id="companion-name"
+							bind:value={companion.name}
+							placeholder="Companion name"
+						/>
 					</div>
 				</div>
 
@@ -289,6 +297,7 @@
 									</td>
 									<td class="py-2 pr-4">
 										<Input
+											disabled={!context.canEdit}
 											bind:value={companion.experiences[i]}
 											placeholder="Unnamed Experience"
 											class="text-xs"
@@ -307,6 +316,7 @@
 							>Attack Name</label
 						>
 						<Input
+							disabled={!context.canEdit}
 							id="companion-attack-name"
 							bind:value={companion.attack.name}
 							placeholder="Attack name"
@@ -320,7 +330,7 @@
 						<div class="text-xs font-medium text-muted-foreground">
 							Level Up Choices ({level_up_choices.length}/{max_level_up_choices})
 						</div>
-						<Select.Root type="single" bind:open={select_open}>
+						<Select.Root disabled={!context.canEdit} type="single" bind:open={select_open}>
 							<Select.Trigger
 								highlighted={level_up_choices.length < max_level_up_choices}
 								class="w-full truncate bg-muted/80 hover:bg-muted/50"
@@ -404,6 +414,7 @@
 								{@const selectId = `intelligent-${i}`}
 								<div class="flex flex-col gap-1">
 									<Select.Root
+										disabled={!context.canEdit}
 										type="single"
 										value={currentChoice}
 										onValueChange={(value: string) => {
@@ -461,6 +472,7 @@
 								{@const selectId = `vicious-${i}`}
 								<div class="flex flex-col gap-1">
 									<Select.Root
+										disabled={!context.canEdit}
 										type="single"
 										value={currentChoice}
 										onValueChange={(value: string) => {
@@ -509,6 +521,7 @@
 					<div class="flex items-start gap-3">
 						<!-- Image -->
 						<button
+							disabled={!context.canEdit}
 							type="button"
 							class="group aspect-square h-[90px] w-[90px] shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 p-1 transition-colors hover:border-primary/50"
 							onclick={triggerImageUpload}
@@ -527,9 +540,15 @@
 								<p class="truncate text-sm font-medium text-foreground">
 									{derived_companion.name || companion.name}
 								</p>
-								<Button variant="ghost" class="h-auto px-2 py-0" onclick={() => (edit_mode = true)}>
-									<Pencil class="size-3.5" />
-								</Button>
+								{#if context.canEdit}
+									<Button
+										variant="ghost"
+										class="h-auto px-2 py-0"
+										onclick={() => (edit_mode = true)}
+									>
+										<Pencil class="size-3.5" />
+									</Button>
+								{/if}
 							</div>
 
 							<!-- Attack -->

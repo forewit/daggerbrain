@@ -4,7 +4,7 @@
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Switch from '$lib/components/ui/switch/switch.svelte';
-	import type { DomainCard } from '$lib/types/compendium-types';
+	import type { DomainCard } from '@shared/types/compendium.types';
 	import { cn } from '$lib/utils';
 	import Tent from '@lucide/svelte/icons/tent';
 	import ArrowUp from '@lucide/svelte/icons/arrow-up';
@@ -155,30 +155,32 @@
 						</div>
 
 						<!-- Rest Mode -->
-						<div class="flex flex-col items-center justify-center gap-3 px-6">
-							<Stress
-								class={cn(
-									'rounded-full bg-muted px-4 py-2',
-									restMode && 'opacity-30'
-									// character.ephemeral_stats.marked_stress >= character.derived_stats.max_stress &&
-									//"border-3 border-destructive"
-								)}
-								displayOnly
-							/>
-							<Label
-								class={cn(
-									'flex h-10 w-min items-center rounded-full border px-3 text-nowrap hover:cursor-pointer',
-									restMode ? 'bg-primary' : 'bg-muted text-muted-foreground'
-								)}
-							>
-								<Switch
-									bind:checked={restMode}
-									class="data-[state=checked]:bg-primary-muted/50 data-[state=unchecked]:bg-foreground/20"
+						{#if context.canEdit}
+							<div class="flex flex-col items-center justify-center gap-3 px-6">
+								<Stress
+									class={cn(
+										'rounded-full bg-muted px-4 py-2',
+										restMode && 'opacity-30'
+										// character.ephemeral_stats.marked_stress >= character.derived_stats.max_stress &&
+										//"border-3 border-destructive"
+									)}
+									displayOnly
 								/>
-								<Tent class="size-4" />
-								<p>Rest Mode</p>
-							</Label>
-						</div>
+								<Label
+									class={cn(
+										'flex h-10 w-min items-center rounded-full border px-3 text-nowrap hover:cursor-pointer',
+										restMode ? 'bg-primary' : 'bg-muted text-muted-foreground'
+									)}
+								>
+									<Switch
+										bind:checked={restMode}
+										class="data-[state=checked]:bg-primary-muted/50 data-[state=unchecked]:bg-foreground/20"
+									/>
+									<Tent class="size-4" />
+									<p>Rest Mode</p>
+								</Label>
+							</div>
+						{/if}
 					</div>
 					<Dialog.Footer class="px-6">
 						<Dialog.Close class={buttonVariants({ variant: 'link' })}>Close</Dialog.Close>
@@ -186,12 +188,14 @@
 				</Dialog.Content>
 			</Dialog.Root>
 
-			<Button
-				variant="ghost"
-				class="text-muted-foreground/50"
-				size="sm"
-				onclick={openDomainCardCatalog}><Pencil /></Button
-			>
+			{#if context.canEdit}
+				<Button
+					variant="ghost"
+					class="text-muted-foreground/50"
+					size="sm"
+					onclick={openDomainCardCatalog}><Pencil /></Button
+				>
+			{/if}
 		</div>
 		{#if expanded}
 			<div class="relative">

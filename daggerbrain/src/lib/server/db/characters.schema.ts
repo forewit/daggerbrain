@@ -4,7 +4,7 @@ import type {
 	BackgroundQuestionAnswer,
 	ConnectionAnswer,
 	CharacterSettings,
-	DerivedDescriptors,
+	DerivedCharacterSummary,
 	LevelUpDomainCardIds,
 	LevelUpChoices,
 	DomainCardId,
@@ -12,17 +12,14 @@ import type {
 	Inventory,
 	ChosenBeastform,
 	Companion
-} from '../../types/character-types';
-import type { DomainIds, Traits } from '../../types/compendium-types';
-import { CHARACTER_DEFAULTS } from '../../types/constants';
+} from '../../../../../shared/src/types/character.types';
+import type { DomainIds, Traits } from '../../../../../shared/src/types/compendium.types';
+import { CHARACTER_DEFAULTS } from '../../../../../shared/src/constants/constants';
 import {
-	RangesSchema,
 	DomainIdsSchema,
-	TraitIdsSchema,
-	DamageTypesSchema
-} from '../../compendium/compendium-schemas';
-import type { ConditionIds } from '$lib/types/rule-types';
-import { z } from 'zod';
+} from '../../../../../shared/src/schemas/compendium.schemas';
+import { ChosenBeastformSchema, CompanionSchema } from '../../../../../shared/src/schemas/character.schemas';
+import type { ConditionIds } from '../../../../../shared/src/types/rule.types';
 
 export const characters_table = sqliteTable(
 	'characters_table',
@@ -32,16 +29,18 @@ export const characters_table = sqliteTable(
 		clerk_user_id: text('clerk_user_id').notNull(),
 		name: text('name').notNull().default(CHARACTER_DEFAULTS.name),
 		image_url: text('image_url').notNull().default(CHARACTER_DEFAULTS.image_url),
+		campaign_id: text('campaign_id'),
+		// Note: claimable status is now stored in campaign_characters_table
 		settings: text('settings', { mode: 'json' })
 			.notNull()
 			.default(CHARACTER_DEFAULTS.settings)
 			.$type<CharacterSettings>(),
 
-		// derived
-		derived_descriptors: text('derived_descriptors', { mode: 'json' })
+		// derived character summary for campaign previews (DB column: derived_descriptors for backward compat)
+		derived_character_summary: text('derived_descriptors', { mode: 'json' })
 			.notNull()
-			.default(CHARACTER_DEFAULTS.derived_descriptors)
-			.$type<DerivedDescriptors>(),
+			.default(CHARACTER_DEFAULTS.derived_character_summary)
+			.$type<DerivedCharacterSummary>(),
 
 		// heritage
 		ancestry_card_id: text('ancestry_card_id'),
@@ -168,39 +167,13 @@ export const characters_table = sqliteTable(
 			.default(CHARACTER_DEFAULTS.level_up_choices)
 			.$type<LevelUpChoices>()
 	},
-	(table) => [index('characters_table_clerk_user_id_idx').on(table.clerk_user_id)]
+	(table) => [
+		index('characters_table_clerk_user_id_idx').on(table.clerk_user_id),
+		index('characters_table_campaign_id_idx').on(table.campaign_id)
+	]
 );
 
-export const ChosenBeastformSchema = z.object({
-	apply_beastform_bonuses: z.boolean(),
-	compendium_id: z.string(),
-	choices: z.record(z.string(), z.array(z.string())),
-	custom_title: z.string().nullable(),
-	custom_level_requirement: z.number().nullable()
-});
-
-export const CompanionSchema = z.object({
-	name: z.string(),
-	image_url: z.string(),
-	attack: z
-		.object({
-			name: z.string(),
-			range: RangesSchema,
-			damage_dice: z.string(),
-			damage_bonus: z.number(),
-			damage_type: DamageTypesSchema
-		})
-		.nullable(),
-	max_stress: z.number(),
-	marked_stress: z.number(),
-	max_hope: z.number(),
-	marked_hope: z.number(),
-	evasion: z.number(),
-	level_up_choices: z.array(z.string()),
-	experiences: z.array(z.string()),
-	experience_modifiers: z.array(z.number()),
-	choices: z.record(z.string(), z.array(z.string()))
-});
+// ChosenBeastformSchema and CompanionSchema are now imported from @shared
 
 export const characters_table_schema = createSelectSchema(characters_table, {
 	secondary_class_domain_id_choice: DomainIdsSchema.nullable(),
@@ -212,8 +185,14 @@ export const characters_table_insert_schema = createInsertSchema(characters_tabl
 	chosen_beastform: ChosenBeastformSchema.nullable(),
 	companion: CompanionSchema.nullable()
 });
+// Base update schema - omits sensitive fields that should only be changed via specific commands
 export const characters_table_update_schema = createUpdateSchema(characters_table, {
 	secondary_class_domain_id_choice: DomainIdsSchema.nullable(),
 	chosen_beastform: ChosenBeastformSchema.nullable(),
 	companion: CompanionSchema.nullable()
+}).omit({
+	campaign_id: true, // Only via assign_character_to_campaign
+	clerk_user_id: true // Immutable
+	// Note: id is not omitted here because it's needed for WHERE clauses, but it won't be updated
+	// Note: claimable status is now stored in campaign_characters_table
 });

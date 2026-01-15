@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { capitalize } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import BardFeatures from './bard-features.svelte';
-	import type { CharacterClass } from '$lib/types/compendium-types';
+	import type { CharacterClass } from '@shared/types/compendium.types';
 	import GuardianFeatures from './guardian-features.svelte';
 	import SeraphFeatures from './seraph-features.svelte';
 	import WizardFeatures from './wizard-features.svelte';

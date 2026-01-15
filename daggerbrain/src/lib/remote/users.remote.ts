@@ -1,5 +1,5 @@
 import { query, command, getRequestEvent } from '$app/server';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import {
 	users_table,
@@ -38,29 +38,31 @@ export const dismiss_popup = command(z.string(), async (popupId) => {
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Get or create user record
-	const [existingUser] = await db
-		.select()
-		.from(users_table)
-		.where(eq(users_table.clerk_id, userId))
-		.limit(1);
-
-	// Use existing dismissed_popups or start with empty array
-	const dismissed_popups = [...(existingUser?.dismissed_popups ?? [])];
-
-	// Add popup ID if not already present
-	if (!dismissed_popups.includes(popupId)) {
-		dismissed_popups.push(popupId);
-	}
-
-	if (existingUser) {
-		await db.update(users_table).set({ dismissed_popups }).where(eq(users_table.clerk_id, userId));
-	} else {
-		await db.insert(users_table).values({
+	// Atomic upsert using SQL JSON functions to conditionally add popup
+	// This eliminates the read-modify-write race condition
+	// Only adds popupId if it's not already in the array
+	await db
+		.insert(users_table)
+		.values({
 			clerk_id: userId,
-			dismissed_popups
+			dismissed_popups: sql`json_array(${popupId})`
+		})
+		.onConflictDoUpdate({
+			target: users_table.clerk_id,
+			set: {
+				dismissed_popups: sql`
+					CASE 
+						WHEN dismissed_popups IS NULL THEN json_array(${popupId})
+						WHEN json_array_length(dismissed_popups) = 0 THEN json_array(${popupId})
+						WHEN EXISTS (
+							SELECT 1 FROM json_each(dismissed_popups) 
+							WHERE value = ${popupId}
+						) THEN dismissed_popups
+						ELSE dismissed_popups || json_array(${popupId})
+					END
+				`
+			}
 		});
-	}
 
 	get_user().refresh();
 	console.log('dismissed popup in D1');
@@ -72,21 +74,17 @@ export const update_user = command(users_table_update_schema, async (updates) =>
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Get or create user record
-	const [existingUser] = await db
-		.select()
-		.from(users_table)
-		.where(eq(users_table.clerk_id, userId))
-		.limit(1);
-
-	if (existingUser) {
-		await db.update(users_table).set(updates).where(eq(users_table.clerk_id, userId));
-	} else {
-		await db.insert(users_table).values({
+	// Atomic upsert
+	await db
+		.insert(users_table)
+		.values({
 			clerk_id: userId,
 			...updates
+		})
+		.onConflictDoUpdate({
+			target: users_table.clerk_id,
+			set: updates
 		});
-	}
 
 	get_user().refresh();
 	console.log('updated user in D1');

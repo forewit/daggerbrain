@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AncestryCard } from '$lib/types/compendium-types';
+	import type { AncestryCard } from '@shared/types/compendium.types';
 	import AncestryCardComponent from '$lib/components/app/cards/full-cards/ancestry-card.svelte';
 
 	let { card }: { card: AncestryCard } = $props();

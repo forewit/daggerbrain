@@ -2,19 +2,30 @@ import { query, command, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
-import { get_db, get_auth } from '../utils';
+import { get_db, get_auth, get_kv } from '../utils';
 import {
 	AncestryCardSchema,
 	CommunityCardSchema,
 	TransformationCardSchema
-} from '$lib/compendium/compendium-schemas';
-import type { AncestryCard, CommunityCard, TransformationCard } from '$lib/types/compendium-types';
+} from '@shared/schemas/compendium.schemas';
+import type {
+	AncestryCard,
+	CommunityCard,
+	TransformationCard
+} from '@shared/types/compendium.types';
 import {
 	homebrew_ancestry_cards,
 	homebrew_community_cards,
 	homebrew_transformation_cards
 } from '$lib/server/db/homebrew.schema';
-import { verifyOwnership, getTotalHomebrewCount, HOMEBREW_LIMIT } from './utils';
+import { campaign_homebrew_vault_table } from '../../server/db/campaigns.schema';
+import {
+	verifyOwnership,
+	getTotalHomebrewCount,
+	HOMEBREW_LIMIT,
+	assertHomebrewTypeEnabled
+} from './utils';
+import { getHomebrewAccessInternal } from '../../server/permissions';
 
 // ============================================================================
 // Ancestry Cards
@@ -40,6 +51,7 @@ export const get_homebrew_ancestry_cards = query(async () => {
 });
 
 export const create_homebrew_ancestry_card = command(AncestryCardSchema, async (data) => {
+	assertHomebrewTypeEnabled('ancestry-cards');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -73,11 +85,15 @@ export const create_homebrew_ancestry_card = command(AncestryCardSchema, async (
 export const update_homebrew_ancestry_card = command(
 	z.object({ id: z.string(), data: AncestryCardSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('ancestry-cards');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		if (!(await verifyOwnership(db, homebrew_ancestry_cards, id, userId))) {
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'ancestry_cards', id);
+
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this ancestry card');
 		}
 
@@ -88,28 +104,40 @@ export const update_homebrew_ancestry_card = command(
 		await db
 			.update(homebrew_ancestry_cards)
 			.set({ data: validatedData, updated_at: now })
-			.where(
-				and(eq(homebrew_ancestry_cards.id, id), eq(homebrew_ancestry_cards.clerk_user_id, userId))
-			);
+			.where(eq(homebrew_ancestry_cards.id, id));
 
 		console.log('updated homebrew ancestry card in D1');
 	}
 );
 
 export const delete_homebrew_ancestry_card = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('ancestry-cards');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	if (!(await verifyOwnership(db, homebrew_ancestry_cards, id, userId))) {
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'ancestry_cards', id);
+
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this ancestry card');
 	}
 
-	await db
-		.delete(homebrew_ancestry_cards)
-		.where(
-			and(eq(homebrew_ancestry_cards.id, id), eq(homebrew_ancestry_cards.clerk_user_id, userId))
-		);
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db.delete(homebrew_ancestry_cards).where(eq(homebrew_ancestry_cards.id, id)),
+
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'ancestry-cards'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
+			)
+	]);
 
 	// refresh the ancestry cards query
 	get_homebrew_ancestry_cards().refresh();
@@ -140,6 +168,7 @@ export const get_homebrew_community_cards = query(async () => {
 });
 
 export const create_homebrew_community_card = command(CommunityCardSchema, async (data) => {
+	assertHomebrewTypeEnabled('community-cards');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -173,11 +202,15 @@ export const create_homebrew_community_card = command(CommunityCardSchema, async
 export const update_homebrew_community_card = command(
 	z.object({ id: z.string(), data: CommunityCardSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('community-cards');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		if (!(await verifyOwnership(db, homebrew_community_cards, id, userId))) {
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'community_cards', id);
+
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this community card');
 		}
 
@@ -188,28 +221,40 @@ export const update_homebrew_community_card = command(
 		await db
 			.update(homebrew_community_cards)
 			.set({ data: validatedData, updated_at: now })
-			.where(
-				and(eq(homebrew_community_cards.id, id), eq(homebrew_community_cards.clerk_user_id, userId))
-			);
+			.where(eq(homebrew_community_cards.id, id));
 
 		console.log('updated homebrew community card in D1');
 	}
 );
 
 export const delete_homebrew_community_card = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('community-cards');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	if (!(await verifyOwnership(db, homebrew_community_cards, id, userId))) {
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'community_cards', id);
+
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this community card');
 	}
 
-	await db
-		.delete(homebrew_community_cards)
-		.where(
-			and(eq(homebrew_community_cards.id, id), eq(homebrew_community_cards.clerk_user_id, userId))
-		);
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db.delete(homebrew_community_cards).where(eq(homebrew_community_cards.id, id)),
+
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'community-cards'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
+			)
+	]);
 
 	// refresh the community cards query
 	get_homebrew_community_cards().refresh();
@@ -242,6 +287,7 @@ export const get_homebrew_transformation_cards = query(async () => {
 export const create_homebrew_transformation_card = command(
 	TransformationCardSchema,
 	async (data) => {
+		assertHomebrewTypeEnabled('transformation-cards');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
@@ -279,11 +325,15 @@ export const create_homebrew_transformation_card = command(
 export const update_homebrew_transformation_card = command(
 	z.object({ id: z.string(), data: TransformationCardSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('transformation-cards');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		if (!(await verifyOwnership(db, homebrew_transformation_cards, id, userId))) {
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'transformation_cards', id);
+
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this transformation card');
 		}
 
@@ -297,34 +347,40 @@ export const update_homebrew_transformation_card = command(
 		await db
 			.update(homebrew_transformation_cards)
 			.set({ data: validatedData, updated_at: now })
-			.where(
-				and(
-					eq(homebrew_transformation_cards.id, id),
-					eq(homebrew_transformation_cards.clerk_user_id, userId)
-				)
-			);
+			.where(eq(homebrew_transformation_cards.id, id));
 
 		console.log('updated homebrew transformation card in D1');
 	}
 );
 
 export const delete_homebrew_transformation_card = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('transformation-cards');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	if (!(await verifyOwnership(db, homebrew_transformation_cards, id, userId))) {
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'transformation_cards', id);
+
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this transformation card');
 	}
 
-	await db
-		.delete(homebrew_transformation_cards)
-		.where(
-			and(
-				eq(homebrew_transformation_cards.id, id),
-				eq(homebrew_transformation_cards.clerk_user_id, userId)
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db.delete(homebrew_transformation_cards).where(eq(homebrew_transformation_cards.id, id)),
+
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'transformation-cards'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
 			)
-		);
+	]);
 
 	// refresh the transformation cards query
 	get_homebrew_transformation_cards().refresh();

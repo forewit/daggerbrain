@@ -10,6 +10,7 @@
 	import { getUserContext } from '$lib/state/user.svelte';
 	import { error } from '@sveltejs/kit';
 	import Footer from '$lib/components/app/footer.svelte';
+	import { UI_CHARACTER_LIMIT } from '@shared/constants/constants';
 
 	const user = getUserContext();
 
@@ -19,10 +20,13 @@
 	let creatingCharacter = $state(false);
 
 	// Check if user is at character limit (3 characters max)
-	let isAtLimit = $derived(user.all_characters.length >= 3);
+	let isAtLimit = $derived(user.all_characters.length >= UI_CHARACTER_LIMIT);
 
 	// Calculate title with character count
-	let titleText = $derived(`${user.all_characters.length}/3`);
+	let titleText = $derived(`${user.all_characters.length}/${UI_CHARACTER_LIMIT}`);
+
+	// Create campaign lookup map for O(1) campaign name lookups
+	let campaignMap = $derived(new Map(user.all_campaigns.map((c) => [c.id, c.name])));
 
 	async function handleCreateCharacter() {
 		creatingCharacter = true;
@@ -109,32 +113,42 @@
 					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 						{#each user.all_characters as char}
 							{#if char.id !== redirecting_to_character}
-								<div class="mx-auto w-full max-w-[500px] overflow-hidden rounded">
+								<div class="relative mx-auto w-full max-w-[500px] overflow-hidden rounded">
 									<a
 										href={`/characters/${char.id}/`}
 										class="flex gap-2 border bg-primary-muted p-1 hover:bg-primary-muted/80"
 									>
-										<div class=" h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2">
+										<div class=" size-19 shrink-0 overflow-hidden rounded-lg border-2">
 											<img
 												src={char.image_url || '/images/portrait-placeholder.png'}
 												alt={char.name.trim() || 'Unnamed Character'}
 												class="h-full w-full object-cover"
 											/>
 										</div>
-										<div class="truncate">
-											<p class="mt-1 truncate text-lg font-bold">
+										<div class="grow truncate">
+											<p class=" truncate text-lg font-bold">
 												{char.name.trim() || 'Unnamed Character'}
 											</p>
 
-											<p class="mt-1 truncate text-xs text-muted-foreground">
-												{char.derived_descriptors.ancestry_name || 'No ancestry'}
+											<p class="truncate text-xs text-muted-foreground">
+												{char.derived_character_summary?.ancestry_name || 'No ancestry'}
 												&ensp;•&ensp;
-												{char.derived_descriptors.primary_class_name || 'No class'}
+												{char.derived_character_summary?.primary_class_name || 'No class'}
 												&ensp;•&ensp;
-												{char.derived_descriptors.primary_subclass_name || 'No subclass'}
+												{char.derived_character_summary?.primary_subclass_name || 'No subclass'}
 											</p>
 										</div>
 									</a>
+									{#if char.campaign_id && campaignMap.has(char.campaign_id)}
+										<div class="absolute right-2 bottom-10.5 left-22 flex truncate">
+											<a
+												href={`/campaigns/${char.campaign_id}`}
+												class="w-min max-w-full truncate rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 text-center text-xs text-accent hover:underline"
+											>
+												Campaign: {campaignMap.get(char.campaign_id)}
+											</a>
+										</div>
+									{/if}
 									<div class="flex bg-muted">
 										<Button
 											variant="ghost"

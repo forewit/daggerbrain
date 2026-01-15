@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { AncestryCard, AncestryCardChoice } from '$lib/types/compendium-types';
+	import type { AncestryCard, AncestryCardChoice } from '@shared/types/compendium.types';
 	import { cn } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import type { Snippet } from 'svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
-	import { BASE_MIXED_ANCESTRY_CARD } from '$lib/types/rules';
+	import { BASE_MIXED_ANCESTRY_CARD } from '@shared/constants/rules';
 	import ChoiceSelector from '$lib/components/app/leveling/secondary-options/choice-selector.svelte';
 	import * as Select from '$lib/components/ui/select/';
 
@@ -51,6 +51,7 @@
 			{#if choice.conditional_choice === null || (conditional_choice_id && conditional_selection_id && character.ancestry_card_choices[conditional_choice_id] && character.ancestry_card_choices[conditional_choice_id].includes(conditional_selection_id))}
 				{#if choice.type === 'arbitrary'}
 					<ChoiceSelector
+						disabled={!context.canEdit}
 						class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
 						bind:selected_ids={character.ancestry_card_choices[choice.choice_id]}
 						max={choice.max}
@@ -59,6 +60,7 @@
 					/>
 				{:else if choice.type === 'experience'}
 					<ChoiceSelector
+						disabled={!context.canEdit}
 						class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
 						bind:selected_ids={character.ancestry_card_choices[choice.choice_id]}
 						max={choice.max}
@@ -85,6 +87,7 @@
 	{#if character && isMixedAncestry && bind_choice_select}
 		<div class={cn('flex flex-col gap-1', gapClass)}>
 			<Select.Root
+				disabled={!context.canEdit}
 				type="single"
 				value={character.custom_top_ancestry || ''}
 				onValueChange={(value: string) => {
@@ -123,6 +126,7 @@
 			</Select.Root>
 
 			<Select.Root
+				disabled={!context.canEdit}
 				type="single"
 				value={character.custom_bottom_ancestry || ''}
 				onValueChange={(value: string) => {

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
-	import type { Weapon, Armor, Consumable, AdventuringGear } from '$lib/types/compendium-types';
+	import type { Weapon, Armor, Consumable, AdventuringGear } from '@shared/types/compendium.types';
 	import WeaponDetails from './weapon-details.svelte';
 	import ArmorDetails from './armor-details.svelte';
 	import ConsumableDetails from './consumable-details.svelte';

@@ -1,10 +1,8 @@
 <script lang="ts">
-	import { cn, capitalize, applyProficiencyToDice } from '$lib/utils';
-	import * as Select from '$lib/components/ui/select/';
-	import type { Traits, DamageTypes } from '$lib/types/compendium-types';
+	import { cn, applyProficiencyToDice } from '$lib/utils';
+	import type { Traits, DamageTypes } from '@shared/types/compendium.types';
 	import { getCharacterContext } from '$lib/state/character.svelte';
-	import Check from '@lucide/svelte/icons/check';
-	import { TRAITS } from '$lib/types/rules';
+	import { TRAITS } from '@shared/constants/rules';
 
 	let {
 		id,

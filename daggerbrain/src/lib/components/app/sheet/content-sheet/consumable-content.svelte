@@ -5,12 +5,13 @@
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { cn } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ConsumableRules from '../../rules/consumable-rules.svelte';
 	import HomebrewBadge from '../../homebrew/homebrew-badge.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
+	import CampaignBadge from '../../homebrew/campaign-badge.svelte';
 
 	let { consumableId }: { consumableId: string } = $props();
 
@@ -90,6 +91,8 @@
 		<p class="flex items-center gap-1.5 text-xs text-muted-foreground italic">
 			{#if consumable.source_id === 'Homebrew'}
 				<HomebrewBadge type="consumable" id={consumable.compendium_id} class="-mt-0.5 size-4" />
+			{:else if consumable.source_id === 'Campaign'}
+				<CampaignBadge type="consumable" id={consumable.compendium_id} class="-mt-0.5 size-4" />
 			{/if}
 			Consumable
 		</p>
@@ -112,7 +115,7 @@
 			{/if}
 		</div>
 
-		{#if inventoryItem}
+		{#if inventoryItem && context.canEdit}
 			<Collapsible.Root bind:open={customizeOpen}>
 				<Collapsible.Trigger
 					class={cn(

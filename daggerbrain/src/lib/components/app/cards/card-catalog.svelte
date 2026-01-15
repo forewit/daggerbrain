@@ -8,7 +8,7 @@
 		AncestryCard,
 		CommunityCard,
 		TransformationCard
-	} from '$lib/types/compendium-types';
+	} from '@shared/types/compendium.types';
 	import DomainCardComponent from './full-cards/domain-card.svelte';
 	import AncestryCardComponent from './full-cards/ancestry-card.svelte';
 	import CommunityCardComponent from './full-cards/community-card.svelte';
@@ -29,6 +29,7 @@
 	} = $props();
 
 	let searchQuery = $state('');
+	// svelte-ignore state_referenced_locally
 	let cardTypeFilter = $state<CardTypeFilter>(initialCardTypeFilter);
 	let domainFilter = $state<DomainIds[]>([]);
 	let levelFilter = $state<number[]>([]);

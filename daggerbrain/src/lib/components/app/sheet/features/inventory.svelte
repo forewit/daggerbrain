@@ -6,7 +6,7 @@
 		Consumable,
 		Loot,
 		AdventuringGear
-	} from '$lib/types/compendium-types';
+	} from '@shared/types/compendium.types';
 	import WeaponCard from './equipment/weapon-row.svelte';
 	import ArmorCard from './equipment/armor-row.svelte';
 	import ConsumableCard from './equipment/consumable-row.svelte';
@@ -16,7 +16,7 @@
 	import { cn } from '$lib/utils';
 	import Search from '@lucide/svelte/icons/search';
 	import { Button } from '$lib/components/ui/button';
-	import Gold from '../../equipment/gold.svelte';
+	import Gold from '../gold.svelte';
 
 	let {
 		class: className = '',
@@ -245,6 +245,8 @@
 			{/if}
 		{/if}
 
-		<Button class="mx-4" variant="outline" onclick={onAddItems}>Add Items</Button>
+		{#if context.canEdit}
+			<Button class="mx-4" variant="outline" onclick={onAddItems}>Add Items</Button>
+		{/if}
 	</div>
 {/if}

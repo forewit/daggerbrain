@@ -1,6 +1,10 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import type { Ranges } from '$lib/types/compendium-types';
+import type { Ranges } from '@shared/types/compendium.types';
+
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
+
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -14,6 +18,27 @@ export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & { ref?:
 export function capitalize(string: string): string {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 }
+
+/**
+ * Renders markdown to sanitized HTML
+ * @param markdown - The markdown string to render
+ * @returns Sanitized HTML string safe for rendering
+ */
+export function renderMarkdown(markdown: string): string {
+	if (!markdown || typeof markdown !== 'string') {
+		return '';
+	}
+
+	// Convert markdown to HTML (synchronous mode)
+	// marked.parse() is synchronous by default, but TypeScript types indicate it could be async
+	const html = marked.parse(markdown) as string;
+
+	// Sanitize the HTML to prevent XSS attacks
+	const sanitized = DOMPurify.sanitize(html);
+
+	return sanitized;
+}
+
 
 /**
  * Applies proficiency multiplier to dice in a dice string.
@@ -142,4 +167,35 @@ export function tier_to_min_level(tier: number): number {
 	if (tier === 2) return 2;
 	if (tier === 3) return 5;
 	return 8; // tier 4
+}
+
+/**
+ * Formats a timestamp (milliseconds since epoch) as "Jan 4, 2026"
+ *
+ * @param timestamp - The timestamp in milliseconds
+ * @returns The formatted date string (e.g., "Jan 4, 2026")
+ *
+ * @example
+ * formatDate(1573516800000) // "Nov 12, 2019"
+ */
+export function formatDate(timestamp: number): string {
+	const date = new Date(timestamp);
+	const monthNames = [
+		'Jan',
+		'Feb',
+		'Mar',
+		'Apr',
+		'May',
+		'Jun',
+		'Jul',
+		'Aug',
+		'Sep',
+		'Oct',
+		'Nov',
+		'Dec'
+	];
+	const month = monthNames[date.getMonth()];
+	const day = date.getDate();
+	const year = date.getFullYear();
+	return `${month} ${day}, ${year}`;
 }

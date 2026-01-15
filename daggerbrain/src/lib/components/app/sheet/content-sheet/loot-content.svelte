@@ -5,13 +5,14 @@
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { cn } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import LootRules from '../../rules/loot-rules.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import CircleMinus from '@lucide/svelte/icons/circle-minus';
 	import HomebrewBadge from '../../homebrew/homebrew-badge.svelte';
+	import CampaignBadge from '../../homebrew/campaign-badge.svelte';
 
 	let { lootId }: { lootId: string } = $props();
 
@@ -91,6 +92,8 @@
 		<p class="flex items-center gap-1.5 text-xs text-muted-foreground italic">
 			{#if loot.source_id === 'Homebrew'}
 				<HomebrewBadge type="loot" id={loot.compendium_id} class="-mt-0.5 size-4" />
+			{:else if loot.source_id === 'Campaign'}
+				<CampaignBadge type="loot" id={loot.compendium_id} class="-mt-0.5 size-4" />
 			{/if}
 			Loot
 		</p>
@@ -113,7 +116,7 @@
 			{/if}
 		</div>
 
-		{#if inventoryItem}
+		{#if inventoryItem && context.canEdit}
 			<Collapsible.Root bind:open={customizeOpen}>
 				<Collapsible.Trigger
 					class={cn(

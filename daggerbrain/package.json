@@ -5,10 +5,11 @@
 	"type": "module",
 	"scripts": {
 		"dev": "NODE_TLS_REJECT_UNAUTHORIZED=0 vite dev",
+		"dev:wrangler": "wrangler dev --local -c wrangler.jsonc -c ../daggerbrain-do/wrangler.jsonc",
 		"build": "vite build",
-		"preview": "bun run build && wrangler dev",
+		"preview": "bun run build && wrangler dev --local -c wrangler.jsonc -c ../daggerbrain-do/wrangler.jsonc",
 		"prepare": "svelte-kit sync || echo ''",
-		"check": "rm -rf .svelte-kit/output .svelte-kit/cloudflare .svelte-kit/cloudflare-tmp && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check": "rm -rf .svelte-kit/output .svelte-kit/cloudflare .svelte-kit/cloudflare-tmp && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && bun run --cwd ../daggerbrain-do check && bun run --cwd ../shared check",
 		"check:watch": "rm -rf .svelte-kit/output .svelte-kit/cloudflare .svelte-kit/cloudflare-tmp && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "prettier --check .",
@@ -19,8 +20,8 @@
 		"db:migrate": "drizzle-kit migrate",
 		"db:studio": "drizzle-kit studio",
 		"seed": "bun run src/lib/scripts/seed.ts",
-		"deploy:prod": "bun run build && wrangler deploy",
-		"deploy:beta": "bun run build && wrangler deploy -c wrangler.beta.jsonc",
+		"deploy:prod": "bun run build && wrangler deploy --config ../daggerbrain-do/wrangler.jsonc && wrangler deploy --config wrangler.jsonc",
+		"deploy:beta": "bun run build && wrangler deploy --config ../daggerbrain-do/wrangler.jsonc && wrangler deploy --config wrangler.beta.jsonc",
 		"cf-typegen": "wrangler types ./src/worker-configuration.d.ts"
 	},
 	"devDependencies": {
@@ -59,8 +60,11 @@
 		"wrangler": "^4.49.0"
 	},
 	"dependencies": {
+		"clsx": "^2.1.1",
 		"dompurify": "^3.3.1",
 		"marked": "^17.0.1",
-		"svelte-clerk": "^0.18.1"
+		"shared": "workspace:*",
+		"svelte-clerk": "^0.20.3",
+		"zod": "^4.3.5"
 	}
 }

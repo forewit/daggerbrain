@@ -23,6 +23,7 @@
 		class={cn('relative flex items-center gap-4', displayOnly && 'pointer-events-none', className)}
 	>
 		<button
+			disabled={!context.canEdit}
 			onclick={() => {
 				companion.marked_stress = 0;
 			}}
@@ -34,6 +35,7 @@
 		<div class="flex flex-wrap gap-2">
 			{#each Array(max_stress) as _, index}
 				<button
+					disabled={!context.canEdit}
 					aria-label="companion-stress-slot"
 					class={cn(
 						'h-3 w-6 rounded-md border border-muted-foreground transition-colors',

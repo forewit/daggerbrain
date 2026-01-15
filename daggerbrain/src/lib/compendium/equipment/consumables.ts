@@ -1,4 +1,4 @@
-import type { Consumable } from '$lib/types/compendium-types';
+import type { Consumable } from '@shared/types/compendium.types';
 
 export const CONSUMABLES = {
 	stride_potion: {

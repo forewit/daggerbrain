@@ -7,10 +7,10 @@
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import Check from '@lucide/svelte/icons/check';
 	import ChevronsUpDown from '@lucide/svelte/icons/chevrons-up-down';
-	import type { DomainIds, Weapon } from '$lib/types/compendium-types';
+	import type { DomainIds, Weapon } from '@shared/types/compendium.types';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import * as Select from '$lib/components/ui/select';
-	import type { HomebrewType } from '$lib/types/homebrew-types';
+	import type { HomebrewType } from '@shared/types/homebrew.types';
 
 	let {
 		homebrewType,

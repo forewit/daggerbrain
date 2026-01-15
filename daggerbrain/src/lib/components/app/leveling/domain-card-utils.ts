@@ -1,7 +1,7 @@
 import { getCharacterContext } from '$lib/state/character.svelte';
 import { getCompendiumContext } from '$lib/state/compendium.svelte';
-import type { DomainCardId } from '$lib/types/character-types';
-import type { DomainCard, DomainIds } from '$lib/types/compendium-types';
+import type { DomainCardId } from '@shared/types/character.types';
+import type { DomainCard, DomainIds } from '@shared/types/compendium.types';
 
 /**
  * Calculate previously chosen domain cards up to the given level.

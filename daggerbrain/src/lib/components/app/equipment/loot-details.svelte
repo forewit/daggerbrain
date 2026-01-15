@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { renderMarkdown } from '$lib/utils/markdown';
-	import type { Loot } from '$lib/types/compendium-types';
+	import { renderMarkdown } from '$lib/utils';
+	import type { Loot } from '@shared/types/compendium.types';
 
 	let { loot }: { loot: Loot } = $props();
 </script>

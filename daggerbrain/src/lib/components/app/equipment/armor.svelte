@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import Shield from '@lucide/svelte/icons/shield';
-	import type { Armor } from '$lib/types/compendium-types';
+	import type { Armor } from '@shared/types/compendium.types';
 
 	let { armor, class: className = '' }: { armor: Armor; class?: string } = $props();
 </script>

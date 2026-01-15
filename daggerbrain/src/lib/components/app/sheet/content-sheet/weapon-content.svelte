@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { DamageTypes, Ranges } from '$lib/types/compendium-types';
+	import type { DamageTypes, Ranges } from '@shared/types/compendium.types';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import * as Collapsible from '$lib/components/ui/collapsible';
 	import * as Select from '$lib/components/ui/select';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { cn, capitalize } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import Hand from '@lucide/svelte/icons/hand';
@@ -16,6 +16,7 @@
 	import WeaponsRules from '../../rules/weapons-rules.svelte';
 	import DicePicker from '../../dice/dice-picker.svelte';
 	import { z } from 'zod';
+	import CampaignBadge from '../../homebrew/campaign-badge.svelte';
 
 	let { weaponId }: { weaponId: string } = $props();
 
@@ -333,6 +334,8 @@
 			<p class="flex items-center gap-1.5 text-xs text-muted-foreground italic">
 				{#if weapon.source_id === 'Homebrew'}
 					<HomebrewBadge type="weapon" id={weapon.compendium_id} class="-mt-0.5 size-4" />
+				{:else if weapon.source_id === 'Campaign'}
+					<CampaignBadge type="weapon" id={weapon.compendium_id} class="-mt-0.5 size-4" />
 				{/if}
 				Tier {context.level_to_tier(weapon.level_requirement)}
 				{weapon.category} Weapon
@@ -398,7 +401,7 @@
 			</div>
 		{/if}
 
-		{#if inventoryItem}
+		{#if inventoryItem && context.canEdit}
 			<Collapsible.Root bind:open={customizeOpen}>
 				<Collapsible.Trigger
 					class={cn(

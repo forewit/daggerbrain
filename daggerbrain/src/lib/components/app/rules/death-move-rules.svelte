@@ -25,11 +25,11 @@
 			cross out your last Hope slot, your character's journey ends.
 		</li>
 		<li>
-			<b>Risk It All:</b> Roll your Duality Dice. If the Hope Die is higher, your character stays on
-			their feet and clears a number of Hit Points or Stress equal to the value of the Hope Die (you
-			can divide the Hope Die value between Hit Points and Stress however you'd prefer). If the Fear
-			Die is higher, your character crosses through the veil of death. If the Duality Dice show matching
-			results, your character stays up and clears all Hit Points and Stress.
+			<b>Risk It All:</b> Roll your Duality Dice. If the Hope Die is higher, your character stays on their
+			feet and clears a number of Hit Points or Stress equal to the value of the Hope Die (you can divide
+			the Hope Die value between Hit Points and Stress however you'd prefer). If the Fear Die is higher,
+			your character crosses through the veil of death. If the Duality Dice show matching results, your
+			character stays up and clears all Hit Points and Stress.
 		</li>
 	</ul>
 </div>

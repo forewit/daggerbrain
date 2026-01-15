@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { CommunityCard } from '$lib/types/compendium-types';
+	import type { CommunityCard } from '@shared/types/compendium.types';
 	import { cn } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import type { Snippet } from 'svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 
@@ -30,20 +30,21 @@
 		{@const current_count = character.community_card_tokens || 0}
 		<div class="flex items-center justify-center gap-2">
 			<!-- Minus Button -->
-			<button
-				type="button"
-				onclick={() => {
-					if (!character) return;
-					const current = character.community_card_tokens || 0;
-					character.community_card_tokens = Math.max(0, current - 1);
-				}}
-				disabled={current_count === 0}
-				class="flex size-7 items-center justify-center rounded-full bg-red-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-gray-300"
-				aria-label="Decrease token count"
-			>
-				−
-			</button>
-
+			{#if context.canEdit}
+				<button
+					type="button"
+					onclick={() => {
+						if (!character) return;
+						const current = character.community_card_tokens || 0;
+						character.community_card_tokens = Math.max(0, current - 1);
+					}}
+					disabled={current_count <= 0}
+					class="flex size-7 items-center justify-center rounded-full bg-red-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+					aria-label="Decrease token count"
+				>
+					−
+				</button>
+			{/if}
 			<!-- Coin Stack -->
 			<div class="relative flex items-center justify-center">
 				<!-- Stack of coins (background coins) -->
@@ -70,19 +71,21 @@
 			</div>
 
 			<!-- Plus Button -->
-			<button
-				type="button"
-				onclick={() => {
-					if (!character) return;
-					const current = character.community_card_tokens || 0;
-					character.community_card_tokens = Math.min(99, current + 1);
-				}}
-				disabled={current_count === 99}
-				class="flex size-7 items-center justify-center rounded-full bg-green-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-gray-300"
-				aria-label="Increase token count"
-			>
-				+
-			</button>
+			{#if context.canEdit}
+				<button
+					type="button"
+					onclick={() => {
+						if (!character) return;
+						const current = character.community_card_tokens || 0;
+						character.community_card_tokens = Math.min(99, current + 1);
+					}}
+					disabled={current_count >= 99}
+					class="flex size-7 items-center justify-center rounded-full bg-green-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+					aria-label="Increase token count"
+				>
+					+
+				</button>
+			{/if}
 		</div>
 	{/if}
 {/snippet}

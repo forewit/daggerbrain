@@ -1,4 +1,4 @@
-import type { Loot } from '$lib/types/compendium-types';
+import type { Loot } from '@shared/types/compendium.types';
 
 // todo: verify everything below
 export const LOOT = {

@@ -1,4 +1,4 @@
-import type { Source, SourceIds } from '$lib/types/compendium-types';
+import type { Source, SourceIds } from '@shared/types/compendium.types';
 
 export const SOURCES = {
 	'Void 1.5': {
@@ -15,5 +15,10 @@ export const SOURCES = {
 		source_id: 'Homebrew',
 		name: 'Homebrew',
 		short_title: 'Homebrew'
+	},
+	Campaign: {
+		source_id: 'Campaign',
+		name: 'Campaign',
+		short_title: 'Campaign'
 	}
 } as const satisfies Record<SourceIds, Source>;

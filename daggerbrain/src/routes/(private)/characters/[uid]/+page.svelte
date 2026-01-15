@@ -4,31 +4,26 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getUserContext } from '$lib/state/user.svelte';
-	import { page } from '$app/stores';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 
 	const context = getCharacterContext();
-	let character = $derived(context.character);
+	let character = $derived(context?.character);
 	const user = getUserContext();
-	const characterId = $derived($page.params.uid);
 
-	let characterNotFound = $derived.by(() => {
-		if (user.loading) return false;
-		return !user.all_characters.some((c) => c.id === characterId);
+	// Check both user loading and character context loading
+	const isLoading = $derived.by(() => {
+		const userLoading = user?.loading;
+		const contextLoading = context?.loading;
+		return userLoading || contextLoading;
 	});
 </script>
 
-{#if user.loading}
+{#if isLoading}
 	<div class="relative min-h-[calc(100dvh-var(--navbar-height,3.5rem))]">
 		<!-- Keep the page height so the footer doesn't jump while loading -->
 		<div class="absolute inset-0 flex items-center justify-center">
 			<LoaderCircle class="h-8 w-8 animate-spin text-muted-foreground" />
 		</div>
-	</div>
-{:else if characterNotFound}
-	<div class="flex flex-col items-center justify-center gap-4 px-4 py-12">
-		<p class="text-sm text-muted-foreground italic">Character not found</p>
-		<Button href="/characters">Back to Characters</Button>
 	</div>
 {:else if character}
 	{#if Object.values(character.selected_traits).includes(null) || !character.primary_class_id}

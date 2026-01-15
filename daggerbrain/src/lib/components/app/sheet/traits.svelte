@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { cn } from '$lib/utils';
-	import type { Traits, TraitIds } from '$lib/types/compendium-types';
-	import { TRAITS } from '$lib/types/rules';
+	import type { Traits, TraitIds } from '@shared/types/compendium.types';
+	import { TRAITS } from '@shared/constants/rules';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 

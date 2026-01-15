@@ -4,6 +4,7 @@ import type {
 	Beastform,
 	CharacterClass,
 	CommunityCard,
+	CompendiumContent,
 	Consumable,
 	Domain,
 	DomainCard,
@@ -14,184 +15,123 @@ import type {
 	Subclass,
 	TransformationCard,
 	Weapon
-} from '$lib/types/compendium-types';
+} from '@shared/types/compendium.types';
 import { getContext, setContext } from 'svelte';
 import { SvelteSet } from 'svelte/reactivity';
 import {
 	get_all_ancestry_cards,
 	get_all_community_cards,
 	get_all_transformation_cards
-} from '$lib/remote/heritages.remote';
-import { get_all_classes, get_all_subclasses } from '$lib/remote/classes.remote';
-import { get_all_beastforms } from '$lib/remote/beastforms.remote';
-import { get_all_domains, get_domain_cards } from '$lib/remote/domains.remote';
+} from '$lib/remote/compendium/heritages.remote';
+import { get_all_classes, get_all_subclasses } from '$lib/remote/compendium/classes.remote';
+import { get_all_beastforms } from '$lib/remote/compendium/beastforms.remote';
+import { get_all_domains, get_domain_cards } from '$lib/remote/compendium/domains.remote';
 import {
 	get_all_armor,
 	get_all_consumables,
 	get_all_loot,
 	get_all_primary_weapons,
 	get_all_secondary_weapons
-} from '$lib/remote/equipment.remote';
-import { get_all_sources } from '$lib/remote/sources.remote';
+} from '$lib/remote/compendium/equipment.remote';
+import { get_all_sources } from '$lib/remote/compendium/sources.remote';
 import { getHomebrewContext } from './homebrew.svelte';
+import { getCharacterContext } from './character.svelte';
+import { get_campaign_homebrew_items } from '$lib/remote/campaigns/campaign-homebrew.remote';
 
 function createCompendium() {
-	let all_ancestry_cards: Record<string, AncestryCard> = $state({});
-	let all_community_cards: Record<string, CommunityCard> = $state({});
-	let all_transformation_cards: Record<string, TransformationCard> = $state({});
-	let all_beastforms: Record<string, Beastform> = $state({});
-	let all_classes: Record<string, CharacterClass> = $state({});
-	let all_subclasses: Record<string, Subclass> = $state({});
-	let all_domains: Record<string, Domain> = $state({});
-	let all_domain_cards: Record<DomainIds, Record<string, DomainCard>> = $state({
-		arcana: {},
-		blade: {},
-		bone: {},
-		codex: {},
-		grace: {},
-		midnight: {},
-		sage: {},
-		splendor: {},
-		valor: {}
+	// Campaign homebrew state (loaded reactively from character context)
+	let campaign_homebrew = $state<CompendiumContent>({
+		primary_weapons: {},
+		secondary_weapons: {},
+		armor: {},
+		loot: {},
+		consumables: {},
+		beastforms: {},
+		classes: {},
+		subclasses: {},
+		domain_cards: {
+			arcana: {},
+			blade: {},
+			bone: {},
+			codex: {},
+			grace: {},
+			midnight: {},
+			sage: {},
+			splendor: {},
+			valor: {}
+		},
+		ancestry_cards: {},
+		community_cards: {},
+		transformation_cards: {},
+		domains: {}
 	});
-	let all_primary_weapons: Record<string, Weapon> = $state({});
-	let all_secondary_weapons: Record<string, Weapon> = $state({});
-	let all_armor: Record<string, Armor> = $state({});
-	let all_loot: Record<string, Loot> = $state({});
-	let all_consumables: Record<string, Consumable> = $state({});
-	let all_sources: Record<string, Source> = $state({});
 
-	const homebrew = getHomebrewContext();
-
-	function compendiumEquivilanceCheck(A: Record<string, any>, B: Record<string, any>) {
-		// check if all keys are the same
-		if (Object.keys(A).length !== Object.keys(B).length) {
-			return false;
-		}
-		for (const key in A) {
-			if (A[key] !== B[key]) {
-				return false;
-			}
-		}
-		return true;
+	function load_campaign_homebrew(campaignId: string) {
+		get_campaign_homebrew_items(campaignId)
+			.then((items) => {
+				campaign_homebrew = items;
+			})
+			.catch((err) => {
+				console.error('Failed to load campaign homebrew:', err);
+				campaign_homebrew = {
+					primary_weapons: {},
+					secondary_weapons: {},
+					armor: {},
+					loot: {},
+					consumables: {},
+					beastforms: {},
+					classes: {},
+					subclasses: {},
+					domain_cards: {
+						arcana: {},
+						blade: {},
+						bone: {},
+						codex: {},
+						grace: {},
+						midnight: {},
+						sage: {},
+						splendor: {},
+						valor: {}
+					},
+					ancestry_cards: {},
+					community_cards: {},
+					transformation_cards: {},
+					domains: {}
+				};
+			});
 	}
 
-	$effect(() => {
-		const new_all_classes: Record<string, CharacterClass> = { ...homebrew.classes, ...all_classes };
-		if (!compendiumEquivilanceCheck(new_all_classes, all_classes)) {
-			all_classes = new_all_classes;
-		}
-	});
-
-	$effect(() => {
-		const new_all_subclasses: Record<string, Subclass> = {
-			...homebrew.subclasses,
-			...all_subclasses
-		};
-		if (!compendiumEquivilanceCheck(new_all_subclasses, all_subclasses)) {
-			all_subclasses = new_all_subclasses;
-		}
-	});
-
-	$effect(() => {
-		const new_all_domains: Record<string, Domain> = { ...homebrew.domains, ...all_domains };
-		if (!compendiumEquivilanceCheck(new_all_domains, all_domains)) {
-			all_domains = new_all_domains;
-		}
-	});
-
-	$effect(() => {
-		const new_all_domain_cards: Record<DomainIds, Record<string, DomainCard>> = {
-			...homebrew.domain_cards,
-			...all_domain_cards
-		};
-		if (!compendiumEquivilanceCheck(new_all_domain_cards, all_domain_cards)) {
-			all_domain_cards = new_all_domain_cards;
-		}
-	});
-
-	$effect(() => {
-		const new_all_primary_weapons: Record<string, Weapon> = {
-			...homebrew.primary_weapons,
-			...all_primary_weapons
-		};
-		if (!compendiumEquivilanceCheck(new_all_primary_weapons, all_primary_weapons)) {
-			all_primary_weapons = new_all_primary_weapons;
-		}
-	});
-
-	$effect(() => {
-		const new_all_secondary_weapons: Record<string, Weapon> = {
-			...homebrew.secondary_weapons,
-			...all_secondary_weapons
-		};
-		if (!compendiumEquivilanceCheck(new_all_secondary_weapons, all_secondary_weapons)) {
-			all_secondary_weapons = new_all_secondary_weapons;
-		}
-	});
-
-	$effect(() => {
-		const new_all_armor: Record<string, Armor> = { ...homebrew.armor, ...all_armor };
-		if (!compendiumEquivilanceCheck(new_all_armor, all_armor)) {
-			all_armor = new_all_armor;
-		}
-	});
-
-	$effect(() => {
-		const new_all_loot: Record<string, Loot> = { ...homebrew.loot, ...all_loot };
-		if (!compendiumEquivilanceCheck(new_all_loot, all_loot)) {
-			all_loot = new_all_loot;
-		}
-	});
-
-	$effect(() => {
-		const new_all_consumables: Record<string, Consumable> = {
-			...homebrew.consumables,
-			...all_consumables
-		};
-		if (!compendiumEquivilanceCheck(new_all_consumables, all_consumables)) {
-			all_consumables = new_all_consumables;
-		}
-	});
-
-	$effect(() => {
-		const new_ancestry_cards: Record<string, AncestryCard> = {
-			...homebrew.ancestry_cards,
-			...all_ancestry_cards
-		};
-		if (!compendiumEquivilanceCheck(new_ancestry_cards, all_ancestry_cards)) {
-			all_ancestry_cards = new_ancestry_cards;
-		}
-	});
-
-	$effect(() => {
-		const new_community_cards: Record<string, CommunityCard> = {
-			...homebrew.community_cards,
-			...all_community_cards
-		};
-		if (!compendiumEquivilanceCheck(new_community_cards, all_community_cards)) {
-			all_community_cards = new_community_cards;
-		}
-	});
-
-	$effect(() => {
-		const new_transformation_cards: Record<string, TransformationCard> = {
-			...homebrew.transformation_cards,
-			...all_transformation_cards
-		};
-		if (!compendiumEquivilanceCheck(new_transformation_cards, all_transformation_cards)) {
-			all_transformation_cards = new_transformation_cards;
-		}
-	});
-
-	$effect(() => {
-		const new_beastforms: Record<string, Beastform> = { ...homebrew.beastforms, ...all_beastforms };
-		if (!compendiumEquivilanceCheck(new_beastforms, all_beastforms)) {
-			all_beastforms = new_beastforms;
-		}
-	});
+	const homebrewContext = getHomebrewContext();
 
 	// Helper to fetch with retry on failure
+	let accessible_sources = $state<Record<string, Source>>({});
+
+	let accessible_content = $state<CompendiumContent>({
+		primary_weapons: {},
+		secondary_weapons: {},
+		armor: {},
+		loot: {},
+		consumables: {},
+		beastforms: {},
+		classes: {},
+		subclasses: {},
+		domain_cards: {
+			arcana: {},
+			blade: {},
+			bone: {},
+			codex: {},
+			grace: {},
+			midnight: {},
+			sage: {},
+			splendor: {},
+			valor: {}
+		},
+		ancestry_cards: {},
+		community_cards: {},
+		transformation_cards: {},
+		domains: {}
+	});
+
 	async function fetchWithRetry<T>(
 		fetcher: () => Promise<T>,
 		onSuccess: (result: T) => void,
@@ -214,46 +154,45 @@ function createCompendium() {
 	}
 
 	// Fetch all data once on initialization
+	fetchWithRetry(get_all_sources, (r) => {
+		accessible_sources = r;
+	});
 	fetchWithRetry(get_all_ancestry_cards, (r) => {
-		all_ancestry_cards = r;
+		accessible_content.ancestry_cards = r;
 	});
 	fetchWithRetry(get_all_community_cards, (r) => {
-		all_community_cards = r;
+		accessible_content.community_cards = r;
 	});
 	fetchWithRetry(get_all_transformation_cards, (r) => {
-		all_transformation_cards = r;
+		accessible_content.transformation_cards = r;
 	});
 	fetchWithRetry(get_all_beastforms, (r) => {
-		all_beastforms = r;
+		accessible_content.beastforms = r;
 	});
 	fetchWithRetry(get_all_classes, (r) => {
-		all_classes = r;
+		accessible_content.classes = r;
 	});
 	fetchWithRetry(get_all_subclasses, (r) => {
-		all_subclasses = r;
+		accessible_content.subclasses = r;
 	});
 	fetchWithRetry(get_all_domains, (r) => {
-		all_domains = r;
+		accessible_content.domains = r;
 	});
 	fetchWithRetry(get_all_primary_weapons, (r) => {
-		all_primary_weapons = r;
+		accessible_content.primary_weapons = r;
 	});
 	fetchWithRetry(get_all_secondary_weapons, (r) => {
-		all_secondary_weapons = r;
+		accessible_content.secondary_weapons = r;
 	});
 	fetchWithRetry(get_all_armor, (r) => {
-		all_armor = r;
+		accessible_content.armor = r;
 	});
 	fetchWithRetry(get_all_loot, (r) => {
-		all_loot = r;
+		accessible_content.loot = r;
 	});
 	fetchWithRetry(get_all_consumables, (r) => {
-		all_consumables = r;
+		accessible_content.consumables = r;
 	});
-	fetchWithRetry(get_all_sources, (r) => {
-		all_sources = r;
-	});
-
 	// Fetch all domain cards
 	const domainIds: DomainIds[] = [
 		'arcana',
@@ -270,122 +209,192 @@ function createCompendium() {
 		fetchWithRetry(
 			() => get_domain_cards(domainId),
 			(r) => {
-				all_domain_cards[domainId] = r;
+				accessible_content.domain_cards[domainId] = r;
 			}
 		);
 	}
 
 	let source_whitelist = $state(new SvelteSet<SourceIds>(['SRD']));
 
+	// Derived accessible content
+	let sources: Record<string, Source> = $derived(
+		Object.fromEntries(
+			Object.entries({
+				...accessible_sources
+			}).filter(([, source]) => source_whitelist.has(source.source_id))
+		)
+	);
 	let ancestry_cards: Record<string, AncestryCard> = $derived(
 		Object.fromEntries(
-			Object.entries(all_ancestry_cards).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries({
+				...homebrewContext.ancestry_cards,
+				...campaign_homebrew.ancestry_cards,
+				...accessible_content.ancestry_cards
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
 	);
 	let community_cards: Record<string, CommunityCard> = $derived(
 		Object.fromEntries(
-			Object.entries(all_community_cards).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries({
+				...homebrewContext.community_cards,
+				...campaign_homebrew.community_cards,
+				...accessible_content.community_cards
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
 	);
 	let transformation_cards: Record<string, TransformationCard> = $derived(
 		Object.fromEntries(
-			Object.entries(all_transformation_cards).filter(([, card]) =>
-				source_whitelist.has(card.source_id)
-			)
+			Object.entries({
+				...homebrewContext.transformation_cards,
+				...campaign_homebrew.transformation_cards,
+				...accessible_content.transformation_cards
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
 	);
 	let beastforms: Record<string, Beastform> = $derived(
 		Object.fromEntries(
-			Object.entries(all_beastforms).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries({
+				...homebrewContext.beastforms,
+				...campaign_homebrew.beastforms,
+				...accessible_content.beastforms
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
 	);
 	let classes: Record<string, CharacterClass> = $derived(
 		Object.fromEntries(
-			Object.entries(all_classes).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries({
+				...homebrewContext.classes,
+				...campaign_homebrew.classes,
+				...accessible_content.classes
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
 	);
 	let subclasses: Record<string, Subclass> = $derived(
 		Object.fromEntries(
-			Object.entries(all_subclasses).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries({
+				...homebrewContext.subclasses,
+				...campaign_homebrew.subclasses,
+				...accessible_content.subclasses
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
 	);
 	let domains: Record<string, Domain> = $derived(
 		Object.fromEntries(
-			Object.entries(all_domains).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries({
+				...homebrewContext.domains,
+				...campaign_homebrew.domains,
+				...accessible_content.domains
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
 	);
 	let domain_cards: Record<DomainIds, Record<string, DomainCard>> = $derived({
 		arcana: Object.fromEntries(
-			Object.entries(all_domain_cards.arcana).filter(([, card]) =>
-				source_whitelist.has(card.source_id)
-			)
+			Object.entries({
+				...homebrewContext.domain_cards.arcana,
+				...campaign_homebrew.domain_cards.arcana,
+				...accessible_content.domain_cards.arcana
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		),
 		blade: Object.fromEntries(
-			Object.entries(all_domain_cards.blade).filter(([, card]) =>
-				source_whitelist.has(card.source_id)
-			)
+			Object.entries({
+				...homebrewContext.domain_cards.blade,
+				...campaign_homebrew.domain_cards.blade,
+				...accessible_content.domain_cards.blade
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		),
 		bone: Object.fromEntries(
-			Object.entries(all_domain_cards.bone).filter(([, card]) =>
-				source_whitelist.has(card.source_id)
-			)
+			Object.entries({
+				...homebrewContext.domain_cards.bone,
+				...campaign_homebrew.domain_cards.bone,
+				...accessible_content.domain_cards.bone
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		),
 		codex: Object.fromEntries(
-			Object.entries(all_domain_cards.codex).filter(([, card]) =>
-				source_whitelist.has(card.source_id)
-			)
+			Object.entries({
+				...homebrewContext.domain_cards.codex,
+				...campaign_homebrew.domain_cards.codex,
+				...accessible_content.domain_cards.codex
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		),
 		grace: Object.fromEntries(
-			Object.entries(all_domain_cards.grace).filter(([, card]) =>
-				source_whitelist.has(card.source_id)
-			)
+			Object.entries({
+				...homebrewContext.domain_cards.grace,
+				...campaign_homebrew.domain_cards.grace,
+				...accessible_content.domain_cards.grace
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		),
 		midnight: Object.fromEntries(
-			Object.entries(all_domain_cards.midnight).filter(([, card]) =>
-				source_whitelist.has(card.source_id)
-			)
+			Object.entries({
+				...homebrewContext.domain_cards.midnight,
+				...campaign_homebrew.domain_cards.midnight,
+				...accessible_content.domain_cards.midnight
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		),
 		sage: Object.fromEntries(
-			Object.entries(all_domain_cards.sage).filter(([, card]) =>
-				source_whitelist.has(card.source_id)
-			)
+			Object.entries({
+				...homebrewContext.domain_cards.sage,
+				...campaign_homebrew.domain_cards.sage,
+				...accessible_content.domain_cards.sage
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		),
 		splendor: Object.fromEntries(
-			Object.entries(all_domain_cards.splendor).filter(([, card]) =>
-				source_whitelist.has(card.source_id)
-			)
+			Object.entries({
+				...homebrewContext.domain_cards.splendor,
+				...campaign_homebrew.domain_cards.splendor,
+				...accessible_content.domain_cards.splendor
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		),
 		valor: Object.fromEntries(
-			Object.entries(all_domain_cards.valor).filter(([, card]) =>
-				source_whitelist.has(card.source_id)
-			)
+			Object.entries({
+				...homebrewContext.domain_cards.valor,
+				...campaign_homebrew.domain_cards.valor,
+				...accessible_content.domain_cards.valor
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
 	});
 	let primary_weapons: Record<string, Weapon> = $derived(
 		Object.fromEntries(
-			Object.entries(all_primary_weapons).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries({
+				...homebrewContext.primary_weapons,
+				...campaign_homebrew.primary_weapons,
+				...accessible_content.primary_weapons
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
 	);
 	let secondary_weapons: Record<string, Weapon> = $derived(
 		Object.fromEntries(
-			Object.entries(all_secondary_weapons).filter(([, card]) =>
-				source_whitelist.has(card.source_id)
-			)
+			Object.entries({
+				...homebrewContext.secondary_weapons,
+				...campaign_homebrew.secondary_weapons,
+				...accessible_content.secondary_weapons
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
 	);
 	let armor: Record<string, Armor> = $derived(
 		Object.fromEntries(
-			Object.entries(all_armor).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries({
+				...homebrewContext.armor,
+				...campaign_homebrew.armor,
+				...accessible_content.armor
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
 	);
 	let loot: Record<string, Loot> = $derived(
 		Object.fromEntries(
-			Object.entries(all_loot).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries({
+				...homebrewContext.loot,
+				...campaign_homebrew.loot,
+				...accessible_content.loot
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
 	);
 	let consumables: Record<string, Consumable> = $derived(
 		Object.fromEntries(
-			Object.entries(all_consumables).filter(([, card]) => source_whitelist.has(card.source_id))
+			Object.entries({
+				...homebrewContext.consumables,
+				...campaign_homebrew.consumables,
+				...accessible_content.consumables
+			}).filter(([, card]) => source_whitelist.has(card.source_id))
 		)
 	);
 
@@ -397,6 +406,9 @@ function createCompendium() {
 		},
 		set source_whitelist(value) {
 			source_whitelist = value;
+		},
+		get sources() {
+			return sources;
 		},
 		get ancestry_cards() {
 			return ancestry_cards;
@@ -437,12 +449,10 @@ function createCompendium() {
 		get consumables() {
 			return consumables;
 		},
-		get sources() {
-			return all_sources;
-		},
 
 		// helper functions
-		destroy
+		destroy,
+		load_campaign_homebrew
 	};
 }
 

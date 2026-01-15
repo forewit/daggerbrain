@@ -78,8 +78,8 @@
 			</li>
 			<li>
 				<b>Work on a Project:</b> With GM approval, a PC may pursue a long-term project, such as deciphering
-				an ancient text or crafting a new weapon. The first time they start a new project, assign it
-				a countdown. Each time a PC makes the Work on a Project move, they either advance their project's
+				an ancient text or crafting a new weapon. The first time they start a new project, assign it a
+				countdown. Each time a PC makes the Work on a Project move, they either advance their project's
 				countdown automatically or make an action roll to advance it (GM's choice).
 			</li>
 		</ul>

@@ -4,7 +4,7 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { cn } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import Shield from '@lucide/svelte/icons/shield';
@@ -12,6 +12,7 @@
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import ArmorRules from '../../rules/armor-rules.svelte';
 	import { z } from 'zod';
+	import CampaignBadge from '../../homebrew/campaign-badge.svelte';
 
 	let { armorId }: { armorId: string } = $props();
 
@@ -243,6 +244,8 @@
 			<p class="flex items-center gap-1.5 text-xs text-muted-foreground italic">
 				{#if armor.source_id === 'Homebrew'}
 					<HomebrewBadge type="armor" id={armor.compendium_id} class="-mt-0.5 size-4" />
+				{:else if armor.source_id === 'Campaign'}
+					<CampaignBadge type="armor" id={armor.compendium_id} class="-mt-0.5 size-4" />
 				{/if}
 				Tier {context.level_to_tier(armor.level_requirement)}
 			</p>
@@ -294,7 +297,7 @@
 			</div>
 		{/if}
 
-		{#if inventoryItem}
+		{#if inventoryItem && context.canEdit}
 			<Collapsible.Root bind:open={customizeOpen}>
 				<Collapsible.Trigger
 					class={cn(

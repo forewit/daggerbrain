@@ -8,15 +8,15 @@ import {
 	COMPANION_BASE_EXPERIENCE_MODIFIER,
 	CONDITIONS,
 	TRAIT_OPTIONS
-} from '../types/rules';
+} from '@shared/constants/rules';
 import { getContext, setContext } from 'svelte';
 import type {
 	Character,
 	DomainCardId,
 	ChosenBeastform,
 	Companion
-} from '$lib/types/character-types';
-import type { AllTierOptionIds, ConditionIds, LevelUpChoice } from '$lib/types/rule-types';
+} from '@shared/types/character.types';
+import type { AllTierOptionIds, ConditionIds, LevelUpChoice } from '@shared/types/rule.types';
 import type {
 	DamageThresholds,
 	Traits,
@@ -25,24 +25,122 @@ import type {
 	CharacterModifier,
 	WeaponModifier,
 	DomainCard,
+	DomainIds,
 	Armor,
 	CommunityCard,
 	AncestryCard,
-	Beastform
-} from '$lib/types/compendium-types';
-import { BLANK_LEVEL_UP_CHOICE } from '$lib/types/constants';
-import { update_character } from '$lib/remote/characters.remote';
+	Beastform,
+	CharacterClass,
+	Subclass,
+	Loot,
+	Consumable,
+	TransformationCard
+} from '@shared/types/compendium.types';
+import { BLANK_LEVEL_UP_CHOICE } from '@shared/constants/constants';
+import { update_character, get_character_by_id } from '$lib/remote/characters.remote';
 import { getCompendiumContext } from './compendium.svelte';
 import { increaseDie, increase_range } from '$lib/utils';
+import { getCampaignContext } from './campaigns.svelte';
 
 function createCharacter(id: string) {
 	const user = getUserContext();
 	let character = <Character | null>$state(null);
+	// Initialize loadingCharacter to true by default to prevent race condition
+	// where page component computes isLoading=false before effect sets it to true
+	// It will be set to false when character is found or when we know we don't need to load
+	let loadingCharacter = $state(true);
+	let characterLoadSource = $state<'owned' | 'permission' | null>(null);
+	let loadingPromise = $state<Promise<void> | null>(null);
+	// Track if we've already failed to load with a permission error (403) to prevent infinite retries
+	let loadFailedWithPermissionError = $state(false);
+	// Track canEdit permission from server (for permission-loaded characters)
+	let characterCanEdit = $state<boolean | null>(null);
+
+	// Load character: first try user.all_characters (fast path), then try get_character_by_id if not found
 	$effect(() => {
-		character = user.all_characters.find((c) => c.id === id) || null;
+		// Guard: check if user context exists before accessing it
+		if (!user) {
+			// User context not available yet, wait for it
+			return;
+		}
+
+		// Fast path: check if character is in user's owned characters
+		const ownedCharacter = user.all_characters.find((c) => c.id === id);
+		if (ownedCharacter) {
+			// Character is owned - always use this (may have been updated)
+			character = ownedCharacter;
+			characterLoadSource = 'owned';
+			characterCanEdit = true; // Owned characters can always be edited
+			loadFailedWithPermissionError = false; // Reset failure flag if character becomes owned
+			loadingCharacter = false; // Character found, no longer loading
+			return;
+		}
+
+		// If character is already loaded via permission and still not owned, don't reload
+		if (character && character.id === id && characterLoadSource === 'permission') {
+			loadingCharacter = false; // Character already loaded, no longer loading
+			return; // Keep existing character, don't reload
+		}
+
+		// If not found in owned characters and user is done loading, try to load with permission check
+		const needsLoad = !character || character.id !== id;
+		const userReady = !user.loading;
+		// Don't check loadingCharacter in shouldLoad - we initialize it to true to prevent race condition
+		// Check if we're already loading to prevent duplicate calls
+		const alreadyLoading = loadingPromise !== null;
+		// Don't retry if we've already failed with a permission error (403)
+		const shouldLoad = userReady && needsLoad && !alreadyLoading && !loadFailedWithPermissionError;
+
+		if (shouldLoad) {
+			// loadingCharacter is already true by default, but ensure it's true here
+			// in case it was set to false in a previous run
+			loadingCharacter = true;
+			const promise = get_character_by_id(id)
+				.then((result) => {
+					character = result.character;
+					characterCanEdit = result.canEdit;
+					characterLoadSource = 'permission';
+					// Set loadingCharacter to false IMMEDIATELY after setting character
+					// This prevents race condition where page computes characterNotFound=true
+					// between character being set and loadingCharacter being set to false
+					loadingCharacter = false;
+				})
+				.catch((err) => {
+					// Character not found or user doesn't have permission
+					character = null;
+					characterCanEdit = null;
+					characterLoadSource = null;
+					loadingCharacter = false;
+					// If it's a 403 (permission denied), mark that we've failed to prevent infinite retries
+					if (err?.status === 403) {
+						loadFailedWithPermissionError = true;
+					}
+				})
+				.finally(() => {
+					loadingPromise = null;
+				});
+			loadingPromise = promise;
+		}
+	});
+
+	// Permission checks - derive from existing state
+	const canEdit = $derived.by(() => {
+		// For owned characters (fast path), canEdit is always true
+		if (characterLoadSource === 'owned') return true;
+		// For permission-loaded characters, use the flag from server
+		return characterCanEdit ?? false;
+	});
+
+	const canView = $derived.by(() => {
+		// If character exists, user has view permission (backend validated via get_character_by_id)
+		return character !== null;
 	});
 
 	const compendium = getCompendiumContext();
+
+	// Campaign homebrew is now loaded directly by the compendium context
+	// No need to manage it here
+
 	// ! void and homebrew source whitelists
 	$effect(() => {
 		if (!character) return;
@@ -63,6 +161,13 @@ function createCharacter(id: string) {
 			compendium.source_whitelist.add('Homebrew');
 		} else {
 			compendium.source_whitelist.delete('Homebrew');
+		}
+
+		// campaign homebrew content
+		if (character.settings.homebrew_enabled && character.campaign_id) {
+			compendium.source_whitelist.add('Campaign');
+		} else {
+			compendium.source_whitelist.delete('Campaign');
 		}
 	});
 
@@ -431,6 +536,14 @@ function createCharacter(id: string) {
 	let spellcast_roll_bonus: number = $state(BASE_STATS.spellcast_roll_bonus);
 	let derived_beastform: Beastform | null = $state(null);
 	let derived_companion: Companion | null = $state(null);
+
+	// Load campaign homebrew
+	$effect(() => {
+		if (!character) return;
+		if (!character.campaign_id) return;
+		if (!character.settings.homebrew_enabled) return;
+		compendium.load_campaign_homebrew(character.campaign_id);
+	});
 
 	// ================================================
 	// CHARACTER VALIDATION EFFECTS
@@ -1266,7 +1379,7 @@ function createCharacter(id: string) {
 		if (!character) return;
 
 		const validConditionIds = Object.keys(CONDITIONS) as ConditionIds[];
-		const cleaned = character.active_conditions
+		const cleaned = (character.active_conditions as ConditionIds[])
 			.filter((condition) => validConditionIds.includes(condition))
 			.filter((condition, index, array) => array.indexOf(condition) === index)
 			.sort();
@@ -1669,20 +1782,23 @@ function createCharacter(id: string) {
 		}
 	});
 
-	// ! update descriptors
+	// ! update derived_character_summary (keeps stats in sync for campaign preview)
 	$effect(() => {
 		if (!character) return;
-		character.derived_descriptors.ancestry_name = ancestry_card ? ancestry_card.title : '';
-		character.derived_descriptors.primary_class_name = primary_class ? primary_class.name : '';
-		character.derived_descriptors.primary_subclass_name = primary_subclass
-			? primary_subclass.name
-			: '';
-		character.derived_descriptors.secondary_class_name = secondary_class
-			? secondary_class.name
-			: '';
-		character.derived_descriptors.secondary_subclass_name = secondary_subclass
-			? secondary_subclass.name
-			: '';
+		character.derived_character_summary = {
+			ancestry_name: ancestry_card?.title ?? '',
+			community_name: community_card?.title ?? '',
+			primary_class_name: primary_class?.name ?? '',
+			primary_subclass_name: primary_subclass?.name ?? '',
+			secondary_class_name: secondary_class?.name ?? '',
+			secondary_subclass_name: secondary_subclass?.name ?? '',
+			max_hp: max_hp,
+			max_stress: max_stress,
+			max_hope: max_hope,
+			evasion: evasion,
+			max_armor: max_armor,
+			damage_thresholds: damage_thresholds
+		};
 	});
 
 	// ! clear invalid community card tokens
@@ -1730,7 +1846,7 @@ function createCharacter(id: string) {
 				multiclass_used ? character.secondary_class_domain_id_choice : null
 			].filter((id) => id !== null);
 
-			//***** level up domain cards *****/
+			// ***** level up domain cards *****/
 			// filter out cards that are not valid for the current level
 			if (level_up_domain_card !== null && level_up_domain_card.level_requirement > i) {
 				console.warn(`Domain card ${level_up_domain_card?.title} is not valid for level ${i}`);
@@ -1759,9 +1875,9 @@ function createCharacter(id: string) {
 			} else if (level_up_domain_card !== null) {
 				new_domain_card_vault.push(level_up_domain_card);
 			}
-			//***** END level up domain cards *****/
+			// ***** END level up domain cards *****/
 
-			//***** domain card choices *****/
+			// ***** domain card choices *****/
 			// clear domain card choices if the level choice is set and is not a domain card choice
 			// (don't clear if option_id is null, as user might select domain card before selecting tier option)
 			if (
@@ -1862,7 +1978,7 @@ function createCharacter(id: string) {
 			} else if (choice_B_selected_domain_card !== null) {
 				new_domain_card_vault.push(choice_B_selected_domain_card);
 			}
-			//***** END domain card choices *****/
+			// ***** END domain card choices *****/
 		}
 
 		// ! add cards from additional_domain_Cards
@@ -3372,9 +3488,69 @@ function createCharacter(id: string) {
 		}
 	});
 
-	// Debounced auto-save effect
+	// Sync character updates from campaign context (when character is in a campaign)
+	// This replaces the old WebSocket connection in character context
+	// IMPORTANT: Only sync FROM campaign context TO character when user cannot edit
+	// (i.e., when viewing someone else's character). Users with edit permissions
+	// should be able to make changes that sync TO the campaign context, not FROM it.
+	$effect(() => {
+		if (!character || !character.campaign_id) return;
+
+		// Don't sync if user has edit permissions - they should be the source of truth
+		// Only sync when viewing (canEdit === false) to get updates from other users
+		const editPermission = canEdit;
+		if (editPermission === true) {
+			// User can edit - don't overwrite their changes with campaign context
+			return;
+		}
+		// If editPermission is null, it's still loading - wait
+		if (editPermission === null) {
+			return;
+		}
+
+		// Try to get campaign context (may not exist if not set up yet)
+		try {
+			const campaignCtx = getCampaignContext();
+			if (!campaignCtx) return;
+
+			const campaignCharacter = campaignCtx.characters[character.id];
+			if (!campaignCharacter) return;
+
+			// Sync campaign-relevant fields from campaign context
+			// Only update if values differ to avoid loops
+			if (campaignCharacter.marked_hp !== character.marked_hp) {
+				character.marked_hp = campaignCharacter.marked_hp;
+			}
+			if (campaignCharacter.marked_stress !== character.marked_stress) {
+				character.marked_stress = campaignCharacter.marked_stress;
+			}
+			if (campaignCharacter.marked_hope !== character.marked_hope) {
+				character.marked_hope = campaignCharacter.marked_hope;
+			}
+			if (campaignCharacter.marked_armor !== character.marked_armor) {
+				character.marked_armor = campaignCharacter.marked_armor;
+			}
+			if (
+				JSON.stringify(campaignCharacter.active_conditions) !==
+				JSON.stringify(character.active_conditions)
+			) {
+				character.active_conditions =
+					campaignCharacter.active_conditions as typeof character.active_conditions;
+			}
+		} catch {
+			// Campaign context not available - this is expected when not in a campaign
+		}
+	});
+
+	// Debounced auto-save effect (for full character save)
 	$effect(() => {
 		if (!character || !initialLoadComplete) return;
+
+		// Don't auto-save if user doesn't have edit permissions
+		// If canEdit is null, permissions are still loading - wait
+		if (canEdit === null) return;
+		// If canEdit is false, user can't edit - don't attempt to save
+		if (canEdit === false) return;
 
 		const currentCharacterJson = JSON.stringify(character);
 		// Only save if the character actually changed from the last saved state
@@ -3397,6 +3573,8 @@ function createCharacter(id: string) {
 			}
 
 			// Use JSON serialization for deep clone to avoid structuredClone issues
+			// Note: derived_character_summary is kept in sync by the effect above,
+			// so it's already part of the character object and will be saved to D1
 			const cloned = JSON.parse(JSON.stringify(character));
 			const savePromise = update_character(cloned)
 				.then(() => {
@@ -3431,10 +3609,8 @@ function createCharacter(id: string) {
 	// INVENTORY HELPER FUNCTIONS
 	// ================================================
 
-	/**
-	 * Add an item to the character's inventory
-	 * @param item - The item to add, where item.id is the compendium_id
-	 */
+	// Add an item to the character's inventory
+	//@param item - The item to add, where item.id is the compendium_id
 	function addToInventory(
 		item: { compendium_id: string; title?: string },
 		type:
@@ -3519,10 +3695,9 @@ function createCharacter(id: string) {
 		}
 	}
 
-	/**
-	 * Remove an item from the character's inventory
-	 * @param item - The item to remove, where item.id is the unique inventory item id (or title for adventuring_gear)
-	 */
+	// Remove an item from the character's inventory
+	// @param item - The item to remove, where item.id is the unique inventory item id (or title for adventuring_gear)
+
 	function removeFromInventory(
 		item: { id: string },
 		type:
@@ -3577,9 +3752,8 @@ function createCharacter(id: string) {
 		}
 	}
 
-	/**
-	 * Equip an armor or weapon
-	 */
+	// Equip an armor or weapon
+
 	function equipItem(
 		item: { id: string; level_requirement: number },
 		type: 'primary_weapon' | 'secondary_weapon' | 'armor'
@@ -3599,9 +3773,7 @@ function createCharacter(id: string) {
 		}
 	}
 
-	/**
-	 * Unequip an armor or weapon
-	 */
+	// Unequip an armor or weapon
 	function unequipItem(
 		item: { id: string },
 		type: 'primary_weapon' | 'secondary_weapon' | 'armor'
@@ -3617,9 +3789,7 @@ function createCharacter(id: string) {
 		}
 	}
 
-	/**
-	 * Check if an armor or weapon is equipped
-	 */
+	// Check if an armor or weapon is equipped
 	function isItemEquipped(
 		item: { id: string },
 		type: 'primary_weapon' | 'secondary_weapon' | 'armor'
@@ -3636,17 +3806,13 @@ function createCharacter(id: string) {
 		return false;
 	}
 
-	/**
-	 * Check if the character meets the level requirement to equip an item
-	 */
+	// Check if the character meets the level requirement to equip an item
 	function canEquipItem(item: { level_requirement: number }): boolean {
 		if (!character) return false;
 		return character.level >= item.level_requirement;
 	}
 
-	/**
-	 * Add a condition to the character's active conditions
-	 */
+	// Add a condition to the character's active conditions
 	function addCondition(conditionId: ConditionIds) {
 		if (!character) return;
 		const validConditionIds = Object.keys(CONDITIONS) as ConditionIds[];
@@ -3659,9 +3825,7 @@ function createCharacter(id: string) {
 		}
 	}
 
-	/**
-	 * Remove a condition from the character's active conditions
-	 */
+	// Remove a condition from the character's active conditions
 	function removeCondition(conditionId: ConditionIds) {
 		if (!character) return;
 		const index = character.active_conditions.indexOf(conditionId);
@@ -3836,6 +4000,19 @@ function createCharacter(id: string) {
 		// 	character = value;
 		// },
 
+		// loading state
+		get loading() {
+			return loadingCharacter;
+		},
+
+		// permissions
+		get canEdit() {
+			return canEdit;
+		},
+		get canView() {
+			return canView;
+		},
+
 		// helper functions
 		destroy,
 		level_to_tier,
@@ -3864,5 +4041,5 @@ export const setCharacterContext = (uid: string) => {
 };
 
 export const getCharacterContext = (): ReturnType<typeof setCharacterContext> => {
-	return getContext(CHARACTER_KEY);
+	return getContext(CHARACTER_KEY) as ReturnType<typeof setCharacterContext>;
 };

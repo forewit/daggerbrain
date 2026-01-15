@@ -4,13 +4,21 @@ import {
 	delete_character
 } from '$lib/remote/characters.remote';
 import { get_user, update_user } from '$lib/remote/users.remote';
-import type { User } from '$lib/types/user-types';
-import type { Character } from '$lib/types/character-types';
+import {
+	get_user_campaigns,
+	create_campaign,
+	delete_campaign
+} from '$lib/remote/campaigns/campaigns.remote';
+import { upload_user_image } from '$lib/remote/images.remote';
+import type { User } from '@shared/types/user.types';
+import type { Character } from '@shared/types/character.types';
+import type { CampaignWithDetails } from '@shared/types/campaign.types';
 import { getContext, setContext } from 'svelte';
 import { error } from '@sveltejs/kit';
 
 function userContext() {
 	let all_characters = $state<Character[]>([]);
+	let all_campaigns = $state<CampaignWithDetails[]>([]);
 	let loading = $state(true);
 	let user = $state<User | null>(null);
 
@@ -28,10 +36,11 @@ function userContext() {
 	// Initial data fetch
 	$effect(() => {
 		loading = true;
-		Promise.all([get_all_characters(), get_user()])
-			.then(([chars, fetchedUser]) => {
+		Promise.all([get_all_characters(), get_user(), get_user_campaigns()])
+			.then(([chars, fetchedUser, campaigns]) => {
 				all_characters = chars;
 				user = fetchedUser;
+				all_campaigns = campaigns;
 			})
 			.catch((err) => {
 				error(500, err.message);
@@ -106,9 +115,49 @@ function userContext() {
 		}
 	};
 
+	const create_character_in_campaign = async (
+		campaign_id?: string,
+		options?: { claimable?: boolean }
+	) => {
+		return create_character(
+			campaign_id ? { campaign_id, claimable: options?.claimable } : undefined
+		);
+	};
+
+	// Wrapper for uploading user images
+	const upload_image = async (params: { data: string; name: string; type: string }) => {
+		return upload_user_image(params);
+	};
+
+	// Wrapper for creating campaigns - refreshes all_campaigns after creation
+	const create_campaign_wrapper = async (params: { name: string; display_name?: string }) => {
+		const campaignId = await create_campaign(params);
+		// Refresh campaigns list after creation
+		const campaigns = await get_user_campaigns();
+		all_campaigns = campaigns;
+		return campaignId;
+	};
+
+	// Wrapper for deleting campaigns - refreshes all_campaigns after deletion
+	const delete_campaign_wrapper = async (campaignId: string) => {
+		await delete_campaign(campaignId);
+		// Refresh campaigns list after deletion
+		const campaigns = await get_user_campaigns();
+		all_campaigns = campaigns;
+	};
+
+	// Method to manually refresh campaigns list
+	const refresh_campaigns = async () => {
+		const campaigns = await get_user_campaigns();
+		all_campaigns = campaigns;
+	};
+
 	return {
 		get all_characters() {
 			return all_characters;
+		},
+		get all_campaigns() {
+			return all_campaigns;
 		},
 		get loading() {
 			return loading;
@@ -120,8 +169,12 @@ function userContext() {
 			user = value;
 		},
 		isPopupDismissed,
-		create_character,
+		create_character: create_character_in_campaign,
 		delete_character,
+		upload_user_image: upload_image,
+		create_campaign: create_campaign_wrapper,
+		delete_campaign: delete_campaign_wrapper,
+		refresh_campaigns,
 		destroy
 	};
 }
@@ -134,5 +187,5 @@ export const setUserContext = () => {
 };
 
 export const getUserContext = (): ReturnType<typeof setUserContext> => {
-	return getContext(USER_CONTEXT_KEY);
+	return getContext(USER_CONTEXT_KEY) as ReturnType<typeof setUserContext>;
 };

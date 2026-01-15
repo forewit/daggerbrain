@@ -8,7 +8,7 @@
 
 	setUserContext();
 	setHomebrewContext();
-	setCompendiumContext();
+	const compendium = setCompendiumContext();
 </script>
 
 <SignedIn>

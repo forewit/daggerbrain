@@ -1,17 +1,20 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { cn } from '$lib/utils';
 	import * as Dialog from '$lib/components/ui/dialog/index';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import { getCharacterContext } from '$lib/state/character.svelte';
-	import { delete_character } from '$lib/remote/characters.remote';
+	import { getUserContext } from '$lib/state/user.svelte';
 
 	let { data } = $props();
 
 	const context = getCharacterContext();
+	const user = getUserContext();
 	let character = $derived(context.character);
+	const isOwner = $derived(data.isOwner ?? false);
 
 	let showVoidDisableDialog = $state(false);
 	let voidCheckboxState = $state(false);
@@ -19,7 +22,7 @@
 	let showHomebrewDisableDialog = $state(false);
 	let homebrewCheckboxState = $state(false);
 
-	// Sync checkbox state with character's void_enabled and homebrew_enabled
+	// Sync checkbox state with character's void_enabled, homebrew_enabled, and visibility
 	$effect(() => {
 		if (character) {
 			voidCheckboxState = character.settings.void_enabled;
@@ -121,37 +124,54 @@
 				Enable Homebrew
 			</Label>
 
-			<Dialog.Root>
-				<Dialog.Trigger
-					class={cn(buttonVariants({ variant: 'link' }), 'h-min w-min p-0 mt-4 text-destructive')}
-					>Delete Character</Dialog.Trigger
-				>
-				<Dialog.Content>
-					<Dialog.Header>
-						<Dialog.Title>Delete Character</Dialog.Title>
-						<Dialog.Description>
-							Are you sure you want to delete <strong>{character.name}</strong>? This action cannot
-							be undone.
-						</Dialog.Description>
-					</Dialog.Header>
-					<Dialog.Footer>
-						<Dialog.Close class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
-							>Cancel</Dialog.Close
-						>
-						<Dialog.Close
-							class={buttonVariants({ variant: 'destructive' })}
-							onclick={async () => {
-								try {
-									await delete_character(character.id);
-									await goto('/characters/');
-								} catch (error) {
-									console.error(error);
-								}
-							}}>Delete</Dialog.Close
-						>
-					</Dialog.Footer>
-				</Dialog.Content>
-			</Dialog.Root>
+			<!-- Show Campaign Information - only visible when character is in a campaign -->
+			{#if character.campaign_id}
+				<Label class="cursor-pointer items-start">
+					<Checkbox bind:checked={character.settings.show_campaign_info} />
+
+					<div class="space-y-1">
+						<p class="whitespace-nowrap">Show Campaign Information</p>
+						<p class="text-xs font-normal text-muted-foreground">
+							Display campaign information that the GM shares with players (Fear tracker and visible
+							countdowns) at the top of your character sheet.
+						</p>
+					</div>
+				</Label>
+			{/if}
+
+			{#if isOwner}
+				<Dialog.Root>
+					<Dialog.Trigger
+						class={cn(buttonVariants({ variant: 'link' }), 'mt-4 h-min w-min p-0 text-destructive')}
+						>Delete Character</Dialog.Trigger
+					>
+					<Dialog.Content>
+						<Dialog.Header>
+							<Dialog.Title>Delete Character</Dialog.Title>
+							<Dialog.Description>
+								Are you sure you want to delete <strong>{character.name}</strong>? This action
+								cannot be undone.
+							</Dialog.Description>
+						</Dialog.Header>
+						<Dialog.Footer>
+							<Dialog.Close class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
+								>Cancel</Dialog.Close
+							>
+							<Dialog.Close
+								class={buttonVariants({ variant: 'destructive' })}
+								onclick={async () => {
+									try {
+										await user.delete_character(character.id);
+										await goto('/characters/');
+									} catch (error) {
+										console.error(error);
+									}
+								}}>Delete</Dialog.Close
+							>
+						</Dialog.Footer>
+					</Dialog.Content>
+				</Dialog.Root>
+			{/if}
 		</div>
 	</div>
 {/if}

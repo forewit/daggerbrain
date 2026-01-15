@@ -1,6 +1,7 @@
 <script lang="ts">
-	import type { Armor } from '$lib/types/compendium-types';
+	import type { Armor } from '@shared/types/compendium.types';
 	import { level_to_tier } from '$lib/utils';
+	import { renderMarkdown } from '$lib/utils';
 	import Shield from '@lucide/svelte/icons/shield';
 
 	let { armor }: { armor: Armor } = $props();
@@ -57,7 +58,9 @@
 						<p class="text-sm font-medium text-muted-foreground">
 							{feature.title || 'Unnamed feature'}
 						</p>
-						<p class="mt-0.5 text-xs text-muted-foreground">{@html feature.description_html}</p>
+						<p class="mt-0.5 text-xs text-muted-foreground">
+							{@html renderMarkdown(feature.description_html)}
+						</p>
 					</div>
 				{/each}
 			</div>

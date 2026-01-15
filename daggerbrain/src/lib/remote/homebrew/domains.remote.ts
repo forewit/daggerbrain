@@ -2,11 +2,18 @@ import { query, command, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
-import { get_db, get_auth } from '../utils';
-import { DomainSchema, DomainCardSchema } from '$lib/compendium/compendium-schemas';
-import type { Domain, DomainCard, DomainIds } from '$lib/types/compendium-types';
+import { get_db, get_auth, get_kv } from '../utils';
+import { DomainSchema, DomainCardSchema } from '@shared/schemas/compendium.schemas';
+import type { Domain, DomainCard, DomainIds } from '@shared/types/compendium.types';
 import { homebrew_domains, homebrew_domain_cards } from '$lib/server/db/homebrew.schema';
-import { verifyOwnership, getTotalHomebrewCount, HOMEBREW_LIMIT } from './utils';
+import { campaign_homebrew_vault_table } from '../../server/db/campaigns.schema';
+import {
+	verifyOwnership,
+	getTotalHomebrewCount,
+	HOMEBREW_LIMIT,
+	assertHomebrewTypeEnabled
+} from './utils';
+import { getHomebrewAccessInternal } from '../../server/permissions';
 
 // ============================================================================
 // Domains
@@ -32,6 +39,7 @@ export const get_homebrew_domains = query(async () => {
 });
 
 export const create_homebrew_domain = command(DomainSchema, async (data) => {
+	assertHomebrewTypeEnabled('domain-cards');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -64,11 +72,15 @@ export const create_homebrew_domain = command(DomainSchema, async (data) => {
 export const update_homebrew_domain = command(
 	z.object({ id: z.string(), data: DomainSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('domain-cards');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		if (!(await verifyOwnership(db, homebrew_domains, id, userId))) {
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'domains', id);
+
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this domain');
 		}
 
@@ -78,24 +90,26 @@ export const update_homebrew_domain = command(
 		await db
 			.update(homebrew_domains)
 			.set({ data: validatedData, updated_at: now })
-			.where(and(eq(homebrew_domains.id, id), eq(homebrew_domains.clerk_user_id, userId)));
+			.where(eq(homebrew_domains.id, id));
 
 		console.log('updated homebrew domain in D1');
 	}
 );
 
 export const delete_homebrew_domain = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('domain-cards');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	if (!(await verifyOwnership(db, homebrew_domains, id, userId))) {
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'domains', id);
+
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this domain');
 	}
 
-	await db
-		.delete(homebrew_domains)
-		.where(and(eq(homebrew_domains.id, id), eq(homebrew_domains.clerk_user_id, userId)));
+	await db.delete(homebrew_domains).where(eq(homebrew_domains.id, id));
 
 	// refresh the domains query
 	get_homebrew_domains().refresh();
@@ -138,6 +152,7 @@ export const get_homebrew_domain_cards = query(async () => {
 });
 
 export const create_homebrew_domain_card = command(DomainCardSchema, async (data) => {
+	assertHomebrewTypeEnabled('domain-cards');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -171,11 +186,15 @@ export const create_homebrew_domain_card = command(DomainCardSchema, async (data
 export const update_homebrew_domain_card = command(
 	z.object({ id: z.string(), data: DomainCardSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('domain-cards');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		if (!(await verifyOwnership(db, homebrew_domain_cards, id, userId))) {
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'domain_cards', id);
+
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this domain card');
 		}
 
@@ -186,33 +205,40 @@ export const update_homebrew_domain_card = command(
 		await db
 			.update(homebrew_domain_cards)
 			.set({ data: validatedData, updated_at: now })
-			.where(
-				and(eq(homebrew_domain_cards.id, id), eq(homebrew_domain_cards.clerk_user_id, userId))
-			);
+			.where(eq(homebrew_domain_cards.id, id));
 
 		console.log('updated homebrew domain card in D1');
 	}
 );
 
 export const delete_homebrew_domain_card = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('domain-cards');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	// Get the card to know which domain it belongs to
-	const [entry] = await db
-		.select()
-		.from(homebrew_domain_cards)
-		.where(and(eq(homebrew_domain_cards.id, id), eq(homebrew_domain_cards.clerk_user_id, userId)))
-		.limit(1);
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'domain_cards', id);
 
-	if (!entry) {
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this domain card');
 	}
 
-	await db
-		.delete(homebrew_domain_cards)
-		.where(and(eq(homebrew_domain_cards.id, id), eq(homebrew_domain_cards.clerk_user_id, userId)));
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db.delete(homebrew_domain_cards).where(eq(homebrew_domain_cards.id, id)),
+
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'domain-cards'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
+			)
+	]);
 
 	// refresh the domain cards query
 	get_homebrew_domain_cards().refresh();

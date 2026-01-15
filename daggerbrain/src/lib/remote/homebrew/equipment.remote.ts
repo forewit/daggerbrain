@@ -2,14 +2,14 @@ import { query, command, getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
-import { get_db, get_auth } from '../utils';
+import { get_db, get_auth, get_kv } from '../utils';
 import {
 	WeaponSchema,
 	ArmorSchema,
 	LootSchema,
 	ConsumableSchema
-} from '$lib/compendium/compendium-schemas';
-import type { Weapon, Armor, Loot, Consumable } from '$lib/types/compendium-types';
+} from '@shared/schemas/compendium.schemas';
+import type { Weapon, Armor, Loot, Consumable } from '@shared/types/compendium.types';
 import {
 	homebrew_primary_weapons,
 	homebrew_secondary_weapons,
@@ -17,7 +17,14 @@ import {
 	homebrew_loot,
 	homebrew_consumables
 } from '$lib/server/db/homebrew.schema';
-import { verifyOwnership, getTotalHomebrewCount, HOMEBREW_LIMIT } from './utils';
+import { campaign_homebrew_vault_table } from '$lib/server/db/campaigns.schema';
+import {
+	verifyOwnership,
+	getTotalHomebrewCount,
+	HOMEBREW_LIMIT,
+	assertHomebrewTypeEnabled
+} from './utils';
+import { getHomebrewAccessInternal } from '../../server/permissions';
 
 // ============================================================================
 // Primary Weapons
@@ -43,6 +50,7 @@ export const get_homebrew_primary_weapons = query(async () => {
 });
 
 export const create_homebrew_primary_weapon = command(WeaponSchema, async (data) => {
+	assertHomebrewTypeEnabled('weapon');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -76,11 +84,15 @@ export const create_homebrew_primary_weapon = command(WeaponSchema, async (data)
 export const update_homebrew_primary_weapon = command(
 	z.object({ id: z.string(), data: WeaponSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('weapon');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		if (!(await verifyOwnership(db, homebrew_primary_weapons, id, userId))) {
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'primary_weapons', id);
+
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this weapon');
 		}
 
@@ -91,28 +103,40 @@ export const update_homebrew_primary_weapon = command(
 		await db
 			.update(homebrew_primary_weapons)
 			.set({ data: validatedData, updated_at: now })
-			.where(
-				and(eq(homebrew_primary_weapons.id, id), eq(homebrew_primary_weapons.clerk_user_id, userId))
-			);
+			.where(eq(homebrew_primary_weapons.id, id));
 
 		console.log('updated homebrew primary weapon in D1');
 	}
 );
 
 export const delete_homebrew_primary_weapon = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('weapon');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	if (!(await verifyOwnership(db, homebrew_primary_weapons, id, userId))) {
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'primary_weapons', id);
+
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this weapon');
 	}
 
-	await db
-		.delete(homebrew_primary_weapons)
-		.where(
-			and(eq(homebrew_primary_weapons.id, id), eq(homebrew_primary_weapons.clerk_user_id, userId))
-		);
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db.delete(homebrew_primary_weapons).where(eq(homebrew_primary_weapons.id, id)),
+
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'weapon'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
+			)
+	]);
 
 	// refresh the primary weapons query
 	get_homebrew_primary_weapons().refresh();
@@ -143,6 +167,7 @@ export const get_homebrew_secondary_weapons = query(async () => {
 });
 
 export const create_homebrew_secondary_weapon = command(WeaponSchema, async (data) => {
+	assertHomebrewTypeEnabled('weapon');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -176,11 +201,15 @@ export const create_homebrew_secondary_weapon = command(WeaponSchema, async (dat
 export const update_homebrew_secondary_weapon = command(
 	z.object({ id: z.string(), data: WeaponSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('weapon');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		if (!(await verifyOwnership(db, homebrew_secondary_weapons, id, userId))) {
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'secondary_weapons', id);
+
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this weapon');
 		}
 
@@ -191,34 +220,40 @@ export const update_homebrew_secondary_weapon = command(
 		await db
 			.update(homebrew_secondary_weapons)
 			.set({ data: validatedData, updated_at: now })
-			.where(
-				and(
-					eq(homebrew_secondary_weapons.id, id),
-					eq(homebrew_secondary_weapons.clerk_user_id, userId)
-				)
-			);
+			.where(eq(homebrew_secondary_weapons.id, id));
 
 		console.log('updated homebrew secondary weapon in D1');
 	}
 );
 
 export const delete_homebrew_secondary_weapon = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('weapon');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	if (!(await verifyOwnership(db, homebrew_secondary_weapons, id, userId))) {
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'secondary_weapons', id);
+
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this weapon');
 	}
 
-	await db
-		.delete(homebrew_secondary_weapons)
-		.where(
-			and(
-				eq(homebrew_secondary_weapons.id, id),
-				eq(homebrew_secondary_weapons.clerk_user_id, userId)
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db.delete(homebrew_secondary_weapons).where(eq(homebrew_secondary_weapons.id, id)),
+
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'weapon'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
 			)
-		);
+	]);
 
 	// refresh the secondary weapons query
 	get_homebrew_secondary_weapons().refresh();
@@ -249,6 +284,7 @@ export const get_homebrew_armor = query(async () => {
 });
 
 export const create_homebrew_armor = command(ArmorSchema, async (data) => {
+	assertHomebrewTypeEnabled('armor');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -282,11 +318,15 @@ export const create_homebrew_armor = command(ArmorSchema, async (data) => {
 export const update_homebrew_armor = command(
 	z.object({ id: z.string(), data: ArmorSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('armor');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		if (!(await verifyOwnership(db, homebrew_armor, id, userId))) {
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'armor', id);
+
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this armor');
 		}
 
@@ -297,24 +337,40 @@ export const update_homebrew_armor = command(
 		await db
 			.update(homebrew_armor)
 			.set({ data: validatedData, updated_at: now })
-			.where(and(eq(homebrew_armor.id, id), eq(homebrew_armor.clerk_user_id, userId)));
+			.where(eq(homebrew_armor.id, id));
 
 		console.log('updated homebrew armor in D1');
 	}
 );
 
 export const delete_homebrew_armor = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('armor');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	if (!(await verifyOwnership(db, homebrew_armor, id, userId))) {
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'armor', id);
+
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this armor');
 	}
 
-	await db
-		.delete(homebrew_armor)
-		.where(and(eq(homebrew_armor.id, id), eq(homebrew_armor.clerk_user_id, userId)));
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db.delete(homebrew_armor).where(eq(homebrew_armor.id, id)),
+
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'armor'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
+			)
+	]);
 
 	// refresh the armor query
 	get_homebrew_armor().refresh();
@@ -345,6 +401,7 @@ export const get_homebrew_loot = query(async () => {
 });
 
 export const create_homebrew_loot = command(LootSchema, async (data) => {
+	assertHomebrewTypeEnabled('loot');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -378,11 +435,15 @@ export const create_homebrew_loot = command(LootSchema, async (data) => {
 export const update_homebrew_loot = command(
 	z.object({ id: z.string(), data: LootSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('loot');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		if (!(await verifyOwnership(db, homebrew_loot, id, userId))) {
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'loot', id);
+
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this loot');
 		}
 
@@ -393,24 +454,40 @@ export const update_homebrew_loot = command(
 		await db
 			.update(homebrew_loot)
 			.set({ data: validatedData, updated_at: now })
-			.where(and(eq(homebrew_loot.id, id), eq(homebrew_loot.clerk_user_id, userId)));
+			.where(eq(homebrew_loot.id, id));
 
 		console.log('updated homebrew loot');
 	}
 );
 
 export const delete_homebrew_loot = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('loot');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	if (!(await verifyOwnership(db, homebrew_loot, id, userId))) {
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'loot', id);
+
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this loot');
 	}
 
-	await db
-		.delete(homebrew_loot)
-		.where(and(eq(homebrew_loot.id, id), eq(homebrew_loot.clerk_user_id, userId)));
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db.delete(homebrew_loot).where(eq(homebrew_loot.id, id)),
+
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'loot'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
+			)
+	]);
 
 	// refresh the loot query
 	get_homebrew_loot().refresh();
@@ -441,6 +518,7 @@ export const get_homebrew_consumables = query(async () => {
 });
 
 export const create_homebrew_consumable = command(ConsumableSchema, async (data) => {
+	assertHomebrewTypeEnabled('consumable');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
@@ -474,11 +552,15 @@ export const create_homebrew_consumable = command(ConsumableSchema, async (data)
 export const update_homebrew_consumable = command(
 	z.object({ id: z.string(), data: ConsumableSchema }),
 	async ({ id, data }) => {
+		assertHomebrewTypeEnabled('consumable');
 		const event = getRequestEvent();
 		const { userId } = get_auth(event);
 		const db = get_db(event);
 
-		if (!(await verifyOwnership(db, homebrew_consumables, id, userId))) {
+		// Get homebrew item with permissions
+		const access = await getHomebrewAccessInternal(db, userId, 'consumables', id);
+
+		if (!access.canEdit) {
 			throw error(403, 'Not authorized to update this consumable');
 		}
 
@@ -489,24 +571,40 @@ export const update_homebrew_consumable = command(
 		await db
 			.update(homebrew_consumables)
 			.set({ data: validatedData, updated_at: now })
-			.where(and(eq(homebrew_consumables.id, id), eq(homebrew_consumables.clerk_user_id, userId)));
+			.where(eq(homebrew_consumables.id, id));
 
 		console.log('updated homebrew consumable');
 	}
 );
 
 export const delete_homebrew_consumable = command(z.string(), async (id) => {
+	assertHomebrewTypeEnabled('consumable');
 	const event = getRequestEvent();
 	const { userId } = get_auth(event);
 	const db = get_db(event);
 
-	if (!(await verifyOwnership(db, homebrew_consumables, id, userId))) {
+	// Get homebrew item with permissions
+	const access = await getHomebrewAccessInternal(db, userId, 'consumables', id);
+
+	if (!access.isOwner) {
 		throw error(403, 'Not authorized to delete this consumable');
 	}
 
-	await db
-		.delete(homebrew_consumables)
-		.where(and(eq(homebrew_consumables.id, id), eq(homebrew_consumables.clerk_user_id, userId)));
+	// Atomic batch delete - both operations succeed or both fail
+	await db.batch([
+		// Delete from homebrew table
+		db.delete(homebrew_consumables).where(eq(homebrew_consumables.id, id)),
+
+		// Delete from all campaign vaults
+		db
+			.delete(campaign_homebrew_vault_table)
+			.where(
+				and(
+					eq(campaign_homebrew_vault_table.homebrew_type, 'consumable'),
+					eq(campaign_homebrew_vault_table.homebrew_id, id)
+				)
+			)
+	]);
 
 	// refresh the consumables query
 	get_homebrew_consumables().refresh();

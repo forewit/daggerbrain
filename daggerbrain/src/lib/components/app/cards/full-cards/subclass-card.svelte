@@ -3,9 +3,9 @@
 		SubclassFoundationCard,
 		SubclassSpecializationCard,
 		SubclassMasteryCard
-	} from '$lib/types/compendium-types';
+	} from '@shared/types/compendium.types';
 	import { cn } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import type { Snippet } from 'svelte';
 	import ClassBanner from '../class-banner.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';

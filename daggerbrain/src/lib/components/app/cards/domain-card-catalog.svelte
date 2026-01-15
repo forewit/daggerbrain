@@ -2,7 +2,7 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Select from '$lib/components/ui/select/';
-	import type { DomainCard, DomainIds } from '$lib/types/compendium-types';
+	import type { DomainCard, DomainIds } from '@shared/types/compendium.types';
 	import DomainCardComponent from './full-cards/domain-card.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import Search from '@lucide/svelte/icons/search';

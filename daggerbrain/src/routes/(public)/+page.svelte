@@ -29,50 +29,6 @@
 	<!-- Content -->
 	<div class="relative z-10 mx-auto h-full w-full">
 		<div class="flex flex-col items-center sm:items-start">
-			<!-- Homebrew Showcase - Full Width Glass Pane -->
-			<section class="relative z-10 mt-14 w-full">
-				<button
-					class="homebrew-showcase group relative min-h-[400px] w-full cursor-pointer overflow-hidden border-y border-muted-foreground/30 bg-background sm:min-h-[320px]"
-					onclick={() => {
-						goto('/homebrew');
-					}}
-				>
-					<!-- Forge Background Image -->
-					<div class="absolute inset-0">
-						<img
-							src="/images/art/forge.webp"
-							alt=""
-							class="h-full w-full object-cover opacity-30 transition-all duration-600 group-hover:scale-103 group-hover:opacity-40"
-							loading="lazy"
-						/>
-					</div>
-
-					<div
-						class="relative z-10 mx-auto flex h-full w-full max-w-5xl flex-col justify-center gap-4 px-4 py-8 sm:px-8 sm:py-12"
-					>
-						<div class="flex flex-col items-center gap-8 sm:text-left">
-							<h3 class="font-eveleth text-2xl font-bold text-foreground">Announcing Homebrew!</h3>
-							<p class="text-center text-sm">
-								Design your own Weapons, Armor, Loot, and more! <br />Build custom content for your
-								Daggerheart characters.
-							</p>
-
-							<div
-								class={cn(
-									buttonVariants({ variant: 'outline' }),
-									'pointer-events-none mx-auto w-min shrink-0 sm:mx-0'
-								)}
-							>
-								Explore Homebrew
-								<ArrowRight
-									class="size-3.5 transition-transform duration-300 group-hover:translate-x-1"
-								/>
-							</div>
-						</div>
-					</div>
-				</button>
-			</section>
-
 			<!-- Hero section-->
 			<section
 				class="mx-auto flex w-full max-w-6xl flex-col items-center gap-x-10 gap-y-16 px-4 pt-16 sm:flex-row sm:justify-evenly sm:px-8"
@@ -136,7 +92,7 @@
 						onclick={() => {
 							goto('/roadmap');
 						}}
-						>Visit the roadmap
+						>See the roadmap
 						<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"
 							><path
 								fill="currentColor"
@@ -147,8 +103,50 @@
 				</div>
 			</section>
 
+			<!-- Campaigns -->
+			<section class="mx-auto w-full max-w-5xl px-4 pt-20 md:px-8">
+				<button
+					class="campaigns-scroll-trigger group relative flex flex-col overflow-hidden rounded-3xl border-x border-accent/0 text-left transition-all duration-600 md:max-h-[400px] md:flex-row"
+					onclick={() => {
+						goto('/campaigns');
+					}}
+				>
+					<div class="relative w-full grow overflow-hidden">
+						<img
+							src="/images/screenshots/campaign-screenshot.webp"
+							alt="Character sheet screenshot"
+							class="h-full w-full object-cover transition-all duration-600"
+							loading="lazy"
+						/>
+					</div>
+					<div
+						class="relative z-20 flex max-w-[300px] grow flex-col justify-center gap-3 px-6 pt-5 pb-6 sm:w-1/2 sm:py-8"
+					>
+						<h3 class="font-eveleth text-xl font-bold">Run Campaigns</h3>
+						<ul class="list-disc space-y-1 pl-6 text-sm text-muted-foreground">
+							<li>Live updates</li>
+							<li>Fear tracker</li>
+							<li>Countdowns</li>
+							<li>Character previews</li>
+							<li>... and more!</li>
+						</ul>
+						<div
+							class={cn(
+								buttonVariants({ variant: 'outline' }),
+								'pointer-events-none mt-2 w-min border-accent/20 bg-accent/10 text-accent transition-all duration-300 group-hover:shadow-[0_0_8px_rgba(253,212,113,0.4)]'
+							)}
+						>
+							Create a campaign
+							<ArrowRight
+								class="size-3.5 transition-transform duration-300 group-hover:translate-x-1"
+							/>
+						</div>
+					</div>
+				</button>
+			</section>
+
 			<!-- Character Sheet -->
-			<section class="mx-auto w-full max-w-3xl px-4 pt-24 pb-30 sm:px-8">
+			<!-- <section class="mx-auto w-full max-w-3xl px-4 pt-24 sm:px-8">
 				<div
 					class="relative flex flex-col overflow-hidden rounded-xl border border-muted-foreground/20 bg-background/70 text-left shadow-lg backdrop-blur-sm sm:flex-row"
 				>
@@ -164,18 +162,58 @@
 							Track character cards, class abilities, inventory, and everything you need at the
 							table.
 						</p>
-						<a
-							class={cn(buttonVariants({ variant: 'outline' }), 'mt-2 w-min')}
-							href="/characters"
-							onclick={() => {
-								goto('/characters');
-							}}
-						>
+						<a class={cn(buttonVariants({ variant: 'outline' }), 'mt-2 w-min')} href="/characters">
 							My characters
 							<ArrowRight class="size-3.5" />
 						</a>
 					</div>
 				</div>
+			</section> -->
+
+			<!-- Homebrew Showcase - Full Width Glass Pane -->
+			<section class="relative z-10 mt-30 w-full pb-30">
+				<button
+					class="homebrew-showcase group relative min-h-[400px] w-full cursor-pointer overflow-hidden border-y border-muted-foreground/30 bg-background sm:min-h-[320px]"
+					onclick={() => {
+						goto('/homebrew');
+					}}
+				>
+					<!-- Forge Background Image -->
+					<div class="absolute inset-0">
+						<img
+							src="/images/art/forge.webp"
+							alt=""
+							class="h-full w-full object-cover opacity-30 transition-all duration-600"
+							loading="lazy"
+						/>
+					</div>
+
+					<div
+						class="relative z-10 mx-auto flex h-full w-full max-w-5xl flex-col justify-center gap-4 px-4 py-8 sm:px-8 sm:py-12"
+					>
+						<div class="flex flex-col items-center gap-8 sm:text-left">
+							<h3 class="font-eveleth text-2xl font-bold text-foreground">
+								Create Homebrew Content
+							</h3>
+							<p class="text-center text-sm">
+								Design your own Weapons, Armor, Loot, and more! <br />Build custom content for your
+								Daggerheart characters.
+							</p>
+
+							<div
+								class={cn(
+									buttonVariants({ variant: 'outline' }),
+									'pointer-events-none mx-auto w-min shrink-0 sm:mx-0'
+								)}
+							>
+								Create Homebrew
+								<ArrowRight
+									class="size-3.5 transition-transform duration-300 group-hover:translate-x-1"
+								/>
+							</div>
+						</div>
+					</div>
+				</button>
 			</section>
 		</div>
 	</div>
@@ -204,5 +242,37 @@
 		box-shadow:
 			0 -8px 16px -4px rgba(0, 0, 0, 1),
 			0 8px 16px -4px rgba(0, 0, 0, 1);
+	}
+
+	/* Campaigns scroll-triggered animations */
+	@keyframes campaigns-border {
+		from {
+			border-color: rgba(253, 212, 113, 0);
+		}
+		to {
+			border-color: rgba(253, 212, 113, 0.2);
+		}
+	}
+
+	@keyframes campaigns-shadow {
+		from {
+			box-shadow: none;
+		}
+		to {
+			box-shadow: 0 0 60px rgba(253, 212, 113, 0.25);
+		}
+	}
+
+	.campaigns-scroll-trigger {
+		animation:
+			campaigns-border 1s ease-out both,
+			campaigns-shadow 1s ease-out both;
+		/* Modern browsers: scroll-driven animations */
+		animation-timeline: view();
+		animation-range: entry 50%;
+		/* Fallback for browsers that don't support view() timeline */
+		@supports not (animation-timeline: view()) {
+			animation: none;
+		}
 	}
 </style>

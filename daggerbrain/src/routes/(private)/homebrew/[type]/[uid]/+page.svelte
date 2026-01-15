@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { HomebrewType } from '$lib/types/homebrew-types';
+	import type { HomebrewType } from '@shared/types/homebrew.types';
 	import type {
 		Weapon,
 		Armor,
@@ -13,12 +13,11 @@
 		TransformationCard,
 		DomainCard,
 		DomainIds
-	} from '$lib/types/compendium-types';
+	} from '@shared/types/compendium.types';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { cn } from '$lib/utils';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
-	import { error } from '@sveltejs/kit';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import { beforeNavigate } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
@@ -241,13 +240,6 @@
 		}
 	});
 
-	// Check if item is not found after loading completes
-	$effect(() => {
-		if (!homebrew.loading && homebrewItem === null) {
-			error(404, `${data.type} with UID "${data.uid}" not found`);
-		}
-	});
-
 	let hasChanges = $state(false);
 	let hasErrors = $state(false);
 	let wasSaving = $state(false);
@@ -352,7 +344,7 @@
 					<div class="relative mx-auto flex w-full max-w-6xl items-center gap-2 py-2 pr-4">
 						<Button href="/homebrew" variant="link">
 							<ChevronLeft />
-							Back to Homebrew
+							Homebrew
 						</Button>
 
 						<div class="grow"></div>

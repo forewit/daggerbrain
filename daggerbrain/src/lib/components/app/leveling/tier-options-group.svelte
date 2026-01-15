@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { AllTierOptionIds, LevelUpChoice, LevelUpOption } from '$lib/types/rule-types';
+	import type { AllTierOptionIds, LevelUpChoice, LevelUpOption } from '@shared/types/rule.types';
 	import { cn } from '$lib/utils';
-	import { renderMarkdown } from '$lib/utils/markdown';
+	import { renderMarkdown } from '$lib/utils';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import Square from '@lucide/svelte/icons/square';
 	import SquareCheck from '@lucide/svelte/icons/square-check';

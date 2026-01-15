@@ -51,27 +51,32 @@
 					buttonVariants({ variant: 'outline', size: 'sm' }),
 					'cursor-pointer gap-3 rounded-full px-4',
 					apply_beastform_bonuses &&
-						'border-accent/10 bg-accent/5 text-accent hover:bg-accent/10 hover:text-accent'
+						'border-accent/10 bg-accent/5 text-accent hover:bg-accent/10 hover:text-accent',
+					!context.canEdit && 'pointer-events-none'
 				)}
 			>
 				Transformed
 				<Switch
+					disabled={!context.canEdit}
 					class="data-[state=checked]:bg-accent/50"
 					checked={apply_beastform_bonuses}
 					onCheckedChange={handleTransformedChange}
 				/>
 			</label>
 			<BeastformComponent beastform={derivedBeastform} show_choices={true} />
-			<div class="flex justify-center gap-2">
-				<Button variant="outline" size="sm" onclick={onBeastformCatalogClick}>
-					<PawPrint class="size-4" />
-					Change Beastform
-				</Button>
-				<Button variant="link" size="sm" class="text-destructive" onclick={removeBeastform}>
-					Remove
-				</Button>
-			</div>
-		{:else}
+
+			{#if context.canEdit}
+				<div class="flex justify-center gap-2">
+					<Button variant="outline" size="sm" onclick={onBeastformCatalogClick}>
+						<PawPrint class="size-4" />
+						Change Beastform
+					</Button>
+					<Button variant="link" size="sm" class="text-destructive" onclick={removeBeastform}>
+						Remove
+					</Button>
+				</div>
+			{/if}
+		{:else if context.canEdit}
 			<Button variant="outline" size="sm" onclick={onBeastformCatalogClick}>
 				<PawPrint class="size-4" />
 				Choose a Beastform

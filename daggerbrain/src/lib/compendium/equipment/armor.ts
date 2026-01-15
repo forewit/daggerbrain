@@ -1,4 +1,4 @@
-import type { Armor } from '$lib/types/compendium-types';
+import type { Armor } from '@shared/types/compendium.types';
 
 export const TIER_1_ARMOR = {
 	gambeson_armor: {
