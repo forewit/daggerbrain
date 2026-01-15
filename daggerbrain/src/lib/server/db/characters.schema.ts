@@ -196,5 +196,3 @@ export const characters_table_update_schema = createUpdateSchema(characters_tabl
 	// Note: id is not omitted here because it's needed for WHERE clauses, but it won't be updated
 	// Note: claimable status is now stored in campaign_characters_table
 });
-
-
