@@ -1,0 +1,1117 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "prevId": "",
+  "version": "6",
+  "dialect": "sqlite",
+  "tables": {
+    "users_table": {
+      "name": "users_table",
+      "columns": {
+        "clerk_id": {
+          "autoincrement": false,
+          "name": "clerk_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "dismissed_popups": {
+          "default": "'[]'",
+          "autoincrement": false,
+          "name": "dismissed_popups",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "homebrew_ancestry_cards": {
+      "name": "homebrew_ancestry_cards",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "clerk_user_id": {
+          "autoincrement": false,
+          "name": "clerk_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "autoincrement": false,
+          "name": "data",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "autoincrement": false,
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "autoincrement": false,
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "homebrew_ancestry_cards_clerk_user_id_idx": {
+          "name": "homebrew_ancestry_cards_clerk_user_id_idx",
+          "columns": [
+            "clerk_user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "homebrew_armor": {
+      "name": "homebrew_armor",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "clerk_user_id": {
+          "autoincrement": false,
+          "name": "clerk_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "autoincrement": false,
+          "name": "data",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "autoincrement": false,
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "autoincrement": false,
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "homebrew_armor_clerk_user_id_idx": {
+          "name": "homebrew_armor_clerk_user_id_idx",
+          "columns": [
+            "clerk_user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "homebrew_beastforms": {
+      "name": "homebrew_beastforms",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "clerk_user_id": {
+          "autoincrement": false,
+          "name": "clerk_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "autoincrement": false,
+          "name": "data",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "autoincrement": false,
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "autoincrement": false,
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "homebrew_beastforms_clerk_user_id_idx": {
+          "name": "homebrew_beastforms_clerk_user_id_idx",
+          "columns": [
+            "clerk_user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "homebrew_classes": {
+      "name": "homebrew_classes",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "clerk_user_id": {
+          "autoincrement": false,
+          "name": "clerk_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "autoincrement": false,
+          "name": "data",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "autoincrement": false,
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "autoincrement": false,
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "homebrew_classes_clerk_user_id_idx": {
+          "name": "homebrew_classes_clerk_user_id_idx",
+          "columns": [
+            "clerk_user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "homebrew_community_cards": {
+      "name": "homebrew_community_cards",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "clerk_user_id": {
+          "autoincrement": false,
+          "name": "clerk_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "autoincrement": false,
+          "name": "data",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "autoincrement": false,
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "autoincrement": false,
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "homebrew_community_cards_clerk_user_id_idx": {
+          "name": "homebrew_community_cards_clerk_user_id_idx",
+          "columns": [
+            "clerk_user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "homebrew_consumables": {
+      "name": "homebrew_consumables",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "clerk_user_id": {
+          "autoincrement": false,
+          "name": "clerk_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "autoincrement": false,
+          "name": "data",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "autoincrement": false,
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "autoincrement": false,
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "homebrew_consumables_clerk_user_id_idx": {
+          "name": "homebrew_consumables_clerk_user_id_idx",
+          "columns": [
+            "clerk_user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "homebrew_domain_cards": {
+      "name": "homebrew_domain_cards",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "clerk_user_id": {
+          "autoincrement": false,
+          "name": "clerk_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "autoincrement": false,
+          "name": "data",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "autoincrement": false,
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "autoincrement": false,
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "homebrew_domain_cards_clerk_user_id_idx": {
+          "name": "homebrew_domain_cards_clerk_user_id_idx",
+          "columns": [
+            "clerk_user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "homebrew_domains": {
+      "name": "homebrew_domains",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "clerk_user_id": {
+          "autoincrement": false,
+          "name": "clerk_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "autoincrement": false,
+          "name": "data",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "autoincrement": false,
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "autoincrement": false,
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "homebrew_domains_clerk_user_id_idx": {
+          "name": "homebrew_domains_clerk_user_id_idx",
+          "columns": [
+            "clerk_user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "homebrew_loot": {
+      "name": "homebrew_loot",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "clerk_user_id": {
+          "autoincrement": false,
+          "name": "clerk_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "autoincrement": false,
+          "name": "data",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "autoincrement": false,
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "autoincrement": false,
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "homebrew_loot_clerk_user_id_idx": {
+          "name": "homebrew_loot_clerk_user_id_idx",
+          "columns": [
+            "clerk_user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "homebrew_primary_weapons": {
+      "name": "homebrew_primary_weapons",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "clerk_user_id": {
+          "autoincrement": false,
+          "name": "clerk_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "autoincrement": false,
+          "name": "data",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "autoincrement": false,
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "autoincrement": false,
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "homebrew_primary_weapons_clerk_user_id_idx": {
+          "name": "homebrew_primary_weapons_clerk_user_id_idx",
+          "columns": [
+            "clerk_user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "homebrew_secondary_weapons": {
+      "name": "homebrew_secondary_weapons",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "clerk_user_id": {
+          "autoincrement": false,
+          "name": "clerk_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "autoincrement": false,
+          "name": "data",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "autoincrement": false,
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "autoincrement": false,
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "homebrew_secondary_weapons_clerk_user_id_idx": {
+          "name": "homebrew_secondary_weapons_clerk_user_id_idx",
+          "columns": [
+            "clerk_user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "homebrew_subclasses": {
+      "name": "homebrew_subclasses",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "clerk_user_id": {
+          "autoincrement": false,
+          "name": "clerk_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "autoincrement": false,
+          "name": "data",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "autoincrement": false,
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "autoincrement": false,
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "homebrew_subclasses_clerk_user_id_idx": {
+          "name": "homebrew_subclasses_clerk_user_id_idx",
+          "columns": [
+            "clerk_user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "homebrew_transformation_cards": {
+      "name": "homebrew_transformation_cards",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "clerk_user_id": {
+          "autoincrement": false,
+          "name": "clerk_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "autoincrement": false,
+          "name": "data",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "autoincrement": false,
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "autoincrement": false,
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "homebrew_transformation_cards_clerk_user_id_idx": {
+          "name": "homebrew_transformation_cards_clerk_user_id_idx",
+          "columns": [
+            "clerk_user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "characters_table": {
+      "name": "characters_table",
+      "columns": {
+        "id": {
+          "default": "'38dae4e3-cbbd-4309-aba8-9a87d480a3cf'",
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "clerk_user_id": {
+          "autoincrement": false,
+          "name": "clerk_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "default": "'New Character'",
+          "autoincrement": false,
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "image_url": {
+          "default": "'/images/portrait-placeholder.png'",
+          "autoincrement": false,
+          "name": "image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "settings": {
+          "default": "'{\"void_enabled\":false,\"use_gold_coins\":false,\"homebrew_enabled\":false}'",
+          "autoincrement": false,
+          "name": "settings",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "derived_descriptors": {
+          "default": "'{\"ancestry_name\":\"\",\"primary_class_name\":\"\",\"primary_subclass_name\":\"\",\"secondary_class_name\":\"\",\"secondary_subclass_name\":\"\"}'",
+          "autoincrement": false,
+          "name": "derived_descriptors",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ancestry_card_id": {
+          "autoincrement": false,
+          "name": "ancestry_card_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_top_ancestry": {
+          "autoincrement": false,
+          "name": "custom_top_ancestry",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_bottom_ancestry": {
+          "autoincrement": false,
+          "name": "custom_bottom_ancestry",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "community_card_id": {
+          "autoincrement": false,
+          "name": "community_card_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "experiences": {
+          "default": "'[\"\",\"\"]'",
+          "autoincrement": false,
+          "name": "experiences",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "class_choices": {
+          "default": "'{}'",
+          "autoincrement": false,
+          "name": "class_choices",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "primary_class_id": {
+          "autoincrement": false,
+          "name": "primary_class_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "primary_subclass_id": {
+          "autoincrement": false,
+          "name": "primary_subclass_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "secondary_class_id": {
+          "autoincrement": false,
+          "name": "secondary_class_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "secondary_subclass_id": {
+          "autoincrement": false,
+          "name": "secondary_subclass_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "secondary_class_domain_id_choice": {
+          "autoincrement": false,
+          "name": "secondary_class_domain_id_choice",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "chosen_beastform": {
+          "default": "'null'",
+          "autoincrement": false,
+          "name": "chosen_beastform",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "companion": {
+          "default": "'null'",
+          "autoincrement": false,
+          "name": "companion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "background_questions": {
+          "default": "'[]'",
+          "autoincrement": false,
+          "name": "background_questions",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "connections": {
+          "default": "'[]'",
+          "autoincrement": false,
+          "name": "connections",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "character_descriptions": {
+          "default": "'{\"clothes\":\"\",\"eyes\":\"\",\"body\":\"\",\"skin\":\"\",\"attitude\":\"\"}'",
+          "autoincrement": false,
+          "name": "character_descriptions",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "notes": {
+          "default": "''",
+          "autoincrement": false,
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "active_armor_id": {
+          "autoincrement": false,
+          "name": "active_armor_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "active_primary_weapon_id": {
+          "autoincrement": false,
+          "name": "active_primary_weapon_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "active_secondary_weapon_id": {
+          "autoincrement": false,
+          "name": "active_secondary_weapon_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "inventory": {
+          "default": "'{\"primary_weapons\":{},\"secondary_weapons\":{},\"armor\":{},\"loot\":{},\"consumables\":{},\"adventuring_gear\":[],\"gold_coins\":0}'",
+          "autoincrement": false,
+          "name": "inventory",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "active_conditions": {
+          "default": "'[]'",
+          "autoincrement": false,
+          "name": "active_conditions",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "transformation_card_id": {
+          "autoincrement": false,
+          "name": "transformation_card_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "additional_domain_card_ids": {
+          "default": "'[]'",
+          "autoincrement": false,
+          "name": "additional_domain_card_ids",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "additional_ancestry_card_ids": {
+          "default": "'[]'",
+          "autoincrement": false,
+          "name": "additional_ancestry_card_ids",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "additional_community_card_ids": {
+          "default": "'[]'",
+          "autoincrement": false,
+          "name": "additional_community_card_ids",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "additional_transformation_card_ids": {
+          "default": "'[]'",
+          "autoincrement": false,
+          "name": "additional_transformation_card_ids",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "unarmed_attack_choices": {
+          "default": "'{}'",
+          "autoincrement": false,
+          "name": "unarmed_attack_choices",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ancestry_card_choices": {
+          "default": "'{}'",
+          "autoincrement": false,
+          "name": "ancestry_card_choices",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "community_card_tokens": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "community_card_tokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "domain_card_choices": {
+          "default": "'{}'",
+          "autoincrement": false,
+          "name": "domain_card_choices",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "domain_card_tokens": {
+          "default": "'{}'",
+          "autoincrement": false,
+          "name": "domain_card_tokens",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "selected_traits": {
+          "default": "'{\"agility\":null,\"strength\":null,\"finesse\":null,\"instinct\":null,\"presence\":null,\"knowledge\":null}'",
+          "autoincrement": false,
+          "name": "selected_traits",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "marked_hp": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "marked_hp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "marked_stress": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "marked_stress",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "marked_hope": {
+          "default": 2,
+          "autoincrement": false,
+          "name": "marked_hope",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "marked_armor": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "marked_armor",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "loadout_domain_card_ids": {
+          "default": "'[]'",
+          "autoincrement": false,
+          "name": "loadout_domain_card_ids",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bonus_max_loadout": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "bonus_max_loadout",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "level": {
+          "default": 1,
+          "autoincrement": false,
+          "name": "level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "level_up_domain_card_ids": {
+          "default": "'{\"1\":{\"A\":null,\"B\":null},\"2\":{\"A\":null},\"3\":{\"A\":null},\"4\":{\"A\":null},\"5\":{\"A\":null},\"6\":{\"A\":null},\"7\":{\"A\":null},\"8\":{\"A\":null},\"9\":{\"A\":null},\"10\":{\"A\":null}}'",
+          "autoincrement": false,
+          "name": "level_up_domain_card_ids",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "level_up_choices": {
+          "default": "'{\"2\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"3\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"4\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"5\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"6\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"7\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"8\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"9\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}},\"10\":{\"A\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null},\"B\":{\"option_id\":null,\"marked_traits\":{\"A\":null,\"B\":null},\"selected_experiences\":[],\"selected_domain_card_id\":null,\"selected_subclass_upgrade\":null}}}'",
+          "autoincrement": false,
+          "name": "level_up_choices",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {
+        "characters_table_clerk_user_id_idx": {
+          "name": "characters_table_clerk_user_id_idx",
+          "columns": [
+            "clerk_user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  }
+}
