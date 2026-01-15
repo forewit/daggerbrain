@@ -3,6 +3,7 @@ import type {
   CampaignState,
   CampaignCharacterSummary,
   CampaignCharacterLiveUpdate,
+  CampaignLiveWebSocketMessage,
 } from "@shared/types/campaign.types";
 import {
   HttpNotificationBodySchema,
@@ -15,18 +16,28 @@ interface WebSocketAttachment {
   userRole: "gm" | "player";
 }
 
+// Storage keys for persistent state
+const STORAGE_KEYS = {
+  CAMPAIGN_STATE: "campaignState",
+  CHARACTERS: "characters",
+  CHARACTER_CLAIMABLE: "characterClaimable",
+  VERSION: "version",
+} as const;
+
 /**
  * CampaignLiveDO is a broadcast-only Durable Object for real-time campaign synchronization.
  *
  * D1 is the source of truth - clients always save to D1 first, then send updates here for broadcast.
- * This DO maintains in-memory state only for the current session to:
+ * This DO maintains state in both memory and persistent storage to:
  * - Track version numbers for detecting stale clients on reconnect
  * - Cache state for broadcasting to other connected clients
+ * - Resume state after eviction/re-instantiation
  *
- * No data is persisted to DO storage or flushed to D1 - that's the client's responsibility.
+ * State is persisted to DO storage so it can be rehydrated when the DO is re-instantiated.
+ * Clients/server are responsible for maintaining the actual D1 state.
  */
 export class CampaignLiveDO extends DurableObject<Env> {
-  // In-memory cache for the current session (not persisted)
+  // In-memory state (also persisted to storage)
   private campaignState: CampaignState | null = null;
   private characters: Record<string, CampaignCharacterSummary> = {};
   private characterClaimable: Record<string, boolean> = {};
@@ -35,6 +46,104 @@ export class CampaignLiveDO extends DurableObject<Env> {
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+    
+    // Rehydrate state from storage before handling any requests
+    // blockConcurrencyWhile ensures no requests are processed until initialization completes
+    ctx.blockConcurrencyWhile(async () => {
+      await this.loadState();
+    });
+  }
+
+  /**
+   * Load state from persistent storage.
+   * Called during constructor initialization to rehydrate state after eviction.
+   */
+  private async loadState(): Promise<void> {
+    try {
+      const [campaignState, characters, characterClaimable, version] = await Promise.all([
+        this.ctx.storage.get<CampaignState | null>(STORAGE_KEYS.CAMPAIGN_STATE),
+        this.ctx.storage.get<Record<string, CampaignCharacterSummary>>(STORAGE_KEYS.CHARACTERS),
+        this.ctx.storage.get<Record<string, boolean>>(STORAGE_KEYS.CHARACTER_CLAIMABLE),
+        this.ctx.storage.get<number>(STORAGE_KEYS.VERSION),
+      ]);
+
+      this.campaignState = campaignState ?? null;
+      this.characters = characters ?? {};
+      this.characterClaimable = characterClaimable ?? {};
+      this.version = version ?? 0;
+
+      console.log(
+        `[CampaignLiveDO] State rehydrated: version=${this.version}, ` +
+        `characters=${Object.keys(this.characters).length}, ` +
+        `state=${this.campaignState ? "present" : "null"}`
+      );
+    } catch (error) {
+      console.error("[CampaignLiveDO] Error loading state from storage:", error);
+      // On error, start with empty state (version 0)
+      this.campaignState = null;
+      this.characters = {};
+      this.characterClaimable = {};
+      this.version = 0;
+    }
+  }
+
+  /**
+   * Increment version and save state to storage.
+   * Helper method to eliminate duplication of this common pattern.
+   */
+  private async incrementVersionAndSave(): Promise<void> {
+    this.version++;
+    try {
+      await this.ctx.storage.put({
+        [STORAGE_KEYS.CAMPAIGN_STATE]: this.campaignState,
+        [STORAGE_KEYS.CHARACTERS]: this.characters,
+        [STORAGE_KEYS.CHARACTER_CLAIMABLE]: this.characterClaimable,
+        [STORAGE_KEYS.VERSION]: this.version,
+      });
+    } catch (error) {
+      console.error("[CampaignLiveDO] Error saving state to storage:", error);
+      // Don't throw - state updates should continue even if persistence fails
+      // The DO will still work for the current session, just won't persist across evictions
+    }
+  }
+
+  /**
+   * Create a JSON response with the given data and status code.
+   */
+  private jsonResponse(data: unknown, status: number): Response {
+    return new Response(JSON.stringify(data), {
+      status,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  /**
+   * Create an error response with a message, status code, and optional details.
+   */
+  private errorResponse(message: string, status: number, details?: unknown): Response {
+    return this.jsonResponse(
+      {
+        error: message,
+        ...(details !== undefined && { details }),
+      },
+      status
+    );
+  }
+
+  /**
+   * Get WebSocket attachment with proper type safety.
+   * Throws if attachment is missing or invalid.
+   */
+  private getWebSocketAttachment(ws: WebSocket): WebSocketAttachment {
+    const attachment = ws.deserializeAttachment();
+    if (!attachment || typeof attachment !== "object") {
+      throw new Error("WebSocket attachment missing or invalid");
+    }
+    const typedAttachment = attachment as WebSocketAttachment;
+    if (!typedAttachment.userId || !typedAttachment.userRole) {
+      throw new Error("WebSocket attachment missing required fields");
+    }
+    return typedAttachment;
   }
 
   override async fetch(request: Request): Promise<Response> {
@@ -57,124 +166,89 @@ export class CampaignLiveDO extends DurableObject<Env> {
 
       if (!parseResult.success) {
         console.error("Invalid HTTP notification body:", parseResult.error.issues);
-        return new Response(
-          JSON.stringify({
-            error: "Invalid request body",
-            details: parseResult.error.issues,
-          }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          }
-        );
+        return this.errorResponse("Invalid request body", 400, parseResult.error.issues);
       }
 
       const body = parseResult.data;
 
       switch (body.type) {
-        case "character_added":
-          // Character added - update in-memory cache and broadcast
-          this.characterClaimable[body.characterId] = body.claimable ?? false;
-          if (body.summary) {
-            this.characters[body.characterId] = body.summary;
+        case "character_added": {
+          // If summary is not provided, we can't broadcast properly
+          // Character is already in D1 (source of truth), so clients can refresh from there
+          if (!body.summary) {
+            break;
           }
-          this.version++;
+
+          // Character added - update in-memory cache and broadcast
+          const claimable = body.claimable ?? false;
+          this.characterClaimable[body.characterId] = claimable;
+          this.characters[body.characterId] = body.summary;
+          
+          await this.incrementVersionAndSave();
           this.broadcast({
             type: "character_added",
             version: this.version,
-            character: body.summary ?? {
-              id: body.characterId,
-              name: "",
-              image_url: "",
-              level: 0,
-              marked_hp: 0,
-              marked_stress: 0,
-              marked_hope: 0,
-              marked_armor: 0,
-              active_conditions: [],
-              owner_user_id: "",
-              derived_character_summary: {
-                ancestry_name: "",
-                primary_class_name: "",
-                primary_subclass_name: "",
-                secondary_class_name: "",
-                secondary_subclass_name: "",
-                max_hp: 0,
-                max_stress: 0,
-                max_hope: 0,
-                evasion: 0,
-                max_armor: 0,
-                damage_thresholds: { major: 0, severe: 0 },
-              },
-              claimable: body.claimable ?? false,
-            },
+            character: body.summary,
             claimable: body.claimable,
           });
           break;
+        }
 
-        case "character_updated":
+        case "character_updated": {
+          // Track if any changes were made
+          let hasChanges = false;
+          const updates: CampaignCharacterLiveUpdate = {};
+
           // Update claimable status if provided
           if (body.claimable !== undefined) {
             this.characterClaimable[body.characterId] = body.claimable;
+            hasChanges = true;
           }
 
           // Apply partial updates to cached character
           if (body.updates && Object.keys(body.updates).length > 0) {
             const existingChar = this.characters[body.characterId];
             if (existingChar) {
-              this.characters[body.characterId] = this.deepMerge(
+              this.characters[body.characterId] = this.mergeCharacterUpdate(
                 existingChar,
                 body.updates
-              ) as CampaignCharacterSummary;
+              );
             }
+            Object.assign(updates, body.updates);
+            hasChanges = true;
+          }
 
-            this.version++;
-
-            // Broadcast partial update
+          // Only broadcast if there were actual changes
+          if (hasChanges) {
+            await this.incrementVersionAndSave();
             this.broadcast({
               type: "character_diff_update",
               version: this.version,
               characterId: body.characterId,
-              updates: body.updates,
+              updates,
               claimable: this.characterClaimable[body.characterId],
-            });
-          } else if (body.claimable !== undefined) {
-            // Just claimable status changed
-            this.version++;
-            this.broadcast({
-              type: "character_diff_update",
-              version: this.version,
-              characterId: body.characterId,
-              updates: {},
-              claimable: body.claimable,
             });
           }
           break;
+        }
 
         case "character_removed":
         case "character_deleted":
-          this.removeCharacter(body.characterId);
+          await this.removeCharacter(body.characterId);
           break;
 
         case "member_updated":
-          this.broadcastMemberUpdate(body.userId, body.displayName);
+          await this.updateMember(body.userId, body.displayName);
+          
           break;
       }
 
-      return new Response(JSON.stringify({ success: true }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
+      return this.jsonResponse({ success: true }, 200);
     } catch (error) {
       console.error("Error handling HTTP notification:", error);
-      return new Response(
-        JSON.stringify({
-          error: error instanceof Error ? error.message : "Unknown error",
-        }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
+      return this.errorResponse(
+        error instanceof Error ? error.message : "Unknown error",
+        500
       );
     }
   }
@@ -184,7 +258,7 @@ export class CampaignLiveDO extends DurableObject<Env> {
     const [client, server] = Object.values(webSocketPair);
 
     if (!server) {
-      return new Response("Failed to create WebSocket pair", { status: 500 });
+      return this.errorResponse("Failed to create WebSocket pair", 500);
     }
 
     const userId = request.headers.get("X-User-Id") || "";
@@ -231,7 +305,7 @@ export class CampaignLiveDO extends DurableObject<Env> {
     }
   }
 
-  override webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): void {
+  override async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
     try {
       const text = typeof message === "string" ? message : new TextDecoder().decode(message);
       const rawData = JSON.parse(text);
@@ -253,11 +327,20 @@ export class CampaignLiveDO extends DurableObject<Env> {
         case "rejoin":
           this.handleRejoin(ws, data.lastKnownVersion);
           break;
-        case "update_state":
-          this.updateState(data.updates);
+        case "update_state": {
+          const attachment = this.getWebSocketAttachment(ws);
+          
+          // Only GMs can update campaign state (fear_track, fear_visible_to_players, notes, countdowns)
+          if (attachment.userRole !== "gm") {
+            this.sendWebSocketError(ws, "Not authorized to update campaign state");
+            return;
+          }
+          
+          await this.updateState(data.updates);
           break;
+        }
         case "update_character": {
-          const attachment = ws.deserializeAttachment() as WebSocketAttachment;
+          const attachment = this.getWebSocketAttachment(ws);
           const character = this.characters[data.characterId];
 
           // Character must exist in cache to verify authorization
@@ -279,7 +362,7 @@ export class CampaignLiveDO extends DurableObject<Env> {
             return;
           }
 
-          this.updateCharacter(data.characterId, data.updates);
+          await this.updateCharacter(data.characterId, data.updates);
           break;
         }
       }
@@ -292,22 +375,10 @@ export class CampaignLiveDO extends DurableObject<Env> {
     }
   }
 
-  override webSocketClose(
-    _ws: WebSocket,
-    _code: number,
-    _reason: string,
-    _wasClean: boolean
-  ): void {
-    // No cleanup needed - D1 is the source of truth, clients already saved there
-  }
-
-  override webSocketError(_ws: WebSocket, error: unknown): void {
-    console.error("WebSocket error in DO:", error);
-  }
-
   private handleRejoin(ws: WebSocket, lastKnownVersion: number | undefined): void {
-    if (lastKnownVersion === undefined || lastKnownVersion < this.version) {
+    if (lastKnownVersion === undefined || lastKnownVersion !== this.version) {
       // Tell client to refresh from D1 (source of truth) instead of sending potentially stale DO cache
+      // This handles: undefined version, client behind (lastKnownVersion < this.version), or DO restarted (lastKnownVersion > this.version)
       ws.send(
         JSON.stringify({
           type: "refresh_required",
@@ -315,6 +386,7 @@ export class CampaignLiveDO extends DurableObject<Env> {
         })
       );
     } else {
+      // Versions match exactly - client is in sync
       ws.send(
         JSON.stringify({
           type: "already_synced",
@@ -324,36 +396,28 @@ export class CampaignLiveDO extends DurableObject<Env> {
     }
   }
 
-  private updateState(updates: Partial<CampaignState>): void {
+  private async updateState(updates: Partial<CampaignState>): Promise<void> {
+    // If we don't have state cached, we can't update it
+    // State should be loaded from storage during initialization
+    if (!this.campaignState) {
+      return;
+    }
+
     // Check for stale updates using timestamp
-    if (updates.updated_at !== undefined && this.campaignState?.updated_at) {
+    if (updates.updated_at !== undefined && this.campaignState.updated_at) {
       if (updates.updated_at <= this.campaignState.updated_at) {
         return; // Ignore stale update
       }
     }
 
     // Update in-memory cache
-    if (this.campaignState) {
-      this.campaignState = {
-        ...this.campaignState,
-        ...updates,
-        updated_at: updates.updated_at ?? Date.now(),
-      };
-    } else {
-      // Initialize campaign state from first update
-      this.campaignState = {
-        campaign_id: "",
-        fear_track: 0,
-        fear_visible_to_players: false,
-        notes: null,
-        countdowns: [],
-        invite_code: "",
-        updated_at: Date.now(),
-        ...updates,
-      };
-    }
+    this.campaignState = {
+      ...this.campaignState,
+      ...updates,
+      updated_at: updates.updated_at ?? Date.now(),
+    };
 
-    this.version++;
+    await this.incrementVersionAndSave();
 
     // Broadcast to all connected clients
     this.broadcast({
@@ -363,38 +427,33 @@ export class CampaignLiveDO extends DurableObject<Env> {
     });
   }
 
-  private deepMerge<T extends Record<string, any>>(target: T, source: Partial<T>): T {
-    const output = { ...target };
+  /**
+   * Merge partial updates into a full CampaignCharacterSummary.
+   * Handles the nested derived_character_summary object specially to allow partial updates.
+   */
+  private mergeCharacterUpdate(
+    target: CampaignCharacterSummary,
+    updates: Partial<CampaignCharacterSummary>
+  ): CampaignCharacterSummary {
+    const result = { ...target, ...updates };
 
-    for (const key in source) {
-      if (source[key] === undefined) continue;
-
-      if (
-        source[key] !== null &&
-        typeof source[key] === "object" &&
-        !Array.isArray(source[key]) &&
-        target[key] !== null &&
-        typeof target[key] === "object" &&
-        !Array.isArray(target[key])
-      ) {
-        output[key] = this.deepMerge(
-          target[key],
-          source[key] as Partial<T[Extract<keyof T, string>]>
-        );
-      } else {
-        output[key] = source[key] as T[Extract<keyof T, string>];
-      }
+    // If derived_character_summary is being updated, merge it instead of replacing
+    if (updates.derived_character_summary !== undefined) {
+      result.derived_character_summary = {
+        ...target.derived_character_summary,
+        ...updates.derived_character_summary,
+      };
     }
 
-    return output;
+    return result;
   }
 
-  private removeCharacter(characterId: string): void {
+  private async removeCharacter(characterId: string): Promise<void> {
     // Remove from in-memory cache
     delete this.characters[characterId];
     delete this.characterClaimable[characterId];
 
-    this.version++;
+    await this.incrementVersionAndSave();
 
     // Broadcast to all connected clients
     this.broadcast({
@@ -404,20 +463,20 @@ export class CampaignLiveDO extends DurableObject<Env> {
     });
   }
 
-  private updateCharacter(
+  private async updateCharacter(
     characterId: string,
     updates: Partial<CampaignCharacterLiveUpdate>
-  ): void {
+  ): Promise<void> {
     // Update in-memory cache if character exists
     const existingChar = this.characters[characterId];
     if (existingChar) {
-      this.characters[characterId] = this.deepMerge(
+      this.characters[characterId] = this.mergeCharacterUpdate(
         existingChar,
         updates
-      ) as CampaignCharacterSummary;
+      );
     }
 
-    this.version++;
+    await this.incrementVersionAndSave();
 
     // Broadcast to all connected clients
     this.broadcast({
@@ -429,8 +488,8 @@ export class CampaignLiveDO extends DurableObject<Env> {
     });
   }
 
-  private broadcastMemberUpdate(userId: string, displayName: string | null): void {
-    this.version++;
+  private async updateMember(userId: string, displayName: string | null): Promise<void> {
+    await this.incrementVersionAndSave();
 
     this.broadcast({
       type: "member_updated",
@@ -440,37 +499,7 @@ export class CampaignLiveDO extends DurableObject<Env> {
     });
   }
 
-  private broadcast(
-    message:
-      | { type: "state_update"; version: number; state: CampaignState }
-      | {
-          type: "character_update";
-          version: number;
-          characterId: string;
-          character: CampaignCharacterLiveUpdate;
-          claimable?: boolean;
-        }
-      | {
-          type: "characters_update";
-          version: number;
-          characters: Record<string, CampaignCharacterLiveUpdate>;
-        }
-      | {
-          type: "character_added";
-          version: number;
-          character: CampaignCharacterSummary;
-          claimable?: boolean;
-        }
-      | { type: "character_removed"; version: number; characterId: string }
-      | {
-          type: "character_diff_update";
-          version: number;
-          characterId: string;
-          updates: CampaignCharacterLiveUpdate;
-          claimable?: boolean;
-        }
-      | { type: "member_updated"; version: number; userId: string; displayName: string | null }
-  ): void {
+  private broadcast(message: CampaignLiveWebSocketMessage): void {
     const websockets = this.ctx.getWebSockets();
     for (const ws of websockets) {
       try {
