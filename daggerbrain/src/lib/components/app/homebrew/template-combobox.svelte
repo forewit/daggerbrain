@@ -530,10 +530,10 @@
 			<span class="truncate text-muted-foreground">Start from scratch</span>
 		{/if}
 	</Select.Trigger>
-	<Select.Content avoidCollisions={false} side="bottom" align="start" class="w-full p-0">
+	<Select.Content collisionPadding={10} avoidCollisions={false} side="bottom" align="start" class="w-full p-0">
 		<Command.Root>
 			<Command.Input placeholder="Search..." />
-			<Command.List class="max-h-auto">
+			<Command.List class="max-h-[300px] overflow-y-auto" style="-webkit-overflow-scrolling: touch;">
 				<Command.Empty>No templates found.</Command.Empty>
 				<!-- Start from scratch group -->
 				<Command.Group class="p-0">
