@@ -533,7 +533,7 @@
 	<Select.Content collisionPadding={10} avoidCollisions={false} side="bottom" align="start" class="w-full p-0">
 		<Command.Root>
 			<Command.Input placeholder="Search..." />
-			<Command.List class="max-h-[300px] overflow-y-auto" style="-webkit-overflow-scrolling: touch;">
+			<Command.List class="max-h-auto">
 				<Command.Empty>No templates found.</Command.Empty>
 				<!-- Start from scratch group -->
 				<Command.Group class="p-0">

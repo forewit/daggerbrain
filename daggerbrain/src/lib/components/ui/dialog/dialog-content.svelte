@@ -26,7 +26,6 @@
 <Dialog.Portal {...portalProps}>
 	<Dialog.Overlay class={cn(overlayClasses)} />
 	<DialogPrimitive.Content
-		preventScroll={false}
 		bind:ref
 		data-slot="dialog-content"
 		class={cn(
