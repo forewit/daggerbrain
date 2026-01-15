@@ -189,7 +189,7 @@ export class CampaignLiveDO extends DurableObject<Env> {
             type: "character_added",
             version: this.version,
             character: body.summary,
-            claimable: body.claimable,
+            claimable: this.characterClaimable[body.characterId],
           });
           break;
         }
@@ -261,7 +261,11 @@ export class CampaignLiveDO extends DurableObject<Env> {
       return this.errorResponse("Failed to create WebSocket pair", 500);
     }
 
-    const userId = request.headers.get("X-User-Id") || "";
+    const userId = request.headers.get("X-User-Id");
+    if (!userId || userId.trim() === "") {
+      return this.errorResponse("Missing required X-User-Id header", 400);
+    }
+
     const userRole = (request.headers.get("X-User-Role") || "player") as "gm" | "player";
 
     const attachment: WebSocketAttachment = {
