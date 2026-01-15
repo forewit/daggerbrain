@@ -23,7 +23,7 @@ export const campaigns_table = sqliteTable(
 		created_at: integer('created_at').notNull(),
 		updated_at: integer('updated_at').notNull()
 	},
-	(table) => [index('campaigns_table_gm_user_id_idx').on(table.gm_user_id)]
+	(table) => []
 );
 
 export const campaigns_table_schema = createSelectSchema(campaigns_table);
@@ -93,7 +93,8 @@ export const campaign_characters_table = sqliteTable(
 	(table) => [
 		primaryKey({ columns: [table.campaign_id, table.character_id] }),
 		index('campaign_characters_table_campaign_id_idx').on(table.campaign_id),
-		index('campaign_characters_table_character_id_idx').on(table.character_id)
+		index('campaign_characters_table_character_id_idx').on(table.character_id),
+		index('campaign_characters_table_campaign_id_claimable_idx').on(table.campaign_id, table.claimable)
 	]
 );
 
@@ -120,6 +121,10 @@ export const campaign_homebrew_vault_table = sqliteTable(
 		index('campaign_homebrew_vault_table_campaign_id_idx').on(table.campaign_id),
 		uniqueIndex('campaign_homebrew_vault_table_campaign_id_homebrew_id_unique').on(
 			table.campaign_id,
+			table.homebrew_id
+		),
+		index('campaign_homebrew_vault_table_homebrew_type_homebrew_id_idx').on(
+			table.homebrew_type,
 			table.homebrew_id
 		)
 	]

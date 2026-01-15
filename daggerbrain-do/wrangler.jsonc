@@ -8,6 +8,12 @@
 	"workers_dev": false,
   "limits": {
     "cpu_ms": 50
-  }
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_classes": ["CampaignLiveDO"]
+    }
+  ]
 }
 

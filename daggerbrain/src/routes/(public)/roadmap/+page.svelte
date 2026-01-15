@@ -86,7 +86,7 @@
 							<div class="px-5 pt-3 pb-4 text-sm text-muted-foreground">
 								Create campaigns for your players to join. Track fear, countdowns, character sheets,
 								and more.
-								<a href="/campaigns" class="block underline hover:text-emerald-500"
+								<a href="https://buymeacoffee.com/marcanderson/homebrew-campaigns" target="_blank" class="block underline hover:text-emerald-500"
 									>Read more about it here <ExternalLink
 										class="-mt-0.5 ml-0.5 inline size-3.5"
 									/></a
