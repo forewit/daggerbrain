@@ -89,7 +89,7 @@ function createCampaignLiveConnection(campaignId: string) {
 	let messageHandler: ((message: CampaignLiveWebSocketMessage) => void) | null = null;
 	let lastKnownVersion = $state<number | undefined>(undefined);
 	let shouldReconnect = $state(true); // Flag to prevent reconnection after explicit disconnect
-	const maxReconnectDelay = 30000; // 30 seconds
+	const maxReconnectAttempts = 2; // Maximum number of reconnect attempts (initial + 2 retries = 3 total)
 
 	function connect() {
 		// Prevent multiple simultaneous connection attempts
@@ -120,6 +120,8 @@ function createCampaignLiveConnection(campaignId: string) {
 				status = 'connected';
 				reconnectAttempts = 0;
 				ws = websocket;
+
+				console.warn(`[CampaignLive] Connected to WebSocket for campaign`);
 
 				// Send rejoin message if we have a last known version
 				if (lastKnownVersion !== undefined) {
@@ -189,10 +191,23 @@ function createCampaignLiveConnection(campaignId: string) {
 	function scheduleReconnect() {
 		if (reconnectTimeout) return;
 		if (!shouldReconnect) return; // Don't reconnect if explicitly disconnected
+		
+		// Stop reconnecting after max attempts
+		if (reconnectAttempts >= maxReconnectAttempts) {
+			console.warn(`[CampaignLive] Max reconnect attempts (${maxReconnectAttempts}) reached. Stopping reconnection.`);
+			shouldReconnect = false;
+			status = 'disconnected';
+			return;
+		}
 
-		const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), maxReconnectDelay);
+		// Fixed delays: 5 seconds for first retry, 10 seconds for second retry
+		const delays = [5000, 10000];
+		const delay = delays[reconnectAttempts] || 10000;
+		
 		reconnectAttempts++;
 		status = 'reconnecting';
+
+		console.warn(`[CampaignLive] Scheduling reconnect attempt ${reconnectAttempts} in ${delay/1000}s`);
 
 		reconnectTimeout = setTimeout(() => {
 			reconnectTimeout = null;
@@ -604,9 +619,22 @@ function campaignContext() {
 							case 'state_sync':
 								// Initial state sync or rejoin sync - now receives CampaignCharacterSummary objects directly
 								if (message.state) {
-									campaignState = message.state;
+									// Preserve read-only fields from D1 if received values are invalid (D1 is source of truth)
+									const preservedInviteCode = 
+										message.state.invite_code && message.state.invite_code.trim() !== ''
+											? message.state.invite_code
+											: campaignState?.invite_code || message.state.invite_code;
+									const preservedCampaignId = 
+										message.state.campaign_id && message.state.campaign_id === id
+											? message.state.campaign_id
+											: id || campaignState?.campaign_id || message.state.campaign_id;
+									campaignState = {
+										...message.state,
+										invite_code: preservedInviteCode,
+										campaign_id: preservedCampaignId
+									};
 									// Update lastSavedCampaignState to prevent auto-save from triggering
-									lastSavedCampaignState = JSON.stringify(message.state);
+									lastSavedCampaignState = JSON.stringify(campaignState);
 								}
 								// Characters are now CampaignCharacterSummary objects directly
 								if (message.characters) {
@@ -639,9 +667,22 @@ function campaignContext() {
 								break;
 							case 'state_update':
 								if (message.state) {
-									campaignState = message.state;
+									// Preserve read-only fields from D1 if received values are invalid (D1 is source of truth)
+									const preservedInviteCode = 
+										message.state.invite_code && message.state.invite_code.trim() !== ''
+											? message.state.invite_code
+											: campaignState?.invite_code || message.state.invite_code;
+									const preservedCampaignId = 
+										message.state.campaign_id && message.state.campaign_id === id
+											? message.state.campaign_id
+											: id || campaignState?.campaign_id || message.state.campaign_id;
+									campaignState = {
+										...message.state,
+										invite_code: preservedInviteCode,
+										campaign_id: preservedCampaignId
+									};
 									// Update lastSavedCampaignState to prevent auto-save from triggering
-									lastSavedCampaignState = JSON.stringify(message.state);
+									lastSavedCampaignState = JSON.stringify(campaignState);
 								}
 								break;
 							case 'characters_update':
