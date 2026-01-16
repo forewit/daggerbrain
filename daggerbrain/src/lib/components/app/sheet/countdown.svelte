@@ -55,20 +55,18 @@
 	<!-- Countdown Name -->
 	<div
 		class={cn(
-			'flex items-center gap-1 text-muted-foreground',
-			countdown.current === 0 && 'text-accent/80'
+			'flex items-center gap-1.5 mb-0.5 text-muted-',
 		)}
 	>
 		<p class="text-xs font-medium">{countdown.name}</p>
 		{#if isGM && countdown.visibleToPlayers}
-			<Eye class="size-4" />
+			<Eye class="size-3.5" />
 		{/if}
 	</div>
 	<!-- Hourglass Button -->
 	<button
 		class={cn(
 			'relative flex size-12 items-center justify-center overflow-visible transition-transform duration-200 hover:scale-105',
-			countdown.current === 0 && ' text-accent',
 			!isGM && 'pointer-events-none'
 		)}
 		onclick={handleHourglassClick}

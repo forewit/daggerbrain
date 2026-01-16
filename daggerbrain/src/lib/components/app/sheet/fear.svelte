@@ -35,7 +35,7 @@
 
 		<Button
 			onclick={() => {
-				fearValue = Math.max(0, fearValue + 1);
+				fearValue = Math.min(MAX_FEAR, fearValue + 1);
 			}}
 			variant="ghost"
 			hidden={!isGM}

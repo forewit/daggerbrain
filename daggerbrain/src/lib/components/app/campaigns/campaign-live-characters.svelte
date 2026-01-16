@@ -12,7 +12,7 @@
 	import Diamond from '@lucide/svelte/icons/diamond';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 
-	let { isGM = false }: { isGM?: boolean } = $props();
+	let { isGM = false, class: className = "" }: { isGM?: boolean, class?: string } = $props();
 
 	const campaignContext = getCampaignContext();
 	const user = getUserContext();
@@ -27,20 +27,20 @@
 </script>
 
 <div
-	class="mt-8 flex flex-col items-center border-y sm:border  border-accent/5 bg-accent/5 p-6 pt-4 px-2 sm:px-6 sm:mx-auto sm:rounded-2xl"
+	class={cn("flex flex-col items-center bg-accent/5 p-6 pt-4 px-2 sm:px-6 sm:mx-auto sm:rounded-2xl  bg-primary/15 border-y shadow-xl", className)}
 >
 	<div class="mb-4 flex items-center justify-center gap-4 ">
-		<p class="text-center font-eveleth text-accent">Characters</p>
+		<p class="text-center font- text-lg font-semibold">Characters</p>
 		<label
 			class={cn(
 				buttonVariants({ variant: 'outline', size: 'sm' }),
-				'bg-accent/5 hover:bg-accent/5 cursor-pointer gap-3 rounded-full border-accent/10 px-4 text-accent hover:text-accent',
-				showPreviews && ' bg-accent/10  hover:bg-accent/10 '
+				'bg-primary/5 hover:bg-primary/5 cursor-pointer gap-3 rounded-full border-primary/20 px-4',
+				showPreviews && ' bg-primary/15  hover:bg-primary/15 '
 			)}
 		>
 			Previews
 			<Switch
-				class="data-[state=checked]:bg-accent/50 data-[state=unchecked]:bg-accent/15"
+				class=""
 				checked={showPreviews}
 				onCheckedChange={(checked: boolean | undefined) => (showPreviews = checked ?? false)}
 			/>
