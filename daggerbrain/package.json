@@ -6,6 +6,7 @@
 	"scripts": {
 		"dev": "NODE_TLS_REJECT_UNAUTHORIZED=0 vite dev",
 		"dev:wrangler": "wrangler dev --local -c wrangler.jsonc -c ../daggerbrain-do/wrangler.jsonc",
+		"dev:wrangler:frontend": "wrangler dev --local -c wrangler.jsonc",
 		"build": "vite build",
 		"preview": "bun run build && wrangler dev --local -c wrangler.jsonc -c ../daggerbrain-do/wrangler.jsonc",
 		"prepare": "svelte-kit sync || echo ''",

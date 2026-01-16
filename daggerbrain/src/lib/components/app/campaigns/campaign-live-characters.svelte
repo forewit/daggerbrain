@@ -47,7 +47,11 @@
 	</div>
 
 	<div
-		class="grid grid-cols-[400px] gap-6 min-[916px]:grid-cols-[repeat(2,400px)] min-[1348px]:grid-cols-[repeat(3,400px)]"
+		class={cn(
+			"grid grid-cols-[400px] gap-6",
+			characterList.length > 1 && "min-[916px]:grid-cols-[repeat(2,400px)]",
+			characterList.length > 2 && "min-[1348px]:grid-cols-[repeat(3,400px)]",
+			)}
 	>
 		{#if characterList.length > 0 && campaignContext.campaignId !== undefined}
 			{#if showPreviews}

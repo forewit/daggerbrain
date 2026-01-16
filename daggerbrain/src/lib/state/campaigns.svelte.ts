@@ -363,11 +363,28 @@ function campaignContext() {
 
 			campaign = camp;
 			members = mems.map((m) => ({ ...m, role: m.role as 'gm' | 'player' }));
-			campaignState = state;
+			
+			// Prevent overwriting campaignState with stale server data after a recent save
+			// If our local state matches what we last saved, but server data is different,
+			// the server cache is stale - keep our local state
+			let stateToUse = state;
+			if (campaignState && lastSavedCampaignState) {
+				const currentStateJson = JSON.stringify(campaignState);
+				const fetchedStateJson = JSON.stringify(state);
+				// If local state matches what we saved, but server data is different, server is stale
+				if (currentStateJson === lastSavedCampaignState && fetchedStateJson !== lastSavedCampaignState) {
+					// Keep our local state - server cache is stale
+					stateToUse = campaignState;
+				}
+			}
+			
+			campaignState = stateToUse;
 			characters = chars;
 			vaultItems = vault;
 			// Initialize lastSavedCampaignState to track changes from this point
-			lastSavedCampaignState = JSON.stringify(state);
+			// Use stateToUse (which may be local state if server was stale) instead of raw state
+			lastSavedCampaignState = JSON.stringify(stateToUse);
+
 			// Initialize userMembership from members array
 			const currentUserId = userContext.user?.clerk_id;
 			if (currentUserId) {
@@ -676,11 +693,13 @@ function campaignContext() {
 										message.state.campaign_id && message.state.campaign_id === id
 											? message.state.campaign_id
 											: id || campaignState?.campaign_id || message.state.campaign_id;
+									
 									campaignState = {
 										...message.state,
 										invite_code: preservedInviteCode,
 										campaign_id: preservedCampaignId
 									};
+								
 									// Update lastSavedCampaignState to prevent auto-save from triggering
 									lastSavedCampaignState = JSON.stringify(campaignState);
 								}
@@ -972,7 +991,7 @@ function campaignContext() {
 
 					// Then send via WebSocket for live broadcast to other clients
 					// Use the send() method which handles connection checking internally
-					if (wsConnection) {
+					if (wsConnection && wsConnection.connected) {
 						wsConnection.send({
 							type: 'update_state',
 							updates: {
