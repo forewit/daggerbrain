@@ -41,7 +41,7 @@
 					}}
 				>
 					<img
-						src="/images/art/epic-monk.webp"
+						src="/images/art/stormy.webp"
 						alt=""
 						fetchpriority="high"
 						class="absolute inset-0 h-full w-full object-cover opacity-40 transition-all duration-600 group-hover:scale-103 group-hover:opacity-50"

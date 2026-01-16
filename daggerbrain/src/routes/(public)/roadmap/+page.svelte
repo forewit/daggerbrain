@@ -18,7 +18,7 @@
 		class="forest-fade-container pointer-events-none absolute right-0 bottom-0 left-0 z-0 h-64 w-full overflow-hidden"
 	>
 		<img
-			src="/images/art/forest.webp"
+			src="/images/art/mountains.webp"
 			alt=""
 			class="forest-fade-container h-full w-full object-cover object-bottom"
 		/>
