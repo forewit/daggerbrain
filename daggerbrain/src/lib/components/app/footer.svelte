@@ -30,9 +30,9 @@
 		>
 			<!-- Background Image -->
 			<img
-				src="/images/art/dragon-splash.webp"
+				src="/images/daggerbrain.svg"
 				alt=""
-				class="absolute inset-0 h-full w-full object-contain object-right opacity-10"
+				class="absolute inset-0 size-full object-contain object-right opacity-10"
 			/>
 			<!-- Content -->
 			<div class="relative z-10">

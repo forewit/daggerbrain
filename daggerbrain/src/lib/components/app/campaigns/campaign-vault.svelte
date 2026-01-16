@@ -163,7 +163,7 @@
 	});
 </script>
 
-<div class={cn('rounded-2xl bg-primary/10 shadow-xl', className)}>
+<div class={cn('rounded-2xl bg-primary/15 border-y shadow-xl', className)}>
 	<div class="flex items-center justify-between px-4 pt-4">
 		<h2 class="text-lg font-semibold">
 			<!-- <Anvil class="size-5 inline -mt-0.5 mr-0.5" /> -->
@@ -180,9 +180,9 @@
 		Items in the vault will be available your player's character sheets.
 	</p>
 
-	{#if sortedVaultItems.length === 0}
-		<p class="pt-2 pb-8 text-center text-sm text-muted-foreground">No items in vault yet.</p>
-	{:else}
+{#if sortedVaultItems.length === 0}
+	<div class="h-4"></div>
+{:else}
 		<div class=" mx-4 mb-4 bg-background">
 			<table class="w-full border-collapse">
 				<colgroup>
@@ -191,7 +191,7 @@
 					<col class="w-12" />
 				</colgroup>
 				<thead>
-					<tr class="border-b bg-primary-muted text-xs text-muted-foreground">
+					<tr class="border-b bg-primary/30 text-xs text-muted-">
 						<th class="px-4 py-2 text-left">Name</th>
 						<th class="py-2 pr-4 text-left">Type</th>
 						<th class="py-2 pr-4 text-center"></th>
@@ -224,7 +224,7 @@
 				</tbody>
 			</table>
 		</div>
-	{/if}
+		{/if}
 </div>
 
 <!-- Add to Vault Dialog -->

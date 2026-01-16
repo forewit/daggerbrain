@@ -189,9 +189,9 @@
 						</div>
 						<CampaignCharacters class="mt-8" />
 						{#if isGM}
-							<CampaignVault {campaignId} class="mt-12" />
+							<CampaignVault {campaignId} class="mt-10" />
 						{/if}
-						<CampaignNotes {isGM} class="mt-12 mb-10" />
+						<CampaignNotes {isGM} class="mt-8 mb-10" />
 					</div>
 				{/if}
 			</div>

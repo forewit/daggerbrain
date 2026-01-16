@@ -28,10 +28,10 @@
 			class="relative mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-2 px-4"
 		>
 			<div class="flex items-center gap-2">
-				<Button href="/campaigns" variant="link" class="hidden px-0 text-muted-foreground sm:flex">
+				<Button href="/campaigns" variant="link" class=" px-0 text-muted-foreground sm:flex">
 					Campaigns
 				</Button>
-				<ChevronRight class="hidden size-3.5 text-muted-foreground sm:block" />
+				<ChevronRight class=" size-3.5 text-muted-foreground sm:block" />
 				<p class="truncate text-sm font-medium">
 					{campaign?.name || 'unnamed campaign'}
 				</p>

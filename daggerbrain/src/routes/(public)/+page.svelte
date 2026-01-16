@@ -20,7 +20,7 @@
 		class="dragon-fade-container pointer-events-none absolute top-0 right-0 left-0 z-0 h-72 w-full overflow-hidden sm:h-96"
 	>
 		<img
-			src="/images/art/dragon-banner.webp"
+			src="/images/art/characters.webp"
 			alt=""
 			class="dragon-fade-container h-full w-full object-cover object-bottom"
 		/>
@@ -41,7 +41,7 @@
 					}}
 				>
 					<img
-						src="/images/art/epic-monk.webp"
+						src="/images/art/stormy.webp"
 						alt=""
 						fetchpriority="high"
 						class="absolute inset-0 h-full w-full object-cover opacity-40 transition-all duration-600 group-hover:scale-103 group-hover:opacity-50"

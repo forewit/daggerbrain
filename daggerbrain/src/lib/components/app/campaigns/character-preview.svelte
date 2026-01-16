@@ -200,10 +200,30 @@
 	</div>
 
 	<!-- Action Button -->
-	<div class="flex gap-2 p-2">
+	<!-- <div class="flex gap-2 p-2">
 		<Button variant="outline" size="sm" href={`/characters/${character.id}/`} class="grow">
 			View Character Sheet
 			<ExternalLink />
 		</Button>
+	</div> -->
+	<div class="flex gap-2 p-2 ">
+		<Button
+			variant="outline"
+			size="sm"
+			class="grow"
+			href={`/characters/${character.id}/`}
+		>
+			View
+		</Button>
+		{#if canEdit}
+			<Button
+				variant="outline"
+				class="grow"
+				size="sm"
+				href={`/characters/${character.id}/edit`}
+			>
+				Edit
+			</Button>
+		{/if}
 	</div>
 </div>

@@ -234,7 +234,7 @@
 	<div class="mx- w-full overflow-hidden rounded-lg shadow-lg">
 		<a
 			href={`/characters/${char.id}/`}
-			class="flex gap-2 border bg-primary-muted p-1 hover:bg-primary-muted/80"
+			class="flex gap-2 border bg-primary-muted p-1 hover:bg-primary-muted/70"
 		>
 			<div class="size-19 shrink-0 overflow-hidden rounded-lg border-2">
 				<img
@@ -247,7 +247,7 @@
 				<p class=" truncate text-lg font-bold">
 					{char.name.trim() || 'Unnamed Character'}
 				</p>
-				<p class=" truncate text-xs text-muted-foreground">
+				<p class=" truncate text-xs text-muted-foreground pr-1 pt-0.5">
 					{char.derived_character_summary?.ancestry_name || 'No ancestry'}
 					&ensp;•&ensp;
 					{char.derived_character_summary?.primary_class_name || 'No class'}
@@ -256,7 +256,7 @@
 				</p>
 				{#if !char.claimable}
 					<div
-						class="mt-1.5 w-min truncate rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 text-center text-xs text-accent"
+						class="mt-1 w-min truncate rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 text-center text-xs text-accent"
 					>
 						Player: {playerName}
 					</div>

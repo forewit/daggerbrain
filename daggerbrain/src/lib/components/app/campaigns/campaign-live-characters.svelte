@@ -10,8 +10,9 @@
 	import Heart from '@lucide/svelte/icons/heart';
 	import Zap from '@lucide/svelte/icons/zap';
 	import Diamond from '@lucide/svelte/icons/diamond';
+	import ExternalLink from '@lucide/svelte/icons/external-link';
 
-	let { isGM = false }: { isGM?: boolean } = $props();
+	let { isGM = false, class: className = "" }: { isGM?: boolean, class?: string } = $props();
 
 	const campaignContext = getCampaignContext();
 	const user = getUserContext();
@@ -26,20 +27,20 @@
 </script>
 
 <div
-	class="mt-8 flex flex-col items-center border-y border-accent/10 bg-accent/5 px-2 pt-7 pb-10 sm:mx-auto sm:rounded-3xl sm:border sm:px-8 sm:pt-5 sm:pb-8"
+	class={cn("flex flex-col items-center bg-accent/5 p-6 pt-4 px-2 sm:px-6 sm:mx-auto sm:rounded-2xl  bg-primary/15 border-y shadow-xl", className)}
 >
-	<div class="mb-8 flex items-center justify-center gap-4 sm:mb-6">
-		<p class="text-center font-eveleth text-accent">Characters</p>
+	<div class="mb-4 flex items-center justify-center gap-4 ">
+		<p class="text-center font- text-lg font-semibold">Characters</p>
 		<label
 			class={cn(
 				buttonVariants({ variant: 'outline', size: 'sm' }),
-				'cursor-pointer gap-3 rounded-full border-accent/10 px-4 text-accent hover:text-accent',
-				showPreviews && ' bg-accent/5  hover:bg-accent/10 '
+				'bg-primary/5 hover:bg-primary/5 cursor-pointer gap-3 rounded-full border-primary/20 px-4',
+				showPreviews && ' bg-primary/20  hover:bg-primary/20 '
 			)}
 		>
 			Previews
 			<Switch
-				class="data-[state=checked]:bg-accent/50 data-[state=unchecked]:bg-accent/15"
+				class=""
 				checked={showPreviews}
 				onCheckedChange={(checked: boolean | undefined) => (showPreviews = checked ?? false)}
 			/>
@@ -47,7 +48,11 @@
 	</div>
 
 	<div
-		class="grid grid-cols-[400px] gap-6 min-[916px]:grid-cols-[repeat(2,400px)] min-[1348px]:grid-cols-[repeat(3,400px)]"
+		class={cn(
+			"grid grid-cols-[400px] gap-6",
+			characterList.length > 1 && "min-[916px]:grid-cols-[repeat(2,400px)]",
+			characterList.length > 2 && "min-[1348px]:grid-cols-[repeat(3,400px)]",
+			)}
 	>
 		{#if characterList.length > 0 && campaignContext.campaignId !== undefined}
 			{#if showPreviews}
@@ -62,10 +67,9 @@
 					{@const playerName =
 						char.owner_name || (char.owner_user_id === user.user?.clerk_id ? 'you' : 'Anonymous')}
 					{@const canEdit = isGM || user.user?.clerk_id === char.owner_user_id}
-					<div class="mx-auto w-full overflow-hidden rounded-lg shadow-lg">
-						<a
-							href={`/characters/${char.id}/`}
-							class="flex gap-2 rounded-t-lg border bg-background p-1 hover:bg-background/80"
+					<div class="mx-auto w-full overflow-hidden rounded-lg shadow-lg bg-background border p-2">
+						<div
+							class="flex gap-2"
 						>
 							<div class="size-19 shrink-0 overflow-hidden rounded-lg border-2">
 								<img
@@ -74,7 +78,7 @@
 									class="h-full w-full object-cover"
 								/>
 							</div>
-							<div class="grow truncate">
+							<div class="grow truncate pt-0.5">
 								<div class="mr-2 flex items-center justify-between">
 									<p class=" truncate text-lg font-bold">
 										{char.name.trim() || 'Unnamed Character'}
@@ -139,27 +143,27 @@
 
 								{#if !char.claimable}
 									<div
-										class="mt-1.5 w-min truncate rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 text-center text-xs text-accent"
+										class="mt-1 w-min truncate rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 text-center text-xs text-accent"
 									>
 										Player: {playerName}
 									</div>
 								{/if}
 							</div>
-						</a>
-						<div class="flex bg-muted">
+						</div>
+						<div class="flex bg-background pt-2 gap-2">
 							<Button
-								variant="ghost"
+								variant="outline"
 								size="sm"
-								class="hover:text-text grow rounded-none border"
+								class="grow"
 								href={`/characters/${char.id}/`}
 							>
 								View
 							</Button>
 							{#if canEdit}
 								<Button
-									variant="ghost"
+									variant="outline"
+									class="grow"
 									size="sm"
-									class="hover:text-text grow rounded-none border border-x-0"
 									href={`/characters/${char.id}/edit`}
 								>
 									Edit
@@ -170,7 +174,7 @@
 				{/each}
 			{/if}
 		{:else}
-			<p class="py-8 text-center text-xs text-accent/80">No active characters in this campaign</p>
+			<p class="py-8 text-center text-xs text-muted-foreground">No active characters in this campaign</p>
 		{/if}
 	</div>
 </div>

@@ -38,17 +38,17 @@
 				'pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]'
 			)}
 		>
-			<div class="mb-6 flex w-full flex-col">
+			<div class="mb-16 flex w-full flex-col gap-9 mt-8">
 				<!-- Fear Tracker -->
 				<Fear
-					class="mx-auto mt-6"
+					class="mx-auto"
 					bind:fearValue={campaignContext.campaignState.fear_track}
 					{isGM}
 				/>
 
 				<!-- Countdowns -->
 				{#if campaignContext.campaignState.countdowns.length > 0}
-					<div class={cn('mt-6 flex flex-wrap items-end justify-center gap-4', isGM && 'mt-4')}>
+					<div class={cn('flex flex-wrap items-end justify-center gap-4')}>
 						{#each campaignContext.campaignState.countdowns as countdown, index (countdown.id)}
 							<Countdown
 								bind:countdown={campaignContext.campaignState.countdowns[index]}
@@ -59,7 +59,7 @@
 					</div>
 				{/if}
 				<!-- Characters (GM only) -->
-				<CampaignLiveCharacters {isGM} />
+				<CampaignLiveCharacters {isGM} class={cn(campaignContext.campaignState.countdowns.length <= 0 && 'mt-2')}/>
 			</div>
 		</div>
 	{/if}
