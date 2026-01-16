@@ -10,6 +10,7 @@
 	import Heart from '@lucide/svelte/icons/heart';
 	import Zap from '@lucide/svelte/icons/zap';
 	import Diamond from '@lucide/svelte/icons/diamond';
+	import ExternalLink from '@lucide/svelte/icons/external-link';
 
 	let { isGM = false }: { isGM?: boolean } = $props();
 
@@ -26,15 +27,15 @@
 </script>
 
 <div
-	class="mt-8 flex flex-col items-center border-y border-accent/10 bg-accent/5 p-6 pt-4 px-2 sm:px-6 sm:mx-auto sm:rounded-2xl sm:border "
+	class="mt-8 flex flex-col items-center border-y sm:border  border-accent/5 bg-accent/5 p-6 pt-4 px-2 sm:px-6 sm:mx-auto sm:rounded-2xl"
 >
 	<div class="mb-4 flex items-center justify-center gap-4 ">
 		<p class="text-center font-eveleth text-accent">Characters</p>
 		<label
 			class={cn(
 				buttonVariants({ variant: 'outline', size: 'sm' }),
-				'cursor-pointer gap-3 rounded-full border-accent/10 px-4 text-accent hover:text-accent',
-				showPreviews && ' bg-accent/5  hover:bg-accent/10 '
+				'bg-accent/5 hover:bg-accent/5 cursor-pointer gap-3 rounded-full border-accent/10 px-4 text-accent hover:text-accent',
+				showPreviews && ' bg-accent/10  hover:bg-accent/10 '
 			)}
 		>
 			Previews
@@ -66,10 +67,9 @@
 					{@const playerName =
 						char.owner_name || (char.owner_user_id === user.user?.clerk_id ? 'you' : 'Anonymous')}
 					{@const canEdit = isGM || user.user?.clerk_id === char.owner_user_id}
-					<div class="mx-auto w-full overflow-hidden rounded-lg shadow-lg">
-						<a
-							href={`/characters/${char.id}/`}
-							class="flex gap-2 rounded-t-lg border bg-background p-1 hover:bg-background/80"
+					<div class="mx-auto w-full overflow-hidden rounded-lg shadow-lg bg-background border p-2">
+						<div
+							class="flex gap-2"
 						>
 							<div class="size-19 shrink-0 overflow-hidden rounded-lg border-2">
 								<img
@@ -78,7 +78,7 @@
 									class="h-full w-full object-cover"
 								/>
 							</div>
-							<div class="grow truncate">
+							<div class="grow truncate pt-0.5">
 								<div class="mr-2 flex items-center justify-between">
 									<p class=" truncate text-lg font-bold">
 										{char.name.trim() || 'Unnamed Character'}
@@ -143,27 +143,27 @@
 
 								{#if !char.claimable}
 									<div
-										class="mt-1.5 w-min truncate rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 text-center text-xs text-accent"
+										class="mt-1 w-min truncate rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 text-center text-xs text-accent"
 									>
 										Player: {playerName}
 									</div>
 								{/if}
 							</div>
-						</a>
-						<div class="flex bg-muted">
+						</div>
+						<div class="flex bg-background pt-2 gap-2">
 							<Button
-								variant="ghost"
+								variant="outline"
 								size="sm"
-								class="hover:text-text grow rounded-none border"
+								class="grow"
 								href={`/characters/${char.id}/`}
 							>
 								View
 							</Button>
 							{#if canEdit}
 								<Button
-									variant="ghost"
+									variant="outline"
+									class="grow"
 									size="sm"
-									class="hover:text-text grow rounded-none border border-x-0"
 									href={`/characters/${char.id}/edit`}
 								>
 									Edit

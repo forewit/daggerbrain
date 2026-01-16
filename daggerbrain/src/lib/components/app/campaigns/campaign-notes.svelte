@@ -17,7 +17,7 @@
 	let showPreview = $state(true);
 </script>
 
-<div class={cn('rounded-2xl bg-primary-muted p-4 shadow-xl', className)}>
+<div class={cn('rounded-2xl bg-primary-muted p-4 shadow-xl border-y', className)}>
 	<div class="mb-2 flex items-center justify-between">
 		<h2 class="text-lg font-semibold">
 			{#if isGM}
