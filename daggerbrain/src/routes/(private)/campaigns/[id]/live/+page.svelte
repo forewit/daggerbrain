@@ -38,7 +38,7 @@
 				'pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]'
 			)}
 		>
-			<div class="mb-6 flex w-full flex-col">
+			<div class="mb-16 flex w-full flex-col">
 				<!-- Fear Tracker -->
 				<Fear
 					class="mx-auto mt-6"

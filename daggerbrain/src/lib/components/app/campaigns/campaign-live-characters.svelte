@@ -26,9 +26,9 @@
 </script>
 
 <div
-	class="mt-8 flex flex-col items-center border-y border-accent/10 bg-accent/5 px-2 pt-7 pb-10 sm:mx-auto sm:rounded-3xl sm:border sm:px-8 sm:pt-5 sm:pb-8"
+	class="mt-8 flex flex-col items-center border-y border-accent/10 bg-accent/5 p-6 pt-4 px-2 sm:px-6 sm:mx-auto sm:rounded-2xl sm:border "
 >
-	<div class="mb-8 flex items-center justify-center gap-4 sm:mb-6">
+	<div class="mb-4 flex items-center justify-center gap-4 ">
 		<p class="text-center font-eveleth text-accent">Characters</p>
 		<label
 			class={cn(

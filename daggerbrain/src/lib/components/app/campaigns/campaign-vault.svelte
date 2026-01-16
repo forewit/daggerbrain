@@ -163,7 +163,7 @@
 	});
 </script>
 
-<div class={cn('rounded-2xl bg-primary/10 shadow-xl', className)}>
+<div class={cn('rounded-2xl bg-primary-muted shadow-xl', className)}>
 	<div class="flex items-center justify-between px-4 pt-4">
 		<h2 class="text-lg font-semibold">
 			<!-- <Anvil class="size-5 inline -mt-0.5 mr-0.5" /> -->
@@ -191,7 +191,7 @@
 					<col class="w-12" />
 				</colgroup>
 				<thead>
-					<tr class="border-b bg-primary-muted text-xs text-muted-foreground">
+					<tr class="border-b bg-primary/50 text-xs text-muted-">
 						<th class="px-4 py-2 text-left">Name</th>
 						<th class="py-2 pr-4 text-left">Type</th>
 						<th class="py-2 pr-4 text-center"></th>
