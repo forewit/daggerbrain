@@ -180,9 +180,9 @@
 		Items in the vault will be available your player's character sheets.
 	</p>
 
-	{#if sortedVaultItems.length === 0}
-		<p class="pt-2 pb-8 text-center text-sm text-muted-foreground">No items in vault yet.</p>
-	{:else}
+{#if sortedVaultItems.length === 0}
+	<div class="h-4"></div>
+{:else}
 		<div class=" mx-4 mb-4 bg-background">
 			<table class="w-full border-collapse">
 				<colgroup>
@@ -224,7 +224,7 @@
 				</tbody>
 			</table>
 		</div>
-	{/if}
+		{/if}
 </div>
 
 <!-- Add to Vault Dialog -->

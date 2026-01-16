@@ -35,7 +35,7 @@
 			class={cn(
 				buttonVariants({ variant: 'outline', size: 'sm' }),
 				'bg-primary/5 hover:bg-primary/5 cursor-pointer gap-3 rounded-full border-primary/20 px-4',
-				showPreviews && ' bg-primary/15  hover:bg-primary/15 '
+				showPreviews && ' bg-primary/20  hover:bg-primary/20 '
 			)}
 		>
 			Previews
@@ -174,7 +174,7 @@
 				{/each}
 			{/if}
 		{:else}
-			<p class="py-8 text-center text-xs text-accent/80">No active characters in this campaign</p>
+			<p class="py-8 text-center text-xs text-muted-foreground">No active characters in this campaign</p>
 		{/if}
 	</div>
 </div>
