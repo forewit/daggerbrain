@@ -53,11 +53,7 @@
 
 <div class={cn('flex flex-col items-center', className)}>
 	<!-- Countdown Name -->
-	<div
-		class={cn(
-			'flex items-center gap-1.5 mb-0.5 text-muted-',
-		)}
-	>
+	<div class={cn('text-muted- mb-0.5 flex items-center gap-1.5')}>
 		<p class="text-xs font-medium">{countdown.name}</p>
 		{#if isGM && countdown.visibleToPlayers}
 			<Eye class="size-3.5" />

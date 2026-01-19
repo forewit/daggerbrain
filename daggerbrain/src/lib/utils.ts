@@ -5,7 +5,6 @@ import type { Ranges } from '@shared/types/compendium.types';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 
-
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
@@ -38,7 +37,6 @@ export function renderMarkdown(markdown: string): string {
 
 	return sanitized;
 }
-
 
 /**
  * Applies proficiency multiplier to dice in a dice string.

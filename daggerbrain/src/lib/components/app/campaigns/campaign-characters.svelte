@@ -247,7 +247,7 @@
 				<p class=" truncate text-lg font-bold">
 					{char.name.trim() || 'Unnamed Character'}
 				</p>
-				<p class=" truncate text-xs text-muted-foreground pr-1 pt-0.5">
+				<p class=" truncate pt-0.5 pr-1 text-xs text-muted-foreground">
 					{char.derived_character_summary?.ancestry_name || 'No ancestry'}
 					&ensp;•&ensp;
 					{char.derived_character_summary?.primary_class_name || 'No class'}

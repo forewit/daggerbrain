@@ -15,10 +15,11 @@ import type {
 } from '../../../../../shared/src/types/character.types';
 import type { DomainIds, Traits } from '../../../../../shared/src/types/compendium.types';
 import { CHARACTER_DEFAULTS } from '../../../../../shared/src/constants/constants';
+import { DomainIdsSchema } from '../../../../../shared/src/schemas/compendium.schemas';
 import {
-	DomainIdsSchema,
-} from '../../../../../shared/src/schemas/compendium.schemas';
-import { ChosenBeastformSchema, CompanionSchema } from '../../../../../shared/src/schemas/character.schemas';
+	ChosenBeastformSchema,
+	CompanionSchema
+} from '../../../../../shared/src/schemas/character.schemas';
 import type { ConditionIds } from '../../../../../shared/src/types/rule.types';
 
 export const characters_table = sqliteTable(

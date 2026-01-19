@@ -209,7 +209,13 @@
 	<Select.Trigger bind:ref={triggerRef} class="w-full">
 		<span class="truncate">{selectedLabel}</span>
 	</Select.Trigger>
-	<Select.Content collisionPadding={10} avoidCollisions={false} side="bottom" align="start" class="w-full p-0">
+	<Select.Content
+		collisionPadding={10}
+		avoidCollisions={false}
+		side="bottom"
+		align="start"
+		class="w-full p-0"
+	>
 		<Command.Root>
 			<Command.Input placeholder="Search..." />
 			<Command.List class="max-h-auto">

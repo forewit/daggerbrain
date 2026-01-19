@@ -3,7 +3,11 @@
 	import { cn } from '$lib/utils';
 	import { renderMarkdown } from '$lib/utils';
 	import * as Select from '$lib/components/ui/select/';
-	import { TIER_2_BASE_OPTIONS, TIER_3_BASE_OPTIONS, TIER_4_BASE_OPTIONS } from '@shared/constants/rules';
+	import {
+		TIER_2_BASE_OPTIONS,
+		TIER_3_BASE_OPTIONS,
+		TIER_4_BASE_OPTIONS
+	} from '@shared/constants/rules';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import Dropdown from './dropdown.svelte';
 	import {

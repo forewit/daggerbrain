@@ -17,7 +17,7 @@
 	let showPreview = $state(true);
 </script>
 
-<div class={cn('rounded-2xl bg-primary/15 p-4 shadow-xl border-y', className)}>
+<div class={cn('rounded-2xl border-y bg-primary/15 p-4 shadow-xl', className)}>
 	<div class="mb-2 flex items-center justify-between">
 		<h2 class="text-lg font-semibold">
 			{#if isGM}
@@ -37,16 +37,16 @@
 		{/if}
 	</div>
 	{#if campaignState}
-	{#if showPreview || !isGM}
-		<div class="px-2 py-2 text-sm text-muted-foreground">
-			{@html renderMarkdown(campaignState.notes || 'No notes')}
-		</div>
-	{:else}
-		<Textarea
-			bind:value={campaignState.notes}
-			class=" bg-background"
-			placeholder="Add campaign notes..."
-		/>
-	{/if}
+		{#if showPreview || !isGM}
+			<div class="px-2 py-2 text-sm text-muted-foreground">
+				{@html renderMarkdown(campaignState.notes || 'No notes')}
+			</div>
+		{:else}
+			<Textarea
+				bind:value={campaignState.notes}
+				class=" bg-background"
+				placeholder="Add campaign notes..."
+			/>
+		{/if}
 	{/if}
 </div>

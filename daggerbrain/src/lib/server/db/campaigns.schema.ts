@@ -94,7 +94,10 @@ export const campaign_characters_table = sqliteTable(
 		primaryKey({ columns: [table.campaign_id, table.character_id] }),
 		index('campaign_characters_table_campaign_id_idx').on(table.campaign_id),
 		index('campaign_characters_table_character_id_idx').on(table.character_id),
-		index('campaign_characters_table_campaign_id_claimable_idx').on(table.campaign_id, table.claimable)
+		index('campaign_characters_table_campaign_id_claimable_idx').on(
+			table.campaign_id,
+			table.claimable
+		)
 	]
 );
 

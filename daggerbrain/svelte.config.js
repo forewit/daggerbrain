@@ -15,7 +15,8 @@ const config = {
 			fallback: 'spa'
 		}),
 		alias: {
-			'@shared': '../shared/src'
+			'@shared': '../shared/src',
+			'@dice': '../dice/src'
 		},
 		experimental: {
 			remoteFunctions: true

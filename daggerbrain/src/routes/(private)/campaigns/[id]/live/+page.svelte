@@ -38,13 +38,9 @@
 				'pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]'
 			)}
 		>
-			<div class="mb-16 flex w-full flex-col gap-9 mt-8">
+			<div class="mt-8 mb-16 flex w-full flex-col gap-9">
 				<!-- Fear Tracker -->
-				<Fear
-					class="mx-auto"
-					bind:fearValue={campaignContext.campaignState.fear_track}
-					{isGM}
-				/>
+				<Fear class="mx-auto" bind:fearValue={campaignContext.campaignState.fear_track} {isGM} />
 
 				<!-- Countdowns -->
 				{#if campaignContext.campaignState.countdowns.length > 0}
@@ -59,7 +55,10 @@
 					</div>
 				{/if}
 				<!-- Characters (GM only) -->
-				<CampaignLiveCharacters {isGM} class={cn(campaignContext.campaignState.countdowns.length <= 0 && 'mt-2')}/>
+				<CampaignLiveCharacters
+					{isGM}
+					class={cn(campaignContext.campaignState.countdowns.length <= 0 && 'mt-2')}
+				/>
 			</div>
 		</div>
 	{/if}

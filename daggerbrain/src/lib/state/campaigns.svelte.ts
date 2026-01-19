@@ -191,10 +191,12 @@ function createCampaignLiveConnection(campaignId: string) {
 	function scheduleReconnect() {
 		if (reconnectTimeout) return;
 		if (!shouldReconnect) return; // Don't reconnect if explicitly disconnected
-		
+
 		// Stop reconnecting after max attempts
 		if (reconnectAttempts >= maxReconnectAttempts) {
-			console.warn(`[CampaignLive] Max reconnect attempts (${maxReconnectAttempts}) reached. Stopping reconnection.`);
+			console.warn(
+				`[CampaignLive] Max reconnect attempts (${maxReconnectAttempts}) reached. Stopping reconnection.`
+			);
 			shouldReconnect = false;
 			status = 'disconnected';
 			return;
@@ -203,11 +205,13 @@ function createCampaignLiveConnection(campaignId: string) {
 		// Fixed delays: 5 seconds for first retry, 10 seconds for second retry
 		const delays = [5000, 10000];
 		const delay = delays[reconnectAttempts] || 10000;
-		
+
 		reconnectAttempts++;
 		status = 'reconnecting';
 
-		console.warn(`[CampaignLive] Scheduling reconnect attempt ${reconnectAttempts} in ${delay/1000}s`);
+		console.warn(
+			`[CampaignLive] Scheduling reconnect attempt ${reconnectAttempts} in ${delay / 1000}s`
+		);
 
 		reconnectTimeout = setTimeout(() => {
 			reconnectTimeout = null;
@@ -363,7 +367,7 @@ function campaignContext() {
 
 			campaign = camp;
 			members = mems.map((m) => ({ ...m, role: m.role as 'gm' | 'player' }));
-			
+
 			// Prevent overwriting campaignState with stale server data after a recent save
 			// If our local state matches what we last saved, but server data is different,
 			// the server cache is stale - keep our local state
@@ -372,12 +376,15 @@ function campaignContext() {
 				const currentStateJson = JSON.stringify(campaignState);
 				const fetchedStateJson = JSON.stringify(state);
 				// If local state matches what we saved, but server data is different, server is stale
-				if (currentStateJson === lastSavedCampaignState && fetchedStateJson !== lastSavedCampaignState) {
+				if (
+					currentStateJson === lastSavedCampaignState &&
+					fetchedStateJson !== lastSavedCampaignState
+				) {
 					// Keep our local state - server cache is stale
 					stateToUse = campaignState;
 				}
 			}
-			
+
 			campaignState = stateToUse;
 			characters = chars;
 			vaultItems = vault;
@@ -637,11 +644,11 @@ function campaignContext() {
 								// Initial state sync or rejoin sync - now receives CampaignCharacterSummary objects directly
 								if (message.state) {
 									// Preserve read-only fields from D1 if received values are invalid (D1 is source of truth)
-									const preservedInviteCode = 
+									const preservedInviteCode =
 										message.state.invite_code && message.state.invite_code.trim() !== ''
 											? message.state.invite_code
 											: campaignState?.invite_code || message.state.invite_code;
-									const preservedCampaignId = 
+									const preservedCampaignId =
 										message.state.campaign_id && message.state.campaign_id === id
 											? message.state.campaign_id
 											: id || campaignState?.campaign_id || message.state.campaign_id;
@@ -685,21 +692,21 @@ function campaignContext() {
 							case 'state_update':
 								if (message.state) {
 									// Preserve read-only fields from D1 if received values are invalid (D1 is source of truth)
-									const preservedInviteCode = 
+									const preservedInviteCode =
 										message.state.invite_code && message.state.invite_code.trim() !== ''
 											? message.state.invite_code
 											: campaignState?.invite_code || message.state.invite_code;
-									const preservedCampaignId = 
+									const preservedCampaignId =
 										message.state.campaign_id && message.state.campaign_id === id
 											? message.state.campaign_id
 											: id || campaignState?.campaign_id || message.state.campaign_id;
-									
+
 									campaignState = {
 										...message.state,
 										invite_code: preservedInviteCode,
 										campaign_id: preservedCampaignId
 									};
-								
+
 									// Update lastSavedCampaignState to prevent auto-save from triggering
 									lastSavedCampaignState = JSON.stringify(campaignState);
 								}
