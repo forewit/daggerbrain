@@ -51,6 +51,13 @@
 	let showResult = $state(true);
 	let latestResults = $state<Roll | null>(null);
 	let isRolling = $state(false);
+	let diceBox = $state<HTMLDivElement | null>(null);
+
+
+    function resetPosition() {
+        if (!diceBox) return;
+		diceBox.style.top = `calc(var(--navbar-height) + ${window.scrollY}px)`;
+    }
 
 	function resetCurrentRoll() {
 		currentRoll = {
@@ -111,25 +118,7 @@
 	
 	// Store the original dice order to map results back correctly
 	let currentRollOrder: Array<{type: string, themeColor: string, sides: number}> = [];
-	
-	onMount(() => {
-		Box = new DiceBox('#dice-box', {
-			assetPath: '/dice-box/',
-            scale: 6,
-            gravity: 2,
-            mass: 2,
-            friction: 0.9,
-            angularDamping: 0.5,
-            linearDamping: 0.5,
-			theme: 'default',
-            settleTimeout: 3000,
-			onRollComplete: (results) => {
-				finalizeRoll(results);
-			}
-		});
 
-		Box.init()
-	});
 
 	function finalizeRoll(rollGroups: any[]) {
 		try {
@@ -188,6 +177,9 @@
 			previousRolls = [...previousRolls, finalRoll];
 			isRolling = false;
 
+			// Keep diceBox pinned (absolute) - don't reset here
+			// It will reset to fixed when a new roll is initiated
+
 			// Reset current roll
 			resetCurrentRoll();
 			showPicker = false;
@@ -195,6 +187,7 @@
 			console.error('Error finalizing roll:', error);
 			isRolling = false;
 			currentRollOrder = [];
+			resetPosition(); // Reset to fixed on error
 		}
 	}
 
@@ -213,6 +206,9 @@
 		try {
 			isRolling = true;
 
+			// Reset to fixed to cover current viewport, then switch to absolute before rolling
+			resetPosition();
+
 			// Clear previous dice
 			Box.clear();
 
@@ -221,33 +217,27 @@
 			
 			for (const die of currentRoll.dice) {
 				let sides: number;
-				let themeColor: string;
+				let themeColor= '#2a2045';
 
 				// Map dice type to sides and themeColor
 				switch (die.type) {
 					case 'd4':
 						sides = 4;
-						themeColor = '#2a2045';
 						break;
 					case 'd6':
 						sides = 6;
-						themeColor = '#2a2045';
 						break;
 					case 'd8':
 						sides = 8;
-						themeColor = '#2a2045';
 						break;
 					case 'd10':
 						sides = 10;
-						themeColor = '#2a2045';
 						break;
 					case 'd12':
 						sides = 12;
-						themeColor = '#2a2045';
 						break;
 					case 'd20':
 						sides = 20;
-						themeColor = '#2a2045';
 						break;
 					case 'hope':
 						sides = 12;
@@ -313,27 +303,48 @@
 		} catch (error) {
 			console.error('Error rolling dice:', error);
 			isRolling = false;
-			// Reset current roll order on error
 			currentRollOrder = [];
+			resetPosition(); // Reset to fixed on error
 		}
 	}
+
+
+	onMount(() => {
+		diceBox = document.body.appendChild(document.createElement('div'));
+		diceBox.id = 'dice-box';
+		diceBox.style.zIndex = '40';
+		diceBox.style.pointerEvents = 'none';
+        diceBox.style.position = 'absolute';
+        diceBox.style.width = '100%';
+        diceBox.style.height = 'calc(100% - var(--navbar-height))';
+		resetPosition();
+
+Box = new DiceBox('#dice-box', {
+    assetPath: '/dice-box/',
+    scale: 5,
+    gravity: 2,
+    mass: 2,
+    friction: 0.9,
+    angularDamping: 0.5,
+    linearDamping: 0.5,
+    theme: 'default',
+    settleTimeout: 3000,
+    onRollComplete: (results) => {
+        finalizeRoll(results);
+    }
+});
+
+Box.init()
+});
 </script>
 
-<div id="dice-box" class="pointer-events-none fixed inset-0 z-40"></div>
-
 <style>
-	#dice-box {
-		width: 100%;
-		height: 100%;
-        z-index: 40;
-	}
-	
 	/* svelte-ignore a11y-no-onchange */
 	:global(#dice-box canvas) {
 		width: 100% !important;
 		height: 100% !important;
 		display: block;
-        z-index: 40;
+        z-index: 45;
 	}
 </style>
 
