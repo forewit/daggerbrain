@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	let { class: className = '', foregroundClasses = '', backgroundClasses = '' } = $props();
+	let { class: className = '', foregroundClasses = '', backgroundClasses = '', showLabel = false } = $props();
 </script>
 
 <svg
@@ -36,4 +36,17 @@
 		class={cn('fill-muted-foreground', backgroundClasses)}
 		xlink:href="#p13"
 	/>
+	{#if showLabel}
+		<text
+			x="50%"
+			y="55%"
+			text-anchor="middle"
+			dominant-baseline="middle"
+			font-size="8"
+			class={cn('font-eveleth drop-shadow-[0_0_2px_black]')}
+			fill="currentColor"
+		>
+			4
+		</text>
+	{/if}
 </svg>

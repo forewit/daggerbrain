@@ -44,6 +44,6 @@
 				console.log(notation, total);
 			}}
 		/> -->
-		<DiceRoller class="fixed bottom-6 left-6 z-45" />
+		<DiceRoller class="fixed bottom-[calc(env(safe-area-inset-bottom)+16px)] left-[calc(env(safe-area-inset-left)+16px)] z-45" />
 	{/if}
 {/if}

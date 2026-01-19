@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import X from '@lucide/svelte/icons/x';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import D4 from './svg-components/d4.svelte';
 	import D6 from './svg-components/d6.svelte';
 	import D8 from './svg-components/d8.svelte';
@@ -20,30 +21,50 @@
 
 	let { class: className = '' } = $props();
 
+	type DiceType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20' | 'hope' | 'fear' | 'advantage' | 'disadvantage';
+
+	const DICE_CONFIG: Record<DiceType, { sides: number; themeColor: string }> = {
+		d4: { sides: 4, themeColor: '#2a2045' },
+		d6: { sides: 6, themeColor: '#2a2045' },
+		d8: { sides: 8, themeColor: '#2a2045' },
+		d10: { sides: 10, themeColor: '#2a2045' },
+		d12: { sides: 12, themeColor: '#2a2045' },
+		d20: { sides: 20, themeColor: '#2a2045' },
+		hope: { sides: 12, themeColor: '#fde07d' },
+		fear: { sides: 12, themeColor: '#6341b2' },
+		advantage: { sides: 6, themeColor: '#009966' },
+		disadvantage: { sides: 6, themeColor: '#a50036' }
+	};
+
+	const STANDARD_DICE_PICKER_CONFIG = [
+		{ type: 'd4' as DiceType, buttonClass: '' },
+		{ type: 'd6' as DiceType, buttonClass: '' },
+		{ type: 'd8' as DiceType, buttonClass: '' },
+		{ type: 'd10' as DiceType, buttonClass: '' },
+		{ type: 'd12' as DiceType, buttonClass: '' },
+		{ type: 'd20' as DiceType, buttonClass: 'mt-0.5 mb-1' }
+	] as const;
+
 	type Roll = {
+		id: string;
+        name: string;
 		dice: {
-			type:
-				| 'd4'
-				| 'd6'
-				| 'd8'
-				| 'd10'
-				| 'd12'
-				| 'd20'
-				| 'hope'
-				| 'fear'
-				| 'advantage'
-				| 'disadvantage';
+			type: DiceType;
 			result?: number;
 			disabled?: boolean;
 		}[];
 		modifier: number;
+		status: 'rolling' | 'complete';
 	};
 
 	let previousRolls = $state<Roll[]>([]);
 
 	let currentRoll = $state<Roll>({
+		id: crypto.randomUUID(),
+        name: 'Roll',
 		dice: [],
-		modifier: 0
+		modifier: 0,
+		status: 'complete'
 	});
 
 	let showCurrentRoll = $state(false);
@@ -52,7 +73,80 @@
 	let latestResults = $state<Roll | null>(null);
 	let isRolling = $state(false);
 	let diceBox = $state<HTMLDivElement | null>(null);
+	let rollingRollId = $state<string | null>(null);
 
+	// Store the original dice order to map results back correctly
+	let currentRollOrder: Array<{type: string, themeColor: string, sides: number}> = [];
+	// Store the roll being rolled (for rerolls, this preserves name/modifier)
+	let rollingRollData: { name: string; modifier: number } | null = null;
+
+	function resetRollingState() {
+		isRolling = false;
+		currentRollOrder = [];
+		rollingRollId = null;
+		rollingRollData = null;
+	}
+
+	function groupDiceByTypeAndColor(dice: Roll['dice']): Map<string, { type: string; sides: number; themeColor: string; count: number }> {
+		const diceGroups = new Map<string, { type: string; sides: number; themeColor: string; count: number }>();
+		
+		for (const die of dice) {
+			const config = DICE_CONFIG[die.type];
+			if (!config) {
+				console.warn(`Unknown dice type: ${die.type}`);
+				continue;
+			}
+
+			const key = `${config.sides}-${config.themeColor}`;
+			const existing = diceGroups.get(key);
+			if (existing) {
+				existing.count++;
+			} else {
+				diceGroups.set(key, { type: die.type, sides: config.sides, themeColor: config.themeColor, count: 1 });
+			}
+		}
+
+		return diceGroups;
+	}
+
+	function prepareRollObjects(dice: Roll['dice']): { rollObjects: any[]; rollOrder: Array<{type: string, themeColor: string, sides: number}> } {
+		const diceGroups = groupDiceByTypeAndColor(dice);
+		const rollObjects: any[] = [];
+		const rollOrder: Array<{type: string, themeColor: string, sides: number}> = [];
+
+		for (const [key, group] of diceGroups.entries()) {
+			rollObjects.push({
+				qty: group.count,
+				sides: group.sides,
+				theme: 'default',
+				themeColor: group.themeColor
+			});
+
+			// Track order for mapping results back
+			for (let i = 0; i < group.count; i++) {
+				rollOrder.push({
+					type: group.type,
+					themeColor: group.themeColor,
+					sides: group.sides
+				});
+			}
+		}
+
+		return { rollObjects, rollOrder };
+	}
+
+	const DICE_COMPONENTS: Record<DiceType, any> = {
+		d4: D4,
+		d6: D6,
+		d8: D8,
+		d10: D10,
+		d12: D12,
+		d20: D20,
+		hope: Hope,
+		fear: Fear,
+		advantage: Advantage,
+		disadvantage: Disadvantage
+	};
 
     function resetPosition() {
         if (!diceBox) return;
@@ -61,28 +155,103 @@
 
 	function resetCurrentRoll() {
 		currentRoll = {
+			id: crypto.randomUUID(),
+            name: 'Roll',
 			dice: [],
-			modifier: 0
+			modifier: 0,
+			status: 'complete'
 		};
 	}
 
-	function calculateTotal(roll: Roll): number {
-		// Sum standard dice, hope, and fear
-		const standardSum = roll.dice
-			.filter(d => d.result !== undefined && d.type !== 'advantage' && d.type !== 'disadvantage')
-			.reduce((sum, d) => sum + (d.result || 0), 0);
+	function closeActiveRoll() {
+		resetCurrentRoll();
+		showCurrentRoll = false;
+	}
+
+    let diceOnScreen = $state(false);
+    function onBeforeRoll() {
+        diceOnScreen = true;
+    }
+
+	function cancelCurrentRoll() {
+        diceOnScreen = false;
+		if (Box) {
+			Box.clear();
+		}
 		
-		// Add advantage results
-		const advantageSum = roll.dice
-			.filter(d => d.type === 'advantage' && d.result !== undefined)
-			.reduce((sum, d) => sum + (d.result || 0), 0);
+		// If there's a rolling roll in history, mark it as complete (cancelled)
+		if (rollingRollId !== null) {
+			const rollIndex = previousRolls.findIndex(r => r.id === rollingRollId);
+			if (rollIndex !== -1 && previousRolls[rollIndex].status === 'rolling') {
+				// Keep the roll but mark it as complete with no results
+				previousRolls[rollIndex] = {
+					...previousRolls[rollIndex],
+					status: 'complete'
+				};
+			}
+		}
 		
-		// Subtract disadvantage results
-		const disadvantageSum = roll.dice
-			.filter(d => d.type === 'disadvantage' && d.result !== undefined)
-			.reduce((sum, d) => sum + (d.result || 0), 0);
-		
-		return standardSum + advantageSum - disadvantageSum + roll.modifier;
+		resetRollingState();
+	}
+
+	function removeRollFromHistory(id: string) {
+		previousRolls = previousRolls.filter(roll => roll.id !== id);
+		if (rollingRollId === id) {
+			rollingRollId = null;
+		}
+	}
+
+	async function rerollHistoryItem(id: string) {
+		const rollIndex = previousRolls.findIndex(r => r.id === id);
+		const roll = previousRolls[rollIndex];
+		if (!roll || rollIndex === -1 || !Box) {
+			return;
+		}
+
+		// Cancel any in-progress roll
+		cancelCurrentRoll();
+
+		// Set status to rolling and clear old results
+		previousRolls[rollIndex] = { 
+			...roll, 
+			status: 'rolling',
+			dice: roll.dice.map(d => ({ type: d.type }))
+		};
+		rollingRollId = id;
+		rollingRollData = { name: roll.name, modifier: roll.modifier };
+
+		try {
+			isRolling = true;
+
+			// Reset to fixed to cover current viewport, then switch to absolute before rolling
+			resetPosition();
+
+			// Clear previous dice
+			Box.clear();
+
+			// Prepare roll objects and track order
+			const { rollObjects, rollOrder } = prepareRollObjects(roll.dice);
+			currentRollOrder = rollOrder;
+
+			// Validate we have at least one valid dice group
+			if (rollObjects.length === 0) {
+				console.error('No valid dice to roll');
+				resetRollingState();
+				return;
+			}
+
+			// Roll all dice together
+			await Box.roll(rollObjects);
+		} catch (error) {
+			console.error('Error rerolling dice:', error);
+			resetRollingState();
+			// Reset status on error
+			const errorRollIndex = previousRolls.findIndex(r => r.id === id);
+			if (errorRollIndex !== -1) {
+				previousRolls[errorRollIndex] = { ...roll, status: 'complete' };
+			}
+			resetPosition();
+		}
 	}
 
 	function calculateBaseTotal(roll: Roll): number {
@@ -104,34 +273,77 @@
 		return standardSum + advantageSum - disadvantageSum;
 	}
 
+	function calculateTotal(roll: Roll): number {
+		return calculateBaseTotal(roll) + roll.modifier;
+	}
+
+	function getRollStatusText(roll: Roll): string {
+		// Get all fear dice results
+		const fearDice = roll.dice.filter(d => d.type === 'fear' && d.result !== undefined);
+		const fearValues = fearDice.map(d => d.result || 0);
+		const totalFear = fearValues.reduce((sum, v) => sum + v, 0);
+		const maxFear = fearValues.length > 0 ? Math.max(...fearValues) : 0;
+		
+		// Get all hope dice results
+		const hopeDice = roll.dice.filter(d => d.type === 'hope' && d.result !== undefined);
+		const hopeValues = hopeDice.map(d => d.result || 0);
+		const totalHope = hopeValues.reduce((sum, v) => sum + v, 0);
+		const maxHope = hopeValues.length > 0 ? Math.max(...hopeValues) : 0;
+		
+		// Check if both exist and any fear value equals any hope value (Critical Success)
+		if (fearDice.length > 0 && hopeDice.length > 0) {
+			// Check if any fear value matches any hope value
+			const hasMatchingValue = fearValues.some(fv => hopeValues.includes(fv));
+			
+			if (hasMatchingValue) {
+				return 'Critical Success';
+			}
+		}
+		
+		// If fear exists and total fear > total hope (or no hope dice)
+		if (fearDice.length > 0 && totalFear > totalHope) {
+			return 'with Fear';
+		}
+		
+		// If hope exists and total hope > total fear (or no fear dice)
+		if (hopeDice.length > 0 && totalHope > totalFear) {
+			return 'with Hope';
+		}
+		
+		// Default: no status text
+		return '';
+	}
+
 	$effect(() => {
-		showCurrentRoll = currentRoll.dice.length > 0;
+		// Show the form when dice are added, hide when all dice are removed
+		if (currentRoll.dice.length > 0) {
+			showCurrentRoll = true;
+		} else {
+			showCurrentRoll = false;
+		}
 	});
 
 	$effect(() => {
 		if (!showPicker) {
 			resetCurrentRoll();
+			showCurrentRoll = false;
 		}
 	});
 
 	let Box: DiceBox | null = null;
-	
-	// Store the original dice order to map results back correctly
-	let currentRollOrder: Array<{type: string, themeColor: string, sides: number}> = [];
-
 
 	function finalizeRoll(rollGroups: any[]) {
 		try {
 			if (!rollGroups || rollGroups.length === 0) {
 				console.warn('No roll results received');
-				isRolling = false;
+				resetRollingState();
 				return;
 			}
 
 			// Validate we have the expected number of results
 			if (currentRollOrder.length === 0) {
 				console.error('No roll order tracked - cannot map results');
-				isRolling = false;
+				resetRollingState();
 				return;
 			}
 
@@ -167,26 +379,44 @@
 			}
 
 			// Create the final roll result
+			// Use rollingRollData if available (for rerolls), otherwise use currentRoll
+			const rollName = rollingRollData?.name ?? currentRoll.name;
+			const rollModifier = rollingRollData?.modifier ?? currentRoll.modifier;
+			const isReroll = rollingRollId !== null;
+			const rollId: string = isReroll && rollingRollId !== null ? rollingRollId : crypto.randomUUID();
+			
 			const finalRoll: Roll = {
+				id: rollId,
+                name: rollName,
 				dice: diceResults,
-				modifier: currentRoll.modifier
+				modifier: rollModifier,
+				status: 'complete'
 			};
 
 			// Update state
 			latestResults = finalRoll;
-			previousRolls = [...previousRolls, finalRoll];
+			
+			// Update the rolling roll if we're rerolling, otherwise add new roll
+			if (isReroll) {
+				const rollIndex = previousRolls.findIndex(r => r.id === rollingRollId);
+				if (rollIndex !== -1) {
+					previousRolls[rollIndex] = finalRoll;
+				}
+				rollingRollId = null;
+			} else {
+				previousRolls = [...previousRolls, finalRoll].slice(-5);
+			}
+			
 			isRolling = false;
 
 			// Keep diceBox pinned (absolute) - don't reset here
 			// It will reset to fixed when a new roll is initiated
 
-			// Reset current roll
-			resetCurrentRoll();
-			showPicker = false;
+			// Don't reset current roll - let it persist so user can easily roll again
+			rollingRollData = null;
 		} catch (error) {
 			console.error('Error finalizing roll:', error);
-			isRolling = false;
-			currentRollOrder = [];
+			resetRollingState();
 			resetPosition(); // Reset to fixed on error
 		}
 	}
@@ -203,6 +433,33 @@
 			return;
 		}
 
+		// Cancel any in-progress roll
+		cancelCurrentRoll();
+
+		// Close the active roll section
+		showCurrentRoll = false;
+
+		// Save dice data before resetting (we need it for the roll)
+		const diceToRoll = currentRoll.dice.map(d => ({ ...d }));
+		const rollName = currentRoll.name;
+		const rollModifier = currentRoll.modifier;
+
+		// Immediately add roll to history with 'rolling' status
+		const rollId = crypto.randomUUID();
+		const rollingRoll: Roll = {
+			id: rollId,
+			name: rollName,
+			dice: diceToRoll.map(d => ({ ...d })),
+			modifier: rollModifier,
+			status: 'rolling'
+		};
+		previousRolls = [...previousRolls, rollingRoll].slice(-5);
+		rollingRollId = rollId;
+		rollingRollData = { name: rollName, modifier: rollModifier };
+
+		// Clear the active roll so user can start fresh for next roll
+		resetCurrentRoll();
+
 		try {
 			isRolling = true;
 
@@ -212,101 +469,28 @@
 			// Clear previous dice
 			Box.clear();
 
-			// Group dice by type and themeColor
-			const diceGroups = new Map<string, { type: string; sides: number; themeColor: string; count: number }>();
-			
-			for (const die of currentRoll.dice) {
-				let sides: number;
-				let themeColor= '#2a2045';
-
-				// Map dice type to sides and themeColor
-				switch (die.type) {
-					case 'd4':
-						sides = 4;
-						break;
-					case 'd6':
-						sides = 6;
-						break;
-					case 'd8':
-						sides = 8;
-						break;
-					case 'd10':
-						sides = 10;
-						break;
-					case 'd12':
-						sides = 12;
-						break;
-					case 'd20':
-						sides = 20;
-						break;
-					case 'hope':
-						sides = 12;
-						themeColor = '#fde07d';
-						break;
-					case 'fear':
-						sides = 12;
-						themeColor = '#6341b2';
-						break;
-					case 'advantage':
-						sides = 6;
-						themeColor = '#009966';
-						break;
-					case 'disadvantage':
-						sides = 6;
-						themeColor = '#a50036';
-						break;
-					default:
-						console.warn(`Unknown dice type: ${die.type}`);
-						continue; // Skip unknown dice types
-				}
-
-				const key = `${sides}-${themeColor}`;
-				const existing = diceGroups.get(key);
-				if (existing) {
-					existing.count++;
-				} else {
-					diceGroups.set(key, { type: die.type, sides, themeColor, count: 1 });
-				}
-			}
+			// Prepare roll objects and track order
+			const { rollObjects, rollOrder } = prepareRollObjects(diceToRoll);
+			currentRollOrder = rollOrder;
 
 			// Validate we have at least one valid dice group
-			if (diceGroups.size === 0) {
+			if (rollObjects.length === 0) {
 				console.error('No valid dice to roll');
-				isRolling = false;
+				resetRollingState();
 				return;
-			}
-
-			// Build roll objects array and track order
-			const rollObjects: any[] = [];
-			currentRollOrder = [];
-
-			for (const [key, group] of diceGroups.entries()) {
-				rollObjects.push({
-					qty: group.count,
-					sides: group.sides,
-					theme: 'default',
-					themeColor: group.themeColor
-				});
-
-				// Track order for mapping results back
-				for (let i = 0; i < group.count; i++) {
-					currentRollOrder.push({
-						type: group.type,
-						themeColor: group.themeColor,
-						sides: group.sides
-					});
-				}
 			}
 
 			// Roll all dice together
 			await Box.roll(rollObjects);
 		} catch (error) {
 			console.error('Error rolling dice:', error);
-			isRolling = false;
-			currentRollOrder = [];
+			resetRollingState();
 			resetPosition(); // Reset to fixed on error
 		}
 	}
+
+
+
 
 
 	onMount(() => {
@@ -322,7 +506,7 @@
 Box = new DiceBox('#dice-box', {
     assetPath: '/dice-box/',
     scale: 5,
-    gravity: 2,
+    gravity: 5,
     mass: 2,
     friction: 0.9,
     angularDamping: 0.5,
@@ -331,11 +515,13 @@ Box = new DiceBox('#dice-box', {
     settleTimeout: 3000,
     onRollComplete: (results) => {
         finalizeRoll(results);
-    }
+    },
+    onBeforeRoll
 });
 
 Box.init()
 });
+
 </script>
 
 <style>
@@ -346,101 +532,33 @@ Box.init()
 		display: block;
         z-index: 45;
 	}
+
 </style>
+
+<!-- svelte-ignore a11y_consider_explicit_label -->
+<button class={cn("fixed inset-0 z-45 cursor-default pointer-events-none", diceOnScreen && 'pointer-events-auto')} onclick={cancelCurrentRoll}></button>
 
 <div class={cn('flex items-end gap-3', className)}>
 	<!-- dice picker -->
 	<div
 		class={cn(
-			'flex flex-col items-center gap-2 rounded-2xl bg-card border-2 p-1 shadow-xl',
+			'flex flex-col items-center gap-2 rounded-2xl bg-card border-2 border-primary-muted p-1 shadow-xl',
 			showPicker && 'pt-3'
 		)}
 	>
 		{#if showPicker}
-			<button
-				title="d4"
-				class="relative"
-				onclick={() => {
-					currentRoll.dice.push({ type: 'd4' });
-				}}
-			>
-				<D4 />
-				<p
-					class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-eveleth drop-shadow-[0_0_2px_black]"
+			{#each STANDARD_DICE_PICKER_CONFIG as config}
+				{@const DiceComponent = DICE_COMPONENTS[config.type]}
+				<button
+					title={config.type}
+					class="relative {config.buttonClass}"
+					onclick={() => {
+						currentRoll.dice.push({ type: config.type });
+					}}
 				>
-					4
-				</p>
-			</button>
-			<button
-				title="d6"
-				class="relative"
-				onclick={() => {
-					currentRoll.dice.push({ type: 'd6' });
-				}}
-			>
-				<D6 />
-				<p
-					class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-eveleth drop-shadow-[0_0_2px_black]"
-				>
-					6
-				</p>
-			</button>
-			<button
-				title="d8"
-				class="relative"
-				onclick={() => {
-					currentRoll.dice.push({ type: 'd8' });
-				}}
-			>
-				<D8 />
-				<p
-					class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-eveleth drop-shadow-[0_0_2px_rgba(0,0,0,1)]"
-				>
-					8
-				</p>
-			</button>
-			<button
-				title="d10"
-				class="relative"
-				onclick={() => {
-					currentRoll.dice.push({ type: 'd10' });
-				}}
-			>
-				<D10 />
-				<p
-					class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-eveleth drop-shadow-[0_0_2px_black]"
-				>
-					10
-				</p>
-			</button>
-			<button
-				title="d12"
-				class="relative"
-				onclick={() => {
-					currentRoll.dice.push({ type: 'd12' });
-				}}
-			>
-				<D12 />
-				<p
-					class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-eveleth drop-shadow-[0_0_2px_black]"
-				>
-					12
-				</p>
-			</button>
-			<button
-				title="d20"
-				class="relative mt-0.5 mb-1"
-				onclick={() => {
-					currentRoll.dice.push({ type: 'd20' });
-				}}
-			>
-				<D20 />
-				<p
-					class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-eveleth drop-shadow-[0_0_2px_black]"
-				>
-					20
-				</p>
-			</button>
+					<DiceComponent showLabel={true} />
+				</button>
+			{/each}
 			<button
 				title="Duality"
 				class="relative size-12"
@@ -466,93 +584,98 @@ Box.init()
 			{#if showPicker}
 				<X class="size-6" />
 			{:else}
-				<D12 />
+				<D12 backgroundClasses="fill-primary-muted" foregroundClasses="fill-primary"/>
 			{/if}
 		</button>
 	</div>
 
 	<div class="flex flex-col gap-3">
-		<!-- results -->
-		{#if showResult && latestResults}
-			<div class="rounded-2xl bg-card p-3 border-2 shadow-xl">
-				<div class="flex items-center justify-between gap-2 mb-2">
-					<p class="font-eveleth text-sm">Results</p>
-				</div>
-				
-				<!-- Individual dice results -->
-				<div class="flex flex-wrap items-center gap-2 mb-2">
-					{#each latestResults.dice as dice}
-						<div class="relative">
-							{#if dice.type === 'd4'}
-								<D4 class="size-9" />
-							{:else if dice.type === 'd6'}
-								<D6 class="size-9" />
-							{:else if dice.type === 'd8'}
-								<D8 class="size-9" />
-							{:else if dice.type === 'd10'}
-								<D10 class="size-9" />
-							{:else if dice.type === 'd12'}
-								<D12 class="size-9" />
-							{:else if dice.type === 'd20'}
-								<D20 class="size-9" />
-							{:else if dice.type === 'hope'}
-								<Hope class="size-9" />
-							{:else if dice.type === 'fear'}
-								<Fear class="size-9" />
-							{:else if dice.type === 'advantage'}
-								<Advantage class="size-9" />
-							{:else if dice.type === 'disadvantage'}
-								<Disadvantage class="size-9" />
-							{/if}
-							{#if dice.result !== undefined}
-								<div class="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-background border-2 border-foreground text-xs font-bold">
-									{dice.result}
-								</div>
-							{/if}
-						</div>
-					{/each}
-				</div>
-				
-				<!-- Advantage/Disadvantage special display -->
-				{#each latestResults.dice as dice}
-					{#if (dice.type === 'advantage' || dice.type === 'disadvantage') && dice.result !== undefined}
-						<div class="text-xs mb-1">
-							<span class="font-bold">
-								{dice.type === 'advantage' ? 'Advantage' : 'Disadvantage'}:
-							</span>
-							<span class="ml-1">
-								{dice.type === 'advantage' ? '+' : '-'}{dice.result}
-							</span>
-						</div>
-					{/if}
-				{/each}
-				
-				<!-- Total -->
-				<div class="flex items-center justify-between pt-2 border-t">
-					<span class="text-sm font-bold">Total:</span>
-					<span class="font-eveleth text-lg">
-						{calculateTotal(latestResults)}
-						{#if latestResults.modifier !== 0}
-							<span class="text-xs text-muted-foreground ml-1">
-								({calculateBaseTotal(latestResults)}
-								{#if latestResults.modifier > 0}
-									+{latestResults.modifier}
+		<!-- results history -->
+		{#if showPicker}
+			{#each previousRolls as roll (roll.id)}
+				{@const isRolling = roll.status === 'rolling'}
+				{@const statusText = getRollStatusText(roll)}
+                <div class={cn(
+					"w-71 flex flex-col gap-2 rounded-2xl p-3 border-2 border-primary-muted shadow-xl bg-card",
+					statusText === 'Critical Success' && 'bg-gradient-to-r from-card to-emerald-950',
+					statusText === 'with Fear' && 'bg-gradient-to-r from-card to-primary-muted',
+					statusText === 'with Hope' && 'bg-gradient-to-r from-card to-accent-muted',
+				)}>
+
+					<div class="flex items-center justify-between gap-2">
+						<p class="font-eveleth text-sm">{roll.name}</p>
+						<Button 
+							onclick={() => removeRollFromHistory(roll.id)} 
+							size="sm" 
+							variant="ghost" 
+							class="h-auto p-0"
+						>
+							<X class="size-4" />
+						</Button>
+					</div>
+					
+					<!-- Individual dice results -->
+					<div class="flex flex-wrap items-center gap-2">
+						{#each roll.dice as dice}
+							{@const DiceComponent = DICE_COMPONENTS[dice.type]}
+							<div class="relative {isRolling ? 'opacity-50' : ''}">
+								<DiceComponent class="size-9" />
+								{#if !isRolling && dice.result !== undefined}
+									<div class="px-1.5 pt-0.5 pb-[1px] absolute -top-1 -right-1 flex items-center justify-center rounded-full bg-background text-xs font-bold">
+										{dice.type === "disadvantage" ? '-' : ''}{dice.result}
+									</div>
+								{/if}
+							</div>
+						{/each}
+						{#if roll.modifier !== 0}
+							<div class="size-9 flex items-center justify-center gap-1 {isRolling ? 'opacity-50' : ''}">
+								{#if roll.modifier > 0}
+									<span class="font-eveleth text-xl">+</span>
 								{:else}
-									{latestResults.modifier}
-								{/if})
-							</span>
+									<span class="font-eveleth text-xl">-</span>
+								{/if}
+								<span class="font-eveleth text-xl">{Math.abs(roll.modifier)}</span>
+							</div>
 						{/if}
-					</span>
+					</div>
+					
+					<!-- Total -->
+					<div class="h-8 flex items-center justify-between">
+						<span class="text-sm font-bold">Total:</span>
+						{#if isRolling}
+							<Loader2 class="size-5 animate-spin" />
+
+                            {:else if calculateTotal(roll) === 0}
+                            <span class="text-sm font-bold">Cancelled</span>
+						{:else}
+                            <div class="flex items-center gap-2">
+                            <span class="font-eveleth text-xl">
+								{calculateTotal(roll)}
+							</span>
+                            <span class="text-sm font-bold">{statusText}</span>
+                            </div>
+						{/if}
+					</div>
+
+					<!-- Reroll button -->
+					<Button
+						size="sm"
+						class="h-7 mt-1 font-bold bg-primary/80 hover:bg-primary/60"
+						onclick={() => rerollHistoryItem(roll.id)}
+                        disabled={isRolling}
+					>
+						{isRolling ? 'Rolling...' : 'Reroll'}
+					</Button>
 				</div>
-			</div>
+			{/each}
 		{/if}
 
 		<!-- active roll -->
 		{#if showCurrentRoll}
-			<div class="w-71 flex flex-col gap-2 rounded-2xl bg-card p-3 border-2 shadow-xl">
+			<div class="w-71 flex flex-col gap-2 rounded-2xl bg-card p-3 border-2 border-primary-muted shadow-xl">
 				<div class="flex items-center justify-between gap-2">
 					<p class="font-eveleth text-sm">New Roll</p>
-                    <Button onclick={resetCurrentRoll} size="sm" variant="ghost" class="h-auto p-0"
+                    <Button onclick={closeActiveRoll} size="sm" variant="ghost" class="h-auto p-0"
 						><X class="size-4" /></Button
 					>
 				</div>
@@ -560,33 +683,14 @@ Box.init()
 				<!-- chosen dice -->
 				<div class="flex flex-wrap items-center gap-2">
 					{#each currentRoll.dice as dice, index}
+						{@const DiceComponent = DICE_COMPONENTS[dice.type]}
 						<button
                         transition:scale={{ duration: 100 }}
 							onclick={() => {
 								currentRoll.dice.splice(index, 1);
 							}}
 						>
-							{#if dice.type === 'd4'}
-								<D4 class="size-9" />
-							{:else if dice.type === 'd6'}
-								<D6 class="size-9" />
-							{:else if dice.type === 'd8'}
-								<D8 class="size-9" />
-							{:else if dice.type === 'd10'}
-								<D10 class="size-9" />
-							{:else if dice.type === 'd12'}
-								<D12 class="size-9" />
-							{:else if dice.type === 'd20'}
-								<D20 class="size-9" />
-							{:else if dice.type === 'hope'}
-								<Hope class="size-9" />
-							{:else if dice.type === 'fear'}
-								<Fear class="size-9" />
-							{:else if dice.type === 'advantage'}
-								<Advantage class="size-9" />
-							{:else if dice.type === 'disadvantage'}
-								<Disadvantage class="size-9" />
-							{/if}
+							<DiceComponent class="size-9" />
 						</button>
 					{/each}
 				</div>
@@ -622,7 +726,9 @@ Box.init()
 							<Minus class="size-4" />
 						</Button>
 						<p class="text-sm font-bold">
-							Mod: <span class="inline-block w-6 text-center font-eveleth">{currentRoll.modifier}</span>
+							Mod: <span class="inline-block w-6 text-center font-eveleth">
+                                
+                                {currentRoll.modifier > 0 ? '+' : ''}{currentRoll.modifier}</span>
 						</p>
 						<Button
 							size="sm"
@@ -642,9 +748,9 @@ Box.init()
 					size="sm"
 					class="h-7 mt-1 font-bold"
 					onclick={handleRoll}
-					disabled={isRolling || currentRoll.dice.length === 0}
+					disabled={currentRoll.dice.length === 0}
 				>
-					{isRolling ? 'Rolling...' : 'Roll'}
+					Roll
 				</Button>
 
 			</div>
