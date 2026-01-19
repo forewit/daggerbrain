@@ -17,7 +17,8 @@
 	import Plus from '@lucide/svelte/icons/plus';
     import DiceBox from '@3d-dice/dice-box';
 	import { onMount } from 'svelte';
-	import { scale } from 'svelte/transition';
+	import { fade, scale } from 'svelte/transition';
+	import Switch from '$lib/components/ui/switch/switch.svelte';
 
 	let { class: className = '' } = $props();
 
@@ -404,7 +405,7 @@
 				}
 				rollingRollId = null;
 			} else {
-				previousRolls = [...previousRolls, finalRoll].slice(-5);
+				previousRolls = [...previousRolls, finalRoll];
 			}
 			
 			isRolling = false;
@@ -453,7 +454,7 @@
 			modifier: rollModifier,
 			status: 'rolling'
 		};
-		previousRolls = [...previousRolls, rollingRoll].slice(-5);
+		previousRolls = [...previousRolls, rollingRoll];
 		rollingRollId = rollId;
 		rollingRollData = { name: rollName, modifier: rollModifier };
 
@@ -521,7 +522,6 @@ Box = new DiceBox('#dice-box', {
 
 Box.init()
 });
-
 </script>
 
 <style>
@@ -538,7 +538,7 @@ Box.init()
 <!-- svelte-ignore a11y_consider_explicit_label -->
 <button class={cn("fixed inset-0 z-45 cursor-default pointer-events-none", diceOnScreen && 'pointer-events-auto')} onclick={cancelCurrentRoll}></button>
 
-<div class={cn('flex items-end gap-3', className)}>
+<div class={cn('flex items-end gap-3 fixed bottom-[calc(env(safe-area-inset-bottom)+16px)] left-[calc(env(safe-area-inset-left)+16px)] z-45', className)}>
 	<!-- dice picker -->
 	<div
 		class={cn(
@@ -592,7 +592,9 @@ Box.init()
 	<div class="flex flex-col gap-3">
 		<!-- results history -->
 		{#if showPicker}
-			{#each previousRolls as roll (roll.id)}
+
+
+			{#each previousRolls as roll, index (roll.id)}
 				{@const isRolling = roll.status === 'rolling'}
 				{@const statusText = getRollStatusText(roll)}
                 <div class={cn(
@@ -608,7 +610,7 @@ Box.init()
 							onclick={() => removeRollFromHistory(roll.id)} 
 							size="sm" 
 							variant="ghost" 
-							class="h-auto p-0"
+							class="h-auto p-1 -m-1"
 						>
 							<X class="size-4" />
 						</Button>
@@ -668,6 +670,8 @@ Box.init()
 					</Button>
 				</div>
 			{/each}
+
+            
 		{/if}
 
 		<!-- active roll -->
@@ -675,7 +679,7 @@ Box.init()
 			<div class="w-71 flex flex-col gap-2 rounded-2xl bg-card p-3 border-2 border-primary-muted shadow-xl">
 				<div class="flex items-center justify-between gap-2">
 					<p class="font-eveleth text-sm">New Roll</p>
-                    <Button onclick={closeActiveRoll} size="sm" variant="ghost" class="h-auto p-0"
+                    <Button onclick={closeActiveRoll} size="sm" variant="ghost" class="h-auto p-1 -m-1"
 						><X class="size-4" /></Button
 					>
 				</div>
