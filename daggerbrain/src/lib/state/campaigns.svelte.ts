@@ -1095,6 +1095,8 @@ function campaignContext() {
 		};
 	});
 
+	const destroy = () => {};
+
 	return {
 		get campaignId() {
 			return campaignId;
@@ -1139,7 +1141,8 @@ function campaignContext() {
 		joinCampaign,
 		addToVault,
 		removeFromVault,
-		canClaimCharacter
+		canClaimCharacter,
+		destroy
 	};
 }
 

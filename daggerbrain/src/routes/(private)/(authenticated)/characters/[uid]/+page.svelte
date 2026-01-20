@@ -1,5 +1,4 @@
 <script lang="ts">
-	import DiceRoller from '$lib/components/app/dice/dice-roller.svelte';
 	import CharacterSheet from '$lib/components/app/sheet/character-sheet.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { getCharacterContext } from '$lib/state/character.svelte';
@@ -38,12 +37,5 @@
 		</div>
 	{:else}
 		<CharacterSheet class="mb-24" />
-		<!-- <Dice
-			class="bottom-6 left-6 z-45"
-			onRollEnd={(notation, total) => {
-				console.log(notation, total);
-			}}
-		/> -->
-		<DiceRoller />
 	{/if}
 {/if}

@@ -4,6 +4,7 @@ import type { Ranges } from '@shared/types/compendium.types';
 
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
+import type { DiceType } from '@shared/types/user.types';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -196,4 +197,54 @@ export function formatDate(timestamp: number): string {
 	const day = date.getDate();
 	const year = date.getFullYear();
 	return `${month} ${day}, ${year}`;
+}
+
+/**
+ * Parses a dice string into an array of dice types and a modifier.
+ * Handles formats like "2d6+3", "1d20-2", "d6", "2d4+1d6+4", etc.
+ *
+ * @param diceString - The dice string to parse (e.g., "2d6+3", "1d20-2", "d6")
+ * @returns An object with an array of dice types and a modifier number
+ *
+ * @example
+ * parseDiceString("2d6+3") // { dice: [{ type: 'd6' }, { type: 'd6' }], modifier: 3 }
+ * parseDiceString("1d20-2") // { dice: [{ type: 'd20' }], modifier: -2 }
+ * parseDiceString("d6") // { dice: [{ type: 'd6' }], modifier: 0 }
+ * parseDiceString("2d4+1d6+4") // { dice: [{ type: 'd4' }, { type: 'd4' }, { type: 'd6' }], modifier: 4 }
+ */
+export function parseDiceString(diceString: string): {
+	dice: { type: DiceType }[];
+	modifier: number;
+} {
+	const dice: { type: DiceType }[] = [];
+	let modifier = 0;
+
+	if (!diceString || typeof diceString !== 'string') {
+		return { dice, modifier };
+	}
+
+	// Match all dice patterns like "1d6", "2d4", "d6", etc.
+	const diceMatches = diceString.matchAll(/(\d*)d(\d+)/g);
+	for (const match of diceMatches) {
+		const numDice = match[1] === '' ? 1 : parseInt(match[1], 10);
+		const dieSize = parseInt(match[2], 10);
+		const dieType = `d${dieSize}` as DiceType;
+
+		// Only add valid dice types (d4, d6, d8, d10, d12, d20)
+		// Note: hope, fear, advantage, disadvantage are not parsed from standard dice strings
+		if (['d4', 'd6', 'd8', 'd10', 'd12', 'd20'].includes(dieType)) {
+			for (let i = 0; i < numDice; i++) {
+				dice.push({ type: dieType });
+			}
+		}
+	}
+
+	// Extract modifier (positive or negative number at the end)
+	// Match patterns like "+3", "-2", "+10", etc.
+	const modifierMatch = diceString.match(/([+-]\d+)$/);
+	if (modifierMatch) {
+		modifier = parseInt(modifierMatch[1], 10);
+	}
+
+	return { dice, modifier };
 }

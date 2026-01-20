@@ -3,6 +3,7 @@
 	import type { Traits, DamageTypes } from '@shared/types/compendium.types';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { TRAITS } from '@shared/constants/rules';
+	import RollButton from '$lib/components/app/dice/roll-button.svelte';
 
 	let {
 		id,
@@ -77,21 +78,21 @@
 
 	// Get current damage type and trait values from inventory choices
 	let currentDamageType = $derived.by(() => {
-		if (!weapon) return null;
+		if (!weapon) return undefined;
 		const choices = weaponChoices?.['damage_type'];
 		if (choices && choices.length > 0) {
 			return choices[0] as DamageTypes;
 		}
-		return weapon.available_damage_types[0] || null;
+		return weapon.available_damage_types[0] || undefined;
 	});
 
 	let currentTrait = $derived.by(() => {
-		if (!weapon) return null;
+		if (!weapon) return undefined;
 		const choices = weaponChoices?.['trait'];
 		if (choices && choices.length > 0) {
 			return choices[0] as keyof Traits;
 		}
-		return weapon.available_traits[0] || null;
+		return weapon.available_traits[0] || undefined;
 	});
 
 	// Calculate to hit: weapon attack_roll_bonus + character trait value
@@ -100,16 +101,6 @@
 		if (!currentTrait || !traits) return weapon.attack_roll_bonus;
 		const traitValue = traits[currentTrait] || 0;
 		return weapon.attack_roll_bonus + traitValue;
-	});
-
-	// Format to hit for display
-	let formattedToHit = $derived(toHit >= 0 ? `+${toHit}` : `${toHit}`);
-
-	// Format damage for Damage column (with proficiency applied)
-	let formattedDamage = $derived.by(() => {
-		if (!weapon) return '';
-		const diceWithProficiency = applyProficiencyToDice(weapon.damage_dice, proficiency);
-		return `${diceWithProficiency}${weapon.damage_bonus > 0 ? '+' + weapon.damage_bonus : ''}${currentDamageType ? ' ' + currentDamageType : ''}`;
 	});
 </script>
 
@@ -166,17 +157,24 @@
 		</td>
 		<td class="py-2 pr-4 text-center whitespace-nowrap">{weapon.range}</td>
 		<td class="py-2 pr-4 whitespace-nowrap">
-			<div class="mx-auto w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs">
-				{formattedToHit}
-				{#if currentTrait}
-					<span class="text-xs">{TRAITS[currentTrait].short_name}</span>
-				{/if}
-			</div>
+			<RollButton
+				type="duality"
+				modifier={toHit}
+				traitId={currentTrait}
+				name={weapon.title}
+				class="mx-auto"
+			/>
 		</td>
 		<td class="py-2 pr-4 text-right whitespace-nowrap sm:text-center">
-			<div class="ml-auto w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs sm:mx-auto">
-				{formattedDamage}
-			</div>
+			<RollButton
+				name="Damage"
+				class="ml-auto sm:mx-auto"
+				applyProficiency
+				type="base"
+				diceString={weapon.damage_dice}
+				modifier={weapon.damage_bonus}
+				damageType={currentDamageType}
+			/>
 		</td>
 		<td class="hidden py-2 pr-4 text-right text-xs sm:table-cell">
 			<div class="ml-auto w-min text-right">

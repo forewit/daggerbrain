@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
+	import DiceRoller from '../dice/dice-roller.svelte';
 	import Traits from './traits.svelte';
 	import Banner from '../cards/class-banner.svelte';
 	import DamageThresholds from './damage-thresholds.svelte';
@@ -33,6 +34,7 @@
 
 	let sheetOpen = $state(false);
 	let sheetContent = $state<SheetContent>(null);
+	let diceRoller = $state<DiceRoller>();
 
 	function openItemSheet(type: 'weapon' | 'armor' | 'consumable' | 'loot', id: string) {
 		sheetContent = { type, id };
@@ -331,4 +333,7 @@
 
 	<!-- Item/Experience detail sheet -->
 	<ContentSheet bind:open={sheetOpen} content={sheetContent} />
+
+	<!-- Dice roller sheet -->
+	<DiceRoller bind:this={diceRoller} />
 {/if}

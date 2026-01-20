@@ -4,6 +4,7 @@
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { Input } from '$lib/components/ui/input';
+	import RollButton from '../../dice/roll-button.svelte';
 
 	let {
 		onExperienceClick = () => {}
@@ -52,7 +53,7 @@
 					}}
 				>
 					<td class="px-4 py-2">
-						<div
+						<!-- <div
 							class="ml-auto w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs sm:mx-auto"
 						>
 							{#if context.experience_modifiers[i] > 0}
@@ -60,7 +61,8 @@
 							{:else}
 								{context.experience_modifiers[i]}
 							{/if}
-						</div>
+						</div> -->
+						<RollButton class="ml-auto sm:mx-auto" name="Experience" type="duality" modifier={context.experience_modifiers[i]} />
 					</td>
 					<td class="py-2 pr-4">
 						<p class="text-xs text-muted-foreground italic">
