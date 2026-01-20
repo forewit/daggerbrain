@@ -10,4 +10,4 @@
 	setCompendiumContext();
 </script>
 
-	{@render children()}
+{@render children()}

@@ -97,9 +97,9 @@
 
 {#if label}
 	<div class="mb-2 flex items-center justify-between truncate">
-		<p class="text-xs font-medium text-muted-foreground text-nowrap">{label}</p>
+		<p class="text-xs font-medium text-nowrap text-muted-foreground">{label}</p>
 		{#if diceString}
-			<span class="text-xs text-muted-foreground truncate">{diceString}</span>
+			<span class="truncate text-xs text-muted-foreground">{diceString}</span>
 		{/if}
 	</div>
 {/if}
@@ -121,15 +121,14 @@
 				>{counts.d4}</span
 			>
 		{/if}
-		<D4 class="size-7" showLabel/>
-
+		<D4 class="size-7" showLabel />
 	</button>
 
 	<!-- d6 -->
 	<button
 		type="button"
 		class={cn(
-			'relative flex items-center justify-center rounded-md p-1 hover:bg-primary/20',
+			'relative flex items-center justify-center rounded-md p-0.5 hover:bg-primary/20',
 			counts.d6 > 0 && 'bg-primary/10'
 		)}
 		onclick={() => handleClick('d6')}
@@ -141,14 +140,14 @@
 				>{counts.d6}</span
 			>
 		{/if}
-		<D6 class="size-7" showLabel/>
+		<D6 class="size-7" showLabel />
 	</button>
 
 	<!-- d8 -->
 	<button
 		type="button"
 		class={cn(
-			'relative flex items-center justify-center rounded-md p-1 hover:bg-primary/20',
+			'relative flex items-center justify-center rounded-md p-0.5 hover:bg-primary/20',
 			counts.d8 > 0 && 'bg-primary/10'
 		)}
 		onclick={() => handleClick('d8')}
@@ -160,14 +159,14 @@
 				>{counts.d8}</span
 			>
 		{/if}
-		<D8 class="size-7" showLabel/>
+		<D8 class="size-7" showLabel />
 	</button>
 
 	<!-- d10 -->
 	<button
 		type="button"
 		class={cn(
-			'relative flex items-center justify-center rounded-md p-1 hover:bg-primary/20',
+			'relative flex items-center justify-center rounded-md p-0.5 hover:bg-primary/20',
 			counts.d10 > 0 && 'bg-primary/10'
 		)}
 		onclick={() => handleClick('d10')}
@@ -179,14 +178,14 @@
 				>{counts.d10}</span
 			>
 		{/if}
-		<D10 class="size-7" showLabel/>
+		<D10 class="size-7" showLabel />
 	</button>
 
 	<!-- d12 -->
 	<button
 		type="button"
 		class={cn(
-			'relative flex items-center justify-center rounded-md p-1 hover:bg-primary/20',
+			'relative flex items-center justify-center rounded-md p-0.5 hover:bg-primary/20',
 			counts.d12 > 0 && 'bg-primary/10'
 		)}
 		onclick={() => handleClick('d12')}
@@ -198,14 +197,14 @@
 				>{counts.d12}</span
 			>
 		{/if}
-		<D12 class="size-7" showLabel/>
+		<D12 class="size-7" showLabel />
 	</button>
 
 	<!-- d20 -->
 	<button
 		type="button"
 		class={cn(
-			'relative flex items-center justify-center rounded-md p-1 hover:bg-primary/20',
+			'relative flex items-center justify-center rounded-md p-0.5 hover:bg-primary/20',
 			counts.d20 > 0 && 'bg-primary/10'
 		)}
 		onclick={() => handleClick('d20')}
@@ -217,6 +216,6 @@
 				>{counts.d20}</span
 			>
 		{/if}
-		<D20 class="size-7" showLabel/>
+		<D20 class="size-7" showLabel />
 	</button>
 </div>

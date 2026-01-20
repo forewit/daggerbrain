@@ -387,9 +387,11 @@
 		<div class="flex flex-col gap-2">
 			<div class="flex items-center justify-between gap-2">
 				<div class="flex items-center gap-2 truncate">
-					<label for="dice-picker" class="text-xs font-medium text-muted-foreground text-nowrap">Dice</label>
+					<label for="dice-picker" class="text-xs font-medium text-nowrap text-muted-foreground"
+						>Dice</label
+					>
 					{#if diceModifier.dice}
-						<span class="text-xs text-muted-foreground truncate">({diceModifier.dice})</span>
+						<span class="truncate text-xs text-muted-foreground">({diceModifier.dice})</span>
 					{/if}
 				</div>
 				<button

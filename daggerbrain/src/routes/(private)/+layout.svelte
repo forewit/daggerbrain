@@ -4,10 +4,10 @@
 	let { children } = $props();
 </script>
 
-<SignedIn >
+<SignedIn>
 	{@render children()}
 </SignedIn>
 
-<SignedOut >
+<SignedOut>
 	<RedirectToSignIn />
 </SignedOut>

@@ -696,11 +696,12 @@
 	<div class="flex flex-col gap-2">
 		<div class="flex items-center justify-between gap-2">
 			<div class="flex items-center gap-2 truncate">
-				<label for="hb-weapon-damage-dice" class="text-xs font-medium text-muted-foreground text-nowrap"
-					>Damage Dice</label
+				<label
+					for="hb-weapon-damage-dice"
+					class="text-xs font-medium text-nowrap text-muted-foreground">Damage Dice</label
 				>
 				{#if formDamageDice}
-					<span class="text-xs text-muted-foreground truncate">({formDamageDice})</span>
+					<span class="truncate text-xs text-muted-foreground">({formDamageDice})</span>
 				{/if}
 			</div>
 			<button

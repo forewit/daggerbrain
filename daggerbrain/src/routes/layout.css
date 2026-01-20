@@ -118,6 +118,9 @@
 		min-width: -webkit-fill-available;
 		background: var(--background);
 	}
+	body {
+		overflow-y: scroll;
+	}
 	button:not(:disabled),
 	[role='button']:not(:disabled) {
 		cursor: pointer;

@@ -678,10 +678,10 @@
 					<div class="flex items-center gap-2 truncate">
 						<label
 							for="hb-beastform-attack-damage-dice"
-							class="text-xs font-medium text-muted-foreground text-nowrap">Damage Dice</label
+							class="text-xs font-medium text-nowrap text-muted-foreground">Damage Dice</label
 						>
 						{#if formAttackDamageDice}
-							<span class="text-xs text-muted-foreground truncate">({formAttackDamageDice})</span>
+							<span class="truncate text-xs text-muted-foreground">({formAttackDamageDice})</span>
 						{/if}
 					</div>
 					<button

@@ -1,6 +1,11 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	let { class: className = '', foregroundClasses = '', backgroundClasses = '', showLabel = false } = $props();
+	let {
+		class: className = '',
+		foregroundClasses = '',
+		backgroundClasses = '',
+		showLabel = false
+	} = $props();
 </script>
 
 <svg

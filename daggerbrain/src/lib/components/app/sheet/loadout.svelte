@@ -80,7 +80,7 @@
 					<Dialog.Header class="px-6">
 						<Dialog.Title>Vault</Dialog.Title>
 					</Dialog.Header>
-					<div class="flex flex-col">
+					<div class="flex flex-col overflow-y-auto">
 						<!-- vault -->
 						<div class="relative mb-5 shrink">
 							<CardCarousel
