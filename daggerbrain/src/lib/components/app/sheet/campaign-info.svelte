@@ -30,7 +30,7 @@
 <div class={cn('relative', className)}>
 	<!-- link to campaign -->
 	<div class="border-b border-primary/20 bg-primary/10">
-		<div class="mx-auto flex max-w-2xl items-center justify-end truncate">
+		<div class="mx-auto flex max-w-2xl items-center justify-end truncate pt-0.5">
 			{#if !campaignCtx.loading}
 				<div class="flex grow truncate" transition:fade={{ duration: 300 }}>
 					<Button

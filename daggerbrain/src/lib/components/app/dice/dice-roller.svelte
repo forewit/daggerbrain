@@ -69,9 +69,6 @@
 		status: 'complete'
 	});
 
-	// Game log scroll container
-	let gameLogScrollContainer = $state<HTMLDivElement | null>(null);
-
 	// Get state from context
 	let previousRolls = $derived(diceCtx.history);
 	let lastRoll = $derived(diceCtx.lastRoll);
@@ -175,17 +172,6 @@
 		}
 	});
 
-	$effect(() => {
-		// Scroll to bottom when game log sheet opens
-		if (showHistory && gameLogScrollContainer) {
-			tick().then(() => {
-				if (gameLogScrollContainer) {
-					gameLogScrollContainer.scrollTop = gameLogScrollContainer.scrollHeight;
-				}
-			});
-		}
-	});
-
 	// Track previous roll ID to detect new rolls
 	let previousRollId = $state<string | null>(null);
 
@@ -236,7 +222,7 @@
 	>
 		{#if showPicker}
 			<div class="flex min-h-0 flex-col items-center gap-2 overflow-x-hidden overflow-y-auto">
-				<Button size="icon" variant="link" class="" onclick={() => (showHistory = !showHistory)}
+				<Button class="mb-0.5" size="icon" variant="link" onclick={() => (showHistory = !showHistory)}
 					><History class="size-5" /></Button
 				>
 				{#each STANDARD_DICE_PICKER_CONFIG as config}
@@ -514,7 +500,7 @@
 			<Sheet.Description>See the last 20 rolls you made.</Sheet.Description>
 		</Sheet.Header>
 
-		<div class="flex flex-col gap-4 overflow-y-auto px-4" bind:this={gameLogScrollContainer}>
+		<div class="flex flex-col-reverse gap-4 overflow-y-auto px-4" >
 			{#each previousRolls as roll, index (roll.id)}
 				{@const isRollingState = roll.status === 'rolling'}
 				{@const statusText = diceCtx.getRollStatusText(roll)}
