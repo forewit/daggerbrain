@@ -522,6 +522,8 @@ Box = new DiceBox('#dice-box', {
 
 Box.init()
 });
+
+let showHistory = $state(false);
 </script>
 
 <style>
@@ -530,23 +532,23 @@ Box.init()
 		width: 100% !important;
 		height: 100% !important;
 		display: block;
-        z-index: 45;
 	}
 
 </style>
 
 <!-- svelte-ignore a11y_consider_explicit_label -->
-<button class={cn("fixed inset-0 z-45 cursor-default pointer-events-none", diceOnScreen && 'pointer-events-auto')} onclick={cancelCurrentRoll}></button>
+<button class={cn("fixed inset-0 z-40 cursor-default pointer-events-none", diceOnScreen && 'pointer-events-auto')} onclick={cancelCurrentRoll}></button>
 
-<div class={cn('flex items-end gap-3 fixed bottom-[calc(env(safe-area-inset-bottom)+16px)] left-[calc(env(safe-area-inset-left)+16px)] z-45', className)}>
+<div class={cn('pointer-events-none flex items-end gap-3 fixed bottom-[calc(env(safe-area-inset-bottom)+16px)] left-[calc(env(safe-area-inset-left)+16px)] z-45', className)}>
 	<!-- dice picker -->
 	<div
 		class={cn(
-			'flex flex-col items-center gap-2 rounded-2xl bg-card border-2 border-primary-muted p-1 shadow-xl',
+			'grow min-h-0 max-h-[calc(100vh-env(safe-area-inset-bottom)-env(safe-area-inset-top)-32px)] flex flex-col gap-2 pointer-events-auto  rounded-2xl bg-card border-2 border-primary-muted p-1 shadow-xl',
 			showPicker && 'pt-3'
 		)}
 	>
 		{#if showPicker}
+        <div class="min-h-0 flex flex-col gap-2 items-center overflow-y-auto overflow-x-hidden">
 			{#each STANDARD_DICE_PICKER_CONFIG as config}
 				{@const DiceComponent = DICE_COMPONENTS[config.type]}
 				<button
@@ -561,7 +563,7 @@ Box.init()
 			{/each}
 			<button
 				title="Duality"
-				class="relative size-12"
+				class="relative h-12 w-12 min-h-12 min-w-12"
 				onclick={() => {
 					if (!currentRoll.dice.some((die) => die.type === 'hope')) {
 						currentRoll.dice.push({ type: 'hope' });
@@ -574,11 +576,13 @@ Box.init()
 				<Fear class="absolute top-0 left-0 size-3/4" />
 				<Hope class="absolute right-0 bottom-1/16 size-3/4" />
 			</button>
+        </div>
+
 		{/if}
 
 		<button
 			title="Roll Dice"
-			class="flex size-12 items-center justify-center"
+			class="shrink-0 flex size-12 items-center justify-center"
 			onclick={() => (showPicker = !showPicker)}
 		>
 			{#if showPicker}
@@ -592,13 +596,12 @@ Box.init()
 	<div class="flex flex-col gap-3">
 		<!-- results history -->
 		{#if showPicker}
-
-
 			{#each previousRolls as roll, index (roll.id)}
+            <!-- {#if showHistory || (!showHistory && index === previousRolls.length - 1 && !showCurrentRoll)} -->
 				{@const isRolling = roll.status === 'rolling'}
 				{@const statusText = getRollStatusText(roll)}
                 <div class={cn(
-					"w-71 flex flex-col gap-2 rounded-2xl p-3 border-2 border-primary-muted shadow-xl bg-card",
+					"pointer-events-auto w-71 flex flex-col gap-2 rounded-2xl p-3 border-2 border-primary-muted shadow-xl bg-card",
 					statusText === 'Critical Success' && 'bg-gradient-to-r from-card to-emerald-950',
 					statusText === 'with Fear' && 'bg-gradient-to-r from-card to-primary-muted',
 					statusText === 'with Hope' && 'bg-gradient-to-r from-card to-accent-muted',
@@ -669,14 +672,15 @@ Box.init()
 						{isRolling ? 'Rolling...' : 'Reroll'}
 					</Button>
 				</div>
+                <!-- {/if} -->
 			{/each}
 
-            
+
 		{/if}
 
 		<!-- active roll -->
 		{#if showCurrentRoll}
-			<div class="w-71 flex flex-col gap-2 rounded-2xl bg-card p-3 border-2 border-primary-muted shadow-xl">
+			<div class="pointer-events-auto w-71 flex flex-col gap-2 rounded-2xl bg-card p-3 border-2 border-primary-muted shadow-xl">
 				<div class="flex items-center justify-between gap-2">
 					<p class="font-eveleth text-sm">New Roll</p>
                     <Button onclick={closeActiveRoll} size="sm" variant="ghost" class="h-auto p-1 -m-1"
@@ -759,5 +763,13 @@ Box.init()
 
 			</div>
 		{/if}
+
+        <!-- history toggle -->
+         <!-- {#if showPicker}
+        <label transition:fade={{ duration: 100 }} class="w-min cursor-pointer flex items-center gap-2 rounded-2xl bg-card px-3 py-1 border-2 border-primary-muted shadow-xl">
+            <p class="text-xs text-nowrap">History</p>
+       <Switch bind:checked={showHistory} />
+        </label>
+        {/if} -->
 	</div>
 </div>
