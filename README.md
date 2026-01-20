@@ -19,3 +19,6 @@ https://lucide.dev/icons/
 
 images
 https://pixabay.com/users/39215122/?tab=all&order=latest
+
+## dice roller
+https://github.com/3d-dice/dice-box

@@ -1,16 +1,13 @@
 <script lang="ts">
-	import { SignedIn } from 'svelte-clerk';
-	import { setUserContext } from '$lib/state/user.svelte';
-	import { setCompendiumContext } from '$lib/state/compendium.svelte';
-	import { setHomebrewContext } from '$lib/state/homebrew.svelte';
+	import { SignedIn, SignedOut, RedirectToSignIn } from 'svelte-clerk';
 
 	let { children } = $props();
-
-	setUserContext();
-	setHomebrewContext();
-	const compendium = setCompendiumContext();
 </script>
 
-<SignedIn>
+<SignedIn >
 	{@render children()}
 </SignedIn>
+
+<SignedOut >
+	<RedirectToSignIn />
+</SignedOut>

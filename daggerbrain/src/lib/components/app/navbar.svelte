@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import {
 		SignedIn,
@@ -6,8 +7,6 @@
 		SignInButton,
 		Protect,
 		useClerkContext,
-		SignOutButton,
-		SignUpButton,
 		UserButton
 	} from 'svelte-clerk';
 	import { cn } from '$lib/utils';
@@ -23,6 +22,13 @@
 	const user = $derived(ctx.user);
 	const userImageUrl = $derived(user?.imageUrl || '/images/portrait-placeholder.png');
 	const userName = $derived(user?.username || 'Profile');
+
+	/** Navigate to / first so we leave (private) before session clears; avoids RedirectToSignIn winning over sign-out redirect. */
+	async function handleSignOut() {
+		open = false;
+		await goto('/');
+		ctx.clerk?.signOut();
+	}
 
 	function updateNavbarHeight() {
 		if (headerElement) {
@@ -146,7 +152,7 @@
 				</div>
 				<Sheet.Footer>
 					<SignedIn>
-						<SignOutButton class={buttonVariants({ size: 'sm' })}>Sign Out</SignOutButton>
+						<Button onclick={handleSignOut} class={buttonVariants({ size: 'sm' })}>Sign Out</Button>
 					</SignedIn>
 				</Sheet.Footer>
 			</Sheet.Content>
@@ -176,7 +182,7 @@
 				<div
 					class="mx-2 flex size-8 items-center justify-center rounded-full border-2 border-accent"
 				>
-					<UserButton />
+					<UserButton afterSignOutUrl="/" />
 				</div>
 			</SignedIn>
 		</div>
