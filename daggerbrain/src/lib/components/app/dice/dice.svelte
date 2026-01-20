@@ -2,7 +2,7 @@
 	import { cn } from '$lib/utils';
 	import { onDestroy, onMount } from 'svelte';
 	import X from '@lucide/svelte/icons/x';
-	import { fade, fly, scale, slide } from 'svelte/transition';
+	import { fade, slide } from 'svelte/transition';
 
 	type Notation = {
 		set: string[];
