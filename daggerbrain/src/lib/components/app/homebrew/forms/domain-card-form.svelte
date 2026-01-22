@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Feature, DomainCard, DomainIds } from '@shared/types/compendium.types';
+	import type { Feature, DomainCard, DomainIds, DomainCardChoice } from '@shared/types/compendium.types';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -7,6 +7,7 @@
 	import * as Select from '$lib/components/ui/select';
 	import { cn } from '$lib/utils';
 	import HomebrewFeatureForm from '../features/feature-form.svelte';
+	import HomebrewDomainChoicesEditor from '../features/domain-choices-editor.svelte';
 	import Dropdown from '../../leveling/dropdown.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
@@ -60,6 +61,7 @@
 	let formForcedInLoadout = $state(false);
 	let formForcedInVault = $state(false);
 	let formFeatures = $state<Feature[]>([]);
+	let formChoices = $state<DomainCardChoice[]>([]);
 
 	// Validation errors state
 	let errors = $state<DomainCardFormErrors>({});
@@ -120,6 +122,9 @@
 		// Compare features (deep comparison)
 		const featuresMatch = JSON.stringify(formFeatures) === JSON.stringify(item.features);
 
+		// Compare choices (deep comparison)
+		const choicesMatch = JSON.stringify(formChoices) === JSON.stringify(item.choices);
+
 		return !(
 			titleMatch &&
 			imageUrlMatch &&
@@ -132,7 +137,8 @@
 			appliesInVaultMatch &&
 			forcedInLoadoutMatch &&
 			forcedInVaultMatch &&
-			featuresMatch
+			featuresMatch &&
+			choicesMatch
 		);
 	});
 
@@ -212,6 +218,7 @@
 			formForcedInLoadout = item.forced_in_loadout;
 			formForcedInVault = item.forced_in_vault;
 			formFeatures = JSON.parse(JSON.stringify(item.features));
+			formChoices = JSON.parse(JSON.stringify(item.choices));
 			// Clear pending image file when item changes
 			hasPendingImageFile = false;
 			// Clear errors when domainCard changes
@@ -237,7 +244,7 @@
 			forced_in_loadout: formForcedInLoadout,
 			forced_in_vault: formForcedInVault,
 			features: JSON.parse(JSON.stringify(formFeatures)),
-			choices: []
+			choices: JSON.parse(JSON.stringify(formChoices))
 		};
 	}
 
@@ -438,6 +445,7 @@
 			formForcedInLoadout = item.forced_in_loadout;
 			formForcedInVault = item.forced_in_vault;
 			formFeatures = JSON.parse(JSON.stringify(item.features));
+			formChoices = JSON.parse(JSON.stringify(item.choices));
 			// Clear pending image file on reset
 			hasPendingImageFile = false;
 			// Clear errors on reset
@@ -623,6 +631,11 @@
 		</div>
 	</div>
 
+		<!-- Choices -->
+		<div class="flex flex-col gap-2">
+			<HomebrewDomainChoicesEditor bind:choices={formChoices} />
+		</div>
+
 	<!-- Features -->
 	<div class="flex flex-col gap-2">
 		<div class="flex items-center justify-between">
@@ -650,6 +663,8 @@
 						bind:feature={formFeatures[index]}
 						onRemove={() => removeFeature(index)}
 						errors={featureErrors.get(index)}
+						domainCardChoices={formChoices}
+						domainCardId={item.compendium_id}
 					/>
 				</Dropdown>
 			{:else}
@@ -657,6 +672,8 @@
 			{/each}
 		</div>
 	</div>
+
+
 
 	<!-- Actions -->
 	<div class="flex flex-col gap-2 pt-2">

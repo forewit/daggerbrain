@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Feature, CharacterModifier, WeaponModifier } from '@shared/types/compendium.types';
+	import type { Feature, CharacterModifier, WeaponModifier, DomainCardChoice } from '@shared/types/compendium.types';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -11,7 +11,9 @@
 	let {
 		feature = $bindable(),
 		onRemove,
-		errors
+		errors,
+		domainCardChoices,
+		domainCardId
 	}: {
 		feature: Feature;
 		onRemove?: (() => void) | undefined;
@@ -21,6 +23,8 @@
 			title?: string;
 			description_html?: string;
 		};
+		domainCardChoices?: DomainCardChoice[];
+		domainCardId?: string;
 	} = $props();
 
 	function addCharacterModifier() {
@@ -140,6 +144,8 @@
 						bind:modifier={feature.character_modifiers[index]}
 						onRemove={() => removeCharacterModifier(index)}
 						errors={errors?.character_modifiers?.get(index)}
+						domainCardChoices={domainCardChoices}
+						domainCardId={domainCardId}
 					/>
 				{/each}
 			</div>

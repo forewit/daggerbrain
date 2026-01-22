@@ -14,6 +14,7 @@
 		card = $bindable(),
 		class: className = '',
 		variant = 'responsive',
+		preview = false,
 		children
 	}: {
 		bind_choice_select?: boolean;
@@ -21,6 +22,7 @@
 		card: DomainCard;
 		variant?: 'responsive' | 'card';
 		class?: string;
+		preview?: boolean;
 		children?: Snippet;
 	} = $props();
 
@@ -32,14 +34,48 @@
 	const compendium = getCompendiumContext();
 
 	let width = $state(300);
+
+	// Local state for preview mode
+	let localChoiceSelections = $state<Record<string, string[]>>({});
+	let localTokenCount = $state(0);
+
+	// Initialize local state when preview is true
+	$effect(() => {
+		if (preview) {
+			// Initialize choice selections
+			const selections: Record<string, string[]> = {};
+			for (const choice of card.choices) {
+				selections[choice.choice_id] = [];
+			}
+			localChoiceSelections = selections;
+			// Initialize token count
+			localTokenCount = 0;
+		}
+		// Re-run when card.choices changes
+		card.choices;
+	});
 </script>
 
 {#snippet token_count()}
-	{#if bind_token_count && card.tokens}
-		{@const current_count = character?.domain_card_tokens[card.compendium_id] ?? 0}
+	{#if (bind_token_count || (preview && card.tokens)) && card.tokens}
+		{@const current_count = preview
+			? localTokenCount
+			: character?.domain_card_tokens[card.compendium_id] ?? 0}
 		<div class="flex items-center justify-center gap-2">
 			<!-- Minus Button -->
-			{#if character && context.canEdit}
+			{#if preview}
+				<button
+					type="button"
+					onclick={() => {
+						localTokenCount = Math.max(0, localTokenCount - 1);
+					}}
+					disabled={current_count === 0}
+					class="flex size-7 items-center justify-center rounded-full bg-red-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+					aria-label="Decrease token count"
+				>
+					−
+				</button>
+			{:else if character && context.canEdit}
 				<button
 					type="button"
 					onclick={() => {
@@ -80,7 +116,19 @@
 			</div>
 
 			<!-- Plus Button -->
-			{#if character && context.canEdit}
+			{#if preview}
+				<button
+					type="button"
+					onclick={() => {
+						localTokenCount = Math.min(99, localTokenCount + 1);
+					}}
+					disabled={current_count === 99}
+					class="flex size-7 items-center justify-center rounded-full bg-green-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+					aria-label="Increase token count"
+				>
+					+
+				</button>
+			{:else if character && context.canEdit}
 				<button
 					type="button"
 					onclick={() => {
@@ -100,38 +148,83 @@
 {/snippet}
 
 {#snippet choice_select(choice: DomainCardChoice)}
-	{#if character && card.choices.length > 0 && bind_choice_select}
+	{#if card.choices.length > 0 && (bind_choice_select || preview)}
 		{@const conditional_choice_id = choice.conditional_choice?.choice_id || null}
 		{@const conditional_selection_id = choice.conditional_choice?.selection_id || null}
 
-		{#if character.domain_card_choices[card.compendium_id] && character.domain_card_choices[card.compendium_id][choice.choice_id]}
-			{#if choice.conditional_choice === null || (conditional_choice_id && conditional_selection_id && character.domain_card_choices[card.compendium_id][conditional_choice_id] && character.domain_card_choices[card.compendium_id][conditional_choice_id].includes(conditional_selection_id))}
+		{#if preview || (character?.domain_card_choices[card.compendium_id] && character.domain_card_choices[card.compendium_id][choice.choice_id])}
+			{@const conditionalMet = preview
+				? (choice.conditional_choice === null ||
+						(conditional_choice_id &&
+							conditional_selection_id &&
+							localChoiceSelections[conditional_choice_id]?.includes(conditional_selection_id)))
+				: (choice.conditional_choice === null ||
+						(conditional_choice_id &&
+							conditional_selection_id &&
+							character?.domain_card_choices[card.compendium_id]?.[conditional_choice_id] &&
+							character.domain_card_choices[card.compendium_id][conditional_choice_id].includes(conditional_selection_id)))}
+			{#if conditionalMet}
 				{#if choice.type === 'arbitrary'}
-					<ChoiceSelector
-						disabled={!context.canEdit}
-						class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
-						bind:selected_ids={character.domain_card_choices[card.compendium_id][choice.choice_id]}
-						max={choice.max}
-						options={choice.options}
-						{width}
-					/>
+					{#if preview}
+						{#if !localChoiceSelections[choice.choice_id]}
+							{localChoiceSelections[choice.choice_id] = []}
+						{/if}
+						<ChoiceSelector
+							disabled={false}
+							class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
+							bind:selected_ids={localChoiceSelections[choice.choice_id]}
+							max={choice.max}
+							options={choice.options}
+							{width}
+						/>
+					{:else if character && character.domain_card_choices[card.compendium_id]?.[choice.choice_id]}
+						<ChoiceSelector
+							disabled={!context.canEdit}
+							class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
+							bind:selected_ids={character.domain_card_choices[card.compendium_id][choice.choice_id]}
+							max={choice.max}
+							options={choice.options}
+							{width}
+						/>
+					{/if}
 				{:else if choice.type === 'experience'}
-					<ChoiceSelector
-						disabled={!context.canEdit}
-						class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
-						bind:selected_ids={character.domain_card_choices[card.compendium_id][choice.choice_id]}
-						max={choice.max}
-						options={character.experiences.map((exp, i) => {
-							return {
+					{#if preview}
+						{#if !localChoiceSelections[choice.choice_id]}
+							{localChoiceSelections[choice.choice_id] = []}
+						{/if}
+						<ChoiceSelector
+							disabled={false}
+							class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
+							bind:selected_ids={localChoiceSelections[choice.choice_id]}
+							max={choice.max}
+							options={Array.from({ length: 4 }, (_, i) => ({
 								selection_id: i.toString(),
-								title: exp,
-								short_title: exp
-							};
-						})}
-						term="Experience"
-						term_plural="Experiences"
-						{width}
-					/>
+								title: `Example experience ${i + 1}`,
+								short_title: `Example experience ${i + 1}`
+							}))}
+							term="Experience"
+							term_plural="Experiences"
+							{width}
+						/>
+					{:else if character && character.domain_card_choices[card.compendium_id]?.[choice.choice_id]}
+						{@const char = character}
+						<ChoiceSelector
+							disabled={!context.canEdit}
+							class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
+							bind:selected_ids={char.domain_card_choices[card.compendium_id][choice.choice_id]}
+							max={choice.max}
+							options={char.experiences.map((exp, i) => {
+								return {
+									selection_id: i.toString(),
+									title: exp,
+									short_title: exp
+								};
+							})}
+							term="Experience"
+							term_plural="Experiences"
+							{width}
+						/>
+					{/if}
 				{/if}
 			{:else}
 				<!-- conditional choice not met -->

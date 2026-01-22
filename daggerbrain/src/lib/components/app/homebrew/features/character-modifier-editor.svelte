@@ -2,7 +2,8 @@
 	import type {
 		CharacterModifier,
 		CharacterCondition,
-		TraitIds
+		TraitIds,
+		DomainCardChoice
 	} from '@shared/types/compendium.types';
 	import * as Select from '$lib/components/ui/select';
 	import Input from '$lib/components/ui/input/input.svelte';
@@ -17,12 +18,16 @@
 		modifier = $bindable(),
 		onModifierChange,
 		onRemove,
-		errors
+		errors,
+		domainCardChoices,
+		domainCardId
 	}: {
 		modifier?: CharacterModifier;
 		onModifierChange?: (modifier: CharacterModifier) => void;
 		onRemove?: (() => void) | undefined;
 		errors?: string[];
+		domainCardChoices?: DomainCardChoice[];
+		domainCardId?: string;
 	} = $props();
 
 	// Use internal state if callback is provided
@@ -63,7 +68,7 @@
 		| 'experience_from_domain_card_choice_selection'
 		| 'experience_from_ancestry_card_choice_selection'
 	>;
-	type ValidTarget = SimpleTarget | 'trait';
+	type ValidTarget = SimpleTarget | 'trait' | 'experience_from_domain_card_choice_selection';
 
 	// Behaviour options - extracted from type
 	const behaviourOptions: readonly ModifierBehaviour[] = ['bonus', 'base', 'override'] as const;
@@ -129,8 +134,14 @@
 		spellcast_roll_bonus: 'Spellcast Roll Bonus',
 		max_short_rest_actions: 'Max Short Rest Actions',
 		max_long_rest_actions: 'Max Long Rest Actions',
-		trait: 'Trait'
+		trait: 'Trait',
+		experience_from_domain_card_choice_selection: 'Experience from Domain Card Choice'
 	};
+
+	// Get experience-type choices for dropdown
+	let experienceChoices = $derived(
+		domainCardChoices?.filter((choice) => choice.type === 'experience') || []
+	);
 
 	// Trait options - using TraitIds type
 	const traitOptions: TraitIds[] = [
@@ -291,6 +302,20 @@
 				target: 'trait',
 				trait: existingTrait
 			} as CharacterModifier;
+		} else if (newTarget === 'experience_from_domain_card_choice_selection') {
+			// Preserve choice_id if already set, otherwise use first experience choice or empty
+			const existingChoiceId =
+				'target' in currentModifier &&
+				currentModifier.target === 'experience_from_domain_card_choice_selection'
+					? ((currentModifier as any).choice_id ?? experienceChoices[0]?.choice_id ?? '')
+					: experienceChoices[0]?.choice_id ?? '';
+			newModifier = {
+				...baseProps,
+				...typeProps,
+				target: 'experience_from_domain_card_choice_selection',
+				domain_card_id: domainCardId || '',
+				choice_id: existingChoiceId
+			} as CharacterModifier;
 		} else {
 			// Simple target
 			newModifier = {
@@ -333,7 +358,8 @@
 				<p class="truncate">
 					{selectedTarget &&
 					(simpleTargetOptions.includes(selectedTarget as SimpleTarget) ||
-						selectedTarget === 'trait')
+						selectedTarget === 'trait' ||
+						selectedTarget === 'experience_from_domain_card_choice_selection')
 						? targetLabels[selectedTarget as ValidTarget]
 						: 'None selected'}
 				</p>
@@ -343,6 +369,11 @@
 					<Select.Item value={target}>{targetLabels[target]}</Select.Item>
 				{/each}
 				<Select.Item value="trait">{targetLabels.trait}</Select.Item>
+				{#if domainCardChoices && experienceChoices.length > 0}
+					<Select.Item value="experience_from_domain_card_choice_selection">
+						{targetLabels.experience_from_domain_card_choice_selection}
+					</Select.Item>
+				{/if}
 			</Select.Content>
 		</Select.Root>
 	</div>
@@ -375,6 +406,56 @@
 					{/each}
 				</Select.Content>
 			</Select.Root>
+		</div>
+	{/if}
+
+	<!-- Experience from Domain Card Choice Selection fields -->
+	{#if currentTarget === 'experience_from_domain_card_choice_selection' && modifier && modifier.target === 'experience_from_domain_card_choice_selection'}
+		{@const experienceModifier = modifier}
+		<div class="flex flex-col gap-2">
+			{#if domainCardId}
+				<div class="flex flex-col gap-1">
+					<label for="domain-card-id-display" class="text-xs font-medium text-muted-foreground"
+						>Domain Card ID</label
+					>
+					<Input
+						id="domain-card-id-display"
+						value={experienceModifier.domain_card_id || domainCardId}
+						disabled
+						class="bg-muted"
+					/>
+				</div>
+			{/if}
+			<div class="flex flex-col gap-1">
+				<label for="choice-id-select" class="text-xs font-medium text-muted-foreground"
+					>Choice</label
+				>
+				<Select.Root
+					type="single"
+					value={experienceModifier.choice_id || ''}
+					onValueChange={(value) => {
+						if (value) {
+							updateModifier({
+								...experienceModifier,
+								choice_id: value,
+								domain_card_id: domainCardId || experienceModifier.domain_card_id || ''
+							});
+						}
+					}}
+				>
+					<Select.Trigger id="choice-id-select" class="w-full">
+						<p class="truncate">
+							{experienceModifier.choice_id ||
+								(experienceChoices.length > 0 ? 'Select choice' : 'No experience choices available')}
+						</p>
+					</Select.Trigger>
+					<Select.Content>
+						{#each experienceChoices as choice}
+							<Select.Item value={choice.choice_id}>{choice.choice_id}</Select.Item>
+						{/each}
+					</Select.Content>
+				</Select.Root>
+			</div>
 		</div>
 	{/if}
 
@@ -515,7 +596,11 @@
 	{#if modifier}
 		<div class="flex flex-col gap-1">
 			<p class="text-xs font-medium text-muted-foreground">Conditions</p>
-			<HomebrewCharacterConditions bind:conditions={modifier.character_conditions} />
+			<HomebrewCharacterConditions
+				bind:conditions={modifier.character_conditions}
+				domainCardChoices={domainCardChoices}
+				domainCardId={domainCardId}
+			/>
 		</div>
 	{/if}
 
