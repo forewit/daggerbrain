@@ -95,6 +95,11 @@
 									/></a
 								>
 							</div>
+
+							<div class="px-5 pt-4 text-sm font-semibold">3D Dice Roller</div>
+							<div class="px-5 pt-3 pb-4 text-sm text-muted-foreground">
+								Roll directly on your character sheet, including hot-clickable traits, weapon damage, and attacks. A future update will include live dice rolls and a game log for campaigns
+							</div>
 						</div>
 					</li>
 
@@ -122,9 +127,9 @@
 								<a href="/contact" class="underline hover:text-accent">lets talk!</a>
 							</div>
 
-							<div class="px-5 pt-4 text-sm font-semibold">3D Dice Roller</div>
+							<div class="px-5 pt-4 text-sm font-semibold">Encounter Builder</div>
 							<div class="px-5 pt-3 pb-4 text-sm text-muted-foreground">
-								Roll with hope or fear directly on your character sheets and campaigns.
+								Build and tune Adversaries and Environments for to your campaign.
 							</div>
 						</div>
 					</li>
@@ -148,19 +153,19 @@
 							<div class="px-5 pt-3 pb-5 text-sm text-muted-foreground">
 								<ul class="list-disc space-y-1 pl-5">
 									<li>
-										<span class="text-foreground">Expanded Homebrew support</span>
-										for Classes, Subclasses, Domain, Ancestry, and Community Cards
+										<span class="text-foreground">Campaign Improvements:</span>
+										Game log, live dice rolls, and more
 									</li>
-
 									<li>
-										<span class="text-foreground">Adversary Manager</span>
+										<span class="text-foreground">Expanded Homebrew:</span>
+										Adversaries, Classes, Subclasses, Domains, Ancestries, and Communities
 									</li>
 									<li><span class="text-foreground">PDF export</span></li>
 
 									<li><span class="text-foreground">Searchable rules compendium</span></li>
 									<li>
 										<span class="text-foreground">The Void content</span>
-										playtest material
+										
 									</li>
 								</ul>
 							</div>
