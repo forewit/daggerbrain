@@ -5,11 +5,13 @@
 	import { TRAITS } from '@shared/constants/rules';
 	import { getCharacterContext } from '$lib/state/character.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
+	import { getDiceContext } from '$lib/state/dice.svelte';
 
 	let { class: className = '', traits = $bindable() }: { class?: string; traits: Traits } =
 		$props();
 
 	const context = getCharacterContext();
+	const diceCtx = getDiceContext();
 	let derivedBeastform = $derived(context.derived_beastform);
 	let character = $derived(context.character);
 
@@ -39,9 +41,15 @@
 			beastformBonus !== 0) ||
 		evolutionBonus !== 0}
 	<div>
-		<div class="relative">
+		<button class="relative group" onclick={()=>{
+			diceCtx.roll({
+				name: TRAITS[trait].name,
+				dice: [{ type: 'hope' }, { type: 'fear' }],
+				modifier: traits[trait] !== null ? traits[trait]! + totalBonus : 0
+			});
+		}}>
 			<svg
-				class="size-22 text-primary-muted"
+				class="size-22 text-primary-muted group-hover:text-primary"
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="-9.199 3.544 58.968 48.466"
 			>
@@ -92,14 +100,13 @@
 			</p>
 
 			<p
-				class={cn(
-					'absolute top-7.5 left-1/2 -translate-x-1/2 text-2xl font-bold',
+				class={cn('absolute top-7.5 left-1/2 -translate-x-1/2 text-2xl font-bold',
 					hasBonus && 'text-accent'
 				)}
 			>
 				{displayValue !== null && displayValue > 0 ? '+' + displayValue : displayValue}
 			</p>
-		</div>
+		</button>
 
 		<div class="-mt-1 text-center text-[10px] text-muted-foreground italic">
 			{#each TRAITS[trait].examples as example}

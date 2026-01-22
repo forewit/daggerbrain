@@ -82,8 +82,8 @@
 	{disabled}
 	{onclick}
 	class={cn(
-		'w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs transition-all',
-		'hover:border-accent/10 hover:bg-accent/10',
+		'w-min rounded-full border bg-foreground/5 px-2.5 py-1.5 -m-0.5 text-xs',
+		'hover:border-primary hover:bg-primary/20 hover:ring ring-primary',
 		className
 	)}
 >
