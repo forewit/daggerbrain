@@ -36,7 +36,8 @@ export const ENABLED_HOMEBREW_TYPES = [
 	'armor',
 	'beastform',
 	'loot',
-	'consumable'
+	'consumable',
+	'domain-cards',
 ] as const satisfies readonly HomebrewType[];
 
 /**

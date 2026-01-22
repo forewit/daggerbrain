@@ -4,10 +4,12 @@
 
 	let {
 		value = $bindable(),
+		hasPendingFile = $bindable(false),
 		id,
 		alt = 'Image preview'
 	}: {
 		value: string;
+		hasPendingFile?: boolean;
 		id?: string;
 		alt?: string;
 	} = $props();
@@ -27,6 +29,7 @@
 
 		// Store the file for later upload
 		pendingFile = file;
+		hasPendingFile = true;
 
 		// Create preview URL from the file
 		const reader = new FileReader();
@@ -77,6 +80,7 @@
 			value = url;
 			pendingFile = null;
 			previewUrl = null;
+			hasPendingFile = false;
 
 			return url;
 		} catch (error) {

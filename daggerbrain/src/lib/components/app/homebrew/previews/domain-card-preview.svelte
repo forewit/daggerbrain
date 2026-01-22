@@ -6,5 +6,5 @@
 </script>
 
 <div class="flex max-w-[300px] min-w-[300px]">
-	<DomainCardComponent {card} variant="responsive" />
+	<DomainCardComponent {card} variant="card" bind_choice_select bind_token_count />
 </div>

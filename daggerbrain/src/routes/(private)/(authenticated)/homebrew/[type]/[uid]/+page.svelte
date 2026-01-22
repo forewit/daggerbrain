@@ -306,8 +306,6 @@
 	function handleReset() {
 		formComponent?.handleReset();
 	}
-
-	let editMode = $state(false);
 </script>
 
 {#if homebrew.loading}
@@ -433,6 +431,15 @@
 									onSubmit={handleSave}
 									onReset={handleReset}
 								/>
+							{:else if homebrewItem.type === 'domain-cards'}
+								<HomebrewDomainCardForm
+									bind:this={formComponent}
+									bind:item={homebrewItem.item}
+									bind:hasChanges
+									bind:hasErrors
+									onSubmit={handleSave}
+									onReset={handleReset}
+								/>
 								<!-- {:else if homebrewItem.type === 'class'}
 								<HomebrewClassForm
 									bind:this={formComponent}
@@ -478,15 +485,7 @@
 									onSubmit={handleSave}
 									onReset={handleReset}
 								/>
-							{:else if homebrewItem.type === 'domain-cards'}
-								<HomebrewDomainCardForm
-									bind:this={formComponent}
-									bind:item={homebrewItem.item}
-									bind:hasChanges
-									bind:hasErrors
-									onSubmit={handleSave}
-									onReset={handleReset}
-								/> -->
+							 -->
 							{/if}
 						</div>
 					</div>
@@ -506,6 +505,8 @@
 									<LootPreview loot={homebrewItem.item} />
 								{:else if homebrewItem.type === 'consumable'}
 									<ConsumablePreview consumable={homebrewItem.item} />
+								{:else if homebrewItem.type === 'domain-cards'}
+									<DomainCardPreview card={homebrewItem.item} />
 									<!-- {:else if homebrewItem.type === 'class'}
 								<ClassPreview characterClass={homebrewItem.item} />
 							{:else if homebrewItem.type === 'subclass'}
@@ -516,8 +517,7 @@
 								<CommunityCardPreview card={homebrewItem.item} />
 							{:else if homebrewItem.type === 'transformation-cards'}
 								<TransformationCardPreview card={homebrewItem.item} />
-							{:else if homebrewItem.type === 'domain-cards'}
-								<DomainCardPreview card={homebrewItem.item} /> -->
+							 -->
 								{/if}
 							</div>
 						</div>

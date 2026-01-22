@@ -35,16 +35,16 @@
 </script>
 
 {#snippet token_count()}
-	{#if character && bind_token_count && card.tokens}
-		{@const current_count = character.domain_card_tokens[card.compendium_id] || 0}
+	{#if bind_token_count && card.tokens}
+		{@const current_count = character?.domain_card_tokens[card.compendium_id] ?? 0}
 		<div class="flex items-center justify-center gap-2">
 			<!-- Minus Button -->
-			{#if context.canEdit}
+			{#if character && context.canEdit}
 				<button
 					type="button"
 					onclick={() => {
 						if (!character) return;
-						const current = character.domain_card_tokens[card.compendium_id] || 0;
+						const current = character.domain_card_tokens[card.compendium_id] ?? 0;
 						character.domain_card_tokens[card.compendium_id] = Math.max(0, current - 1);
 					}}
 					disabled={current_count === 0}
@@ -80,7 +80,7 @@
 			</div>
 
 			<!-- Plus Button -->
-			{#if context.canEdit}
+			{#if character && context.canEdit}
 				<button
 					type="button"
 					onclick={() => {
