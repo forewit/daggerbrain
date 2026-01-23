@@ -279,7 +279,11 @@ function createCharacter(id: string) {
 	let inventory_primary_weapons = $derived.by(() => {
 		return Object.entries(character?.inventory.primary_weapons || {})
 			.map(([uniqueId, item]) => {
-				const compendiumItem = compendium.primary_weapons[item.compendium_id];
+				let compendiumItem = compendium.primary_weapons[item.compendium_id];
+				// If not found in primary_weapons, check secondary_weapons (handles mis-categorized items)
+				if (!compendiumItem) {
+					compendiumItem = compendium.secondary_weapons[item.compendium_id] || null;
+				}
 				if (!compendiumItem) return null;
 				const weapon = { ...compendiumItem, id: uniqueId };
 				// Apply customizations
@@ -312,7 +316,11 @@ function createCharacter(id: string) {
 	let inventory_secondary_weapons = $derived.by(() => {
 		return Object.entries(character?.inventory.secondary_weapons || {})
 			.map(([uniqueId, item]) => {
-				const compendiumItem = compendium.secondary_weapons[item.compendium_id];
+				let compendiumItem = compendium.secondary_weapons[item.compendium_id];
+				// If not found in secondary_weapons, check primary_weapons (handles mis-categorized items)
+				if (!compendiumItem) {
+					compendiumItem = compendium.primary_weapons[item.compendium_id] || null;
+				}
 				if (!compendiumItem) return null;
 				const weapon = { ...compendiumItem, id: uniqueId };
 				// Apply customizations
@@ -3509,8 +3517,12 @@ function createCharacter(id: string) {
 		if (character && !initialLoadComplete) {
 			// Character has been loaded from app.characters, mark initial load as complete
 			initialLoadComplete = true;
-			// Set initial saved state to match what was loaded
-			lastSavedCharacter = JSON.stringify(character);
+			// Delay setting lastSavedCharacter to allow initialization effects (compendium, companion, etc.) to run first
+			setTimeout(() => {
+				if (character) {
+					lastSavedCharacter = JSON.stringify(character);
+				}
+			}, 0);
 		}
 	});
 
