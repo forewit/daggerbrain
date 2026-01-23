@@ -15,6 +15,9 @@
 	// For new choices without choice_id, use index-based temporary identifier
 	let dropdownOpenStates = $state<Record<string, boolean>>({});
 
+
+	let arbitraryChoices = $derived(choices.filter(c => c.type === 'arbitrary'));
+
 	// Helper to get a unique key for a choice
 	function getChoiceKey(choice: DomainCardChoice, indexInFiltered: number): string {
 		if (choice.choice_id) return choice.choice_id;
@@ -23,7 +26,6 @@
 	}
 
 	function addChoice() {
-		const arbitraryChoices = choices.filter(c => c.type === 'arbitrary');
 		const newChoice: DomainCardChoice = {
 			choice_id: '',
 			conditional_choice: null,
@@ -48,7 +50,6 @@
 
 	function removeChoice(index: number) {
 		// Find the actual choice in the filtered arbitrary choices
-		const arbitraryChoices = choices.filter(c => c.type === 'arbitrary');
 		const choiceToRemove = arbitraryChoices[index];
 		if (!choiceToRemove) return;
 		
@@ -64,8 +65,7 @@
 			selection_id: '',
 			title: '',
 			short_title: ''
-		};
-		const arbitraryChoices = choices.filter(c => c.type === 'arbitrary');
+		};	
 		const choiceToUpdate = arbitraryChoices[choiceIndex];
 		if (!choiceToUpdate) return;
 		
@@ -84,7 +84,6 @@
 	}
 
 	function removeOption(choiceIndex: number, optionIndex: number) {
-		const arbitraryChoices = choices.filter(c => c.type === 'arbitrary');
 		const choiceToUpdate = arbitraryChoices[choiceIndex];
 		if (!choiceToUpdate) return;
 		
@@ -103,7 +102,6 @@
 	}
 
 	function updateChoiceField(choiceIndex: number, field: string, value: unknown) {
-		const arbitraryChoices = choices.filter(c => c.type === 'arbitrary');
 		const choiceToUpdate = arbitraryChoices[choiceIndex];
 		if (!choiceToUpdate) return;
 		
@@ -137,7 +135,6 @@
 		field: string,
 		value: string
 	) {
-		const arbitraryChoices = choices.filter(c => c.type === 'arbitrary');
 		const choiceToUpdate = arbitraryChoices[choiceIndex];
 		if (!choiceToUpdate) return;
 		
@@ -172,7 +169,6 @@
 		field: 'choice_id' | 'selection_id' | null,
 		value: string | null
 	) {
-		const arbitraryChoices = choices.filter(c => c.type === 'arbitrary');
 		const choiceToUpdate = arbitraryChoices[choiceIndex];
 		if (!choiceToUpdate) return;
 		
@@ -210,7 +206,7 @@
 		</Button>
 	</div>
 	<div class="flex flex-col gap-3">
-		{#each choices.filter(c => c.type === 'arbitrary') as choice, choiceIndex (choiceIndex)}
+		{#each arbitraryChoices as choice, choiceIndex (choiceIndex)}
 			{@const choiceKey = getChoiceKey(choice, choiceIndex)}
 
 			<Dropdown
@@ -270,7 +266,7 @@
 								for="domain-conditional-checkbox-{choiceIndex}"
 								class="text-xs text-muted-foreground cursor-pointer"
 							>
-								Requires an answer to a different choice
+								Hidden until specific choice is answered
 							</label>
 						</div>
 						{#if choice.conditional_choice !== null}
@@ -302,8 +298,11 @@
 											</p>
 										</Select.Trigger>
 										<Select.Content>
-											{#each choices as otherChoice, otherIndex}
-												{#if otherIndex !== choiceIndex && otherChoice.choice_id && otherChoice.type === 'arbitrary'}
+											{#if arbitraryChoices.length <= 1}
+												<Select.Item value="" disabled>None</Select.Item>
+											{/if}
+											{#each arbitraryChoices as otherChoice, otherIndex}
+												{#if otherIndex !== choiceIndex && otherChoice.choice_id}
 													<Select.Item value={otherChoice.choice_id}>
 														{otherChoice.choice_id}
 													</Select.Item>
@@ -313,8 +312,8 @@
 									</Select.Root>
 								</div>
 								{#if choice.conditional_choice?.choice_id}
-									{@const selectedConditionalChoice = choices.find((c) => c.choice_id === choice.conditional_choice?.choice_id)}
-									{#if selectedConditionalChoice && selectedConditionalChoice.type === 'arbitrary'}
+									{@const selectedConditionalChoice = arbitraryChoices.find((c) => c.choice_id === choice.conditional_choice?.choice_id)}
+									{#if selectedConditionalChoice}
 										<div class="flex flex-col gap-1 flex-1">
 											<label
 												for="domain-conditional-selection-select-{choiceIndex}"
