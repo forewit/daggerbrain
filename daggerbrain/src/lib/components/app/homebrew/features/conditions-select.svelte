@@ -4,13 +4,16 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
+	import { cn } from '$lib/utils';
 
 	let {
 		conditions = $bindable([]),
+		choiceRequiredError,
 		domainCardChoices,
 		domainCardId
 	}: {
 		conditions?: CharacterCondition[];
+		choiceRequiredError?: string;
 		domainCardChoices?: DomainCardChoice[];
 		domainCardId?: string;
 	} = $props();
@@ -51,7 +54,7 @@
 		{ value: 'level', label: 'Minimum level requirement' },
 		{ value: 'min_loadout_cards_from_domain', label: 'Minimum cards from a domain in your loadout' },
 		...(domainCardChoices && domainCardChoices.length > 0 || hasDomainCardChoiceCondition
-			? [{ value: 'domain_card_choice', label: 'Domain card choice selection' }]
+			? [{ value: 'domain_card_choice', label: 'Requires an answer to a choice' }]
 			: [])
 	] as const);
 
@@ -171,13 +174,12 @@
 				if (existing) {
 					newConditions.push(existing);
 				} else {
-					const choices = effectiveDomainCardChoices || domainCardChoices;
-					const firstChoice = choices?.[0];
+					const firstArbitraryChoice = arbitraryChoices[0];
 					newConditions.push({
 						type: 'domain_card_choice',
 						domain_card_id: domainCardId || '',
-						choice_id: firstChoice?.choice_id || '',
-						selection_id: firstChoice?.type === 'arbitrary' ? firstChoice.options[0]?.selection_id || '' : ''
+						choice_id: firstArbitraryChoice?.choice_id || '',
+						selection_id: firstArbitraryChoice?.options[0]?.selection_id || ''
 					});
 				}
 			}
@@ -223,6 +225,9 @@
 	function updateDomainCardChoiceId(choiceId: string) {
 		const newConditions = conditions.map((cond) => {
 			if (cond.type === 'domain_card_choice') {
+				if (!choiceId || choiceId.trim() === '') {
+					return { ...cond, choice_id: '', selection_id: '' };
+				}
 				const choices = effectiveDomainCardChoices || domainCardChoices;
 				const selectedChoice = choices?.find((c) => c.choice_id === choiceId);
 				return {
@@ -255,6 +260,37 @@
 		if (!domainCardChoiceCondition) return undefined;
 		const choices = effectiveDomainCardChoices || domainCardChoices;
 		return choices?.find((c) => c.choice_id === domainCardChoiceCondition.choice_id);
+	});
+
+	// Filter choices to only show arbitrary choice types
+	let arbitraryChoices = $derived.by(() => {
+		const choices = effectiveDomainCardChoices || domainCardChoices;
+		return choices?.filter((c) => c.type === 'arbitrary') || [];
+	});
+
+	// Revert domain_card_choice to "None" when the referenced choice is removed
+	$effect(() => {
+		const arbitrary = arbitraryChoices;
+		const choiceIds = new Set(arbitrary.map((c) => c.choice_id));
+		const needsUpdate = conditions.some(
+			(c) =>
+				c.type === 'domain_card_choice' &&
+				c.choice_id &&
+				c.choice_id.trim() !== '' &&
+				!choiceIds.has(c.choice_id)
+		);
+		if (!needsUpdate) return;
+		conditions = conditions.map((cond) => {
+			if (
+				cond.type === 'domain_card_choice' &&
+				cond.choice_id &&
+				cond.choice_id.trim() !== '' &&
+				!choiceIds.has(cond.choice_id)
+			) {
+				return { ...cond, choice_id: '', selection_id: '' };
+			}
+			return cond;
+		});
 	});
 
 	// Check if domain card was found in compendium
@@ -298,7 +334,7 @@
 	</div>
 
 	{#if selectedTypes.length > 0}
-		<div class="mx-3 flex flex-col gap-3 border-l-2 border-dotted border-primary pt-3 pl-2">
+		<div class="ml-3 flex flex-col gap-3 border-l-2 border-dotted border-primary pt-3 pl-2">
 			<!-- Condition-specific fields -->
 			{#if selectedTypes.includes('armor_equipped_true') || selectedTypes.includes('armor_equipped_false')}
 				<p class="text-xs text-muted-foreground">
@@ -371,59 +407,54 @@
 
 			{#if selectedTypes.includes('domain_card_choice') && (effectiveDomainCardChoices || domainCardChoiceCondition)}
 				<div class="flex flex-col gap-2">
-					<p class="text-xs text-muted-foreground">Domain card choice selection</p>
-					{#if !domainCardFound}
-						<div class="rounded-md bg-destructive/10 p-2">
-							<p class="text-xs text-destructive">
-								Domain card "{domainCardChoiceCondition?.domain_card_id}" not found in compendium. Choices cannot be loaded.
-							</p>
-						</div>
-					{/if}
-					{#if domainCardId || domainCardChoiceCondition?.domain_card_id}
-						<div class="flex flex-col gap-1">
-							<label for="domain-card-id-display" class="text-xs text-muted-foreground"
-								>Domain Card ID</label
-							>
-							<Input
-								id="domain-card-id-display"
-								value={domainCardChoiceCondition?.domain_card_id || domainCardId}
-								disabled
-								class="bg-muted"
-							/>
-						</div>
-					{/if}
 					{#if effectiveDomainCardChoices && effectiveDomainCardChoices.length > 0}
-						<div class="flex flex-col gap-1">
-							<label for="choice-id-select" class="text-xs text-muted-foreground">Choice</label>
+						
+					<div class="grid grid-cols-2 gap-2">
+					<div class="flex flex-col gap-1">
+							<label
+								for="choice-id-select"
+								class={cn('text-xs text-muted-foreground', choiceRequiredError && 'text-destructive')}
+								>Choice</label
+							>
 							<Select.Root
 								type="single"
-								value={domainCardChoiceCondition?.choice_id || ''}
+								value={domainCardChoiceCondition?.choice_id ?? ''}
 								onValueChange={(value) => {
-									if (value) {
+									if (value === '' || value == null) {
+										updateDomainCardChoiceId('');
+									} else {
 										updateDomainCardChoiceId(value);
 									}
 								}}
 							>
-								<Select.Trigger id="choice-id-select" class="w-full">
+								<Select.Trigger
+									id="choice-id-select"
+									class={cn('w-full', choiceRequiredError && 'border-destructive')}
+								>
 									<p class="truncate">
-										{domainCardChoiceCondition?.choice_id || 'Select choice'}
+										{domainCardChoiceCondition?.choice_id || 'None'}
 									</p>
 								</Select.Trigger>
 								<Select.Content>
-									{#each effectiveDomainCardChoices as choice}
+									{#if arbitraryChoices.length <= 0}
+									<Select.Item value="" disabled>None</Select.Item>
+									{/if}
+									{#each arbitraryChoices as choice}
 										<Select.Item value={choice.choice_id}>{choice.choice_id}</Select.Item>
 									{/each}
 								</Select.Content>
 							</Select.Root>
+							{#if choiceRequiredError}
+								<p class="text-xs text-destructive">{choiceRequiredError}</p>
+							{/if}
 						</div>
-						{#if selectedChoice}
-							{#if selectedChoice.type === 'arbitrary'}
 								<div class="flex flex-col gap-1">
 									<label for="selection-id-select" class="text-xs text-muted-foreground"
-										>Selection</label
+										>Answer</label
 									>
 									<Select.Root
 										type="single"
+										disabled={!selectedChoice}
 										value={domainCardChoiceCondition?.selection_id || ''}
 										onValueChange={(value) => {
 											if (value) {
@@ -437,19 +468,17 @@
 											</p>
 										</Select.Trigger>
 										<Select.Content>
+											{#if selectedChoice && selectedChoice.type === 'arbitrary'}
 											{#each selectedChoice.options as option}
 												<Select.Item value={option.selection_id}>{option.title}</Select.Item>
 											{/each}
+											{/if}
 										</Select.Content>
 									</Select.Root>
 								</div>
-							{:else if selectedChoice.type === 'experience'}
-								<p class="text-xs text-muted-foreground italic">
-									Experience choices are selected by the player at runtime
-								</p>
-							{/if}
-						{/if}
-					{:else if domainCardChoiceCondition}
+
+					</div>
+					{:else if domainCardChoiceCondition?.choice_id}
 						<div class="rounded-md bg-muted p-2">
 							<p class="text-xs text-muted-foreground">
 								Choice ID: {domainCardChoiceCondition.choice_id}

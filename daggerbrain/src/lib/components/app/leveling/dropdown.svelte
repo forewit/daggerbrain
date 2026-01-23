@@ -12,7 +12,8 @@
 		title_snippet = null,
 		subtitle_snippet = null,
 		children,
-		open = $bindable(false)
+		open = $bindable(false),
+		onOpenChange = undefined
 	}: {
 		class?: string;
 		title?: string;
@@ -23,6 +24,7 @@
 		highlighted?: boolean;
 		children?: Snippet;
 		open?: boolean;
+		onOpenChange?: (open: boolean) => void;
 	} = $props();
 </script>
 
@@ -40,7 +42,10 @@
 			'relative z-10 flex h-14 w-full items-center truncate rounded-lg border-b bg-primary-muted px-4',
 			disabled && 'pointer-events-none opacity-50'
 		)}
-		onclick={() => (open = !open)}
+		onclick={() => {
+			if (onOpenChange) onOpenChange(!open);
+			else open = !open;
+		}}
 		{disabled}
 	>
 		<!-- title -->

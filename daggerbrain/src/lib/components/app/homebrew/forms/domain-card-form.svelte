@@ -13,6 +13,7 @@
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import ImageUrlInput from '../image-url-input.svelte';
 	import {
+		CONDITIONS_CHOICE_REQUIRED,
 		DomainCardFormSchema,
 		FeatureSchema,
 		extractFieldErrors,
@@ -23,7 +24,7 @@
 	import { SvelteMap } from 'svelte/reactivity';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import { getHomebrewContext } from '$lib/state/homebrew.svelte';
-	import { tick } from 'svelte';
+	import { tick, untrack } from 'svelte';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 
 	let {
@@ -204,6 +205,41 @@
 		hasErrors = validationAttempted && hasValidationErrors;
 	});
 
+	// Ensure experience choices exist for character modifiers
+	function ensureExperienceChoicesForModifiers() {
+		// Find all character modifiers that target experience choices
+		const experienceModifiers = formFeatures.flatMap((f) =>
+			f.character_modifiers.filter(
+				(m) =>
+					m.target === 'experience_from_domain_card_choice_selection' &&
+					(m as any).choice_id
+			)
+		);
+
+		// For each modifier, ensure the referenced experience choice exists
+		for (const modifier of experienceModifiers) {
+			const choiceId = (modifier as any).choice_id;
+			const existingChoice = formChoices.find(
+				(c) => c.choice_id === choiceId && c.type === 'experience'
+			);
+
+			if (!existingChoice) {
+				// Try to find the choice in the original item (if cloning)
+				const originalChoice = item.choices?.find(
+					(c) => c.choice_id === choiceId && c.type === 'experience'
+				);
+
+				const newChoice: DomainCardChoice = {
+					choice_id: choiceId,
+					type: 'experience',
+					max: originalChoice?.max || 1, // Use original max or default to 1
+					conditional_choice: originalChoice?.conditional_choice || null
+				};
+				formChoices = [...formChoices, newChoice];
+			}
+		}
+	}
+
 	// Sync form state when item prop changes
 	$effect(() => {
 		if (item) {
@@ -219,6 +255,8 @@
 			formForcedInVault = item.forced_in_vault;
 			formFeatures = JSON.parse(JSON.stringify(item.features));
 			formChoices = JSON.parse(JSON.stringify(item.choices));
+			// Ensure experience choices exist for modifiers (untrack to avoid effect re-running when formChoices is updated)
+			untrack(() => ensureExperienceChoicesForModifiers());
 			// Clear pending image file when item changes
 			hasPendingImageFile = false;
 			// Clear errors when domainCard changes
@@ -304,6 +342,29 @@
 				}
 			} else {
 				featureErrors.delete(i);
+			}
+		}
+
+		// Second pass: domain_card_choice conditions with empty choice_id
+		for (let i = 0; i < formFeatures.length; i++) {
+			const f = formFeatures[i];
+			for (let j = 0; j < f.character_modifiers.length; j++) {
+				const mod = f.character_modifiers[j];
+				const hasEmptyChoice = (mod.character_conditions || []).some(
+					(c) =>
+						c.type === 'domain_card_choice' &&
+						(!c.choice_id || c.choice_id.trim() === '')
+				);
+				if (!hasEmptyChoice) continue;
+				if (!validatedModifierKeys.has(getModifierKey(i, 'character', j))) continue;
+
+				const existing = untrack(() => featureErrors.get(i) || {});
+				const charMods = new Map(existing.character_modifiers || []);
+				const arr = charMods.get(j) || [];
+				if (!arr.includes(CONDITIONS_CHOICE_REQUIRED)) {
+					charMods.set(j, [...arr, CONDITIONS_CHOICE_REQUIRED]);
+				}
+				featureErrors.set(i, { ...existing, character_modifiers: charMods });
 			}
 		}
 	}
@@ -446,6 +507,7 @@
 			formForcedInVault = item.forced_in_vault;
 			formFeatures = JSON.parse(JSON.stringify(item.features));
 			formChoices = JSON.parse(JSON.stringify(item.choices));
+			ensureExperienceChoicesForModifiers();
 			// Clear pending image file on reset
 			hasPendingImageFile = false;
 			// Clear errors on reset
@@ -608,7 +670,7 @@
 					<Checkbox id="hb-domain-card-tokens" bind:checked={formTokens} />
 					<label for="hb-domain-card-tokens" class="text-xs">Has tokens</label>
 				</div>
-				<div class="flex items- gap-2">
+				<div class="flex items-center gap-2">
 					<Checkbox id="hb-domain-card-applies-in-vault" bind:checked={formAppliesInVault} />
 					<label for="hb-domain-card-applies-in-vault" class="text-xs cursor-pointer"						>
 						<p>Applies in Vault</p>
@@ -663,7 +725,7 @@
 						bind:feature={formFeatures[index]}
 						onRemove={() => removeFeature(index)}
 						errors={featureErrors.get(index)}
-						domainCardChoices={formChoices}
+						bind:domainCardChoices={formChoices}
 						domainCardId={item.compendium_id}
 					/>
 				</Dropdown>

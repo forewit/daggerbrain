@@ -11,6 +11,7 @@
 	import * as Collapsible from '$lib/components/ui/collapsible';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import HomebrewCharacterConditions from './conditions-select.svelte';
+	import { CONDITIONS_CHOICE_REQUIRED } from '../form-schemas';
 	import { cn, capitalize } from '$lib/utils';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 
@@ -19,7 +20,7 @@
 		onModifierChange,
 		onRemove,
 		errors,
-		domainCardChoices,
+		domainCardChoices = $bindable(),
 		domainCardId
 	}: {
 		modifier?: CharacterModifier;
@@ -55,6 +56,10 @@
 	}
 
 	const compendium = getCompendiumContext();
+
+	// Split errors: target select vs conditions choice (routed to conditions-select)
+	let targetErrors = $derived(errors?.filter((e) => e !== CONDITIONS_CHOICE_REQUIRED) ?? []);
+	let conditionsChoiceError = $derived(errors?.find((e) => e === CONDITIONS_CHOICE_REQUIRED));
 
 	// Extract types from CharacterModifier
 	type ModifierBehaviour = CharacterModifier['behaviour'];
@@ -135,13 +140,78 @@
 		max_short_rest_actions: 'Max Short Rest Actions',
 		max_long_rest_actions: 'Max Long Rest Actions',
 		trait: 'Trait',
-		experience_from_domain_card_choice_selection: 'Experience from Domain Card Choice'
+		experience_from_domain_card_choice_selection: 'Experience'
 	};
 
+	// Generate sequential experience choice ID
+	function generateExperienceChoiceId(choices: DomainCardChoice[]): string {
+		let counter = 1;
+		let candidateId = `experience_${counter}`;
+		while (choices.some((c) => c.choice_id === candidateId)) {
+			counter++;
+			candidateId = `experience_${counter}`;
+		}
+		return candidateId;
+	}
+
+	// Ensure experience choice exists and return its choice_id
+	function ensureExperienceChoice(max: number): string {
+		if (!domainCardChoices) {
+			domainCardChoices = [];
+		}
+
+		const existingChoiceId =
+			effectiveModifier?.target === 'experience_from_domain_card_choice_selection'
+				? (effectiveModifier as any).choice_id
+				: null;
+
+		// If modifier already has a choice_id, try to find or create that specific choice
+		if (existingChoiceId) {
+			const existingChoice = domainCardChoices.find(
+				(c) => c.choice_id === existingChoiceId && c.type === 'experience'
+			);
+
+			if (existingChoice) {
+				// Update max value by creating a new array
+				domainCardChoices = domainCardChoices.map((c) =>
+					c.choice_id === existingChoiceId && c.type === 'experience'
+						? { ...c, max }
+						: c
+				);
+				return existingChoiceId;
+			} else {
+				// Choice ID exists in modifier but choice doesn't exist - create it
+				const newChoice: DomainCardChoice = {
+					choice_id: existingChoiceId,
+					type: 'experience',
+					max: max,
+					conditional_choice: null
+				};
+				domainCardChoices = [...domainCardChoices, newChoice];
+				return existingChoiceId;
+			}
+		}
+
+		// No existing choice_id - create new one with generated ID
+		const newChoiceId = generateExperienceChoiceId(domainCardChoices);
+		const newChoice: DomainCardChoice = {
+			choice_id: newChoiceId,
+			type: 'experience',
+			max: max,
+			conditional_choice: null
+		};
+
+		domainCardChoices = [...domainCardChoices, newChoice];
+		return newChoiceId;
+	}
+
+	// Remove experience choice when modifier is removed
+	function removeExperienceChoice(choiceId: string) {
+		if (!domainCardChoices || !choiceId) return;
+		domainCardChoices = domainCardChoices.filter((c) => c.choice_id !== choiceId);
+	}
+
 	// Get experience-type choices for dropdown
-	let experienceChoices = $derived(
-		domainCardChoices?.filter((choice) => choice.type === 'experience') || []
-	);
 
 	// Trait options - using TraitIds type
 	const traitOptions: TraitIds[] = [
@@ -303,18 +373,14 @@
 				trait: existingTrait
 			} as CharacterModifier;
 		} else if (newTarget === 'experience_from_domain_card_choice_selection') {
-			// Preserve choice_id if already set, otherwise use first experience choice or empty
-			const existingChoiceId =
-				'target' in currentModifier &&
-				currentModifier.target === 'experience_from_domain_card_choice_selection'
-					? ((currentModifier as any).choice_id ?? experienceChoices[0]?.choice_id ?? '')
-					: experienceChoices[0]?.choice_id ?? '';
+			// Create or get existing experience choice
+			const choiceId = ensureExperienceChoice(1); // Default max is 1
 			newModifier = {
 				...baseProps,
 				...typeProps,
 				target: 'experience_from_domain_card_choice_selection',
 				domain_card_id: domainCardId || '',
-				choice_id: existingChoiceId
+				choice_id: choiceId
 			} as CharacterModifier;
 		} else {
 			// Simple target
@@ -336,7 +402,7 @@
 			for="target-select"
 			class={cn(
 				'text-xs font-medium text-muted-foreground',
-				errors && errors.length > 0 && 'text-destructive'
+				targetErrors.length > 0 && 'text-destructive'
 			)}>Character attribute to modify</label
 		>
 		<Select.Root
@@ -353,7 +419,7 @@
 		>
 			<Select.Trigger
 				id="target-select"
-				class={cn('w-full', errors && errors.length > 0 && 'border-destructive')}
+				class={cn('w-full', targetErrors.length > 0 && 'border-destructive')}
 			>
 				<p class="truncate">
 					{selectedTarget &&
@@ -369,7 +435,7 @@
 					<Select.Item value={target}>{targetLabels[target]}</Select.Item>
 				{/each}
 				<Select.Item value="trait">{targetLabels.trait}</Select.Item>
-				{#if domainCardChoices && experienceChoices.length > 0}
+				{#if domainCardChoices}
 					<Select.Item value="experience_from_domain_card_choice_selection">
 						{targetLabels.experience_from_domain_card_choice_selection}
 					</Select.Item>
@@ -412,49 +478,28 @@
 	<!-- Experience from Domain Card Choice Selection fields -->
 	{#if currentTarget === 'experience_from_domain_card_choice_selection' && modifier && modifier.target === 'experience_from_domain_card_choice_selection'}
 		{@const experienceModifier = modifier}
+		{@const experienceChoice = domainCardChoices?.find((c) => c.choice_id === experienceModifier.choice_id && c.type === 'experience')}
 		<div class="flex flex-col gap-2">
-			{#if domainCardId}
-				<div class="flex flex-col gap-1">
-					<label for="domain-card-id-display" class="text-xs font-medium text-muted-foreground"
-						>Domain Card ID</label
-					>
-					<Input
-						id="domain-card-id-display"
-						value={experienceModifier.domain_card_id || domainCardId}
-						disabled
-						class="bg-muted"
-					/>
-				</div>
-			{/if}
 			<div class="flex flex-col gap-1">
-				<label for="choice-id-select" class="text-xs font-medium text-muted-foreground"
-					>Choice</label
+				<label for="max-experiences-input" class="text-xs font-medium text-muted-foreground"
+					>Max number of experiences</label
 				>
-				<Select.Root
-					type="single"
-					value={experienceModifier.choice_id || ''}
-					onValueChange={(value) => {
-						if (value) {
-							updateModifier({
-								...experienceModifier,
-								choice_id: value,
-								domain_card_id: domainCardId || experienceModifier.domain_card_id || ''
-							});
-						}
+				<Input
+					id="max-experiences-input"
+					type="number"
+					value={experienceChoice ? String(experienceChoice.max) : '1'}
+					oninput={(e) => {
+						const maxValue = Number(e.currentTarget.value) || 1;
+						const choiceId = ensureExperienceChoice(maxValue);
+						updateModifier({
+							...experienceModifier,
+							choice_id: choiceId,
+							domain_card_id: domainCardId || experienceModifier.domain_card_id || ''
+						});
 					}}
-				>
-					<Select.Trigger id="choice-id-select" class="w-full">
-						<p class="truncate">
-							{experienceModifier.choice_id ||
-								(experienceChoices.length > 0 ? 'Select choice' : 'No experience choices available')}
-						</p>
-					</Select.Trigger>
-					<Select.Content>
-						{#each experienceChoices as choice}
-							<Select.Item value={choice.choice_id}>{choice.choice_id}</Select.Item>
-						{/each}
-					</Select.Content>
-				</Select.Root>
+					min="1"
+					step="1"
+				/>
 			</div>
 		</div>
 	{/if}
@@ -598,6 +643,7 @@
 			<p class="text-xs font-medium text-muted-foreground">Conditions</p>
 			<HomebrewCharacterConditions
 				bind:conditions={modifier.character_conditions}
+				choiceRequiredError={conditionsChoiceError}
 				domainCardChoices={domainCardChoices}
 				domainCardId={domainCardId}
 			/>
@@ -610,7 +656,16 @@
 			type="button"
 			size="sm"
 			variant="link"
-			onclick={onRemove}
+			onclick={() => {
+				// Remove associated experience choice if it exists
+				if (
+					effectiveModifier?.target === 'experience_from_domain_card_choice_selection' &&
+					(effectiveModifier as any).choice_id
+				) {
+					removeExperienceChoice((effectiveModifier as any).choice_id);
+				}
+				onRemove();
+			}}
 			class="mx-auto w-min text-destructive"
 		>
 			Delete Character Modifier

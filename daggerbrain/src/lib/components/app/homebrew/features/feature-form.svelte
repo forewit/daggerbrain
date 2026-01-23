@@ -12,7 +12,7 @@
 		feature = $bindable(),
 		onRemove,
 		errors,
-		domainCardChoices,
+		domainCardChoices = $bindable(),
 		domainCardId
 	}: {
 		feature: Feature;
@@ -144,7 +144,7 @@
 						bind:modifier={feature.character_modifiers[index]}
 						onRemove={() => removeCharacterModifier(index)}
 						errors={errors?.character_modifiers?.get(index)}
-						domainCardChoices={domainCardChoices}
+						bind:domainCardChoices={domainCardChoices}
 						domainCardId={domainCardId}
 					/>
 				{/each}

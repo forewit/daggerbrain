@@ -11,14 +11,19 @@
 
 	let { choices = $bindable() }: { choices: DomainCardChoice[] } = $props();
 
-	const choiceTypeOptions = ['arbitrary', 'experience'] as const;
+	// Track which dropdowns are open by choice_id
+	// For new choices without choice_id, use index-based temporary identifier
+	let dropdownOpenStates = $state<Record<string, boolean>>({});
 
-	// Track which dropdown is open (same pattern as features)
-	// svelte-ignore non_reactive_update
-	let dropdownOpenIndex = -1;
+	// Helper to get a unique key for a choice
+	function getChoiceKey(choice: DomainCardChoice, indexInFiltered: number): string {
+		if (choice.choice_id) return choice.choice_id;
+		// For new choices, use index in filtered array as temporary key
+		return `__temp_${indexInFiltered}`;
+	}
 
 	function addChoice() {
-		dropdownOpenIndex = choices.length;
+		const arbitraryChoices = choices.filter(c => c.type === 'arbitrary');
 		const newChoice: DomainCardChoice = {
 			choice_id: '',
 			conditional_choice: null,
@@ -33,21 +38,25 @@
 			]
 		};
 		choices = [...choices, newChoice];
+		const tempKey = `__temp_${arbitraryChoices.length}`;
+		dropdownOpenStates = { ...dropdownOpenStates, [tempKey]: true };
 
 		tick().then(() => {
-			dropdownOpenIndex = -1;
+			dropdownOpenStates = { ...dropdownOpenStates, [tempKey]: false };
 		});
 	}
 
 	function removeChoice(index: number) {
-		choices = choices.filter((_, i) => i !== index);
-		// Close dropdown if the removed choice was open
-		if (dropdownOpenIndex === index) {
-			dropdownOpenIndex = -1;
-		} else if (dropdownOpenIndex > index) {
-			// Re-index if a choice before the open one was removed
-			dropdownOpenIndex = dropdownOpenIndex - 1;
-		}
+		// Find the actual choice in the filtered arbitrary choices
+		const arbitraryChoices = choices.filter(c => c.type === 'arbitrary');
+		const choiceToRemove = arbitraryChoices[index];
+		if (!choiceToRemove) return;
+		
+		const key = getChoiceKey(choiceToRemove, index);
+		choices = choices.filter((c) => c !== choiceToRemove);
+		const next = { ...dropdownOpenStates };
+		delete next[key];
+		dropdownOpenStates = next;
 	}
 
 	function addOption(choiceIndex: number) {
@@ -56,8 +65,15 @@
 			title: '',
 			short_title: ''
 		};
+		const arbitraryChoices = choices.filter(c => c.type === 'arbitrary');
+		const choiceToUpdate = arbitraryChoices[choiceIndex];
+		if (!choiceToUpdate) return;
+		
+		const actualIndex = choices.findIndex(c => c === choiceToUpdate);
+		if (actualIndex === -1) return;
+		
 		choices = choices.map((choice, i) => {
-			if (i === choiceIndex && choice.type === 'arbitrary') {
+			if (i === actualIndex && choice.type === 'arbitrary') {
 				return {
 					...choice,
 					options: [...choice.options, newOption]
@@ -68,8 +84,15 @@
 	}
 
 	function removeOption(choiceIndex: number, optionIndex: number) {
+		const arbitraryChoices = choices.filter(c => c.type === 'arbitrary');
+		const choiceToUpdate = arbitraryChoices[choiceIndex];
+		if (!choiceToUpdate) return;
+		
+		const actualIndex = choices.findIndex(c => c === choiceToUpdate);
+		if (actualIndex === -1) return;
+		
 		choices = choices.map((choice, i) => {
-			if (i === choiceIndex && choice.type === 'arbitrary') {
+			if (i === actualIndex && choice.type === 'arbitrary') {
 				return {
 					...choice,
 					options: choice.options.filter((_, j) => j !== optionIndex)
@@ -80,8 +103,15 @@
 	}
 
 	function updateChoiceField(choiceIndex: number, field: string, value: unknown) {
+		const arbitraryChoices = choices.filter(c => c.type === 'arbitrary');
+		const choiceToUpdate = arbitraryChoices[choiceIndex];
+		if (!choiceToUpdate) return;
+		
+		const actualIndex = choices.findIndex(c => c === choiceToUpdate);
+		if (actualIndex === -1) return;
+		
 		choices = choices.map((choice, i) => {
-			if (i === choiceIndex) {
+			if (i === actualIndex) {
 				return { ...choice, [field]: value };
 			}
 			return choice;
@@ -107,8 +137,15 @@
 		field: string,
 		value: string
 	) {
+		const arbitraryChoices = choices.filter(c => c.type === 'arbitrary');
+		const choiceToUpdate = arbitraryChoices[choiceIndex];
+		if (!choiceToUpdate) return;
+		
+		const actualIndex = choices.findIndex(c => c === choiceToUpdate);
+		if (actualIndex === -1) return;
+		
 		choices = choices.map((choice, i) => {
-			if (i === choiceIndex && choice.type === 'arbitrary') {
+			if (i === actualIndex && choice.type === 'arbitrary') {
 				return {
 					...choice,
 					options: choice.options.map((option, j) => {
@@ -135,8 +172,15 @@
 		field: 'choice_id' | 'selection_id' | null,
 		value: string | null
 	) {
+		const arbitraryChoices = choices.filter(c => c.type === 'arbitrary');
+		const choiceToUpdate = arbitraryChoices[choiceIndex];
+		if (!choiceToUpdate) return;
+		
+		const actualIndex = choices.findIndex(c => c === choiceToUpdate);
+		if (actualIndex === -1) return;
+		
 		choices = choices.map((choice, i) => {
-			if (i === choiceIndex) {
+			if (i === actualIndex) {
 				if (field === null) {
 					return { ...choice, conditional_choice: null };
 				}
@@ -166,10 +210,15 @@
 		</Button>
 	</div>
 	<div class="flex flex-col gap-3">
-		{#each choices as choice, choiceIndex (choiceIndex)}
+		{#each choices.filter(c => c.type === 'arbitrary') as choice, choiceIndex (choiceIndex)}
+			{@const choiceKey = getChoiceKey(choice, choiceIndex)}
+
 			<Dropdown
 				title={choice.choice_id || 'Unnamed choice'}
-				open={dropdownOpenIndex === choiceIndex}
+				open={dropdownOpenStates[choiceKey] ?? false}
+				onOpenChange={(v) => {
+					dropdownOpenStates = { ...dropdownOpenStates, [choiceKey]: v };
+				}}
 			>
 				<div class="flex flex-col gap-3">
 					<!-- Choice Name -->
@@ -185,49 +234,11 @@
 						/>
 					</div>
 
-					<!-- Choice Type -->
-					 <div class="flex gap-2">
-					<div class="flex flex-col gap-1 grow">
-						<label for="domain-choice-type-{choiceIndex}" class="text-xs text-muted-foreground"
-							>Choice Type</label
-						>
-						<Select.Root
-							type="single"
-							value={choice.type}
-							onValueChange={(v) => {
-									if (v) {
-									const newType = v as 'arbitrary' | 'experience';
-									updateChoiceField(choiceIndex, 'type', newType);
-									if (newType === 'experience') {
-										updateChoiceField(choiceIndex, 'options', []);
-									} else if (newType === 'arbitrary') {
-										// Initialize with one empty option when switching to arbitrary
-										updateChoiceField(choiceIndex, 'options', [
-											{
-												selection_id: '',
-												title: '',
-												short_title: ''
-											}
-										]);
-									}
-								}
-							}}
-						>
-							<Select.Trigger id="domain-choice-type-{choiceIndex}" class="w-full">
-								<p class="truncate">{choice.type}</p>
-							</Select.Trigger>
-							<Select.Content>
-								{#each choiceTypeOptions as type}
-									<Select.Item value={type}>{type}</Select.Item>
-								{/each}
-							</Select.Content>
-						</Select.Root>
-					</div>
-
 					<!-- Max -->
-					<div class="flex flex-col gap-1 w-24">
+					<div class="flex gap-2">
+						<div class="flex flex-col gap-1 w-24">
 						<label for="domain-max-selections-{choiceIndex}" class="text-xs text-muted-foreground"
-							>Max Selections</label
+							>Max Answers</label
 						>
 						<Input
 							id="domain-max-selections-{choiceIndex}"
@@ -237,8 +248,8 @@
 							placeholder="1"
 							min="1"
 						/>
+						</div>
 					</div>
-				</div>
 
 					<!-- Conditional Choice -->
 					<div class="flex flex-col gap-2">
@@ -259,15 +270,15 @@
 								for="domain-conditional-checkbox-{choiceIndex}"
 								class="text-xs text-muted-foreground cursor-pointer"
 							>
-								Conditional to the answer of another choice
+								Requires an answer to a different choice
 							</label>
 						</div>
 						{#if choice.conditional_choice !== null}
-							<div class="flex gap-2">
+							<div class="grid grid-cols-2 gap-2">
 								<div class="flex flex-col gap-1 flex-1">
 									<label
 										for="domain-conditional-choice-select-{choiceIndex}"
-										class="text-xs text-muted-foreground">Conditional choice</label
+										class="text-xs text-muted-foreground">Choice</label
 									>
 									<Select.Root
 										type="single"

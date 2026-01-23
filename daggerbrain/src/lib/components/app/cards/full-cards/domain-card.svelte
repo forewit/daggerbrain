@@ -163,7 +163,14 @@
 							conditional_selection_id &&
 							character?.domain_card_choices[card.compendium_id]?.[conditional_choice_id] &&
 							character.domain_card_choices[card.compendium_id][conditional_choice_id].includes(conditional_selection_id)))}
-			{#if conditionalMet}
+			{@const modifierUnconditionalForThisChoice = card.features.some((f) =>
+				f.character_modifiers.some((m) =>
+					m.target === 'experience_from_domain_card_choice_selection' &&
+					(m as { choice_id?: string }).choice_id === choice.choice_id &&
+					!(m.character_conditions || []).some((c) => (c as { type?: string }).type === 'domain_card_choice')
+				)
+			)}
+			{#if conditionalMet || modifierUnconditionalForThisChoice}
 				{#if choice.type === 'arbitrary'}
 					{#if preview}
 						{#if !localChoiceSelections[choice.choice_id]}

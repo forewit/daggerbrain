@@ -24,6 +24,9 @@ import {
 
 export { CharacterModifierSchema, WeaponModifierSchema, FeatureSchema };
 
+/** Error message when domain_card_choice condition is set but choice_id is empty. */
+export const CONDITIONS_CHOICE_REQUIRED = 'Conditions: Choice is required';
+
 // ============================================================================
 // Weapon Form Schema - derives from WeaponSchema without auto-generated fields
 // ============================================================================
