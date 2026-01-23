@@ -2729,37 +2729,58 @@ function createCharacter(id: string) {
 		}
 
 		// start from base + marked trait bonuses
+		const evolution_trait =
+			character.class_choices[compendium.classes.druid.compendium_id]?.['evolution_trait']?.[0];
+		const evolution_trait_bonus = 1;
+
+		const beastform_trait = derived_beastform?.character_trait?.trait;
+		const beastform_trait_bonus = derived_beastform?.character_trait?.bonus ?? 0;
+
+		const apply_beastform_bonuses = character.chosen_beastform?.apply_beastform_bonuses === true;
+
 		let new_traits = {
 			agility:
 				(base_traits.agility === null ? 0 : base_traits.agility) +
 				(tier_2_marked_traits.agility ? 1 : 0) +
 				(tier_3_marked_traits.agility ? 1 : 0) +
-				(tier_4_marked_traits.agility ? 1 : 0),
+				(tier_4_marked_traits.agility ? 1 : 0) +
+				(apply_beastform_bonuses && beastform_trait === 'agility' ? beastform_trait_bonus : 0) +
+				(apply_beastform_bonuses && evolution_trait === 'agility' ? evolution_trait_bonus : 0),
 			strength:
 				(base_traits.strength === null ? 0 : base_traits.strength) +
 				(tier_2_marked_traits.strength ? 1 : 0) +
 				(tier_3_marked_traits.strength ? 1 : 0) +
-				(tier_4_marked_traits.strength ? 1 : 0),
+				(tier_4_marked_traits.strength ? 1 : 0) +
+				(apply_beastform_bonuses && beastform_trait === 'strength' ? beastform_trait_bonus : 0) +
+				(apply_beastform_bonuses && evolution_trait === 'strength' ? evolution_trait_bonus : 0),
 			finesse:
 				(base_traits.finesse === null ? 0 : base_traits.finesse) +
 				(tier_2_marked_traits.finesse ? 1 : 0) +
 				(tier_3_marked_traits.finesse ? 1 : 0) +
-				(tier_4_marked_traits.finesse ? 1 : 0),
+				(tier_4_marked_traits.finesse ? 1 : 0) +
+				(apply_beastform_bonuses && beastform_trait === 'finesse' ? beastform_trait_bonus : 0) +
+				(apply_beastform_bonuses && evolution_trait === 'finesse' ? evolution_trait_bonus : 0),
 			instinct:
 				(base_traits.instinct === null ? 0 : base_traits.instinct) +
 				(tier_2_marked_traits.instinct ? 1 : 0) +
 				(tier_3_marked_traits.instinct ? 1 : 0) +
-				(tier_4_marked_traits.instinct ? 1 : 0),
+				(tier_4_marked_traits.instinct ? 1 : 0) +
+				(apply_beastform_bonuses && beastform_trait === 'instinct' ? beastform_trait_bonus : 0) +
+				(apply_beastform_bonuses && evolution_trait === 'instinct' ? evolution_trait_bonus : 0),
 			presence:
 				(base_traits.presence === null ? 0 : base_traits.presence) +
 				(tier_2_marked_traits.presence ? 1 : 0) +
 				(tier_3_marked_traits.presence ? 1 : 0) +
-				(tier_4_marked_traits.presence ? 1 : 0),
+				(tier_4_marked_traits.presence ? 1 : 0) +
+				(apply_beastform_bonuses && beastform_trait === 'presence' ? beastform_trait_bonus : 0) +
+				(apply_beastform_bonuses && evolution_trait === 'presence' ? evolution_trait_bonus : 0),
 			knowledge:
 				(base_traits.knowledge === null ? 0 : base_traits.knowledge) +
 				(tier_2_marked_traits.knowledge ? 1 : 0) +
 				(tier_3_marked_traits.knowledge ? 1 : 0) +
-				(tier_4_marked_traits.knowledge ? 1 : 0)
+				(tier_4_marked_traits.knowledge ? 1 : 0) +
+				(apply_beastform_bonuses && beastform_trait === 'knowledge' ? beastform_trait_bonus : 0) +
+				(apply_beastform_bonuses && evolution_trait === 'knowledge' ? evolution_trait_bonus : 0)
 		};
 
 		// apply bonus effects targeting traits (additive or derived)
@@ -3013,6 +3034,11 @@ function createCharacter(id: string) {
 		}
 
 		new_evasion = apply_modifiers(base_character_modifiers, 'evasion', new_evasion, 'base');
+
+		if (character.chosen_beastform?.apply_beastform_bonuses) {
+			new_evasion += derived_beastform?.evasion_bonus ?? 0;
+		}
+
 		new_evasion = apply_modifiers(bonus_character_modifiers, 'evasion', new_evasion, 'bonus');
 		new_evasion = apply_modifiers(override_character_modifiers, 'evasion', new_evasion, 'override');
 

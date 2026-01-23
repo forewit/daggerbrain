@@ -99,7 +99,7 @@
 	let toHit = $derived.by(() => {
 		if (!weapon) return 0;
 		if (!currentTrait || !traits) return weapon.attack_roll_bonus;
-		const traitValue = traits[currentTrait] || 0;
+		const traitValue = traits[currentTrait] ?? 0;
 		return weapon.attack_roll_bonus + traitValue;
 	});
 </script>

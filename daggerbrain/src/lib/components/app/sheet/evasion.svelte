@@ -9,17 +9,6 @@
 	let derivedBeastform = $derived(context.derived_beastform);
 	let character = $derived(context.character);
 
-	let displayEvasion = $derived.by(() => {
-		if (
-			derivedBeastform &&
-			derivedBeastform.evasion_bonus !== 0 &&
-			character?.chosen_beastform?.apply_beastform_bonuses
-		) {
-			return evasion + derivedBeastform.evasion_bonus;
-		}
-		return evasion;
-	});
-
 	let hasBeastformBonus = $derived(
 		derivedBeastform !== null &&
 			derivedBeastform.evasion_bonus !== 0 &&
@@ -85,7 +74,7 @@
 			hasBeastformBonus && 'text-accent'
 		)}
 	>
-		{displayEvasion}
+		{evasion}
 	</p>
 	<p
 		class={cn(

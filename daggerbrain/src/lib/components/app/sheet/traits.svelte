@@ -27,27 +27,21 @@
 
 {#snippet trait(trait: keyof Traits)}
 	{@const applyBonuses = character?.chosen_beastform?.apply_beastform_bonuses === true}
-	{@const beastformBonus =
-		applyBonuses && derivedBeastform && derivedBeastform.character_trait.trait === trait
-			? derivedBeastform.character_trait.bonus
-			: 0}
-	{@const evolutionBonus = evolution_trait === trait ? 1 : 0}
-	{@const totalBonus = beastformBonus + evolutionBonus}
-	{@const displayValue = traits[trait] !== null ? traits[trait]! + totalBonus : null}
+	{@const traitValue = traits[trait] ?? 0}
 	{@const hasBonus =
-		(applyBonuses &&
-			derivedBeastform !== null &&
-			derivedBeastform.character_trait.trait === trait &&
-			beastformBonus !== 0) ||
-		evolutionBonus !== 0}
+		applyBonuses &&
+		(evolution_trait === trait || derivedBeastform?.character_trait?.trait === trait)}
 	<div>
-		<button class="relative group" onclick={()=>{
-			diceCtx.roll({
-				name: TRAITS[trait].name,
-				dice: [{ type: 'hope' }, { type: 'fear' }],
-				modifier: traits[trait] !== null ? traits[trait]! + totalBonus : 0
-			});
-		}}>
+		<button
+			class="group relative"
+			onclick={() => {
+				diceCtx.roll({
+					name: TRAITS[trait].name,
+					dice: [{ type: 'hope' }, { type: 'fear' }],
+					modifier: traitValue
+				});
+			}}
+		>
 			<svg
 				class="size-22 text-primary-muted group-hover:text-primary"
 				xmlns="http://www.w3.org/2000/svg"
@@ -100,11 +94,12 @@
 			</p>
 
 			<p
-				class={cn('absolute top-7.5 left-1/2 -translate-x-1/2 text-2xl font-bold',
+				class={cn(
+					'absolute top-7.5 left-1/2 -translate-x-1/2 text-2xl font-bold',
 					hasBonus && 'text-accent'
 				)}
 			>
-				{displayValue !== null && displayValue > 0 ? '+' + displayValue : displayValue}
+				{traitValue !== null && traitValue > 0 ? '+' + traitValue : traitValue}
 			</p>
 		</button>
 

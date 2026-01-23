@@ -33,27 +33,22 @@
 
 	const characterCtx = getCharacterContext();
 	const diceCtx = getDiceContext();
-	
-    let character_proficiency = $derived(characterCtx.proficiency);
-	
-    let diceStringWithProficiency = $derived.by(() => {
+
+	let character_proficiency = $derived(characterCtx.proficiency);
+
+	let diceStringWithProficiency = $derived.by(() => {
 		if (!restProps.diceString) return '';
 		return applyProficiencyToDice(restProps.diceString, character_proficiency);
 	});
 
-    let combinedModifier = $derived.by(() => {
-        if (restProps.type === 'duality' && restProps.traitId) {
-            return (restProps.modifier ?? 0) + (characterCtx.traits?.[restProps.traitId] ?? 0);
-        }
-        return restProps.modifier ?? 0;
-    })
-    
-    let traitName = $derived.by(() => {
-        if (restProps.type === 'duality' && restProps.traitId) {
-            return TRAITS[restProps.traitId].short_name;
-        }
-        return null;
-    })
+	let Modifier = $derived(restProps.modifier ?? 0);
+
+	let traitName = $derived.by(() => {
+		if (restProps.type === 'duality' && restProps.traitId) {
+			return TRAITS[restProps.traitId].short_name;
+		}
+		return null;
+	});
 
 	function onclick() {
 		if (disabled) return;
@@ -63,7 +58,7 @@
 			diceCtx.roll({
 				name: name,
 				dice: [...parsed.dice, { type: 'hope' }, { type: 'fear' }],
-				modifier: combinedModifier
+				modifier: Modifier
 			});
 		} else if (restProps.type === 'base') {
 			const parsed = parseDiceString(
@@ -72,7 +67,7 @@
 			diceCtx.roll({
 				name: name,
 				dice: [...parsed.dice],
-				modifier: combinedModifier
+				modifier: Modifier
 			});
 		}
 	}
@@ -82,24 +77,20 @@
 	{disabled}
 	{onclick}
 	class={cn(
-		'w-min rounded-full border bg-foreground/5 px-2.5 py-1.5 -m-0.5 text-xs',
-		'hover:border-primary hover:bg-primary/20 hover:ring ring-primary',
+		'-m-0.5 w-min rounded-full border bg-foreground/5 px-2.5 py-1.5 text-xs',
+		'ring-primary hover:border-primary hover:bg-primary/20 hover:ring',
 		className
 	)}
 >
 	{#if restProps.type === 'duality'}
 		{restProps.diceString ? `+${restProps.diceString}` : ''}
-		{combinedModifier >= 0 ? `+${combinedModifier}` : combinedModifier}
-        {traitName}
+		{Modifier >= 0 ? `+${Modifier}` : Modifier}
+		{traitName}
 	{/if}
 
 	{#if restProps.type === 'base'}
 		{(restProps.applyProficiency ? diceStringWithProficiency : restProps.diceString) +
-			(combinedModifier !== 0
-				? combinedModifier > 0
-					? `+${combinedModifier}`
-					: combinedModifier
-				: '')}
+			(Modifier !== 0 ? (Modifier > 0 ? `+${Modifier}` : Modifier) : '')}
 		{restProps.damageType}
 	{/if}
 </button>

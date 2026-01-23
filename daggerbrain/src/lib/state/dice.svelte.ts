@@ -347,9 +347,7 @@ function diceContext() {
 		Box.init();
 	};
 
-	const destroy = () => {
-
-	};
+	const destroy = () => {};
 
 	const roll = (input: RollInput) => {
 		// Validate input
