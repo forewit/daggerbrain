@@ -121,6 +121,37 @@ export const DomainCardFormSchema = DomainCardSchema.omit({
 	source_id: true
 }).extend({
 	title: z.string().min(1, 'Name is required')
+}).superRefine((data, ctx) => {
+	// Validate that all arbitrary choices have non-empty and unique choice_id values
+	const arbitraryChoices = data.choices.filter(c => c.type === 'arbitrary');
+	const nameCounts = new Map<string, number>();
+	
+	// Count occurrences of each name (case-insensitive, trimmed)
+	arbitraryChoices.forEach((choice) => {
+		const name = choice.choice_id.trim();
+		const normalizedName = name.toLowerCase();
+		nameCounts.set(normalizedName, (nameCounts.get(normalizedName) || 0) + 1);
+	});
+	
+	// Check for blank and duplicate names
+	arbitraryChoices.forEach((choice, index) => {
+		const name = choice.choice_id.trim();
+		const normalizedName = name.toLowerCase();
+		
+		if (!name) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				path: ['choices', index, 'choice_id'],
+				message: 'Name is required'
+			});
+		} else if (nameCounts.get(normalizedName)! > 1) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				path: ['choices', index, 'choice_id'],
+				message: 'Name must be unique'
+			});
+		}
+	});
 });
 
 // ============================================================================

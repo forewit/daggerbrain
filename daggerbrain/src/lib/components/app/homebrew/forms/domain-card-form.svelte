@@ -70,6 +70,9 @@
 	// Feature validation state - track detailed errors for each feature
 	const featureErrors = new SvelteMap<number, FeatureValidationErrors>();
 
+	// Choice validation state - track errors for each choice by index in arbitraryChoices array
+	let choiceErrors = $state<Map<number, string[]>>(new Map());
+
 	// Track if validation has been attempted (to show errors only after first submit attempt)
 	let validationAttempted = $state(false);
 
@@ -158,6 +161,10 @@
 		if (featureErrors.size > 0) {
 			return true;
 		}
+		// Check choice errors
+		if (choiceErrors.size > 0) {
+			return true;
+		}
 		return false;
 	});
 
@@ -165,9 +172,9 @@
 	let allErrorMessages = $derived.by(() => {
 		const messages: string[] = [];
 
-		// Add form-level errors (exclude 'features' since individual feature errors are shown)
+		// Add form-level errors (exclude 'features' and 'choices' since individual errors are shown)
 		for (const [key, value] of Object.entries(errors)) {
-			if (value && key !== 'features') {
+			if (value && key !== 'features' && key !== 'choices') {
 				messages.push(`${key}: ${value}`);
 			}
 		}
@@ -194,6 +201,16 @@
 						messages.push(`${featureTitle}, Weapon Modifier ${modIndex + 1}: ${error}`);
 					}
 				}
+			}
+		}
+
+		// Add choice errors
+		const arbitraryChoices = formChoices.filter(c => c.type === 'arbitrary');
+		for (const [index, choiceErrorsList] of choiceErrors) {
+			const choice = arbitraryChoices[index];
+			const choiceName = choice?.choice_id || `Choice ${index + 1}`;
+			for (const error of choiceErrorsList) {
+				messages.push(`${choiceName}: ${error}`);
 			}
 		}
 
@@ -262,6 +279,7 @@
 			// Clear errors when domainCard changes
 			errors = {};
 			featureErrors.clear();
+			choiceErrors = new Map();
 			validationAttempted = false;
 			validatedModifierKeys.clear();
 		}
@@ -284,6 +302,40 @@
 			features: JSON.parse(JSON.stringify(formFeatures)),
 			choices: JSON.parse(JSON.stringify(formChoices))
 		};
+	}
+
+	// Validate choices for blank and duplicate names
+	function validateChoices() {
+		const errors = new Map<number, string[]>();
+		const arbitraryChoices = formChoices.filter(c => c.type === 'arbitrary');
+		const nameCounts = new Map<string, number>();
+		
+		// Count occurrences of each name (case-insensitive, trimmed)
+		arbitraryChoices.forEach((choice) => {
+			const name = choice.choice_id.trim();
+			const normalizedName = name.toLowerCase();
+			nameCounts.set(normalizedName, (nameCounts.get(normalizedName) || 0) + 1);
+		});
+		
+		// Check for blank and duplicate names
+		arbitraryChoices.forEach((choice, index) => {
+			const name = choice.choice_id.trim();
+			const normalizedName = name.toLowerCase();
+			const choiceErrorsList: string[] = [];
+			
+			if (!name) {
+				choiceErrorsList.push('Name is required');
+			} else if (nameCounts.get(normalizedName)! > 1) {
+				choiceErrorsList.push('Name must be unique');
+			}
+			
+			if (choiceErrorsList.length > 0) {
+				errors.set(index, choiceErrorsList);
+			}
+		});
+		
+		choiceErrors = errors;
+		return errors.size === 0;
 	}
 
 	// Validate features and update error state
@@ -386,6 +438,9 @@
 
 		// Re-validate features when they change
 		validateFeatures();
+		
+		// Re-validate choices when they change
+		validateChoices();
 	});
 
 	// Re-validate form fields when they change
@@ -403,6 +458,7 @@
 		formAppliesInVault;
 		formForcedInLoadout;
 		formForcedInVault;
+		formChoices; // Track choices changes for validation
 
 		validateFormFields();
 	});
@@ -447,12 +503,16 @@
 
 		// Validate form-level fields
 		validateFormFields();
+		
+		// Validate choices
+		validateChoices();
 
 		// Check if there are any validation errors
 		const hasFormErrors = Object.keys(errors).length > 0;
 		const hasFeatureErrors = featureErrors.size > 0;
+		const hasChoiceErrors = choiceErrors.size > 0;
 
-		if (hasFormErrors || hasFeatureErrors) {
+		if (hasFormErrors || hasFeatureErrors || hasChoiceErrors) {
 			// Don't set generic error message - errors are shown inline in each feature
 			return;
 		}
@@ -484,6 +544,7 @@
 		// Clear errors on success
 		errors = {};
 		featureErrors.clear();
+		choiceErrors = new Map();
 		validationAttempted = false;
 
 		// Call callback if provided
@@ -503,18 +564,19 @@
 		formCategory = item.category;
 		formTokens = item.tokens;
 		formAppliesInVault = item.applies_in_vault;
-			formForcedInLoadout = item.forced_in_loadout;
-			formForcedInVault = item.forced_in_vault;
-			formFeatures = JSON.parse(JSON.stringify(item.features));
-			formChoices = JSON.parse(JSON.stringify(item.choices));
-			ensureExperienceChoicesForModifiers();
-			// Clear pending image file on reset
-			hasPendingImageFile = false;
-			// Clear errors on reset
-			errors = {};
-			featureErrors.clear();
-			validationAttempted = false;
-			validatedModifierKeys.clear();
+		formForcedInLoadout = item.forced_in_loadout;
+		formForcedInVault = item.forced_in_vault;
+		formFeatures = JSON.parse(JSON.stringify(item.features));
+		formChoices = JSON.parse(JSON.stringify(item.choices));
+		ensureExperienceChoicesForModifiers();
+		// Clear pending image file on reset
+		hasPendingImageFile = false;
+		// Clear errors on reset
+		errors = {};
+		featureErrors.clear();
+		choiceErrors = new Map();
+		validationAttempted = false;
+		validatedModifierKeys.clear();
 
 		// Note: onReset callback removed to prevent infinite recursion
 		// The parent component should handle any additional reset logic if needed
@@ -674,7 +736,7 @@
 					<Checkbox id="hb-domain-card-applies-in-vault" bind:checked={formAppliesInVault} />
 					<label for="hb-domain-card-applies-in-vault" class="text-xs cursor-pointer"						>
 						<p>Applies in Vault</p>
-						<p class="text-muted-foreground">Modifiers will be applied even if the card is not in the character's loadout</p>
+						<p class="text-muted-foreground">Feature modifiers will be applied even if the card is in the vault.</p>
 					</label>
 				</div>
 				<div class="flex items-center gap-2">
@@ -695,7 +757,7 @@
 
 		<!-- Choices -->
 		<div class="flex flex-col gap-2">
-			<HomebrewDomainChoicesEditor bind:choices={formChoices} />
+			<HomebrewDomainChoicesEditor bind:choices={formChoices} errors={choiceErrors} />
 		</div>
 
 	<!-- Features -->
@@ -752,7 +814,7 @@
 				disabled={!formHasChanges || homebrew.saving}
 				class={cn(
 					'h-7',
-					hasValidationErrors && 'cursor-not-allowed border border-destructive hover:bg-primary'
+					hasValidationErrors && 'border border-destructive hover:bg-primary'
 				)}
 			>
 				{#if homebrew.saving}

@@ -95,13 +95,15 @@
 		<label
 			for="hb-feature-title"
 			class={cn('text-xs font-medium text-muted-foreground', errors?.title && 'text-destructive')}
-			>Title</label
-		>
+			>
+			Name
+			{domainCardId && '(optional)'}
+			</label		>
 		<Input
 			id="hb-feature-title"
 			value={feature.title}
 			oninput={(e) => updateTitle(e.currentTarget.value)}
-			placeholder="Feature title"
+			placeholder="Feature name"
 			class={errors?.title ? 'border-destructive' : ''}
 		/>
 		{#if errors?.title}

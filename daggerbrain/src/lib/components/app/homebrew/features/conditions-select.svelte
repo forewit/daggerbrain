@@ -268,7 +268,7 @@
 		return choices?.filter((c) => c.type === 'arbitrary') || [];
 	});
 
-	// Revert domain_card_choice to "None" when the referenced choice is removed
+	// Remove domain_card_choice condition when the referenced choice is deleted
 	$effect(() => {
 		const arbitrary = arbitraryChoices;
 		const choiceIds = new Set(arbitrary.map((c) => c.choice_id));
@@ -280,17 +280,14 @@
 				!choiceIds.has(c.choice_id)
 		);
 		if (!needsUpdate) return;
-		conditions = conditions.map((cond) => {
-			if (
-				cond.type === 'domain_card_choice' &&
+		// Remove the entire condition instead of clearing its fields
+		conditions = conditions.filter(
+			(cond) =>
+				!(cond.type === 'domain_card_choice' &&
 				cond.choice_id &&
 				cond.choice_id.trim() !== '' &&
-				!choiceIds.has(cond.choice_id)
-			) {
-				return { ...cond, choice_id: '', selection_id: '' };
-			}
-			return cond;
-		});
+				!choiceIds.has(cond.choice_id))
+		);
 	});
 
 	// Check if domain card was found in compendium

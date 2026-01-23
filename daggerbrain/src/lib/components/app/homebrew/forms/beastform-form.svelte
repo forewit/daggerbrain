@@ -839,7 +839,7 @@
 				disabled={!formHasChanges || homebrew.saving}
 				class={cn(
 					'h-7',
-					hasValidationErrors && 'cursor-not-allowed border border-destructive hover:bg-primary'
+					hasValidationErrors && 'border border-destructive hover:bg-primary'
 				)}
 			>
 				{#if homebrew.saving}

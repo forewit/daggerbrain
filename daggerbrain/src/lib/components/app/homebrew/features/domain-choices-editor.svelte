@@ -9,20 +9,25 @@
 	import Dropdown from '../../leveling/dropdown.svelte';
 	import { tick } from 'svelte';
 
-	let { choices = $bindable() }: { choices: DomainCardChoice[] } = $props();
+	let { 
+		choices = $bindable(),
+		errors = new Map<number, string[]>()
+	}: { 
+		choices: DomainCardChoice[];
+		errors?: Map<number, string[]>;
+	} = $props();
 
-	// Track which dropdowns are open by choice_id
-	// For new choices without choice_id, use index-based temporary identifier
+	// Track which dropdowns are open by stable index-based key
+	// Use index consistently to avoid key changes when choice_id changes
 	let dropdownOpenStates = $state<Record<string, boolean>>({});
 
 
 	let arbitraryChoices = $derived(choices.filter(c => c.type === 'arbitrary'));
 
-	// Helper to get a unique key for a choice
-	function getChoiceKey(choice: DomainCardChoice, indexInFiltered: number): string {
-		if (choice.choice_id) return choice.choice_id;
-		// For new choices, use index in filtered array as temporary key
-		return `__temp_${indexInFiltered}`;
+	// Helper to get a stable key for a choice based on index
+	// This key doesn't change when choice_id changes, preventing dropdown from closing
+	function getChoiceKey(indexInFiltered: number): string {
+		return `choice_${indexInFiltered}`;
 	}
 
 	function addChoice() {
@@ -40,11 +45,12 @@
 			]
 		};
 		choices = [...choices, newChoice];
-		const tempKey = `__temp_${arbitraryChoices.length}`;
-		dropdownOpenStates = { ...dropdownOpenStates, [tempKey]: true };
+		const newIndex = arbitraryChoices.length - 1;
+		const stableKey = getChoiceKey(newIndex);
+		dropdownOpenStates = { ...dropdownOpenStates, [stableKey]: true };
 
 		tick().then(() => {
-			dropdownOpenStates = { ...dropdownOpenStates, [tempKey]: false };
+			dropdownOpenStates = { ...dropdownOpenStates, [stableKey]: false };
 		});
 	}
 
@@ -53,8 +59,32 @@
 		const choiceToRemove = arbitraryChoices[index];
 		if (!choiceToRemove) return;
 		
-		const key = getChoiceKey(choiceToRemove, index);
-		choices = choices.filter((c) => c !== choiceToRemove);
+		// Get the choice_id of the choice being removed
+		const removedChoiceId = choiceToRemove.choice_id;
+		
+		// Remove the choice and clean up conditional_choice references
+		choices = choices.map((choice) => {
+			// If this is the choice being removed, exclude it
+			if (choice === choiceToRemove) {
+				return null; // Mark for removal
+			}
+			
+			// If this choice has a conditional_choice pointing to the removed choice, clear it
+			if (
+				choice.conditional_choice &&
+				choice.conditional_choice.choice_id === removedChoiceId
+			) {
+				return {
+					...choice,
+					conditional_choice: null
+				};
+			}
+			
+			return choice;
+		}).filter((c): c is DomainCardChoice => c !== null);
+		
+		// Clean up dropdown state
+		const key = getChoiceKey(index);
 		const next = { ...dropdownOpenStates };
 		delete next[key];
 		dropdownOpenStates = next;
@@ -207,7 +237,8 @@
 	</div>
 	<div class="flex flex-col gap-3">
 		{#each arbitraryChoices as choice, choiceIndex (choiceIndex)}
-			{@const choiceKey = getChoiceKey(choice, choiceIndex)}
+			{@const choiceKey = getChoiceKey(choiceIndex)}
+			{@const choiceErrors = errors.get(choiceIndex) || []}
 
 			<Dropdown
 				title={choice.choice_id || 'Unnamed choice'}
@@ -215,9 +246,15 @@
 				onOpenChange={(v) => {
 					dropdownOpenStates = { ...dropdownOpenStates, [choiceKey]: v };
 				}}
+				class={errors.has(choiceIndex)
+					? 'data-[open=false]:border data-[open=false]:border-destructive'
+					: ''}
 			>
-				<div class="flex flex-col gap-3">
-					<!-- Choice Name -->
+				<div class="flex flex-col gap-4">
+					
+
+					<div class="flex gap-2">
+						<!-- Choice Name -->
 					<div class="flex flex-col gap-1">
 						<label for="domain-choice-id-{choiceIndex}" class="text-xs text-muted-foreground"
 							>Name</label
@@ -227,11 +264,16 @@
 							value={choice.choice_id}
 							oninput={(e) => updateChoiceField(choiceIndex, 'choice_id', e.currentTarget.value)}
 							placeholder="Name for this choice"
+							class={choiceErrors.length > 0 ? 'border-destructive' : ''}
 						/>
+						{#if choiceErrors.length > 0}
+							{#each choiceErrors as error}
+								<p class="text-xs text-destructive">{error}</p>
+							{/each}
+						{/if}
 					</div>
 
-					<!-- Max -->
-					<div class="flex gap-2">
+					<!-- max answers -->
 						<div class="flex flex-col gap-1 w-24">
 						<label for="domain-max-selections-{choiceIndex}" class="text-xs text-muted-foreground"
 							>Max Answers</label
@@ -266,7 +308,7 @@
 								for="domain-conditional-checkbox-{choiceIndex}"
 								class="text-xs text-muted-foreground cursor-pointer"
 							>
-								Hidden until specific choice is answered
+								Hidden until another choice is answered
 							</label>
 						</div>
 						{#if choice.conditional_choice !== null}
@@ -281,7 +323,7 @@
 										value={choice.conditional_choice?.choice_id || ''}
 										onValueChange={(value) => {
 											if (value) {
-												const selectedChoice = choices.find((c, i) => i !== choiceIndex && c.choice_id === value);
+												const selectedChoice = arbitraryChoices.find((c, idx) => idx !== choiceIndex && c.choice_id === value);
 												updateConditionalChoice(choiceIndex, 'choice_id', value);
 												// Auto-select first option if available
 												if (selectedChoice?.type === 'arbitrary' && selectedChoice.options.length > 0) {

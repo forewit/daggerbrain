@@ -359,7 +359,7 @@
 								size="sm"
 								class={cn(
 									'h-7',
-									hasErrors && 'cursor-not-allowed border border-destructive hover:bg-primary'
+									hasErrors && 'border border-destructive hover:bg-primary'
 								)}
 								disabled={!hasChanges || homebrew.saving}
 								hidden={!hasChanges && !homebrew.saving}
