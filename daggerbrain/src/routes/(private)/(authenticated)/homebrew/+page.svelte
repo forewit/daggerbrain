@@ -1006,9 +1006,8 @@
 	function getItemSubtitle(entry: FilteredItem): string {
 		switch (entry.type) {
 			case 'primary_weapon':
-				return `Tier ${getItemTier(entry)} Primary Weapon`;
 			case 'secondary_weapon':
-				return `Tier ${getItemTier(entry)} Secondary Weapon`;
+				return `Tier ${getItemTier(entry)} ${entry.item.category || 'Primary'} Weapon`;
 			case 'armor':
 				return `Tier ${getItemTier(entry)} Armor`;
 			case 'beastform':
