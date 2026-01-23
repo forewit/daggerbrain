@@ -222,8 +222,11 @@
 	>
 		{#if showPicker}
 			<div class="flex min-h-0 flex-col items-center gap-2 overflow-x-hidden overflow-y-auto">
-				<Button class="mb-0.5" size="icon" variant="link" onclick={() => (showHistory = !showHistory)}
-					><History class="size-5" /></Button
+				<Button
+					class="mb-0.5"
+					size="icon"
+					variant="link"
+					onclick={() => (showHistory = !showHistory)}><History class="size-5" /></Button
 				>
 				{#each STANDARD_DICE_PICKER_CONFIG as config}
 					{@const DiceComponent = DICE_COMPONENTS[config.type]}
@@ -500,7 +503,7 @@
 			<Sheet.Description>See the last 20 rolls you made.</Sheet.Description>
 		</Sheet.Header>
 
-		<div class="flex flex-col-reverse gap-4 overflow-y-auto px-4" >
+		<div class="flex flex-col-reverse gap-4 overflow-y-auto px-4">
 			{#each previousRolls as roll, index (roll.id)}
 				{@const isRollingState = roll.status === 'rolling'}
 				{@const statusText = diceCtx.getRollStatusText(roll)}

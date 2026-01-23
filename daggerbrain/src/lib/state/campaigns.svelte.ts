@@ -437,7 +437,12 @@ function campaignContext() {
 		if (!id) return;
 
 		await reset_invite_code({ campaign_id: id });
-		// Query refresh is handled by the remote command - state will update automatically
+		// Clear lastSavedCampaignState to allow load() to accept the new server state
+		// Otherwise, load() will think the server data is stale and keep the old local state
+		lastSavedCampaignState = null;
+		// Manually reload to get the updated invite code
+		// Query refresh is called by the remote command, but we need to reload state to see the update
+		await load();
 	}
 
 	// Assign character to campaign (or remove from campaign if campaignId is null)

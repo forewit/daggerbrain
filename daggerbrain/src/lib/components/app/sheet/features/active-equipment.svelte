@@ -6,6 +6,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
 	import { TRAITS } from '@shared/constants/rules';
+	import RollButton from '../../dice/roll-button.svelte';
 	let {
 		class: className = '',
 		onItemClick = () => {},
@@ -40,43 +41,8 @@
 
 	// Beastform attack calculations
 	const beastformToHit = $derived.by(() => {
-		if (!derivedBeastform || !context.traits || !context.character) return 0;
-		const traitValue = context.traits[derivedBeastform.attack.trait] || 0;
-		let total = traitValue;
-
-		// Add beastform trait bonus if transformed and attack trait matches character trait
-		if (isTransformed && derivedBeastform.character_trait.trait === derivedBeastform.attack.trait) {
-			total += derivedBeastform.character_trait.bonus;
-		}
-
-		// Add evolution bonus if evolution trait matches attack trait
-		const evolutionTrait =
-			context.character.class_choices[druid_class_id]?.['evolution_trait']?.[0];
-		if (evolutionTrait && evolutionTrait === derivedBeastform.attack.trait) {
-			total += 1;
-		}
-
-		return total;
-	});
-
-	const formattedBeastformToHit = $derived(
-		beastformToHit >= 0 ? `+${beastformToHit}` : `${beastformToHit}`
-	);
-
-	const beastformDamage = $derived.by(() => {
-		if (!derivedBeastform) return '';
-		const diceWithProficiency = applyProficiencyToDice(
-			derivedBeastform.attack.damage_dice,
-			context.proficiency
-		);
-		let damageStr = diceWithProficiency;
-		if (derivedBeastform.attack.damage_bonus > 0) {
-			damageStr += `+${derivedBeastform.attack.damage_bonus}`;
-		} else if (derivedBeastform.attack.damage_bonus < 0) {
-			damageStr += `${derivedBeastform.attack.damage_bonus}`;
-		}
-		damageStr += ` ${derivedBeastform.attack.damage_type}`;
-		return damageStr;
+		if (!derivedBeastform || !context.traits) return 0;
+		return context.traits[derivedBeastform.attack.trait] ?? 0;
 	});
 </script>
 
@@ -231,17 +197,24 @@
 						</td>
 						<td class="py-2 pr-4 text-center whitespace-nowrap">{derivedBeastform.attack.range}</td>
 						<td class="py-2 pr-4 whitespace-nowrap">
-							<div class="mx-auto w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs">
-								{formattedBeastformToHit}
-								<span class="text-xs">{TRAITS[derivedBeastform.attack.trait].short_name}</span>
-							</div>
+							<RollButton
+								name="To Hit"
+								class="mx-auto"
+								type="duality"
+								modifier={beastformToHit}
+								traitId={derivedBeastform.attack.trait}
+							/>
 						</td>
 						<td class="py-2 pr-4 text-right whitespace-nowrap sm:text-center">
-							<div
-								class="ml-auto w-min rounded-full border bg-foreground/5 px-2 py-1 text-xs sm:mx-auto"
-							>
-								{beastformDamage}
-							</div>
+							<RollButton
+								name="Damage"
+								class="ml-auto sm:mx-auto"
+								applyProficiency
+								type="base"
+								diceString={derivedBeastform.attack.damage_dice}
+								modifier={derivedBeastform.attack.damage_bonus}
+								damageType={derivedBeastform.attack.damage_type}
+							/>
 						</td>
 						<td class="hidden py-2 pr-4 text-right text-xs sm:table-cell">
 							<div class="ml-auto w-min text-right">

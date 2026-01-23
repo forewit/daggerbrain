@@ -98,7 +98,9 @@
 
 							<div class="px-5 pt-4 text-sm font-semibold">3D Dice Roller</div>
 							<div class="px-5 pt-3 pb-4 text-sm text-muted-foreground">
-								Roll directly on your character sheet, including hot-clickable traits, weapon damage, and attacks. A future update will include live dice rolls and a game log for campaigns
+								Roll directly on your character sheet, including hot-clickable traits, weapon
+								damage, and attacks. A future update will include live dice rolls and a game log for
+								campaigns
 							</div>
 						</div>
 					</li>
@@ -165,7 +167,6 @@
 									<li><span class="text-foreground">Searchable rules compendium</span></li>
 									<li>
 										<span class="text-foreground">The Void content</span>
-										
 									</li>
 								</ul>
 							</div>

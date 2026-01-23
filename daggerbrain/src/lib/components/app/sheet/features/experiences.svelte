@@ -62,7 +62,12 @@
 								{context.experience_modifiers[i]}
 							{/if}
 						</div> -->
-						<RollButton class="ml-auto sm:mx-auto" name="Experience" type="duality" modifier={context.experience_modifiers[i]} />
+						<RollButton
+							class="ml-auto sm:mx-auto"
+							name="Experience"
+							type="duality"
+							modifier={context.experience_modifiers[i]}
+						/>
 					</td>
 					<td class="py-2 pr-4">
 						<p class="text-xs text-muted-foreground italic">
