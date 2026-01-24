@@ -3,7 +3,8 @@
 		CharacterModifier,
 		CharacterCondition,
 		TraitIds,
-		DomainCardChoice
+		DomainCardChoice,
+		AncestryCardChoice
 	} from '@shared/types/compendium.types';
 	import * as Select from '$lib/components/ui/select';
 	import Input from '$lib/components/ui/input/input.svelte';
@@ -21,7 +22,9 @@
 		onRemove,
 		errors,
 		domainCardChoices = $bindable(),
-		domainCardId
+		domainCardId,
+		ancestryCardChoices = $bindable(),
+		ancestryCardId
 	}: {
 		modifier?: CharacterModifier;
 		onModifierChange?: (modifier: CharacterModifier) => void;
@@ -29,6 +32,8 @@
 		errors?: string[];
 		domainCardChoices?: DomainCardChoice[];
 		domainCardId?: string;
+		ancestryCardChoices?: AncestryCardChoice[];
+		ancestryCardId?: string;
 	} = $props();
 
 	// Use internal state if callback is provided
@@ -73,7 +78,7 @@
 		| 'experience_from_domain_card_choice_selection'
 		| 'experience_from_ancestry_card_choice_selection'
 	>;
-	type ValidTarget = SimpleTarget | 'trait' | 'experience_from_domain_card_choice_selection';
+	type ValidTarget = SimpleTarget | 'trait' | 'experience_from_domain_card_choice_selection' | 'experience_from_ancestry_card_choice_selection';
 
 	// Behaviour options - extracted from type
 	const behaviourOptions: readonly ModifierBehaviour[] = ['bonus', 'base', 'override'] as const;
@@ -140,10 +145,11 @@
 		max_short_rest_actions: 'Max Short Rest Actions',
 		max_long_rest_actions: 'Max Long Rest Actions',
 		trait: 'Trait',
-		experience_from_domain_card_choice_selection: 'Experience'
+		experience_from_domain_card_choice_selection: 'Experience (Domain Card)',
+		experience_from_ancestry_card_choice_selection: 'Experience (Ancestry Card)'
 	};
 
-	// Generate sequential experience choice ID
+	// Generate sequential experience choice ID for domain cards
 	function generateExperienceChoiceId(choices: DomainCardChoice[]): string {
 		let counter = 1;
 		let candidateId = `experience_${counter}`;
@@ -154,7 +160,18 @@
 		return candidateId;
 	}
 
-	// Ensure experience choice exists and return its choice_id
+	// Generate sequential experience choice ID for ancestry cards
+	function generateAncestryExperienceChoiceId(choices: AncestryCardChoice[]): string {
+		let counter = 1;
+		let candidateId = `experience_${counter}`;
+		while (choices.some((c) => c.choice_id === candidateId)) {
+			counter++;
+			candidateId = `experience_${counter}`;
+		}
+		return candidateId;
+	}
+
+	// Ensure experience choice exists and return its choice_id (for domain cards)
 	function ensureExperienceChoice(max: number): string {
 		if (!domainCardChoices) {
 			domainCardChoices = [];
@@ -205,10 +222,69 @@
 		return newChoiceId;
 	}
 
-	// Remove experience choice when modifier is removed
+	// Ensure experience choice exists and return its choice_id (for ancestry cards)
+	function ensureAncestryExperienceChoice(max: number): string {
+		if (!ancestryCardChoices) {
+			ancestryCardChoices = [];
+		}
+
+		const existingChoiceId =
+			effectiveModifier?.target === 'experience_from_ancestry_card_choice_selection'
+				? (effectiveModifier as any).choice_id
+				: null;
+
+		// If modifier already has a choice_id, try to find or create that specific choice
+		if (existingChoiceId) {
+			const existingChoice = ancestryCardChoices.find(
+				(c) => c.choice_id === existingChoiceId && c.type === 'experience'
+			);
+
+			if (existingChoice) {
+				// Update max value by creating a new array
+				ancestryCardChoices = ancestryCardChoices.map((c) =>
+					c.choice_id === existingChoiceId && c.type === 'experience'
+						? { ...c, max }
+						: c
+				);
+				return existingChoiceId;
+			} else {
+				// Choice ID exists in modifier but choice doesn't exist - create it
+				const newChoice: AncestryCardChoice = {
+					choice_id: existingChoiceId,
+					feature_index: 0, // Default to first feature
+					type: 'experience',
+					max: max,
+					conditional_choice: null
+				};
+				ancestryCardChoices = [...ancestryCardChoices, newChoice];
+				return existingChoiceId;
+			}
+		}
+
+		// No existing choice_id - create new one with generated ID
+		const newChoiceId = generateAncestryExperienceChoiceId(ancestryCardChoices);
+		const newChoice: AncestryCardChoice = {
+			choice_id: newChoiceId,
+			feature_index: 0, // Default to first feature
+			type: 'experience',
+			max: max,
+			conditional_choice: null
+		};
+
+		ancestryCardChoices = [...ancestryCardChoices, newChoice];
+		return newChoiceId;
+	}
+
+	// Remove experience choice when modifier is removed (for domain cards)
 	function removeExperienceChoice(choiceId: string) {
 		if (!domainCardChoices || !choiceId) return;
 		domainCardChoices = domainCardChoices.filter((c) => c.choice_id !== choiceId);
+	}
+
+	// Remove experience choice when modifier is removed (for ancestry cards)
+	function removeAncestryExperienceChoice(choiceId: string) {
+		if (!ancestryCardChoices || !choiceId) return;
+		ancestryCardChoices = ancestryCardChoices.filter((c) => c.choice_id !== choiceId);
 	}
 
 	// Get experience-type choices for dropdown
@@ -382,6 +458,16 @@
 				domain_card_id: domainCardId || '',
 				choice_id: choiceId
 			} as CharacterModifier;
+		} else if (newTarget === 'experience_from_ancestry_card_choice_selection') {
+			// Create or get existing experience choice
+			const choiceId = ensureAncestryExperienceChoice(1); // Default max is 1
+			newModifier = {
+				...baseProps,
+				...typeProps,
+				target: 'experience_from_ancestry_card_choice_selection',
+				ancestry_card_id: ancestryCardId || '',
+				choice_id: choiceId
+			} as CharacterModifier;
 		} else {
 			// Simple target
 			newModifier = {
@@ -425,7 +511,8 @@
 					{selectedTarget &&
 					(simpleTargetOptions.includes(selectedTarget as SimpleTarget) ||
 						selectedTarget === 'trait' ||
-						selectedTarget === 'experience_from_domain_card_choice_selection')
+						selectedTarget === 'experience_from_domain_card_choice_selection' ||
+						selectedTarget === 'experience_from_ancestry_card_choice_selection')
 						? targetLabels[selectedTarget as ValidTarget]
 						: 'None selected'}
 				</p>
@@ -438,6 +525,11 @@
 				{#if domainCardChoices}
 					<Select.Item value="experience_from_domain_card_choice_selection">
 						{targetLabels.experience_from_domain_card_choice_selection}
+					</Select.Item>
+				{/if}
+				{#if ancestryCardChoices}
+					<Select.Item value="experience_from_ancestry_card_choice_selection">
+						{targetLabels.experience_from_ancestry_card_choice_selection}
 					</Select.Item>
 				{/if}
 			</Select.Content>
@@ -495,6 +587,35 @@
 							...experienceModifier,
 							choice_id: choiceId,
 							domain_card_id: domainCardId || experienceModifier.domain_card_id || ''
+						});
+					}}
+					min="1"
+					step="1"
+				/>
+			</div>
+		</div>
+	{/if}
+
+	<!-- Experience from Ancestry Card Choice Selection fields -->
+	{#if currentTarget === 'experience_from_ancestry_card_choice_selection' && modifier && modifier.target === 'experience_from_ancestry_card_choice_selection'}
+		{@const experienceModifier = modifier}
+		{@const experienceChoice = ancestryCardChoices?.find((c) => c.choice_id === experienceModifier.choice_id && c.type === 'experience')}
+		<div class="flex flex-col gap-2">
+			<div class="flex flex-col gap-1">
+				<label for="max-ancestry-experiences-input" class="text-xs font-medium text-muted-foreground"
+					>Max number of experiences</label
+				>
+				<Input
+					id="max-ancestry-experiences-input"
+					type="number"
+					value={experienceChoice ? String(experienceChoice.max) : '1'}
+					oninput={(e) => {
+						const maxValue = Number(e.currentTarget.value) || 1;
+						const choiceId = ensureAncestryExperienceChoice(maxValue);
+						updateModifier({
+							...experienceModifier,
+							choice_id: choiceId,
+							ancestry_card_id: ancestryCardId || experienceModifier.ancestry_card_id || ''
 						});
 					}}
 					min="1"
@@ -646,6 +767,8 @@
 				choiceRequiredError={conditionsChoiceError}
 				domainCardChoices={domainCardChoices}
 				domainCardId={domainCardId}
+				ancestryCardChoices={ancestryCardChoices}
+				ancestryCardId={ancestryCardId}
 			/>
 		</div>
 	{/if}
@@ -663,6 +786,12 @@
 					(effectiveModifier as any).choice_id
 				) {
 					removeExperienceChoice((effectiveModifier as any).choice_id);
+				}
+				if (
+					effectiveModifier?.target === 'experience_from_ancestry_card_choice_selection' &&
+					(effectiveModifier as any).choice_id
+				) {
+					removeAncestryExperienceChoice((effectiveModifier as any).choice_id);
 				}
 				onRemove();
 			}}

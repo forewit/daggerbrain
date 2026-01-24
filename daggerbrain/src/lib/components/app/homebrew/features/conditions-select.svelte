@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { CharacterCondition, DomainIds, DomainCardChoice } from '@shared/types/compendium.types';
+	import type { CharacterCondition, DomainIds, DomainCardChoice, AncestryCardChoice } from '@shared/types/compendium.types';
 	import * as Select from '$lib/components/ui/select';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
@@ -10,12 +10,16 @@
 		conditions = $bindable([]),
 		choiceRequiredError,
 		domainCardChoices,
-		domainCardId
+		domainCardId,
+		ancestryCardChoices,
+		ancestryCardId
 	}: {
 		conditions?: CharacterCondition[];
 		choiceRequiredError?: string;
 		domainCardChoices?: DomainCardChoice[];
 		domainCardId?: string;
+		ancestryCardChoices?: AncestryCardChoice[];
+		ancestryCardId?: string;
 	} = $props();
 
 	const compendium = getCompendiumContext();
@@ -23,6 +27,11 @@
 	// Check if domain_card_choice condition exists
 	let hasDomainCardChoiceCondition = $derived(
 		conditions.some((c) => c.type === 'domain_card_choice')
+	);
+
+	// Check if ancestry_card_choice condition exists
+	let hasAncestryCardChoiceCondition = $derived(
+		conditions.some((c) => c.type === 'ancestry_card_choice')
 	);
 
 	// Load choices from compendium if domainCardChoices prop is not provided but condition exists
@@ -54,7 +63,10 @@
 		{ value: 'level', label: 'Minimum level requirement' },
 		{ value: 'min_loadout_cards_from_domain', label: 'Minimum cards from a domain in your loadout' },
 		...(domainCardChoices && domainCardChoices.length > 0 || hasDomainCardChoiceCondition
-			? [{ value: 'domain_card_choice', label: 'Requires an answer to a choice' }]
+			? [{ value: 'domain_card_choice', label: 'Requires an answer to a domain card choice' }]
+			: []),
+		...(ancestryCardChoices && ancestryCardChoices.length > 0 || hasAncestryCardChoiceCondition
+			? [{ value: 'ancestry_card_choice', label: 'Requires an answer to an ancestry card choice' }]
 			: [])
 	] as const);
 
@@ -97,6 +109,12 @@
 	let domainCardChoiceCondition = $derived(
 		conditions.find((c) => c.type === 'domain_card_choice') as
 			| { type: 'domain_card_choice'; domain_card_id: string; choice_id: string; selection_id: string }
+			| undefined
+	);
+
+	let ancestryCardChoiceCondition = $derived(
+		conditions.find((c) => c.type === 'ancestry_card_choice') as
+			| { type: 'ancestry_card_choice'; ancestry_card_id: string; choice_id: string; selection_id: string }
 			| undefined
 	);
 
@@ -182,6 +200,20 @@
 						selection_id: firstArbitraryChoice?.options[0]?.selection_id || ''
 					});
 				}
+			} else if (type === 'ancestry_card_choice') {
+				// Preserve existing ancestry card choice condition if it exists, otherwise create new one
+				const existing = ancestryCardChoiceCondition;
+				if (existing) {
+					newConditions.push(existing);
+				} else {
+					const firstArbitraryAncestryChoice = arbitraryAncestryChoices[0];
+					newConditions.push({
+						type: 'ancestry_card_choice',
+						ancestry_card_id: ancestryCardId || '',
+						choice_id: firstArbitraryAncestryChoice?.choice_id || '',
+						selection_id: firstArbitraryAncestryChoice?.options[0]?.selection_id || ''
+					});
+				}
 			}
 		}
 
@@ -262,10 +294,15 @@
 		return choices?.find((c) => c.choice_id === domainCardChoiceCondition.choice_id);
 	});
 
-	// Filter choices to only show arbitrary choice types
+	// Filter choices to only show arbitrary choice types (for domain cards)
 	let arbitraryChoices = $derived.by(() => {
 		const choices = effectiveDomainCardChoices || domainCardChoices;
 		return choices?.filter((c) => c.type === 'arbitrary') || [];
+	});
+
+	// Filter choices to only show arbitrary choice types (for ancestry cards)
+	let arbitraryAncestryChoices = $derived.by(() => {
+		return ancestryCardChoices?.filter((c) => c.type === 'arbitrary') || [];
 	});
 
 	// Remove domain_card_choice condition when the referenced choice is deleted
@@ -284,6 +321,28 @@
 		conditions = conditions.filter(
 			(cond) =>
 				!(cond.type === 'domain_card_choice' &&
+				cond.choice_id &&
+				cond.choice_id.trim() !== '' &&
+				!choiceIds.has(cond.choice_id))
+		);
+	});
+
+	// Remove ancestry_card_choice condition when the referenced choice is deleted
+	$effect(() => {
+		const arbitrary = arbitraryAncestryChoices;
+		const choiceIds = new Set(arbitrary.map((c) => c.choice_id));
+		const needsUpdate = conditions.some(
+			(c) =>
+				c.type === 'ancestry_card_choice' &&
+				c.choice_id &&
+				c.choice_id.trim() !== '' &&
+				!choiceIds.has(c.choice_id)
+		);
+		if (!needsUpdate) return;
+		// Remove the entire condition instead of clearing its fields
+		conditions = conditions.filter(
+			(cond) =>
+				!(cond.type === 'ancestry_card_choice' &&
 				cond.choice_id &&
 				cond.choice_id.trim() !== '' &&
 				!choiceIds.has(cond.choice_id))
@@ -481,6 +540,90 @@
 								Choice ID: {domainCardChoiceCondition.choice_id}
 								{#if domainCardChoiceCondition.selection_id}
 									<br />Selection ID: {domainCardChoiceCondition.selection_id}
+								{/if}
+							</p>
+						</div>
+					{/if}
+				</div>
+			{/if}
+
+			{#if selectedTypes.includes('ancestry_card_choice') && (ancestryCardChoices || ancestryCardChoiceCondition)}
+				<div class="flex flex-col gap-2">
+					{#if ancestryCardChoices && ancestryCardChoices.length > 0}
+						<div class="grid grid-cols-2 gap-2">
+							<div class="flex flex-col gap-1">
+								<label
+									for="ancestry-choice-id-select"
+									class={cn('text-xs text-muted-foreground', choiceRequiredError && 'text-destructive')}
+									>Choice</label
+								>
+								<Select.Root
+									type="single"
+									value={ancestryCardChoiceCondition?.choice_id ?? ''}
+									onValueChange={(value) => {
+										if (value === '' || value == null) {
+											updateAncestryCardChoiceId('');
+										} else {
+											updateAncestryCardChoiceId(value);
+										}
+									}}
+								>
+									<Select.Trigger
+										id="ancestry-choice-id-select"
+										class={cn('w-full', choiceRequiredError && 'border-destructive')}
+									>
+										<p class="truncate">
+											{ancestryCardChoiceCondition?.choice_id || 'None'}
+										</p>
+									</Select.Trigger>
+									<Select.Content>
+										{#if arbitraryAncestryChoices.length <= 0}
+											<Select.Item value="" disabled>None</Select.Item>
+										{/if}
+										{#each arbitraryAncestryChoices as choice}
+											<Select.Item value={choice.choice_id}>{choice.choice_id}</Select.Item>
+										{/each}
+									</Select.Content>
+								</Select.Root>
+								{#if choiceRequiredError}
+									<p class="text-xs text-destructive">{choiceRequiredError}</p>
+								{/if}
+							</div>
+							<div class="flex flex-col gap-1">
+								<label for="ancestry-selection-id-select" class="text-xs text-muted-foreground"
+									>Answer</label
+								>
+								<Select.Root
+									type="single"
+									disabled={!selectedAncestryChoice}
+									value={ancestryCardChoiceCondition?.selection_id || ''}
+									onValueChange={(value) => {
+										if (value) {
+											updateAncestryCardChoiceSelection(value);
+										}
+									}}
+								>
+									<Select.Trigger id="ancestry-selection-id-select" class="w-full">
+										<p class="truncate">
+											{ancestryCardChoiceCondition?.selection_id || 'Select selection'}
+										</p>
+									</Select.Trigger>
+									<Select.Content>
+										{#if selectedAncestryChoice && selectedAncestryChoice.type === 'arbitrary'}
+											{#each selectedAncestryChoice.options as option}
+												<Select.Item value={option.selection_id}>{option.title}</Select.Item>
+											{/each}
+										{/if}
+									</Select.Content>
+								</Select.Root>
+							</div>
+						</div>
+					{:else if ancestryCardChoiceCondition?.choice_id}
+						<div class="rounded-md bg-muted p-2">
+							<p class="text-xs text-muted-foreground">
+								Choice ID: {ancestryCardChoiceCondition.choice_id}
+								{#if ancestryCardChoiceCondition.selection_id}
+									<br />Selection ID: {ancestryCardChoiceCondition.selection_id}
 								{/if}
 							</p>
 						</div>

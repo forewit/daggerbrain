@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Feature, CharacterModifier, WeaponModifier, DomainCardChoice } from '@shared/types/compendium.types';
+	import type { Feature, CharacterModifier, WeaponModifier, DomainCardChoice, AncestryCardChoice } from '@shared/types/compendium.types';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -13,7 +13,9 @@
 		onRemove,
 		errors,
 		domainCardChoices = $bindable(),
-		domainCardId
+		domainCardId,
+		ancestryCardChoices = $bindable(),
+		ancestryCardId
 	}: {
 		feature: Feature;
 		onRemove?: (() => void) | undefined;
@@ -25,6 +27,8 @@
 		};
 		domainCardChoices?: DomainCardChoice[];
 		domainCardId?: string;
+		ancestryCardChoices?: AncestryCardChoice[];
+		ancestryCardId?: string;
 	} = $props();
 
 	function addCharacterModifier() {
@@ -148,6 +152,8 @@
 						errors={errors?.character_modifiers?.get(index)}
 						bind:domainCardChoices={domainCardChoices}
 						domainCardId={domainCardId}
+						bind:ancestryCardChoices={ancestryCardChoices}
+						ancestryCardId={ancestryCardId}
 					/>
 				{/each}
 			</div>
