@@ -174,7 +174,6 @@
 			{/if}
 		</div>
 	</div>
-{/if}
 
 <!-- Void Disable Confirmation Dialog -->
 <Dialog.Root bind:open={showVoidDisableDialog}>
@@ -220,3 +219,4 @@
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
+{/if}
