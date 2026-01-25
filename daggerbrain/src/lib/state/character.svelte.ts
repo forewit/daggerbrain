@@ -9,7 +9,7 @@ import {
 	CONDITIONS,
 	TRAIT_OPTIONS
 } from '@shared/constants/rules';
-import { getContext, setContext } from 'svelte';
+import { getContext, setContext, tick } from 'svelte';
 import type {
 	Character,
 	DomainCardId,
@@ -36,7 +36,7 @@ import type {
 	Consumable,
 	TransformationCard
 } from '@shared/types/compendium.types';
-import { BLANK_LEVEL_UP_CHOICE } from '@shared/constants/constants';
+import { BLANK_LEVEL_UP_CHOICE, CHARACTER_DEFAULTS } from '@shared/constants/constants';
 import { update_character, get_character_by_id } from '$lib/remote/characters.remote';
 import { getCompendiumContext } from './compendium.svelte';
 import { increaseDie, increase_range } from '$lib/utils';
@@ -100,6 +100,11 @@ function createCharacter(id: string) {
 					character = result.character;
 					characterCanEdit = result.canEdit;
 					characterLoadSource = 'permission';
+
+					character.settings = {
+						...CHARACTER_DEFAULTS.settings,
+						...character.settings
+					}
 					// Set loadingCharacter to false IMMEDIATELY after setting character
 					// This prevents race condition where page computes characterNotFound=true
 					// between character being set and loadingCharacter being set to false
