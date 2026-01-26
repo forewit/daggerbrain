@@ -304,7 +304,7 @@
 							compendium_id: '', // overwritten by the server
 							source_id: 'Homebrew',
 							name: newItemName.trim(),
-							image_url: '',
+							image_url: '/images/art/placeholder-art.webp',
 							description_html: '',
 							starting_evasion: 0,
 							starting_max_hp: 0,
@@ -315,16 +315,16 @@
 								weapon_modifiers: []
 							},
 							primary_domain_id: 'arcana',
-							secondary_domain_id: 'arcana',
+							secondary_domain_id: 'blade',
 							class_features: [],
 							subclass_ids: [],
 							suggested_traits: {
-								agility: null,
-								strength: null,
-								finesse: null,
-								instinct: null,
-								presence: null,
-								knowledge: null
+								agility: 0,
+								strength: 0,
+								finesse: 0,
+								instinct: 0,
+								presence: 0,
+								knowledge: 0
 							},
 							suggested_primary_weapon_id: null,
 							suggested_secondary_weapon_id: null,
@@ -369,7 +369,7 @@
 								card_type: 'subclass_foundation',
 								title: '',
 								description_html: '',
-								image_url: '',
+								image_url: '/images/art/placeholder-art.webp',
 								artist_name: '',
 								features: [],
 								spellcast_trait: null,
@@ -380,7 +380,7 @@
 								card_type: 'subclass_specialization',
 								title: '',
 								description_html: '',
-								image_url: '',
+								image_url: '/images/art/placeholder-art.webp',
 								artist_name: '',
 								features: [],
 								class_id: ''
@@ -390,7 +390,7 @@
 								card_type: 'subclass_mastery',
 								title: '',
 								description_html: '',
-								image_url: '',
+								image_url: '/images/art/placeholder-art.webp',
 								artist_name: '',
 								features: [],
 								class_id: ''
@@ -413,7 +413,7 @@
 							source_id: 'Homebrew',
 							card_type: 'domain',
 							title: newItemName.trim(),
-							image_url: '',
+							image_url: '/images/art/placeholder-art.webp',
 							artist_name: '',
 							domain_id: 'arcana',
 							level_requirement: 1,
@@ -444,9 +444,22 @@
 							card_type: 'ancestry',
 							title: newItemName.trim(),
 							description_html: '',
-							image_url: '',
+							image_url: '/images/art/placeholder-art.webp',
 							artist_name: '',
-							features: [],
+							features: [
+								{
+									title: '',
+									description_html: '',
+									character_modifiers: [],
+									weapon_modifiers: []
+								},
+								{
+									title: '',
+									description_html: '',
+									character_modifiers: [],
+									weapon_modifiers: []
+								}
+							],
 							choices: []
 						});
 					}
@@ -467,7 +480,7 @@
 							card_type: 'community',
 							title: newItemName.trim(),
 							description_html: '',
-							image_url: '',
+							image_url: '/images/art/placeholder-art.webp',
 							artist_name: '',
 							features: [],
 							tokens: false
@@ -490,7 +503,7 @@
 							card_type: 'transformation',
 							title: newItemName.trim(),
 							description_html: '',
-							image_url: '',
+							image_url: '/images/art/placeholder-art.webp',
 							artist_name: '',
 							features: []
 						});
@@ -1021,8 +1034,7 @@
 			case 'subclass':
 				return 'Subclass';
 			case 'domain-cards':
-				const tier = getItemTier(entry);
-				return tier ? `Tier ${tier} Domain Card` : 'Domain Card';
+				return 'Domain Card';
 			case 'ancestry-cards':
 				return 'Ancestry Card';
 			case 'community-cards':

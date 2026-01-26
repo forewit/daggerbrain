@@ -1,5 +1,10 @@
 <script lang="ts">
-	import type { Feature, DomainCard, DomainIds, DomainCardChoice } from '@shared/types/compendium.types';
+	import type {
+		Feature,
+		DomainCard,
+		DomainIds,
+		DomainCardChoice
+	} from '@shared/types/compendium.types';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -31,12 +36,14 @@
 		item = $bindable(),
 		hasChanges = $bindable(),
 		hasErrors = $bindable(),
+		unsavedItem = $bindable(),
 		onSubmit,
 		onReset
 	}: {
 		item: DomainCard;
 		hasChanges?: boolean;
 		hasErrors?: boolean;
+		unsavedItem?: DomainCard | null;
 		onSubmit?: (e?: SubmitEvent) => void;
 		onReset?: () => void;
 	} = $props();
@@ -45,14 +52,19 @@
 	const homebrew = getHomebrewContext();
 
 	// Reference to image input component
-	let imageInput: { uploadPendingFile: () => Promise<string | null> } | null = $state(null);
-	
+	let imageInput: {
+		uploadPendingFile: () => Promise<string | null>;
+		getPreviewUrl: () => string | null;
+		clearPendingFile: () => void;
+	} | null = $state(null);
+
 	// Track if there's a pending image file
 	let hasPendingImageFile = $state(false);
 
 	// Form state - initialized from domainCard prop
 	let formTitle = $state('');
 	let formImageUrl = $state('');
+	let formArtistName = $state('');
 	let formDomainId = $state<DomainIds>('arcana');
 	let formLevelRequirement = $state('');
 	let formRecallCost = $state('');
@@ -112,6 +124,7 @@
 
 		const titleMatch = formTitle.trim() === item.title;
 		const imageUrlMatch = formImageUrl === item.image_url;
+		const artistNameMatch = formArtistName.trim() === item.artist_name;
 		const domainMatch = formDomainId === item.domain_id;
 		const formLevelNum = formLevelRequirement === '' ? 0 : Number(formLevelRequirement);
 		const levelMatch = formLevelNum === item.level_requirement;
@@ -132,6 +145,7 @@
 		return !(
 			titleMatch &&
 			imageUrlMatch &&
+			artistNameMatch &&
 			!hasPendingImageFile &&
 			domainMatch &&
 			levelMatch &&
@@ -146,9 +160,48 @@
 		);
 	});
 
+	// Build unsaved domain card from current form state
+	let unsavedDomainCard = $derived.by(() => {
+		if (!item) return null;
+
+		// Track all form fields to ensure reactivity
+		formTitle;
+		formImageUrl;
+		formArtistName;
+		formDomainId;
+		formLevelRequirement;
+		formRecallCost;
+		formCategory;
+		formTokens;
+		formAppliesInVault;
+		formForcedInLoadout;
+		formForcedInVault;
+		formFeatures;
+		formChoices;
+		hasPendingImageFile;
+
+		// Get preview URL if there's a pending file
+		const previewUrl = hasPendingImageFile && imageInput ? imageInput.getPreviewUrl() : null;
+
+		// Build the unsaved domain card by merging item with form data
+		const formData = buildFormData();
+
+		// Use preview URL if available, otherwise use formImageUrl
+		return {
+			...item,
+			...formData,
+			image_url: previewUrl || formData.image_url
+		} as DomainCard;
+	});
+
 	// Sync hasChanges to bindable prop
 	$effect(() => {
 		hasChanges = formHasChanges;
+	});
+
+	// Sync unsavedDomainCard to bindable prop
+	$effect(() => {
+		unsavedItem = unsavedDomainCard;
 	});
 
 	// Check if there are any validation errors
@@ -205,7 +258,7 @@
 		}
 
 		// Add choice errors
-		const arbitraryChoices = formChoices.filter(c => c.type === 'arbitrary');
+		const arbitraryChoices = formChoices.filter((c) => c.type === 'arbitrary');
 		for (const [index, choiceErrorsList] of choiceErrors) {
 			const choice = arbitraryChoices[index];
 			const choiceName = choice?.choice_id || `Choice ${index + 1}`;
@@ -227,9 +280,7 @@
 		// Find all character modifiers that target experience choices
 		const experienceModifiers = formFeatures.flatMap((f) =>
 			f.character_modifiers.filter(
-				(m) =>
-					m.target === 'experience_from_domain_card_choice_selection' &&
-					(m as any).choice_id
+				(m) => m.target === 'experience_from_domain_card_choice_selection' && (m as any).choice_id
 			)
 		);
 
@@ -262,6 +313,7 @@
 		if (item) {
 			formTitle = item.title;
 			formImageUrl = item.image_url;
+			formArtistName = item.artist_name;
 			formDomainId = item.domain_id;
 			formLevelRequirement = item.level_requirement === 0 ? '' : String(item.level_requirement);
 			formRecallCost = item.recall_cost === 0 ? '' : String(item.recall_cost);
@@ -291,7 +343,7 @@
 			domain_id: formDomainId,
 			title: formTitle.trim(),
 			image_url: formImageUrl,
-			artist_name: '',
+			artist_name: formArtistName.trim(),
 			level_requirement: formLevelRequirement === '' ? 0 : Number(formLevelRequirement),
 			recall_cost: formRecallCost === '' ? 0 : Number(formRecallCost),
 			category: formCategory,
@@ -307,33 +359,33 @@
 	// Validate choices for blank and duplicate names
 	function validateChoices() {
 		const errors = new Map<number, string[]>();
-		const arbitraryChoices = formChoices.filter(c => c.type === 'arbitrary');
+		const arbitraryChoices = formChoices.filter((c) => c.type === 'arbitrary');
 		const nameCounts = new Map<string, number>();
-		
+
 		// Count occurrences of each name (case-insensitive, trimmed)
 		arbitraryChoices.forEach((choice) => {
 			const name = choice.choice_id.trim();
 			const normalizedName = name.toLowerCase();
 			nameCounts.set(normalizedName, (nameCounts.get(normalizedName) || 0) + 1);
 		});
-		
+
 		// Check for blank and duplicate names
 		arbitraryChoices.forEach((choice, index) => {
 			const name = choice.choice_id.trim();
 			const normalizedName = name.toLowerCase();
 			const choiceErrorsList: string[] = [];
-			
+
 			if (!name) {
 				choiceErrorsList.push('Name is required');
 			} else if (nameCounts.get(normalizedName)! > 1) {
 				choiceErrorsList.push('Name must be unique');
 			}
-			
+
 			if (choiceErrorsList.length > 0) {
 				errors.set(index, choiceErrorsList);
 			}
 		});
-		
+
 		choiceErrors = errors;
 		return errors.size === 0;
 	}
@@ -403,9 +455,7 @@
 			for (let j = 0; j < f.character_modifiers.length; j++) {
 				const mod = f.character_modifiers[j];
 				const hasEmptyChoice = (mod.character_conditions || []).some(
-					(c) =>
-						c.type === 'domain_card_choice' &&
-						(!c.choice_id || c.choice_id.trim() === '')
+					(c) => c.type === 'domain_card_choice' && (!c.choice_id || c.choice_id.trim() === '')
 				);
 				if (!hasEmptyChoice) continue;
 				if (!validatedModifierKeys.has(getModifierKey(i, 'character', j))) continue;
@@ -438,7 +488,7 @@
 
 		// Re-validate features when they change
 		validateFeatures();
-		
+
 		// Re-validate choices when they change
 		validateChoices();
 	});
@@ -503,7 +553,7 @@
 
 		// Validate form-level fields
 		validateFormFields();
-		
+
 		// Validate choices
 		validateChoices();
 
@@ -558,6 +608,7 @@
 		// Re-sync form from domainCard prop
 		formTitle = item.title;
 		formImageUrl = item.image_url;
+		formArtistName = item.artist_name;
 		formDomainId = item.domain_id;
 		formLevelRequirement = item.level_requirement === 0 ? '' : String(item.level_requirement);
 		formRecallCost = item.recall_cost === 0 ? '' : String(item.recall_cost);
@@ -570,6 +621,7 @@
 		formChoices = JSON.parse(JSON.stringify(item.choices));
 		ensureExperienceChoicesForModifiers();
 		// Clear pending image file on reset
+		imageInput?.clearPendingFile();
 		hasPendingImageFile = false;
 		// Clear errors on reset
 		errors = {};
@@ -710,8 +762,8 @@
 		</div>
 	</div>
 
-	<!-- Image & card flags-->
-	<div class="grid grid-cols-2 gap-3">
+	<!-- Image & Artist Name -->
+	<div class="flex gap-2">
 		<div class="flex flex-col gap-1">
 			<label for="hb-domain-card-image-url" class="text-xs font-medium text-muted-foreground"
 				>Artwork</label
@@ -722,43 +774,57 @@
 				bind:value={formImageUrl}
 				bind:hasPendingFile={hasPendingImageFile}
 				alt="Domain card image"
+				class="w-26"
 			/>
 		</div>
 
-		<div class="flex flex-col gap-2">
-			<p class="text-xs font-medium text-muted-foreground">Flags</p>
-			<div class="flex flex-col gap-2">
-				<div class="flex items-center gap-2">
-					<Checkbox id="hb-domain-card-tokens" bind:checked={formTokens} />
-					<label for="hb-domain-card-tokens" class="text-xs">Has tokens</label>
-				</div>
-				<div class="flex items-center gap-2">
-					<Checkbox id="hb-domain-card-applies-in-vault" bind:checked={formAppliesInVault} />
-					<label for="hb-domain-card-applies-in-vault" class="text-xs cursor-pointer"						>
-						<p>Applies in Vault</p>
-						<p class="text-muted-foreground">Feature modifiers will be applied even if the card is in the vault.</p>
-					</label>
-				</div>
-				<div class="flex items-center gap-2">
-					<Checkbox id="hb-domain-card-forced-in-loadout" bind:checked={formForcedInLoadout} />
-					<label for="hb-domain-card-forced-in-loadout" class="text-xs"
-						>Forced in Loadout</label
-					>
-				</div>
-				<div class="flex items-center gap-2">
-					<Checkbox id="hb-domain-card-forced-in-vault" bind:checked={formForcedInVault} />
-					<label for="hb-domain-card-forced-in-vault" class="text-xs"
-						>Forced in Vault</label
-					>
-				</div>
+		<div class="flex grow flex-col gap-1">
+			<!-- Artist name -->
+			<div class="flex flex-col gap-1">
+				<label for="hb-domain-card-artist-name" class="text-xs font-medium text-muted-foreground"
+					>Artist Name</label
+				>
+				<Input
+					id="hb-domain-card-artist-name"
+					bind:value={formArtistName}
+					placeholder="Artist name"
+				/>
 			</div>
 		</div>
 	</div>
 
-		<!-- Choices -->
+	<!-- Card flags-->
+	<div class="flex flex-col gap-2">
+		<p class="text-xs font-medium text-muted-foreground">Flags</p>
 		<div class="flex flex-col gap-2">
-			<HomebrewDomainChoicesEditor bind:choices={formChoices} errors={choiceErrors} />
+			<div class="flex items-center gap-2">
+				<Checkbox id="hb-domain-card-tokens" bind:checked={formTokens} />
+				<label for="hb-domain-card-tokens" class="text-xs">Has tokens</label>
+			</div>
+			<div class="flex items-center gap-2">
+				<Checkbox id="hb-domain-card-applies-in-vault" bind:checked={formAppliesInVault} />
+				<label for="hb-domain-card-applies-in-vault" class="cursor-pointer text-xs">
+					<p>Applies in Vault</p>
+					<p class="text-muted-foreground">
+						Feature modifiers will be applied even if the card is in the vault.
+					</p>
+				</label>
+			</div>
+			<div class="flex items-center gap-2">
+				<Checkbox id="hb-domain-card-forced-in-loadout" bind:checked={formForcedInLoadout} />
+				<label for="hb-domain-card-forced-in-loadout" class="text-xs">Forced in Loadout</label>
+			</div>
+			<div class="flex items-center gap-2">
+				<Checkbox id="hb-domain-card-forced-in-vault" bind:checked={formForcedInVault} />
+				<label for="hb-domain-card-forced-in-vault" class="text-xs">Forced in Vault</label>
+			</div>
 		</div>
+	</div>
+
+	<!-- Choices -->
+	<div class="flex flex-col gap-2">
+		<HomebrewDomainChoicesEditor bind:choices={formChoices} errors={choiceErrors} />
+	</div>
 
 	<!-- Features -->
 	<div class="flex flex-col gap-2">
@@ -797,8 +863,6 @@
 		</div>
 	</div>
 
-
-
 	<!-- Actions -->
 	<div class="flex flex-col gap-2 pt-2">
 		<div class="flex justify-end gap-2">
@@ -812,10 +876,7 @@
 				type="submit"
 				size="sm"
 				disabled={!formHasChanges || homebrew.saving}
-				class={cn(
-					'h-7',
-					hasValidationErrors && 'border border-destructive hover:bg-primary'
-				)}
+				class={cn('h-7', hasValidationErrors && 'border border-destructive hover:bg-primary')}
 			>
 				{#if homebrew.saving}
 					<Loader2 class="size-3.5 animate-spin" />

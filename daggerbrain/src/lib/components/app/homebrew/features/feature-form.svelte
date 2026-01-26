@@ -1,5 +1,11 @@
 <script lang="ts">
-	import type { Feature, CharacterModifier, WeaponModifier, DomainCardChoice, AncestryCardChoice } from '@shared/types/compendium.types';
+	import type {
+		Feature,
+		CharacterModifier,
+		WeaponModifier,
+		DomainCardChoice,
+		AncestryCardChoice
+	} from '@shared/types/compendium.types';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -99,10 +105,10 @@
 		<label
 			for="hb-feature-title"
 			class={cn('text-xs font-medium text-muted-foreground', errors?.title && 'text-destructive')}
-			>
+		>
 			Name
 			{domainCardId && '(optional)'}
-			</label		>
+		</label>
 		<Input
 			id="hb-feature-title"
 			value={feature.title}
@@ -150,10 +156,10 @@
 						bind:modifier={feature.character_modifiers[index]}
 						onRemove={() => removeCharacterModifier(index)}
 						errors={errors?.character_modifiers?.get(index)}
-						bind:domainCardChoices={domainCardChoices}
-						domainCardId={domainCardId}
-						bind:ancestryCardChoices={ancestryCardChoices}
-						ancestryCardId={ancestryCardId}
+						bind:domainCardChoices
+						{domainCardId}
+						bind:ancestryCardChoices
+						{ancestryCardId}
 					/>
 				{/each}
 			</div>

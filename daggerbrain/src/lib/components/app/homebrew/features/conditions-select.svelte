@@ -1,5 +1,10 @@
 <script lang="ts">
-	import type { CharacterCondition, DomainIds, DomainCardChoice, AncestryCardChoice } from '@shared/types/compendium.types';
+	import type {
+		CharacterCondition,
+		DomainIds,
+		DomainCardChoice,
+		AncestryCardChoice
+	} from '@shared/types/compendium.types';
 	import * as Select from '$lib/components/ui/select';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { getCompendiumContext } from '$lib/state/compendium.svelte';
@@ -61,11 +66,14 @@
 		{ value: 'armor_equipped_true', label: 'Armor must be equipped' },
 		{ value: 'armor_equipped_false', label: 'Armor must not be equipped' },
 		{ value: 'level', label: 'Minimum level requirement' },
-		{ value: 'min_loadout_cards_from_domain', label: 'Minimum cards from a domain in your loadout' },
-		...(domainCardChoices && domainCardChoices.length > 0 || hasDomainCardChoiceCondition
+		{
+			value: 'min_loadout_cards_from_domain',
+			label: 'Minimum cards from a domain in your loadout'
+		},
+		...((domainCardChoices && domainCardChoices.length > 0) || hasDomainCardChoiceCondition
 			? [{ value: 'domain_card_choice', label: 'Requires an answer to a domain card choice' }]
 			: []),
-		...(ancestryCardChoices && ancestryCardChoices.length > 0 || hasAncestryCardChoiceCondition
+		...((ancestryCardChoices && ancestryCardChoices.length > 0) || hasAncestryCardChoiceCondition
 			? [{ value: 'ancestry_card_choice', label: 'Requires an answer to an ancestry card choice' }]
 			: [])
 	] as const);
@@ -108,13 +116,23 @@
 
 	let domainCardChoiceCondition = $derived(
 		conditions.find((c) => c.type === 'domain_card_choice') as
-			| { type: 'domain_card_choice'; domain_card_id: string; choice_id: string; selection_id: string }
+			| {
+					type: 'domain_card_choice';
+					domain_card_id: string;
+					choice_id: string;
+					selection_id: string;
+			  }
 			| undefined
 	);
 
 	let ancestryCardChoiceCondition = $derived(
 		conditions.find((c) => c.type === 'ancestry_card_choice') as
-			| { type: 'ancestry_card_choice'; ancestry_card_id: string; choice_id: string; selection_id: string }
+			| {
+					type: 'ancestry_card_choice';
+					ancestry_card_id: string;
+					choice_id: string;
+					selection_id: string;
+			  }
 			| undefined
 	);
 
@@ -300,6 +318,45 @@
 		return choices?.filter((c) => c.type === 'arbitrary') || [];
 	});
 
+	// Update ancestry card choice condition choice_id
+	function updateAncestryCardChoiceId(choiceId: string) {
+		const newConditions = conditions.map((cond) => {
+			if (cond.type === 'ancestry_card_choice') {
+				if (!choiceId || choiceId.trim() === '') {
+					return { ...cond, choice_id: '', selection_id: '' };
+				}
+				const selectedChoice = ancestryCardChoices?.find((c) => c.choice_id === choiceId);
+				return {
+					...cond,
+					choice_id: choiceId,
+					selection_id:
+						selectedChoice?.type === 'arbitrary'
+							? selectedChoice.options[0]?.selection_id || ''
+							: cond.selection_id
+				};
+			}
+			return cond;
+		});
+		conditions = newConditions;
+	}
+
+	// Update ancestry card choice condition selection_id
+	function updateAncestryCardChoiceSelection(selectionId: string) {
+		const newConditions = conditions.map((cond) => {
+			if (cond.type === 'ancestry_card_choice') {
+				return { ...cond, selection_id: selectionId };
+			}
+			return cond;
+		});
+		conditions = newConditions;
+	}
+
+	// Get selected choice for ancestry card choice condition
+	let selectedAncestryChoice: AncestryCardChoice | undefined = $derived.by(() => {
+		if (!ancestryCardChoiceCondition) return undefined;
+		return ancestryCardChoices?.find((c) => c.choice_id === ancestryCardChoiceCondition.choice_id);
+	});
+
 	// Filter choices to only show arbitrary choice types (for ancestry cards)
 	let arbitraryAncestryChoices = $derived.by(() => {
 		return ancestryCardChoices?.filter((c) => c.type === 'arbitrary') || [];
@@ -320,10 +377,12 @@
 		// Remove the entire condition instead of clearing its fields
 		conditions = conditions.filter(
 			(cond) =>
-				!(cond.type === 'domain_card_choice' &&
-				cond.choice_id &&
-				cond.choice_id.trim() !== '' &&
-				!choiceIds.has(cond.choice_id))
+				!(
+					cond.type === 'domain_card_choice' &&
+					cond.choice_id &&
+					cond.choice_id.trim() !== '' &&
+					!choiceIds.has(cond.choice_id)
+				)
 		);
 	});
 
@@ -342,10 +401,12 @@
 		// Remove the entire condition instead of clearing its fields
 		conditions = conditions.filter(
 			(cond) =>
-				!(cond.type === 'ancestry_card_choice' &&
-				cond.choice_id &&
-				cond.choice_id.trim() !== '' &&
-				!choiceIds.has(cond.choice_id))
+				!(
+					cond.type === 'ancestry_card_choice' &&
+					cond.choice_id &&
+					cond.choice_id.trim() !== '' &&
+					!choiceIds.has(cond.choice_id)
+				)
 		);
 	});
 
@@ -464,76 +525,75 @@
 			{#if selectedTypes.includes('domain_card_choice') && (effectiveDomainCardChoices || domainCardChoiceCondition)}
 				<div class="flex flex-col gap-2">
 					{#if effectiveDomainCardChoices && effectiveDomainCardChoices.length > 0}
-						
-					<div class="grid grid-cols-2 gap-2">
-					<div class="flex flex-col gap-1">
-							<label
-								for="choice-id-select"
-								class={cn('text-xs text-muted-foreground', choiceRequiredError && 'text-destructive')}
-								>Choice</label
-							>
-							<Select.Root
-								type="single"
-								value={domainCardChoiceCondition?.choice_id ?? ''}
-								onValueChange={(value) => {
-									if (value === '' || value == null) {
-										updateDomainCardChoiceId('');
-									} else {
-										updateDomainCardChoiceId(value);
-									}
-								}}
-							>
-								<Select.Trigger
-									id="choice-id-select"
-									class={cn('w-full', choiceRequiredError && 'border-destructive')}
+						<div class="grid grid-cols-2 gap-2">
+							<div class="flex flex-col gap-1">
+								<label
+									for="choice-id-select"
+									class={cn(
+										'text-xs text-muted-foreground',
+										choiceRequiredError && 'text-destructive'
+									)}>Choice</label
 								>
-									<p class="truncate">
-										{domainCardChoiceCondition?.choice_id || 'None'}
-									</p>
-								</Select.Trigger>
-								<Select.Content>
-									{#if arbitraryChoices.length <= 0}
-									<Select.Item value="" disabled>None</Select.Item>
-									{/if}
-									{#each arbitraryChoices as choice}
-										<Select.Item value={choice.choice_id}>{choice.choice_id}</Select.Item>
-									{/each}
-								</Select.Content>
-							</Select.Root>
-							{#if choiceRequiredError}
-								<p class="text-xs text-destructive">{choiceRequiredError}</p>
-							{/if}
-						</div>
-								<div class="flex flex-col gap-1">
-									<label for="selection-id-select" class="text-xs text-muted-foreground"
-										>Answer</label
+								<Select.Root
+									type="single"
+									value={domainCardChoiceCondition?.choice_id ?? ''}
+									onValueChange={(value) => {
+										if (value === '' || value == null) {
+											updateDomainCardChoiceId('');
+										} else {
+											updateDomainCardChoiceId(value);
+										}
+									}}
+								>
+									<Select.Trigger
+										id="choice-id-select"
+										class={cn('w-full', choiceRequiredError && 'border-destructive')}
 									>
-									<Select.Root
-										type="single"
-										disabled={!selectedChoice}
-										value={domainCardChoiceCondition?.selection_id || ''}
-										onValueChange={(value) => {
-											if (value) {
-												updateDomainCardChoiceSelection(value);
-											}
-										}}
-									>
-										<Select.Trigger id="selection-id-select" class="w-full">
-											<p class="truncate">
-												{domainCardChoiceCondition?.selection_id || 'Select selection'}
-											</p>
-										</Select.Trigger>
-										<Select.Content>
-											{#if selectedChoice && selectedChoice.type === 'arbitrary'}
+										<p class="truncate">
+											{domainCardChoiceCondition?.choice_id || 'None'}
+										</p>
+									</Select.Trigger>
+									<Select.Content>
+										{#if arbitraryChoices.length <= 0}
+											<Select.Item value="" disabled>None</Select.Item>
+										{/if}
+										{#each arbitraryChoices as choice}
+											<Select.Item value={choice.choice_id}>{choice.choice_id}</Select.Item>
+										{/each}
+									</Select.Content>
+								</Select.Root>
+								{#if choiceRequiredError}
+									<p class="text-xs text-destructive">{choiceRequiredError}</p>
+								{/if}
+							</div>
+							<div class="flex flex-col gap-1">
+								<label for="selection-id-select" class="text-xs text-muted-foreground">Answer</label
+								>
+								<Select.Root
+									type="single"
+									disabled={!selectedChoice}
+									value={domainCardChoiceCondition?.selection_id || ''}
+									onValueChange={(value) => {
+										if (value) {
+											updateDomainCardChoiceSelection(value);
+										}
+									}}
+								>
+									<Select.Trigger id="selection-id-select" class="w-full">
+										<p class="truncate">
+											{domainCardChoiceCondition?.selection_id || 'Select selection'}
+										</p>
+									</Select.Trigger>
+									<Select.Content>
+										{#if selectedChoice && selectedChoice.type === 'arbitrary'}
 											{#each selectedChoice.options as option}
 												<Select.Item value={option.selection_id}>{option.title}</Select.Item>
 											{/each}
-											{/if}
-										</Select.Content>
-									</Select.Root>
-								</div>
-
-					</div>
+										{/if}
+									</Select.Content>
+								</Select.Root>
+							</div>
+						</div>
 					{:else if domainCardChoiceCondition?.choice_id}
 						<div class="rounded-md bg-muted p-2">
 							<p class="text-xs text-muted-foreground">
@@ -554,8 +614,10 @@
 							<div class="flex flex-col gap-1">
 								<label
 									for="ancestry-choice-id-select"
-									class={cn('text-xs text-muted-foreground', choiceRequiredError && 'text-destructive')}
-									>Choice</label
+									class={cn(
+										'text-xs text-muted-foreground',
+										choiceRequiredError && 'text-destructive'
+									)}>Choice</label
 								>
 								<Select.Root
 									type="single"

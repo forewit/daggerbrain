@@ -32,6 +32,8 @@
 					<div class="">
 						<Gold
 							bind:gold_coins={character.inventory.gold_coins}
+							isCoinMode={!!character?.settings.use_gold_coins}
+							canEdit={context.canEdit}
 							class="justify-center px-2 pb-4"
 						/>
 						<Inventory />

@@ -60,7 +60,7 @@
 	{#if (bind_token_count || (preview && card.tokens)) && card.tokens}
 		{@const current_count = preview
 			? localTokenCount
-			: character?.domain_card_tokens[card.compendium_id] ?? 0}
+			: (character?.domain_card_tokens[card.compendium_id] ?? 0)}
 		<div class="flex items-center justify-center gap-2">
 			<!-- Minus Button -->
 			{#if preview}
@@ -154,27 +154,32 @@
 
 		{#if preview || (character?.domain_card_choices[card.compendium_id] && character.domain_card_choices[card.compendium_id][choice.choice_id])}
 			{@const conditionalMet = preview
-				? (choice.conditional_choice === null ||
-						(conditional_choice_id &&
-							conditional_selection_id &&
-							localChoiceSelections[conditional_choice_id]?.includes(conditional_selection_id)))
-				: (choice.conditional_choice === null ||
-						(conditional_choice_id &&
-							conditional_selection_id &&
-							character?.domain_card_choices[card.compendium_id]?.[conditional_choice_id] &&
-							character.domain_card_choices[card.compendium_id][conditional_choice_id].includes(conditional_selection_id)))}
+				? choice.conditional_choice === null ||
+					(conditional_choice_id &&
+						conditional_selection_id &&
+						localChoiceSelections[conditional_choice_id]?.includes(conditional_selection_id))
+				: choice.conditional_choice === null ||
+					(conditional_choice_id &&
+						conditional_selection_id &&
+						character?.domain_card_choices[card.compendium_id]?.[conditional_choice_id] &&
+						character.domain_card_choices[card.compendium_id][conditional_choice_id].includes(
+							conditional_selection_id
+						))}
 			{@const modifierUnconditionalForThisChoice = card.features.some((f) =>
-				f.character_modifiers.some((m) =>
-					m.target === 'experience_from_domain_card_choice_selection' &&
-					(m as { choice_id?: string }).choice_id === choice.choice_id &&
-					!(m.character_conditions || []).some((c) => (c as { type?: string }).type === 'domain_card_choice')
+				f.character_modifiers.some(
+					(m) =>
+						m.target === 'experience_from_domain_card_choice_selection' &&
+						(m as { choice_id?: string }).choice_id === choice.choice_id &&
+						!(m.character_conditions || []).some(
+							(c) => (c as { type?: string }).type === 'domain_card_choice'
+						)
 				)
 			)}
 			{#if conditionalMet || modifierUnconditionalForThisChoice}
 				{#if choice.type === 'arbitrary'}
 					{#if preview}
 						{#if !localChoiceSelections[choice.choice_id]}
-							{localChoiceSelections[choice.choice_id] = []}
+							{(localChoiceSelections[choice.choice_id] = [])}
 						{/if}
 						<ChoiceSelector
 							disabled={false}
@@ -188,7 +193,9 @@
 						<ChoiceSelector
 							disabled={!context.canEdit}
 							class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
-							bind:selected_ids={character.domain_card_choices[card.compendium_id][choice.choice_id]}
+							bind:selected_ids={
+								character.domain_card_choices[card.compendium_id][choice.choice_id]
+							}
 							max={choice.max}
 							options={choice.options}
 							{width}
@@ -197,7 +204,7 @@
 				{:else if choice.type === 'experience'}
 					{#if preview}
 						{#if !localChoiceSelections[choice.choice_id]}
-							{localChoiceSelections[choice.choice_id] = []}
+							{(localChoiceSelections[choice.choice_id] = [])}
 						{/if}
 						<ChoiceSelector
 							disabled={false}
@@ -404,7 +411,11 @@
 
 			<!-- credits -->
 			<div class="mt-auto flex shrink-0 items-end px-3 pb-2 leading-none">
-				<img src="/images/card/quill-icon.png" alt="quill" class="size-[14px]" />
+				<img
+					src="/images/card/quill-icon.png"
+					alt="quill"
+					class={cn('size-[14px]', card.artist_name.trim() === '' && 'hidden')}
+				/>
 				<p class="grow text-[9px] text-black italic">{card.artist_name}</p>
 				<p class="px-[2px] text-[8px] text-black text-muted-foreground italic">
 					Daggerheart™ Compatible. Terms at Daggerheart.com

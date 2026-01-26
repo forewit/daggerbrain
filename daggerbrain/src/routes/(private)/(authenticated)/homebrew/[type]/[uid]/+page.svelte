@@ -243,6 +243,17 @@
 	let hasChanges = $state(false);
 	let hasErrors = $state(false);
 	let wasSaving = $state(false);
+	let unsavedWeapon: Weapon | null = $state(null);
+	let unsavedArmor: Armor | null = $state(null);
+	let unsavedBeastform: Beastform | null = $state(null);
+	let unsavedLoot: Loot | null = $state(null);
+	let unsavedConsumable: Consumable | null = $state(null);
+	let unsavedDomainCard: DomainCard | null = $state(null);
+	let unsavedAncestryCard: AncestryCard | null = $state(null);
+	let unsavedCommunityCard: CommunityCard | null = $state(null);
+	let unsavedSubclass: Subclass | null = $state(null);
+	let unsavedClass: CharacterClass | null = $state(null);
+	let subclassFormTab: 'foundation' | 'specialization' | 'mastery' = $state('foundation');
 
 	// Watch for save completion and show toast
 	$effect(() => {
@@ -357,10 +368,7 @@
 							<Button
 								type="button"
 								size="sm"
-								class={cn(
-									'h-7',
-									hasErrors && 'border border-destructive hover:bg-primary'
-								)}
+								class={cn('h-7', hasErrors && 'border border-destructive hover:bg-primary')}
 								disabled={!hasChanges || homebrew.saving}
 								hidden={!hasChanges && !homebrew.saving}
 								onclick={handleSave}
@@ -380,16 +388,17 @@
 			<!-- Main Content: Preview and Edit Side by Side -->
 			<div class="w-full max-w-6xl sm:px-4 sm:py-8">
 				<div
-					class="relative grid grid-cols-1 gap-8 border-accent/10 bg-accent/5 px-2 py-8 sm:gap-6 sm:rounded-3xl sm:border-x sm:px-6 sm:py-6 md:grid-cols-2"
+					class="relative flex flex-col-reverse gap-8 border-accent/10 bg-accent/5 px-2 py-8 sm:gap-6 sm:rounded-3xl sm:border-x sm:px-6 sm:py-6 md:flex-row"
 				>
 					<!-- edit -->
-					<div>
+					<div class="flex-1">
 						<p class="mb-4 text-center font-eveleth text-accent">Edit</p>
 						<div class="rounded-lg bg-background p-4">
 							{#if homebrewItem.type === 'weapon'}
 								<HomebrewWeaponForm
 									bind:this={formComponent}
 									bind:item={homebrewItem.item}
+									bind:unsavedItem={unsavedWeapon}
 									bind:hasChanges
 									bind:hasErrors
 									onSubmit={handleSave}
@@ -399,6 +408,7 @@
 								<HomebrewArmorForm
 									bind:this={formComponent}
 									bind:item={homebrewItem.item}
+									bind:unsavedItem={unsavedArmor}
 									bind:hasChanges
 									bind:hasErrors
 									onSubmit={handleSave}
@@ -408,6 +418,7 @@
 								<HomebrewBeastformForm
 									bind:this={formComponent}
 									bind:item={homebrewItem.item}
+									bind:unsavedItem={unsavedBeastform}
 									bind:hasChanges
 									bind:hasErrors
 									onSubmit={handleSave}
@@ -417,6 +428,7 @@
 								<HomebrewLootForm
 									bind:this={formComponent}
 									bind:item={homebrewItem.item}
+									bind:unsavedItem={unsavedLoot}
 									bind:hasChanges
 									bind:hasErrors
 									onSubmit={handleSave}
@@ -426,6 +438,7 @@
 								<HomebrewConsumableForm
 									bind:this={formComponent}
 									bind:item={homebrewItem.item}
+									bind:unsavedItem={unsavedConsumable}
 									bind:hasChanges
 									bind:hasErrors
 									onSubmit={handleSave}
@@ -435,24 +448,7 @@
 								<HomebrewDomainCardForm
 									bind:this={formComponent}
 									bind:item={homebrewItem.item}
-									bind:hasChanges
-									bind:hasErrors
-									onSubmit={handleSave}
-									onReset={handleReset}
-								/>
-								<!-- {:else if homebrewItem.type === 'class'}
-								<HomebrewClassForm
-									bind:this={formComponent}
-									bind:item={homebrewItem.item}
-									bind:hasChanges
-									bind:hasErrors
-									onSubmit={handleSave}
-									onReset={handleReset}
-								/>
-							{:else if homebrewItem.type === 'subclass'}
-								<HomebrewSubclassForm
-									bind:this={formComponent}
-									bind:item={homebrewItem.item}
+									bind:unsavedItem={unsavedDomainCard}
 									bind:hasChanges
 									bind:hasErrors
 									onSubmit={handleSave}
@@ -462,6 +458,7 @@
 								<HomebrewAncestryCardForm
 									bind:this={formComponent}
 									bind:item={homebrewItem.item}
+									bind:unsavedItem={unsavedAncestryCard}
 									bind:hasChanges
 									bind:hasErrors
 									onSubmit={handleSave}
@@ -471,12 +468,34 @@
 								<HomebrewCommunityCardForm
 									bind:this={formComponent}
 									bind:item={homebrewItem.item}
+									bind:unsavedItem={unsavedCommunityCard}
 									bind:hasChanges
 									bind:hasErrors
 									onSubmit={handleSave}
 									onReset={handleReset}
 								/>
-							{:else if homebrewItem.type === 'transformation-cards'}
+							{:else if homebrewItem.type === 'class'}
+								<HomebrewClassForm
+									bind:this={formComponent}
+									bind:item={homebrewItem.item}
+									bind:unsavedItem={unsavedClass}
+									bind:hasChanges
+									bind:hasErrors
+									onSubmit={handleSave}
+									onReset={handleReset}
+								/>
+							{:else if homebrewItem.type === 'subclass'}
+								<HomebrewSubclassForm
+									bind:formTab={subclassFormTab}
+									bind:this={formComponent}
+									bind:item={homebrewItem.item}
+									bind:unsavedItem={unsavedSubclass}
+									bind:hasChanges
+									bind:hasErrors
+									onSubmit={handleSave}
+									onReset={handleReset}
+								/>
+								<!-- {:else if homebrewItem.type === 'transformation-cards'}
 								<HomebrewTransformationCardForm
 									bind:this={formComponent}
 									bind:item={homebrewItem.item}
@@ -491,34 +510,41 @@
 					</div>
 
 					<!-- preview -->
-					<div>
-						<div class="sticky top-17">
-							<p class="mb-4 text-center font-eveleth text-accent">Preview</p>
-							<div class="  flex flex-col items-center gap-4">
-								{#if homebrewItem.type === 'weapon'}
-									<WeaponPreview weapon={homebrewItem.item} />
-								{:else if homebrewItem.type === 'armor'}
-									<ArmorPreview armor={homebrewItem.item} />
-								{:else if homebrewItem.type === 'beastform'}
-									<BeastformPreview beastform={homebrewItem.item} />
-								{:else if homebrewItem.type === 'loot'}
-									<LootPreview loot={homebrewItem.item} />
-								{:else if homebrewItem.type === 'consumable'}
-									<ConsumablePreview consumable={homebrewItem.item} />
-								{:else if homebrewItem.type === 'domain-cards'}
-									<DomainCardPreview card={homebrewItem.item} />
-									<!-- {:else if homebrewItem.type === 'class'}
-								<ClassPreview characterClass={homebrewItem.item} />
-							{:else if homebrewItem.type === 'subclass'}
-								<SubclassPreview subclass={homebrewItem.item} />
-							{:else if homebrewItem.type === 'ancestry-cards'}
-								<AncestryCardPreview card={homebrewItem.item} />
-							{:else if homebrewItem.type === 'community-cards'}
-								<CommunityCardPreview card={homebrewItem.item} />
-							{:else if homebrewItem.type === 'transformation-cards'}
+					<div class="grid flex-1">
+						<div class="flex-1">
+							<div class="sticky top-17">
+								<p class="mb-4 text-center font-eveleth text-accent">Preview</p>
+								<div class="  flex flex-col items-center gap-4">
+									{#if homebrewItem.type === 'weapon'}
+										<WeaponPreview weapon={unsavedWeapon || homebrewItem.item} />
+									{:else if homebrewItem.type === 'armor'}
+										<ArmorPreview armor={unsavedArmor || homebrewItem.item} />
+									{:else if homebrewItem.type === 'beastform'}
+										<BeastformPreview beastform={unsavedBeastform || homebrewItem.item} />
+									{:else if homebrewItem.type === 'loot'}
+										<LootPreview loot={unsavedLoot || homebrewItem.item} />
+									{:else if homebrewItem.type === 'consumable'}
+										<ConsumablePreview consumable={unsavedConsumable || homebrewItem.item} />
+									{:else if homebrewItem.type === 'domain-cards'}
+										<DomainCardPreview card={unsavedDomainCard || homebrewItem.item} />
+									{:else if homebrewItem.type === 'ancestry-cards'}
+										<AncestryCardPreview card={unsavedAncestryCard || homebrewItem.item} />
+									{:else if homebrewItem.type === 'community-cards'}
+										<CommunityCardPreview card={unsavedCommunityCard || homebrewItem.item} />
+									{:else if homebrewItem.type === 'class'}
+										<ClassPreview characterClass={unsavedClass || homebrewItem.item} />
+									{:else if homebrewItem.type === 'subclass'}
+										<SubclassPreview
+											card={unsavedSubclass || homebrewItem.item}
+											bind:formTab={subclassFormTab}
+											description={unsavedSubclass?.description_html ||
+												homebrewItem.item.description_html}
+										/>
+										<!-- {:else if homebrewItem.type === 'transformation-cards'}
 								<TransformationCardPreview card={homebrewItem.item} />
 							 -->
-								{/if}
+									{/if}
+								</div>
 							</div>
 						</div>
 					</div>

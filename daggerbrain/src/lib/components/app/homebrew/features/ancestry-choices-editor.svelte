@@ -24,7 +24,7 @@
 	// Track which dropdowns are open by stable index-based key
 	let dropdownOpenStates = $state<Record<string, boolean>>({});
 
-	let arbitraryChoices = $derived(choices.filter(c => c.type === 'arbitrary'));
+	let arbitraryChoices = $derived(choices.filter((c) => c.type === 'arbitrary'));
 
 	// Helper to get a stable key for a choice based on index
 	function getChoiceKey(indexInFiltered: number): string {
@@ -73,31 +73,30 @@
 		// Find the actual choice in the filtered arbitrary choices
 		const choiceToRemove = arbitraryChoices[index];
 		if (!choiceToRemove) return;
-		
+
 		// Get the choice_id of the choice being removed
 		const removedChoiceId = choiceToRemove.choice_id;
-		
+
 		// Remove the choice and clean up conditional_choice references
-		choices = choices.map((choice) => {
-			// If this is the choice being removed, exclude it
-			if (choice === choiceToRemove) {
-				return null; // Mark for removal
-			}
-			
-			// If this choice has a conditional_choice pointing to the removed choice, clear it
-			if (
-				choice.conditional_choice &&
-				choice.conditional_choice.choice_id === removedChoiceId
-			) {
-				return {
-					...choice,
-					conditional_choice: null
-				};
-			}
-			
-			return choice;
-		}).filter((c): c is AncestryCardChoice => c !== null);
-		
+		choices = choices
+			.map((choice) => {
+				// If this is the choice being removed, exclude it
+				if (choice === choiceToRemove) {
+					return null; // Mark for removal
+				}
+
+				// If this choice has a conditional_choice pointing to the removed choice, clear it
+				if (choice.conditional_choice && choice.conditional_choice.choice_id === removedChoiceId) {
+					return {
+						...choice,
+						conditional_choice: null
+					};
+				}
+
+				return choice;
+			})
+			.filter((c): c is AncestryCardChoice => c !== null);
+
 		// Clean up dropdown state
 		const key = getChoiceKey(index);
 		const next = { ...dropdownOpenStates };
@@ -113,10 +112,10 @@
 		};
 		const choiceToUpdate = arbitraryChoices[choiceIndex];
 		if (!choiceToUpdate) return;
-		
-		const actualIndex = choices.findIndex(c => c === choiceToUpdate);
+
+		const actualIndex = choices.findIndex((c) => c === choiceToUpdate);
 		if (actualIndex === -1) return;
-		
+
 		choices = choices.map((choice, i) => {
 			if (i === actualIndex && choice.type === 'arbitrary') {
 				return {
@@ -131,10 +130,10 @@
 	function removeOption(choiceIndex: number, optionIndex: number) {
 		const choiceToUpdate = arbitraryChoices[choiceIndex];
 		if (!choiceToUpdate) return;
-		
-		const actualIndex = choices.findIndex(c => c === choiceToUpdate);
+
+		const actualIndex = choices.findIndex((c) => c === choiceToUpdate);
 		if (actualIndex === -1) return;
-		
+
 		choices = choices.map((choice, i) => {
 			if (i === actualIndex && choice.type === 'arbitrary') {
 				return {
@@ -149,10 +148,10 @@
 	function updateChoiceField(choiceIndex: number, field: string, value: unknown) {
 		const choiceToUpdate = arbitraryChoices[choiceIndex];
 		if (!choiceToUpdate) return;
-		
-		const actualIndex = choices.findIndex(c => c === choiceToUpdate);
+
+		const actualIndex = choices.findIndex((c) => c === choiceToUpdate);
 		if (actualIndex === -1) return;
-		
+
 		choices = choices.map((choice, i) => {
 			if (i === actualIndex) {
 				return { ...choice, [field]: value };
@@ -169,10 +168,10 @@
 	) {
 		const choiceToUpdate = arbitraryChoices[choiceIndex];
 		if (!choiceToUpdate) return;
-		
-		const actualIndex = choices.findIndex(c => c === choiceToUpdate);
+
+		const actualIndex = choices.findIndex((c) => c === choiceToUpdate);
 		if (actualIndex === -1) return;
-		
+
 		choices = choices.map((choice, i) => {
 			if (i === actualIndex && choice.type === 'arbitrary') {
 				return {
@@ -203,10 +202,10 @@
 	) {
 		const choiceToUpdate = arbitraryChoices[choiceIndex];
 		if (!choiceToUpdate) return;
-		
-		const actualIndex = choices.findIndex(c => c === choiceToUpdate);
+
+		const actualIndex = choices.findIndex((c) => c === choiceToUpdate);
 		if (actualIndex === -1) return;
-		
+
 		choices = choices.map((choice, i) => {
 			if (i === actualIndex) {
 				if (field === null) {
@@ -255,7 +254,7 @@
 				<div class="flex flex-col gap-4">
 					<div class="flex gap-2">
 						<!-- Choice Name -->
-						<div class="flex flex-col gap-1 flex-1">
+						<div class="flex flex-1 flex-col gap-1">
 							<label for="ancestry-choice-id-{choiceIndex}" class="text-xs text-muted-foreground"
 								>Name</label
 							>
@@ -273,37 +272,48 @@
 							{/if}
 						</div>
 
-						<!-- Feature Index -->
-						<div class="flex flex-col gap-1 w-32">
-							<label for="ancestry-feature-index-{choiceIndex}" class="text-xs text-muted-foreground"
-								>Feature Index</label
-							>
-							<Input
-								id="ancestry-feature-index-{choiceIndex}"
-								type="number"
-								value={String(choice.feature_index)}
-								oninput={(e) =>
-									updateChoiceField(choiceIndex, 'feature_index', Number(e.currentTarget.value))}
-								placeholder="0"
-								min="0"
-								max={Math.max(0, featureCount - 1)}
-							/>
-						</div>
-
 						<!-- Max Answers -->
-						<div class="flex flex-col gap-1 w-24">
-							<label for="ancestry-max-selections-{choiceIndex}" class="text-xs text-muted-foreground"
-								>Max Answers</label
+						<div class="flex w-24 flex-col gap-1">
+							<label
+								for="ancestry-max-selections-{choiceIndex}"
+								class="text-xs text-muted-foreground">Max Answers</label
 							>
 							<Input
 								id="ancestry-max-selections-{choiceIndex}"
 								type="number"
 								value={String(choice.max)}
-								oninput={(e) => updateChoiceField(choiceIndex, 'max', Number(e.currentTarget.value))}
+								oninput={(e) =>
+									updateChoiceField(choiceIndex, 'max', Number(e.currentTarget.value))}
 								placeholder="1"
 								min="1"
 							/>
 						</div>
+					</div>
+
+					<!-- Feature Selection -->
+					<div class="flex flex-col gap-1">
+						<label for="ancestry-feature-select-{choiceIndex}" class="text-xs text-muted-foreground"
+							>Feature</label
+						>
+						<Select.Root
+							type="single"
+							value={String(choice.feature_index)}
+							onValueChange={(v) => {
+								if (v) {
+									updateChoiceField(choiceIndex, 'feature_index', Number(v));
+								}
+							}}
+						>
+							<Select.Trigger id="ancestry-feature-select-{choiceIndex}" class="w-full">
+								<p class="truncate">
+									{choice.feature_index === 0 ? 'Top Feature' : 'Bottom Feature'}
+								</p>
+							</Select.Trigger>
+							<Select.Content>
+								<Select.Item value="0">Top Feature</Select.Item>
+								<Select.Item value="1">Bottom Feature</Select.Item>
+							</Select.Content>
+						</Select.Root>
 					</div>
 
 					<!-- Choice Type -->
@@ -355,14 +365,14 @@
 							/>
 							<label
 								for="ancestry-conditional-checkbox-{choiceIndex}"
-								class="text-xs text-muted-foreground cursor-pointer"
+								class="cursor-pointer text-xs text-muted-foreground"
 							>
 								Hidden until another choice is answered
 							</label>
 						</div>
 						{#if choice.conditional_choice !== null}
 							<div class="grid grid-cols-2 gap-2">
-								<div class="flex flex-col gap-1 flex-1">
+								<div class="flex flex-1 flex-col gap-1">
 									<label
 										for="ancestry-conditional-choice-select-{choiceIndex}"
 										class="text-xs text-muted-foreground">Choice</label
@@ -372,18 +382,30 @@
 										value={choice.conditional_choice?.choice_id || ''}
 										onValueChange={(value) => {
 											if (value) {
-												const selectedChoice = arbitraryChoices.find((c, idx) => idx !== choiceIndex && c.choice_id === value);
+												const selectedChoice = arbitraryChoices.find(
+													(c, idx) => idx !== choiceIndex && c.choice_id === value
+												);
 												updateConditionalChoice(choiceIndex, 'choice_id', value);
 												// Auto-select first option if available
-												if (selectedChoice?.type === 'arbitrary' && selectedChoice.options.length > 0) {
-													updateConditionalChoice(choiceIndex, 'selection_id', selectedChoice.options[0].selection_id);
+												if (
+													selectedChoice?.type === 'arbitrary' &&
+													selectedChoice.options.length > 0
+												) {
+													updateConditionalChoice(
+														choiceIndex,
+														'selection_id',
+														selectedChoice.options[0].selection_id
+													);
 												}
 											} else {
 												updateConditionalChoice(choiceIndex, null, null);
 											}
 										}}
 									>
-										<Select.Trigger id="ancestry-conditional-choice-select-{choiceIndex}" class="w-full">
+										<Select.Trigger
+											id="ancestry-conditional-choice-select-{choiceIndex}"
+											class="w-full"
+										>
 											<p class="truncate">
 												{choice.conditional_choice?.choice_id || 'Select a choice'}
 											</p>
@@ -403,9 +425,11 @@
 									</Select.Root>
 								</div>
 								{#if choice.conditional_choice?.choice_id}
-									{@const selectedConditionalChoice = arbitraryChoices.find((c) => c.choice_id === choice.conditional_choice?.choice_id)}
+									{@const selectedConditionalChoice = arbitraryChoices.find(
+										(c) => c.choice_id === choice.conditional_choice?.choice_id
+									)}
 									{#if selectedConditionalChoice}
-										<div class="flex flex-col gap-1 flex-1">
+										<div class="flex flex-1 flex-col gap-1">
 											<label
 												for="ancestry-conditional-selection-select-{choiceIndex}"
 												class="text-xs text-muted-foreground">Answer</label
@@ -419,9 +443,14 @@
 													}
 												}}
 											>
-												<Select.Trigger id="ancestry-conditional-selection-select-{choiceIndex}" class="w-full">
+												<Select.Trigger
+													id="ancestry-conditional-selection-select-{choiceIndex}"
+													class="w-full"
+												>
 													<p class="truncate">
-														{selectedConditionalChoice.options.find((opt) => opt.selection_id === choice.conditional_choice?.selection_id)?.title || 'Select an answer'}
+														{selectedConditionalChoice.options.find(
+															(opt) => opt.selection_id === choice.conditional_choice?.selection_id
+														)?.title || 'Select an answer'}
 													</p>
 												</Select.Trigger>
 												<Select.Content>
@@ -435,17 +464,17 @@
 										</div>
 									{/if}
 								{:else}
-									<div class="flex flex-col gap-1 flex-1">
+									<div class="flex flex-1 flex-col gap-1">
 										<label
 											for="ancestry-conditional-selection-select-{choiceIndex}"
 											class="text-xs text-muted-foreground">Answer</label
 										>
-										<Select.Root
-											type="single"
-											value=""
-											disabled={true}
-										>
-											<Select.Trigger id="ancestry-conditional-selection-select-{choiceIndex}" class="w-full" disabled>
+										<Select.Root type="single" value="" disabled={true}>
+											<Select.Trigger
+												id="ancestry-conditional-selection-select-{choiceIndex}"
+												class="w-full"
+												disabled
+											>
 												<p class="truncate">Select a choice first</p>
 											</Select.Trigger>
 										</Select.Root>
@@ -476,19 +505,19 @@
 										<Input
 											value={option.title}
 											oninput={(e) =>
-												updateOptionField(
-													choiceIndex,
-													optionIndex,
-													'title',
-													e.currentTarget.value
-												)}
+												updateOptionField(choiceIndex, optionIndex, 'title', e.currentTarget.value)}
 											onblur={(e) => {
 												// Auto-generate selection_id from title on blur
 												const title = e.currentTarget.value;
 												if (title && title.trim() !== '') {
 													const generatedId = generateSelectionId(title);
 													if (generatedId && generatedId !== option.selection_id) {
-														updateOptionField(choiceIndex, optionIndex, 'selection_id', generatedId);
+														updateOptionField(
+															choiceIndex,
+															optionIndex,
+															'selection_id',
+															generatedId
+														);
 													}
 												}
 											}}

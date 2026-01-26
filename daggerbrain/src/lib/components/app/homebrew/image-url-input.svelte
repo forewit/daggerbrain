@@ -1,17 +1,20 @@
 <script lang="ts">
 	import { getUserContext } from '$lib/state/user.svelte';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
+	import { cn } from '$lib/utils';
 
 	let {
 		value = $bindable(),
 		hasPendingFile = $bindable(false),
 		id,
-		alt = 'Image preview'
+		alt = 'Image preview',
+		class: className = ''
 	}: {
 		value: string;
 		hasPendingFile?: boolean;
 		id?: string;
 		alt?: string;
+		class?: string;
 	} = $props();
 
 	const user = getUserContext();
@@ -45,6 +48,28 @@
 	function triggerImageUpload() {
 		fileInput?.click();
 	}
+
+	// Method to get the current preview URL (if a file is pending)
+	// Returns the preview URL if available, otherwise null
+	export function getPreviewUrl(): string | null {
+		return previewUrl;
+	}
+
+	// Method to clear the pending file and preview URL
+	// This should be called when resetting/discarding changes
+	export function clearPendingFile(): void {
+		pendingFile = null;
+		previewUrl = null;
+	}
+
+	// Reactive effect: clear internal state when hasPendingFile becomes false
+	$effect(() => {
+		if (!hasPendingFile && (pendingFile || previewUrl)) {
+			// Parent set hasPendingFile to false, clear internal state
+			pendingFile = null;
+			previewUrl = null;
+		}
+	});
 
 	// Method to upload the pending file and return the URL
 	// This should be called by the parent form on save
@@ -96,7 +121,7 @@
 	const imageUrl = $derived(previewUrl || value || placeholderImage);
 </script>
 
-<div class="flex flex-col gap-1">
+<div class={cn('flex flex-col gap-1', className)}>
 	<!-- Hidden file input for image upload -->
 	<input
 		bind:this={fileInput}

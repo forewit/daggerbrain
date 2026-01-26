@@ -26,12 +26,14 @@
 		item = $bindable(),
 		hasChanges = $bindable(),
 		hasErrors = $bindable(),
+		unsavedItem = $bindable(),
 		onSubmit,
 		onReset
 	}: {
 		item: Armor;
 		hasChanges?: boolean;
 		hasErrors?: boolean;
+		unsavedItem?: Armor | null;
 		onSubmit?: (e?: SubmitEvent) => void;
 		onReset?: () => void;
 	} = $props();
@@ -107,9 +109,34 @@
 		);
 	});
 
+	// Build unsaved armor from current form state
+	let unsavedArmor = $derived.by(() => {
+		if (!item) return null;
+
+		// Track all form fields to ensure reactivity
+		formTitle;
+		formDescriptionHtml;
+		formTier;
+		formMaxArmor;
+		formMajorThreshold;
+		formSevereThreshold;
+		formFeatures;
+
+		// Build the unsaved armor by merging item with form data
+		return {
+			...item,
+			...buildFormData()
+		} as Armor;
+	});
+
 	// Sync hasChanges to bindable prop
 	$effect(() => {
 		hasChanges = formHasChanges;
+	});
+
+	// Sync unsavedArmor to bindable prop
+	$effect(() => {
+		unsavedItem = unsavedArmor;
 	});
 
 	// Check if there are any validation errors
@@ -573,10 +600,7 @@
 				type="submit"
 				size="sm"
 				disabled={!formHasChanges || homebrew.saving}
-				class={cn(
-					'h-7',
-					hasValidationErrors && 'border border-destructive hover:bg-primary'
-				)}
+				class={cn('h-7', hasValidationErrors && 'border border-destructive hover:bg-primary')}
 			>
 				{#if homebrew.saving}
 					<Loader2 class="size-3.5 animate-spin" />

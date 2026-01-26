@@ -14,12 +14,14 @@
 		card = $bindable(),
 		class: className = '',
 		variant = 'responsive',
+		preview = false,
 		children
 	}: {
 		bind_choice_select?: boolean;
 		card: AncestryCard;
 		variant?: 'responsive' | 'card';
 		class?: string;
+		preview?: boolean;
 		children?: Snippet;
 	} = $props();
 
@@ -30,6 +32,23 @@
 	const compendium = getCompendiumContext();
 
 	let width = $state(300);
+
+	// Local state for preview mode
+	let localChoiceSelections = $state<Record<string, string[]>>({});
+
+	// Initialize local state when preview is true
+	$effect(() => {
+		if (preview) {
+			// Initialize choice selections
+			const selections: Record<string, string[]> = {};
+			for (const choice of card.choices) {
+				selections[choice.choice_id] = [];
+			}
+			localChoiceSelections = selections;
+		}
+		// Re-run when card.choices changes
+		card.choices;
+	});
 
 	let isMixedAncestry = $derived(card.compendium_id === BASE_MIXED_ANCESTRY_CARD.compendium_id);
 	let ancestryOptions = $derived(
@@ -43,38 +62,84 @@
 </script>
 
 {#snippet choice_select(choice: AncestryCardChoice)}
-	{#if character && card.choices.length > 0 && bind_choice_select}
+	{#if card.choices.length > 0 && (bind_choice_select || preview)}
 		{@const conditional_choice_id = choice.conditional_choice?.choice_id || null}
 		{@const conditional_selection_id = choice.conditional_choice?.selection_id || null}
 
-		{#if character.ancestry_card_choices[choice.choice_id]}
-			{#if choice.conditional_choice === null || (conditional_choice_id && conditional_selection_id && character.ancestry_card_choices[conditional_choice_id] && character.ancestry_card_choices[conditional_choice_id].includes(conditional_selection_id))}
+		{#if preview || character?.ancestry_card_choices[choice.choice_id]}
+			{@const conditionalMet = preview
+				? choice.conditional_choice === null ||
+					(conditional_choice_id &&
+						conditional_selection_id &&
+						localChoiceSelections[conditional_choice_id]?.includes(conditional_selection_id))
+				: choice.conditional_choice === null ||
+					(conditional_choice_id &&
+						conditional_selection_id &&
+						character?.ancestry_card_choices[conditional_choice_id] &&
+						character.ancestry_card_choices[conditional_choice_id].includes(
+							conditional_selection_id
+						))}
+			{#if conditionalMet}
 				{#if choice.type === 'arbitrary'}
-					<ChoiceSelector
-						disabled={!context.canEdit}
-						class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
-						bind:selected_ids={character.ancestry_card_choices[choice.choice_id]}
-						max={choice.max}
-						options={choice.options}
-						{width}
-					/>
+					{#if preview}
+						{#if !localChoiceSelections[choice.choice_id]}
+							{(localChoiceSelections[choice.choice_id] = [])}
+						{/if}
+						<ChoiceSelector
+							disabled={false}
+							class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
+							bind:selected_ids={localChoiceSelections[choice.choice_id]}
+							max={choice.max}
+							options={choice.options}
+							{width}
+						/>
+					{:else if character && character.ancestry_card_choices[choice.choice_id]}
+						<ChoiceSelector
+							disabled={!context.canEdit}
+							class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
+							bind:selected_ids={character.ancestry_card_choices[choice.choice_id]}
+							max={choice.max}
+							options={choice.options}
+							{width}
+						/>
+					{/if}
 				{:else if choice.type === 'experience'}
-					<ChoiceSelector
-						disabled={!context.canEdit}
-						class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
-						bind:selected_ids={character.ancestry_card_choices[choice.choice_id]}
-						max={choice.max}
-						options={character.experiences.map((exp, i) => {
-							return {
+					{#if preview}
+						{#if !localChoiceSelections[choice.choice_id]}
+							{(localChoiceSelections[choice.choice_id] = [])}
+						{/if}
+						<ChoiceSelector
+							disabled={false}
+							class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
+							bind:selected_ids={localChoiceSelections[choice.choice_id]}
+							max={choice.max}
+							options={Array.from({ length: 4 }, (_, i) => ({
 								selection_id: i.toString(),
-								title: exp,
-								short_title: exp
-							};
-						})}
-						term="Experience"
-						term_plural="Experiences"
-						{width}
-					/>
+								title: `Example experience ${i + 1}`,
+								short_title: `Example experience ${i + 1}`
+							}))}
+							term="Experience"
+							term_plural="Experiences"
+							{width}
+						/>
+					{:else if character && character.ancestry_card_choices[choice.choice_id]}
+						<ChoiceSelector
+							disabled={!context.canEdit}
+							class="w-full border-black/30 bg-white font-medium text-background hover:bg-black/10 data-[placeholder]:text-muted [&_svg:not([class*='text-'])]:text-muted"
+							bind:selected_ids={character.ancestry_card_choices[choice.choice_id]}
+							max={choice.max}
+							options={character.experiences.map((exp, i) => {
+								return {
+									selection_id: i.toString(),
+									title: exp,
+									short_title: exp
+								};
+							})}
+							term="Experience"
+							term_plural="Experiences"
+							{width}
+						/>
+					{/if}
 				{/if}
 			{:else}
 				<!-- conditional choice not met -->
@@ -270,7 +335,11 @@
 
 			<!-- credits -->
 			<div class="mt-auto flex shrink-0 items-end px-3 pb-2 leading-none">
-				<img src="/images/card/quill-icon.png" alt="quill" class="size-[14px]" />
+				<img
+					src="/images/card/quill-icon.png"
+					alt="quill"
+					class={cn('size-[14px]', card.artist_name.trim() === '' && 'hidden')}
+				/>
 				<p class="grow text-[9px] text-black italic">{card.artist_name}</p>
 				<p class="px-[2px] text-[8px] text-black text-muted-foreground italic">
 					Daggerheart™ Compatible. Terms at Daggerheart.com

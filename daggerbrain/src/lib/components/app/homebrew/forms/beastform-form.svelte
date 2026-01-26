@@ -33,12 +33,14 @@
 		item = $bindable(),
 		hasChanges = $bindable(),
 		hasErrors = $bindable(),
+		unsavedItem = $bindable(),
 		onSubmit,
 		onReset
 	}: {
 		item: Beastform;
 		hasChanges?: boolean;
 		hasErrors?: boolean;
+		unsavedItem?: Beastform | null;
 		onSubmit?: (e?: SubmitEvent) => void;
 		onReset?: () => void;
 	} = $props();
@@ -179,9 +181,41 @@
 		);
 	});
 
+	// Build unsaved beastform from current form state
+	let unsavedBeastform = $derived.by(() => {
+		if (!item) return null;
+
+		// Track all form fields to ensure reactivity
+		formName;
+		formCategory;
+		formTier;
+		formCharacterTrait;
+		formCharacterTraitBonus;
+		formAttackRange;
+		formAttackTrait;
+		formAttackDamageDice;
+		formAttackDamageBonus;
+		formAttackDamageType;
+		formAdvantages;
+		formEvasionBonus;
+		formFeatures;
+		formSpecialCase;
+
+		// Build the unsaved beastform by merging item with form data
+		return {
+			...item,
+			...buildFormData()
+		} as Beastform;
+	});
+
 	// Sync hasChanges to bindable prop
 	$effect(() => {
 		hasChanges = formHasChanges;
+	});
+
+	// Sync unsavedBeastform to bindable prop
+	$effect(() => {
+		unsavedItem = unsavedBeastform;
 	});
 
 	// Check if there are any validation errors
@@ -837,10 +871,7 @@
 				type="submit"
 				size="sm"
 				disabled={!formHasChanges || homebrew.saving}
-				class={cn(
-					'h-7',
-					hasValidationErrors && 'border border-destructive hover:bg-primary'
-				)}
+				class={cn('h-7', hasValidationErrors && 'border border-destructive hover:bg-primary')}
 			>
 				{#if homebrew.saving}
 					<Loader2 class="size-3.5 animate-spin" />

@@ -23,12 +23,14 @@
 		item = $bindable(),
 		hasChanges = $bindable(),
 		hasErrors = $bindable(),
+		unsavedItem = $bindable(),
 		onSubmit,
 		onReset
 	}: {
 		item: Loot;
 		hasChanges?: boolean;
 		hasErrors?: boolean;
+		unsavedItem?: Loot | null;
 		onSubmit?: (e?: SubmitEvent) => void;
 		onReset?: () => void;
 	} = $props();
@@ -76,9 +78,31 @@
 		return !(titleMatch && descriptionMatch && characterModifiersMatch && weaponModifiersMatch);
 	});
 
+	// Build unsaved loot from current form state
+	let unsavedLoot = $derived.by(() => {
+		if (!item) return null;
+
+		// Track all form fields to ensure reactivity
+		formTitle;
+		formDescriptionHtml;
+		formCharacterModifiers;
+		formWeaponModifiers;
+
+		// Build the unsaved loot by merging item with form data
+		return {
+			...item,
+			...buildFormData()
+		} as Loot;
+	});
+
 	// Sync hasChanges to bindable prop
 	$effect(() => {
 		hasChanges = formHasChanges;
+	});
+
+	// Sync unsavedLoot to bindable prop
+	$effect(() => {
+		unsavedItem = unsavedLoot;
 	});
 
 	// Check if there are any validation errors
@@ -511,10 +535,7 @@
 				type="submit"
 				size="sm"
 				disabled={!formHasChanges || homebrew.saving}
-				class={cn(
-					'h-7',
-					hasValidationErrors && 'border border-destructive hover:bg-primary'
-				)}
+				class={cn('h-7', hasValidationErrors && 'border border-destructive hover:bg-primary')}
 			>
 				{#if homebrew.saving}
 					<Loader2 class="size-3.5 animate-spin" />

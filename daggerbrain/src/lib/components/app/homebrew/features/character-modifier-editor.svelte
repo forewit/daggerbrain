@@ -78,7 +78,11 @@
 		| 'experience_from_domain_card_choice_selection'
 		| 'experience_from_ancestry_card_choice_selection'
 	>;
-	type ValidTarget = SimpleTarget | 'trait' | 'experience_from_domain_card_choice_selection' | 'experience_from_ancestry_card_choice_selection';
+	type ValidTarget =
+		| SimpleTarget
+		| 'trait'
+		| 'experience_from_domain_card_choice_selection'
+		| 'experience_from_ancestry_card_choice_selection';
 
 	// Behaviour options - extracted from type
 	const behaviourOptions: readonly ModifierBehaviour[] = ['bonus', 'base', 'override'] as const;
@@ -146,7 +150,7 @@
 		max_long_rest_actions: 'Max Long Rest Actions',
 		trait: 'Trait',
 		experience_from_domain_card_choice_selection: 'Experience (Domain Card)',
-		experience_from_ancestry_card_choice_selection: 'Experience (Ancestry Card)'
+		experience_from_ancestry_card_choice_selection: 'Experience'
 	};
 
 	// Generate sequential experience choice ID for domain cards
@@ -191,9 +195,7 @@
 			if (existingChoice) {
 				// Update max value by creating a new array
 				domainCardChoices = domainCardChoices.map((c) =>
-					c.choice_id === existingChoiceId && c.type === 'experience'
-						? { ...c, max }
-						: c
+					c.choice_id === existingChoiceId && c.type === 'experience' ? { ...c, max } : c
 				);
 				return existingChoiceId;
 			} else {
@@ -242,9 +244,7 @@
 			if (existingChoice) {
 				// Update max value by creating a new array
 				ancestryCardChoices = ancestryCardChoices.map((c) =>
-					c.choice_id === existingChoiceId && c.type === 'experience'
-						? { ...c, max }
-						: c
+					c.choice_id === existingChoiceId && c.type === 'experience' ? { ...c, max } : c
 				);
 				return existingChoiceId;
 			} else {
@@ -465,7 +465,6 @@
 				...baseProps,
 				...typeProps,
 				target: 'experience_from_ancestry_card_choice_selection',
-				ancestry_card_id: ancestryCardId || '',
 				choice_id: choiceId
 			} as CharacterModifier;
 		} else {
@@ -570,7 +569,9 @@
 	<!-- Experience from Domain Card Choice Selection fields -->
 	{#if currentTarget === 'experience_from_domain_card_choice_selection' && modifier && modifier.target === 'experience_from_domain_card_choice_selection'}
 		{@const experienceModifier = modifier}
-		{@const experienceChoice = domainCardChoices?.find((c) => c.choice_id === experienceModifier.choice_id && c.type === 'experience')}
+		{@const experienceChoice = domainCardChoices?.find(
+			(c) => c.choice_id === experienceModifier.choice_id && c.type === 'experience'
+		)}
 		<div class="flex flex-col gap-2">
 			<div class="flex flex-col gap-1">
 				<label for="max-experiences-input" class="text-xs font-medium text-muted-foreground"
@@ -599,11 +600,14 @@
 	<!-- Experience from Ancestry Card Choice Selection fields -->
 	{#if currentTarget === 'experience_from_ancestry_card_choice_selection' && modifier && modifier.target === 'experience_from_ancestry_card_choice_selection'}
 		{@const experienceModifier = modifier}
-		{@const experienceChoice = ancestryCardChoices?.find((c) => c.choice_id === experienceModifier.choice_id && c.type === 'experience')}
+		{@const experienceChoice = ancestryCardChoices?.find(
+			(c) => c.choice_id === experienceModifier.choice_id && c.type === 'experience'
+		)}
 		<div class="flex flex-col gap-2">
 			<div class="flex flex-col gap-1">
-				<label for="max-ancestry-experiences-input" class="text-xs font-medium text-muted-foreground"
-					>Max number of experiences</label
+				<label
+					for="max-ancestry-experiences-input"
+					class="text-xs font-medium text-muted-foreground">Max number of experiences</label
 				>
 				<Input
 					id="max-ancestry-experiences-input"
@@ -614,8 +618,7 @@
 						const choiceId = ensureAncestryExperienceChoice(maxValue);
 						updateModifier({
 							...experienceModifier,
-							choice_id: choiceId,
-							ancestry_card_id: ancestryCardId || experienceModifier.ancestry_card_id || ''
+							choice_id: choiceId
 						});
 					}}
 					min="1"
@@ -765,10 +768,10 @@
 			<HomebrewCharacterConditions
 				bind:conditions={modifier.character_conditions}
 				choiceRequiredError={conditionsChoiceError}
-				domainCardChoices={domainCardChoices}
-				domainCardId={domainCardId}
-				ancestryCardChoices={ancestryCardChoices}
-				ancestryCardId={ancestryCardId}
+				{domainCardChoices}
+				{domainCardId}
+				{ancestryCardChoices}
+				{ancestryCardId}
 			/>
 		</div>
 	{/if}

@@ -10,27 +10,52 @@
 		card = $bindable(),
 		class: className = '',
 		variant = 'responsive',
+		preview = false,
 		children
 	}: {
 		bind_token_count?: boolean;
 		card: CommunityCard;
 		variant?: 'responsive' | 'card';
 		class?: string;
+		preview?: boolean;
 		children?: Snippet;
 	} = $props();
 
 	let clientWidth = $state(360);
 
 	const context = getCharacterContext();
-	let character = $derived(context.character);
+	let character = $derived(context?.character);
+
+	// Local state for preview mode
+	let localTokenCount = $state(0);
+
+	// Initialize local state when preview is true
+	$effect(() => {
+		if (preview) {
+			// Initialize token count
+			localTokenCount = 0;
+		}
+	});
 </script>
 
 {#snippet token_count()}
-	{#if character && bind_token_count && card.tokens}
-		{@const current_count = character.community_card_tokens || 0}
+	{#if (bind_token_count || (preview && card.tokens)) && card.tokens}
+		{@const current_count = preview ? localTokenCount : (character?.community_card_tokens ?? 0)}
 		<div class="flex items-center justify-center gap-2">
 			<!-- Minus Button -->
-			{#if context.canEdit}
+			{#if preview}
+				<button
+					type="button"
+					onclick={() => {
+						localTokenCount = Math.max(0, localTokenCount - 1);
+					}}
+					disabled={current_count === 0}
+					class="flex size-7 items-center justify-center rounded-full bg-red-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+					aria-label="Decrease token count"
+				>
+					−
+				</button>
+			{:else if character && context?.canEdit}
 				<button
 					type="button"
 					onclick={() => {
@@ -71,7 +96,19 @@
 			</div>
 
 			<!-- Plus Button -->
-			{#if context.canEdit}
+			{#if preview}
+				<button
+					type="button"
+					onclick={() => {
+						localTokenCount = Math.min(99, localTokenCount + 1);
+					}}
+					disabled={current_count >= 99}
+					class="flex size-7 items-center justify-center rounded-full bg-green-500 text-lg font-bold text-white shadow-md transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+					aria-label="Increase token count"
+				>
+					+
+				</button>
+			{:else if character && context?.canEdit}
 				<button
 					type="button"
 					onclick={() => {
@@ -179,7 +216,11 @@
 
 			<!-- credits -->
 			<div class="mt-auto flex shrink-0 items-end px-3 pb-2 leading-none">
-				<img src="/images/card/quill-icon.png" alt="quill" class="size-[14px]" />
+				<img
+					src="/images/card/quill-icon.png"
+					alt="quill"
+					class={cn('size-[14px]', card.artist_name.trim() === '' && 'hidden')}
+				/>
 				<p class="grow text-[9px] text-black italic">{card.artist_name}</p>
 				<p class="px-[2px] text-[8px] text-black text-muted-foreground italic">
 					Daggerheart™ Compatible. Terms at Daggerheart.com

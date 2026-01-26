@@ -6,5 +6,5 @@
 </script>
 
 <div class="flex max-w-[300px] min-w-[300px]">
-	<CommunityCardComponent {card} variant="responsive" />
+	<CommunityCardComponent {card} variant="card" bind_token_count preview />
 </div>

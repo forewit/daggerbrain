@@ -9,10 +9,10 @@
 	import Dropdown from '../../leveling/dropdown.svelte';
 	import { tick } from 'svelte';
 
-	let { 
+	let {
 		choices = $bindable(),
 		errors = new Map<number, string[]>()
-	}: { 
+	}: {
 		choices: DomainCardChoice[];
 		errors?: Map<number, string[]>;
 	} = $props();
@@ -21,8 +21,7 @@
 	// Use index consistently to avoid key changes when choice_id changes
 	let dropdownOpenStates = $state<Record<string, boolean>>({});
 
-
-	let arbitraryChoices = $derived(choices.filter(c => c.type === 'arbitrary'));
+	let arbitraryChoices = $derived(choices.filter((c) => c.type === 'arbitrary'));
 
 	// Helper to get a stable key for a choice based on index
 	// This key doesn't change when choice_id changes, preventing dropdown from closing
@@ -58,31 +57,30 @@
 		// Find the actual choice in the filtered arbitrary choices
 		const choiceToRemove = arbitraryChoices[index];
 		if (!choiceToRemove) return;
-		
+
 		// Get the choice_id of the choice being removed
 		const removedChoiceId = choiceToRemove.choice_id;
-		
+
 		// Remove the choice and clean up conditional_choice references
-		choices = choices.map((choice) => {
-			// If this is the choice being removed, exclude it
-			if (choice === choiceToRemove) {
-				return null; // Mark for removal
-			}
-			
-			// If this choice has a conditional_choice pointing to the removed choice, clear it
-			if (
-				choice.conditional_choice &&
-				choice.conditional_choice.choice_id === removedChoiceId
-			) {
-				return {
-					...choice,
-					conditional_choice: null
-				};
-			}
-			
-			return choice;
-		}).filter((c): c is DomainCardChoice => c !== null);
-		
+		choices = choices
+			.map((choice) => {
+				// If this is the choice being removed, exclude it
+				if (choice === choiceToRemove) {
+					return null; // Mark for removal
+				}
+
+				// If this choice has a conditional_choice pointing to the removed choice, clear it
+				if (choice.conditional_choice && choice.conditional_choice.choice_id === removedChoiceId) {
+					return {
+						...choice,
+						conditional_choice: null
+					};
+				}
+
+				return choice;
+			})
+			.filter((c): c is DomainCardChoice => c !== null);
+
 		// Clean up dropdown state
 		const key = getChoiceKey(index);
 		const next = { ...dropdownOpenStates };
@@ -95,13 +93,13 @@
 			selection_id: '',
 			title: '',
 			short_title: ''
-		};	
+		};
 		const choiceToUpdate = arbitraryChoices[choiceIndex];
 		if (!choiceToUpdate) return;
-		
-		const actualIndex = choices.findIndex(c => c === choiceToUpdate);
+
+		const actualIndex = choices.findIndex((c) => c === choiceToUpdate);
 		if (actualIndex === -1) return;
-		
+
 		choices = choices.map((choice, i) => {
 			if (i === actualIndex && choice.type === 'arbitrary') {
 				return {
@@ -116,10 +114,10 @@
 	function removeOption(choiceIndex: number, optionIndex: number) {
 		const choiceToUpdate = arbitraryChoices[choiceIndex];
 		if (!choiceToUpdate) return;
-		
-		const actualIndex = choices.findIndex(c => c === choiceToUpdate);
+
+		const actualIndex = choices.findIndex((c) => c === choiceToUpdate);
 		if (actualIndex === -1) return;
-		
+
 		choices = choices.map((choice, i) => {
 			if (i === actualIndex && choice.type === 'arbitrary') {
 				return {
@@ -134,10 +132,10 @@
 	function updateChoiceField(choiceIndex: number, field: string, value: unknown) {
 		const choiceToUpdate = arbitraryChoices[choiceIndex];
 		if (!choiceToUpdate) return;
-		
-		const actualIndex = choices.findIndex(c => c === choiceToUpdate);
+
+		const actualIndex = choices.findIndex((c) => c === choiceToUpdate);
 		if (actualIndex === -1) return;
-		
+
 		choices = choices.map((choice, i) => {
 			if (i === actualIndex) {
 				return { ...choice, [field]: value };
@@ -167,10 +165,10 @@
 	) {
 		const choiceToUpdate = arbitraryChoices[choiceIndex];
 		if (!choiceToUpdate) return;
-		
-		const actualIndex = choices.findIndex(c => c === choiceToUpdate);
+
+		const actualIndex = choices.findIndex((c) => c === choiceToUpdate);
 		if (actualIndex === -1) return;
-		
+
 		choices = choices.map((choice, i) => {
 			if (i === actualIndex && choice.type === 'arbitrary') {
 				return {
@@ -201,10 +199,10 @@
 	) {
 		const choiceToUpdate = arbitraryChoices[choiceIndex];
 		if (!choiceToUpdate) return;
-		
-		const actualIndex = choices.findIndex(c => c === choiceToUpdate);
+
+		const actualIndex = choices.findIndex((c) => c === choiceToUpdate);
 		if (actualIndex === -1) return;
-		
+
 		choices = choices.map((choice, i) => {
 			if (i === actualIndex) {
 				if (field === null) {
@@ -251,41 +249,40 @@
 					: ''}
 			>
 				<div class="flex flex-col gap-4">
-					
-
 					<div class="flex gap-2">
 						<!-- Choice Name -->
-					<div class="flex flex-col gap-1">
-						<label for="domain-choice-id-{choiceIndex}" class="text-xs text-muted-foreground"
-							>Name</label
-						>
-						<Input
-							id="domain-choice-id-{choiceIndex}"
-							value={choice.choice_id}
-							oninput={(e) => updateChoiceField(choiceIndex, 'choice_id', e.currentTarget.value)}
-							placeholder="Name for this choice"
-							class={choiceErrors.length > 0 ? 'border-destructive' : ''}
-						/>
-						{#if choiceErrors.length > 0}
-							{#each choiceErrors as error}
-								<p class="text-xs text-destructive">{error}</p>
-							{/each}
-						{/if}
-					</div>
+						<div class="flex flex-col gap-1">
+							<label for="domain-choice-id-{choiceIndex}" class="text-xs text-muted-foreground"
+								>Name</label
+							>
+							<Input
+								id="domain-choice-id-{choiceIndex}"
+								value={choice.choice_id}
+								oninput={(e) => updateChoiceField(choiceIndex, 'choice_id', e.currentTarget.value)}
+								placeholder="Name for this choice"
+								class={choiceErrors.length > 0 ? 'border-destructive' : ''}
+							/>
+							{#if choiceErrors.length > 0}
+								{#each choiceErrors as error}
+									<p class="text-xs text-destructive">{error}</p>
+								{/each}
+							{/if}
+						</div>
 
-					<!-- max answers -->
-						<div class="flex flex-col gap-1 w-24">
-						<label for="domain-max-selections-{choiceIndex}" class="text-xs text-muted-foreground"
-							>Max Answers</label
-						>
-						<Input
-							id="domain-max-selections-{choiceIndex}"
-							type="number"
-							value={String(choice.max)}
-							oninput={(e) => updateChoiceField(choiceIndex, 'max', Number(e.currentTarget.value))}
-							placeholder="1"
-							min="1"
-						/>
+						<!-- max answers -->
+						<div class="flex w-24 flex-col gap-1">
+							<label for="domain-max-selections-{choiceIndex}" class="text-xs text-muted-foreground"
+								>Max Answers</label
+							>
+							<Input
+								id="domain-max-selections-{choiceIndex}"
+								type="number"
+								value={String(choice.max)}
+								oninput={(e) =>
+									updateChoiceField(choiceIndex, 'max', Number(e.currentTarget.value))}
+								placeholder="1"
+								min="1"
+							/>
 						</div>
 					</div>
 
@@ -306,14 +303,14 @@
 							/>
 							<label
 								for="domain-conditional-checkbox-{choiceIndex}"
-								class="text-xs text-muted-foreground cursor-pointer"
+								class="cursor-pointer text-xs text-muted-foreground"
 							>
 								Hidden until another choice is answered
 							</label>
 						</div>
 						{#if choice.conditional_choice !== null}
 							<div class="grid grid-cols-2 gap-2">
-								<div class="flex flex-col gap-1 flex-1">
+								<div class="flex flex-1 flex-col gap-1">
 									<label
 										for="domain-conditional-choice-select-{choiceIndex}"
 										class="text-xs text-muted-foreground">Choice</label
@@ -323,18 +320,30 @@
 										value={choice.conditional_choice?.choice_id || ''}
 										onValueChange={(value) => {
 											if (value) {
-												const selectedChoice = arbitraryChoices.find((c, idx) => idx !== choiceIndex && c.choice_id === value);
+												const selectedChoice = arbitraryChoices.find(
+													(c, idx) => idx !== choiceIndex && c.choice_id === value
+												);
 												updateConditionalChoice(choiceIndex, 'choice_id', value);
 												// Auto-select first option if available
-												if (selectedChoice?.type === 'arbitrary' && selectedChoice.options.length > 0) {
-													updateConditionalChoice(choiceIndex, 'selection_id', selectedChoice.options[0].selection_id);
+												if (
+													selectedChoice?.type === 'arbitrary' &&
+													selectedChoice.options.length > 0
+												) {
+													updateConditionalChoice(
+														choiceIndex,
+														'selection_id',
+														selectedChoice.options[0].selection_id
+													);
 												}
 											} else {
 												updateConditionalChoice(choiceIndex, null, null);
 											}
 										}}
 									>
-										<Select.Trigger id="domain-conditional-choice-select-{choiceIndex}" class="w-full">
+										<Select.Trigger
+											id="domain-conditional-choice-select-{choiceIndex}"
+											class="w-full"
+										>
 											<p class="truncate">
 												{choice.conditional_choice?.choice_id || 'Select a choice'}
 											</p>
@@ -354,9 +363,11 @@
 									</Select.Root>
 								</div>
 								{#if choice.conditional_choice?.choice_id}
-									{@const selectedConditionalChoice = arbitraryChoices.find((c) => c.choice_id === choice.conditional_choice?.choice_id)}
+									{@const selectedConditionalChoice = arbitraryChoices.find(
+										(c) => c.choice_id === choice.conditional_choice?.choice_id
+									)}
 									{#if selectedConditionalChoice}
-										<div class="flex flex-col gap-1 flex-1">
+										<div class="flex flex-1 flex-col gap-1">
 											<label
 												for="domain-conditional-selection-select-{choiceIndex}"
 												class="text-xs text-muted-foreground">Answer</label
@@ -370,9 +381,14 @@
 													}
 												}}
 											>
-												<Select.Trigger id="domain-conditional-selection-select-{choiceIndex}" class="w-full">
+												<Select.Trigger
+													id="domain-conditional-selection-select-{choiceIndex}"
+													class="w-full"
+												>
 													<p class="truncate">
-														{selectedConditionalChoice.options.find((opt) => opt.selection_id === choice.conditional_choice?.selection_id)?.title || 'Select an answer'}
+														{selectedConditionalChoice.options.find(
+															(opt) => opt.selection_id === choice.conditional_choice?.selection_id
+														)?.title || 'Select an answer'}
 													</p>
 												</Select.Trigger>
 												<Select.Content>
@@ -386,17 +402,17 @@
 										</div>
 									{/if}
 								{:else}
-									<div class="flex flex-col gap-1 flex-1">
+									<div class="flex flex-1 flex-col gap-1">
 										<label
 											for="domain-conditional-selection-select-{choiceIndex}"
 											class="text-xs text-muted-foreground">Answer</label
 										>
-										<Select.Root
-											type="single"
-											value=""
-											disabled={true}
-										>
-											<Select.Trigger id="domain-conditional-selection-select-{choiceIndex}" class="w-full" disabled>
+										<Select.Root type="single" value="" disabled={true}>
+											<Select.Trigger
+												id="domain-conditional-selection-select-{choiceIndex}"
+												class="w-full"
+												disabled
+											>
 												<p class="truncate">Select a choice first</p>
 											</Select.Trigger>
 										</Select.Root>
@@ -427,19 +443,19 @@
 										<Input
 											value={option.title}
 											oninput={(e) =>
-												updateOptionField(
-													choiceIndex,
-													optionIndex,
-													'title',
-													e.currentTarget.value
-												)}
+												updateOptionField(choiceIndex, optionIndex, 'title', e.currentTarget.value)}
 											onblur={(e) => {
 												// Auto-generate selection_id from title on blur
 												const title = e.currentTarget.value;
 												if (title && title.trim() !== '') {
 													const generatedId = generateSelectionId(title);
 													if (generatedId && generatedId !== option.selection_id) {
-														updateOptionField(choiceIndex, optionIndex, 'selection_id', generatedId);
+														updateOptionField(
+															choiceIndex,
+															optionIndex,
+															'selection_id',
+															generatedId
+														);
 													}
 												}
 											}}

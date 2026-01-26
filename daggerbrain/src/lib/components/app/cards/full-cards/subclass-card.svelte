@@ -28,7 +28,11 @@
 
 	const compendium = getCompendiumContext();
 
-	const character_class = compendium.classes[card.class_id] || null;
+	// Explicitly track card.class_id to ensure reactivity when it changes
+	const character_class = $derived.by(() => {
+		card.class_id; // Track the nested property
+		return compendium.classes[card.class_id] || null;
+	});
 </script>
 
 {#if variant === 'responsive'}
@@ -147,7 +151,11 @@
 
 			<!-- credits -->
 			<div class="mt-auto flex shrink-0 items-end px-3 pb-2 leading-none">
-				<img src="/images/card/quill-icon.png" alt="quill" class="size-[14px]" />
+				<img
+					src="/images/card/quill-icon.png"
+					alt="quill"
+					class={cn('size-[14px]', card.artist_name.trim() === '' && 'hidden')}
+				/>
 				<p class="grow text-[9px] text-black italic">{card.artist_name}</p>
 				<p class="px-[2px] text-[8px] text-black text-muted-foreground italic">
 					Daggerheart™ Compatible. Terms at Daggerheart.com

@@ -119,40 +119,42 @@ export const SubclassFormSchema = SubclassSchema.omit({
 export const DomainCardFormSchema = DomainCardSchema.omit({
 	compendium_id: true,
 	source_id: true
-}).extend({
-	title: z.string().min(1, 'Name is required')
-}).superRefine((data, ctx) => {
-	// Validate that all arbitrary choices have non-empty and unique choice_id values
-	const arbitraryChoices = data.choices.filter(c => c.type === 'arbitrary');
-	const nameCounts = new Map<string, number>();
-	
-	// Count occurrences of each name (case-insensitive, trimmed)
-	arbitraryChoices.forEach((choice) => {
-		const name = choice.choice_id.trim();
-		const normalizedName = name.toLowerCase();
-		nameCounts.set(normalizedName, (nameCounts.get(normalizedName) || 0) + 1);
+})
+	.extend({
+		title: z.string().min(1, 'Name is required')
+	})
+	.superRefine((data, ctx) => {
+		// Validate that all arbitrary choices have non-empty and unique choice_id values
+		const arbitraryChoices = data.choices.filter((c) => c.type === 'arbitrary');
+		const nameCounts = new Map<string, number>();
+
+		// Count occurrences of each name (case-insensitive, trimmed)
+		arbitraryChoices.forEach((choice) => {
+			const name = choice.choice_id.trim();
+			const normalizedName = name.toLowerCase();
+			nameCounts.set(normalizedName, (nameCounts.get(normalizedName) || 0) + 1);
+		});
+
+		// Check for blank and duplicate names
+		arbitraryChoices.forEach((choice, index) => {
+			const name = choice.choice_id.trim();
+			const normalizedName = name.toLowerCase();
+
+			if (!name) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					path: ['choices', index, 'choice_id'],
+					message: 'Name is required'
+				});
+			} else if (nameCounts.get(normalizedName)! > 1) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					path: ['choices', index, 'choice_id'],
+					message: 'Name must be unique'
+				});
+			}
+		});
 	});
-	
-	// Check for blank and duplicate names
-	arbitraryChoices.forEach((choice, index) => {
-		const name = choice.choice_id.trim();
-		const normalizedName = name.toLowerCase();
-		
-		if (!name) {
-			ctx.addIssue({
-				code: z.ZodIssueCode.custom,
-				path: ['choices', index, 'choice_id'],
-				message: 'Name is required'
-			});
-		} else if (nameCounts.get(normalizedName)! > 1) {
-			ctx.addIssue({
-				code: z.ZodIssueCode.custom,
-				path: ['choices', index, 'choice_id'],
-				message: 'Name must be unique'
-			});
-		}
-	});
-});
 
 // ============================================================================
 // Ancestry Card Form Schema
@@ -161,53 +163,55 @@ export const DomainCardFormSchema = DomainCardSchema.omit({
 export const AncestryCardFormSchema = AncestryCardSchema.omit({
 	compendium_id: true,
 	source_id: true
-}).extend({
-	title: z.string().min(1, 'Name is required')
-}).superRefine((data, ctx) => {
-	// Validate that all arbitrary choices have non-empty and unique choice_id values
-	const arbitraryChoices = data.choices.filter(c => c.type === 'arbitrary');
-	const nameCounts = new Map<string, number>();
-	
-	// Count occurrences of each name (case-insensitive, trimmed)
-	arbitraryChoices.forEach((choice) => {
-		const name = choice.choice_id.trim();
-		const normalizedName = name.toLowerCase();
-		nameCounts.set(normalizedName, (nameCounts.get(normalizedName) || 0) + 1);
+})
+	.extend({
+		title: z.string().min(1, 'Name is required')
+	})
+	.superRefine((data, ctx) => {
+		// Validate that all arbitrary choices have non-empty and unique choice_id values
+		const arbitraryChoices = data.choices.filter((c) => c.type === 'arbitrary');
+		const nameCounts = new Map<string, number>();
+
+		// Count occurrences of each name (case-insensitive, trimmed)
+		arbitraryChoices.forEach((choice) => {
+			const name = choice.choice_id.trim();
+			const normalizedName = name.toLowerCase();
+			nameCounts.set(normalizedName, (nameCounts.get(normalizedName) || 0) + 1);
+		});
+
+		// Check for blank and duplicate names, and validate feature_index
+		data.choices.forEach((choice, index) => {
+			const name = choice.choice_id.trim();
+			const normalizedName = name.toLowerCase();
+
+			// Check for blank choice_id
+			if (!name) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					path: ['choices', index, 'choice_id'],
+					message: 'Name is required'
+				});
+			}
+
+			// Check for duplicate names (only for arbitrary choices)
+			if (choice.type === 'arbitrary' && nameCounts.get(normalizedName)! > 1) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					path: ['choices', index, 'choice_id'],
+					message: 'Name must be unique'
+				});
+			}
+
+			// Validate feature_index is within bounds
+			if (choice.feature_index < 0 || choice.feature_index >= data.features.length) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					path: ['choices', index, 'feature_index'],
+					message: `Feature index must be between 0 and ${data.features.length - 1}`
+				});
+			}
+		});
 	});
-	
-	// Check for blank and duplicate names, and validate feature_index
-	data.choices.forEach((choice, index) => {
-		const name = choice.choice_id.trim();
-		const normalizedName = name.toLowerCase();
-		
-		// Check for blank choice_id
-		if (!name) {
-			ctx.addIssue({
-				code: z.ZodIssueCode.custom,
-				path: ['choices', index, 'choice_id'],
-				message: 'Name is required'
-			});
-		}
-		
-		// Check for duplicate names (only for arbitrary choices)
-		if (choice.type === 'arbitrary' && nameCounts.get(normalizedName)! > 1) {
-			ctx.addIssue({
-				code: z.ZodIssueCode.custom,
-				path: ['choices', index, 'choice_id'],
-				message: 'Name must be unique'
-			});
-		}
-		
-		// Validate feature_index is within bounds
-		if (choice.feature_index < 0 || choice.feature_index >= data.features.length) {
-			ctx.addIssue({
-				code: z.ZodIssueCode.custom,
-				path: ['choices', index, 'feature_index'],
-				message: `Feature index must be between 0 and ${data.features.length - 1}`
-			});
-		}
-	});
-});
 
 // ============================================================================
 // Community Card Form Schema

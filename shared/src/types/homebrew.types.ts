@@ -38,6 +38,10 @@ export const ENABLED_HOMEBREW_TYPES = [
 	'loot',
 	'consumable',
 	'domain-cards',
+	'ancestry-cards',
+	'community-cards',
+	'subclass',
+	'class'
 ] as const satisfies readonly HomebrewType[];
 
 /**

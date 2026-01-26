@@ -104,7 +104,7 @@ function createCharacter(id: string) {
 					character.settings = {
 						...CHARACTER_DEFAULTS.settings,
 						...character.settings
-					}
+					};
 					// Set loadingCharacter to false IMMEDIATELY after setting character
 					// This prevents race condition where page computes characterNotFound=true
 					// between character being set and loadingCharacter being set to false

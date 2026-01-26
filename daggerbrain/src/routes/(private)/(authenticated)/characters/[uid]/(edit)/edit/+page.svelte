@@ -175,48 +175,49 @@
 		</div>
 	</div>
 
-<!-- Void Disable Confirmation Dialog -->
-<Dialog.Root bind:open={showVoidDisableDialog}>
-	<Dialog.Content class="sm:max-w-md">
-		<Dialog.Header>
-			<Dialog.Title>Disable The Void</Dialog.Title>
-			<Dialog.Description>
-				Are you sure you want to disable The Void? This will remove any void content on this
-				character. This action cannot be undone.
-			</Dialog.Description>
-		</Dialog.Header>
-		<Dialog.Footer class="flex gap-3 pt-4">
-			<Dialog.Close
-				class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
-				onclick={cancelDisableVoid}>Cancel</Dialog.Close
-			>
-			<Dialog.Close class={buttonVariants({ variant: 'destructive' })} onclick={confirmDisableVoid}
-				>Disable The Void</Dialog.Close
-			>
-		</Dialog.Footer>
-	</Dialog.Content>
-</Dialog.Root>
+	<!-- Void Disable Confirmation Dialog -->
+	<Dialog.Root bind:open={showVoidDisableDialog}>
+		<Dialog.Content class="sm:max-w-md">
+			<Dialog.Header>
+				<Dialog.Title>Disable The Void</Dialog.Title>
+				<Dialog.Description>
+					Are you sure you want to disable The Void? This will remove any void content on this
+					character. This action cannot be undone.
+				</Dialog.Description>
+			</Dialog.Header>
+			<Dialog.Footer class="flex gap-3 pt-4">
+				<Dialog.Close
+					class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
+					onclick={cancelDisableVoid}>Cancel</Dialog.Close
+				>
+				<Dialog.Close
+					class={buttonVariants({ variant: 'destructive' })}
+					onclick={confirmDisableVoid}>Disable The Void</Dialog.Close
+				>
+			</Dialog.Footer>
+		</Dialog.Content>
+	</Dialog.Root>
 
-<!-- Homebrew Disable Confirmation Dialog -->
-<Dialog.Root bind:open={showHomebrewDisableDialog}>
-	<Dialog.Content class="sm:max-w-md">
-		<Dialog.Header>
-			<Dialog.Title>Disable Homebrew</Dialog.Title>
-			<Dialog.Description>
-				Are you sure you want to disable Homebrew? This will remove any homebrew content on this
-				character. This action cannot be undone.
-			</Dialog.Description>
-		</Dialog.Header>
-		<Dialog.Footer class="flex gap-3 pt-4">
-			<Dialog.Close
-				class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
-				onclick={cancelDisableHomebrew}>Cancel</Dialog.Close
-			>
-			<Dialog.Close
-				class={buttonVariants({ variant: 'destructive' })}
-				onclick={confirmDisableHomebrew}>Disable Homebrew</Dialog.Close
-			>
-		</Dialog.Footer>
-	</Dialog.Content>
-</Dialog.Root>
+	<!-- Homebrew Disable Confirmation Dialog -->
+	<Dialog.Root bind:open={showHomebrewDisableDialog}>
+		<Dialog.Content class="sm:max-w-md">
+			<Dialog.Header>
+				<Dialog.Title>Disable Homebrew</Dialog.Title>
+				<Dialog.Description>
+					Are you sure you want to disable Homebrew? This will remove any homebrew content on this
+					character. This action cannot be undone.
+				</Dialog.Description>
+			</Dialog.Header>
+			<Dialog.Footer class="flex gap-3 pt-4">
+				<Dialog.Close
+					class={cn(buttonVariants({ variant: 'link' }), 'text-muted-foreground')}
+					onclick={cancelDisableHomebrew}>Cancel</Dialog.Close
+				>
+				<Dialog.Close
+					class={buttonVariants({ variant: 'destructive' })}
+					onclick={confirmDisableHomebrew}>Disable Homebrew</Dialog.Close
+				>
+			</Dialog.Footer>
+		</Dialog.Content>
+	</Dialog.Root>
 {/if}

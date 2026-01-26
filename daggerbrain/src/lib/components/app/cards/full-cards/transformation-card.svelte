@@ -102,7 +102,11 @@
 
 			<!-- credits -->
 			<div class="mt-auto flex shrink-0 items-end px-3 pb-2 leading-none">
-				<img src="/images/card/quill-icon.png" alt="quill" class="size-[14px]" />
+				<img
+					src="/images/card/quill-icon.png"
+					alt="quill"
+					class={cn('size-[14px]', card.artist_name.trim() === '' && 'hidden')}
+				/>
 				<p class="grow text-[9px] text-black italic">{card.artist_name}</p>
 				<p class="px-[2px] text-[8px] text-black text-muted-foreground italic">
 					Daggerheart™ Compatible. Terms at Daggerheart.com

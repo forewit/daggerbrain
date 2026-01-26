@@ -5,9 +5,7 @@
 
 	const context = getCharacterContext();
 	let character = $derived(context?.character);
-
 </script>
-
 
 {#if character}
 	{#if Object.values(character.selected_traits).includes(null) || !character.primary_class_id}

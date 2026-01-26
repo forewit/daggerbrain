@@ -35,12 +35,14 @@
 		item = $bindable(),
 		hasChanges = $bindable(),
 		hasErrors = $bindable(),
+		unsavedItem = $bindable(),
 		onSubmit,
 		onReset
 	}: {
 		item: Weapon;
 		hasChanges?: boolean;
 		hasErrors?: boolean;
+		unsavedItem?: Weapon | null;
 		onSubmit?: (e?: SubmitEvent) => void;
 		onReset?: () => void;
 	} = $props();
@@ -210,6 +212,32 @@
 		);
 	});
 
+	// Build unsaved weapon from current form state
+	let unsavedWeapon = $derived.by(() => {
+		if (!item) return null;
+
+		// Track all form fields to ensure reactivity
+		formTitle;
+		formDescriptionHtml;
+		formTier;
+		formCategory;
+		formType;
+		formRange;
+		formAvailableTraits;
+		formDamageTypes;
+		formBurden;
+		formDamageDice;
+		formDamageBonus;
+		formAttackRollBonus;
+		formFeatures;
+
+		// Build the unsaved weapon by merging item with form data
+		return {
+			...item,
+			...buildFormData()
+		} as Weapon;
+	});
+
 	// Sync hasChanges to bindable prop
 	$effect(() => {
 		hasChanges = formHasChanges;
@@ -218,6 +246,11 @@
 	// Sync hasValidationErrors to bindable prop (only after validation attempted)
 	$effect(() => {
 		hasErrors = validationAttempted && hasValidationErrors;
+	});
+
+	// Sync unsavedWeapon to bindable prop
+	$effect(() => {
+		unsavedItem = unsavedWeapon;
 	});
 
 	// Sync form state when weapon prop changes
@@ -794,10 +827,7 @@
 				type="submit"
 				size="sm"
 				disabled={!formHasChanges || homebrew.saving}
-				class={cn(
-					'h-7',
-					hasValidationErrors && 'border border-destructive hover:bg-primary'
-				)}
+				class={cn('h-7', hasValidationErrors && 'border border-destructive hover:bg-primary')}
 			>
 				{#if homebrew.saving}
 					<Loader2 class="size-3.5 animate-spin" />

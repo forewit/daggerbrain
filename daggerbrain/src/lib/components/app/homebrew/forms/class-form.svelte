@@ -20,6 +20,8 @@
 	import X from '@lucide/svelte/icons/x';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import ImageUrlInput from '../image-url-input.svelte';
+	import ItemSelectorSheet from '../features/item-selector-sheet.svelte';
+	import Gold from '../../sheet/gold.svelte';
 	import {
 		ClassFormSchema,
 		FeatureSchema,
@@ -38,12 +40,14 @@
 		item = $bindable(),
 		hasChanges = $bindable(),
 		hasErrors = $bindable(),
+		unsavedItem = $bindable(),
 		onSubmit,
 		onReset
 	}: {
 		item: CharacterClass;
 		hasChanges?: boolean;
 		hasErrors?: boolean;
+		unsavedItem?: CharacterClass | null;
 		onSubmit?: (e?: SubmitEvent) => void;
 		onReset?: () => void;
 	} = $props();
@@ -52,7 +56,22 @@
 	const homebrew = getHomebrewContext();
 
 	// Reference to image input component
-	let imageInput: { uploadPendingFile: () => Promise<string | null> } | null = $state(null);
+	let imageInput: {
+		uploadPendingFile: () => Promise<string | null>;
+		getPreviewUrl: () => string | null;
+		clearPendingFile: () => void;
+	} | null = $state(null);
+
+	// Track if there's a pending image file
+	let hasPendingImageFile = $state(false);
+
+	// Sheet state for item selectors
+	let freeGearSheetOpen = $state(false);
+	let lootOrConsumableSheetOpen = $state(false);
+	let classGearSheetOpen = $state(false);
+	let primaryWeaponSheetOpen = $state(false);
+	let secondaryWeaponSheetOpen = $state(false);
+	let armorSheetOpen = $state(false);
 
 	// Form state - initialized from characterClass prop
 	let formName = $state('');
@@ -76,7 +95,7 @@
 	let formSuggestedPrimaryWeaponId = $state<string | null>(null);
 	let formSuggestedSecondaryWeaponId = $state<string | null>(null);
 	let formSuggestedArmorId = $state<string | null>(null);
-	let formGoldCoins = $state('');
+	let formGoldCoins = $state(0);
 	let formFreeGear = $state<AdventuringGear[]>([]);
 	let formLootOrConsumableOptions = $state<string[]>([]);
 	let formClassGearOptions = $state<AdventuringGear[]>([]);
@@ -136,7 +155,7 @@
 		'knowledge'
 	];
 
-	// Get all available subclasses (compendium + homebrew)
+	// Get all available subclasses (compendium + homebrew) - kept for reference but not used in UI
 	let availableSubclasses = $derived.by(() => {
 		const subclasses: Array<{ id: string; name: string; source: 'compendium' | 'homebrew' }> = [];
 		// Add compendium subclasses
@@ -146,6 +165,43 @@
 		// Add homebrew subclasses
 		for (const [id, subclass] of Object.entries(homebrew.subclasses)) {
 			subclasses.push({ id, name: subclass.name, source: 'homebrew' });
+		}
+		return subclasses.sort((a, b) => a.name.localeCompare(b.name));
+	});
+
+	// Get the current class ID (UID for homebrew, compendium_id for compendium)
+	let currentClassId = $derived.by(() => {
+		if (!item) return null;
+		// Check if it's in compendium classes
+		for (const [id, cls] of Object.entries(compendium.classes)) {
+			if (cls === item) {
+				return id; // compendium_id
+			}
+		}
+		// Check if it's in homebrew classes
+		for (const [uid, cls] of Object.entries(homebrew.classes)) {
+			if (cls === item) {
+				return uid; // UID
+			}
+		}
+		return null;
+	});
+
+	// Get available subclasses for the current class being edited
+	let availableSubclassesForClass = $derived.by(() => {
+		if (!currentClassId) return [];
+		const subclasses: Array<{ id: string; name: string; source: 'compendium' | 'homebrew' }> = [];
+		// Add compendium subclasses that match this class
+		for (const [id, subclass] of Object.entries(compendium.subclasses)) {
+			if (subclass.class_id === currentClassId) {
+				subclasses.push({ id, name: subclass.name, source: 'compendium' });
+			}
+		}
+		// Add homebrew subclasses that match this class
+		for (const [id, subclass] of Object.entries(homebrew.subclasses)) {
+			if (subclass.class_id === currentClassId) {
+				subclasses.push({ id, name: subclass.name, source: 'homebrew' });
+			}
 		}
 		return subclasses.sort((a, b) => a.name.localeCompare(b.name));
 	});
@@ -184,18 +240,70 @@
 		return armor.sort((a, b) => a.title.localeCompare(b.title));
 	});
 
+	// Build unsaved class from current form state
+	let unsavedClass = $derived.by(() => {
+		if (!item) return null;
+
+		// Track all form fields to ensure reactivity
+		formName;
+		formDescriptionHtml;
+		formImageUrl;
+		formStartingEvasion;
+		formStartingMaxHp;
+		formPrimaryDomainId;
+		formSecondaryDomainId;
+		formHopeFeature;
+		formClassFeatures;
+		formSubclassIds;
+		formSuggestedTraits;
+		formSuggestedPrimaryWeaponId;
+		formSuggestedSecondaryWeaponId;
+		formSuggestedArmorId;
+		formGoldCoins;
+		formFreeGear;
+		formLootOrConsumableOptions;
+		formClassGearOptions;
+		formSpellbookPrompt;
+		formBackgroundQuestions;
+		formConnectionQuestions;
+		formClothes;
+		formEyes;
+		formBody;
+		formSkin;
+		formAttitude;
+		hasPendingImageFile;
+
+		// Get preview URL if there's a pending file
+		const previewUrl = hasPendingImageFile && imageInput ? imageInput.getPreviewUrl() : null;
+
+		// Build the unsaved class by merging item with form data
+		const formData = buildFormData();
+
+		// Use preview URL if available, otherwise use formImageUrl
+		return {
+			...item,
+			...formData,
+			image_url: previewUrl || formData.image_url
+		} as CharacterClass;
+	});
+
 	// Check if form has changes
 	let formHasChanges = $derived.by(() => {
 		if (!item) return false;
 		// This is complex - we'll do a deep comparison
 		const current = JSON.stringify(buildFormData());
 		const original = JSON.stringify(item);
-		return current !== original;
+		return current !== original || hasPendingImageFile;
 	});
 
 	// Sync hasChanges to bindable prop
 	$effect(() => {
 		hasChanges = formHasChanges;
+	});
+
+	// Sync unsavedClass to bindable prop
+	$effect(() => {
+		unsavedItem = unsavedClass;
 	});
 
 	// Check if there are any validation errors
@@ -301,7 +409,7 @@
 			formSuggestedPrimaryWeaponId = item.suggested_primary_weapon_id;
 			formSuggestedSecondaryWeaponId = item.suggested_secondary_weapon_id;
 			formSuggestedArmorId = item.suggested_armor_id;
-			formGoldCoins = String(item.starting_inventory.gold_coins);
+			formGoldCoins = item.starting_inventory.gold_coins;
 			formFreeGear = JSON.parse(JSON.stringify(item.starting_inventory.free_gear));
 			formLootOrConsumableOptions = [...item.starting_inventory.loot_or_consumable_options];
 			formClassGearOptions = JSON.parse(JSON.stringify(item.starting_inventory.class_gear_options));
@@ -313,6 +421,8 @@
 			formBody = item.character_description_suggestions.body;
 			formSkin = item.character_description_suggestions.skin;
 			formAttitude = item.character_description_suggestions.attitude;
+			// Clear pending image file when item changes
+			hasPendingImageFile = false;
 			// Clear errors
 			errors = {};
 			featureErrors.clear();
@@ -339,7 +449,7 @@
 			suggested_secondary_weapon_id: formSuggestedSecondaryWeaponId,
 			suggested_armor_id: formSuggestedArmorId,
 			starting_inventory: {
-				gold_coins: Number(formGoldCoins),
+				gold_coins: formGoldCoins,
 				free_gear: JSON.parse(JSON.stringify(formFreeGear)),
 				loot_or_consumable_options: [...formLootOrConsumableOptions],
 				class_gear_options: JSON.parse(JSON.stringify(formClassGearOptions)),
@@ -651,7 +761,7 @@
 		formSuggestedPrimaryWeaponId = item.suggested_primary_weapon_id;
 		formSuggestedSecondaryWeaponId = item.suggested_secondary_weapon_id;
 		formSuggestedArmorId = item.suggested_armor_id;
-		formGoldCoins = String(item.starting_inventory.gold_coins);
+		formGoldCoins = item.starting_inventory.gold_coins;
 		formFreeGear = JSON.parse(JSON.stringify(item.starting_inventory.free_gear));
 		formLootOrConsumableOptions = [...item.starting_inventory.loot_or_consumable_options];
 		formClassGearOptions = JSON.parse(JSON.stringify(item.starting_inventory.class_gear_options));
@@ -663,6 +773,9 @@
 		formBody = item.character_description_suggestions.body;
 		formSkin = item.character_description_suggestions.skin;
 		formAttitude = item.character_description_suggestions.attitude;
+		// Clear pending image file on reset
+		imageInput?.clearPendingFile();
+		hasPendingImageFile = false;
 		// Clear errors
 		errors = {};
 		featureErrors.clear();
@@ -712,14 +825,6 @@
 		}
 	}
 
-	function toggleSubclass(id: string) {
-		if (formSubclassIds.includes(id)) {
-			formSubclassIds = formSubclassIds.filter((sid) => sid !== id);
-		} else {
-			formSubclassIds = [...formSubclassIds, id];
-		}
-	}
-
 	function addFreeGear() {
 		formFreeGear = [...formFreeGear, { title: '' }];
 	}
@@ -759,6 +864,32 @@
 	function removeConnectionQuestion(index: number) {
 		formConnectionQuestions = formConnectionQuestions.filter((_, i) => i !== index);
 	}
+
+	// Helper function to resolve item ID to name
+	function getItemName(itemId: string): string {
+		// Check loot
+		const loot = compendium.loot[itemId] || homebrew.loot[itemId];
+		if (loot) return loot.title;
+
+		// Check consumables
+		const consumable = compendium.consumables[itemId] || homebrew.consumables[itemId];
+		if (consumable) return consumable.title;
+
+		// Check weapons
+		const primaryWeapon = compendium.primary_weapons[itemId] || homebrew.primary_weapons[itemId];
+		if (primaryWeapon) return primaryWeapon.title;
+
+		const secondaryWeapon =
+			compendium.secondary_weapons[itemId] || homebrew.secondary_weapons[itemId];
+		if (secondaryWeapon) return secondaryWeapon.title;
+
+		// Check armor
+		const armor = compendium.armor[itemId] || homebrew.armor[itemId];
+		if (armor) return armor.title;
+
+		// Fallback to ID if not found
+		return itemId;
+	}
 </script>
 
 <form onsubmit={handleSubmit} class="flex flex-col gap-4">
@@ -793,15 +924,54 @@
 		/>
 	</div>
 
-	<!-- Image -->
-	<div class="flex flex-col gap-1">
-		<label for="hb-class-image-url" class="text-xs font-medium text-muted-foreground">Image</label>
-		<ImageUrlInput
-			bind:this={imageInput}
-			id="hb-class-image-url"
-			bind:value={formImageUrl}
-			alt="Class image"
-		/>
+	<div class="flex gap-2">
+		<!-- Image -->
+		<div class="flex flex-col gap-1">
+			<label for="hb-class-image-url" class="text-xs font-medium text-muted-foreground">Image</label
+			>
+			<ImageUrlInput
+				bind:this={imageInput}
+				id="hb-class-image-url"
+				bind:value={formImageUrl}
+				bind:hasPendingFile={hasPendingImageFile}
+				alt="Class image"
+				class="w-26"
+			/>
+		</div>
+
+		<!-- Domains -->
+		<div class="flex grow flex-col gap-2">
+			<div class="flex flex-col gap-1">
+				<label for="hb-class-primary-domain" class="text-xs font-medium text-muted-foreground"
+					>Primary Domain</label
+				>
+				<Select.Root type="single" bind:value={formPrimaryDomainId}>
+					<Select.Trigger id="hb-class-primary-domain" class="w-full">
+						<p class="truncate">{formPrimaryDomainId}</p>
+					</Select.Trigger>
+					<Select.Content>
+						{#each domainOptions as domain}
+							<Select.Item value={domain}>{domain}</Select.Item>
+						{/each}
+					</Select.Content>
+				</Select.Root>
+			</div>
+			<div class="flex flex-col gap-1">
+				<label for="hb-class-secondary-domain" class="text-xs font-medium text-muted-foreground"
+					>Secondary Domain</label
+				>
+				<Select.Root type="single" bind:value={formSecondaryDomainId}>
+					<Select.Trigger id="hb-class-secondary-domain" class="w-full">
+						<p class="truncate">{formSecondaryDomainId}</p>
+					</Select.Trigger>
+					<Select.Content>
+						{#each domainOptions as domain}
+							<Select.Item value={domain}>{domain}</Select.Item>
+						{/each}
+					</Select.Content>
+				</Select.Root>
+			</div>
+		</div>
 	</div>
 
 	<!-- Starting Stats -->
@@ -829,40 +999,6 @@
 				bind:value={formStartingMaxHp}
 				placeholder="0"
 			/>
-		</div>
-	</div>
-
-	<!-- Domains -->
-	<div class="grid grid-cols-2 gap-3">
-		<div class="flex flex-col gap-1">
-			<label for="hb-class-primary-domain" class="text-xs font-medium text-muted-foreground"
-				>Primary Domain</label
-			>
-			<Select.Root type="single" bind:value={formPrimaryDomainId}>
-				<Select.Trigger id="hb-class-primary-domain" class="w-full">
-					<p class="truncate">{formPrimaryDomainId}</p>
-				</Select.Trigger>
-				<Select.Content>
-					{#each domainOptions as domain}
-						<Select.Item value={domain}>{domain}</Select.Item>
-					{/each}
-				</Select.Content>
-			</Select.Root>
-		</div>
-		<div class="flex flex-col gap-1">
-			<label for="hb-class-secondary-domain" class="text-xs font-medium text-muted-foreground"
-				>Secondary Domain</label
-			>
-			<Select.Root type="single" bind:value={formSecondaryDomainId}>
-				<Select.Trigger id="hb-class-secondary-domain" class="w-full">
-					<p class="truncate">{formSecondaryDomainId}</p>
-				</Select.Trigger>
-				<Select.Content>
-					{#each domainOptions as domain}
-						<Select.Item value={domain}>{domain}</Select.Item>
-					{/each}
-				</Select.Content>
-			</Select.Root>
 		</div>
 	</div>
 
@@ -956,25 +1092,43 @@
 	<!-- Subclasses -->
 	<div class="flex flex-col gap-2">
 		<p class="text-xs font-medium text-muted-foreground">Subclasses</p>
-		<div class="flex flex-wrap gap-2">
-			{#each availableSubclasses as subclass}
-				<label class="flex items-center gap-2 text-xs">
-					<input
-						type="checkbox"
-						checked={formSubclassIds.includes(subclass.id)}
-						onchange={() => toggleSubclass(subclass.id)}
-						class="accent-accent"
-					/>
-					{subclass.name} ({subclass.source === 'homebrew' ? 'Homebrew' : 'Compendium'})
-				</label>
-			{/each}
-		</div>
+
+		{#if availableSubclassesForClass.length > 0}
+			<Select.Root
+				type="multiple"
+				value={formSubclassIds}
+				onValueChange={(value) => {
+					formSubclassIds = value.filter((v) => !!v);
+				}}
+			>
+				<Select.Trigger class="w-full">
+					<p class="truncate">
+						{#if formSubclassIds.length === 0 || availableSubclassesForClass.length === 0}
+							None
+						{:else}
+							{formSubclassIds.length} selected
+						{/if}
+					</p>
+				</Select.Trigger>
+				<Select.Content>
+					{#each availableSubclassesForClass as subclass}
+						<Select.Item value={subclass.id}>
+							{subclass.name} ({subclass.source === 'homebrew' ? 'Homebrew' : 'Compendium'})
+						</Select.Item>
+					{/each}
+				</Select.Content>
+			</Select.Root>
+		{:else}
+			<p class="text-xs text-muted-foreground italic">
+				No subclasses have been created for this class yet.
+			</p>
+		{/if}
 	</div>
 
 	<!-- Suggested Traits -->
 	<div class="flex flex-col gap-2">
 		<p class="text-xs font-medium text-muted-foreground">Suggested Traits</p>
-		<div class="grid grid-cols-2 gap-3">
+		<div class="grid grid-cols-3 gap-3">
 			{#each traitOptions as trait}
 				<div class="flex flex-col gap-1">
 					<label for="class-suggested-trait-{trait}" class="text-xs text-muted-foreground"
@@ -1001,109 +1155,157 @@
 	<!-- Suggested Equipment -->
 	<div class="flex flex-col gap-2">
 		<p class="text-xs font-medium text-muted-foreground">Suggested Equipment</p>
-		<div class="grid grid-cols-3 gap-3">
-			<div class="flex flex-col gap-1">
-				<label for="class-primary-weapon" class="text-xs text-muted-foreground"
-					>Primary Weapon</label
-				>
-				<Select.Root
-					type="single"
-					value={formSuggestedPrimaryWeaponId || undefined}
-					onValueChange={(v) => (formSuggestedPrimaryWeaponId = v || null)}
-				>
-					<Select.Trigger id="class-primary-weapon" class="w-full">
-						<p class="truncate">
-							{formSuggestedPrimaryWeaponId
-								? availablePrimaryWeapons.find((w) => w.id === formSuggestedPrimaryWeaponId)
-										?.title || 'Unknown'
-								: 'None'}
-						</p>
-					</Select.Trigger>
-					<Select.Content>
-						<Select.Item value="">None</Select.Item>
-						{#each availablePrimaryWeapons as weapon}
-							<Select.Item value={weapon.id}>
-								{weapon.title} ({weapon.source === 'homebrew' ? 'Homebrew' : 'Compendium'})
-							</Select.Item>
-						{/each}
-					</Select.Content>
-				</Select.Root>
+		<div class="flex flex-col gap-3">
+			<!-- Primary Weapon -->
+			<div class="flex flex-col gap-2">
+				<div class="flex items-center justify-between">
+					<label for="class-primary-weapon" class="text-xs text-muted-foreground"
+						>Primary Weapon</label
+					>
+					{#if !formSuggestedPrimaryWeaponId}
+						<Button
+							type="button"
+							size="sm"
+							variant="outline"
+							onclick={() => (primaryWeaponSheetOpen = true)}
+						>
+							<Plus class="size-3.5" />
+							Select
+						</Button>
+					{/if}
+				</div>
+				{#if formSuggestedPrimaryWeaponId}
+					<div class="flex items-center gap-2">
+						<span class="flex-1 text-sm">{getItemName(formSuggestedPrimaryWeaponId)}</span>
+						<Button
+							type="button"
+							size="sm"
+							variant="ghost"
+							onclick={() => (formSuggestedPrimaryWeaponId = null)}
+						>
+							<X class="size-3.5" />
+						</Button>
+					</div>
+				{/if}
 			</div>
-			<div class="flex flex-col gap-1">
-				<label for="class-secondary-weapon" class="text-xs text-muted-foreground"
-					>Secondary Weapon</label
-				>
-				<Select.Root
-					type="single"
-					value={formSuggestedSecondaryWeaponId || undefined}
-					onValueChange={(v) => (formSuggestedSecondaryWeaponId = v || null)}
-				>
-					<Select.Trigger id="class-secondary-weapon" class="w-full">
-						<p class="truncate">
-							{formSuggestedSecondaryWeaponId
-								? availableSecondaryWeapons.find((w) => w.id === formSuggestedSecondaryWeaponId)
-										?.title || 'Unknown'
-								: 'None'}
-						</p>
-					</Select.Trigger>
-					<Select.Content>
-						<Select.Item value="">None</Select.Item>
-						{#each availableSecondaryWeapons as weapon}
-							<Select.Item value={weapon.id}>
-								{weapon.title} ({weapon.source === 'homebrew' ? 'Homebrew' : 'Compendium'})
-							</Select.Item>
-						{/each}
-					</Select.Content>
-				</Select.Root>
+
+			<!-- Secondary Weapon -->
+			<div class="flex flex-col gap-2">
+				<div class="flex items-center justify-between">
+					<label for="class-secondary-weapon" class="text-xs text-muted-foreground"
+						>Secondary Weapon</label
+					>
+					{#if !formSuggestedSecondaryWeaponId}
+						<Button
+							type="button"
+							size="sm"
+							variant="outline"
+							onclick={() => (secondaryWeaponSheetOpen = true)}
+						>
+							<Plus class="size-3.5" />
+							Select
+						</Button>
+					{/if}
+				</div>
+				{#if formSuggestedSecondaryWeaponId}
+					<div class="flex items-center gap-2">
+						<span class="flex-1 text-sm">{getItemName(formSuggestedSecondaryWeaponId)}</span>
+						<Button
+							type="button"
+							size="sm"
+							variant="ghost"
+							onclick={() => (formSuggestedSecondaryWeaponId = null)}
+						>
+							<X class="size-3.5" />
+						</Button>
+					</div>
+				{/if}
 			</div>
-			<div class="flex flex-col gap-1">
-				<label for="class-armor" class="text-xs text-muted-foreground">Armor</label>
-				<Select.Root
-					type="single"
-					value={formSuggestedArmorId || undefined}
-					onValueChange={(v) => (formSuggestedArmorId = v || null)}
-				>
-					<Select.Trigger id="class-armor" class="w-full">
-						<p class="truncate">
-							{formSuggestedArmorId
-								? availableArmor.find((a) => a.id === formSuggestedArmorId)?.title || 'Unknown'
-								: 'None'}
-						</p>
-					</Select.Trigger>
-					<Select.Content>
-						<Select.Item value="">None</Select.Item>
-						{#each availableArmor as item}
-							<Select.Item value={item.id}>
-								{item.title} ({item.source === 'homebrew' ? 'Homebrew' : 'Compendium'})
-							</Select.Item>
-						{/each}
-					</Select.Content>
-				</Select.Root>
+
+			<!-- Armor -->
+			<div class="flex flex-col gap-2">
+				<div class="flex items-center justify-between">
+					<label for="class-armor" class="text-xs text-muted-foreground">Armor</label>
+					{#if !formSuggestedArmorId}
+						<Button
+							type="button"
+							size="sm"
+							variant="outline"
+							onclick={() => (armorSheetOpen = true)}
+						>
+							<Plus class="size-3.5" />
+							Select
+						</Button>
+					{/if}
+				</div>
+				{#if formSuggestedArmorId}
+					<div class="flex items-center gap-2">
+						<span class="flex-1 text-sm">{getItemName(formSuggestedArmorId)}</span>
+						<Button
+							type="button"
+							size="sm"
+							variant="ghost"
+							onclick={() => (formSuggestedArmorId = null)}
+						>
+							<X class="size-3.5" />
+						</Button>
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>
+
+	<!-- Item Selector Sheets for Suggested Equipment -->
+	<ItemSelectorSheet
+		bind:open={primaryWeaponSheetOpen}
+		itemTypes={['weapon']}
+		title="Select Primary Weapon"
+		description="Select a primary weapon from the catalog"
+		onSelect={(item) => {
+			formSuggestedPrimaryWeaponId = item.id;
+			primaryWeaponSheetOpen = false;
+		}}
+	/>
+
+	<ItemSelectorSheet
+		bind:open={secondaryWeaponSheetOpen}
+		itemTypes={['weapon']}
+		title="Select Secondary Weapon"
+		description="Select a secondary weapon from the catalog"
+		onSelect={(item) => {
+			formSuggestedSecondaryWeaponId = item.id;
+			secondaryWeaponSheetOpen = false;
+		}}
+	/>
+
+	<ItemSelectorSheet
+		bind:open={armorSheetOpen}
+		itemTypes={['armor']}
+		title="Select Armor"
+		description="Select armor from the catalog"
+		onSelect={(item) => {
+			formSuggestedArmorId = item.id;
+			armorSheetOpen = false;
+		}}
+	/>
 
 	<!-- Starting Inventory -->
 	<div class="flex flex-col gap-2">
 		<p class="text-xs font-medium text-muted-foreground">Starting Inventory</p>
 		<div class="space-y-3 rounded-lg border bg-muted p-3">
-			<!-- Gold Coins -->
-			<div class="flex flex-col gap-1">
-				<label for="class-gold-coins" class="text-xs text-muted-foreground">Gold Coins</label>
-				<Input
-					id="class-gold-coins"
-					type="number"
-					bind:value={formGoldCoins}
-					placeholder="0"
-					min="0"
-				/>
-			</div>
+			<!-- Gold  -->
+			<Gold bind:gold_coins={formGoldCoins} canEdit />
 
 			<!-- Free Gear -->
 			<div class="flex flex-col gap-2">
 				<div class="flex items-center justify-between">
 					<p class="text-xs text-muted-foreground">Free Gear</p>
-					<Button type="button" size="sm" variant="outline" onclick={addFreeGear}>
+					<Button
+						type="button"
+						size="sm"
+						variant="outline"
+						onclick={() => (freeGearSheetOpen = true)}
+					>
 						<Plus class="size-3.5" />
 						Add
 					</Button>
@@ -1124,11 +1326,28 @@
 				</div>
 			</div>
 
+			<ItemSelectorSheet
+				bind:open={freeGearSheetOpen}
+				itemTypes={['weapon', 'armor', 'consumable', 'loot', 'gear']}
+				allowCustom={true}
+				title="Add Free Gear"
+				description="Select an item from the catalog or enter a custom item name"
+				onSelect={(item) => {
+					formFreeGear = [...formFreeGear, { title: item.title }];
+					freeGearSheetOpen = false;
+				}}
+			/>
+
 			<!-- Loot or Consumable Options -->
 			<div class="flex flex-col gap-2">
 				<div class="flex items-center justify-between">
 					<p class="text-xs text-muted-foreground">Loot or Consumable Options</p>
-					<Button type="button" size="sm" variant="outline" onclick={addLootOrConsumableOption}>
+					<Button
+						type="button"
+						size="sm"
+						variant="outline"
+						onclick={() => (lootOrConsumableSheetOpen = true)}
+					>
 						<Plus class="size-3.5" />
 						Add
 					</Button>
@@ -1136,11 +1355,7 @@
 				<div class="flex flex-col gap-2">
 					{#each formLootOrConsumableOptions as option, index (index)}
 						<div class="flex items-center gap-2">
-							<Input
-								bind:value={formLootOrConsumableOptions[index]}
-								placeholder="Item ID"
-								class="flex-1"
-							/>
+							<span class="flex-1 text-sm">{getItemName(option)}</span>
 							<Button
 								type="button"
 								size="sm"
@@ -1154,11 +1369,27 @@
 				</div>
 			</div>
 
+			<ItemSelectorSheet
+				bind:open={lootOrConsumableSheetOpen}
+				itemTypes={['loot', 'consumable']}
+				title="Add Loot or Consumable"
+				description="Select a loot item or consumable from the catalog"
+				onSelect={(item) => {
+					formLootOrConsumableOptions = [...formLootOrConsumableOptions, item.id];
+					lootOrConsumableSheetOpen = false;
+				}}
+			/>
+
 			<!-- Class Gear Options -->
 			<div class="flex flex-col gap-2">
 				<div class="flex items-center justify-between">
 					<p class="text-xs text-muted-foreground">Class Gear Options</p>
-					<Button type="button" size="sm" variant="outline" onclick={addClassGear}>
+					<Button
+						type="button"
+						size="sm"
+						variant="outline"
+						onclick={() => (classGearSheetOpen = true)}
+					>
 						<Plus class="size-3.5" />
 						Add
 					</Button>
@@ -1183,6 +1414,18 @@
 					{/each}
 				</div>
 			</div>
+
+			<ItemSelectorSheet
+				bind:open={classGearSheetOpen}
+				itemTypes={['weapon', 'armor', 'consumable', 'loot', 'gear']}
+				allowCustom={true}
+				title="Add Class Gear"
+				description="Select an item from the catalog or enter a custom item name"
+				onSelect={(item) => {
+					formClassGearOptions = [...formClassGearOptions, { title: item.title }];
+					classGearSheetOpen = false;
+				}}
+			/>
 
 			<!-- Spellbook Prompt -->
 			<div class="flex flex-col gap-1">
@@ -1300,10 +1543,7 @@
 				type="submit"
 				size="sm"
 				disabled={!formHasChanges || homebrew.saving}
-				class={cn(
-					'h-7',
-					hasValidationErrors && 'border border-destructive hover:bg-primary'
-				)}
+				class={cn('h-7', hasValidationErrors && 'border border-destructive hover:bg-primary')}
 			>
 				{#if homebrew.saving}
 					<Loader2 class="size-3.5 animate-spin" />

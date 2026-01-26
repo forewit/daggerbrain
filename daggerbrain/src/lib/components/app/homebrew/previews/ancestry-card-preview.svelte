@@ -6,5 +6,5 @@
 </script>
 
 <div class="flex max-w-[300px] min-w-[300px]">
-	<AncestryCardComponent {card} variant="responsive" />
+	<AncestryCardComponent {card} variant="card" bind_choice_select preview />
 </div>
