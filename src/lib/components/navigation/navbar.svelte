@@ -265,7 +265,7 @@
 								size="icon"
 								class="gap-2 text-sm hover:bg-card hover:text-foreground"
 								target="_blank"
-								href="https://bsky.app/profile/daggerbrain.bsky.social"
+								href="https://bsky.app/"
 							>
 								<svg
 									class="size-5"
@@ -283,7 +283,7 @@
 								size="icon"
 								class="gap-2 text-sm hover:bg-card hover:text-foreground"
 								target="_blank"
-								href="https://x.com/daggerbrain"
+								href="https://x.com/"
 							>
 								<svg
 									class="size-4"
@@ -302,7 +302,7 @@
 								size="icon"
 								class="gap-2 text-sm hover:bg-card hover:text-foreground"
 								target="_blank"
-								href="https://instagram.com/daggerbrain_official"
+								href="https://instagram.com/"
 							>
 								<svg class="size-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"
 									><path
@@ -318,7 +318,7 @@
 								size="icon"
 								class="gap-2 text-sm hover:bg-card hover:text-foreground"
 								target="_blank"
-								href="https://www.youtube.com/@daggerbrain"
+								href="https://www.youtube.com/"
 							>
 								<svg class="size-5" version="1.1" id="svg2" viewBox="0 0 528.70935 370.36798"
 									><g transform="matrix(1.3333333,0,0,-1.3333333,-137.10346,529.09599)"
@@ -561,7 +561,7 @@
 						size="icon"
 						class="gap-2 text-sm hover:bg-card hover:text-foreground"
 						target="_blank"
-						href="https://bsky.app/profile/daggerbrain.bsky.social"
+						href="https://bsky.app"
 					>
 						<svg class="size-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 568 501"
 							><title>Bluesky butterfly logo</title><path
@@ -575,7 +575,7 @@
 						size="icon"
 						class="gap-2 text-sm hover:bg-card hover:text-foreground"
 						target="_blank"
-						href="https://x.com/daggerbrain"
+						href="https://x.com/"
 					>
 						<svg
 							class="size-4"
@@ -594,7 +594,7 @@
 						size="icon"
 						class="gap-2 text-sm hover:bg-card hover:text-foreground"
 						target="_blank"
-						href="https://instagram.com/daggerbrain_official"
+						href="https://instagram.com/"
 					>
 						<svg class="size-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"
 							><path
@@ -610,7 +610,7 @@
 						size="icon"
 						class="gap-2 text-sm hover:bg-card hover:text-foreground"
 						target="_blank"
-						href="https://www.youtube.com/@daggerbrain"
+						href="https://www.youtube.com/"
 					>
 						<svg class="size-5" version="1.1" id="svg2" viewBox="0 0 528.70935 370.36798"
 							><g transform="matrix(1.3333333,0,0,-1.3333333,-137.10346,529.09599)"
