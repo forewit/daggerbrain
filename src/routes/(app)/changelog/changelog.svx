@@ -1,0 +1,18 @@
+---
+title: Changelog
+description: Track product updates, shipped improvements, and notable changes across Daggerbrain.
+date: 1781536020000
+published: true
+updated: 1781536020000
+author:
+  name: Author
+  role: Creator of Daggerbrain
+  avatar: /images/me.webp
+---
+
+## June 15, 2026
+- Example feature 1
+- Example feature 2
+> **Bug Fixes**
+> - Example Bug 1
+> - Example Bug 2

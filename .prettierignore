@@ -1,0 +1,21 @@
+# Package managers
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+bun.lock
+bun.lockb
+
+# Root dot-directories
+/.git/
+/.svelte-kit/
+/.vscode/
+/.wrangler/
+
+# Generated code
+src/convex/_generated/
+
+# Non-app content
+docs/
+
+# Readme files
+/README.md

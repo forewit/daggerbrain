@@ -1,0 +1,261 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+@custom-variant hover (&:hover);
+
+@font-face {
+	font-family: 'Inter';
+	src: url('/fonts/inter/InterVariable.woff2') format('woff2');
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Inter';
+	src: url('/fonts/inter/InterVariable-Italic.woff2') format('woff2');
+	font-weight: 100 900;
+	font-style: italic;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Eveleth Clean';
+	src: url('/fonts/eveleth/EvelethCleanRegular.woff') format('woff');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+:root {
+	/** Theme variables  */
+	/* primary colors */
+	--primary: #6542b5; /* 500 */
+	--primary-muted: #33215c; /* 900 */
+	--primary-foreground: #ffffff;
+
+	/* background colors */
+	--background: #19161e; /* 1300*/
+	--foreground: #ffffff;
+	--card: #2e2b36; /* 900 */
+	--card-foreground: #ffffff;
+	--muted: #3d3c40; /* 500 */
+	--muted-foreground: #b5b5b6; /* 100 */
+	--secondary: #3d3c40; /* 500 */
+	--secondary-foreground: #ffffff;
+
+	/* Accent colors */
+	--accent: #fde07d;
+	--accent-muted: #483c35;
+	--accent-foreground: #ffffff;
+
+	/* destructive colors */
+	--destructive: #b83f3f;
+	--destructive-foreground: #ffffff;
+
+	/** not included in the themes */
+	--hope: #fde07d;
+	--hope-muted: #483c35;
+	--fear: #6b46c1;
+	--fear-muted: #2a2045;
+	--dice-foreground: #4a5466;
+	--dice-background: #949ba5;
+
+	--radius: 0.375rem;
+	--ring: rgb(from var(--primary) r g b / 0.302);
+	--input: rgb(from var(--primary) r g b / 0.102);
+	--border: var(--primary-muted);
+	--popover: var(--card);
+	--popover-foreground: var(--card-foreground);
+}
+
+.dark {
+	/** Theme variables  */
+	/* primary colors */
+	--primary: #6542b5; /* 500 */
+	--primary-muted: #33215c; /* 900 */
+	--primary-foreground: #ffffff;
+
+	/* background colors */
+	--background: #19161e; /* 1300*/
+	--foreground: #ffffff;
+	--card: #2e2b36; /* 900 */
+	--card-foreground: #ffffff;
+	--muted: #3d3c40; /* 500 */
+	--muted-foreground: #b5b5b6; /* 100 */
+	--secondary: #3d3c40; /* 500 */
+	--secondary-foreground: #ffffff;
+
+	/* Accent colors */
+	--accent: #fde07d;
+	--accent-muted: #483c35;
+	--accent-foreground: #ffffff;
+
+	/* destructive colors */
+	--destructive: #b83f3f;
+	--destructive-foreground: #ffffff;
+
+	/** not included in the themes */
+	--hope: #fde07d;
+	--hope-muted: #483c35;
+	--fear: #6b46c1;
+	--fear-muted: #2a2045;
+	--dice-foreground: #4a5466;
+	--dice-background: #949ba5;
+
+	--radius: 0.375rem;
+	--ring: rgb(from var(--primary) r g b / 0.302);
+	--input: rgb(from var(--primary) r g b / 0.102);
+	--border: var(--primary-muted);
+	--popover: var(--card);
+	--popover-foreground: var(--card-foreground);
+}
+
+@theme inline {
+	--font-eveleth: 'Eveleth Clean';
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-muted: var(--primary-muted);
+	--color-primary-muted-light: var(--primary-muted-light);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-muted: var(--accent-muted);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--color-hope: var(--hope);
+	--color-hope-muted: var(--hope-muted);
+	--color-fear: var(--fear);
+	--color-fear-muted: var(--fear-muted);
+	--color-dice-foreground: var(--dice-foreground);
+	--color-dice-background: var(--dice-background);
+}
+
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+		font-family: 'Inter', sans-serif;
+	}
+	body {
+		@apply bg-background text-foreground;
+	}
+}
+
+/* Customizations below */
+@layer base {
+	html,
+	body {
+		min-height: -webkit-fill-available;
+		min-width: -webkit-fill-available;
+		background: var(--background);
+	}
+	body {
+		overflow-y: scroll;
+	}
+	button:not(:disabled),
+	[role='button']:not(:disabled) {
+		cursor: pointer;
+	}
+	ul {
+		list-style-type: disc;
+		list-style-position: inside;
+		margin-left: 0.5rem;
+	}
+
+	ol {
+		list-style-type: decimal;
+		margin-left: 1rem;
+	}
+}
+
+@layer utilities {
+	.card-shadow {
+		box-shadow:
+			0 1px 3px rgba(0, 0, 0, 0.3),
+			0 1px 2px rgba(0, 0, 0, 0.24),
+			inset 0 1px 0 rgba(255, 255, 255, 0.05);
+	}
+
+	.card-shadow-lg {
+		box-shadow:
+			0 4px 6px rgba(0, 0, 0, 0.4),
+			0 2px 4px rgba(0, 0, 0, 0.3),
+			inset 0 1px 0 rgba(255, 255, 255, 0.05);
+	}
+
+	.inset-shadow {
+		box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+	}
+}
+
+/* clerk custom theme */
+:root {
+	--clerk-color-background: #212126;
+	--clerk-color-neutral: white;
+	--clerk-color-primary: #ffffff;
+	--clerk-color-primary-foreground: black;
+	--clerk-color-foreground: white;
+	--clerk-color-input-foreground: white;
+	--clerk-color-input: #26262b;
+	--clerk-spacing: 0.875rem;
+	--clerk-border-radius: 0.1rem;
+}
+
+.dark {
+	--clerk-color-background: #24202f;
+	--clerk-color-neutral: white;
+	--clerk-color-primary: #ffffff;
+	--clerk-color-primary-foreground: black;
+	--clerk-color-foreground: white;
+	--clerk-color-input-foreground: white;
+	--clerk-color-input: #26262b;
+	--clerk-spacing: 0.875rem;
+	--clerk-border-radius: 0.1rem;
+}
+
+.cl-checkout-root * {
+	z-index: 50;
+}
+
+.cl-drawerBackdrop {
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.cl-userButtonPopoverCard {
+	/* margin-left: 108px; */
+	margin-left: 6px;
+	margin-top: 2px;
+	z-index: 44;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+	border-top-right-radius: 0;
+
+	--clerk-color-background: var(--primary-muted);
+}
+
+.cl-modalBackdrop {
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.cl-userButtonTrigger {
+	padding: 4px;
+	padding-left: 8px;
+	border-radius: 100vw;
+	box-shadow: none !important;
+}

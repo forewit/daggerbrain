@@ -1,0 +1,22 @@
+---
+title: Example Article
+description: Example article description
+date: 1781536020000
+published: true
+coverImage: /images/art/mountains.webp
+author:
+  name: Author Name
+  role: Creator of Daggerbrain
+  avatar: /images/me.webp
+---
+
+## headings
+
+paragraph with **bold**, *italic*, and [links](https://www.example.com)
+
+> and add quote styling
+
+### sub headings
+
+You can also display images:
+![image alt text](/images/art/mountains.webp)

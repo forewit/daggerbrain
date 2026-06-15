@@ -1,0 +1,17 @@
+{
+  "guidelinesHash": "62d72acb9afcc18f658d88dd772f34b5b1da5fa60ef0402e57a784d97c458e57",
+  "agentsMdSectionHash": "04bd28a078ba0013e4a05d06bf0f18c7b3ce0325f5b5239f31b9dab1b8f36c7e",
+  "claudeMdHash": "04bd28a078ba0013e4a05d06bf0f18c7b3ce0325f5b5239f31b9dab1b8f36c7e",
+  "agentSkillsSha": "b86618b5c3c4789c9fed98e84bbc34b3e8e70f20",
+  "installedSkillNames": [
+    "convex",
+    "convex-create-component",
+    "convex-migration-helper",
+    "convex-performance-audit",
+    "convex-quickstart",
+    "convex-setup-auth",
+    "sentry-cloudflare-sdk",
+    "sentry-fix-issues",
+    "sentry-svelte-sdk"
+  ]
+}
