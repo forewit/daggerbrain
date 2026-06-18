@@ -148,6 +148,16 @@
 									</div>
 									{userName}
 								</Button>
+								{#if isFreeUser}
+									<Button
+										class="w-min font-bold tracking-wide"
+										href="/subscribe"
+										onclick={closeMobileMenu}
+										data-desktop-nav-sheet-safe
+									>
+										Subscribe
+									</Button>
+								{/if}
 							</div>
 						{:else}
 							<div class="flex gap-2">
@@ -367,6 +377,16 @@
 				{#if isLoggedIn}
 					<div in:fade class="flex h-full items-center gap-3">
 						<NavUserButton />
+						{#if isFreeUser}
+							<Button
+								size="sm"
+								class="w-min font-bold tracking-wide"
+								href="/subscribe"
+								data-desktop-nav-sheet-safe
+							>
+								Subscribe
+							</Button>
+						{/if}
 					</div>
 				{:else}
 					<div class="flex gap-2">

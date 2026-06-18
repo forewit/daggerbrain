@@ -25,7 +25,7 @@ npm install
 ```
 
 ## Environment
-There is an `env.example` file in the repo that you can use as a template to set up your own `.env.local` environment file.
+There is a `.env.example` file in the repo that you can use as a template to set up your own `.env.local` environment file.
 
 ## Clerk Setup
 
@@ -34,6 +34,19 @@ API/issuer URL into `.env.local`.
 
 Convex auth expects Clerk tokens from a JWT template named `convex`. In Clerk,
 create that JWT template and make sure its audience matches `convex`.
+
+For subscriptions, enable Clerk Billing for user subscriptions and connect it to
+Stripe. Clerk automatically creates a default free plan when Billing is enabled;
+set that free plan's slug to `free_user`. Create a paid plan with the slug
+`adventurer`, then attach these features to that paid plan:
+
+- `unlimited_characters`
+- `unlimited_homebrew`
+
+The `/subscribe` page renders Clerk's `PricingTable`, and successful checkout
+returns to `/subscribe/success`. To keep Convex entitlements in sync, add a Clerk
+webhook pointed at your Convex site URL plus `/clerk/webhooks`, then copy the
+webhook signing secret into `CLERK_WEBHOOK_SIGNING_SECRET`.
 
 ## Convex Setup
 

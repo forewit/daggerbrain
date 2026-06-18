@@ -411,7 +411,8 @@
 
 					{#if !canCreateCharacter}
 						<p class="text-xs text-muted-foreground">
-							You have reached the {CHARACTER_LIMIT} character limit. Delete one to create another character.
+							Free accounts can keep up to {CHARACTER_LIMIT} characters. Delete one or subscribe to
+							create another.
 						</p>
 					{/if}
 				</div>
@@ -522,7 +523,8 @@
 				<Dialog.Title>Character Limit Reached</Dialog.Title>
 				<Dialog.Description>
 					<p class="mb-2">
-						You have reached the {CHARACTER_LIMIT} character limit. Delete one to claim this character.
+						Free accounts can keep up to {CHARACTER_LIMIT} characters. Delete one or subscribe to
+						claim another.
 					</p>
 
 					<Button variant="link" href="/characters" class="pl-0 text-accent">

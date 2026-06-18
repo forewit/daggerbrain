@@ -79,6 +79,17 @@ export const PUBLIC_PAGE_DEFINITIONS = {
 		changefreq: 'weekly',
 		priority: '0.8'
 	},
+	subscribe: {
+		routeId: '/(app)/subscribe',
+		pathname: '/subscribe',
+		title: 'Pricing | Daggerbrain',
+		description:
+			'Compare Daggerbrain plans and unlock unlimited characters, homebrew, and campaign prep tools.',
+		summary:
+			'Public pricing page for Daggerbrain with plan details, upgrade context, and feature summaries.',
+		changefreq: 'monthly',
+		priority: '0.7'
+	},
 	roadmap: {
 		routeId: '/(app)/roadmap',
 		pathname: '/roadmap',
@@ -166,6 +177,7 @@ export const PUBLIC_ROUTE_DEFINITIONS = {
 	[PUBLIC_PAGE_DEFINITIONS.campaigns.routeId]: PUBLIC_PAGE_DEFINITIONS.campaigns,
 	[PUBLIC_PAGE_DEFINITIONS.encounters.routeId]: PUBLIC_PAGE_DEFINITIONS.encounters,
 	[PUBLIC_PAGE_DEFINITIONS.homebrew.routeId]: PUBLIC_PAGE_DEFINITIONS.homebrew,
+	[PUBLIC_PAGE_DEFINITIONS.subscribe.routeId]: PUBLIC_PAGE_DEFINITIONS.subscribe,
 	[PUBLIC_PAGE_DEFINITIONS.roadmap.routeId]: PUBLIC_PAGE_DEFINITIONS.roadmap,
 	[PUBLIC_PAGE_DEFINITIONS.posts.routeId]: PUBLIC_PAGE_DEFINITIONS.posts,
 	[PUBLIC_PAGE_DEFINITIONS.changelog.routeId]: PUBLIC_PAGE_DEFINITIONS.changelog,
@@ -210,6 +222,11 @@ export const PRIVATE_ROUTE_DEFINITIONS = {
 	'/(app)/campaigns/join/[uid]': {
 		title: 'Campaign Invite | Daggerbrain',
 		description: 'Join a private Daggerbrain campaign from an invite link.',
+		robots: PRIVATE_ROBOTS
+	},
+	'/(app)/subscribe/success': {
+		title: 'Subscription Success | Daggerbrain',
+		description: 'Your Daggerbrain subscription is active and ready to use.',
 		robots: PRIVATE_ROBOTS
 	}
 } as const satisfies Record<string, PrivateRouteDefinition>;
@@ -410,6 +427,8 @@ export function buildRouteJsonLd(rawOrigin: string, routeId: string | null, seo:
 				url: seo.canonical,
 				description: seo.description
 			};
+		case PUBLIC_PAGE_DEFINITIONS.subscribe.routeId:
+			return buildFaqJsonLd(FAQ_ITEMS);
 		case PUBLIC_PAGE_DEFINITIONS.faq.routeId:
 			return buildFaqJsonLd(FAQ_ITEMS);
 		default:

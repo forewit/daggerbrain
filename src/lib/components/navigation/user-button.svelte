@@ -43,7 +43,7 @@
 		sideOffset={-6}
 		collisionPadding={4}
 		align="center"
-		class="rounded-t-0 z-45 w-56 bg-primary-muted p-2 pt-4 shadow-lg"
+		class="rounded-t-0 z-40 w-56 bg-primary-muted p-2 pt-4 shadow-lg"
 	>
 		<div class="flex flex-col gap-1">
 			<Button variant="ghost" class="w-full justify-start gap-2" onclick={handleManageAccount}>

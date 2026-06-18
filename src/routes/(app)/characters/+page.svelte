@@ -131,6 +131,17 @@
 				{:else if loadError}
 					<LoadError />
 				{:else if characters.length === 0}
+					{#if !hasUnlimitedCharacters && !canCreateCharacter}
+						<div class="flex flex-col items-start gap-1">
+							<p class="text-sm text-muted-foreground">
+								Want unlimited characters? Become an
+								<a href="/subscribe" class="font-bold hover:underline">
+									Adventurer <ExternalLink class="-mt-[2px] inline size-3.5 stroke-3" />
+								</a>
+							</p>
+						</div>
+					{/if}
+
 					<div in:fade class="mx-auto my-20">
 						<Button onclick={handleCreateCharacter}>
 							<UserRoundPen />
@@ -138,6 +149,17 @@
 						</Button>
 					</div>
 				{:else}
+					{#if !hasUnlimitedCharacters && !canCreateCharacter}
+						<div class="flex flex-col items-start gap-1">
+							<p class="text-sm text-muted-foreground">
+								Want unlimited characters? Become an
+								<a href="/subscribe" class="font-bold hover:underline">
+									Adventurer <ExternalLink class="-mt-[2px] inline size-3.5 stroke-3" />
+								</a>
+							</p>
+						</div>
+					{/if}
+
 					<div in:fade class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 						{#each characters as { id, character }}
 							{#if id !== redirecting_to_character}

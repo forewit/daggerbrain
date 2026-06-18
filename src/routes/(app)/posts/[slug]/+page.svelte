@@ -2,6 +2,7 @@
 	import { onMount, tick } from 'svelte';
 	import type { PageProps } from './$types';
 	import ArticleContent from '$lib/articles/article-content.svelte';
+	import ArticleFooter from '$lib/articles/article-footer.svelte';
 	import ArticleHeader from '$lib/articles/article-header.svelte';
 	import ArticleToc from '$lib/articles/article-toc.svelte';
 	import Footer from '$lib/components/navigation/footer.svelte';
@@ -227,7 +228,7 @@
 				updated={data.post.updated}
 			/>
 			<ArticleContent Content={data.Content} bind:articleElement />
-			<div class="h-16"></div>
+			<ArticleFooter class="mt-16 mb-16" />
 		</div>
 	</main>
 </div>

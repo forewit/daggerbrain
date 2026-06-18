@@ -127,6 +127,11 @@
 						/>
 					</svg>
 				</a>
+
+				<p class="text-xs text-muted-foreground italic">
+					Or <a href="/subscribe" class="underline hover:text-accent">Subscribe</a> to unlock unlimited
+					characters & homebrew
+				</p>
 			</div>
 
 			<!-- Contact Us Section -->

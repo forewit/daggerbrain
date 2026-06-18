@@ -3,15 +3,14 @@
 	import { artCharacters } from '$lib/assets/images';
 	import { cn } from '$lib/utils';
 	import Loader from '$lib/components/utility/loader.svelte';
-	import { getUserContext } from '$lib/state/user.svelte';
 	import Footer from '$lib/components/navigation/footer.svelte';
 	import { Show, useClerkContext, UserProfile } from 'svelte-clerk';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
+	import { Button } from '$lib/components/ui/button';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 	import LogOut from '@lucide/svelte/icons/log-out';
 	import { goto } from '$app/navigation';
 	import { fade } from 'svelte/transition';
-	import { ADVENTURER_PLAN_SLUG, FREE_PLAN_SLUG } from '@convex/constants/entitlements';
+	import { ADVENTURER_PLAN_SLUG } from '@convex/constants/entitlements';
 
 	const clerkCtx = useClerkContext();
 </script>
@@ -38,6 +37,31 @@
 			class="@container pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]"
 		>
 			<div class="mx-auto flex w-min max-w-6xl flex-col justify-center gap-4 px-2 py-4">
+				<div
+					class="flex items-center justify-between gap-2 rounded-md border border-emerald-900/50 bg-emerald-900/30 p-4"
+				>
+					<Show when={{ plan: ADVENTURER_PLAN_SLUG }}>
+						<p class="text-sm text-emerald-50">
+							You are an
+							<span
+								class="font-eveleth text-accent [filter:drop-shadow(0_0_8px_rgba(253,212,113,0.2))_drop-shadow(0_0_16px_rgba(253,212,113,0.2))]"
+								>Adventurer</span
+							>
+						</p>
+						<Button href="/profile#/billing" variant="link" size="sm" class="h-6 w-min">
+							Manage Subscription
+						</Button>
+						{#snippet fallback()}
+							<p class="text-sm text-emerald-50">
+								Want unlimited characters and homebrew? Become an
+								<a href="/subscribe" class="font-bold hover:underline">
+									Adventurer <ExternalLink class="-mt-[2px] inline size-3.5 stroke-3" />
+								</a>
+							</p>
+						{/snippet}
+					</Show>
+				</div>
+
 				<div class="flex flex-col gap-4 @6xl:flex-row">
 					<div class="relative h-[704px] max-w-[880px] grow">
 						<div class="absolute inset-0"></div>

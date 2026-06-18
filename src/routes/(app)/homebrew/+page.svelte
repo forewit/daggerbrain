@@ -762,7 +762,16 @@
 			</div>
 
 			{#if !isLoading && !hasUnlimitedHomebrew}
-				<div class="flex flex-col items-start gap-1"></div>
+				<div class="flex flex-col items-start gap-1">
+					{#if !canCreateHomebrew}
+						<p class="text-sm text-muted-foreground">
+							Want unlimited homebrew? Become an
+							<a href="/subscribe" class="font-bold hover:underline">
+								Adventurer <ExternalLink class="-mt-[2px] inline size-3.5 stroke-3" />
+							</a>
+						</p>
+					{/if}
+				</div>
 			{/if}
 
 			{#if isLoading}

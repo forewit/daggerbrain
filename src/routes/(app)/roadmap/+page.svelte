@@ -38,15 +38,6 @@
 					</Button>
 				</div>
 
-				<div class="mb-6 w-full rounded-lg border border-accent/20 bg-accent/10 p-4">
-					<p class="text-accent">
-						Daggerbrain.com will be shutting down August 31st, 2026. <a
-							href="/posts/example"
-							class="text-accent underline">Read more about it here</a
-						>
-					</p>
-				</div>
-
 				<div class="relative border-l border-dashed border-muted-foreground/40 pl-8">
 					<!-- Past -->
 					<div class="relative pb-8">
